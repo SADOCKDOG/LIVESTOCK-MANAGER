@@ -204,13 +204,20 @@ const ProduccionView = {
       registrarHandler: "App._abrirAsistenteProduccion('leche')",
       records: d.lecheEvents.slice(0, 30).map(e => {
         const isInd = e.tipo_entidad === 'animal';
-        const label = isInd ? '👤 INDIVIDUAL' : '🐄 LOTE';
+        const isLote = e.tipo_entidad === 'rebano';
+        const isTanque = e.tipo_entidad === 'finca' || e.motivo_tarea === 'expedicion';
+
+        let label = '🥛 CONTROL';
+        if (isInd) label = '👤 INDIVIDUAL';
+        if (isLote) label = '🐄 LOTE';
+        if (isTanque) label = '🚛 TANQUE';
+
         return {
           title: `${label}: ${e.snap_identificacion || 'S/N'}`,
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
           value: (e.valor_neto || 0) + ' L',
-          typeColor: isInd ? '#3b82f6' : '#8b5cf6',
+          typeColor: isInd ? '#3b82f6' : (isLote ? '#8b5cf6' : '#10b981'),
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
       }),
