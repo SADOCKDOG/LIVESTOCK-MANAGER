@@ -157,10 +157,15 @@
         { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321098', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Farmacia'] },
         { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210987', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Maquinaria'] }
       ];
+      var provs = [];
       for (var pv = 0; pv < provDefs.length; pv++) {
-        try { await Proveedores.save(provDefs[pv]); } catch (e) { console.log('[SEED] Error proveedor:', e.message); }
+        try {
+          var pvid = await Proveedores.save(provDefs[pv]);
+          provs.push(Object.assign({ id: pvid }, provDefs[pv]));
+        } catch (e) { console.log('[SEED] Error proveedor:', e.message); }
         await sleep(100);
       }
+      var provPienso = provs[0], provVet = provs[1], provMaq = provs[2];
 
       // 7. Transportistas
       var transDefs = [
@@ -246,19 +251,34 @@
         }
       }
 
-      // 13. Producción de leche por vaca (cifrada)
+      // 13. Producción de leche por vaca (cifrada + registro_eventos)
       var prodLecheVacas = [vaca1, vaca2, vaca3];
       var lecheFechas = ['2025-03-01', '2025-03-15', '2025-04-01', '2025-04-15', '2025-05-01'];
       for (var plv = 0; plv < prodLecheVacas.length; plv++) {
         if (!prodLecheVacas[plv]) continue;
         for (var lf = 0; lf < lecheFechas.length; lf++) {
           try {
+            var litros = 22 + Math.round(Math.random() * 8);
+            // 1. Guardar en tabla cifrada
             await Produccion.saveLeche({
               vacaId: prodLecheVacas[plv].id,
               fecha: lecheFechas[lf],
-              cantidad_litros: 22 + Math.round(Math.random() * 8),
+              cantidad_litros: litros,
               analisis_grasa_proteina: { grasa: 3.7, proteina: 3.3 }
             }, fincaId);
+
+            // 2. Registrar en Libro Maestro (registro_eventos) para que aparezca en la lista de Registros
+            await Pesajes.registrar({
+              entidad_id: prodLecheVacas[plv].id,
+              tipo_entidad: 'animal',
+              valor_neto: litros,
+              fecha: lecheFechas[lf],
+              unidad: 'L',
+              motivo_tarea: 'control_lechero',
+              snap_zona: 'Parcela Norte 42ha', // Snapshot manual para demo
+              snap_tipo: 'Madres',
+              snap_especie: 'Vacas'
+            });
           } catch (e) { console.log('[SEED] Error prod leche:', e.message); }
           await sleep(60);
         }

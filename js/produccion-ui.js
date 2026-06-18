@@ -136,7 +136,7 @@ const ProduccionUI = {
           if (data.tipo_objetivo === 'individual') {
             const animales = await window.Animales.list();
             if (data.operacion === 'leche') {
-              items = animales.filter(a => a.sexo === 'H' && ['Vacas', 'Ovejas', 'Cabras'].includes(a.especie));
+              items = animales.filter(a => (a.sexo === 'H' || (a.sexo || '').toUpperCase().startsWith('H')) && ['Vacas', 'Ovejas', 'Cabras'].includes(a.especie));
             } else {
               items = animales;
             }
