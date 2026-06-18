@@ -46,10 +46,8 @@ const ProduccionView = {
       e.motivo_tarea === 'expedicion'
     );
     const lecheEvents = eventos.filter(e =>
-      e.unidad === 'L' ||
-      e.unidad === 'Litros' ||
-      e.motivo_tarea === 'produccion_leche' ||
-      e.motivo_tarea === 'control_lechero'
+      (e.unidad === 'L' || e.unidad === 'Litros') &&
+      (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero' || e.motivo_tarea === 'expedicion')
     );
     const ventaEvents = eventos.filter(e => e.motivo_tarea === 'expedicion' || e.rol_contable === 'VENTA');
 

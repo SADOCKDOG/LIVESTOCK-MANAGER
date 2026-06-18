@@ -285,43 +285,30 @@ const PesajesUI = {
                 }
 
                 try {
-                    // Validar Asignación si es necesaria (solo para carne)
-                    let finalRebanoId = rebanoId;
-                    if (necesitaAsignacion) {
-                        const selR = overlay.querySelector('#w-assign-rebano').value;
-                        if (!selR) {
-                            window.App.toastError("Debes asociar el animal a un rebaño para activar la trazabilidad");
-                            return;
-                        }
-                        finalRebanoId = parseInt(selR);
-                        const animalSave = await Animales.get(entidades[currentAnimalIndex].id);
-                        animalSave.rebanoId = finalRebanoId;
-                        await Animales.save(animalSave);
-                        necesitaAsignacion = false;
-                    }
-
                     const a = entidades[currentAnimalIndex];
+                    if (!a) throw new Error("No se ha seleccionado ningún animal/entidad");
+
                     const fecha = overlay.querySelector('#w-fecha')?.value || new Date().toISOString().split('T')[0];
+                    const activeFincaId = await Fincas.getActiveId();
 
                     if (esModoLeche) {
-                        // MODO LECHE: guardar en produccion_leche y registro_eventos
                         const grasa = parseFloat(overlay.querySelector('#w-leche-grasa')?.value) || null;
                         const proteina = parseFloat(overlay.querySelector('#w-leche-proteina')?.value) || null;
 
-                        // Guardar en el store cifrado de leche
+                        // 1. Guardar en store cifrado
                         await Produccion.saveLeche({
                             vacaId: a.id,
                             fecha: fecha,
                             cantidad_litros: val,
                             analisis_grasa_proteina: { grasa, proteina },
                             creadoEn: new Date().toISOString(),
-                        }, await Fincas.getActiveId());
+                        }, activeFincaId);
 
-                        // También registrar en el libro maestro
+                        // 2. Registrar en Libro Maestro (registro_eventos)
                         await Pesajes.registrar({
                             entidad_id: a.id,
                             tipo_entidad: 'animal',
-                            motivo_tarea: 'produccion_leche',
+                            motivo_tarea: 'control_lechero',
                             fecha: fecha,
                             valor_neto: val,
                             unidad: 'L',
@@ -330,10 +317,10 @@ const PesajesUI = {
                             snap_identificacion: a.numero_identificacion
                         });
 
-                        a.pesoActual = val + 'L';
-                        window.App.toast(`✅ ${a.numero_identificacion} ➟ ${val} L`);
+                        a.pesoActual = val + ' L';
+                        window.App.toast(`✅ Registrado: ${val} L`);
                     } else {
-                        // MODO CARNE: guardar pesaje normal
+                        // MODO CARNE: registrar en Libro Maestro
                         await Pesajes.registrar({
                             entidad_id: a.id,
                             tipo_entidad: 'animal',
@@ -342,25 +329,34 @@ const PesajesUI = {
                             valor_neto: val,
                             precio_unitario: (motivo === 'expedicion') ? parseFloat(overlay.querySelector('#w-precio')?.value || 0) : 0,
                             matricula: isLogistico ? overlay.querySelector('#w-matricula')?.value.toUpperCase() : '',
-                            rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO'
+                            rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO',
+                            snap_identificacion: a.numero_identificacion
                         });
 
-                        a.pesoActual = val;
-                        window.App.toast(`✅ ${a.numero_identificacion} ➟ ${val} kg`);
+                        a.pesoActual = val + ' kg';
+                        window.App.toast(`✅ Registrado: ${val} kg`);
                     }
 
-                    let nextIndex = currentAnimalIndex + 1;
-                    while(nextIndex < entidades.length && entidades[nextIndex].pesoActual) {
-                        nextIndex++;
-                    }
-                    if (nextIndex < entidades.length) {
-                        selectAnimal(nextIndex);
+                    // Avanzar al siguiente si es lote
+                    if (entidades.length > 1) {
+                        let nextIndex = currentAnimalIndex + 1;
+                        if (nextIndex < entidades.length) {
+                            selectAnimal(nextIndex);
+                        } else {
+                            renderTable();
+                            window.App.toast("Lote completado ✓");
+                        }
                     } else {
                         renderTable();
-                        window.App.toast(esModoLeche ? "✅ Control lechero completado" : "✅ Lote completado");
+                    }
+
+                    // Disparar evento para que la vista se refresque
+                    if (window.EventBus) {
+                        window.EventBus.emit('pesaje:registrado', { refresh: true });
                     }
                 } catch (e) {
-                    window.App.toastError(e.message);
+                    console.error('[PesajesUI] Error al guardar:', e);
+                    window.App.toastError("Error al guardar: " + e.message);
                 }
             };
 
