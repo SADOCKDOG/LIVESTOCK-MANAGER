@@ -62,10 +62,13 @@ const App = {
         ];
         eventosRefresh.forEach(event => {
           window.EventBus.on(event, () => {
-            // Si el usuario está en el dashboard, refrescarlo automáticamente
             const hash = window.location.hash.slice(1) || '/';
             if (hash === '/' || hash === '') {
               App.renderDashboard();
+            } else if (hash.startsWith('/produccion')) {
+              App.renderProduccion();
+            } else if (hash.startsWith('/gastos')) {
+              App.renderGastos();
             }
           });
         });
