@@ -235,10 +235,11 @@
       }
 
       // 12. Producción de carne (Individual, Lote y Ventas)
+      var currentYear = new Date().getFullYear();
       var prodCarneData = [
-        { animal: terner1, pesos: [{ f: '2025-01-10', p: 175 }, { f: '2025-02-10', p: 210 }, { f: '2025-03-10', p: 248 }, { f: '2025-04-10', p: 285 }] },
-        { animal: terner2, pesos: [{ f: '2025-01-10', p: 190 }, { f: '2025-02-10', p: 228 }, { f: '2025-03-10', p: 265 }, { f: '2025-04-10', p: 300 }] },
-        { animal: oveja4, pesos: [{ f: '2025-02-01', p: 60 }, { f: '2025-03-01', p: 68 }, { f: '2025-04-01', p: 75 }] }
+        { animal: terner1, pesos: [{ f: `${currentYear}-01-10`, p: 175 }, { f: `${currentYear}-02-10`, p: 210 }, { f: `${currentYear}-03-10`, p: 248 }, { f: `${currentYear}-04-10`, p: 285 }] },
+        { animal: terner2, pesos: [{ f: `${currentYear}-01-10`, p: 190 }, { f: `${currentYear}-02-10`, p: 228 }, { f: `${currentYear}-03-10`, p: 265 }, { f: `${currentYear}-04-10`, p: 300 }] },
+        { animal: oveja4, pesos: [{ f: `${currentYear}-02-01`, p: 60 }, { f: `${currentYear}-03-01`, p: 68 }, { f: `${currentYear}-04-01`, p: 75 }] }
       ];
       for (var pc = 0; pc < prodCarneData.length; pc++) {
         var pcItem = prodCarneData[pc];
@@ -288,7 +289,7 @@
 
       // 13. Producción de leche (Individual, Lote y Expedición Tanque)
       var prodLecheVacas = [vaca1, vaca2, vaca3];
-      var lecheFechas = ['2025-03-01', '2025-03-15', '2025-04-01', '2025-04-15', '2025-05-01'];
+      var lecheFechas = [`${currentYear}-03-01`, `${currentYear}-03-15`, `${currentYear}-04-01`, `${currentYear}-04-15`, `${currentYear}-05-01`];
       for (var plv = 0; plv < prodLecheVacas.length; plv++) {
         if (!prodLecheVacas[plv]) continue;
         for (var lf = 0; lf < lecheFechas.length; lf++) {

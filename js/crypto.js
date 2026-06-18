@@ -20,33 +20,44 @@ const CryptoUtils = {
             return this._keyCache[keyId];
         }
 
-        const { Filesystem, Directory } = window.Capacitor.Plugins;
+        const Filesystem = window.Capacitor?.Plugins?.Filesystem;
+        // En Capacitor, el enum Directory suele estar en Plugins o se puede usar el string directamente
+        const directory = 'DATA';
         const path = `keystore/${keyId}.json`;
 
         try {
+            if (!Filesystem) throw new Error("Plugin Filesystem no disponible");
+
             // 1. Intentar leer la clave del filesystem
-            const result = await Filesystem.readFile({ path, directory: Directory.Data });
+            const result = await Filesystem.readFile({ path, directory });
             const jwk = JSON.parse(atob(result.data));
             const key = await window.crypto.subtle.importKey("jwk", jwk, { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
             this._keyCache[keyId] = key;
             return key;
         } catch (e) {
-            // 2. Si no existe, generar, exportar y guardar
-            console.log(`[Crypto] No se encontró clave para ${keyId}, generando una nueva.`);
+            // 2. Si no existe o falla (ej: estamos en web/browser sin plugin), generar una temporal
+            console.log(`[Crypto] No se pudo leer clave de disco para ${keyId}: ${e.message}. Generando clave temporal.`);
+
             const newKey = await window.crypto.subtle.generateKey(
                 { name: "AES-GCM", length: 256 },
                 true,
                 ["encrypt", "decrypt"]
             );
 
-            const jwk = await window.crypto.subtle.exportKey("jwk", newKey);
-
-            await Filesystem.writeFile({
-                path,
-                data: btoa(JSON.stringify(jwk)), // btoa para ofuscación simple
-                directory: Directory.Data,
-                recursive: true // Crea el directorio 'keystore' si no existe
-            });
+            // Intentar persistirla si el plugin existe
+            if (Filesystem) {
+                try {
+                    const jwk = await window.crypto.subtle.exportKey("jwk", newKey);
+                    await Filesystem.writeFile({
+                        path,
+                        data: btoa(JSON.stringify(jwk)),
+                        directory,
+                        recursive: true
+                    });
+                } catch (writeErr) {
+                    console.warn("[Crypto] No se pudo persistir la clave en disco:", writeErr.message);
+                }
+            }
 
             this._keyCache[keyId] = newKey;
             return newKey;
