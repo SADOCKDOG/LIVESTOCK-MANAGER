@@ -19,11 +19,13 @@ const Pesajes = {
         let snap_zona = "Finca";
         let snap_tipo = "Sin Clasificar";
         let snap_especie = "General";
+        let snap_identificacion = "";
 
         if (data.tipo_entidad === "animal") {
           const animal = await Animales.get(data.entidad_id);
           if (animal) {
             snap_especie = animal.especie || snap_especie;
+            snap_identificacion = animal.numero_identificacion || "";
             if (animal.rebanoId) {
               const rebano = await Rebanos.get(animal.rebanoId);
               if (rebano) {
@@ -38,6 +40,7 @@ const Pesajes = {
             snap_zona = rebano.zonaActual || snap_zona;
             snap_tipo = rebano.tipo || snap_tipo;
             snap_especie = rebano.especie || snap_especie;
+            snap_identificacion = rebano.nombre || "";
           }
         }
 
@@ -53,6 +56,7 @@ const Pesajes = {
           snap_zona: data.snap_zona || snap_zona,
           snap_tipo: data.snap_tipo || snap_tipo,
           snap_especie: data.snap_especie || snap_especie,
+          snap_identificacion: data.snap_identificacion || snap_identificacion,
 
           // Magnitudes
           peso_bruto: Number(data.peso_bruto) || 0,

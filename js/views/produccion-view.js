@@ -169,7 +169,7 @@ const ProduccionView = {
       registrarLabel: 'Cárnica', listName: 'Lista PRO Cárnica',
       registrarHandler: "App._abrirAsistenteProduccion('carne')",
       records: d.carneEvents.slice(0, 20).map(e => ({
-        title: '⚖️ Pesada: ' + (e.snap_especie || 'General'),
+        title: '⚖️ Pesada: ' + (e.snap_identificacion || e.snap_especie || 'General'),
         date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
         zone: e.snap_zona || '',
         value: (e.valor_neto || 0) + ' kg',
@@ -191,7 +191,7 @@ const ProduccionView = {
       registrarLabel: 'Láctea', listName: 'Lista PRO Láctea',
       registrarHandler: "App._abrirAsistenteProduccion('leche')",
       records: d.lecheEvents.slice(0, 20).map(e => ({
-        title: '🥛 Control Lechero',
+        title: '🥛 Control: ' + (e.snap_identificacion || 'Tanque/Lote'),
         date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
         zone: e.snap_zona || '',
         value: (e.valor_neto || 0) + ' L',
@@ -296,8 +296,15 @@ const ProduccionView = {
 
   async _abrirOpcionesGasto(id) {
     try {
-      const gasto = await window.db.get('gastos_ganaderia', Number(id));
+      const numId = Number(id);
+      const gasto = await window.db.get('gastos_ganaderia', numId);
       if (!gasto) return;
+
+      const [rebanos, proveedores] = await Promise.all([
+        window.db.getAll('rebanos'),
+        window.db.getAll('proveedores')
+      ]);
+
       const overlay = document.createElement("div");
       overlay.className = "wizard-full-screen";
       overlay.style.justifyContent = "center";
@@ -305,32 +312,80 @@ const ProduccionView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
         <div class="card p-25" style="max-width:400px; border-top:5px solid #8b5cf6;">
-          <h3 class="mt-0 text-gold text-md">🧾 Detalle del Gasto</h3>
-          <div class="my-15">
-            <div class="flex justify-between py-8 border-bottom-222">
-              <span class="text-gray text-xs">CONCEPTO</span>
-              <span class="text-white font-bold">${gasto.concepto || gasto.categoria || 'Gasto'}</span>
-            </div>
-            <div class="flex justify-between py-8 border-bottom-222">
-              <span class="text-gray text-xs">MONTO</span>
-              <span class="text-purple font-black">${(gasto.monto || 0)} €</span>
-            </div>
-            <div class="flex justify-between py-8 border-bottom-222">
-              <span class="text-gray text-xs">FECHA</span>
-              <span class="text-white">${gasto.fecha || '-'}</span>
-            </div>
-            ${gasto.descripcion ? `<div class="flex justify-between py-8 border-bottom-222">
-              <span class="text-gray text-xs">DESCRIPCIÓN</span>
-              <span class="text-white">${gasto.descripcion}</span>
-            </div>` : ''}
-            ${gasto.categoria ? `<div class="flex justify-between py-8 border-bottom-222">
-              <span class="text-gray text-xs">CATEGORÍA</span>
-              <span class="text-white">${gasto.categoria}</span>
-            </div>` : ''}
+          <h3 class="mt-0 text-gold text-md">🧾 Editar Gasto</h3>
+
+          <div class="wizard-input-group mt-15">
+            <label class="wizard-label">Concepto</label>
+            <input type="text" id="edit-gasto-concepto" value="${gasto.concepto || ''}" class="wizard-input">
           </div>
-          <button class="wizard-btn-action wizard-btn-secondary w-full" onclick="this.closest('.wizard-full-screen').remove()">Cerrar</button>
+
+          <div class="grid grid-cols-2 gap-10">
+            <div class="wizard-input-group">
+              <label class="wizard-label">Monto (€)</label>
+              <input type="number" id="edit-gasto-monto" value="${gasto.monto}" step="0.01" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">Fecha</label>
+              <input type="date" id="edit-gasto-fecha" value="${gasto.fecha}" class="wizard-input">
+            </div>
+          </div>
+
+          <div class="wizard-input-group">
+            <label class="wizard-label">Proveedor</label>
+            <select id="edit-gasto-prov" class="wizard-input wizard-select">
+              <option value="">Sin proveedor</option>
+              ${proveedores.map(p => `<option value="${p.id}" ${gasto.proveedorId === p.id ? 'selected' : ''}>${p.nombre}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="wizard-input-group">
+            <label class="wizard-label">Rebaño / Lote</label>
+            <select id="edit-gasto-reb" class="wizard-input wizard-select">
+              <option value="">Sin rebaño</option>
+              ${rebanos.map(r => `<option value="${r.id}" ${gasto.rebanoId === r.id ? 'selected' : ''}>${r.nombre}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="flex gap-10 mt-20">
+            <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-gasto">💾 Guardar</button>
+            <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-gasto">🗑️ Borrar</button>
+          </div>
+          <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cerrar</button>
         </div>`;
       document.body.appendChild(overlay);
+
+      overlay.querySelector('#btn-save-gasto').onclick = async () => {
+        const concepto = document.getElementById('edit-gasto-concepto').value.trim();
+        const monto = parseFloat(document.getElementById('edit-gasto-monto').value);
+        const fecha = document.getElementById('edit-gasto-fecha').value;
+        const proveedorId = document.getElementById('edit-gasto-prov').value;
+        const rebanoId = document.getElementById('edit-gasto-reb').value;
+
+        if (!concepto || isNaN(monto)) return App.toastError("Concepto y monto obligatorios");
+
+        gasto.concepto = concepto;
+        gasto.monto = monto;
+        gasto.fecha = fecha;
+        gasto.proveedorId = proveedorId ? Number(proveedorId) : null;
+        gasto.rebanoId = rebanoId ? Number(rebanoId) : null;
+        gasto.actualizadoEn = new Date().toISOString();
+
+        await window.db.put('gastos_ganaderia', gasto);
+        App.toast("Gasto actualizado");
+        overlay.remove();
+        if (window.GastosView && GastosView._cachedData) GastosView.render();
+        else ProduccionView.render();
+      };
+
+      overlay.querySelector('#btn-del-gasto').onclick = async () => {
+        if (!confirm("¿Eliminar este gasto de forma permanente?")) return;
+        await window.db.delete('gastos_ganaderia', numId);
+        App.toast("Gasto eliminado");
+        overlay.remove();
+        if (window.GastosView && GastosView._cachedData) GastosView.render();
+        else ProduccionView.render();
+      };
+
     } catch (e) { App.toastError(e.message); }
   },
 
