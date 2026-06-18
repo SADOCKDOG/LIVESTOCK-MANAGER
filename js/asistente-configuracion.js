@@ -17,6 +17,9 @@ const AsistenteConfiguracion = {
                     <img src="icons/Logo aplicación.png" alt="Livestock Manager" style="height: 50px; margin-bottom: 25px; object-fit: contain;">
                     <h1>Bienvenido</h1>
                     <p>Gestión ganadera profesional v4.5.0 Premium</p>
+                    <button class="btn-tour" id="btn-iniciar-tour">
+                        💡 Primeros pasos
+                    </button>
                 </div>
 
                 <div class="asistente-opciones">
@@ -130,6 +133,14 @@ const AsistenteConfiguracion = {
         const btnImportarConfirmar = contenedor.querySelector('#btn-importar-confirmar');
         const btnVolverImportar = contenedor.querySelector('#btn-volver-importar');
         const btnVolverSeleccionar = contenedor.querySelector('#btn-volver-seleccionar');
+
+        // Botón Iniciar Tour
+        const btnTour = contenedor.querySelector('#btn-iniciar-tour');
+        if (btnTour) {
+            btnTour.addEventListener('click', () => {
+                this._mostrarTourInicio(contenedor);
+            });
+        }
 
         // Opción: Importar desde Backup
         btnImportar.addEventListener('click', () => {
@@ -368,6 +379,348 @@ const AsistenteConfiguracion = {
     },
 
     /**
+     * Tour de inicio flotante: guía al usuario en sus primeros pasos
+     */
+    _mostrarTourInicio(contenedor) {
+        const existente = document.getElementById('tour-flotante-overlay');
+        if (existente) existente.remove();
+
+        const pasos = [
+            {
+                icono: '👋',
+                titulo: 'Bienvenido a Livestock Manager',
+                texto: 'Plataforma profesional de gestión ganadera con trazabilidad industrial, control lechero, comercialización y centro de informes premium.\n\nTodo funciona 100% offline en tu dispositivo.',
+                accion: null
+            },
+            {
+                icono: '🐄',
+                titulo: 'Explorar la Demo',
+                texto: 'Prueba la app sin riesgos cargando la explotación de ejemplo "Ganadería Chamorro". Incluye animales, rebaños, pesajes, ventas, gastos, sanidad e informes completos.',
+                accion: { texto: '🚀 Cargar Demo', metodo: 'cargarDemo' }
+            },
+            {
+                icono: '📖',
+                titulo: 'Manuales de Usuario',
+                texto: 'La app incluye 8 manuales interactivos con capturas paso a paso: General, Ovino de Carne, Ovino de Leche, Producción, Comercialización, Pesadas, Control Lechero y Gastos.',
+                accion: { texto: '📚 Abrir Manuales', metodo: 'abrirManuales' }
+            },
+            {
+                icono: '🚀',
+                titulo: '¡Manos a la obra!',
+                texto: 'Elige cómo empezar:\n\n📥 Importa una copia de seguridad existente.\n➕ Crea una nueva explotación desde cero.\n🐄 Carga la demo para explorar todas las funcionalidades.\n📖 Consulta los manuales cuando necesites ayuda.',
+                accion: null
+            }
+        ];
+
+        let pasoActual = 0;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'tour-flotante-overlay';
+        overlay.innerHTML = `
+            <div class="tour-flotante-backdrop"></div>
+            <div class="tour-flotante-card" id="tour-card">
+                <button class="tour-btn-cerrar" id="tour-cerrar">✕</button>
+                <div class="tour-body" id="tour-body">
+                    <div class="tour-icono">${pasos[0].icono}</div>
+                    <h3 class="tour-titulo">${pasos[0].titulo}</h3>
+                    <p class="tour-texto">${pasos[0].texto.replace(/\n/g, '<br>')}</p>
+                    <div class="tour-accion" id="tour-accion"></div>
+                </div>
+                <div class="tour-footer">
+                    <button class="tour-btn tour-btn-prev" id="tour-prev" disabled>← Anterior</button>
+                    <div class="tour-dots" id="tour-dots">
+                        ${pasos.map((_, i) => `<span class="tour-dot ${i === 0 ? 'activo' : ''}" data-index="${i}"></span>`).join('')}
+                    </div>
+                    <button class="tour-btn tour-btn-next" id="tour-next">Siguiente →</button>
+                    <button class="tour-btn tour-btn-fin" id="tour-fin" style="display:none;">✓ ¡Comenzar!</button>
+                </div>
+            </div>
+        `;
+
+        const renderPaso = (idx) => {
+            const paso = pasos[idx];
+            const accionDiv = overlay.querySelector('#tour-accion');
+            const prevBtn = overlay.querySelector('#tour-prev');
+            const nextBtn = overlay.querySelector('#tour-next');
+            const finBtn = overlay.querySelector('#tour-fin');
+            const dots = overlay.querySelectorAll('.tour-dot');
+
+            overlay.querySelector('#tour-body .tour-icono').textContent = paso.icono;
+            overlay.querySelector('#tour-body .tour-titulo').textContent = paso.titulo;
+            overlay.querySelector('#tour-body .tour-texto').innerHTML = paso.texto.replace(/\n/g, '<br>');
+
+            accionDiv.innerHTML = '';
+            if (paso.accion) {
+                const btnAccion = document.createElement('button');
+                btnAccion.className = 'tour-btn-accion';
+                btnAccion.textContent = paso.accion.texto;
+                btnAccion.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this._ejecutarAccionTour(paso.accion.metodo, contenedor);
+                });
+                accionDiv.appendChild(btnAccion);
+            }
+
+            prevBtn.disabled = idx === 0;
+            prevBtn.style.opacity = idx === 0 ? '0.4' : '1';
+            if (idx < pasos.length - 1) {
+                nextBtn.style.display = 'inline-block';
+                finBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                finBtn.style.display = 'inline-block';
+            }
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('activo', i === idx);
+            });
+        };
+
+        overlay.querySelector('#tour-next').addEventListener('click', () => {
+            if (pasoActual < pasos.length - 1) {
+                pasoActual++;
+                renderPaso(pasoActual);
+            }
+        });
+        overlay.querySelector('#tour-prev').addEventListener('click', () => {
+            if (pasoActual > 0) {
+                pasoActual--;
+                renderPaso(pasoActual);
+            }
+        });
+        overlay.querySelector('#tour-fin').addEventListener('click', () => {
+            overlay.remove();
+        });
+        overlay.querySelector('#tour-cerrar').addEventListener('click', () => {
+            overlay.remove();
+        });
+        overlay.querySelector('.tour-flotante-backdrop').addEventListener('click', () => {
+            overlay.remove();
+        });
+
+        this._aplicarEstilosTour(overlay);
+        document.body.appendChild(overlay);
+    },
+
+    /** Ejecuta acciones contextuales del tour */
+    _ejecutarAccionTour(metodo, contenedor) {
+        const overlay = document.getElementById('tour-flotante-overlay');
+        if (overlay) overlay.remove();
+        if (contenedor) contenedor.remove();
+
+        switch (metodo) {
+            case 'cargarDemo':
+                if (window.SeedData && typeof window.SeedData.run === 'function') {
+                    if (!confirm('¿Cargar la explotación de ejemplo "DEMO CHAMORRO"? Se añadirán datos de ejemplo en todos los módulos.')) return;
+                    const msgDiv = document.createElement('div');
+                    msgDiv.style.cssText = 'position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:15px;';
+                    msgDiv.innerHTML = '<div style="font-size:2rem;">⏳</div><div style="color:#d97706; font-weight:700;">Cargando datos demo...</div><div style="color:#888; font-size:0.8rem;">Esto puede tardar unos segundos.</div>';
+                    document.body.appendChild(msgDiv);
+                    setTimeout(async () => {
+                        try {
+                            await window.SeedData.run(true);
+                            window.location.reload();
+                        } catch (e) {
+                            alert('Error: ' + e.message);
+                            window.location.reload();
+                        }
+                    }, 300);
+                } else {
+                    alert('Módulo de datos demo no disponible.');
+                }
+                break;
+
+            case 'abrirManuales':
+                window.location.hash = '#/ajustes';
+                if (window.App && typeof window.App.renderAjustes === 'function') {
+                    window.App.renderAjustes();
+                    setTimeout(() => {
+                        if (window.ManualesView && typeof window.ManualesView.render === 'function') {
+                            window.ManualesView.render();
+                        }
+                    }, 500);
+                }
+                break;
+        }
+    },
+
+    /**
+     * Aplicar estilos al tour flotante
+     */
+    _aplicarEstilosTour(overlay) {
+        const estilo = document.createElement('style');
+        estilo.textContent = `
+            #tour-flotante-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 4000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+            .tour-flotante-backdrop {
+                position: absolute;
+                inset: 0;
+                background: rgba(0,0,0,0.75);
+                backdrop-filter: blur(4px);
+            }
+            .tour-flotante-card {
+                position: relative;
+                background: #0d0d0d;
+                border: 1px solid #222;
+                border-radius: 24px;
+                width: 90%;
+                max-width: 420px;
+                max-height: 90vh;
+                box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(217,119,6,0.2);
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                animation: tourEntrada 0.35s ease-out;
+            }
+            @keyframes tourEntrada {
+                from { opacity: 0; transform: scale(0.92) translateY(20px); }
+                to { opacity: 1; transform: scale(1) translateY(0); }
+            }
+            .tour-btn-cerrar {
+                position: absolute;
+                top: 12px;
+                right: 14px;
+                background: rgba(255,255,255,0.06);
+                border: none;
+                color: #888;
+                font-size: 1.1rem;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+            }
+            .tour-btn-cerrar:hover {
+                background: rgba(255,255,255,0.15);
+                color: #fff;
+            }
+            .tour-body {
+                padding: 40px 28px 20px;
+                text-align: center;
+                flex: 1;
+                overflow-y: auto;
+            }
+            .tour-icono {
+                font-size: 3.2rem;
+                margin-bottom: 16px;
+                display: block;
+            }
+            .tour-titulo {
+                color: #fff;
+                font-size: 1.3rem;
+                font-weight: 800;
+                margin: 0 0 14px 0;
+                letter-spacing: -0.3px;
+            }
+            .tour-texto {
+                color: #aaa;
+                font-size: 0.9rem;
+                line-height: 1.65;
+                margin: 0 0 18px 0;
+            }
+            .tour-accion {
+                margin: 10px 0;
+            }
+            .tour-btn-accion {
+                background: linear-gradient(135deg, #d97706, #b45309);
+                color: #fff;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 14px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                width: 100%;
+                max-width: 260px;
+                box-shadow: 0 4px 15px rgba(217,119,6,0.3);
+            }
+            .tour-btn-accion:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 25px rgba(217,119,6,0.5);
+            }
+            .tour-btn-accion:active {
+                transform: scale(0.97);
+            }
+            .tour-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 24px 20px;
+                border-top: 1px solid #1a1a1a;
+            }
+            .tour-btn {
+                background: rgba(255,255,255,0.06);
+                border: 1px solid #333;
+                color: #ddd;
+                padding: 10px 18px;
+                border-radius: 12px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                min-width: 90px;
+            }
+            .tour-btn:disabled {
+                cursor: default;
+            }
+            .tour-btn:not(:disabled):hover {
+                background: rgba(255,255,255,0.12);
+                border-color: #d97706;
+                color: #fff;
+            }
+            .tour-btn-fin {
+                background: linear-gradient(135deg, #059669, #047857);
+                border: none;
+                color: #fff;
+                box-shadow: 0 4px 15px rgba(5,150,105,0.3);
+            }
+            .tour-btn-fin:not(:disabled):hover {
+                background: linear-gradient(135deg, #10b981, #059669);
+                box-shadow: 0 6px 25px rgba(5,150,105,0.5);
+            }
+            .tour-dots {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+            .tour-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #333;
+                transition: all 0.3s;
+                cursor: pointer;
+            }
+            .tour-dot.activo {
+                background: #d97706;
+                box-shadow: 0 0 8px rgba(217,119,6,0.5);
+                transform: scale(1.3);
+            }
+            @media (max-width: 480px) {
+                .tour-flotante-card { width: 94%; border-radius: 20px; }
+                .tour-body { padding: 32px 20px 16px; }
+                .tour-icono { font-size: 2.6rem; }
+                .tour-titulo { font-size: 1.15rem; }
+                .tour-btn { padding: 8px 14px; min-width: 70px; font-size: 0.75rem; }
+                .tour-btn-accion { padding: 12px 20px; font-size: 0.9rem; }
+            }
+        `;
+        overlay.appendChild(estilo);
+    },
+
+    /**
      * Aplicar estilos al asistente
      */
     _aplicarEstilos(contenedor) {
@@ -419,8 +772,26 @@ const AsistenteConfiguracion = {
 
             .asistente-cabecera p {
                 color: #888;
-                margin: 0;
+                margin: 0 0 16px 0;
                 font-size: 15px;
+            }
+
+            .btn-tour {
+                background: rgba(217,119,6,0.12);
+                border: 1px solid rgba(217,119,6,0.3);
+                color: #d97706;
+                padding: 10px 24px;
+                border-radius: 14px;
+                font-size: 0.9rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.25s ease;
+            }
+            .btn-tour:hover {
+                background: rgba(217,119,6,0.22);
+                border-color: #d97706;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 20px rgba(217,119,6,0.2);
             }
 
             .asistente-opciones {

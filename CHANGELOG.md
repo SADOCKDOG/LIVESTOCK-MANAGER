@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.5.1] - 2026-06-17
+### Added
+- **Tour de inicio flotante en pantalla de bienvenida:** Wizard de 4 pasos que guía al usuario en sus primeros pasos.
+  - Botón "💡 Primeros pasos" en la cabecera del asistente de configuración.
+  - Paso 1: Descripción general de la aplicación.
+  - Paso 2: Carga directa de la demo "Ganadería Chamorro" con feedback de progreso.
+  - Paso 3: Acceso directo a los 8 manuales de usuario interactivos.
+  - Paso 4: Resumen de opciones para empezar (importar, crear, demo, manuales).
+  - Navegación Anterior/Siguiente/Comenzar con indicadores de paso.
+  - Cierre mediante botón ✕, click en backdrop o botón final.
+  - Diseño responsive oscuro con animación de entrada y blur.
+
 ## [v4.5.0] - 2026-06-18
 ### Added
 - **Nuevo Generador de PDF Industrial:** Implementación de un motor de renderizado unificado para todos los documentos de la app.
