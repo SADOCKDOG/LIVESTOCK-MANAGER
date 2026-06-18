@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comercialización · Venta Masiva y Albarán Leche · Livestock Manager</title>
+<style>
+  :root{
+    --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
+    --gris-claro:#777; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
+    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --carne:#ef4444;
+    --leche:#3b82f6; --comer:#8b5e3c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+
+  .portada{
+    text-align:center; padding:60px 24px 50px;
+    background:linear-gradient(160deg,#1a1a2e,#2d2d44);
+    color:#fff; border-bottom:6px solid var(--oro-claro);
+  }
+  .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--oro-claro); letter-spacing:.5px;}
+  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a;
+    border-radius:30px; color:var(--oro-claro); font-size:.85rem; letter-spacing:1px;}
+  .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
+
+  h2.modulo{
+    font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
+    border-left:5px solid var(--comer); padding-left:14px;
+  }
+  h2.carne{border-left-color:var(--carne);}
+  h2.leche{border-left-color:var(--leche);}
+  .fase-tag{display:inline-block; background:var(--comer); color:#fff; font-size:.7rem; font-weight:700;
+    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+  .fase-tag.carne{background:var(--carne);}
+  .fase-tag.leche{background:var(--leche);}
+  .fase-tag.wizard{background:var(--oro);}
+  .intro-mod{color:var(--gris); margin:8px 0 16px;}
+
+  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+  ol.pasos > li{
+    position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
+    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+  }
+  ol.pasos > li::before{
+    counter-increment:paso; content:counter(paso);
+    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+    background:var(--comer); color:#fff; font-weight:700; font-size:.85rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
+  ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
+  ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--comer); font-weight:700;}
+
+  .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
+    margin:14px 0; font-size:.92rem; color:#6b5418;}
+  .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
+    margin:14px 0; font-size:.92rem; color:#7a241b;}
+  .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
+    margin:14px 0; font-size:.92rem; color:#14512f;}
+  .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
+    margin:14px 0; font-size:.92rem;}
+
+  figure{margin:18px 0; text-align:center;}
+  figure img{
+    max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
+    box-shadow:0 6px 22px rgba(0,0,0,.12);
+  }
+  figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
+
+  .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
+  .seccion:last-child{border-bottom:none;}
+
+  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
+  .indice h3{margin:0 0 14px; color:var(--tinta);}
+  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
+  .indice li{margin-bottom:7px;}
+  .indice a{color:var(--tinta); text-decoration:none;}
+  .indice a:hover{color:var(--comer); text-decoration:underline;}
+
+  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
+  .ruta{color:var(--comer); font-weight:600;}
+  .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
+
+  .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
+    padding:20px 24px; margin:20px 0;}
+  .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
+  .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
+  .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
+
+  table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
+  table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
+  table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
+  table.parametros .ok{color:var(--verde); font-weight:700;}
+  table.parametros .alert{color:var(--rojo); font-weight:700;}
+
+  .tabs-ej{display:flex; gap:10px; margin:16px 0;}
+  .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
+    border:1px solid var(--linea); cursor:default;}
+  .tab-ej.carne{background:#fef2f2; color:var(--carne); border-color:var(--carne);}
+  .tab-ej.leche{background:#eff6ff; color:var(--leche); border-color:var(--leche);}
+
+  .grid-pasos{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:14px 0;}
+  .card-paso{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:16px;}
+  .card-paso h5{margin:0 0 6px; color:var(--tinta); font-size:.93rem;}
+  .card-paso p{font-size:.83rem; color:var(--gris); margin:0;}
+  .card-paso .num{display:inline-block; width:24px; height:24px; border-radius:50%; background:var(--comer);
+    color:#fff; font-weight:700; font-size:.75rem; text-align:center; line-height:24px; margin-bottom:8px;}
+  .card-paso.carne .num{background:var(--carne);}
+  .card-paso.leche .num{background:var(--leche);}
+
+  .wizard-bar{display:flex; align-items:center; gap:6px; margin:16px 0; flex-wrap:wrap;}
+  .wizard-step{display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:20px;
+    font-size:.75rem; font-weight:700; background:var(--linea); color:var(--gris);}
+  .wizard-step.active{background:var(--comer); color:#fff;}
+  .wizard-step.done{background:#d4edda; color:var(--verde);}
+
+  @media print{
+    body{font-size:12px;}
+    .portada{padding:40px 24px;}
+    .seccion{page-break-inside:avoid; padding:18px 0;}
+    figure img{max-width:230px; box-shadow:none;}
+    a{color:var(--tinta) !important; text-decoration:none;}
+    .indice ol{columns:2;}
+  }
+</style>
+</head>
+<body>
+
+<header class="portada">
+  <img src="img/logo-app.png" alt="Livestock Manager" class="logo-img">
+  <h1>💰 Comercialización</h1>
+  <p class="sub">Venta Masiva de Animales y Albarán de Leche — Guía completa paso a paso</p>
+  <div class="badge">MANUAL PRÁCTICO · Todos los flujos de comercialización</div>
+</header>
+
+<div class="wrap">
+
+  <section class="seccion">
+    <h2 class="modulo">📖 Sobre este manual</h2>
+    <p class="intro-mod">
+      Este manual documenta los <strong>flujos de comercialización</strong> disponibles en Livestock Manager:
+      la <strong>venta masiva de animales</strong> (producción cárnica) con todos los pasos del wizard
+      y la <strong>expedición de leche de tanque</strong> (albarán de leche) con su wizard de 6 pasos.
+    </p>
+    <p class="intro-mod">
+      El acceso se realiza desde <span class="ruta">Registros → Comercialización</span> en la barra inferior.
+      La vista principal ofrece dos pestañas: <strong>🥩 Carne</strong> y <strong>🥛 Leche</strong>.
+    </p>
+
+    <div class="indice">
+      <h3>📋 Índice</h3>
+      <ol>
+        <li><a href="#acceso">Acceso a Comercialización</a></li>
+        <li><a href="#venta-masiva">Wizard de Venta Masiva (5 pasos)</a></li>
+        <li><a href="#vm-paso1">Paso 1: Selección de animales</a></li>
+        <li><a href="#vm-paso2">Paso 2: Trazabilidad (fecha, matadero, ICA, guía)</a></li>
+        <li><a href="#vm-paso3">Paso 3: Pesos y costes</a></li>
+        <li><a href="#vm-paso4">Paso 4: Comprador + Clasificación SEUROP</a></li>
+        <li><a href="#vm-paso5">Paso 5: Transportista + Autorización Veterinaria</a></li>
+        <li><a href="#albaran-leche">Wizard de Albarán de Leche (6 pasos)</a></li>
+        <li><a href="#al-paso1">Paso 1: Datos generales, CCAA, Contrato y ADSG</a></li>
+        <li><a href="#al-paso2">Paso 2: Cisterna, Letra Q e INFOLAC</a></li>
+        <li><a href="#al-paso3">Paso 3: Cadena de frío y temperatura</a></li>
+        <li><a href="#al-paso4">Paso 4: Laboratorio y analíticas</a></li>
+        <li><a href="#al-paso5">Paso 5: Precio y liquidación</a></li>
+        <li><a href="#al-paso6">Paso 6: MOFA y resumen final</a></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- 1. ACCESO A COMERCIALIZACIÓN -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="acceso">
+    <span class="fase-tag">Inicio</span>
+    <h2 class="modulo">1. Acceso a Comercialización</h2>
+    <p class="intro-mod">
+      La sección de <strong>Comercialización</strong> agrupa todas las operaciones de venta de la explotación:
+      venta de animales para carne, expedición de leche, y gestión de compradores y transportistas.
+    </p>
+
+    <figure>
+      <img src="img/comer-01-acceso.jpg" alt="Vista principal de Comercialización">
+      <figcaption>Pantalla principal de Comercialización con indicadores y acceso a wizards.</figcaption>
+    </figure>
+
+    <p>Desde esta pantalla puedes:</p>
+    <ul>
+      <li>Ver los <strong>indicadores</strong> de ventas del período actual</li>
+      <li>Acceder al histórico de <strong>albaranes</strong> de carne y leche</li>
+      <li>Iniciar el wizard de <strong>Venta Masiva</strong> para animales de carne</li>
+      <li>Iniciar el wizard de <strong>Albarán de Leche</strong> para expedición de tanque</li>
+    </ul>
+
+    <p>La vista se organiza en dos pestañas:</p>
+    <div class="tabs-ej">
+      <span class="tab-ej carne">🥩 Carne</span>
+      <span class="tab-ej leche">🥛 Leche</span>
+    </div>
+
+    <figure>
+      <img src="img/comer-02-tab-carne.jpg" alt="Pestaña de carne en Comercialización">
+      <figcaption>Pestaña <strong>Carne</strong> con registros de venta masiva y albaranes de animales.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="img/comer-03-tab-leche.jpg" alt="Pestaña de leche en Comercialización">
+      <figcaption>Pestaña <strong>Leche</strong> con registros de expedición de tanque y albaranes lácteos.</figcaption>
+    </figure>
+
+    <div class="tip">
+      <strong>Tip:</strong> Puedes alternar entre pestañas en cualquier momento. Los datos se actualizan automáticamente según la finca activa.
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- 2. WIZARD VENTA MASIVA -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="venta-masiva">
+    <span class="fase-tag wizard">Wizard 5 pasos</span>
+    <h2 class="modulo">2. Wizard de Venta Masiva</h2>
+    <p class="intro-mod">
+      El wizard de <strong>Venta Masiva</strong> guía al ganadero a través de todo el proceso de
+      comercialización de animales para carne, desde la selección de los animales hasta la generación
+      de la documentación oficial (albarán DIMOE y factura).
+    </p>
+
+    <div class="wizard-bar">
+      <span class="wizard-step done">1. Animales</span>
+      <span class="wizard-step active">2. Trazabilidad</span>
+      <span class="wizard-step">3. Pesos</span>
+      <span class="wizard-step">4. Comprador</span>
+      <span class="wizard-step">5. Transporte</span>
+    </div>
+
+    <p>Al pulsar el botón <strong>"Venta Masiva"</strong> en la pantalla de Comercialización, se abre el wizard en una ventana a pantalla completa.</p>
+  </section>
+
+  <!-- 2.1 PASO 1 -->
+  <section class="seccion" id="vm-paso1">
+    <span class="fase-tag">Paso 1 de 5</span>
+    <h2 class="modulo">3. Paso 1: Selección de animales</h2>
+
+    <figure>
+      <img src="img/comer-04-wizard-paso1.jpg" alt="Paso 1: Selección de animales">
+      <figcaption>Paso 1: Selección de los animales a vender. Se muestran los disponibles con su censo y estado sanitario.</figcaption>
+    </figure>
+
+    <p>En este primer paso puedes:</p>
+    <ol class="pasos">
+      <li><strong>Seleccionar animales individualmente</strong> marcando la casilla de cada uno</li>
+      <li>Usar <strong>"Seleccionar todos"</strong> para marcar todo el lote</li>
+      <li>Ver el <strong>censo</strong> actual de cada animal (peso, edad, raza)</li>
+      <li>Comprobar el <strong>estado sanitario</strong> y si tiene tratamientos activos</li>
+      <li>Filtrar por <strong>categoría</strong> (cebones, primalas, adultas, etc.)</li>
+    </ol>
+
+    <div class="info-tecnica">
+      <strong>📋 Requisito:</strong> Solo aparecen animales con estado sanitario "apto para venta".
+      Si un animal no aparece, revisa su ficha en <span class="ruta">Registros → Animales</span>.
+    </div>
+
+    <p>Una vez seleccionados los animales, pulsa <kbd>SIGUIENTE</kbd> para continuar.</p>
+  </section>
+
+  <!-- 2.2 PASO 2 -->
+  <section class="seccion" id="vm-paso2">
+    <span class="fase-tag">Paso 2 de 5</span>
+    <h2 class="modulo">4. Paso 2: Datos de trazabilidad</h2>
+
+    <figure>
+      <img src="img/comer-05-wizard-paso2.jpg" alt="Paso 2: Trazabilidad">
+      <figcaption>Paso 2: Datos de trazabilidad de la venta — fecha, matadero, ICA, guía.</figcaption>
+    </figure>
+
+    <p>En este paso se registra la información de trazabilidad obligatoria:</p>
+
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Fecha de venta</span></td><td>Fecha de la operación. Por defecto la fecha actual.</td></tr>
+      <tr><td><span class="campo">Matadero</span></td><td>Selecciona el matadero de destino de la lista (dados de alta en <span class="ruta">Ajustes → Compradores</span>)</td></tr>
+      <tr><td><span class="campo">Nº ICA Matadero</span></td><td>Código ICA del matadero de destino</td></tr>
+      <tr><td><span class="campo">Nº Guía</span></td><td>Número de guía de origen o documento de transporte</td></tr>
+      <tr><td><span class="campo">Motivo de venta</span></td><td>Selecciona el motivo (sacrificio, venta en vivo, etc.)</td></tr>
+    </table>
+
+    <div class="nota">
+      <strong>Nota:</strong> Los campos de trazabilidad son obligatorios para la generación del DIMOE y del albarán sanitario.
+    </div>
+  </section>
+
+  <!-- 2.3 PASO 3 -->
+  <section class="seccion" id="vm-paso3">
+    <span class="fase-tag">Paso 3 de 5</span>
+    <h2 class="modulo">5. Paso 3: Pesos y costes</h2>
+
+    <figure>
+      <img src="img/comer-06-wizard-paso3.jpg" alt="Paso 3: Pesos y costes">
+      <figcaption>Paso 3: Pesos, costes de transporte y sacrificio.</figcaption>
+    </figure>
+
+    <p>Para cada animal seleccionado, se muestran los siguientes campos:</p>
+
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Peso vivo (kg)</span></td><td>Peso del animal en vivo. Se puede rellenar manualmente o traer del último pesaje.</td></tr>
+      <tr><td><span class="campo">Peso canal (kg)</span></td><td>Peso estimado o real de la canal. Se calcula aplicando el rendimiento si está configurado.</td></tr>
+      <tr><td><span class="campo">Gastos de transporte (€)</span></td><td>Coste del transporte al matadero. Se prorratea entre los animales si es un viaje compartido.</td></tr>
+      <tr><td><span class="campo">Gastos de matadero (€)</span></td><td>Coste del sacrificio y faenado por animal.</td></tr>
+      <tr><td><span class="campo">Rendimiento (%)</span></td><td>Rendimiento canal estimado (típicamente 45-55% en ovino).</td></tr>
+    </table>
+
+    <div class="tip">
+      <strong>Tip:</strong> Si tienes una báscula conectada, puedes usar el botón <strong>⚖️</strong> para importar el peso directamente.
+    </div>
+  </section>
+
+  <!-- 2.4 PASO 4 -->
+  <section class="seccion" id="vm-paso4">
+    <span class="fase-tag">Paso 4 de 5</span>
+    <h2 class="modulo">6. Paso 4: Comprador y clasificación SEUROP</h2>
+
+    <figure>
+      <img src="img/comer-07-wizard-paso4.jpg" alt="Paso 4: Comprador y SEUROP">
+      <figcaption>Paso 4: Selección del comprador y clasificación SEUROP de las canales.</figcaption>
+    </figure>
+
+    <p>En este paso se configura la información comercial:</p>
+
+    <h4>Comprador</h4>
+    <ul>
+      <li>Selecciona el <strong>comprador</strong> de la lista de compradores registrados</li>
+      <li>Si no aparece, puedes darlo de alta desde <span class="ruta">Ajustes → Compradores</span></li>
+      <li>Se muestran los datos fiscales del comprador (CIF/NIF, dirección)</li>
+    </ul>
+
+    <h4>Clasificación SEUROP</h4>
+    <p>Para cada canal, se puede registrar la clasificación SEUROP:</p>
+
+    <table class="parametros">
+      <tr><th>Clase</th><th>Descripción</th><th>Conformación</th></tr>
+      <tr><td><span class="campo">S</span></td><td>Superior</td><td>Perfiles extraordinarios</td></tr>
+      <tr><td><span class="campo">E</span></td><td>Excelente</td><td>Perfiles muy convexos</td></tr>
+      <tr><td><span class="campo">U</span></td><td>Muy buena</td><td>Perfiles convexos</td></tr>
+      <tr><td><span class="campo">R</span></td><td>Buena</td><td>Perfiles ligeramente convexos</td></tr>
+      <tr><td><span class="campo">O</span></td><td>Mediana</td><td>Perfiles rectilíneos</td></tr>
+      <tr><td><span class="campo">P</span></td><td>Inferior</td><td>Perfiles cóncavos</td></tr>
+    </table>
+
+    <p>También se puede registrar el <strong>grado de engrasamiento</strong> (1 a 5) y el <strong>color</strong> de la canal.</p>
+
+    <div class="info-tecnica">
+      <strong>🔬 SEUROP:</strong> La clasificación SEUROP es obligatoria para canales de ovino mayores de 12 kg en la UE.
+      Livestock Manager permite registrar tanto la conformación como el engrasamiento.
+    </div>
+  </section>
+
+  <!-- 2.5 PASO 5 -->
+  <section class="seccion" id="vm-paso5">
+    <span class="fase-tag">Paso 5 de 5</span>
+    <h2 class="modulo">7. Paso 5: Transportista y Autorización Veterinaria</h2>
+
+    <figure>
+      <img src="img/comer-08-wizard-paso5.jpg" alt="Paso 5: Transportista y Autorización Veterinaria">
+      <figcaption>Paso 5: Datos del transportista, vehículo y autorización veterinaria.</figcaption>
+    </figure>
+
+    <p>Último paso del wizard, donde se registra la información logística y sanitaria:</p>
+
+    <h4>Transportista</h4>
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Transportista</span></td><td>Nombre o empresa de transporte</td></tr>
+      <tr><td><span class="campo">Nº de autorización de transporte</span></td><td>Número de autorización del transportista (obligatorio)</td></tr>
+      <tr><td><span class="campo">Matrícula del vehículo</span></td><td>Matrícula del camión o vehículo de transporte</td></tr>
+    </table>
+
+    <h4>Autorización Veterinaria</h4>
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Veterinario autorizante</span></td><td>Nombre del veterinario que autoriza el traslado</td></tr>
+      <tr><td><span class="campo">Nº Colegiado</span></td><td>Número de colegiado del veterinario</td></tr>
+      <tr><td><span class="campo">Fecha de autorización</span></td><td>Fecha del certificado veterinario</td></tr>
+      <tr><td><span class="campo">Observaciones</span></td><td>Notas adicionales (condiciones especiales, etc.)</td></tr>
+    </table>
+
+    <div class="nota">
+      <strong>Documentos generados:</strong> Al finalizar el wizard, el sistema genera automáticamente:
+      <ul>
+        <li><strong>Albarán de venta</strong> (descargable en PDF)</li>
+        <li><strong>DIMOE</strong> (Documento de Identificación y Movimiento Ovino-Especista)</li>
+        <li><strong>Factura simplificada</strong> con los datos del comprador</li>
+      </ul>
+    </div>
+
+    <div class="tip">
+      <strong>Tip:</strong> Una vez finalizado, el registro de venta aparece en la pestaña <strong>Carne</strong> de Comercialización.
+      Puedes consultar, editar o descargar la documentación desde allí.
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- 3. ALBARÁN DE LECHE -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="albaran-leche">
+    <span class="fase-tag leche">Wizard 6 pasos</span>
+    <h2 class="modulo leche">8. Wizard de Albarán de Leche (Expedición de Tanque)</h2>
+    <p class="intro-mod">
+      El wizard de <strong>Albarán de Leche</strong> registra la expedición de leche de tanque,
+      incluyendo todos los parámetros obligatorios: datos de recogida, cadena de frío, analíticas
+      de laboratorio, precio y liquidación, y el resumen MOFA para la declaración mensual.
+    </p>
+
+    <div class="wizard-bar">
+      <span class="wizard-step done">1. Grales</span>
+      <span class="wizard-step active">2. Recogida</span>
+      <span class="wizard-step">3. Frío</span>
+      <span class="wizard-step">4. Laboratorio</span>
+      <span class="wizard-step">5. Precio</span>
+      <span class="wizard-step">6. MOFA</span>
+    </div>
+
+    <p>Se accede desde la pestaña <strong>Leche</strong> de Comercialización pulsando el botón <strong>"Albarán de Leche"</strong> o desde el asistente de producción láctea seleccionando <strong>"Expedición de Tanque"</strong>.</p>
+  </section>
+
+  <!-- 3.1 PASO 1 -->
+  <section class="seccion" id="al-paso1">
+    <span class="fase-tag leche">Paso 1 de 6</span>
+    <h2 class="modulo leche">9. Paso 1: Datos Generales, CCAA, Contrato Lácteo y ADSG</h2>
+
+    <figure>
+      <img src="img/leche-07-tanque-paso1.jpg" alt="Paso 1 del Albarán de Leche">
+      <figcaption>Paso 1: Datos generales de la expedición, contrato lácteo y ADSG.</figcaption>
+    </figure>
+
+    <p>En este primer paso se recoge la información administrativa de la expedición:</p>
+
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Fecha de recogida</span></td><td>Fecha de la expedición de leche</td></tr>
+      <tr><td><span class="campo">CCAA de recogida</span></td><td>Comunidad Autónoma donde se realiza la recogida</td></tr>
+      <tr><td><span class="campo">Contrato lácteo asociado</span></td><td>Nº de contrato con la industria/compañía</td></tr>
+      <tr><td><span class="campo">ADSG</span></td><td>Agrupación de Defensa Sanitaria Ganadera (si aplica)</td></tr>
+      <tr><td><span class="campo">Nº de explotación (REGA)</span></td><td>Código REGA de la explotación (se rellena automáticamente desde la ficha de finca)</td></tr>
+    </table>
+
+    <div class="info-tecnica">
+      <strong>📌 Contrato lácteo:</strong> El Real Decreto 752/2011 establece la obligatoriedad del contrato lácteo
+      entre productor y comprador. Asegúrate de tenerlo registrado en la app antes de crear el albarán.
+    </div>
+  </section>
+
+  <!-- 3.2 PASO 2 -->
+  <section class="seccion" id="al-paso2">
+    <span class="fase-tag leche">Paso 2 de 6</span>
+    <h2 class="modulo leche">10. Paso 2: Cisterna, Letra Q e INFOLAC</h2>
+
+    <figure>
+      <img src="img/leche-08-tanque-paso2.jpg" alt="Paso 2: Datos de recogida">
+      <figcaption>Paso 2: Datos de la cisterna, Letra Q e INFOLAC.</figcaption>
+    </figure>
+
+    <p>En este paso se registra la información logística de la recogida:</p>
+
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Transportista / Cisterna</span></td><td>Empresa de recogida y matrícula de la cisterna</td></tr>
+      <tr><td><span class="campo">Nº de precinto</span></td><td>Número de precinto del tanque (opcional pero recomendado)</td></tr>
+      <tr><td><span class="campo">Letra Q</span></td><td>Letra Q de clasificación de la leche (Q=calidad, NoQ=no calidad)</td></tr>
+      <tr><td><span class="campo">INFOLAC</span></td><td>Nº de registro INFOLAC si aplica</td></tr>
+      <tr><td><span class="campo">Volumen recogido (L)</span></td><td>Litros de leche recogidos en esta expedición</td></tr>
+      <tr><td><span class="campo">Control de antibióticos</span></td><td>¿Se ha realizado test de inhibidores? (Sí/No)</td></tr>
+    </table>
+
+    <div class="nota">
+      <strong>Nota:</strong> La Letra Q es un indicador de calidad exigido por la normativa europea.
+      Si la leche no cumple los parámetros mínimos de calidad, se clasifica como "No Q".
+    </div>
+  </section>
+
+  <!-- 3.3 PASO 3 -->
+  <section class="seccion" id="al-paso3">
+    <span class="fase-tag leche">Paso 3 de 6</span>
+    <h2 class="modulo leche">11. Paso 3: Cadena de Frío y Temperatura</h2>
+
+    <figure>
+      <img src="img/leche-09-tanque-paso3.jpg" alt="Paso 3: Cadena de frío">
+      <figcaption>Paso 3: Registro de la cadena de frío, temperatura e inhibidores.</figcaption>
+    </figure>
+
+    <p>Control de la temperatura de la leche en el momento de la recogida:</p>
+
+    <table class="parametros">
+      <tr><th>Campo</th><th>Descripción</th><th>Rango recomendado</th></tr>
+      <tr><td><span class="campo">Temperatura del tanque (°C)</span></td><td>Temperatura de la leche en el tanque de almacenamiento</td><td>2–6 °C</td></tr>
+      <tr><td><span class="campo">Temperatura ambiente (°C)</span></td><td>Temperatura exterior en el momento de la recogida</td><td>-</td></tr>
+      <tr><td><span class="campo">Temperatura a la llegada (°C)</span></td><td>Temperatura de la leche al llegar a la industria</td><td>&lt; 8 °C</td></tr>
+      <tr><td><span class="campo">Horas desde el último ordeño</span></td><td>Tiempo transcurrido desde el último ordeño hasta la recogida</td><td>&lt; 24h</td></tr>
+      <tr><td><span class="campo">Test de inhibidores</span></td><td>Resultado del test de detección de antibióticos</td><td>Negativo</td></tr>
+    </table>
+
+    <div class="aviso">
+      <strong>⚠️ Importante:</strong> Si el test de inhibidores es positivo, la leche NO puede ser recogida para consumo humano.
+      La app te alertará y bloqueará la finalización del albarán hasta que se resuelva la incidencia.
+    </div>
+  </section>
+
+  <!-- 3.4 PASO 4 -->
+  <section class="seccion" id="al-paso4">
+    <span class="fase-tag leche">Paso 4 de 6</span>
+    <h2 class="modulo leche">12. Paso 4: Laboratorio y Analíticas</h2>
+
+    <figure>
+      <img src="img/leche-10-tanque-paso4.jpg" alt="Paso 4: Resultados de laboratorio">
+      <figcaption>Paso 4: Resultados analíticos del laboratorio — parámetros de calidad de la leche.</figcaption>
+    </figure>
+
+    <p>Registro de los resultados del análisis de laboratorio de la leche:</p>
+
+    <table class="parametros">
+      <tr><th>Parámetro</th><th>Unidad</th><th>Rango de calidad</th></tr>
+      <tr><td><span class="campo">Grasa</span></td><td>%</td><td>≥ 3,5%</td></tr>
+      <tr><td><span class="campo">Proteína</span></td><td>%</td><td>≥ 3,0%</td></tr>
+      <tr><td><span class="campo">Extracto seco</span></td><td>%</td><td>≥ 12,0%</td></tr>
+      <tr><td><span class="campo">Recuento de bacterias</span></td><td>UFC/ml</td><td>&lt; 100.000</td></tr>
+      <tr><td><span class="campo">Células somáticas</span></td><td>Cél./ml</td><td>&lt; 400.000</td></tr>
+      <tr><td><span class="campo">Punto crioscópico</span></td><td>°C</td><td>≥ -0,520 °C</td></tr>
+      <tr><td><span class="campo">Urea</span></td><td>mg/L</td><td>150–300</td></tr>
+      <tr><td><span class="campo">Acidez</span></td><td>°D</td><td>6,0–7,5</td></tr>
+    </table>
+
+    <div class="info-tecnica">
+      <strong>🧪 Parámetros:</strong> Los valores de referencia corresponden a la normativa europea (Reglamento 853/2004)
+      y al RD 640/2006 para leche cruda de ovino y caprino.
+    </div>
+  </section>
+
+  <!-- 3.5 PASO 5 -->
+  <section class="seccion" id="al-paso5">
+    <span class="fase-tag leche">Paso 5 de 6</span>
+    <h2 class="modulo leche">13. Paso 5: Precio y Liquidación</h2>
+
+    <figure>
+      <img src="img/leche-11-tanque-paso5.jpg" alt="Paso 5: Precio y liquidación">
+      <figcaption>Paso 5: Cálculo del precio de la leche y detalle de la liquidación.</figcaption>
+    </figure>
+
+    <p>Cálculo detallado del precio de la leche en función de los parámetros de calidad:</p>
+
+    <table class="parametros">
+      <tr><th>Concepto</th><th>Descripción</th></tr>
+      <tr><td><span class="campo">Volumen facturado (L)</span></td><td>Litros totales de la expedición</td></tr>
+      <tr><td><span class="campo">Precio base (€/L)</span></td><td>Precio base establecido en el contrato lácteo</td></tr>
+      <tr><td><span class="campo">Precio grasa (€/L)</span></td><td>Prima o penalización por contenido de grasa sobre el estándar</td></tr>
+      <tr><td><span class="campo">Precio proteína (€/L)</span></td><td>Prima o penalización por contenido de proteína sobre el estándar</td></tr>
+      <tr><td><span class="campo">Precio extracto seco (€/L)</span></td><td>Prima por extracto seco</td></tr>
+      <tr><td><span class="campo">Primas / bonificaciones</span></td><td>Primas por calidad (recuento bajo, células somáticas, etc.)</td></tr>
+      <tr><td><span class="campo">Penalizaciones</span></td><td>Descuentos por incumplimiento de parámetros</td></tr>
+      <tr><td><span class="campo">Precio final (€/L)</span></td><td>Precio total después de primas y penalizaciones</td></tr>
+      <tr><td><span class="campo">Importe total (€)</span></td><td>Volumen × Precio final</td></tr>
+    </table>
+
+    <div class="tip">
+      <strong>Tip:</strong> La app calcula automáticamente el precio final aplicando las primas y penalizaciones
+      según los parámetros de calidad registrados en el paso de laboratorio.
+    </div>
+  </section>
+
+  <!-- 3.6 PASO 6 -->
+  <section class="seccion" id="al-paso6">
+    <span class="fase-tag leche">Paso 6 de 6</span>
+    <h2 class="modulo leche">14. Paso 6: MOFA y Resumen Final</h2>
+
+    <figure>
+      <img src="img/leche-12-tanque-paso6.jpg" alt="Paso 6: MOFA y resumen">
+      <figcaption>Paso 6: Resumen MOFA y confirmación final del albarán.</figcaption>
+    </figure>
+
+    <p>Último paso del wizard, donde se genera el resumen para la <strong>MOFA</strong> (Mensual de Operadores y Facturación Anual):</p>
+
+    <h4>Resumen MOFA</h4>
+    <ul>
+      <li><strong>Total litros del período:</strong> Suma de todas las expediciones del mes</li>
+      <li><strong>Volumen de esta expedición:</strong> Litros declarados en este albarán</li>
+      <li><strong>Acumulado mensual:</strong> Volumen total del mes hasta la fecha</li>
+      <li><strong>Importe total mensual:</strong> Suma acumulada de importes</li>
+    </ul>
+
+    <h4>Resumen del albarán</h4>
+    <p>Antes de finalizar, se muestra un resumen completo de todos los datos introducidos:</p>
+    <ul>
+      <li>Datos de la explotación y contrato</li>
+      <li>Volumen y calidad (parámetros analíticos)</li>
+      <li>Precio y liquidación detallada</li>
+      <li>Cadena de frío e inhibidores</li>
+    </ul>
+
+    <p>Pulsa <kbd>FINALIZAR</kbd> para guardar el albarán y generar la documentación.</p>
+
+    <div class="nota">
+      <strong>Documentos generados:</strong>
+      <ul>
+        <li><strong>Albarán de leche</strong> en formato PDF con todos los datos de la expedición</li>
+        <li><strong>Registro MOFA</strong> actualizado con el volumen e importe de esta expedición</li>
+        <li><strong>Etiqueta de tanque</strong> con la trazabilidad del lote</li>
+      </ul>
+    </div>
+
+    <div class="tip">
+      <strong>Tip:</strong> Los albaranes de leche quedan registrados en la pestaña <strong>Leche</strong>
+      de Comercialización. Puedes consultarlos, reimprimirlos o editarlos en cualquier momento.
+    </div>
+  </section>
+
+  <div class="text-center text-gray text-xs" style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
+    Livestock Manager v6.4 · Manual de Comercialización · Venta Masiva y Albarán de Leche
+  </div>
+
+</div>
+
+</body>
+</html>
