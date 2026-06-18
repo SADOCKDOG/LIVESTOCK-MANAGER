@@ -722,57 +722,100 @@ const App = {
 
   async _escanearCrotal(inputId) {
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
-    if (!BarcodeScanner) {
-      // Fallback: input manual con sugerencia
-      App.toast('Escáner no disponible — introduce el crotal manualmente');
-      return;
+
+    // 1️⃣ Intentar con Capacitor nativo
+    if (BarcodeScanner) {
+      try {
+        const perm = await BarcodeScanner.checkPermission({ force: true });
+        if (!perm.granted) {
+          App.toastError(perm.denied
+            ? 'Permiso de cámara denegado permanentemente. Actívalo en Ajustes > Apps > Livestock Manager > Permisos.'
+            : 'Permiso de cámara no concedido');
+          return;
+        }
+        await BarcodeScanner.prepare();
+        await BarcodeScanner.hideBackground();
+        App.toast('Enfoca el código del crotal...', 3000);
+        const result = await BarcodeScanner.startScan();
+        try { await BarcodeScanner.showBackground(); } catch (_) {}
+        if (result.hasContent && result.content) {
+          return this._procesarCrotalEscaneado(inputId, result.content.trim());
+        }
+        App.toast('Escaneo cancelado');
+        return;
+      } catch (err) {
+        try { await BarcodeScanner.showBackground(); } catch (_) {}
+        console.warn('[SCAN] Error nativo:', err);
+        // Fall through to web fallback
+      }
     }
 
+    // 2️⃣ Fallback Web: BarcodeDetector API (Chrome/Edge Android)
     try {
-      // 1️⃣ Permiso de cámara
-      const perm = await BarcodeScanner.checkPermission({ force: true });
-      if (!perm.granted) {
-        if (perm.denied) {
-          App.toastError('Permiso de cámara denegado permanentemente. Actívalo en Ajustes > Apps > Livestock Manager > Permisos.');
-        } else {
-          App.toastError('Permiso de cámara no concedido');
-        }
+      if (!('BarcodeDetector' in window)) {
+        App.toastError('Escáner no disponible en este navegador. Introduce el crotal manualmente.');
         return;
       }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: 640, height: 480 }
+      });
+      // Crear overlay de escaneo
+      const overlay = document.createElement('div');
+      overlay.id = 'scanner-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
+      overlay.innerHTML = `
+        <video id="scanner-video" autoplay playsinline style="flex:1;width:100%;object-fit:cover;"></video>
+        <div style="padding:16px;text-align:center;background:#1a1a1a;">
+          <div class="text-white text-sm mb-8">🔍 Enfoca el código de barras del crotal</div>
+          <button class="btn btn-primary btn-sm" onclick="App._cancelarScanWeb()" style="background:#ef4444;">✕ Cancelar</button>
+        </div>`;
+      document.body.appendChild(overlay);
+      const video = overlay.querySelector('#scanner-video');
+      video.srcObject = stream;
+      window._scanStream = stream;
+      window._scanOverlay = overlay;
 
-      // 2️⃣ Preparar y escanear
-      await BarcodeScanner.prepare();
-      await BarcodeScanner.hideBackground();
-      App.toast('Enfoca el código QR/barras del crotal...', 3000);
-
-      const result = await BarcodeScanner.startScan();
-
-      // 3️⃣ Restaurar vista web
-      try { await BarcodeScanner.showBackground(); } catch (_) {}
-
-      if (result.hasContent && result.content) {
-        const codigo = result.content.trim();
-        const input = document.getElementById(inputId);
-        if (input) {
-          input.value = codigo;
-          // Disparar eventos para listeners del formulario
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          input.dispatchEvent(new Event('change', { bubbles: true }));
-          // Validar formato del crotal
-          if (window.AnimalesView?._validarCrotalUI) {
-            window.AnimalesView._validarCrotalUI(input);
+      // Intentar detectar cada 1.5s
+      const detector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'code_93', 'data_matrix', 'itf', 'aztec'] });
+      let detectado = false;
+      const intervalo = setInterval(async () => {
+        if (detectado) return;
+        try {
+          const barcodes = await detector.detect(video);
+          if (barcodes.length > 0 && barcodes[0].rawValue) {
+            detectado = true;
+            clearInterval(intervalo);
+            this._cancelarScanWeb();
+            await this._procesarCrotalEscaneado(inputId, barcodes[0].rawValue.trim());
           }
-          App.toast(`✅ Crotal leído: ${codigo}`, 4000);
-        }
-      } else {
-        App.toast('Escaneo cancelado');
-      }
+        } catch (_) {}
+      }, 1500);
+      window._scanInterval = intervalo;
     } catch (err) {
-      // Restaurar vista web en caso de error
-      try { await window.Capacitor?.Plugins?.BarcodeScanner?.showBackground(); } catch (_) {}
-      console.warn('[SCAN] Error escaneando crotal:', err);
-      App.toastError('Error al escanear: ' + (err.message || err));
+      console.warn('[SCAN] Error web:', err);
+      App.toastError('No se pudo iniciar la cámara. Introduce el crotal manualmente.');
     }
+  },
+
+  /** Procesa el código escaneado y lo asigna al input */
+  _procesarCrotalEscaneado(inputId, codigo) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = codigo.toUpperCase();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    if (window.AnimalesView?._validarCrotalUI) {
+      window.AnimalesView._validarCrotalUI(input);
+    }
+    App.toast(`✅ Crotal leído: ${codigo.toUpperCase()}`, 4000);
+  },
+
+  /** Cancela el escaneo web y libera recursos */
+  _cancelarScanWeb() {
+    if (window._scanInterval) { clearInterval(window._scanInterval); window._scanInterval = null; }
+    if (window._scanStream) { window._scanStream.getTracks().forEach(t => t.stop()); window._scanStream = null; }
+    const ov = document.getElementById('scanner-overlay');
+    if (ov) ov.remove();
   },
   async _abrirWizardReproduccion(animalId) {
     if (!window.Reproduccion) { this.toastError('Módulo de reproducción no disponible'); return; }
