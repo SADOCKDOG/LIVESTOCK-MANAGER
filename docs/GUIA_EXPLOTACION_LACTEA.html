@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Guía de Explotación Láctea - Livestock Manager v4.2.0</title>
+    <style>
+        :root { --primary: #3b82f6; --bg: #0a0a0a; --card: #171717; --text: #e5e5e5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 40px; }
+        .header { display: flex; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
+        .logo { height: 80px; margin-right: 20px; }
+        h1 { color: var(--primary); margin: 0; }
+        .module-card { background: var(--card); border-radius: 12px; padding: 25px; margin-bottom: 25px; border-left: 5px solid var(--primary); }
+        .screenshot { width: 100%; max-width: 400px; border-radius: 8px; border: 1px solid #333; margin: 15px 0; display: block; }
+        .badge { background: #3b82f622; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
+        footer { margin-top: 50px; font-size: 0.8em; color: #737373; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="Logo-app.png" class="logo" alt="Logo">
+        <div>
+            <h1>Gestión de Producción Láctea</h1>
+            <p>Control de Entregas y Calidad (v4.2.0)</p>
+        </div>
+    </div>
+
+    <div class="module-card">
+        <h2><span class="badge">LECHE</span> Registro de Entregas</h2>
+        <p>Seguimiento diario de la recogida de leche por cisterna. Incluye campos para extracto seco, grasa, proteína y mofa.</p>
+        <img src="img/leche.png" class="screenshot" alt="Pantalla Leche">
+        <ul>
+            <li><strong>Cálculo de Precio:</strong> El sistema calcula el precio final unitario basado en los componentes de calidad.</li>
+            <li><strong>INFOLAC:</strong> Preparado para la comunicación de datos a los sistemas oficiales.</li>
+        </ul>
+    </div>
+
+    <div class="module-card">
+        <h2><span class="badge">KPIs</span> Análisis de Rendimiento</h2>
+        <p>Monitorice la producción por animal o por rebaño para identificar a los individuos más productivos.</p>
+        <img src="img/dash.png" class="screenshot" alt="Dashboard KPIs">
+    </div>
+
+    <footer>
+        &copy; 2026 Livestock Manager Premium - Especialista en Vacuno y Ovino de Leche
+    </footer>
+</body>
+</html>

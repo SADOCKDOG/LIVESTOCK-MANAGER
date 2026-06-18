@@ -1,0 +1,629 @@
+/**
+ * Livestock Manager - CuadernoDigitalView v1.0.0
+ * Cuaderno Digital de Explotación Ganadera (RD 787/2023)
+ *
+ * Agrega todos los registros obligatorios en un informe único
+ * con validez oficial, exportable a PDF.
+ *
+ * Secciones:
+ *   1. Explotación  2. Censo  3. Movimientos  4. Sanidad
+ *   5. Reproducción  6. Producción  7. Alimentación  8. Incidencias
+ */
+
+const CuadernoDigitalView = {
+
+  async render() {
+    const main = document.getElementById('app-content');
+    main.innerHTML = `<div class="text-center p-40"><div class="loader">Generando Cuaderno Digital...</div></div>`;
+
+    try {
+      const data = await this._recopilarDatos();
+      this._renderContenido(main, data);
+    } catch (e) {
+      console.error('[CuadernoDigital] Error:', e);
+      main.innerHTML = `<div class="card text-center p-40 text-red">❌ Error al generar Cuaderno Digital: ${e.message}</div>`;
+    }
+  },
+
+  async _recopilarDatos() {
+    const finca = await Fincas.getActive();
+    const activeId = await Fincas.getActiveId();
+    const [animales, rebanos, sanitarios, eventos, reproduccion,
+           ventasCarne, ventasLeche, pesajes, transportistas, docs] = await Promise.all([
+      window.db.getAll('animales').catch(() => []),
+      window.db.getAll('rebanos').catch(() => []),
+      window.db.getAll('sanitarios_ganado').catch(() => []),
+      window.db.getAll('registro_eventos').catch(() => []),
+      window.db.getAll('reproduccion_eventos').catch(() => []),
+      window.db.getAll('comercializacion_carne').catch(() => []),
+      window.db.getAll('comercializacion_leche').catch(() => []),
+      window.db.getAll('produccion_carne').catch(() => []),
+      window.db.getAll('transportistas').catch(() => []),
+      window.db.getAll('documentos_legales').catch(() => []),
+    ]);
+
+    const activos = animales.filter(a => a.estado === 'activo' || a.estado === 'Activo');
+    const rebanosIdx = {};
+    rebanos.forEach(r => { rebanosIdx[r.id] = r; });
+
+    // Especies y categorías
+    const censoPorEspecie = {};
+    activos.forEach(a => {
+      const esp = a.especie || 'Sin especie';
+      if (!censoPorEspecie[esp]) censoPorEspecie[esp] = { total: 0, hembras: 0, machos: 0, categorias: {} };
+      censoPorEspecie[esp].total++;
+      if (a.sexo === 'hembra' || a.sexo === 'Hembra') censoPorEspecie[esp].hembras++;
+      if (a.sexo === 'macho' || a.sexo === 'Macho') censoPorEspecie[esp].machos++;
+      const cat = a.categoria || 'Sin categoría';
+      if (!censoPorEspecie[esp].categorias[cat]) censoPorEspecie[esp].categorias[cat] = 0;
+      censoPorEspecie[esp].categorias[cat]++;
+    });
+
+    // Métricas de sanidad
+    const tratamientosActivos = sanitarios.filter(t => {
+      if (!t.fecha || !t.tiempo_espera_carne_dias) return false;
+      const fechaTrat = new Date(t.fecha);
+      const diasPasados = Math.floor((new Date() - fechaTrat) / (1000 * 60 * 60 * 24));
+      return diasPasados < t.tiempo_espera_carne_dias;
+    });
+
+    // KPIs reproductivos
+    const partos = reproduccion.filter(e => (e.tipo || '').toLowerCase().includes('parto'));
+    const cubriciones = reproduccion.filter(e => (e.tipo || '').toLowerCase().includes('cubricion') || e.tipo?.toLowerCase().includes('celo'));
+    const gestaciones = reproduccion.filter(e => (e.resultado || '').toLowerCase().includes('gestante') || e.resultado?.toLowerCase().includes('positivo'));
+
+    // Incidencias / mortalidad
+    const bajas = animales.filter(a => a.estado === 'baja' || a.estado === 'Baja' || a.estado === 'muerto' || a.estado === 'Muerto');
+    const incidenciasEventos = eventos.filter(e =>
+      (e.motivo_tarea || '').toLowerCase().includes('baja') ||
+      (e.motivo_tarea || '').toLowerCase().includes('muerte') ||
+      (e.tipo || '').toLowerCase().includes('incidencia')
+    );
+
+    const year = new Date().getFullYear();
+    const yearStart = new Date(year, 0, 1);
+    const bajasAnio = bajas.filter(a => a.fecha_baja && new Date(a.fecha_baja) >= yearStart).length;
+
+    return {
+      finca,
+      censo: censoPorEspecie,
+      totalActivos: activos.length,
+      rebanos,
+      animales: activos,
+      sanitarios: sanitarios.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
+      tratamientosActivos,
+      eventos: eventos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
+      reproduccion: reproduccion.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
+      partos: partos.length,
+      cubriciones: cubriciones.length,
+      gestaciones: gestaciones.length,
+      ventasCarne: ventasCarne.sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0)),
+      ventasLeche: ventasLeche.sort((a, b) => new Date(b.fechaRecogida || 0) - new Date(a.fechaRecogida || 0)),
+      pesajes,
+      transportistas,
+      docs,
+      bajasAnio,
+      totalBajas: bajas.length,
+      totalIncidencias: incidenciasEventos.length,
+      year,
+    };
+  },
+
+  _renderContenido(main, d) {
+    const f = d.finca || {};
+
+    main.innerHTML = `
+    <div style="max-width:900px; margin:0 auto;">
+      <!-- Cabecera -->
+      <div class="text-center mb-25">
+        <div class="text-gold text-82">RD 787/2023 — Explotación Ganadera</div>
+        <div class="mt-8 flex justify-center gap-10 flex-wrap">
+          <button class="btn btn-primary" onclick="CuadernoDigitalView._exportarPDF()">📄 Exportar PDF Completo</button>
+          <button class="btn btn-secondary" onclick="CuadernoDigitalView._imprimir()">🖨 Imprimir</button>
+        </div>
+      </div>
+
+      <!-- 1. EXPLOTACIÓN -->
+      <div class="card card-left-amber">
+        <h3 class="section-h3 text-gold">1. 🏠 Datos de la Explotación</h3>
+        <div class="grid grid-cols-2 gap-6 text-85">
+          <div><span class="text-gray">Nombre:</span> <strong class="text-white">${f.nombre || '—'}</strong></div>
+          <div><span class="text-gray">Código REGA:</span> <strong class="text-white">${f.codigo_REGA || f.rega || '—'}</strong></div>
+          <div><span class="text-gray">CEA:</span> <strong class="text-white">${f.cea || '—'}</strong></div>
+          <div><span class="text-gray">NIF:</span> <strong class="text-white">${f.nif || '—'}</strong></div>
+          <div><span class="text-gray">Provincia:</span> <strong class="text-white">${f.provincia || '—'}</strong></div>
+          <div><span class="text-gray">Municipio:</span> <strong class="text-white">${f.municipio || '—'}</strong></div>
+          <div><span class="text-gray">CC.AA.:</span> <strong class="text-white">${f.comunidad_autonoma || '—'}</strong></div>
+          <div><span class="text-gray">Tipo Explotación:</span> <strong class="text-white">${f.tipo_explotacion || '—'}</strong></div>
+          <div><span class="text-gray">Sistema:</span> <strong class="text-white">${f.sistema_explotacion || '—'}</strong></div>
+          <div><span class="text-gray">ADSG:</span> <strong class="text-white">${f.adsg_nombre || '—'}</strong></div>
+          <div><span class="text-gray">Veterinario:</span> <strong class="text-white">${f.adsg_veterinario || '—'}</strong></div>
+          <div><span class="text-gray">Nº Colegiado:</span> <strong class="text-white">${f.adsg_vet_colegiado || '—'}</strong></div>
+          <div><span class="text-gray">Contrato Lácteo:</span> <strong class="text-white">${f.contrato_lacteo_numero || '—'}</strong></div>
+          <div><span class="text-gray">INFOLAC:</span> <strong class="text-white">${f.numero_infolac || '—'}</strong></div>
+        </div>
+      </div>
+
+      <!-- 2. CENSO -->
+      <div class="card card-left-blue">
+        <h3 class="section-h3 text-blue-400">2. 🐑 Censo Actual <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
+        <div class="text-3xl font-black text-white mb-10">${d.totalActivos} animales activos</div>
+        ${Object.entries(d.censo).length === 0 ? '<p class="empty-state-text mb-0">Sin animales registrados.</p>' : ''}
+        ${Object.entries(d.censo).map(([especie, info]) => `
+        <div class="rounded-sm p-10 mb-8 bg-dark">
+          <div class="flex justify-between font-bold text-gold mb-6">
+            <span>${especie}</span>
+            <span>Total: ${info.total}</span>
+          </div>
+          <div class="text-gray text-82">
+            ♀ ${info.hembras} hembras · ♂ ${info.machos} machos
+          </div>
+          <div class="mt-4 text-gray-500 text-75">
+            ${Object.entries(info.categorias).map(([cat, cnt]) =>
+              `<span class="rounded-sm" style="background:#222; padding:2px 6px; margin-right:4px;">${cat}: ${cnt}</span>`
+            ).join('')}
+          </div>
+        </div>
+        `).join('')}
+      </div>
+
+      <!-- 3. MOVIMIENTOS -->
+      <div class="card card-left-purple">
+        <h3 class="section-h3 text-purple-400">3. 🔄 Movimientos y Eventos</h3>
+        <div class="grid grid-cols-3 gap-10 mb-12">
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-green font-black text-2xl">${d.eventos.length}</div>
+            <div class="text-gray text-2xs">Eventos totales</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-red font-black text-2xl">${d.bajasAnio}</div>
+            <div class="text-gray text-2xs">Bajas este año</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-amber font-black text-2xl">${d.ventasCarne.length}</div>
+            <div class="text-gray text-2xs">Expediciones</div>
+          </div>
+        </div>
+        <div class="text-sm" style="max-height:200px; overflow-y:auto;">
+          ${d.eventos.slice(0, 30).map(e =>
+            `<div class="flex justify-between" style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+              <span class="text-gray">${e.fecha || '—'}</span>
+              <span class="text-ccc">${e.motivo_tarea || e.tipo || 'Evento'}</span>
+              <span class="text-gray-500">${e.descripcion || e.notas || ''}</span>
+            </div>`
+          ).join('') || '<p class="empty-state-text mb-0">Sin eventos registrados.</p>'}
+        </div>
+      </div>
+
+      <!-- 4. SANIDAD -->
+      <div class="card card-left-red">
+        <h3 class="section-h3 text-red">4. 💉 Registro Sanitario</h3>
+        <div class="grid grid-cols-2 gap-10 mb-12">
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-white font-black text-2xl">${d.sanitarios.length}</div>
+            <div class="text-gray text-2xs">Tratamientos totales</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-amber font-black text-2xl">${d.tratamientosActivos.length}</div>
+            <div class="text-gray text-2xs">En periodo supresión</div>
+          </div>
+        </div>
+        <div class="text-sm" style="max-height:200px; overflow-y:auto;">
+          ${d.sanitarios.slice(0, 20).map(t => {
+            const rb = d.rebanos.find(r => r.id === t.rebanoId);
+            return `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+              <span class="text-gray">${t.fecha || '—'}</span>
+              <span class="text-gold font-semibold">${t.medicamento || t.producto || '—'}</span>
+              <span class="text-gray"> · ${rb?.nombre || ''}</span>
+              <span class="text-gray-500" style="float:right;">Espera: ${t.tiempo_espera_carne_dias || '?'}d</span>
+            </div>`;
+          }).join('') || '<p class="empty-state-text mb-0">Sin tratamientos registrados.</p>'}
+        </div>
+      </div>
+
+      <!-- 5. REPRODUCCIÓN -->
+      <div class="card card-left-pink">
+        <h3 class="section-h3 text-pink">5. 🔬 Registro Reproductivo</h3>
+        <div class="grid grid-cols-3 gap-10 mb-12">
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-violet font-black text-2xl">${d.cubriciones}</div>
+            <div class="text-gray text-2xs">Cubriciones/Celos</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-amber font-black text-2xl">${d.gestaciones}</div>
+            <div class="text-gray text-2xs">Gestaciones</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-green font-black text-2xl">${d.partos}</div>
+            <div class="text-gray text-2xs">Partos</div>
+          </div>
+        </div>
+        <div class="text-sm" style="max-height:150px; overflow-y:auto;">
+          ${d.reproduccion.slice(0, 15).map(e =>
+            `<div class="flex justify-between" style="padding:3px 0; border-bottom:1px solid #1a1a1a;">
+              <span class="text-gray">${e.fecha || '—'}</span>
+              <span class="text-ccc">${e.tipo || ''}</span>
+              <span class="text-gray-500">${e.resultado || e.notas || ''}</span>
+            </div>`
+          ).join('') || '<p class="empty-state-text mb-0">Sin eventos reproductivos.</p>'}
+        </div>
+      </div>
+
+      <!-- 6. PRODUCCIÓN -->
+      <div class="card card-left-green">
+        <h3 class="section-h3 text-green">6. 📦 Producción</h3>
+        <div class="grid grid-cols-2 gap-10">
+          <div class="rounded-sm p-12 bg-dark">
+            <h4 class="text-gold mb-8 text-85 m-0">🥛 Leche</h4>
+            ${d.ventasLeche.length > 0 ? `
+              <div class="text-white font-black text-lg">${d.ventasLeche.reduce((s, v) => s + (v.litros || v.cantidad || 0), 0).toFixed(0)} L</div>
+              <div class="text-gray text-2xs">${d.ventasLeche.length} entregas</div>
+            ` : '<div class="empty-state mb-0"><p class="empty-state-text">Sin datos de producción láctea.</p></div>'}
+          </div>
+          <div class="rounded-sm p-12 bg-dark">
+            <h4 class="text-gold mb-8 text-85 m-0">🥩 Carne</h4>
+            ${d.ventasCarne.length > 0 ? `
+              <div class="text-white font-black text-lg">${d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0).toFixed(0)} kg</div>
+              <div class="text-gray text-2xs">${d.ventasCarne.length} expediciones</div>
+            ` : '<div class="empty-state mb-0"><p class="empty-state-text">Sin datos de producción cárnica.</p></div>'}
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. RESUMEN ECONÓMICO -->
+      <div class="card card-left-amber">
+        <h3 class="section-h3 text-gold">7. 💰 Resumen Económico</h3>
+        <div class="grid grid-cols-2 gap-10">
+          <div class="rounded-sm p-12 bg-dark">
+            <div class="text-gray text-2xs">Ingresos Carne</div>
+            <div class="text-xl font-black text-green">
+              ${d.ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0).toFixed(2)} €
+            </div>
+          </div>
+          <div class="rounded-sm p-12 bg-dark">
+            <div class="text-gray text-2xs">Ingresos Leche</div>
+            <div class="text-xl font-black text-green">
+              ${d.ventasLeche.reduce((s, v) => s + (v.precio_total || v.importe || 0), 0).toFixed(2)} €
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. TRANSPORTISTAS -->
+      <div class="card card-left-blue">
+        <h3 class="section-h3 text-blue-400">8. 🚛 Transportistas</h3>
+        ${d.transportistas.length > 0 ? d.transportistas.map(t => `
+        <div class="flex justify-between rounded-sm mb-6 bg-dark text-82 px-12 py-8">
+          <span class="text-white">${t.nombre} (${t.nif || '—'})</span>
+          <span class="text-gray">Matrícula: ${t.matricula || '—'}</span>
+<span class="${t.certificado_bienestar_fin ? 'text-amber' : 'text-gray-500'}">Cert: ${t.certificado_bienestar_fin || 'No registrado'}</span>
+        </div>`).join('') : '<p class="empty-state-text mb-0">Sin transportistas registrados.</p>'}
+      </div>
+
+      <!-- Pie -->
+      <div class="text-center p-20 text-555 mt-25" style="font-size:0.72rem; border-top:1px solid #222;">
+        Documento generado el ${new Date().toLocaleString('es-ES')} · Cuaderno Digital RD 787/2023<br>
+        Livestock Manager Premium — v4.3.0
+      </div>
+    </div>`;
+  },
+
+  /**
+   * Exportar PDF completo del Cuaderno Digital
+   * Usa html2pdf + Capacitor Share / navigator.share
+   */
+  async _exportarPDF() {
+    const finca = await Fincas.getActive().catch(() => null);
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    const nombreFinca = (finca?.nombre || 'explotacion').replace(/\s+/g, '_').toLowerCase();
+    const titulo = `Cuaderno_Digital_${nombreFinca}_${fechaHoy}`;
+    const fileName = `${titulo}.pdf`;
+
+    if (typeof html2pdf === 'undefined') {
+      App.toastError('html2pdf no disponible');
+      return;
+    }
+
+    App.toast("Generando PDF...");
+    let data;
+    try {
+      data = await this._recopilarDatos();
+    } catch (e) {
+      console.warn("[Cuaderno] Error recopilando datos:", e);
+      App.toastError("Error al obtener datos: " + e.message);
+      return;
+    }
+    const contenidoHTML = this._generarHTMLImprimible(data);
+
+    const pdfEl = document.createElement('div');
+    pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${contenidoHTML}</div>`;
+    document.body.appendChild(pdfEl);
+
+    try {
+      const pdfBlob = await html2pdf().set({
+        margin: [0.3, 0.3, 0.3, 0.3],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      }).from(pdfEl).toPdf().output('blob');
+      document.body.removeChild(pdfEl);
+
+      // Compartir usando el mismo patrón que informes-view
+      await this._ejecutarShare({
+        blob: pdfBlob,
+        fileName,
+        mimeType: 'application/pdf',
+        titulo: 'PDF',
+        shareTitle: 'Cuaderno Digital de Explotación',
+        shareText: `Cuaderno Digital — ${finca?.nombre || 'Explotación'}`,
+      });
+    } catch (e) {
+      document.body.removeChild(pdfEl);
+      console.warn("[Cuaderno] html2pdf falló:", e);
+      App.toastError("Error al generar PDF: " + e.message);
+    }
+  },
+
+  /**
+   * Intenta compartir el PDF por todos los medios disponibles.
+   * Idéntico al patrón usado en informes-view.js que funciona.
+   */
+  async _ejecutarShare(fileObj) {
+    const { blob, fileName, mimeType, titulo, shareTitle, shareText } = fileObj;
+
+    // 1️⃣ Capacitor Native Share (no necesita gesto)
+    try {
+      const cap = window.Capacitor;
+      const fsPlugin = cap?.Plugins?.Filesystem;
+      const sharePlugin = cap?.Plugins?.Share;
+      if (fsPlugin && sharePlugin) {
+        const dataUri = await this._blobToBase64(blob);
+        const result = await fsPlugin.writeFile({
+          path: fileName,
+          data: dataUri.split(',')[1],
+          directory: 'CACHE'
+        });
+        await sharePlugin.share({
+          title: shareTitle,
+          text: shareText,
+          url: result.uri,
+          files: [result.uri],
+          dialogTitle: `Compartir ${titulo} con…`
+        });
+        App.toast(`${titulo} compartido ✅`);
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[Capacitor Share ${titulo}] falló:`, e?.message || e);
+    }
+
+    // 2️⃣ navigator.share con File (requiere gesto)
+    try {
+      if (navigator.share) {
+        const file = new File([blob], fileName, { type: mimeType });
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          files: [file]
+        });
+        App.toast(`${titulo} compartido ✅`);
+        return true;
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        console.warn(`[navigator.share ${titulo}] falló:`, e?.message || e);
+      } else {
+        return true;
+      }
+    }
+
+    // 3️⃣ Fallback: descarga directa con blob URL
+    App.toast(`Descargando ${titulo}...`);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    App.toast(`${titulo} descargado ✅`);
+    return false;
+  },
+
+  /** Convierte un Blob a base64 */
+  _blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  },
+
+  /**
+   * Renderiza el cuaderno en un modal de pantalla completa para imprimir
+   * (en lugar de window.open que falla en Android/Capacitor)
+   * El botón "Imprimir" genera PDF y usa Capacitor Share (que ofrece imprimir en Android)
+   */
+  _abrirVistaImprimible() {
+    App.toast("Preparando impresión...");
+
+    // Quitar modal previo si existe
+    const prev = document.getElementById('cuaderno-print-overlay');
+    if (prev) prev.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'cuaderno-print-overlay';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background:#fff; overflow-y:auto; display:flex; flex-direction:column;';
+    overlay.innerHTML = `
+      <div style="position:sticky; top:0; z-index:10; background:#f5f5f5; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d97706; -webkit-print-color-adjust:exact;">
+        <span style="font-weight:bold; font-size:14px; color:#333;">📋 Vista de Impresión — Cuaderno Digital</span>
+        <div style="display:flex; gap:10px;">
+          <button id="cuaderno-btn-print" style="padding:10px 24px; font-size:14px; cursor:pointer; background:#d97706; color:#fff; border:none; border-radius:6px; font-weight:bold;">📄 Compartir / Imprimir PDF</button>
+          <button id="cuaderno-btn-cerrar" style="padding:10px 20px; font-size:14px; cursor:pointer; background:#666; color:#fff; border:none; border-radius:6px;">✕ Cerrar</button>
+        </div>
+      </div>
+      <div id="cuaderno-print-content" style="flex:1; padding:20px; font-family:'Courier New',monospace; color:#000; font-size:10px; line-height:1.4;"></div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Cargar datos y renderizar
+    this._recopilarDatos().then(data => {
+      const contenidoHTML = this._generarHTMLImprimible(data);
+      document.getElementById('cuaderno-print-content').innerHTML = `
+        <div style="max-width:180mm; margin:0 auto;">${contenidoHTML}</div>
+      `;
+      // Guardar datos para el botón de imprimir
+      overlay._printData = data;
+    }).catch(e => {
+      console.error('[Cuaderno] Error al preparar impresión:', e);
+      App.toastError('Error al preparar la impresión');
+    });
+
+    // Evento imprimir: generar PDF y compartir vía Capacitor/navigator
+    document.getElementById('cuaderno-btn-print').onclick = async () => {
+      if (!overlay._printData) {
+        App.toastError('Datos aún cargando...');
+        return;
+      }
+      if (typeof html2pdf === 'undefined') {
+        App.toastError('html2pdf no disponible');
+        return;
+      }
+      try {
+        const finca = overlay._printData.finca || {};
+        const fechaHoy = new Date().toISOString().split('T')[0];
+        const nombreFinca = (finca.nombre || 'explotacion').replace(/\s+/g, '_').toLowerCase();
+        const fileName = `Cuaderno_Digital_${nombreFinca}_${fechaHoy}.pdf`;
+
+        App.toast("Generando PDF...");
+        const contenidoHTML = overlay._printData._html || document.getElementById('cuaderno-print-content').innerHTML;
+
+        const pdfEl = document.createElement('div');
+        pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${CuadernoDigitalView._generarHTMLImprimible(overlay._printData)}</div>`;
+        document.body.appendChild(pdfEl);
+
+        const pdfBlob = await html2pdf().set({
+          margin: [0.3, 0.3, 0.3, 0.3],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        }).from(pdfEl).toPdf().output('blob');
+        document.body.removeChild(pdfEl);
+
+        await this._ejecutarShare({
+          blob: pdfBlob,
+          fileName,
+          mimeType: 'application/pdf',
+          titulo: 'PDF',
+          shareTitle: 'Cuaderno Digital de Explotación',
+          shareText: `Cuaderno Digital — ${finca.nombre || 'Explotación'}`,
+        });
+      } catch (e) {
+        console.error('[Cuaderno] Error al generar PDF:', e);
+        App.toastError('Error al generar PDF');
+      }
+    };
+
+    // Cerrar
+    document.getElementById('cuaderno-btn-cerrar').onclick = () => overlay.remove();
+  },
+
+  _generarHTMLImprimible(d) {
+    const f = d.finca || {};
+    const totalLeche = d.ventasLeche.reduce((s, v) => s + (v.litros || v.cantidad || 0), 0);
+    const totalCarneKg = d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0);
+    const ingresosCarne = d.ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0);
+    const ingresosLeche = d.ventasLeche.reduce((s, v) => s + (v.precio_total || v.importe || 0), 0);
+
+    return `
+    <h1>📋 CUADERNO DIGITAL DE EXPLOTACIÓN</h1>
+    <p style="text-align:center; font-size:9px; color:#666;">Real Decreto 787/2023 · Generado: ${new Date().toLocaleString('es-ES')}</p>
+
+    <h2>1. Datos de la Explotación</h2>
+    <table>
+      <tr><td width="30%"><b>Nombre</b></td><td>${f.nombre || '—'}</td><td width="30%"><b>REGA</b></td><td>${f.codigo_REGA || f.rega || '—'}</td></tr>
+      <tr><td><b>CEA</b></td><td>${f.cea || '—'}</td><td><b>NIF</b></td><td>${f.nif || '—'}</td></tr>
+      <tr><td><b>Provincia</b></td><td>${f.provincia || '—'}</td><td><b>Municipio</b></td><td>${f.municipio || '—'}</td></tr>
+      <tr><td><b>CC.AA.</b></td><td>${f.comunidad_autonoma || '—'}</td><td><b>Tipo/Sistema</b></td><td>${f.tipo_explotacion || '—'} / ${f.sistema_explotacion || '—'}</td></tr>
+      <tr><td><b>ADSG</b></td><td>${f.adsg_nombre || '—'}</td><td><b>Veterinario</b></td><td>${f.adsg_veterinario || '—'} (${f.adsg_vet_colegiado || '—'})</td></tr>
+    </table>
+
+    <h2>2. Censo Actual (${d.year})</h2>
+    <p><b>Total animales activos: ${d.totalActivos}</b></p>
+    <table>
+      <tr><th>Especie</th><th>Total</th><th>Hembras</th><th>Machos</th><th>Categorías</th></tr>
+      ${Object.entries(d.censo).map(([esp, info]) => `
+        <tr>
+          <td>${esp}</td>
+          <td>${info.total}</td>
+          <td>${info.hembras}</td>
+          <td>${info.machos}</td>
+          <td>${Object.entries(info.categorias).map(([c, n]) => `${c}: ${n}`).join(', ')}</td>
+        </tr>
+      `).join('')}
+    </table>
+
+    <h2>3. Movimientos y Eventos</h2>
+    <div class="grid3">
+      <div class="stat-box"><div class="stat-num">${d.eventos.length}</div><div class="stat-label">Eventos totales</div></div>
+      <div class="stat-box"><div class="stat-num">${d.bajasAnio}</div><div class="stat-label">Bajas este año</div></div>
+      <div class="stat-box"><div class="stat-num">${d.ventasCarne.length}</div><div class="stat-label">Expediciones</div></div>
+    </div>
+    ${d.eventos.length > 0 ? `
+    <table>
+      <tr><th>Fecha</th><th>Tipo</th><th>Descripción</th></tr>
+      ${d.eventos.slice(0, 20).map(e => `<tr><td>${e.fecha || '—'}</td><td>${e.motivo_tarea || e.tipo || '—'}</td><td>${(e.descripcion || e.notas || '').substring(0, 50)}</td></tr>`).join('')}
+    </table>` : '<p>Sin movimientos registrados.</p>'}
+
+    <h2>4. Registro Sanitario</h2>
+    <div class="grid2">
+      <div class="stat-box"><div class="stat-num">${d.sanitarios.length}</div><div class="stat-label">Tratamientos totales</div></div>
+      <div class="stat-box"><div class="stat-num">${d.tratamientosActivos.length}</div><div class="stat-label">En periodo de supresión</div></div>
+    </div>
+    ${d.sanitarios.length > 0 ? `
+    <table>
+      <tr><th>Fecha</th><th>Medicamento</th><th>Días Espera</th><th>Rebano</th></tr>
+      ${d.sanitarios.slice(0, 15).map(t => `<tr><td>${t.fecha || '—'}</td><td>${t.medicamento || t.producto || '—'}</td><td>${t.tiempo_espera_carne_dias || '—'}</td><td>${d.rebanos.find(r => r.id === t.rebanoId)?.nombre || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin tratamientos registrados.</p>'}
+
+    <h2>5. Registro Reproductivo</h2>
+    <div class="grid3">
+      <div class="stat-box"><div class="stat-num">${d.cubriciones}</div><div class="stat-label">Cubriciones/Celos</div></div>
+      <div class="stat-box"><div class="stat-num">${d.gestaciones}</div><div class="stat-label">Gestaciones</div></div>
+      <div class="stat-box"><div class="stat-num">${d.partos}</div><div class="stat-label">Partos</div></div>
+    </div>
+
+    <h2>6. Producción</h2>
+    <div class="grid2">
+      <div class="stat-box"><div class="stat-num">${totalLeche.toFixed(0)} L</div><div class="stat-label">Leche total</div></div>
+      <div class="stat-box"><div class="stat-num">${totalCarneKg.toFixed(0)} kg</div><div class="stat-label">Carne (peso canal)</div></div>
+    </div>
+
+    <h2>7. Resumen Económico</h2>
+    <div class="grid2">
+      <div class="stat-box"><div class="stat-num">${ingresosCarne.toFixed(2)} €</div><div class="stat-label">Ingresos Carne</div></div>
+      <div class="stat-box"><div class="stat-num">${ingresosLeche.toFixed(2)} €</div><div class="stat-label">Ingresos Leche</div></div>
+    </div>
+
+    <h2>8. Transportistas</h2>
+    ${d.transportistas.length > 0 ? `
+    <table>
+      <tr><th>Nombre</th><th>NIF</th><th>Matrícula</th><th>Cert. Bienestar</th></tr>
+      ${d.transportistas.map(t => `<tr><td>${t.nombre}</td><td>${t.nif || '—'}</td><td>${t.matricula || '—'}</td><td>${t.certificado_bienestar_fin || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin transportistas registrados.</p>'}
+
+    <div class="footer">
+      <p>Documento generado electrónicamente con Livestock Manager Premium</p>
+      <p>Cuaderno Digital según RD 787/2023 — Fecha: ${new Date().toLocaleString('es-ES')}</p>
+    </div>`;
+  },
+
+  _imprimir() {
+    this._abrirVistaImprimible();
+  },
+};
+
+window.CuadernoDigitalView = CuadernoDigitalView;

@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+dist/
+
+# Build output — www se regenera desde raíz
+www/
+
+# Android — regenerar con npx cap copy android
+android/
+
+# Interno / Privado — datos de usuario, backups, capturas, informes
+Private/
+.env
+*.log
+
+# Claude Code — configuración personal del asistente
+.claude/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
