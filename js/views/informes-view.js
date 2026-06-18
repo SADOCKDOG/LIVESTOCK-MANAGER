@@ -2454,6 +2454,11 @@ const InformesView = {
 
       document.body.appendChild(pdfEl);
 
+      // Añadir estilos anti-corte a todos los elementos del PDF
+      pdfEl.querySelectorAll('.card, table, h3, h4, .report-section, [class*="border-top"]').forEach(el => {
+        if (el) el.style.cssText += ';page-break-inside:avoid;';
+      });
+
       updateProgress(70, 'Rasterizando PDF...');
       const opt = {
         margin: [12, 10, 12, 10],
@@ -2471,7 +2476,7 @@ const InformesView = {
           windowHeight: pdfEl.scrollHeight
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak: { mode: ['css', 'legacy'] }
       };
 
       const fileName = opt.filename;
@@ -3040,9 +3045,9 @@ const InformesView = {
 
   /** Intenta compartir por todos los medios disponibles */
   async _ejecutarShare(fileObj) {
-    const { blob, fileName, mimeType, titulo, seccion, shareTitle, shareText } = fileObj;
+    const { blob, fileName, mimeType, titulo, shareTitle, shareText } = fileObj;
 
-    // 1️⃣ Capacitor Native Share (no necesita gesto)
+    // 1️⃣ Capacitor Native Share (Android nativo)
     try {
       const cap = window.Capacitor;
       const fsPlugin = cap?.Plugins?.Filesystem;
@@ -3055,10 +3060,9 @@ const InformesView = {
           directory: 'CACHE'
         });
         await sharePlugin.share({
-          title: shareTitle,
-          text: shareText,
+          title: shareTitle || 'Livestock Manager',
+          text: shareText || '',
           url: result.uri,
-          files: [result.uri],
           dialogTitle: `Compartir ${titulo} con…`
         });
         App.toast(`${titulo} compartido ✅`);
@@ -3068,28 +3072,24 @@ const InformesView = {
       console.warn(`[Capacitor Share ${titulo}]`, e?.message || e);
     }
 
-    // 2️⃣ navigator.share con File (requiere gesto — aquí el botón lo preserva)
+    // 2️⃣ navigator.share (Web/PWA)
     try {
       if (navigator.share) {
         const file = new File([blob], fileName, { type: mimeType });
         await navigator.share({
-          title: shareTitle,
-          text: shareText,
+          title: shareTitle || 'Livestock Manager',
+          text: shareText || '',
           files: [file]
         });
         App.toast(`${titulo} compartido ✅`);
         return true;
       }
     } catch (e) {
-      if (e.name !== 'AbortError') {
-        console.warn(`[navigator.share ${titulo}]`, e?.message || e);
-      } else {
-        // Usuario canceló
-        return true;
-      }
+      if (e.name === 'AbortError') return true; // usuario canceló
+      console.warn(`[navigator.share ${titulo}]`, e?.message || e);
     }
 
-    // 3️⃣ Fallback: guardar y descargar
+    // 3️⃣ Fallback: descarga directa
     App.toast(`Descargando ${titulo}...`);
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

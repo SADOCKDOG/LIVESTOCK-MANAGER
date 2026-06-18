@@ -300,7 +300,8 @@ const AnimalesView = {
               🧬 GESTIÓN REPRODUCTIVA
             </button>` : ""}
         </div>
-        <div class="wizard-footer-fixed grid grid-cols-2 gap-12">
+        <div class="wizard-footer-fixed grid grid-cols-3 gap-8">
+          ${!esNuevo ? `<button onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action" style="background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;font-weight:800;">🔄 360°</button>` : '<div></div>'}
           <button onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">✖ SALIR</button>
           <button id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">✔ GUARDAR</button>
         </div>
