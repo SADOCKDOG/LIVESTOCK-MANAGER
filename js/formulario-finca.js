@@ -268,12 +268,29 @@ const FormularioFinca = {
    * Aplicar estilos CSS al formulario
    */
   _aplicarEstilos(contenedor) {
-    // Estilos movidos a styles.css (v5.0) — ya no se inyectan desde JS
     if (document.getElementById("formulario-finca-styles")) return;
-    const marker = document.createElement("meta");
-    marker.id = "formulario-finca-styles";
-    marker.setAttribute("data-loaded", "css-v5");
-    document.head.appendChild(marker);
+    const estilo = document.createElement("style");
+    estilo.id = "formulario-finca-styles";
+    estilo.textContent = `
+      .formulario-finca-botones .btn-primario {
+        flex: 1; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
+        font-weight: 700; font-size: 15px; background: #d97706; color: white;
+        transition: all 0.2s;
+      }
+      .formulario-finca-botones .btn-primario:hover:not(:disabled) {
+        background: #b45309; transform: translateY(-1px);
+      }
+      .formulario-finca-botones .btn-primario:disabled {
+        background: #222; color: #555; cursor: not-allowed;
+      }
+      .formulario-finca-botones .btn-secundario {
+        flex: 1; padding: 14px; border: 1px solid #333; border-radius: 12px; cursor: pointer;
+        font-weight: 700; font-size: 15px; background: #1a1a1a; color: #eee;
+        transition: all 0.2s;
+      }
+      .formulario-finca-botones .btn-secundario:hover { background: #222; }
+    `;
+    document.head.appendChild(estilo);
   },
 };
 
