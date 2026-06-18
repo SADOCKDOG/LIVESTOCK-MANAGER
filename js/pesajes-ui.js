@@ -286,7 +286,7 @@ const PesajesUI = {
 
                 try {
                     const a = entidades[currentAnimalIndex];
-                    if (!a) throw new Error("No se ha seleccionado ningún animal/entidad");
+                    if (!a) throw new Error("No hay entidad seleccionada para guardar");
 
                     const fecha = overlay.querySelector('#w-fecha')?.value || new Date().toISOString().split('T')[0];
                     const activeFincaId = await Fincas.getActiveId();
@@ -318,7 +318,7 @@ const PesajesUI = {
                             snap_identificacion: a.numero_identificacion || a.nombre || 'S/N'
                         });
 
-                        a.pesoActual = val + ' L';
+                        a.pesoActual = val; // Guardamos número para evitar error en input type=number
                         window.App.toast(`✅ ${a.numero_identificacion || 'Registro'} ➟ ${val} L`);
                     } else {
                         // MODO CARNE: registrar en Libro Maestro
@@ -334,7 +334,7 @@ const PesajesUI = {
                             snap_identificacion: a.numero_identificacion || a.nombre || 'S/N'
                         });
 
-                        a.pesoActual = val + ' kg';
+                        a.pesoActual = val;
                         window.App.toast(`✅ ${a.numero_identificacion || 'Registro'} ➟ ${val} kg`);
                     }
 
@@ -348,17 +348,18 @@ const PesajesUI = {
                             window.App.toast("Lote completado ✓");
                         }
                     } else {
+                        // Feedback individual: limpiar y refrescar
+                        input.value = '';
                         renderTable();
                     }
 
                     // Notificar refresco de vistas
                     if (window.EventBus) {
                         window.EventBus.emit('pesaje:registrado', { refresh: true });
-                        if (esModoLeche) window.EventBus.emit('leche:entrega', { cantidad: val });
                     }
                 } catch (e) {
                     console.error('[PesajesUI] Error al guardar:', e);
-                    window.App.toastError("Error al guardar: " + (e.message || "Error desconocido"));
+                    window.App.toastError("Error al guardar: " + e.message);
                 }
             };
 
