@@ -40,8 +40,17 @@ const ProduccionView = {
     eventos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
     gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
-    const carneEvents = eventos.filter(e => e.unidad === 'kg' || e.motivo_tarea === 'control');
-    const lecheEvents = eventos.filter(e => e.unidad === 'L' || e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero');
+    const carneEvents = eventos.filter(e =>
+      e.unidad === 'kg' ||
+      e.motivo_tarea === 'control' ||
+      e.motivo_tarea === 'expedicion'
+    );
+    const lecheEvents = eventos.filter(e =>
+      e.unidad === 'L' ||
+      e.unidad === 'Litros' ||
+      e.motivo_tarea === 'produccion_leche' ||
+      e.motivo_tarea === 'control_lechero'
+    );
     const ventaEvents = eventos.filter(e => e.motivo_tarea === 'expedicion' || e.rol_contable === 'VENTA');
 
     // Extracto seco medio desde comercializacion_leche
@@ -116,14 +125,14 @@ const ProduccionView = {
     const recordsHtml = records.length > 0
       ? records.map(r => `
         <div class="card mb-6" onclick="${r.onclick || ''}"
-             style="border-left:4px solid ${color}; padding:12px 14px; cursor:pointer; background:rgba(0,0,0,0.3);">
+             style="border-left:4px solid ${r.typeColor || color}; padding:12px 14px; cursor:pointer; background:rgba(0,0,0,0.3);">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
               <div class="text-white font-800 nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${r.title}</div>
               <div class="text-gray" style="font-size:0.72rem; margin-top:3px;">📅 ${r.date}${r.zone ? ' | 📍 ' + r.zone : ''}</div>
             </div>
             <div class="text-right flex-shrink-0 ml-8">
-              <div class="font-900" style="font-size:1rem; color:${color};">${r.value}</div>
+              <div class="font-900" style="font-size:1rem; color:${r.typeColor || color};">${r.value}</div>
             </div>
           </div>
         </div>`).join('')
@@ -168,13 +177,18 @@ const ProduccionView = {
       ],
       registrarLabel: 'Cárnica', listName: 'Lista PRO Cárnica',
       registrarHandler: "App._abrirAsistenteProduccion('carne')",
-      records: d.carneEvents.slice(0, 20).map(e => ({
-        title: '⚖️ Pesada: ' + (e.snap_identificacion || e.snap_especie || 'General'),
-        date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
-        zone: e.snap_zona || '',
-        value: (e.valor_neto || 0) + ' kg',
-        onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
-      })),
+      records: d.carneEvents.slice(0, 30).map(e => {
+        const isInd = e.tipo_entidad === 'animal';
+        const label = isInd ? '👤 INDIVIDUAL' : '🐄 LOTE';
+        return {
+          title: `${label}: ${e.snap_identificacion || 'S/N'}`,
+          date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+          zone: e.snap_zona || '',
+          value: (e.valor_neto || 0) + ' kg',
+          typeColor: isInd ? '#ef4444' : '#f59e0b',
+          onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
+        };
+      }),
       emptyMsg: 'Sin registros cárnicos. Usa "Registrar Cárnica" para añadir.'
     });
   },
@@ -190,13 +204,18 @@ const ProduccionView = {
       ],
       registrarLabel: 'Láctea', listName: 'Lista PRO Láctea',
       registrarHandler: "App._abrirAsistenteProduccion('leche')",
-      records: d.lecheEvents.slice(0, 20).map(e => ({
-        title: '🥛 Control: ' + (e.snap_identificacion || 'Tanque/Lote'),
-        date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
-        zone: e.snap_zona || '',
-        value: (e.valor_neto || 0) + ' L',
-        onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
-      })),
+      records: d.lecheEvents.slice(0, 30).map(e => {
+        const isInd = e.tipo_entidad === 'animal';
+        const label = isInd ? '👤 INDIVIDUAL' : '🐄 LOTE';
+        return {
+          title: `${label}: ${e.snap_identificacion || 'S/N'}`,
+          date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+          zone: e.snap_zona || '',
+          value: (e.valor_neto || 0) + ' L',
+          typeColor: isInd ? '#3b82f6' : '#8b5cf6',
+          onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
+        };
+      }),
       emptyMsg: 'Sin registros lácteos. Usa "Registrar Láctea" para añadir.'
     });
   },
@@ -247,41 +266,94 @@ const ProduccionView = {
     try {
       const evento = await window.db.get('registro_eventos', id);
       if (!evento) return;
+
+      const [rebanos, finca] = await Promise.all([
+        window.db.getAll('rebanos'),
+        Fincas.getActive()
+      ]);
+      const zonas = finca?.zonas || [];
+
       const overlay = document.createElement("div");
       overlay.className = "wizard-full-screen";
       overlay.style.justifyContent = "center";
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:400px; border-top:5px solid #d97706;">
-              <h3 class="mt-0 text-gold">Opciones de Registro</h3>
-              <p class="text-base text-ccc">Registro de ${evento.motivo_tarea}</p>
-              <div class="wizard-input-group mt-20">
-                  <label class="wizard-label">Valor Neto (${evento.unidad})</label>
-                  <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
+          <div class="card p-25" style="max-width:420px; border-top:5px solid #d97706; overflow-y:auto; max-height:90vh;">
+              <h3 class="mt-0 text-gold">Editar Registro</h3>
+              <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
+
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Valor (${evento.unidad})</label>
+                    <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
+                </div>
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Fecha</label>
+                    <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
+                </div>
               </div>
+
               <div class="wizard-input-group">
-                  <label class="wizard-label">Fecha</label>
-                  <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
+                  <label class="wizard-label">Identificación (Crotal/Lote)</label>
+                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
               </div>
-              <div class="flex gap-10 mt-30">
+
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Zona</label>
+                    <select id="edit-reg-zona" class="wizard-input wizard-select">
+                      <option value="">Sin zona</option>
+                      ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Tipo Animal</label>
+                    <input type="text" id="edit-reg-tipo" value="${evento.snap_tipo || ''}" class="wizard-input">
+                </div>
+              </div>
+
+              <div class="wizard-input-group">
+                  <label class="wizard-label">Especie</label>
+                  <select id="edit-reg-especie" class="wizard-input wizard-select">
+                    <option value="Vacas" ${evento.snap_especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
+                    <option value="Ovejas" ${evento.snap_especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
+                    <option value="Cabras" ${evento.snap_especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
+                  </select>
+              </div>
+
+              <div class="flex gap-10 mt-20">
                   <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="flex:2;">💾 Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🗑️ Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
           </div>`;
       document.body.appendChild(overlay);
+
       overlay.querySelector('#btn-save-reg').onclick = async () => {
         const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
         const fecha = overlay.querySelector('#edit-reg-fecha').value;
+        const ident = overlay.querySelector('#edit-reg-ident').value.trim();
+        const zona = overlay.querySelector('#edit-reg-zona').value;
+        const tipo = overlay.querySelector('#edit-reg-tipo').value.trim();
+        const especie = overlay.querySelector('#edit-reg-especie').value;
+
         if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
+
         evento.valor_neto = val;
         evento.fecha = fecha;
+        evento.snap_identificacion = ident;
+        evento.snap_zona = zona;
+        evento.snap_tipo = tipo;
+        evento.snap_especie = especie;
+        evento.actualizadoEn = new Date().toISOString();
+
         await window.db.put('registro_eventos', evento);
-        App.toast("Registro actualizado");
+        App.toast("Registro actualizado correctamente");
         overlay.remove();
         ProduccionView.render();
       };
+
       overlay.querySelector('#btn-del-reg').onclick = async () => {
         if (!confirm("¿Eliminar este registro de forma permanente?")) return;
         await window.db.delete('registro_eventos', id);

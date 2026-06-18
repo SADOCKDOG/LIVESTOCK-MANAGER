@@ -245,7 +245,16 @@
         if (!pcItem.animal) continue;
         for (var pp = 0; pp < pcItem.pesos.length; pp++) {
           try {
-            await Produccion.saveCarne({ animalId: pcItem.animal.id, fecha: pcItem.pesos[pp].f, peso: pcItem.pesos[pp].p });
+            // Registrar en Libro Maestro para visibilidad total
+            await Pesajes.registrar({
+              entidad_id: pcItem.animal.id,
+              tipo_entidad: 'animal',
+              valor_neto: pcItem.pesos[pp].p,
+              fecha: pcItem.pesos[pp].f,
+              motivo_tarea: 'control',
+              unidad: 'kg',
+              rol_contable: 'INVENTARIO'
+            });
           } catch (e) { console.log('[SEED] Error prod carne:', e.message); }
           await sleep(60);
         }
@@ -277,7 +286,8 @@
               motivo_tarea: 'control_lechero',
               snap_zona: 'Parcela Norte 42ha', // Snapshot manual para demo
               snap_tipo: 'Madres',
-              snap_especie: 'Vacas'
+              snap_especie: 'Vacas',
+              snap_identificacion: prodLecheVacas[plv].numero_identificacion
             });
           } catch (e) { console.log('[SEED] Error prod leche:', e.message); }
           await sleep(60);
