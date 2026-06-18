@@ -319,50 +319,107 @@ const CuadernoDigitalView = {
     const titulo = `Cuaderno_Digital_${nombreFinca}_${fechaHoy}`;
     const fileName = `${titulo}.pdf`;
 
-    if (typeof html2pdf === 'undefined') {
-      App.toastError('html2pdf no disponible');
-      return;
-    }
-
-    App.toast("Generando PDF...");
-    let data;
+    let loader;
     try {
-      data = await this._recopilarDatos();
+      // Crear overlay de carga con barra de proceso
+      loader = document.createElement('div');
+      loader.id = 'pdf-loader-overlay';
+      loader.style.cssText = `
+        position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+        background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+        align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+      `;
+      loader.innerHTML = `
+        <div style="width:280px; text-align:center;">
+          <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
+          <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
+          <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Cuaderno Digital</div>
+          <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
+            <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+          </div>
+          <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+        </div>
+        <style>
+          @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+        </style>
+      `;
+      document.body.appendChild(loader);
+
+      const updateProgress = (pct, text) => {
+        const bar = loader.querySelector('#pdf-progress-bar');
+        const txt = loader.querySelector('#pdf-progress-text');
+        if (bar) bar.style.width = pct + '%';
+        if (txt) txt.textContent = text.toUpperCase();
+      };
+
+      if (typeof html2pdf === 'undefined') {
+        App.toastError('html2pdf no disponible');
+        loader.remove();
+        return;
+      }
+
+      updateProgress(20, 'Recopilando datos...');
+      let data;
+      try {
+        data = await this._recopilarDatos();
+      } catch (e) {
+        console.warn("[Cuaderno] Error recopilando datos:", e);
+        App.toastError("Error al obtener datos: " + e.message);
+        loader.remove();
+        return;
+      }
+
+      updateProgress(50, 'Generando contenido...');
+      const contenidoHTML = this._generarHTMLImprimible(data);
+      const pdfEl = document.createElement('div');
+      pdfEl.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible;';
+      pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${contenidoHTML}</div>`;
+      document.body.appendChild(pdfEl);
+
+      updateProgress(80, 'Rasterizando PDF...');
+      try {
+        const pdfBlob = await html2pdf().set({
+          margin: [12, 10, 12, 10],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: 800,
+            scrollX: 0,
+            scrollY: 0,
+            height: pdfEl.scrollHeight,
+            windowHeight: pdfEl.scrollHeight
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        }).from(pdfEl).toPdf().output('blob');
+
+        document.body.removeChild(pdfEl);
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 400));
+        loader.remove();
+
+        // Compartir usando el mismo patrón que informes-view
+        await this._ejecutarShare({
+          blob: pdfBlob,
+          fileName,
+          mimeType: 'application/pdf',
+          titulo: 'PDF',
+          shareTitle: 'Cuaderno Digital de Explotación',
+          shareText: `Cuaderno Digital — ${finca?.nombre || 'Explotación'}`,
+        });
+      } catch (e) {
+        if (pdfEl.parentNode) document.body.removeChild(pdfEl);
+        console.warn("[Cuaderno] html2pdf falló:", e);
+        App.toastError("Error al generar PDF: " + e.message);
+        loader.remove();
+      }
     } catch (e) {
-      console.warn("[Cuaderno] Error recopilando datos:", e);
-      App.toastError("Error al obtener datos: " + e.message);
-      return;
-    }
-    const contenidoHTML = this._generarHTMLImprimible(data);
-
-    const pdfEl = document.createElement('div');
-    pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${contenidoHTML}</div>`;
-    document.body.appendChild(pdfEl);
-
-    try {
-      const pdfBlob = await html2pdf().set({
-        margin: [0.3, 0.3, 0.3, 0.3],
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      }).from(pdfEl).toPdf().output('blob');
-      document.body.removeChild(pdfEl);
-
-      // Compartir usando el mismo patrón que informes-view
-      await this._ejecutarShare({
-        blob: pdfBlob,
-        fileName,
-        mimeType: 'application/pdf',
-        titulo: 'PDF',
-        shareTitle: 'Cuaderno Digital de Explotación',
-        shareText: `Cuaderno Digital — ${finca?.nombre || 'Explotación'}`,
-      });
-    } catch (e) {
-      document.body.removeChild(pdfEl);
-      console.warn("[Cuaderno] html2pdf falló:", e);
-      App.toastError("Error al generar PDF: " + e.message);
+      console.error("[Cuaderno] Error inesperado:", e);
+      if (loader) loader.remove();
     }
   },
 
@@ -486,32 +543,81 @@ const CuadernoDigitalView = {
         App.toastError('Datos aún cargando...');
         return;
       }
-      if (typeof html2pdf === 'undefined') {
-        App.toastError('html2pdf no disponible');
-        return;
-      }
+
+      let loader;
       try {
+        // Crear overlay de carga con barra de proceso
+        loader = document.createElement('div');
+        loader.id = 'pdf-loader-overlay';
+        loader.style.cssText = `
+          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+        `;
+        loader.innerHTML = `
+          <div style="width:280px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
+            <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
+            <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Cuaderno Digital</div>
+            <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
+              <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+            </div>
+            <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+          </div>
+          <style>
+            @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+          </style>
+        `;
+        document.body.appendChild(loader);
+
+        const updateProgress = (pct, text) => {
+          const bar = loader.querySelector('#pdf-progress-bar');
+          const txt = loader.querySelector('#pdf-progress-text');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = text.toUpperCase();
+        };
+
+        if (typeof html2pdf === 'undefined') {
+          App.toastError('html2pdf no disponible');
+          loader.remove();
+          return;
+        }
+
         const finca = overlay._printData.finca || {};
         const fechaHoy = new Date().toISOString().split('T')[0];
         const nombreFinca = (finca.nombre || 'explotacion').replace(/\s+/g, '_').toLowerCase();
         const fileName = `Cuaderno_Digital_${nombreFinca}_${fechaHoy}.pdf`;
 
-        App.toast("Generando PDF...");
-        const contenidoHTML = overlay._printData._html || document.getElementById('cuaderno-print-content').innerHTML;
-
+        updateProgress(30, 'Generando contenido...');
         const pdfEl = document.createElement('div');
+        pdfEl.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible;';
         pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${CuadernoDigitalView._generarHTMLImprimible(overlay._printData)}</div>`;
         document.body.appendChild(pdfEl);
 
+        updateProgress(70, 'Rasterizando PDF...');
         const pdfBlob = await html2pdf().set({
-          margin: [0.3, 0.3, 0.3, 0.3],
+          margin: [12, 10, 12, 10],
           filename: fileName,
           image: { type: 'jpeg', quality: 0.95 },
-          html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: 800,
+            scrollX: 0,
+            scrollY: 0,
+            height: pdfEl.scrollHeight,
+            windowHeight: pdfEl.scrollHeight
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         }).from(pdfEl).toPdf().output('blob');
+
         document.body.removeChild(pdfEl);
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 400));
+        loader.remove();
 
         await this._ejecutarShare({
           blob: pdfBlob,
@@ -524,6 +630,7 @@ const CuadernoDigitalView = {
       } catch (e) {
         console.error('[Cuaderno] Error al generar PDF:', e);
         App.toastError('Error al generar PDF');
+        if (loader) loader.remove();
       }
     };
 

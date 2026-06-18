@@ -16,7 +16,7 @@ const AsistenteConfiguracion = {
                 <div class="asistente-cabecera">
                     <img src="icons/Logo aplicación.png" alt="Livestock Manager" style="height: 50px; margin-bottom: 25px; object-fit: contain;">
                     <h1>Bienvenido</h1>
-                    <p>Gestión ganadera profesional v3.2 Premium</p>
+                    <p>Gestión ganadera profesional v4.5.0 Premium</p>
                 </div>
 
                 <div class="asistente-opciones">

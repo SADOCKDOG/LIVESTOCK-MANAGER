@@ -201,25 +201,80 @@ window.WizardCrotales = {
     document.body.appendChild(overlay);
 
     overlay.querySelector("#btn-descargar-adsg").onclick = async () => {
-      const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `Solicitud_Crotales_${finca.codigo_REGA}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
-
-      const el = document.getElementById(contentId);
-      if (!el) return App.toastError("Error: contenido PDF no encontrado");
-
-      if (typeof html2pdf === 'undefined') {
-        WizardCrotales._fallbackPDF(el, opt.filename);
-        return;
-      }
-
+      let loader;
       try {
-        const pdfBlob = await html2pdf().set(opt).from(el).toPdf().output('blob');
+        // Crear overlay de carga con barra de proceso
+        loader = document.createElement('div');
+        loader.id = 'pdf-loader-overlay';
+        loader.style.cssText = `
+          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+        `;
+        loader.innerHTML = `
+          <div style="width:280px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">🏷️</div>
+            <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando Solicitud</div>
+            <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Pedido de Crotales</div>
+            <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
+              <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+            </div>
+            <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+          </div>
+          <style> @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} } </style>
+        `;
+        document.body.appendChild(loader);
+
+        const updateProgress = (pct, text) => {
+          const bar = loader.querySelector('#pdf-progress-bar');
+          const txt = loader.querySelector('#pdf-progress-text');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = text.toUpperCase();
+        };
+
+        const el = document.getElementById(contentId);
+        if (!el) {
+          App.toastError("Error: contenido PDF no encontrado");
+          loader.remove();
+          return;
+        }
+
+        updateProgress(30, 'Preparando documento...');
+        const tempContainer = document.createElement('div');
+        tempContainer.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; padding:40px; font-family:serif;';
+        tempContainer.innerHTML = el.innerHTML;
+        document.body.appendChild(tempContainer);
+
+        const opt = {
+          margin: [12, 10, 12, 10],
+          filename: `Solicitud_Crotales_${finca.codigo_REGA}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: 800,
+            height: tempContainer.scrollHeight,
+            windowHeight: tempContainer.scrollHeight
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        if (typeof html2pdf === 'undefined') {
+          loader.remove();
+          WizardCrotales._fallbackPDF(el, opt.filename);
+          return;
+        }
+
+        updateProgress(70, 'Rasterizando PDF...');
+        const pdfBlob = await html2pdf().set(opt).from(tempContainer).output('blob');
+        document.body.removeChild(tempContainer);
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 400));
+        loader.remove();
+
         App.toast("Documento listo ✅");
 
         // 1️⃣ Capacitor Native Share
@@ -246,7 +301,6 @@ window.WizardCrotales = {
               files: [result.uri],
               dialogTitle: 'Compartir Pedido de Crotales con…'
             });
-            App.toast("Documento compartido ✅");
             return;
           }
         } catch (capErr) {
@@ -262,7 +316,6 @@ window.WizardCrotales = {
               text: `Solicitud de material de identificación para ${finca.codigo_REGA}`,
               files: [file]
             });
-            App.toast("Documento compartido ✅");
             return;
           }
         } catch (shareErr) {
@@ -271,10 +324,10 @@ window.WizardCrotales = {
 
         // 3️⃣ Fallback descarga
         html2pdf().set(opt).from(el).save(opt.filename);
-        App.toast("Descargando PDF...");
       } catch (e) {
-        console.warn("html2pdf falló:", e);
-        WizardCrotales._fallbackPDF(el, opt.filename);
+        console.warn("Error en generación PDF Crotales:", e);
+        if (loader) loader.remove();
+        WizardCrotales._fallbackPDF(document.getElementById(contentId), `Solicitud_Crotales_${finca.codigo_REGA}.pdf`);
       }
     };
   },

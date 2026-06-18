@@ -1588,22 +1588,56 @@ const InformesView = {
   },
 
   async _exportPDF(seccion) {
+    let loader;
     try {
+      // Crear overlay de carga con barra de proceso
+      loader = document.createElement('div');
+      loader.id = 'pdf-loader-overlay';
+      loader.style.cssText = `
+        position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+        background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+        align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+      `;
+      loader.innerHTML = `
+        <div style="width:280px; text-align:center;">
+          <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
+          <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
+          <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Informe: ${seccion || 'Completo'}</div>
+          <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
+            <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+          </div>
+          <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+        </div>
+        <style>
+          @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+        </style>
+      `;
+      document.body.appendChild(loader);
+
+      const updateProgress = (pct, text) => {
+        const bar = loader.querySelector('#pdf-progress-bar');
+        const txt = loader.querySelector('#pdf-progress-text');
+        if (bar) bar.style.width = pct + '%';
+        if (txt) txt.textContent = text.toUpperCase();
+      };
+
       if (typeof html2pdf === 'undefined') {
         App.toastError("Librería PDF no disponible");
+        loader.remove();
         this._exportFallback();
         return;
       }
 
-      App.toast("Generando PDF...");
+      updateProgress(20, 'Cargando recursos...');
       const logoBase64 = await this._getLogoBase64();
       const finca = await Fincas.getActive();
       const d = this._cachedData;
       const fecha = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
+      updateProgress(40, 'Generando contenido...');
       // Crear contenedor del PDF
       const pdfEl = document.createElement('div');
-      pdfEl.style.cssText = 'padding:30px; font-family:"Inter",system-ui,sans-serif; color:#000; background:#fff;';
+      pdfEl.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible; padding:30px; font-family:"Inter",system-ui,sans-serif;';
       const uid = `pdf-${Date.now()}`;
 
       // Generar secciones según el tipo
@@ -1648,6 +1682,71 @@ const InformesView = {
         seccionesHtml += this._pdfSeccionRega(d);
       }
 
+      pdfEl.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #d97706; padding-bottom:18px; margin-bottom:20px; width:100%;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            ${logoBase64 ? `<img src="${logoBase64}" style="height:50px; width:auto;" alt="Logo">` : ''}
+            <div>
+              <h1 style="margin:0; font-size:1.3rem; font-weight:900; color:#d97706; text-transform:uppercase;">Livestock Manager</h1>
+              <p style="margin:2px 0 0 0; font-size:0.7rem; color:#666;">${seccion ? seccion.charAt(0).toUpperCase() + seccion.slice(1) : 'Informe completo'}</p>
+            </div>
+          </div>
+          <div style="text-align:right; font-size:0.7rem; color:#888;">
+            <div><strong>${finca?.nombre || 'Explotación'}</strong></div>
+            <div>REGA: ${finca?.codigo_REGA || 'N/D'}</div>
+            <div>${fecha}</div>
+          </div>
+        </div>
+        <div style="width:100%;">${seccionesHtml}</div>
+        <div style="margin-top:30px; padding-top:12px; border-top:1px solid #ddd; text-align:center; font-size:0.65rem; color:#999; width:100%;">
+          Informe generado por Livestock Manager Premium — ${fecha}
+        </div>
+      `;
+
+      document.body.appendChild(pdfEl);
+
+      updateProgress(70, 'Rasterizando PDF...');
+      const opt = {
+        margin: [12, 10, 12, 10],
+        filename: `Livestock_${finca?.codigo_REGA || 'export'}_${seccion || 'completo'}_${Date.now()}.pdf`,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: 800,
+          scrollX: 0,
+          scrollY: 0,
+          height: pdfEl.scrollHeight,
+          windowHeight: pdfEl.scrollHeight
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      const fileName = opt.filename;
+      const seccionLabel = seccion || 'completo';
+
+      // Usar el nuevo sistema de compartir
+      await this._exportarConCompartir(
+        async () => {
+          const pdfBlob = await html2pdf().set(opt).from(pdfEl).toPdf().output('blob');
+          document.body.removeChild(pdfEl);
+          updateProgress(100, '¡Listo!');
+          await new Promise(r => setTimeout(r, 400));
+          loader.remove();
+          return pdfBlob;
+        },
+        'PDF', fileName, 'application/pdf', seccionLabel
+      );
+    } catch (e) {
+      console.error('[PDF Export]', e);
+      App.toastError("Error al exportar PDF: " + e.message);
+      if (loader) loader.remove();
+      this._exportFallback();
+    }
+  },
       pdfEl.innerHTML = `
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #d97706; padding-bottom:18px; margin-bottom:20px;">
           <div style="display:flex; align-items:center; gap:12px;">

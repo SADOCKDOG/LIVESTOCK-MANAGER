@@ -265,6 +265,7 @@ const MotorTrazabilidad = {
         "contratos_compra",
         "transportistas",
         "documentos_legales",
+        "meta",
       ];
       const storesAInyectar = storesDisponibles.filter(
         (store) => data[store] && Array.isArray(data[store])

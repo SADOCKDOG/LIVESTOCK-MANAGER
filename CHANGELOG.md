@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.5.0] - 2026-06-18
+### Added
+- **Nuevo Generador de PDF Industrial:** Implementación de un motor de renderizado unificado para todos los documentos de la app.
+  - **Barra de Progreso Animada:** Visualización del estado de generación (Recopilando, Procesando, Rasterizando).
+  - **Ajuste A4 Perfecto:** Lógica de escalado a 800px para evitar cortes de texto y desbordamientos en móviles.
+  - **Ubicaciones actualizadas:** Manuales, Cuaderno Digital, Albaranes, Facturas, Certificados y Pedido de Crotales.
+- **Finca Demo "Chamorro" Ampliada:** Población completa de datos en los 12 módulos principales (Genealogía, DIBs, MOFA, Contabilidad).
+
+### Changed
+- Versión de app: v4.4.0 → v4.5.0
+- Service Worker: corcho-v6.5.8 → corcho-v6.5.9
+- README.md: Documentación exhaustiva de módulos y sección destacada de Onboarding.
+- Limpieza de Directorio: Archivos innecesarios en la raíz de Android movidos a la carpeta Private/.
+
 ## [v4.4.0] - 2026-06-17
 ### Added
 - **5 nuevos tipos de informe** en el Centro de Informes (14 tabs totales):
