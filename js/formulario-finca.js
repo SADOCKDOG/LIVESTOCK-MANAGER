@@ -20,109 +20,111 @@ const FormularioFinca = {
                     <button class="formulario-finca-cerrar" type="button">✕</button>
                 </div>
 
-                <form class="formulario-finca-formulario" id="formFinca">
-                    <!-- Campo: Nombre -->
-                    <div class="formulario-finca-grupo">
-                        <label for="nombreFinca">
-                            <span class="requerido">*</span> Nombre de Finca
-                        </label>
-                        <input
-                            type="text"
-                            id="nombreFinca"
-                            name="nombre"
-                            placeholder="Ej: El Chamorro"
-                            maxlength="100"
-                            required
-                        />
-                        <span class="formulario-finca-error" data-campo="nombre"></span>
-                    </div>
+                <div class="formulario-finca-cuerpo">
+                    <form class="formulario-finca-formulario" id="formFinca">
+                        <!-- Campo: Nombre -->
+                        <div class="formulario-finca-grupo">
+                            <label for="nombreFinca">
+                                <span class="requerido">*</span> Nombre de Finca
+                            </label>
+                            <input
+                                type="text"
+                                id="nombreFinca"
+                                name="nombre"
+                                placeholder="Ej: El Chamorro"
+                                maxlength="100"
+                                required
+                            />
+                            <span class="formulario-finca-error" data-campo="nombre"></span>
+                        </div>
 
-                    <!-- Campo: Propietario -->
-                    <div class="formulario-finca-grupo">
-                        <label for="propietarioFinca">
-                            <span class="requerido">*</span> Propietario
-                        </label>
-                        <input
-                            type="text"
-                            id="propietarioFinca"
-                            name="propietario"
-                            placeholder="Ej: María García López"
-                            maxlength="100"
-                            required
-                        />
-                        <span class="formulario-finca-error" data-campo="propietario"></span>
-                    </div>
+                        <!-- Campo: Propietario -->
+                        <div class="formulario-finca-grupo">
+                            <label for="propietarioFinca">
+                                <span class="requerido">*</span> Propietario
+                            </label>
+                            <input
+                                type="text"
+                                id="propietarioFinca"
+                                name="propietario"
+                                placeholder="Ej: María García López"
+                                maxlength="100"
+                                required
+                            />
+                            <span class="formulario-finca-error" data-campo="propietario"></span>
+                        </div>
 
-                    <!-- Campo: Dirección -->
-                    <div class="formulario-finca-grupo">
-                        <label for="direccionFinca">
-                            <span class="requerido">*</span> Dirección
-                        </label>
-                        <input
-                            type="text"
-                            id="direccionFinca"
-                            name="direccion"
-                            placeholder="Ej: Calle Principal 123, Municipio (Provincia)"
-                            maxlength="200"
-                            required
-                        />
-                        <span class="formulario-finca-error" data-campo="direccion"></span>
-                    </div>
+                        <!-- Campo: Dirección -->
+                        <div class="formulario-finca-grupo">
+                            <label for="direccionFinca">
+                                <span class="requerido">*</span> Dirección
+                            </label>
+                            <input
+                                type="text"
+                                id="direccionFinca"
+                                name="direccion"
+                                placeholder="Ej: Calle Principal 123, Municipio (Provincia)"
+                                maxlength="200"
+                                required
+                            />
+                            <span class="formulario-finca-error" data-campo="direccion"></span>
+                        </div>
 
-                    <!-- Campo: Teléfono (opcional) -->
-                    <div class="formulario-finca-grupo">
-                        <label for="telefonoFinca">
-                            Teléfono (Opcional)
-                        </label>
-                        <input
-                            type="tel"
-                            id="telefonoFinca"
-                            name="telefonoContacto"
-                            placeholder="Ej: +34 600 123 456"
-                            maxlength="20"
-                        />
-                        <span class="formulario-finca-error" data-campo="telefonoContacto"></span>
-                    </div>
+                        <!-- Campo: Teléfono (opcional) -->
+                        <div class="formulario-finca-grupo">
+                            <label for="telefonoFinca">
+                                Teléfono (Opcional)
+                            </label>
+                            <input
+                                type="tel"
+                                id="telefonoFinca"
+                                name="telefonoContacto"
+                                placeholder="Ej: +34 600 123 456"
+                                maxlength="20"
+                            />
+                            <span class="formulario-finca-error" data-campo="telefonoContacto"></span>
+                        </div>
 
-                    <!-- NUEVOS CAMPOS: NIF, EMAIL, ADSG -->
-                    <div class="formulario-finca-grupo">
-                        <label for="nifFinca">NIF / CIF (Opcional)</label>
-                        <input type="text" id="nifFinca" name="nif_cif" placeholder="Ej: B12345678" maxlength="20" />
-                    </div>
+                        <!-- NUEVOS CAMPOS: NIF, EMAIL, ADSG -->
+                        <div class="formulario-finca-grupo">
+                            <label for="nifFinca">NIF / CIF (Opcional)</label>
+                            <input type="text" id="nifFinca" name="nif_cif" placeholder="Ej: B12345678" maxlength="20" />
+                        </div>
 
-                    <div class="formulario-finca-grupo">
-                        <label for="emailFinca">Correo Electrónico (Opcional)</label>
-                        <input type="email" id="emailFinca" name="email" placeholder="Ej: ganaderia@ejemplo.com" maxlength="100" />
-                    </div>
+                        <div class="formulario-finca-grupo">
+                            <label for="emailFinca">Correo Electrónico (Opcional)</label>
+                            <input type="email" id="emailFinca" name="email" placeholder="Ej: ganaderia@ejemplo.com" maxlength="100" />
+                        </div>
 
-                    <div class="formulario-finca-grupo">
-                        <label for="adsgFinca">Agrupación ADSG (Opcional)</label>
-                        <input type="text" id="adsgFinca" name="adsg_nombre" placeholder="Ej: ADSG Ovino Sierra Norte" maxlength="100" />
-                    </div>
+                        <div class="formulario-finca-grupo">
+                            <label for="adsgFinca">Agrupación ADSG (Opcional)</label>
+                            <input type="text" id="adsgFinca" name="adsg_nombre" placeholder="Ej: ADSG Ovino Sierra Norte" maxlength="100" />
+                        </div>
 
-                    <div class="formulario-finca-grupo">
-                        <label for="regaFinca">Código REGA (Opcional)</label>
-                        <input type="text" id="regaFinca" name="rega" placeholder="Ej: ES-XX-XXXXXX-XXX" maxlength="25" />
-                    </div>
+                        <div class="formulario-finca-grupo">
+                            <label for="regaFinca">Código REGA (Opcional)</label>
+                            <input type="text" id="regaFinca" name="rega" placeholder="Ej: ES-XX-XXXXXX-XXX" maxlength="25" />
+                        </div>
 
-                    <div class="formulario-finca-grupo">
-                        <label for="ceaFinca">Código CEA (Opcional)</label>
-                        <input type="text" id="ceaFinca" name="cea" placeholder="Ej: XX-XXXXX-XX" maxlength="20" />
-                    </div>
+                        <div class="formulario-finca-grupo">
+                            <label for="ceaFinca">Código CEA (Opcional)</label>
+                            <input type="text" id="ceaFinca" name="cea" placeholder="Ej: XX-XXXXX-XX" maxlength="20" />
+                        </div>
 
-                    <!-- Botones -->
-                    <div class="formulario-finca-botones">
-                        <button type="submit" class="btn-primario">
-                            Crear Finca
-                        </button>
-                        <button type="button" class="btn-secundario formulario-finca-cancelar">
-                            Cancelar
-                        </button>
-                    </div>
+                        <div class="formulario-finca-mensaje-exito" style="display: none;"></div>
+                        <div class="formulario-finca-mensaje-error" style="display: none;"></div>
+                    </form>
+                </div>
 
-                    <div class="formulario-finca-mensaje-exito" style="display: none;"></div>
-                    <div class="formulario-finca-mensaje-error" style="display: none;"></div>
-                </form>
+                <!-- Botones SIEMPRE visibles abajo (fuera del scroll) -->
+                <div class="formulario-finca-botones">
+                    <button type="button" class="btn-primario" id="btn-guardar-finca">
+                        💾 Crear Finca
+                    </button>
+                    <button type="button" class="btn-secundario formulario-finca-cancelar">
+                        ✕ Cancelar
+                    </button>
+                </div>
             </div>
         `;
 
@@ -133,10 +135,19 @@ const FormularioFinca = {
     const formElement = formulario.querySelector("#formFinca");
     const btnCerrar = formulario.querySelector(".formulario-finca-cerrar");
     const btnCancelar = formulario.querySelector(".formulario-finca-cancelar");
+    const btnGuardar = formulario.querySelector("#btn-guardar-finca");
 
-    formElement.addEventListener("submit", (e) => {
-      e.preventDefault();
+    // Click en botón guardar → validar y enviar
+    btnGuardar.addEventListener("click", () => {
       this._manejarEnvio(formElement, onSubmit, formulario);
+    });
+
+    // Enter en campos también envía
+    formElement.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        this._manejarEnvio(formElement, onSubmit, formulario);
+      }
     });
 
     btnCerrar.addEventListener("click", () => {
@@ -272,6 +283,10 @@ const FormularioFinca = {
     const estilo = document.createElement("style");
     estilo.id = "formulario-finca-styles";
     estilo.textContent = `
+      .formulario-finca-cuerpo { flex: 1; overflow-y: auto; min-height: 0; }
+      .formulario-finca-botones {
+        flex-shrink: 0; background: #0a0a0a; border-top: 1px solid #1a1a1a;
+      }
       .formulario-finca-botones .btn-primario {
         flex: 1; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
         font-weight: 700; font-size: 15px; background: #d97706; color: white;
