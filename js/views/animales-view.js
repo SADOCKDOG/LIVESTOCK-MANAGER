@@ -5,6 +5,8 @@
  */
 
 const AnimalesView = {
+  _filtroActivo: { especie: '', sexo: '', estado: '' },
+
   async render() {
     const main = document.getElementById("app-content");
     const animales = await Animales.list();
@@ -15,10 +17,16 @@ const AnimalesView = {
     const rebanoMap = {};
     rebanos.forEach(r => { rebanoMap[r.id] = r; });
 
+    const activos = animales.filter(a => a.estado === 'activo').length;
+    const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
+
     let html = `
       <div class="mb-16">
-        <div class="flex flex-wrap gap-8">
-          <button class="btn btn-primary btn-sm" onclick="location.hash='/animal'">➕ Nuevo</button>
+        <div class="flex justify-between items-center">
+          <div class="flex gap-8">
+            <button class="btn btn-primary btn-sm" onclick="location.hash='/animal'">➕ Nuevo</button>
+          </div>
+          ${animales.length > 0 ? `<span class="text-xs text-gray">${activos}/${animales.length} activos</span>` : ''}
         </div>
       </div>`;
 
@@ -28,43 +36,95 @@ const AnimalesView = {
         <p class="empty-state-text">Aún no hay animales registrados.</p>
         <button class="btn btn-primary btn-sm mt-12" onclick="location.hash='/animal'">➕ Registrar primer animal</button>
       </div>`;
-    } else {
-      html += `
-        <div class="sticky-top" style="padding-bottom:10px;">
-          <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
-                 oninput="AnimalesView._filtrar(this.value)"
-                 class="search-input">
-        </div>
-        <div id="animales-lista" class="grid gap-12">`;
-
-      animales.forEach((a) => {
-        const r = rebanoMap[a.rebanoId];
-        html += AnimalesView._renderCard(a, r);
-      });
-      html += `</div>`;
-
-      html += `
-        <div id="animales-empty-search" class="empty-state-search" style="display:none;">
-          <div class="text-2xl mb-8">🔍</div>
-          <p class="text-gray-500">No se encontraron animales con ese criterio.</p>
-        </div>`;
+      main.innerHTML = html;
+      return;
     }
+
+    // Barra de resumen
+    html += `
+      <div class="flex flex-wrap gap-4 mb-10">
+        ${especies.map(esp => `<span class="badge badge-sm badge-gold">${esp}: ${animales.filter(a => a.especie === esp).length}</span>`).join('')}
+        <span class="badge badge-sm badge-green">✅ ${activos} activos</span>
+        <span class="badge badge-sm badge-red">📦 ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
+      </div>`;
+
+    // Filtros rápidos
+    html += `
+      <div class="flex flex-wrap gap-4 mb-10" style="overflow-x:auto;white-space:nowrap;">
+        ${['Todas','Vacas','Ovejas','Cabras','Cerdos'].map(esp => `
+          <button class="btn btn-${this._filtroActivo.especie === (esp === 'Todas' ? '' : esp) ? 'primary' : 'secondary'} btn-xs" style="padding:4px 10px;font-size:0.7rem;border-radius:12px;" onclick="AnimalesView._setFiltro('especie', '${esp === 'Todas' ? '' : esp}')">${esp}</button>
+        `).join('')}
+      </div>
+      <div class="sticky-top" style="padding-bottom:10px;">
+        <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
+               oninput="AnimalesView._filtrar(this.value)"
+               class="search-input">
+      </div>
+      <div id="animales-lista" class="grid gap-12">`;
+
+    const filtrados = this._aplicarFiltros(animales, rebanoMap);
+    filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
+    html += `</div>
+      <div id="animales-empty-search" class="empty-state-search" style="display:none;">
+        <div class="text-2xl mb-8">🔍</div>
+        <p class="text-gray-500">No se encontraron animales con ese criterio.</p>
+      </div>`;
 
     main.innerHTML = html;
     AnimalesView._cache = { animales, rebanoMap };
   },
 
+  _aplicarFiltros(animales, rebanoMap) {
+    let r = animales;
+    if (this._filtroActivo.especie) r = r.filter(a => a.especie === this._filtroActivo.especie);
+    if (this._filtroActivo.sexo) r = r.filter(a => a.sexo === this._filtroActivo.sexo);
+    if (this._filtroActivo.estado) r = r.filter(a => a.estado === this._filtroActivo.estado);
+    return r;
+  },
+
+  _setFiltro(tipo, valor) {
+    this._filtroActivo[tipo] = valor;
+    const texto = document.getElementById('search-animales')?.value || '';
+    this._filtrar(texto);
+    // Actualizar visual de botones
+    document.querySelectorAll('[onclick^="AnimalesView._setFiltro"]').forEach(b => {
+      const match = b.getAttribute('onclick').match(/'([^']*)'/g);
+      if (match && match.length >= 2) {
+        const bt = match[0].slice(1, -1);
+        const bv = match[1].slice(1, -1);
+        b.className = `btn btn-${bt === tipo && bv === (this._filtroActivo[tipo] || '') ? 'primary' : 'secondary'} btn-xs`;
+      }
+    });
+  },
+
   _renderCard(a, r) {
+    const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+    const iconoEspecie = a.especie === 'Vacas' ? '🐄' : a.especie === 'Ovejas' ? '🐑' : a.especie === 'Cabras' ? '🐐' : '🐾';
+    const iconoSexo = a.sexo === 'H' ? '♀' : a.sexo === 'M' ? '♂' : '⚤';
+    const colorEstado = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : a.estado === 'baja' ? '#ef4444' : '#888';
     return `
-      <div class="card card-animal" onclick="location.hash='/animal?id=${a.id}'">
-        <div class="flex justify-between items-center">
-          <h3 class="section-h3 m-0">${a.numero_identificacion}</h3>
-          <span class="text-sm text-777">Ficha ➔</span>
+      <div class="card card-animal" onclick="location.hash='/animal?id=${a.id}'" style="border-left:4px solid ${colorEstado};">
+        <div class="flex justify-between items-start">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-6">
+              <span class="text-xl">${iconoEspecie}</span>
+              <h3 class="section-h3 m-0 text-ellipsis">${a.numero_identificacion}</h3>
+            </div>
+            <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+              <span>${iconoSexo} ${a.sexo === 'H' ? 'Hembra' : a.sexo === 'M' ? 'Macho' : 'Castrado'}</span>
+              <span>·</span>
+              <span>🧬 ${a.raza || 'Sin raza'}</span>
+              <span>·</span>
+              <span>📦 ${r ? r.nombre : 'S/R'}</span>
+              ${edad !== null ? `<span>·</span><span>🎂 ${edad} años</span>` : ''}
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="badge badge-sm" style="background:${colorEstado}20;color:${colorEstado};border:1px solid ${colorEstado}40;display:block;margin-bottom:4px;">${(a.estado || 'activo').toUpperCase()}</span>
+            <span class="text-xs text-777">Ficha ➔</span>
+          </div>
         </div>
-        <p class="text-ccc text-85" style="margin:6px 0 0;">📦 ${r ? r.nombre : "S/R"} · 🧬 ${a.raza || 'Sin raza'}</p>
-        <div class="mt-8">
-          <span class="badge badge-gold">${(a.estado || 'activo').toUpperCase()}</span>
-        </div>
+        ${a.categoria ? `<div class="mt-4 text-xs text-gray">📋 ${a.categoria}</div>` : ''}
       </div>`;
   },
 
@@ -76,17 +136,19 @@ const AnimalesView = {
     const emptyMsg = document.getElementById("animales-empty-search");
     if (!contenedor) return;
 
+    let base = this._aplicarFiltros(cache.animales, cache.rebanoMap);
+
     if (!texto) {
       contenedor.style.display = 'grid';
       if (emptyMsg) emptyMsg.style.display = 'none';
-      contenedor.innerHTML = cache.animales.map(a => {
+      contenedor.innerHTML = base.map(a => {
         const r = cache.rebanoMap[a.rebanoId];
         return AnimalesView._renderCard(a, r);
       }).join('');
       return;
     }
 
-    const filtrados = cache.animales.filter(a => {
+    const filtrados = base.filter(a => {
       const rebano = cache.rebanoMap[a.rebanoId];
       const nombreReb = rebano ? rebano.nombre.toLowerCase() : '';
       return (a.numero_identificacion || '').toLowerCase().includes(texto) ||

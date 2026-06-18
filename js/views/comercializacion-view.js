@@ -22,17 +22,6 @@ const ComercializacionView = {
 
     this._inyectarEstilos();
 
-    main.innerHTML = `
-      <div class="mb-14">
-        <div class="tabs-scroll comer-tabs scroll-shadow-container">
-          <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">🥩 Carne</button>
-          <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">🥛 Leche</button>
-          <button class="comer-tab ${this._currentTab === 'gastos' ? 'active' : ''}" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">💸 Gastos</button>
-        </div>
-      </div>
-      <div id="comer-content"><div class="loader">Cargando...</div></div>`;
-
-    // Cargar datos
     const fincaId = await Fincas.getActiveId();
     const [ventas, entregas, gastosRecords] = await Promise.all([
       window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
@@ -44,12 +33,29 @@ const ComercializacionView = {
     entregas.sort((a, b) => new Date(b.fechaRecogida || 0) - new Date(a.fechaRecogida || 0));
     gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
-    const pesoTotal = ventas.reduce((s, v) => s + (v.pesoCanal || 0), 0);
-    const rendProm = ventas.length > 0
-      ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length
-      : 0;
-
+    const pesoTotal = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
+    const rendProm = ventas.length > 0 ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length : 0;
+    const ingresoTotal = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
     const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
+    const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
+    const gastoTotal = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
+
+    main.innerHTML = `
+      <!-- KPIs globales -->
+      <div class="grid grid-cols-3 gap-6 mb-14">
+        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">🥩 CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
+        <div class="info-box-center" style="border-left:3px solid #fbbf24;"><small class="s-lbl">🥛 LECHE</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div><small class="text-gray text-xs">${entregas.length} entregas · MOFA ${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</small></div>
+        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">💸 GASTOS</small><div class="inf-val-lg text-red">${gastoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${gastosRecords.length} registros</small></div>
+      </div>
+
+      <div class="mb-14">
+        <div class="tabs-scroll comer-tabs scroll-shadow-container">
+          <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">🥩 Carne</button>
+          <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">🥛 Leche</button>
+          <button class="comer-tab ${this._currentTab === 'gastos' ? 'active' : ''}" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">💸 Gastos</button>
+        </div>
+      </div>
+      <div id="comer-content"><div class="loader">Cargando...</div></div>`;
 
     this._cachedData = {
       ventas, entregas, gastosRecords,
@@ -57,23 +63,25 @@ const ComercializacionView = {
         carne: [
           { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
           { label: 'Animales', value: ventas.length },
-          { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' }
+          { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' },
+          { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
         ],
         leche: [
           { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
           { label: 'Entregas', value: entregas.length },
-          { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' }
+          { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
+          { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
         ],
         gastos: [
-          { label: 'Total (€)', value: this._fmt(gastosRecords.reduce((s, g) => s + (g.monto || 0), 0)) + ' €' },
-          { label: 'Registros', value: gastosRecords.length }
+          { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
+          { label: 'Registros', value: gastosRecords.length },
+          { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
         ]
       }
     };
 
     this._renderTabActual();
-
-      },
+  },
 
   _inyectarEstilos() {
     if (document.getElementById('comer-tab-styles')) return;

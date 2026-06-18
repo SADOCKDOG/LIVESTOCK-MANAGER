@@ -30,19 +30,35 @@ const GastosView = {
 
     this._inyectarEstilos();
 
-    // Cabecera compacta + tabs de categorías
-    main.innerHTML = `
-      <div class="mb-14">
-        <div class="tabs-scroll gasto-tabs scroll-shadow-container">
-          ${this._CATEGORIAS.map(c => `
-            <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="GastosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label}</button>
-          `).join('')}
-        </div>
-      </div>
-      <div id="gasto-content"><div class="loader">Cargando gastos...</div></div>`;
-
-    // Cargar datos
+    // Cargar datos primero
     const gastosRecords = await Gastos.list(await Fincas.getActiveId());
+
+    // Resumen mensual (últimos 6 meses)
+    const hoy = new Date();
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const porMes = {};
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
+    }
+    gastosRecords.forEach(g => {
+      if (!g.fecha) return;
+      const key = g.fecha.substring(0, 7);
+      if (porMes[key]) porMes[key].total += g.monto || 0;
+    });
+    const totalGeneral = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
+    const mesesHtml = Object.values(porMes).reverse().map(m => {
+      const pct = Math.min(100, m.total / (Math.max(1, Object.values(porMes).reduce((s,x) => Math.max(s, x.total), 0)) / 100));
+      const color = pct > 70 ? '#ef4444' : pct > 40 ? '#f59e0b' : '#10b981';
+      return `<div style="flex:1;text-align:center;">
+        <div class="text-xs text-gray mb-2">${m.label}</div>
+        <div style="height:40px;background:#1a1a1a;border-radius:6px;overflow:hidden;position:relative;">
+          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
+        </div>
+        <div class="text-xs font-bold mt-2" style="color:${color}">${(m.total/1000).toFixed(1)}k€</div>
+      </div>`;
+    }).join('');
 
     // Calcular KPIs por categoría
     const kpis = {};
@@ -54,6 +70,23 @@ const GastosView = {
         count: filtered.length
       };
     });
+
+    main.innerHTML = `
+      <div class="card mb-14" style="padding:12px;background:rgba(239,68,68,0.03);">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
+          <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
+        </div>
+        <div style="display:flex;gap:6px;">${mesesHtml}</div>
+      </div>
+      <div class="mb-14">
+        <div class="tabs-scroll gasto-tabs scroll-shadow-container">
+          ${this._CATEGORIAS.map(c => `
+            <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="GastosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label}</button>
+          `).join('')}
+        </div>
+      </div>
+      <div id="gasto-content"><div class="loader">Cargando gastos...</div></div>`;
 
     this._cachedData = { gastosRecords, kpis };
 

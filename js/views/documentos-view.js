@@ -38,21 +38,54 @@ const DocumentosView = {
     const tiposDoc = ['todos', 'dimoe', 'factura', 'certificado', 'dib'];
     const labels = { todos: '📋 Todos', dimoe: '📄 DIMOE', factura: '🧾 Facturas', certificado: '📜 Certificados', dib: '🏛️ DIB' };
     const colors = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6' };
+    const totalDocs = docs.length;
+    const porTipo = {};
+    docs.forEach(d => { porTipo[d.tipo] = (porTipo[d.tipo] || 0) + 1; });
 
     return `
+      <div class="grid grid-cols-4 gap-6 mb-14">
+        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${totalDocs}</div></div>
+        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">DIMOE</small><div class="inf-val-lg text-green">${porTipo.dimoe || 0}</div></div>
+        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">FACTURAS</small><div class="inf-val-lg text-amber">${porTipo.factura || 0}</div></div>
+        <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">DIB</small><div class="inf-val-lg text-purple">${porTipo.dib || 0}</div></div>
+      </div>
       <div class="mb-16">
-        <div class="tabs-scroll scroll-shadow-container mb-12" style="overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          ${tiposDoc.map(t => `
-            <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}"
-              onclick="DocumentosView._cambiarTab('${t}')"
-              style="text-transform:uppercase; letter-spacing:0.3px; display:inline-flex; gap:4px;">
-              ${labels[t] || t}
-            </button>
-          `).join('')}
+        <div class="flex gap-6 mb-10">
+          <div class="tabs-scroll scroll-shadow-container" style="overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap;flex:1;">
+            ${tiposDoc.map(t => `
+              <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}"
+                onclick="DocumentosView._cambiarTab('${t}')"
+                style="text-transform:uppercase; letter-spacing:0.3px; display:inline-flex; gap:4px;">
+                ${labels[t] || t}
+              </button>
+            `).join('')}
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="DocumentosView._exportDocs()" style="white-space:nowrap;">📤 Exportar</button>
         </div>
       </div>
       <div id="docs-lista">${this._renderLista(docs, ventaMap)}</div>
     `;
+  },
+
+  async _exportDocs() {
+    try {
+      const docs = this._cachedDocs || [];
+      if (!docs.length) return App.toastError('No hay documentos para exportar');
+      const data = docs.map(d => ({
+        Tipo: d.tipo || '', Número: d.numero || '', Fecha: d.fecha_emision || '',
+        Albarán: d.numero_albaran || '', Comprador: d.razonSocial || '',
+        Importe: d.importe_total || 0
+      }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Documentos');
+      const wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `Documentos_${new Date().toISOString().split('T')[0]}.xlsx`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      App.toast('✅ Documentos exportados');
+    } catch (e) { App.toastError('Error al exportar: ' + e.message); }
   },
 
   _renderLista(docs, ventaMap) {

@@ -17,64 +17,75 @@ const ZonasView = {
     if (zonas.length === 0)
       html += `<div class="empty-state"><div class="empty-state-icon">🗺️</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
     else {
+      let totalAforo = 0, totalOcupacion = 0;
       html += `<div class="grid gap-15">`;
       for (let [index, z] of zonas.entries()) {
         let censoTotal = 0;
         const rebsEnZona = rebanos.filter((r) => r.zonaActual === z.nombre);
+        const especiesEnZona = new Set();
 
         let rebanosHtml = "";
         for (let r of rebsEnZona) {
           const ans = await Animales.list(r.id);
           const n = ans.length;
           censoTotal += n;
-
-          let colorEspecie = "#3b82f6";
-          if (r.especie.toLowerCase().includes("oveja"))
-            colorEspecie = "#10b981";
-          if (r.especie.toLowerCase().includes("cerdo"))
-            colorEspecie = "#ec4899";
-          if (r.especie.toLowerCase().includes("cabra"))
-            colorEspecie = "#f59e0b";
-
-          rebanosHtml += `
-            <div class="flex justify-between items-center mt-8" style="background:rgba(0,0,0,0.3); border-left:3px solid ${colorEspecie}; padding:8px 12px; border-radius:8px;">
-              <div>
-                <div style="font-size:0.85rem; font-weight:700; color:${colorEspecie};">${r.nombre}</div>
-                <div class="text-gray text-2xs" style="text-transform:uppercase;">${r.tipo}</div>
-              </div>
-              <div class="text-white font-800" style="font-size:0.9rem;">${n} <small class="text-555" style="font-size:0.6rem;">ANM</small></div>
-            </div>`;
+          especiesEnZona.add(r.especie);
+          if (n > 0) {
+            const colorEspecie = r.especie === 'Vacas' ? '#3b82f6' : r.especie === 'Ovejas' ? '#10b981' : r.especie === 'Cabras' ? '#f59e0b' : '#ec4899';
+            rebanosHtml += `
+              <div class="flex justify-between items-center mt-6" style="background:rgba(0,0,0,0.3); border-left:3px solid ${colorEspecie}; padding:6px 10px; border-radius:8px;">
+                <div>
+                  <div style="font-size:0.8rem; font-weight:700; color:${colorEspecie};">${r.nombre}</div>
+                  <div class="text-gray text-2xs">${r.tipo}</div>
+                </div>
+                <div class="text-white font-800" style="font-size:0.85rem;">${n}</div>
+              </div>`;
+          }
         }
 
-        const aforo = z.aforoMax || 50;
-        const pct = Math.round((censoTotal / aforo) * 100);
-        const colorCenso = pct > 100 ? "#ef4444" : pct > 85 ? "#f59e0b" : "#10b981";
+        const aforo = z.aforoMax || z.aforo_maximo || 50;
+        const superficie = z.superficie || z.superficieGrafica || 0;
+        totalAforo += aforo;
+        totalOcupacion += censoTotal;
+        const pct = aforo > 0 ? Math.round((censoTotal / aforo) * 100) : 0;
+        const colorCenso = pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
+        const estadoTexto = pct > 100 ? '🔴 Sobrecarga' : pct >= 80 ? '🟡 Óptimo' : pct >= 50 ? '🟢 Aceptable' : '⚪ Infrautilizada';
 
         html += `
-          <div class="card card-left-amber" onclick="location.hash='/zona?index=${index}'" style="cursor:pointer; padding-bottom:15px;">
-            <div class="flex justify-between items-start">
+          <div class="card" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px;" onclick="location.hash='/zona?index=${index}'">
+            <div class="flex justify-between items-start mb-8">
               <div>
-                <h3 class="mb-4">${z.nombre}</h3>
-                <p class="m-0 text-gray text-sm" style="font-style:italic;">${z.usoPrincipal || "Sin uso definido"}</p>
+                <h3 class="m-0">${z.nombre}</h3>
+                <p class="m-0 text-gray text-xs">${z.usoPrincipal || 'Sin uso'}${superficie ? ` · ${superficie} ha` : ''}${especiesEnZona.size ? ` · ${[...especiesEnZona].join(', ')}` : ''}</p>
               </div>
-              <span class="text-555 text-xs">Ficha ➔</span>
+              <div class="text-right"><span class="text-xs font-bold" style="color:${colorCenso}">${estadoTexto}</span><br><span class="text-555 text-xs">Ficha ➔</span></div>
             </div>
-            <div class="mt-14 p-10 rounded" style="background:#000; border:1px solid #222;">
-              <div class="flex justify-between font-800 text-75" style="margin-bottom:6px;">
-                <span class="text-gray">OCUPACIÓN TOTAL</span>
-                <span style="color:${colorCenso};">${censoTotal} / ${aforo} (${pct}%)</span>
+            <div class="p-10 rounded" style="background:#000;border:1px solid #222;">
+              <div class="flex justify-between font-800 text-xs mb-4">
+                <span class="text-gray">OCUPACIÓN</span>
+                <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
               </div>
-              <div class="rounded-sm" style="width:100%; height:6px; background:#222; overflow:hidden;">
-                <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; box-shadow:0 0 10px ${colorCenso}44;"></div>
+              <div style="width:100%;height:8px;background:#222;border-radius:4px;overflow:hidden;">
+                <div style="width:${Math.min(pct, 100)}%;height:100%;background:${colorCenso};border-radius:4px;box-shadow:0 0 8px ${colorCenso}44;transition:width 0.3s;"></div>
               </div>
             </div>
-            <div class="mt-14">
-              <div class="text-444" style="font-size:0.65rem; font-weight:900; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Rebaños en Parcela</div>
-              ${rebanosHtml || '<p class="text-555 text-center text-75" style="margin:10px 0;">Parcela vacía</p>'}
-            </div>
+            ${rebanosHtml ? `<div class="mt-8">${rebanosHtml}</div>` : '<div class="text-gray text-xs text-center mt-8">📍 Sin rebaños asignados</div>'}
           </div>`;
       }
       html += `</div>`;
+      // Barra resumen global
+      const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
+      const colorGlobal = pctGlobal > 100 ? '#ef4444' : pctGlobal >= 80 ? '#f59e0b' : '#10b981';
+      html += `
+        <div class="card mt-15" style="background:rgba(16,185,129,0.03);padding:15px;">
+          <div class="flex justify-between items-center mb-6">
+            <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
+            <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
+          </div>
+          <div style="width:100%;height:10px;background:#222;border-radius:5px;overflow:hidden;">
+            <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
+          </div>
+        </div>`;
     }
     main.innerHTML = html;
   },

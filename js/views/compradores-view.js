@@ -11,6 +11,7 @@ const CompradoresView = {
         const main = document.getElementById("app-content");
         main.innerHTML = `
           <div class="mb-16">
+            <div id="compr-kpis"></div>
             <div class="flex gap-6 flex-wrap mb-10">
               ${['todos','cárnico','láctico','híbrido'].map(t => `
                 <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}" data-tab="${t}"
@@ -34,6 +35,25 @@ const CompradoresView = {
 
     async _cargarDatos() {
         const compradores = await Compradores.list();
+        const fincaId = await Fincas.getActiveId();
+        const [ventasCarne, ventasLeche] = await Promise.all([
+            window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
+            window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+        ]);
+        const ingresoTotal = ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0) +
+            ventasLeche.reduce((s, v) => s + ((v.cantidad || 0) * (v.precioBase || 0.45)), 0);
+        const tipos = { cárnico: 0, láctico: 0, híbrido: 0 };
+        compradores.forEach(c => { if (tipos[c.tipo_comprador] !== undefined) tipos[c.tipo_comprador]++; });
+        const kpisContainer = document.getElementById('compr-kpis');
+        if (kpisContainer) {
+            kpisContainer.innerHTML = `
+              <div class="grid grid-cols-4 gap-6 mb-14">
+                <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${compradores.length}</div></div>
+                <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">CÁRNICOS</small><div class="inf-val-lg text-red">${tipos.cárnico}</div></div>
+                <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">LÁCTEOS</small><div class="inf-val-lg text-amber">${tipos.láctico}</div></div>
+                <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${ingresoTotal.toLocaleString()}€</div></div>
+              </div>`;
+        }
         this._cachedData = compradores;
         this._renderLista(compradores);
     },

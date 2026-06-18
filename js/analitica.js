@@ -486,6 +486,167 @@ const Analitica = {
             };
         } catch (e) { console.error('[FlujoCaja]', e); return { porMes: [], totalEntradas: 0, totalSalidas: 0, totalNeto: 0, saldoFinal: 0 }; }
     },
+
+    /**
+     * Rentabilidad por Especie: ingresos, gastos, margen desglosado
+     */
+    async obtenerRentabilidadEspecie(fincaId) {
+        try {
+            const [rebanos, animales, gastos, ventasCarne, ventasLeche] = await Promise.all([
+                window.db.getAllFromIndex('rebanos', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAll('animales').catch(() => []),
+                window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAllFromIndex('comercializacion_carne', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAllFromIndex('comercializacion_leche', 'fincaId', Number(fincaId)).catch(() => []),
+            ]);
+            const rebIds = new Set(rebanos.map(r => r.id));
+            const especies = [...new Set(rebanos.filter(r => r.especie).map(r => r.especie))];
+            const porEspecie = {};
+            especies.forEach(esp => {
+                porEspecie[esp] = { especie: esp, ingresos: 0, gastos: 0, numRebanos: 0, numAnimales: 0, numVentasCarne: 0, numVentasLeche: 0 };
+            });
+            rebanos.forEach(r => {
+                if (porEspecie[r.especie]) {
+                    porEspecie[r.especie].numRebanos++;
+                    const anims = animales.filter(a => a.rebanoId === r.id && a.estado === 'activo');
+                    porEspecie[r.especie].numAnimales += anims.length;
+                }
+            });
+            ventasCarne.forEach(v => {
+                const rebId = v.snap_rebano || v.rebanoId;
+                const reb = rebanos.find(r => r.id === rebId || r.nombre === v.snap_rebano);
+                const esp = reb?.especie || 'otras';
+                if (porEspecie[esp]) {
+                    porEspecie[esp].ingresos += v.precio_total || 0;
+                    porEspecie[esp].numVentasCarne++;
+                }
+            });
+            ventasLeche.forEach(v => {
+                const esp = 'Vacas';
+                if (porEspecie[esp]) {
+                    porEspecie[esp].ingresos += (v.cantidad || 0) * (v.precioBase || 0.45);
+                    porEspecie[esp].numVentasLeche++;
+                }
+            });
+            gastos.forEach(g => {
+                const cat = (g.categoria || '').toLowerCase();
+                const rebId = g.rebanoId || g.snap_rebano;
+                const reb = rebanos.find(r => r.id === rebId || r.nombre === g.snap_rebano);
+                const esp = reb?.especie || 'otras';
+                if (porEspecie[esp]) {
+                    porEspecie[esp].gastos += g.monto || 0;
+                }
+            });
+            Object.values(porEspecie).forEach(e => e.balance = e.ingresos - e.gastos);
+            const result = Object.values(porEspecie).sort((a, b) => b.balance - a.balance);
+            const totalIngresos = result.reduce((s, e) => s + e.ingresos, 0);
+            const totalGastos = result.reduce((s, e) => s + e.gastos, 0);
+            return { porEspecie: result, totalIngresos, totalGastos, totalBalance: totalIngresos - totalGastos };
+        } catch (e) { console.error('[RentEsp]', e); return { porEspecie: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0 }; }
+    },
+
+    /**
+     * Curva de Producción: producción acumulada vs objetivo mensual
+     */
+    async obtenerCurvaProduccion(fincaId) {
+        try {
+            const [ventasCarne, leche] = await Promise.all([
+                window.db.getAllFromIndex('comercializacion_carne', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAllFromIndex('comercializacion_leche', 'fincaId', Number(fincaId)).catch(() => []),
+            ]);
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const porMes = {};
+            for (let m = 0; m < 12; m++) {
+                const key = String(m + 1).padStart(2, '0');
+                porMes[key] = { mes: meses[m], kg: 0, litros: 0, ingresos: 0, kgAcum: 0, litrosAcum: 0, ingresosAcum: 0 };
+            }
+            ventasCarne.forEach(v => {
+                const m = (v.fechaSacrificio || v.fecha_emision || '').substring(5, 7);
+                if (porMes[m]) {
+                    const kg = v.pesoCanal || v.pesoVivo || 0;
+                    porMes[m].kg += kg;
+                    porMes[m].ingresos += v.precio_total || 0;
+                }
+            });
+            leche.forEach(v => {
+                const m = (v.fechaRecogida || v.fecha || '').substring(5, 7);
+                if (porMes[m]) {
+                    const l = v.cantidad || 0;
+                    porMes[m].litros += l;
+                    porMes[m].ingresos += l * (v.precioBase || 0.45);
+                }
+            });
+            let kgAcum = 0, litrosAcum = 0, ingresosAcum = 0;
+            const valores = Object.values(porMes);
+            valores.forEach(m => {
+                kgAcum += m.kg; m.kgAcum = kgAcum;
+                litrosAcum += m.litros; m.litrosAcum = litrosAcum;
+                ingresosAcum += m.ingresos; m.ingresosAcum = ingresosAcum;
+            });
+            const totalKg = kgAcum;
+            const totalLitros = litrosAcum;
+            const totalIngresos = ingresosAcum;
+            const metaKg = Math.max(totalKg * 1.1, 1000);
+            const metaLitros = Math.max(totalLitros * 1.1, 1000);
+            const pctCumplimientoKg = metaKg > 0 ? ((totalKg / metaKg) * 100).toFixed(1) : 0;
+            const pctCumplimientoLitros = metaLitros > 0 ? ((totalLitros / metaLitros) * 100).toFixed(1) : 0;
+            return {
+                porMes: valores,
+                totalKg, totalLitros, totalIngresos,
+                metaKg, metaLitros,
+                pctCumplimientoKg, pctCumplimientoLitros
+            };
+        } catch (e) { console.error('[CurvaProd]', e); return { porMes: [], totalKg: 0, totalLitros: 0, totalIngresos: 0, metaKg: 0, metaLitros: 0, pctCumplimientoKg: '0', pctCumplimientoLitros: '0' }; }
+    },
+
+    /**
+     * Break-Even: punto muerto económico
+     */
+    async obtenerBreakEven(fincaId) {
+        try {
+            const [gastos, ventasCarne, leche, rebanos] = await Promise.all([
+                window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAllFromIndex('comercializacion_carne', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAllFromIndex('comercializacion_leche', 'fincaId', Number(fincaId)).catch(() => []),
+                window.db.getAllFromIndex('rebanos', 'fincaId', Number(fincaId)).catch(() => []),
+            ]);
+            // Separar costes fijos y variables
+            const catsFijas = ['electricidad', 'alquiler', 'seguros', 'amortización', 'impuestos', 'personal', 'gestoría'];
+            const costesFijos = gastos.filter(g => catsFijas.includes((g.categoria || '').toLowerCase())).reduce((s, g) => s + (g.monto || 0), 0);
+            const costesVariables = gastos.reduce((s, g) => s + (g.monto || 0), 0) - costesFijos;
+            // Ingresos y volumen
+            const totalKg = ventasCarne.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
+            const totalLitros = leche.reduce((s, v) => s + (v.cantidad || 0), 0);
+            const ingresosCarne = ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0);
+            const ingresosLeche = leche.reduce((s, v) => s + ((v.cantidad || 0) * (v.precioBase || 0.45)), 0);
+            const ingresosTotal = ingresosCarne + ingresosLeche;
+            // Precio medio ponderado
+            const precioMedioKg = totalKg > 0 ? ingresosCarne / totalKg : 0;
+            const precioMedioLitro = totalLitros > 0 ? ingresosLeche / totalLitros : 0;
+            // Coste variable unitario
+            const costeVarKg = totalKg > 0 ? (costesVariables * (ingresosCarne / (ingresosTotal || 1))) / totalKg : 0;
+            const costeVarLitro = totalLitros > 0 ? (costesVariables * (ingresosLeche / (ingresosTotal || 1))) / totalLitros : 0;
+            // Break-even
+            const beKg = (precioMedioKg - costeVarKg) > 0 ? costesFijos / (precioMedioKg - costeVarKg) : 0;
+            const beLitros = (precioMedioLitro - costeVarLitro) > 0 ? costesFijos / (precioMedioLitro - costeVarLitro) : 0;
+            const margenSeguridadKg = totalKg > 0 ? ((totalKg - beKg) / totalKg * 100).toFixed(1) : 0;
+            const margenSeguridadLitros = totalLitros > 0 ? ((totalLitros - beLitros) / totalLitros * 100).toFixed(1) : 0;
+            return {
+                costesFijos, costesVariables,
+                ingresosCarne, ingresosLeche, ingresosTotal,
+                precioMedioKg, precioMedioLitro,
+                costeVarKg, costeVarLitro,
+                breakEvenKg: Math.round(beKg), breakEvenLitros: Math.round(beLitros),
+                totalKgProducido: Math.round(totalKg), totalLitrosProducido: Math.round(totalLitros),
+                margenSeguridadKg: margenSeguridadKg + '%',
+                margenSeguridadLitros: margenSeguridadLitros + '%',
+                cubiertoCarne: totalKg >= beKg,
+                cubiertoLeche: totalLitros >= beLitros,
+                numRebanos: rebanos.length,
+                numMeses: Math.max(1, [...new Set([...ventasCarne.map(v => (v.fechaSacrificio || '').substring(0,7)), ...leche.map(v => (v.fechaRecogida || '').substring(0,7))].filter(Boolean))].length)
+            };
+        } catch (e) { console.error('[BreakEven]', e); return { costesFijos: 0, costesVariables: 0, ingresosTotal: 0, breakEvenKg: 0, breakEvenLitros: 0, margenSeguridadKg: '0%', margenSeguridadLitros: '0%', cubiertoCarne: false, cubiertoLeche: false, numRebanos: 0, numMeses: 0 }; }
+    },
 };
 
 window.Analitica = Analitica;

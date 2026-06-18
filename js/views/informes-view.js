@@ -18,10 +18,13 @@ const InformesView = {
     main.style.paddingRight = '12px';
 
     main.innerHTML = `
+      <div id="inf-kpis-bar" class="grid grid-cols-4 gap-6 mb-14" style="display:none;">
+        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">CENSO</small><div class="inf-val-lg text-green" id="inf-kpi-censo">—</div></div>
+        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">BALANCE</small><div class="inf-val-lg" id="inf-kpi-balance" style="color:#10b981;">—</div></div>
+        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-blue" id="inf-kpi-ingresos">—</div></div>
+        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red" id="inf-kpi-gastos">—</div></div>
+      </div>
       <div class="mb-14">
-        <!-- TITLE ROW -->
-
-        <!-- TABS: scroll horizontal sin recortes -->
         <div class="scroll-shadow-container" style="margin:0 -12px 8px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
           <div class="informes-tabs" style="display:inline-flex; gap:6px; padding:4px 0;">
             <button class="inf-tab active" data-tab="general" onclick="InformesView._cambiarTab('general')">📊 General</button>
@@ -44,6 +47,10 @@ const InformesView = {
             <button class="inf-tab" data-tab="cargas" onclick="InformesView._cambiarTab('cargas')">📐 Aforos</button>
             <button class="inf-tab" data-tab="rotacion" onclick="InformesView._cambiarTab('rotacion')">🔄 Rotación</button>
             <button class="inf-tab" data-tab="flujo-caja" onclick="InformesView._cambiarTab('flujo-caja')">📈 Flujo Caja</button>
+            <button class="inf-tab" data-tab="rent-esp" onclick="InformesView._cambiarTab('rent-esp')">🧬 Rent. Especie</button>
+            <button class="inf-tab" data-tab="curva-prod" onclick="InformesView._cambiarTab('curva-prod')">📉 Curva Prod.</button>
+            <button class="inf-tab" data-tab="breakeven" onclick="InformesView._cambiarTab('breakeven')">⚖️ Break-Even</button>
+            <button class="inf-tab" data-tab="subvenciones" onclick="InformesView._cambiarTab('subvenciones')">🌾 PAC</button>
           </div>
         </div>
       </div>
@@ -60,9 +67,10 @@ const InformesView = {
         estadisticasSanidad, lecheStats, gastosCat,
         gmdData, ventasHist, animales, rebanos,
         finca, ventasCompleto, docsLegales, transportistas, eventos, rawLeche,
-        compradoresData, proveedoresData, fitosanitarioData, alertasData, porFincaData,
+        compradoresData, proveedoresData,         fitosanitarioData, alertasData, porFincaData,
         ventasPorRebano, lechePorRebano,
-        pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData
+        pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
+        rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw
       ] = await Promise.all([
         Analitica.obtenerRentabilidadFinca(fId).catch(() => null),
         Analitica.obtenerMargenPorAnimal(fId).catch(() => []),
@@ -95,19 +103,38 @@ const InformesView = {
         Analitica.obtenerCargasAforos(fId).catch(() => ({ porZona: [], totalAforo: 0, totalOcupacion: 0, pctGlobal: '0', alertas: [], numAlertas: 0, numZonas: 0 })),
         Analitica.obtenerEficienciaTecnica(fId).catch(() => ({ kpis: [], activos: 0, totalLecheros: 0, numRebanos: 0, totalAnimales: 0 })),
         Analitica.obtenerFlujoCaja(fId).catch(() => ({ porMes: [], totalEntradas: 0, totalSalidas: 0, totalNeto: 0, saldoFinal: 0 })),
+        Analitica.obtenerRentabilidadEspecie(fId).catch(() => ({ porEspecie: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0 })),
+        Analitica.obtenerCurvaProduccion(fId).catch(() => ({ porMes: [], totalKg: 0, totalLitros: 0, totalIngresos: 0, metaKg: 0, metaLitros: 0, pctCumplimientoKg: '0', pctCumplimientoLitros: '0' })),
+        Analitica.obtenerBreakEven(fId).catch(() => ({ costesFijos: 0, costesVariables: 0, ingresosTotal: 0, breakEvenKg: 0, breakEvenLitros: 0, margenSeguridadKg: '0%', margenSeguridadLitros: '0%', cubiertoCarne: false, cubiertoLeche: false, numRebanos: 0, numMeses: 0 })),
+        this._obtenerDatosPAC(fId),
+        window.db.getAll('sanitarios_ganado').catch(() => []),
       ]);
 
-      this._cachedLeche = rawLeche || [];
+      // Poblar barra de KPIs globales
+      const kpiBar = document.getElementById('inf-kpis-bar');
+      if (kpiBar) {
+        const totalCenso = censo.reduce((s, r) => s + r.total, 0);
+        document.getElementById('inf-kpi-censo').textContent = totalCenso;
+        const balance = rent?.balance || 0;
+        const balEl = document.getElementById('inf-kpi-balance');
+        balEl.textContent = (balance >= 0 ? '+' : '') + balance.toLocaleString() + '€';
+        balEl.style.color = balance >= 0 ? '#10b981' : '#ef4444';
+        document.getElementById('inf-kpi-ingresos').textContent = (rent?.ingresos || 0).toLocaleString() + '€';
+        document.getElementById('inf-kpi-gastos').textContent = (rent?.gastos || 0).toLocaleString() + '€';
+        kpiBar.style.display = 'grid';
+      }
 
       // Cachear data para los tabs
       this._cachedData = {
+        _cachedLeche: rawLeche || [],
         rent, margenA, rentZ, censo, kpisRepro,
         estadisticasSanidad, lecheStats, gastosCat,
         gmdData, ventasHist, animales, rebanos, fId,
         finca, ventasCompleto, docsLegales, transportistas, eventos,
         compradoresData, proveedoresData, fitosanitarioData, alertasData, porFincaData,
         ventasPorRebano, lechePorRebano,
-        pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData
+        pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
+        rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw
       };
 
       this._renderTabActual();
@@ -186,6 +213,10 @@ const InformesView = {
         case 'cargas': this._renderCargas(content, d); break;
         case 'rotacion': this._renderRotacion(content, d); break;
         case 'flujo-caja': this._renderFlujoCaja(content, d); break;
+        case 'rent-esp': this._renderRentabilidadEspecie(content, d); break;
+        case 'curva-prod': this._renderCurvaProduccion(content, d); break;
+        case 'breakeven': this._renderBreakEven(content, d); break;
+        case 'subvenciones': this._renderSubvenciones(content, d); break;
         default: this._renderGeneral(content, d);
       }
     } catch (e) {
@@ -286,6 +317,34 @@ const InformesView = {
       </div>
 
       <!-- Leche mini -->
+      <!-- Comparativa mensual PyG -->
+      ${d.pygData?.porMes?.length > 0 ? (() => {
+        const meses = d.pygData.porMes.filter(m => m.ingresos > 0 || m.gastos > 0);
+        const actual = meses[meses.length - 1];
+        const anterior = meses[meses.length - 2];
+        if (!actual) return '';
+        const diffBalance = actual.balance - (anterior?.balance || 0);
+        const diffIngresos = actual.ingresos - (anterior?.ingresos || 0);
+        return `<div class="card report-section border-top-3px border-top-3px-blue report-card">
+          <div class="inf-card-title">📅 Comparativa Mensual</div>
+          <div class="grid grid-cols-2 gap-8 mb-8">
+            <div class="info-box border-left-blue">
+              <small class="s-lbl">MES ACTUAL</small>
+              <div class="inf-val-md text-white">${actual.mes}</div>
+              <div class="text-sm mt-4">Ingresos: <strong class="text-green">${actual.ingresos.toLocaleString()}€</strong></div>
+              <div class="text-sm">Gastos: <strong class="text-red">${actual.gastos.toLocaleString()}€</strong></div>
+              <div class="text-sm">Balance: <strong style="color:${actual.balance >= 0 ? '#10b981' : '#ef4444'}">${actual.balance.toLocaleString()}€</strong></div>
+            </div>
+            <div class="info-box border-left-amber">
+              <small class="s-lbl">VS MES ANTERIOR</small>
+              <div class="inf-val-md text-white">${anterior?.mes || '—'}</div>
+              <div class="text-sm mt-4">Ingresos: <strong style="color:${diffIngresos >= 0 ? '#10b981' : '#ef4444'}">${diffIngresos >= 0 ? '+' : ''}${diffIngresos.toLocaleString()}€</strong></div>
+              <div class="text-sm">Balance: <strong style="color:${diffBalance >= 0 ? '#10b981' : '#ef4444'}">${diffBalance >= 0 ? '+' : ''}${diffBalance.toLocaleString()}€</strong></div>
+            </div>
+          </div>
+        </div>`;
+      })() : ''}
+
       ${lecheStats.totalLitros > 0 ? `<div class="card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title">🥛 Producción Lechera</div>
         <div class="grid grid-cols-3 gap-8 mb-10">
@@ -302,11 +361,19 @@ const InformesView = {
   },
 
   _renderCarne(content, d) {
-    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano } = d;
+    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos } = d;
     const totalIngresos = rent?.detalles?.carne || 0;
     const totalVentas = ventasHist.length;
     const kgTotal = ventasHist.reduce((s, v) => s + (v.kg || 0), 0);
     const precioMedioKg = kgTotal > 0 ? (totalIngresos / kgTotal) : 0;
+    // GMD media simple desde eventos de control
+    const eventosCarne = (eventos || []).filter(e => e.motivo_tarea === 'control' && e.unidad === 'kg');
+    const gmdMedia = eventosCarne.length > 1 ? (() => {
+      const sorted = eventosCarne.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      const primero = sorted[0], ultimo = sorted[sorted.length - 1];
+      const dias = Math.max(1, (new Date(ultimo.fecha) - new Date(primero.fecha)) / (1000 * 60 * 60 * 24));
+      return ((ultimo.valor_neto - primero.valor_neto) / dias).toFixed(3);
+    })() : null;
 
     content.innerHTML = this._sectionActionsHTML('carne', 'Cárnico') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-orange report-card">
@@ -327,6 +394,11 @@ const InformesView = {
           <div class="info-box border-left-purple">
             <small class="s-lbl">PRECIO MEDIO KG</small>
             <div class="inf-val-lg text-violet">${precioMedioKg.toFixed(2)}€</div>
+          </div>
+          <div class="info-box" style="border-left:3px solid ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? '#10b981' : '#6b7280'};">
+            <small class="s-lbl">GMD MEDIA GLOBAL</small>
+            <div class="inf-val-lg" style="color:${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? '#10b981' : '#6b7280'}">${gmdMedia !== null ? gmdMedia + ' kg' : '—'}</div>
+            ${gmdMedia !== null ? '<small class="text-gray text-xs">Ganancia Media Diaria</small>' : '<small class="text-gray text-xs">Se necesitan 2+ pesajes</small>'}
           </div>
         </div>
 
@@ -374,11 +446,31 @@ const InformesView = {
   },
 
   _renderLeche(content, d) {
-    const { lecheStats, lechePorRebano } = d;
+    const { lecheStats, lechePorRebano, _cachedLeche } = d;
+    const rawLeche = _cachedLeche || [];
     if (!lecheStats || lecheStats.totalLitros === 0) {
       content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🥛</div><p class="empty-state-text">No hay datos de producción lechera registrados.</p></div>`;
       return;
     }
+    // Calcular métricas de calidad desde los datos crudos
+    const conLab = rawLeche.filter(e => e.laboratorio?.grasa != null);
+    const grasaMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.grasa || 0), 0) / conLab.length : 0;
+    const protMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.proteina || 0), 0) / conLab.length : 0;
+    const esMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.extracto_seco || (e.laboratorio.grasa + e.laboratorio.proteina) || 0), 0) / conLab.length : 0;
+    const somaticasMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.somaticas || 0), 0) / conLab.length : 0;
+    // MOFA
+    const mofaTotal = rawLeche.reduce((s, e) => s + (e.mofa || 0), 0);
+    const importeTotal = rawLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
+    const mofaRatio = importeTotal > 0 ? ((mofaTotal / importeTotal) * 100).toFixed(1) : 0;
+    // Umbrales de calidad
+    const umbrales = window.ComunidadesService?.CALIDAD_LECHE_OVINO_UMBRALES || null;
+    const semaforo = (valor, min, max) => {
+      if (valor == null) return '#555';
+      if (min != null && valor < min) return '#ef4444';
+      if (max != null && valor > max) return '#ef4444';
+      return '#10b981';
+    };
+
     content.innerHTML = this._sectionActionsHTML('leche', 'Lácteo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title">🥛 Producción Láctea</div>
@@ -396,10 +488,44 @@ const InformesView = {
             <div class="inf-val-lg text-dark-gold">${lecheStats.precioMedio.toFixed(3)}€</div>
           </div>
         </div>
-        <div class="info-box mb-12">
-          <small class="s-lbl">REGISTROS</small>
-          <div class="inf-val-md text-white">${lecheStats.totalRegistros}</div>
+        <div class="grid grid-cols-2 gap-10 mb-12">
+          <div class="info-box border-left-green">
+            <small class="s-lbl">REGISTROS</small>
+            <div class="inf-val-md text-white">${lecheStats.totalRegistros}</div>
+          </div>
+          <div class="info-box" style="border-left:3px solid ${mofaTotal >= 0 ? '#10b981' : '#ef4444'};">
+            <small class="s-lbl">MOFA TOTAL</small>
+            <div class="inf-val-md" style="color:${mofaTotal >= 0 ? '#10b981' : '#ef4444'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div>
+            <small class="text-gray text-xs">Ratio: ${mofaRatio}% sobre ingresos</small>
+          </div>
         </div>
+
+        ${conLab.length > 0 ? `
+        <div class="card" style="background:rgba(251,191,36,0.05);margin-bottom:14px;padding:12px;">
+          <div class="inf-section-title mb-8">🔬 Calidad de la Leche (${conLab.length} analíticas)</div>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="info-box-sm" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
+              <small class="s-lbl">GRASA</small>
+              <div class="inf-val-md" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${grasaMedia.toFixed(2)}%</div>
+              ${umbrales ? `<small class="text-gray text-xs">Obj: ≥${umbrales.grasa.min}%</small>` : ''}
+            </div>
+            <div class="info-box-sm" style="border-left:3px solid ${semaforo(protMedia, umbrales?.proteina?.min, null)};">
+              <small class="s-lbl">PROTEÍNA</small>
+              <div class="inf-val-md" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${protMedia.toFixed(2)}%</div>
+              ${umbrales ? `<small class="text-gray text-xs">Obj: ≥${umbrales.proteina.min}%</small>` : ''}
+            </div>
+            <div class="info-box-sm" style="border-left:3px solid ${semaforo(esMedia, umbrales?.extracto_seco?.min, null)};">
+              <small class="s-lbl">EXTRACTO SECO</small>
+              <div class="inf-val-md" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${esMedia.toFixed(2)}%</div>
+              ${umbrales ? `<small class="text-gray text-xs">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
+            </div>
+            <div class="info-box-sm" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
+              <small class="s-lbl">CÉL. SOMÁTICAS</small>
+              <div class="inf-val-md" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}/mL</div>
+              ${umbrales ? `<small class="text-gray text-xs">Obj: ≤${(umbrales.somaticas.max / 1000).toFixed(0)}k</small>` : ''}
+            </div>
+          </div>
+        </div>` : ''}
 
         ${lechePorRebano?.length > 0 ? `
         <div class="inf-section-title">Producción por rebaño</div>
@@ -426,11 +552,25 @@ const InformesView = {
   },
 
   _renderReproductivo(content, d) {
-    const { kpisRepro } = d;
+    const { kpisRepro, eventos } = d;
+    // Calcular distribución estacional de partos desde eventos
+    const partos = (eventos || []).filter(e => e.motivo_tarea === 'parto' || e.motivo_tarea === 'nacimiento');
+    const porTrimestre = { 'Q1 (Ene-Mar)': 0, 'Q2 (Abr-Jun)': 0, 'Q3 (Jul-Sep)': 0, 'Q4 (Oct-Dic)': 0 };
+    partos.forEach(e => {
+      const m = new Date(e.fecha).getMonth();
+      if (m < 3) porTrimestre['Q1 (Ene-Mar)']++;
+      else if (m < 6) porTrimestre['Q2 (Abr-Jun)']++;
+      else if (m < 9) porTrimestre['Q3 (Jul-Sep)']++;
+      else porTrimestre['Q4 (Oct-Dic)']++;
+    });
+    const abortos = (eventos || []).filter(e => e.motivo_tarea === 'aborto').length;
+    const totalEventos = partos.length + abortos;
+    const tasaAbortos = totalEventos > 0 ? ((abortos / totalEventos) * 100).toFixed(1) : 0;
+
     content.innerHTML = this._sectionActionsHTML('reproductivo', 'Reproductivo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
-        <div class="inf-card-title">🧬 KPI Reproductivos</div>
-        <div class="grid grid-cols-2 gap-10">
+        <div class="inf-card-title">🧬 KPIs Reproductivos</div>
+        <div class="grid grid-cols-2 gap-10 mb-12">
           <div class="info-box border-left-violet">
             <small class="s-lbl">FERTILIDAD</small>
             <div class="inf-val-lg text-purple">${kpisRepro.tasaFertilidadPct}%</div>
@@ -448,6 +588,25 @@ const InformesView = {
             <div class="inf-val-lg text-purple">${kpisRepro.totalPartosAnalizados}</div>
           </div>
         </div>
+        <div class="grid grid-cols-2 gap-10 mb-12">
+          <div class="info-box" style="border-left:3px solid ${parseFloat(tasaAbortos) > 10 ? '#ef4444' : '#10b981'};">
+            <small class="s-lbl">RATIO DE ABORTOS</small>
+            <div class="inf-val-lg" style="color:${parseFloat(tasaAbortos) > 10 ? '#ef4444' : '#10b981'}">${tasaAbortos}%</div>
+            <small class="text-gray text-xs">${abortos} abortos de ${totalEventos} gestaciones</small>
+          </div>
+          <div class="info-box border-left-blue">
+            <small class="s-lbl">DISTRIBUCIÓN DE PARTOS</small>
+            <div class="inf-val-md text-white">${partos.length} partos</div>
+          </div>
+        </div>
+        ${partos.length > 0 ? `
+        <div class="grid grid-cols-2 gap-6 mb-12">
+          ${Object.entries(porTrimestre).filter(([_, v]) => v > 0).map(([trim, count]) => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-aaa text-sm">${trim}</span>
+              <span class="font-bold text-white">${count} <span class="text-gray text-xs">(${((count / partos.length) * 100).toFixed(0)}%)</span></span>
+            </div>`).join('')}
+        </div>` : ''}
         <div class="mt-12"><canvas id="chart-repro-kpis" class="chart-canvas"></canvas></div>
       </div>
     `;
@@ -464,11 +623,26 @@ const InformesView = {
   },
 
   _renderSanidad(content, d) {
-    const { estadisticasSanidad, gastosCat } = d;
+    const { estadisticasSanidad, gastosCat, rebanos, animales, eventos, sanitariosRaw } = d;
+    // Calcular coste sanitario por animal
+    const gastosSanitarios = (gastosCat || []).filter(g => (g.categoria || '').toLowerCase() === 'sanidad');
+    const totalGastoSanidad = gastosSanitarios.reduce((s, g) => s + g.total, 0);
+    const totalAnimalesActivos = (animales || []).filter(a => a.estado === 'activo').length;
+    const costeSanitarioAnimal = totalAnimalesActivos > 0 ? (totalGastoSanidad / totalAnimalesActivos) : 0;
+    // Tratamientos por rebaño
+    const sanitariosTotal = sanitariosRaw || [];
+    const tratPorRebano = {};
+    const mapaReb = {};
+    (rebanos || []).forEach(r => { mapaReb[r.id] = r; });
+    sanitariosTotal.forEach(s => {
+      const nom = mapaReb[s.rebanoId]?.nombre || 'Sin rebaño';
+      tratPorRebano[nom] = (tratPorRebano[nom] || 0) + 1;
+    });
+
     content.innerHTML = this._sectionActionsHTML('sanidad', 'Sanidad') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title">⚕️ Sanidad y Tratamientos</div>
-        <div class="grid grid-cols-2 gap-10 mb-12">
+        <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box border-left-red">
             <small class="s-lbl">TRATAMIENTOS</small>
             <div class="inf-val-lg text-red">${estadisticasSanidad.totalTratamientos || 0}</div>
@@ -477,7 +651,22 @@ const InformesView = {
             <small class="s-lbl">SUPRESIÓN ACTIVA</small>
             <div class="inf-val-lg text-red">${estadisticasSanidad.retencionesActivas || 0}</div>
           </div>
+          <div class="info-box border-left-${costeSanitarioAnimal > 0 ? 'amber' : 'gray'}">
+            <small class="s-lbl">COSTE SANITARIO/ANIMAL</small>
+            <div class="inf-val-lg text-amber">${costeSanitarioAnimal > 0 ? costeSanitarioAnimal.toFixed(2) + '€' : '—'}</div>
+          </div>
         </div>
+        ${Object.keys(tratPorRebano).length > 0 ? `
+        <div class="mb-12">
+          <div class="inf-section-title">Tratamientos por rebaño</div>
+          <div class="grid grid-cols-2 gap-6">
+            ${Object.entries(tratPorRebano).sort((a, b) => b[1] - a[1]).map(([nom, cnt]) => `
+              <div class="info-box-sm flex justify-between items-center">
+                <span class="text-aaa text-sm">${nom}</span>
+                <span class="font-bold text-red">${cnt}</span>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
         ${estadisticasSanidad.porCategoria?.length > 0
         ? '<div class="chart-wrap"><canvas id="chart-sanidad-kpis" class="chart-canvas"></canvas></div>'
         : '<div class="empty-state"><div class="empty-state-icon">💊</div><p class="empty-state-text">Sin tratamientos registrados.</p></div>'}
@@ -549,6 +738,21 @@ const InformesView = {
               <span class="inf-val-md text-white">${count}</span>
             </div>`).join('')}
         </div>` : ''}
+
+        ${animales?.length > 0 ? (() => {
+          const porCategoria = {};
+          animales.forEach(a => { const cat = a.categoria || 'Sin categoría'; porCategoria[cat] = (porCategoria[cat] || 0) + 1; });
+          const totalCats = Object.keys(porCategoria).length;
+          return totalCats > 0 ? `
+        <div class="inf-section-title">Por categoría productiva</div>
+        <div class="grid grid-cols-2 gap-6 mb-12">
+          ${Object.entries(porCategoria).map(([cat, cnt]) => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="inf-small text-aaa">${cat}</span>
+              <div class="text-right"><span class="font-bold text-white">${cnt}</span><span class="text-gray text-xs ml-4">(${((cnt / animales.length) * 100).toFixed(1)}%)</span></div>
+            </div>`).join('')}
+        </div>` : '';
+        })() : ''}
 
         <div class="inf-section-title">Detalle por rebaño</div>
         <div class="table-scroll scroll-shadow-container">
@@ -635,6 +839,40 @@ const InformesView = {
             </tfoot>
           </table>
         </div>`}
+
+        ${ventas.length > 1 ? (() => {
+          const porComp = {};
+          ventas.forEach(v => {
+            const nom = v.razonSocial || v.nombreComprador || 'Sin comprador';
+            if (!porComp[nom]) porComp[nom] = { kg: 0, total: 0, num: 0 };
+            porComp[nom].kg += v.pesoCanal || v.pesoVivo || 0;
+            porComp[nom].total += v.precio_total || 0;
+            porComp[nom].num++;
+          });
+          const comps = Object.entries(porComp).map(([nom, d]) => ({
+            nombre: nom, kg: d.kg, total: d.total, num: d.num,
+            precioMedio: d.kg > 0 ? (d.total / d.kg) : 0
+          })).sort((a, b) => b.total - a.total);
+          if (comps.length < 2) return '';
+          return `
+        <div class="card report-section border-top-3px border-top-3px-green report-card mt-14">
+          <div class="inf-card-title">📊 Precio Medio por Comprador</div>
+          <div class="table-scroll scroll-shadow-container">
+            <table class="inf-table inf-table-sm" style="--tbl-accent:#10b981;">
+              <thead><tr><th>Comprador</th><th class="text-center">Ventas</th><th class="text-right">Kg</th><th class="text-right">Total</th><th class="text-right">€/Kg</th></tr></thead>
+              <tbody>${comps.map(c => `
+                <tr>
+                  <td><strong>${c.nombre}</strong></td>
+                  <td class="text-center">${c.num}</td>
+                  <td class="text-right">${c.kg.toFixed(1)}</td>
+                  <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
+                  <td class="text-right font-bold text-green">${c.precioMedio.toFixed(2)}€</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+        })() : ''}
       </div>
     `;
   },
@@ -1098,8 +1336,17 @@ const InformesView = {
       if (a.estado === 'activo' || a.estado === 'Activo') porEspecie[esp].activos++;
     });
 
+    const numRebanos = (rebanos || []).length;
+    const especies = Object.keys(porEspecie);
     content.innerHTML = this._sectionActionsHTML('rega', 'REGA') + `
       <div class="inf-report mb-14">
+        <!-- KPIs -->
+        <div class="grid grid-cols-4 gap-6 mb-14">
+          <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">CENSO TOTAL</small><div class="inf-val-lg text-green">${totalAnimales}</div></div>
+          <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-blue">${activos}</div></div>
+          <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">REBAÑOS</small><div class="inf-val-lg text-amber">${numRebanos}</div></div>
+          <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">ESPECIES</small><div class="inf-val-lg text-purple">${especies.length}</div></div>
+        </div>
         <!-- Datos Explotación -->
         <div class="card report-section border-top-3px border-top-3px-gold report-card">
           <div class="inf-card-title">📋 Datos de la Explotación</div>
@@ -1195,6 +1442,436 @@ const InformesView = {
         </div>
       </div>
     `;
+  },
+
+  // ===================== NUEVOS INFORMES =====================
+
+  /** PyG: Cuenta de Resultados mensual */
+  _renderPyG(content, d) {
+    const { pygData } = d;
+    const data = pygData || { porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0.0' };
+    content.innerHTML = this._sectionActionsHTML('pyg', 'PyG') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
+        <div class="inf-card-title">💰 Cuenta de Resultados</div>
+        <div class="grid grid-cols-4 gap-8 mb-14">
+          <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${data.totalIngresos.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${data.totalGastos.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg" style="color:${data.totalBalance >= 0 ? '#10b981' : '#ef4444'}">${data.totalBalance.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">RENTABILIDAD</small><div class="inf-val-lg text-blue">${data.rentabilidad}%</div></div>
+        </div>
+        ${data.porMes.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container mb-14">
+          <table class="inf-table" style="--tbl-accent:#10b981;">
+            <thead><tr><th>Mes</th><th class="text-right text-green">Ingresos</th><th class="text-right text-red">Gastos</th><th class="text-right">Balance</th><th class="text-right">Acumulado</th></tr></thead>
+            <tbody>${data.porMes.filter(m => m.ingresos > 0 || m.gastos > 0).map(m => `
+              <tr>
+                <td><strong>${m.mes}</strong></td>
+                <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
+                <td class="text-right text-red">${m.gastos.toLocaleString()}€</td>
+                <td class="text-right font-bold" style="color:${m.balance >= 0 ? '#10b981' : '#ef4444'}">${m.balance.toLocaleString()}€</td>
+                <td class="text-right text-gray">—</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">💰</div><p class="empty-state-text">Sin datos económicos registrados. Añade ventas y gastos para ver la cuenta de resultados.</p></div>'}
+        ${data.gastosPorCategoria.length > 0 ? `
+        <div class="inf-section-title">Gastos por Categoría</div>
+        <div class="grid grid-cols-2 gap-6 mb-10">
+          ${data.gastosPorCategoria.map(g => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="inf-small text-aaa">${g.categoria}</span>
+              <span class="font-bold text-red">${g.total.toLocaleString()}€ <span class="text-gray text-xs">(${data.totalGastos > 0 ? ((g.total / data.totalGastos) * 100).toFixed(1) : 0}%)</span></span>
+            </div>`).join('')}
+        </div>` : ''}
+      </div>`;
+  },
+
+  /** Coste de Producción por Animal/Día */
+  _renderCosteProd(content, d) {
+    const { costeProdData } = d;
+    const data = costeProdData || { porRebano: [], totalGasto: 0, totalAnimales: 0, costeMedioCabeza: 0, costeMedioDia: 0 };
+    content.innerHTML = this._sectionActionsHTML('coste-prod', 'Coste Producción') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
+        <div class="inf-card-title">🐄 Coste de Producción por Animal</div>
+        <div class="grid grid-cols-3 gap-8 mb-14">
+          <div class="info-box-center border-left-purple"><small class="s-lbl">COSTE MEDIO/CABEZA</small><div class="inf-val-lg text-purple">${data.costeMedioCabeza.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">COSTE/DÍA</small><div class="inf-val-lg text-blue">${data.costeMedioDia}€</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">ANIMALES</small><div class="inf-val-lg text-green">${data.totalAnimales}</div></div>
+        </div>
+        ${data.totalGasto > 0 ? `<div class="info-box mb-14"><small class="s-lbl">GASTO TOTAL</small><div class="inf-val-md text-red">${data.totalGasto.toLocaleString()}€</div></div>` : ''}
+        ${data.porRebano.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
+            <thead><tr><th>Rebaño</th><th class="text-center">Animales</th><th class="text-right">Gasto Total</th><th class="text-right">€/Cabeza</th><th class="text-right">€/Día</th><th class="text-right">%Alim</th><th class="text-right">%Sanidad</th></tr></thead>
+            <tbody>${data.porRebano.map(r => `
+              <tr>
+                <td><strong>${r.nombre}</strong> <span class="text-gray text-xs">${r.especie}</span></td>
+                <td class="text-center">${r.numAnimales}</td>
+                <td class="text-right font-bold text-red">${r.totalGasto.toLocaleString()}€</td>
+                <td class="text-right">${r.costePorCabeza.toLocaleString()}€</td>
+                <td class="text-right text-blue">${r.costePorDia}€</td>
+                <td class="text-right">${r.pctAlimentacion}%</td>
+                <td class="text-right">${r.pctSanidad}%</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">🐄</div><p class="empty-state-text">Sin datos de gastos asociados a rebaños.</p></div>'}
+      </div>`;
+  },
+
+  /** Panel de Eficiencia Técnica */
+  _renderEficiencia(content, d) {
+    const { eficienciaData } = d;
+    const data = eficienciaData || { kpis: [], activos: 0, totalLecheros: 0, numRebanos: 0, totalAnimales: 0 };
+    const semaforo = (s) => s === 'verde' ? '#10b981' : s === 'amarillo' ? '#f59e0b' : '#ef4444';
+    content.innerHTML = this._sectionActionsHTML('eficiencia', 'Eficiencia Técnica') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
+        <div class="inf-card-title">📊 Panel de Eficiencia Técnica</div>
+        <div class="grid grid-cols-4 gap-8 mb-14">
+          <div class="info-box-center border-left-blue"><small class="s-lbl">REBAÑOS</small><div class="inf-val-lg text-blue">${data.numRebanos}</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${data.activos}</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">HEMBRAS LECH.</small><div class="inf-val-lg text-amber">${data.totalLecheros}</div></div>
+          <div class="info-box-center border-left-purple"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-purple">${data.totalAnimales}</div></div>
+        </div>
+        ${data.kpis.length > 0 ? `
+        <div class="grid grid-cols-3 gap-8 mb-10">
+          ${data.kpis.map(k => `
+            <div class="info-box-sm" style="border-left:3px solid ${semaforo(k.status)};">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <small class="s-lbl">${k.label}</small>
+                <span style="width:10px;height:10px;border-radius:50%;background:${semaforo(k.status)};display:inline-block;"></span>
+              </div>
+              <div class="inf-val-md text-white">${k.value}</div>
+              <small class="text-gray text-xs">Objetivo: ${k.objetivo}${k.unidad}</small>
+            </div>`).join('')}
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">📊</div><p class="empty-state-text">No hay suficientes datos para calcular KPIs de eficiencia.</p></div>'}
+      </div>`;
+  },
+
+  /** Cargas y Aforos por zona */
+  _renderCargas(content, d) {
+    const { cargasData } = d;
+    const data = cargasData || { porZona: [], totalAforo: 0, totalOcupacion: 0, pctGlobal: '0', alertas: [], numAlertas: 0, numZonas: 0 };
+    const colorPct = (p) => p > 100 ? '#ef4444' : p >= 80 ? '#10b981' : p >= 50 ? '#f59e0b' : '#6b7280';
+    content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
+        <div class="inf-card-title">📐 Cargas y Aforos</div>
+        <div class="grid grid-cols-4 gap-8 mb-14">
+          <div class="info-box-center border-left-blue"><small class="s-lbl">ZONAS</small><div class="inf-val-lg text-blue">${data.numZonas}</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">AFORO TOTAL</small><div class="inf-val-lg text-green">${data.totalAforo}</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">OCUPACIÓN</small><div class="inf-val-lg text-amber">${data.totalOcupacion}</div></div>
+          <div class="info-box-center" style="border-left:3px solid ${colorPct(parseFloat(data.pctGlobal))};"><small class="s-lbl">% GLOBAL</small><div class="inf-val-lg" style="color:${colorPct(parseFloat(data.pctGlobal))}">${data.pctGlobal}%</div></div>
+        </div>
+        ${data.numAlertas > 0 ? `<div class="card" style="background:rgba(239,68,68,0.1);margin-bottom:14px;padding:12px;">
+          <div class="flex items-center gap-8"><span style="font-size:1.4rem;">🚨</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm" style="display:block;">Zonas con sobrecarga o infrautilización</span></div></div>
+        </div>` : ''}
+        ${data.porZona.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm" style="--tbl-accent:#f59e0b;">
+            <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo</th><th class="text-center">Ocupación</th><th class="text-center">%</th><th>Estado</th></tr></thead>
+            <tbody>${data.porZona.map(z => `
+              <tr>
+                <td><strong>${z.nombre}</strong>${z.especie ? `<br><span class="text-gray text-xs">${z.especie}</span>` : ''}</td>
+                <td class="text-center">${z.superficie} ha</td>
+                <td class="text-center">${z.aforo}</td>
+                <td class="text-center">${z.ocupacion}</td>
+                <td class="text-center font-bold" style="color:${colorPct(z.pctOcupacion)}">${z.pctOcupacion}%</td>
+                <td class="text-center"><span class="badge badge-sm ${z.estado === 'sobrecarga' ? 'badge-red' : z.estado === 'optimo' ? 'badge-green' : z.estado === 'aceptable' ? 'badge-amber' : 'badge-gray'}">${z.estado}</span></td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">📐</div><p class="empty-state-text">Sin zonas configuradas o sin datos de ocupación.</p></div>'}
+      </div>`;
+  },
+
+  /** Rotación de Censo */
+  _renderRotacion(content, d) {
+    const { rotacionData } = d;
+    const data = rotacionData || { ultimos90: {}, ultimos30: {}, totalAnimales: 0, activos: 0, tasaReposicion: '0%', tasaBajas: '0%', periodo: '90 días' };
+    const u90 = data.ultimos90 || {};
+    const u30 = data.ultimos30 || {};
+    content.innerHTML = this._sectionActionsHTML('rotacion', 'Rotación Censo') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
+        <div class="inf-card-title">🔄 Rotación de Censo (${data.periodo})</div>
+        <div class="grid grid-cols-3 gap-8 mb-14">
+          <div class="info-box-center border-left-green"><small class="s-lbl">CENSO TOTAL</small><div class="inf-val-lg text-green">${data.totalAnimales}</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-blue">${data.activos}</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">ENTRADA NETA</small><div class="inf-val-lg" style="color:${(u90.entradaNeta || 0) >= 0 ? '#10b981' : '#ef4444'}">${(u90.entradaNeta || 0) >= 0 ? '+' : ''}${u90.entradaNeta || 0}</div></div>
+        </div>
+        <div class="grid grid-cols-2 gap-8 mb-14">
+          <div class="info-box border-left-green"><small class="s-lbl">TASA REPOSICIÓN</small><div class="inf-val-lg text-green">${data.tasaReposicion}</div></div>
+          <div class="info-box border-left-red"><small class="s-lbl">TASA BAJAS</small><div class="inf-val-lg text-red">${data.tasaBajas}</div></div>
+        </div>
+        <div class="grid grid-cols-4 gap-8 mb-10">
+          <div class="info-box-sm text-center border-left-green"><small class="s-lbl">NACIMIENTOS</small><div class="inf-val-md text-green">${u90.nacimientos || 0}</div></div>
+          <div class="info-box-sm text-center border-left-blue"><small class="s-lbl">COMPRAS</small><div class="inf-val-md text-blue">${u90.compras || 0}</div></div>
+          <div class="info-box-sm text-center border-left-red"><small class="s-lbl">VENTAS</small><div class="inf-val-md text-red">${u90.ventas || 0}</div></div>
+          <div class="info-box-sm text-center border-left-gray"><small class="s-lbl">BAJAS</small><div class="inf-val-md text-gray">${u90.bajas || 0}</div></div>
+        </div>
+        ${data.totalAnimales === 0 ? '<div class="empty-state"><div class="empty-state-icon">🔄</div><p class="empty-state-text">Sin datos de censo registrados.</p></div>' : ''}
+      </div>`;
+  },
+
+  /** Flujo de Caja mensual */
+  _renderFlujoCaja(content, d) {
+    const { flujoCajaData } = d;
+    const data = flujoCajaData || { porMes: [], totalEntradas: 0, totalSalidas: 0, totalNeto: 0, saldoFinal: 0 };
+    content.innerHTML = this._sectionActionsHTML('flujo-caja', 'Flujo Caja') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-teal report-card">
+        <div class="inf-card-title">📈 Flujo de Caja</div>
+        <div class="grid grid-cols-4 gap-8 mb-14">
+          <div class="info-box-center border-left-green"><small class="s-lbl">ENTRADAS</small><div class="inf-val-lg text-green">${data.totalEntradas.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-red"><small class="s-lbl">SALIDAS</small><div class="inf-val-lg text-red">${data.totalSalidas.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalNeto >= 0 ? 'green' : 'red'}"><small class="s-lbl">NETO</small><div class="inf-val-lg" style="color:${data.totalNeto >= 0 ? '#10b981' : '#ef4444'}">${data.totalNeto.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">SALDO FINAL</small><div class="inf-val-lg text-blue">${data.saldoFinal.toLocaleString()}€</div></div>
+        </div>
+        ${data.porMes.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm" style="--tbl-accent:#14b8a6;">
+            <thead><tr><th>Mes</th><th class="text-right text-green">Entradas</th><th class="text-right text-red">Salidas</th><th class="text-right">Neto</th><th class="text-right">Acumulado</th></tr></thead>
+            <tbody>${data.porMes.filter(m => m.entradas > 0 || m.salidas > 0).map(m => `
+              <tr>
+                <td><strong>${m.mes}</strong></td>
+                <td class="text-right text-green">${m.entradas.toLocaleString()}€</td>
+                <td class="text-right text-red">${m.salidas.toLocaleString()}€</td>
+                <td class="text-right font-bold" style="color:${m.neto >= 0 ? '#10b981' : '#ef4444'}">${m.neto.toLocaleString()}€</td>
+                <td class="text-right text-blue font-bold">${m.acumulado.toLocaleString()}€</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">📈</div><p class="empty-state-text">Sin datos de ingresos o gastos para calcular flujo de caja.</p></div>'}
+      </div>`;
+  },
+
+  /** Rentabilidad por Especie */
+  _renderRentabilidadEspecie(content, d) {
+    const { rentEspData } = d;
+    const data = rentEspData || { porEspecie: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0 };
+    content.innerHTML = this._sectionActionsHTML('rent-esp', 'Rent. Especie') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
+        <div class="inf-card-title">🧬 Rentabilidad por Especie</div>
+        <div class="grid grid-cols-3 gap-8 mb-14">
+          <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${data.totalIngresos.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${data.totalGastos.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg" style="color:${data.totalBalance >= 0 ? '#10b981' : '#ef4444'}">${data.totalBalance.toLocaleString()}€</div></div>
+        </div>
+        ${data.porEspecie.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table" style="--tbl-accent:#8b5cf6;">
+            <thead><tr><th>Especie</th><th class="text-center">Rebaños</th><th class="text-center">Animales</th><th class="text-right text-green">Ingresos</th><th class="text-right text-red">Gastos</th><th class="text-right">Balance</th><th class="text-center">Vtas Carne</th><th class="text-center">Vtas Leche</th></tr></thead>
+            <tbody>${data.porEspecie.map(e => `
+              <tr>
+                <td><strong>${e.especie}</strong></td>
+                <td class="text-center">${e.numRebanos}</td>
+                <td class="text-center font-bold">${e.numAnimales}</td>
+                <td class="text-right text-green font-bold">${e.ingresos.toLocaleString()}€</td>
+                <td class="text-right text-red">${e.gastos.toLocaleString()}€</td>
+                <td class="text-right font-bold" style="color:${e.balance >= 0 ? '#10b981' : '#ef4444'}">${e.balance.toLocaleString()}€</td>
+                <td class="text-center">${e.numVentasCarne}</td>
+                <td class="text-center">${e.numVentasLeche}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">🧬</div><p class="empty-state-text">Sin datos de especies o ventas. Registra rebaños con especie asignada.</p></div>'}
+      </div>`;
+  },
+
+  /** Curva de Producción */
+  _renderCurvaProduccion(content, d) {
+    const { curvaProdData } = d;
+    const data = curvaProdData || { porMes: [], totalKg: 0, totalLitros: 0, totalIngresos: 0, metaKg: 0, metaLitros: 0, pctCumplimientoKg: '0', pctCumplimientoLitros: '0' };
+    content.innerHTML = this._sectionActionsHTML('curva-prod', 'Curva Producción') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
+        <div class="inf-card-title">📉 Curva de Producción</div>
+        <div class="grid grid-cols-4 gap-8 mb-14">
+          <div class="info-box-center border-left-amber"><small class="s-lbl">KG TOTAL</small><div class="inf-val-lg text-amber">${data.totalKg.toFixed(1)}</div></div>
+          <div class="info-box-center border-left-gold"><small class="s-lbl">LITROS TOTAL</small><div class="inf-val-lg text-gold">${data.totalLitros.toFixed(1)}</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">META KG</small><div class="inf-val-lg text-green">${Math.round(data.metaKg)}</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">META L</small><div class="inf-val-lg text-blue">${Math.round(data.metaLitros)}</div></div>
+        </div>
+        <div class="grid grid-cols-2 gap-8 mb-14">
+          <div class="info-box" style="border-left:3px solid ${parseFloat(data.pctCumplimientoKg) >= 100 ? '#10b981' : '#f59e0b'};">
+            <small class="s-lbl">CUMPLIMIENTO CARNE</small>
+            <div class="inf-val-lg" style="color:${parseFloat(data.pctCumplimientoKg) >= 100 ? '#10b981' : '#f59e0b'}">${data.pctCumplimientoKg}%</div>
+          </div>
+          <div class="info-box" style="border-left:3px solid ${parseFloat(data.pctCumplimientoLitros) >= 100 ? '#10b981' : '#f59e0b'};">
+            <small class="s-lbl">CUMPLIMIENTO LECHE</small>
+            <div class="inf-val-lg" style="color:${parseFloat(data.pctCumplimientoLitros) >= 100 ? '#10b981' : '#f59e0b'}">${data.pctCumplimientoLitros}%</div>
+          </div>
+        </div>
+        ${data.porMes.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm" style="--tbl-accent:#3b82f6;">
+            <thead><tr><th>Mes</th><th class="text-right text-amber">Kg</th><th class="text-right text-gold">Litros</th><th class="text-right text-amber">Kg Acum</th><th class="text-right text-gold">L Acum</th><th class="text-right text-green">Ingresos</th></tr></thead>
+            <tbody>${data.porMes.map(m => `
+              <tr>
+                <td><strong>${m.mes}</strong></td>
+                <td class="text-right text-amber">${m.kg.toFixed(1)}</td>
+                <td class="text-right text-gold">${m.litros.toFixed(1)}</td>
+                <td class="text-right font-bold">${m.kgAcum.toFixed(1)}</td>
+                <td class="text-right font-bold">${m.litrosAcum.toFixed(1)}</td>
+                <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">📉</div><p class="empty-state-text">Sin datos de producción registrados.</p></div>'}
+      </div>`;
+  },
+
+  /** Break-Even: Punto Muerto */
+  _renderBreakEven(content, d) {
+    const { breakEvenData } = d;
+    const data = breakEvenData || { costesFijos: 0, costesVariables: 0, ingresosTotal: 0, breakEvenKg: 0, breakEvenLitros: 0, margenSeguridadKg: '0%', margenSeguridadLitros: '0%', cubiertoCarne: false, cubiertoLeche: false, numRebanos: 0, numMeses: 0 };
+    content.innerHTML = this._sectionActionsHTML('breakeven', 'Break-Even') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
+        <div class="inf-card-title">⚖️ Análisis de Punto Muerto (Break-Even)</div>
+        <div class="grid grid-cols-3 gap-8 mb-14">
+          <div class="info-box-center border-left-red"><small class="s-lbl">COSTES FIJOS</small><div class="inf-val-lg text-red">${data.costesFijos.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">COSTES VARIABLES</small><div class="inf-val-lg text-amber">${data.costesVariables.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS TOTALES</small><div class="inf-val-lg text-green">${data.ingresosTotal.toLocaleString()}€</div></div>
+        </div>
+        <div class="grid grid-cols-2 gap-10 mb-14">
+          <div class="card" style="background:rgba(16,185,129,0.05);padding:14px;">
+            <div class="inf-card-title mb-6" style="font-size:0.9rem;">🥩 Carne</div>
+            <div class="grid grid-cols-2 gap-6">
+              <div><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber">${data.precioMedioKg.toFixed(2)}€</div></div>
+              <div><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red">${data.costeVarKg.toFixed(2)}€</div></div>
+              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md" style="color:${data.cubiertoCarne ? '#10b981' : '#ef4444'}">${data.breakEvenKg} kg</div></div>
+              <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadKg}</div></div>
+            </div>
+          </div>
+          <div class="card" style="background:rgba(251,191,36,0.05);padding:14px;">
+            <div class="inf-card-title mb-6" style="font-size:0.9rem;">🥛 Leche</div>
+            <div class="grid grid-cols-2 gap-6">
+              <div><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold">${data.precioMedioLitro.toFixed(3)}€</div></div>
+              <div><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red">${data.costeVarLitro.toFixed(3)}€</div></div>
+              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md" style="color:${data.cubiertoLeche ? '#10b981' : '#ef4444'}">${data.breakEvenLitros} L</div></div>
+              <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadLitros}</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-box mb-10">
+          <small class="s-lbl">PERÍODO ANALIZADO</small>
+          <div class="inf-val-md text-white">${data.numMeses} meses · ${data.numRebanos} rebaños</div>
+        </div>
+        ${data.ingresosTotal === 0 ? '<div class="empty-state"><div class="empty-state-icon">⚖️</div><p class="empty-state-text">Sin datos económicos. Añade ventas y gastos para calcular el punto muerto.</p></div>' : ''}
+      </div>`;
+  },
+
+  /** Subvenciones PAC */
+  _renderSubvenciones(content, d) {
+    const { pacData } = d;
+    const data = pacData || { registros: [], totalSolicitado: 0, totalCobrado: 0, totalPendiente: 0, numRegistros: 0, porAnio: [] };
+    content.innerHTML = this._sectionActionsHTML('subvenciones', 'PAC') + `
+      <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
+        <div class="flex justify-between items-center mb-14">
+          <div class="inf-card-title" style="margin:0;">🌾 Subvenciones PAC</div>
+          <button class="btn btn-primary btn-sm" onclick="InformesView._agregarPAC()" style="background:linear-gradient(135deg,#065f46,#059669);padding:6px 14px;font-size:0.75rem;">➕ Añadir</button>
+        </div>
+        <div class="grid grid-cols-4 gap-8 mb-14">
+          <div class="info-box-center border-left-green"><small class="s-lbl">SOLICITADO</small><div class="inf-val-lg text-green">${data.totalSolicitado.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">COBRADO</small><div class="inf-val-lg text-blue">${data.totalCobrado.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalPendiente > 0 ? 'amber' : 'green'}"><small class="s-lbl">PENDIENTE</small><div class="inf-val-lg" style="color:${data.totalPendiente > 0 ? '#f59e0b' : '#10b981'}">${data.totalPendiente.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-purple"><small class="s-lbl">REGISTROS</small><div class="inf-val-lg text-purple">${data.numRegistros}</div></div>
+        </div>
+        ${data.porAnio.length > 0 ? `
+        <div class="inf-section-title">Resumen por año</div>
+        <div class="grid grid-cols-1 gap-4 mb-14">
+          ${data.porAnio.map(a => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="font-bold text-white">${a.anio}</span>
+              <span class="text-gray text-xs">${a.num} ayudas</span>
+              <div class="text-right">
+                <span class="text-green">${a.cobrado.toLocaleString()}€</span>
+                <span class="text-gray mx-4">/</span>
+                <span class="text-amber">${a.solicitado.toLocaleString()}€</span>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
+        ${data.registros.length > 0 ? `
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm" style="--tbl-accent:#10b981;">
+            <thead><tr><th>Año</th><th>Concepto</th><th>Régimen</th><th class="text-right">Solicitado</th><th class="text-right">Cobrado</th><th class="text-center">Estado</th></tr></thead>
+            <tbody>${data.registros.map(r => {
+              const pct = r.importe_solicitado > 0 ? ((r.importe_cobrado || 0) / r.importe_solicitado * 100).toFixed(0) : 0;
+              const est = pct >= 100 ? '✅ Cobrado' : pct > 0 ? '🔄 Parcial' : '⏳ Pendiente';
+              return `<tr>
+                <td class="font-bold">${r.anio || '-'}</td>
+                <td>${r.concepto || r.descripcion || 'PAC'}</td>
+                <td class="text-gray text-xs">${r.regimen || '—'}</td>
+                <td class="text-right">${(r.importe_solicitado || 0).toLocaleString()}€</td>
+                <td class="text-right text-green font-bold">${(r.importe_cobrado || 0).toLocaleString()}€</td>
+                <td class="text-center text-xs">${est}</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>` : '<div class="empty-state"><div class="empty-state-icon">🌾</div><p class="empty-state-text">Sin subvenciones PAC registradas. Usa "Añadir" para registrar ayudas de la PAC, PDR, incorporación jóvenes u otras subvenciones.</p></div>'}
+      </div>
+    `;
+  },
+
+  /** Agrega un registro de subvención PAC vía overlay simple */
+  async _agregarPAC() {
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
+    overlay.innerHTML = `
+      <div class="card p-25" style="max-width:380px;border-top:5px solid #10b981;">
+        <h3 class="mt-0 text-green">🌾 Nueva Subvención PAC</h3>
+        <div class="wizard-input-group">
+          <label class="wizard-label">Año</label>
+          <input type="number" id="pac-anio" value="${new Date().getFullYear()}" class="wizard-input">
+        </div>
+        <div class="wizard-input-group">
+          <label class="wizard-label">Concepto</label>
+          <input type="text" id="pac-concepto" placeholder="PAC, PDR, Incorporación Jóvenes..." class="wizard-input">
+        </div>
+        <div class="wizard-input-group">
+          <label class="wizard-label">Régimen</label>
+          <select id="pac-regimen" class="wizard-input wizard-select">
+            <option value="PAC Base">PAC Base</option>
+            <option value="PAC Verde">PAC Verde</option>
+            <option value="PDR">PDR</option>
+            <option value="Incorporación Jóvenes">Incorporación Jóvenes</option>
+            <option value="Bienestar Animal">Bienestar Animal</option>
+            <option value="Producción Ecológica">Producción Ecológica</option>
+            <option value="Otra">Otra</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-10">
+          <div class="wizard-input-group">
+            <label class="wizard-label">Importe Solicitado (€)</label>
+            <input type="number" id="pac-solicitado" step="0.01" class="wizard-input">
+          </div>
+          <div class="wizard-input-group">
+            <label class="wizard-label">Importe Cobrado (€)</label>
+            <input type="number" id="pac-cobrado" step="0.01" value="0" class="wizard-input">
+          </div>
+        </div>
+        <div class="flex gap-10 mt-20">
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-pac-guardar">💾 Guardar</button>
+          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#btn-pac-guardar').onclick = async () => {
+      const anio = parseInt(document.getElementById('pac-anio').value);
+      const concepto = document.getElementById('pac-concepto').value.trim();
+      const regimen = document.getElementById('pac-regimen').value;
+      const solicitado = parseFloat(document.getElementById('pac-solicitado').value) || 0;
+      const cobrado = parseFloat(document.getElementById('pac-cobrado').value) || 0;
+      if (!concepto || solicitado <= 0) { App.toastError("Concepto e importe solicitado obligatorios"); return; }
+      try {
+        await window.db.add('documentos_legales', {
+          tipo: 'pac', anio, concepto, regimen,
+          importe_solicitado: solicitado, importe_cobrado: cobrado,
+          fecha_emision: new Date().toISOString().split('T')[0],
+          fincaId: await Fincas.getActiveId(),
+          creadoEn: new Date().toISOString()
+        });
+        App.toast('✅ Subvención registrada');
+        overlay.remove();
+        if (window.InformesView) { InformesView._cachedData = null; await InformesView.render(); }
+      } catch (e) { App.toastError("Error: " + e.message); }
+    };
   },
 
   // ===================== GRÁFICOS =====================
@@ -1482,6 +2159,31 @@ const InformesView = {
     } catch (e) { console.error('[LechePorRebano]', e); return []; }
   },
 
+  /** Datos de Subvenciones PAC desde documentos_legales */
+  async _obtenerDatosPAC(fId) {
+    try {
+      const docs = await window.db.getAll('documentos_legales').catch(() => []);
+      const pac = docs.filter(d => d.tipo === 'pac');
+      const totalSolicitado = pac.reduce((s, p) => s + (p.importe_solicitado || 0), 0);
+      const totalCobrado = pac.reduce((s, p) => s + (p.importe_cobrado || 0), 0);
+      const totalPendiente = totalSolicitado - totalCobrado;
+      const porAnio = {};
+      pac.forEach(p => {
+        const a = p.anio || '—';
+        if (!porAnio[a]) porAnio[a] = { anio: a, solicitado: 0, cobrado: 0, num: 0 };
+        porAnio[a].solicitado += p.importe_solicitado || 0;
+        porAnio[a].cobrado += p.importe_cobrado || 0;
+        porAnio[a].num++;
+      });
+      return {
+        registros: pac.sort((a, b) => (b.anio || '0') - (a.anio || '0')),
+        totalSolicitado, totalCobrado, totalPendiente,
+        numRegistros: pac.length,
+        porAnio: Object.values(porAnio).sort((a, b) => b.anio - a.anio)
+      };
+    } catch (e) { console.error('[PAC]', e); return { registros: [], totalSolicitado: 0, totalCobrado: 0, totalPendiente: 0, numRegistros: 0, porAnio: [] }; }
+  },
+
   // ===================== EXPORTACIÓN EXCEL =====================
 
   async _exportExcel() {
@@ -1700,6 +2402,33 @@ const InformesView = {
       }
       if (!seccion || seccion === 'rega') {
         seccionesHtml += this._pdfSeccionRega(d);
+      }
+      if (!seccion || seccion === 'pyg') {
+        seccionesHtml += this._pdfSeccionPyG(d);
+      }
+      if (!seccion || seccion === 'coste-prod') {
+        seccionesHtml += this._pdfSeccionCosteProd(d);
+      }
+      if (!seccion || seccion === 'eficiencia') {
+        seccionesHtml += this._pdfSeccionEficiencia(d);
+      }
+      if (!seccion || seccion === 'cargas') {
+        seccionesHtml += this._pdfSeccionCargas(d);
+      }
+      if (!seccion || seccion === 'rotacion') {
+        seccionesHtml += this._pdfSeccionRotacion(d);
+      }
+      if (!seccion || seccion === 'flujo-caja') {
+        seccionesHtml += this._pdfSeccionFlujoCaja(d);
+      }
+      if (!seccion || seccion === 'rent-esp') {
+        seccionesHtml += this._pdfSeccionRentabilidadEspecie(d);
+      }
+      if (!seccion || seccion === 'curva-prod') {
+        seccionesHtml += this._pdfSeccionCurvaProduccion(d);
+      }
+      if (!seccion || seccion === 'breakeven') {
+        seccionesHtml += this._pdfSeccionBreakEven(d);
       }
 
       pdfEl.innerHTML = `
@@ -2115,6 +2844,146 @@ const InformesView = {
         <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Gastos Totales</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:#cc0000;">${(rent.gastos || 0).toLocaleString()}€</td></tr>
         <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">BALANCE NETO</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem; color:${balanceTotal >= 0 ? '#10b981' : '#cc0000'};">${balanceTotal.toLocaleString()}€</td></tr>
       </table>` : ''}
+    `;
+  },
+
+  // ========= SECCIONES PDF NUEVOS INFORMES =========
+
+  _pdfSeccionPyG(d) {
+    const { pygData } = d;
+    if (!pygData || pygData.totalIngresos === 0) return '';
+    return `
+      <h3 style="color:#10b981; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">💰 Cuenta de Resultados</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Total Ingresos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${pygData.totalIngresos.toLocaleString()}€</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Total Gastos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#cc0000;">${pygData.totalGastos.toLocaleString()}€</td></tr>
+        <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">BALANCE NETO</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem; color:${pygData.totalBalance >= 0 ? '#10b981' : '#cc0000'};">${pygData.totalBalance.toLocaleString()}€</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Rentabilidad</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${pygData.rentabilidad}%</td></tr>
+      </table>
+      ${pygData.gastosPorCategoria?.length > 0 ? `
+      <h4 style="color:#ef4444; border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:12px;">Gastos por Categoría</h4>
+      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Categoría</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Total</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">%</th></tr></thead>
+        <tbody>${pygData.gastosPorCategoria.map(g => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;">${g.categoria}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${g.total.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${pygData.totalGastos > 0 ? ((g.total / pygData.totalGastos) * 100).toFixed(1) : 0}%</td></tr>`).join('')}</tbody>
+      </table>` : ''}
+    `;
+  },
+
+  _pdfSeccionCosteProd(d) {
+    const { costeProdData } = d;
+    if (!costeProdData?.porRebano?.length) return '';
+    return `
+      <h3 style="color:#8b5cf6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🐄 Coste de Producción por Animal</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Rebaño</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Animales</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Gasto Total</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">€/Cabeza</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">€/Día</th></tr></thead>
+        <tbody>${costeProdData.porRebano.map(r => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${r.nombre}</strong> (${r.especie})</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${r.numAnimales}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${r.totalGasto.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${r.costePorCabeza.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${r.costePorDia}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">MEDIA GLOBAL</td><td style="padding:6px; text-align:center; font-weight:bold;">${costeProdData.totalAnimales}</td><td style="padding:6px; text-align:right; font-weight:bold;">${costeProdData.totalGasto.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${costeProdData.costeMedioCabeza.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${costeProdData.costeMedioDia}€</td></tr></tfoot>
+      </table>
+    `;
+  },
+
+  _pdfSeccionEficiencia(d) {
+    const { eficienciaData } = d;
+    if (!eficienciaData?.kpis?.length) return '';
+    const semaforoPdf = (s) => s === 'verde' ? '#10b981' : s === 'amarillo' ? '#f59e0b' : '#cc0000';
+    return `
+      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📊 Panel de Eficiencia Técnica</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
+        ${eficienciaData.kpis.map(k => `<tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">${k.label}</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:${semaforoPdf(k.status)};">${k.value}</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#888;">Obj: ${k.objetivo}${k.unidad}</td></tr>`).join('')}
+      </table>
+      <p style="font-size:0.65rem; color:#888;">🟢 Óptimo · 🟡 Alerta · 🔴 Crítico</p>
+    `;
+  },
+
+  _pdfSeccionCargas(d) {
+    const { cargasData } = d;
+    if (!cargasData?.porZona?.length) return '';
+    return `
+      <h3 style="color:#f59e0b; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📐 Cargas y Aforos</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Zona</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Aforo</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Ocupación</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">%</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Estado</th></tr></thead>
+        <tbody>${cargasData.porZona.map(z => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${z.nombre}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.aforo}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.ocupacion}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.pctOcupacion}%</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.estado}</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:center; font-weight:bold;">${cargasData.totalAforo}</td><td style="padding:6px; text-align:center; font-weight:bold;">${cargasData.totalOcupacion}</td><td style="padding:6px; text-align:center; font-weight:bold;">${cargasData.pctGlobal}%</td><td style="padding:6px; text-align:center;">${cargasData.numAlertas > 0 ? '⚠️ ' + cargasData.numAlertas + ' alertas' : '✅'}</td></tr></tfoot>
+      </table>
+    `;
+  },
+
+  _pdfSeccionRotacion(d) {
+    const { rotacionData } = d;
+    if (!rotacionData || rotacionData.totalAnimales === 0) return '';
+    const u90 = rotacionData.ultimos90 || {};
+    return `
+      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🔄 Rotación de Censo (${rotacionData.periodo})</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:8px;">
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Censo Total</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${rotacionData.totalAnimales}</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Animales Activos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${rotacionData.activos}</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Nacimientos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#10b981;">${u90.nacimientos || 0}</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Compras</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#3b82f6;">${u90.compras || 0}</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Ventas</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#cc0000;">${u90.ventas || 0}</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Bajas</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#888;">${u90.bajas || 0}</td></tr>
+        <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">Entrada Neta</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem; color:${(u90.entradaNeta || 0) >= 0 ? '#10b981' : '#cc0000'};">${(u90.entradaNeta >= 0 ? '+' : '')}${u90.entradaNeta || 0}</td></tr>
+      </table>
+      <p style="font-size:0.65rem; color:#888;">Tasa reposición: ${rotacionData.tasaReposicion} · Tasa bajas: ${rotacionData.tasaBajas}</p>
+    `;
+  },
+
+  _pdfSeccionFlujoCaja(d) {
+    const { flujoCajaData } = d;
+    if (!flujoCajaData?.porMes?.length) return '';
+    const meses = flujoCajaData.porMes.filter(m => m.entradas > 0 || m.salidas > 0);
+    if (!meses.length) return '';
+    return `
+      <h3 style="color:#14b8a6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📈 Flujo de Caja</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Mes</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Entradas</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Salidas</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Neto</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Acumulado</th></tr></thead>
+        <tbody>${meses.map(m => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${m.mes}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.entradas.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.salidas.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right; color:${m.neto >= 0 ? '#10b981' : '#cc0000'};">${m.neto.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${m.acumulado.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:right; font-weight:bold;">${flujoCajaData.totalEntradas.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${flujoCajaData.totalSalidas.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold; color:${flujoCajaData.totalNeto >= 0 ? '#10b981' : '#cc0000'};">${flujoCajaData.totalNeto.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${flujoCajaData.saldoFinal.toLocaleString()}€</td></tr></tfoot>
+      </table>
+    `;
+  },
+
+  // ========= SECCIONES PDF RENTABILIDAD ESPECIE, CURVA PRODUCCIÓN, BREAK-EVEN =========
+
+  _pdfSeccionRentabilidadEspecie(d) {
+    const { rentEspData } = d;
+    if (!rentEspData?.porEspecie?.length) return '';
+    return `
+      <h3 style="color:#8b5cf6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🧬 Rentabilidad por Especie</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Especie</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Animales</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Ingresos</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Gastos</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Balance</th></tr></thead>
+        <tbody>${rentEspData.porEspecie.map(e => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${e.especie}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${e.numAnimales}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${e.ingresos.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${e.gastos.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:${e.balance >= 0 ? '#10b981' : '#cc0000'};">${e.balance.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:center; font-weight:bold;">${rentEspData.porEspecie.reduce((s, e) => s + e.numAnimales, 0)}</td><td style="padding:6px; text-align:right; font-weight:bold;">${rentEspData.totalIngresos.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${rentEspData.totalGastos.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold; color:${rentEspData.totalBalance >= 0 ? '#10b981' : '#cc0000'};">${rentEspData.totalBalance.toLocaleString()}€</td></tr></tfoot>
+      </table>
+    `;
+  },
+
+  _pdfSeccionCurvaProduccion(d) {
+    const { curvaProdData } = d;
+    if (!curvaProdData?.porMes?.length) return '';
+    return `
+      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📉 Curva de Producción</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.7rem;">
+        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Mes</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Kg</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Litros</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Kg Acum</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">L Acum</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Ingresos</th></tr></thead>
+        <tbody>${curvaProdData.porMes.map(m => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${m.mes}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.kg.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.litros.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.kgAcum.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.litrosAcum.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.ingresos.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:right; font-weight:bold;">${curvaProdData.totalKg.toFixed(1)}</td><td style="padding:6px; text-align:right; font-weight:bold;">${curvaProdData.totalLitros.toFixed(1)}</td><td style="padding:6px; text-align:right; font-weight:bold;">—</td><td style="padding:6px; text-align:right; font-weight:bold;">—</td><td style="padding:6px; text-align:right; font-weight:bold;">${curvaProdData.totalIngresos.toLocaleString()}€</td></tr></tfoot>
+      </table>
+      <p style="font-size:0.65rem; color:#888;">Meta kg: ${Math.round(curvaProdData.metaKg)} · Meta litros: ${Math.round(curvaProdData.metaLitros)} · Cumplimiento: ${curvaProdData.pctCumplimientoKg}% kg / ${curvaProdData.pctCumplimientoLitros}% L</p>
+    `;
+  },
+
+  _pdfSeccionBreakEven(d) {
+    const { breakEvenData } = d;
+    if (!breakEvenData || breakEvenData.ingresosTotal === 0) return '';
+    return `
+      <h3 style="color:#ef4444; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">⚖️ Análisis de Punto Muerto (Break-Even)</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Costes Fijos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.costesFijos.toLocaleString()}€</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Costes Variables</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.costesVariables.toLocaleString()}€</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Break-Even Carne</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${breakEvenData.breakEvenKg} kg <span style="color:${breakEvenData.cubiertoCarne ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoCarne ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Break-Even Leche</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${breakEvenData.breakEvenLitros} L <span style="color:${breakEvenData.cubiertoLeche ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoLeche ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Margen Seguridad Carne</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.margenSeguridadKg}</td></tr>
+        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Margen Seguridad Leche</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.margenSeguridadLitros}</td></tr>
+      </table>
     `;
   },
 
