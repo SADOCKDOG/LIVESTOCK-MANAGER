@@ -234,7 +234,7 @@
         }
       }
 
-      // 12. Producción de carne (pesos para GMD / informes)
+      // 12. Producción de carne (Individual, Lote y Ventas)
       var prodCarneData = [
         { animal: terner1, pesos: [{ f: '2025-01-10', p: 175 }, { f: '2025-02-10', p: 210 }, { f: '2025-03-10', p: 248 }, { f: '2025-04-10', p: 285 }] },
         { animal: terner2, pesos: [{ f: '2025-01-10', p: 190 }, { f: '2025-02-10', p: 228 }, { f: '2025-03-10', p: 265 }, { f: '2025-04-10', p: 300 }] },
@@ -245,38 +245,48 @@
         if (!pcItem.animal) continue;
         for (var pp = 0; pp < pcItem.pesos.length; pp++) {
           try {
-            // Registrar en Libro Maestro para visibilidad total
-            await Pesajes.registrar({
+            await window.db.add('registro_eventos', {
+              fincaId: fincaId,
+              fecha: pcItem.pesos[pp].f,
               entidad_id: pcItem.animal.id,
               tipo_entidad: 'animal',
               valor_neto: pcItem.pesos[pp].p,
-              fecha: pcItem.pesos[pp].f,
-              motivo_tarea: 'control',
               unidad: 'kg',
-              rol_contable: 'INVENTARIO'
+              motivo_tarea: 'control',
+              rol_contable: 'INVENTARIO',
+              snap_identificacion: pcItem.animal.numero_identificacion,
+              snap_zona: 'Parcela Norte 42ha',
+              snap_especie: pcItem.animal.especie,
+              snap_tipo: pcItem.animal.categoria || 'Cebo',
+              creadoEn: new Date().toISOString()
             });
-          } catch (e) { console.log('[SEED] Error prod carne:', e.message); }
-          await sleep(60);
+          } catch (e) { console.log('[SEED] Error prod carne ind:', e.message); }
+          await sleep(50);
         }
       }
 
       // Registro de pesaje POR LOTE (ejemplo cárnico)
       if (rebTerneros) {
         try {
-          await Pesajes.registrar({
+          await window.db.add('registro_eventos', {
+            fincaId: fincaId,
+            fecha: hoyStr,
             entidad_id: rebTerneros.id,
             tipo_entidad: 'rebano',
-            valor_neto: 4500, // Peso total estimado del lote
-            fecha: new Date().toISOString().split('T')[0],
-            motivo_tarea: 'control',
+            valor_neto: 4500,
             unidad: 'kg',
+            motivo_tarea: 'control',
             rol_contable: 'INVENTARIO',
-            snap_identificacion: rebTerneros.nombre
+            snap_identificacion: rebTerneros.nombre,
+            snap_zona: rebTerneros.zonaActual,
+            snap_especie: rebTerneros.especie,
+            snap_tipo: rebTerneros.tipo,
+            creadoEn: new Date().toISOString()
           });
         } catch (e) { console.log('[SEED] Error pesaje lote carne:', e.message); }
       }
 
-      // 13. Producción de leche por vaca (cifrada + registro_eventos)
+      // 13. Producción de leche (Individual, Lote y Expedición Tanque)
       var prodLecheVacas = [vaca1, vaca2, vaca3];
       var lecheFechas = ['2025-03-01', '2025-03-15', '2025-04-01', '2025-04-15', '2025-05-01'];
       for (var plv = 0; plv < prodLecheVacas.length; plv++) {
@@ -284,7 +294,7 @@
         for (var lf = 0; lf < lecheFechas.length; lf++) {
           try {
             var litros = 22 + Math.round(Math.random() * 8);
-            // 1. Guardar en tabla cifrada
+            // 1. Guardar en tabla cifrada (para el historial de leche)
             await Produccion.saveLeche({
               vacaId: prodLecheVacas[plv].id,
               fecha: lecheFechas[lf],
@@ -292,53 +302,63 @@
               analisis_grasa_proteina: { grasa: 3.7, proteina: 3.3 }
             }, fincaId);
 
-            // 2. Registrar en Libro Maestro (registro_eventos) para que aparezca en la lista de Registros
-            await Pesajes.registrar({
+            // 2. Registrar en Libro Maestro (registro_eventos) para visibilidad en Producción
+            await window.db.add('registro_eventos', {
+              fincaId: fincaId,
+              fecha: lecheFechas[lf],
               entidad_id: prodLecheVacas[plv].id,
               tipo_entidad: 'animal',
               valor_neto: litros,
-              fecha: lecheFechas[lf],
               unidad: 'L',
               motivo_tarea: 'control_lechero',
-              snap_zona: 'Parcela Norte 42ha', // Snapshot manual para demo
-              snap_tipo: 'Madres',
+              rol_contable: 'INVENTARIO',
+              snap_identificacion: prodLecheVacas[plv].numero_identificacion,
+              snap_zona: 'Parcela Norte 42ha',
               snap_especie: 'Vacas',
-              snap_identificacion: prodLecheVacas[plv].numero_identificacion
+              snap_tipo: 'Madres',
+              creadoEn: new Date().toISOString()
             });
-          } catch (e) { console.log('[SEED] Error prod leche:', e.message); }
-          await sleep(60);
+          } catch (e) { console.log('[SEED] Error prod leche ind:', e.message); }
+          await sleep(50);
         }
       }
 
       // Registro de control lechero POR LOTE (ejemplo lácteo)
       if (rebVacas) {
         try {
-          await Pesajes.registrar({
+          await window.db.add('registro_eventos', {
+            fincaId: fincaId,
+            fecha: hoyStr,
             entidad_id: rebVacas.id,
             tipo_entidad: 'rebano',
-            valor_neto: 1200, // Litros totales del rebaño
-            fecha: new Date().toISOString().split('T')[0],
+            valor_neto: 1200,
             unidad: 'L',
             motivo_tarea: 'control_lechero',
+            rol_contable: 'INVENTARIO',
+            snap_identificacion: rebVacas.nombre,
             snap_zona: rebVacas.zonaActual,
-            snap_tipo: rebVacas.tipo,
             snap_especie: rebVacas.especie,
-            snap_identificacion: rebVacas.nombre
+            snap_tipo: rebVacas.tipo,
+            creadoEn: new Date().toISOString()
           });
         } catch (e) { console.log('[SEED] Error control lote leche:', e.message); }
       }
 
       // Registro de EXPEDICIÓN DE TANQUE (ejemplo lácteo)
       try {
-        await Pesajes.registrar({
+        await window.db.add('registro_eventos', {
+          fincaId: fincaId,
+          fecha: hoyStr,
           entidad_id: fincaId,
           tipo_entidad: 'finca',
           valor_neto: 1850,
-          fecha: new Date().toISOString().split('T')[0],
           unidad: 'L',
           motivo_tarea: 'expedicion',
+          rol_contable: 'VENTA',
           snap_identificacion: 'TANQUE PRINCIPAL',
-          rol_contable: 'VENTA'
+          snap_zona: 'Finca',
+          snap_especie: 'Vacas',
+          creadoEn: new Date().toISOString()
         });
       } catch (e) { console.log('[SEED] Error expedicion tanque:', e.message); }
 

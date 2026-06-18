@@ -290,6 +290,7 @@ const PesajesUI = {
 
                     const fecha = overlay.querySelector('#w-fecha')?.value || new Date().toISOString().split('T')[0];
                     const activeFincaId = await Fincas.getActiveId();
+                    if (!activeFincaId) throw new Error("No hay una finca activa seleccionada");
 
                     if (esModoLeche) {
                         const grasa = parseFloat(overlay.querySelector('#w-leche-grasa')?.value) || null;
@@ -314,11 +315,11 @@ const PesajesUI = {
                             unidad: 'L',
                             calidad: (grasa || proteina) ? { grasa, proteina } : null,
                             rol_contable: 'INVENTARIO',
-                            snap_identificacion: a.numero_identificacion
+                            snap_identificacion: a.numero_identificacion || a.nombre || 'S/N'
                         });
 
                         a.pesoActual = val + ' L';
-                        window.App.toast(`✅ Registrado: ${val} L`);
+                        window.App.toast(`✅ ${a.numero_identificacion || 'Registro'} ➟ ${val} L`);
                     } else {
                         // MODO CARNE: registrar en Libro Maestro
                         await Pesajes.registrar({
@@ -330,11 +331,11 @@ const PesajesUI = {
                             precio_unitario: (motivo === 'expedicion') ? parseFloat(overlay.querySelector('#w-precio')?.value || 0) : 0,
                             matricula: isLogistico ? overlay.querySelector('#w-matricula')?.value.toUpperCase() : '',
                             rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO',
-                            snap_identificacion: a.numero_identificacion
+                            snap_identificacion: a.numero_identificacion || a.nombre || 'S/N'
                         });
 
                         a.pesoActual = val + ' kg';
-                        window.App.toast(`✅ Registrado: ${val} kg`);
+                        window.App.toast(`✅ ${a.numero_identificacion || 'Registro'} ➟ ${val} kg`);
                     }
 
                     // Avanzar al siguiente si es lote
@@ -350,13 +351,14 @@ const PesajesUI = {
                         renderTable();
                     }
 
-                    // Disparar evento para que la vista se refresque
+                    // Notificar refresco de vistas
                     if (window.EventBus) {
                         window.EventBus.emit('pesaje:registrado', { refresh: true });
+                        if (esModoLeche) window.EventBus.emit('leche:entrega', { cantidad: val });
                     }
                 } catch (e) {
                     console.error('[PesajesUI] Error al guardar:', e);
-                    window.App.toastError("Error al guardar: " + e.message);
+                    window.App.toastError("Error al guardar: " + (e.message || "Error desconocido"));
                 }
             };
 
