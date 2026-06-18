@@ -20,6 +20,7 @@ const App = {
     "/gastos": "renderGastos",
     "/comercializacion": "renderComercializacion",
     "/albaran-leche": "renderDetalleLeche",
+    "/venta-carne": "renderDetalleVentaCarne",
     "/gasto": "renderDetalleGasto",
     "/informes": "renderInformes",
     "/ajustes": "renderAjustes",
@@ -851,6 +852,122 @@ const App = {
   // ==========================================
   // DETALLES INDIVIDUALES
   // ==========================================
+  _abrirDetalleVentaCarne(id) {
+    location.hash = `/venta-carne?id=${id}`;
+  },
+
+  async renderDetalleVentaCarne(params) {
+    const id = params.get("id");
+    if (!id) return;
+    try {
+      const v = await window.db.get("comercializacion_carne", parseInt(id));
+      if (!v) throw new Error("Registro de venta no encontrado");
+
+      const animal = await window.db.get("animales", v.animalId);
+
+      document.getElementById("app-content").innerHTML = `
+        <div class="mb-20">
+          <a href="#/comercializacion?tab=carne" class="text-gold no-underline">← Volver</a>
+          <h2 class="text-white mt-10">🥩 Detalle de Venta</h2>
+        </div>
+
+        <div class="card mb-20" style="border-top: 5px solid #ef4444;">
+          <div class="flex justify-between items-center border-bottom-222 pb-10 mb-15">
+            <div>
+              <div class="text-gray text-tiny uppercase font-bold">Albarán Nº</div>
+              <div class="text-white font-black text-lg">${v.numero_albaran || 'S/N'}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-gray text-tiny uppercase font-bold">Fecha</div>
+              <div class="text-white font-bold">${new Date(v.fechaSacrificio).toLocaleDateString()}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-15 mb-20">
+            <div class="bg-dark p-10 rounded">
+              <small class="text-gray uppercase font-bold text-tiny">Animal</small>
+              <div class="text-gold font-black">${animal?.numero_identificacion || 'Desconocido'}</div>
+              <div class="text-gray text-xs">${v.snap_especie || ''} - ${v.snap_tipo || ''}</div>
+            </div>
+            <div class="bg-dark p-10 rounded text-right">
+              <small class="text-gray uppercase font-bold text-tiny">Rendimiento</small>
+              <div class="text-green font-black text-lg">${v.rendimientoCanal || 0}%</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-15 mb-20">
+            <div>
+              <label class="text-gray text-tiny uppercase font-bold">Peso Vivo</label>
+              <div class="text-white font-bold">${v.pesoVivo || 0} kg</div>
+            </div>
+            <div class="text-right">
+              <label class="text-gray text-tiny uppercase font-bold">Peso Canal</label>
+              <div class="text-white font-black text-lg">${v.pesoCanal || 0} kg</div>
+            </div>
+          </div>
+
+          <div class="border-top-222 pt-15 mt-15">
+            <div class="text-gray text-tiny uppercase font-bold mb-4">Comprador / Destino</div>
+            <div class="text-white font-bold">${v.razonSocial || 'N/D'}</div>
+            <div class="text-gray text-xs">NIF: ${v.nifComprador || 'N/D'}</div>
+            <div class="text-gray text-xs mt-4">📍 ${v.codigoMatadero || ''}</div>
+          </div>
+
+          <div class="flex gap-10 mt-30">
+            <button class="btn btn-primary flex-1" onclick="App._reimprimirAlbaranCarne(${v.id})" style="background:#ef4444; border:none;">
+              📄 REIMPRIMIR ALBARÁN
+            </button>
+            <button class="btn btn-secondary" onclick="App._eliminarVentaCarneDetalle(${v.id})" style="background:#450a0a; color:white; border:none; padding: 0 15px;">
+              🗑️
+            </button>
+          </div>
+        </div>
+
+        <div class="card bg-darker" style="border-left: 3px solid #333;">
+          <h4 class="text-gray text-xs uppercase font-bold mb-8">Información de Trazabilidad</h4>
+          <div class="grid grid-cols-2 gap-8 text-xs text-aaa">
+            <div>Guía Sanitaria:</div><div class="text-white text-right">${v.numero_Guia_Sanitaria || '-'}</div>
+            <div>Documento ICA:</div><div class="text-white text-right">${v.codigoDocumento_ICA || '-'}</div>
+            <div>Transportista:</div><div class="text-white text-right">${v.nombreTransportista || '-'}</div>
+            <div>Matrícula:</div><div class="text-white text-right">${v.matriculaTransportista || '-'}</div>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      this.toastError(e.message);
+      location.hash = "/comercializacion?tab=carne";
+    }
+  },
+
+  async _reimprimirAlbaranCarne(id) {
+    try {
+      const v = await window.db.get("comercializacion_carne", id);
+      const est = await window.Trazabilidad.generarEstructuraAlbaran(window.db, v, "carne");
+      await this.imprimirAlbaran(est, "carne");
+    } catch (e) {
+      this.toastError("Error al generar albarán: " + e.message);
+    }
+  },
+
+  async _eliminarVentaCarneDetalle(id) {
+    if (!confirm("¿Eliminar este registro de venta? El animal volverá a estar ACTIVO en el censo.")) return;
+    try {
+      const v = await window.db.get("comercializacion_carne", id);
+      if (v.animalId) {
+        const a = await window.db.get("animales", v.animalId);
+        if (a) {
+          a.estado = "activo";
+          await Animales.save(a);
+        }
+      }
+      await window.db.delete("comercializacion_carne", id);
+      this.toast("Registro de venta eliminado correctamente");
+      location.hash = "/comercializacion?tab=carne";
+    } catch (e) {
+      this.toastError(e.message);
+    }
+  },
+
   async renderDetalleLeche(params) {
     const id = params.get("id");
     const e = await window.db.get("comercializacion_leche", parseInt(id));

@@ -38,6 +38,12 @@ const InformesView = {
             <button class="inf-tab" data-tab="por-finca" onclick="InformesView._cambiarTab('por-finca')">🏠 Por Finca</button>
             <button class="inf-tab" data-tab="rega" onclick="InformesView._cambiarTab('rega')">📋 REGA</button>
             <button class="inf-tab" data-tab="exportar" onclick="InformesView._cambiarTab('exportar')">📤 Exportar</button>
+            <button class="inf-tab" data-tab="pyg" onclick="InformesView._cambiarTab('pyg')">💰 PyG</button>
+            <button class="inf-tab" data-tab="coste-prod" onclick="InformesView._cambiarTab('coste-prod')">🐄 Coste/Animal</button>
+            <button class="inf-tab" data-tab="eficiencia" onclick="InformesView._cambiarTab('eficiencia')">📊 Eficiencia</button>
+            <button class="inf-tab" data-tab="cargas" onclick="InformesView._cambiarTab('cargas')">📐 Aforos</button>
+            <button class="inf-tab" data-tab="rotacion" onclick="InformesView._cambiarTab('rotacion')">🔄 Rotación</button>
+            <button class="inf-tab" data-tab="flujo-caja" onclick="InformesView._cambiarTab('flujo-caja')">📈 Flujo Caja</button>
           </div>
         </div>
       </div>
@@ -55,7 +61,8 @@ const InformesView = {
         gmdData, ventasHist, animales, rebanos,
         finca, ventasCompleto, docsLegales, transportistas, eventos, rawLeche,
         compradoresData, proveedoresData, fitosanitarioData, alertasData, porFincaData,
-        ventasPorRebano, lechePorRebano
+        ventasPorRebano, lechePorRebano,
+        pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData
       ] = await Promise.all([
         Analitica.obtenerRentabilidadFinca(fId).catch(() => null),
         Analitica.obtenerMargenPorAnimal(fId).catch(() => []),
@@ -82,6 +89,12 @@ const InformesView = {
         this._obtenerDatosPorFinca(fId),
         this._obtenerVentasPorRebano(fId),
         this._obtenerLechePorRebano(fId),
+        Analitica.obtenerCuentaResultados(fId).catch(() => ({ porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0.0' })),
+        Analitica.obtenerCosteProduccionDiario(fId).catch(() => ({ porRebano: [], totalGasto: 0, totalAnimales: 0, costeMedioCabeza: 0, costeMedioDia: 0 })),
+        Analitica.obtenerRotacionCenso(fId).catch(() => ({ ultimos90: {}, ultimos30: {}, totalAnimales: 0, activos: 0, tasaReposicion: '0%', tasaBajas: '0%', periodo: '90 días' })),
+        Analitica.obtenerCargasAforos(fId).catch(() => ({ porZona: [], totalAforo: 0, totalOcupacion: 0, pctGlobal: '0', alertas: [], numAlertas: 0, numZonas: 0 })),
+        Analitica.obtenerEficienciaTecnica(fId).catch(() => ({ kpis: [], activos: 0, totalLecheros: 0, numRebanos: 0, totalAnimales: 0 })),
+        Analitica.obtenerFlujoCaja(fId).catch(() => ({ porMes: [], totalEntradas: 0, totalSalidas: 0, totalNeto: 0, saldoFinal: 0 })),
       ]);
 
       this._cachedLeche = rawLeche || [];
@@ -93,7 +106,8 @@ const InformesView = {
         gmdData, ventasHist, animales, rebanos, fId,
         finca, ventasCompleto, docsLegales, transportistas, eventos,
         compradoresData, proveedoresData, fitosanitarioData, alertasData, porFincaData,
-        ventasPorRebano, lechePorRebano
+        ventasPorRebano, lechePorRebano,
+        pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData
       };
 
       this._renderTabActual();
@@ -166,6 +180,12 @@ const InformesView = {
         case 'por-finca': this._renderPorFinca(content, d); break;
         case 'rega': this._renderRega(content, d); break;
         case 'exportar': this._renderExportar(content, d); break;
+        case 'pyg': this._renderPyG(content, d); break;
+        case 'coste-prod': this._renderCosteProd(content, d); break;
+        case 'eficiencia': this._renderEficiencia(content, d); break;
+        case 'cargas': this._renderCargas(content, d); break;
+        case 'rotacion': this._renderRotacion(content, d); break;
+        case 'flujo-caja': this._renderFlujoCaja(content, d); break;
         default: this._renderGeneral(content, d);
       }
     } catch (e) {
