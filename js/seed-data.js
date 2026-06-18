@@ -81,15 +81,15 @@
 
       // 3. Animales (rebanoId asignado directamente en la definición)
       var animDefs = [
-        { numero_identificacion: 'ES123456789012', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2021-03-15', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 580, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V1-2021' },
-        { numero_identificacion: 'ES123456789013', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2020-07-22', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 620, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V2-2020' },
-        { numero_identificacion: 'ES123456789014', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2022-01-10', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 510, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V3-2022' },
-        { numero_identificacion: 'ES123456789015', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-11-05', sexo: 'Macho', raza: 'Frisona', peso_inicial: 180, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T1-2024', madre_id: null },
-        { numero_identificacion: 'ES123456789016', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-10-20', sexo: 'Macho', raza: 'Frisona', peso_inicial: 195, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T2-2024', madre_id: null },
-        { numero_identificacion: 'ES654321098765', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2022-06-01', sexo: 'Hembra', raza: 'Merina', peso_inicial: 55, rebanoId: rebOvejas.id, categoria: 'Madres' },
-        { numero_identificacion: 'ES654321098766', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2023-02-14', sexo: 'Hembra', raza: 'Merina', peso_inicial: 52, rebanoId: rebOvejas.id, categoria: 'Madres' },
-        { numero_identificacion: 'ES654321098767', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2021-11-30', sexo: 'Hembra', raza: 'Merina', peso_inicial: 58, rebanoId: rebOvejas.id, categoria: 'Madres' },
-        { numero_identificacion: 'ES654321098768', especie: 'Ovejas', tipo: 'Cordero', estado: 'activo', fecha_nacimiento: '2024-05-18', sexo: 'Macho', raza: 'Merina', peso_inicial: 60, rebanoId: rebOvejas.id, categoria: 'Cebo' }
+        { numero_identificacion: 'ES123456789012', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2021-03-15', sexo: 'H', raza: 'Frisona', peso_inicial: 580, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V1-2021' },
+        { numero_identificacion: 'ES123456789013', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2020-07-22', sexo: 'H', raza: 'Frisona', peso_inicial: 620, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V2-2020' },
+        { numero_identificacion: 'ES123456789014', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2022-01-10', sexo: 'H', raza: 'Frisona', peso_inicial: 510, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V3-2022' },
+        { numero_identificacion: 'ES123456789015', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-11-05', sexo: 'M', raza: 'Frisona', peso_inicial: 180, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T1-2024', madre_id: null },
+        { numero_identificacion: 'ES123456789016', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-10-20', sexo: 'M', raza: 'Frisona', peso_inicial: 195, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T2-2024', madre_id: null },
+        { numero_identificacion: 'ES654321098765', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2022-06-01', sexo: 'H', raza: 'Merina', peso_inicial: 55, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { numero_identificacion: 'ES654321098766', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2023-02-14', sexo: 'H', raza: 'Merina', peso_inicial: 52, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { numero_identificacion: 'ES654321098767', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2021-11-30', sexo: 'H', raza: 'Merina', peso_inicial: 58, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { numero_identificacion: 'ES654321098768', especie: 'Ovejas', tipo: 'Cordero', estado: 'activo', fecha_nacimiento: '2024-05-18', sexo: 'M', raza: 'Merina', peso_inicial: 60, rebanoId: rebOvejas.id, categoria: 'Cebo' }
       ];
       var anims = [];
       for (var a = 0; a < animDefs.length; a++) {
@@ -186,14 +186,18 @@
       await sleep(150);
 
       // 9. Gastos
+      var hoyStr = new Date().toISOString().split('T')[0];
+      var hace10d = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var hace20d = new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
       var gastosDefs = [
-        { concepto: 'Pienso concentrado vacuno', fecha: '2025-03-01', monto: 2340.50, categoria: 'Alimentación', rebanoId: rebVacas.id },
-        { concepto: 'Paja para cama', fecha: '2025-03-05', monto: 680.00, categoria: 'Cama', rebanoId: rebVacas.id },
-        { concepto: 'Vacunación trimestral', fecha: '2025-03-10', monto: 425.00, categoria: 'Sanidad', rebanoId: rebVacas.id },
-        { concepto: 'Gasoil tractor', fecha: '2025-03-15', monto: 320.75, categoria: 'Combustible' },
-        { concepto: 'Mantenimiento valla parcela norte', fecha: '2025-03-20', monto: 890.00, categoria: 'Mantenimiento', rebanoId: rebVacas.id },
-        { concepto: 'Pienso lactancia corderos', fecha: '2025-02-12', monto: 540.00, categoria: 'Alimentación', rebanoId: rebOvejas.id },
-        { concepto: 'Veterinario revisión rebaño', fecha: '2025-05-02', monto: 260.00, categoria: 'Sanidad', rebanoId: rebVacas.id }
+        { concepto: 'Pienso concentrado vacuno', fecha: hace10d, monto: 2340.50, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
+        { concepto: 'Paja para cama', fecha: hace20d, monto: 680.00, categoria: 'Cama', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
+        { concepto: 'Vacunación trimestral', fecha: '2025-03-10', monto: 425.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null },
+        { concepto: 'Gasoil tractor', fecha: '2025-03-15', monto: 320.75, categoria: 'Combustible', proveedorId: provMaq ? provMaq.id : null },
+        { concepto: 'Mantenimiento valla parcela norte', fecha: '2025-03-20', monto: 890.00, categoria: 'Mantenimiento', rebanoId: rebVacas.id, proveedorId: provMaq ? provMaq.id : null },
+        { concepto: 'Pienso lactancia corderos', fecha: hace10d, monto: 540.00, categoria: 'Alimentacion', rebanoId: rebOvejas.id, proveedorId: provPienso ? provPienso.id : null },
+        { concepto: 'Veterinario revisión rebaño', fecha: hoyStr, monto: 260.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null }
       ];
       for (var g = 0; g < gastosDefs.length; g++) {
         try { await Gastos.save(gastosDefs[g]); } catch (e) { console.log('[SEED] Error gasto:', e.message); }
@@ -203,7 +207,8 @@
       // 10. Sanitarios
       var sanDefs = [
         { tipo_tratamiento: 'Vacunación', medicamento: 'Cydectin 1%', fecha: '2025-02-01', tiempo_espera_carne_dias: 14, tiempo_espera_leche_dias: 7, prohibidoLeche: false, rebanoId: rebVacas.id },
-        { tipo_tratamiento: 'Desparasitación', medicamento: 'Eprinex Pour-On', fecha: '2025-01-15', tiempo_espera_carne_dias: 7, tiempo_espera_leche_dias: 0, prohibidoLeche: false, rebanoId: rebVacas.id }
+        { tipo_tratamiento: 'Desparasitación', medicamento: 'Eprinex Pour-On', fecha: '2025-01-15', tiempo_espera_carne_dias: 7, tiempo_espera_leche_dias: 0, prohibidoLeche: false, rebanoId: rebVacas.id },
+        { tipo_tratamiento: 'Antibiótico', medicamento: 'Marbocyl 10%', fecha: hoyStr, tiempo_espera_carne_dias: 28, tiempo_espera_leche_dias: 0, prohibidoLeche: true, rebanoId: rebVacas.id, notas: 'Tratamiento activo para ver alertas', enfermedad: 'Mamitis' }
       ];
       for (var s = 0; s < sanDefs.length; s++) {
         try { await Sanitarios.save(sanDefs[s]); } catch (e) { console.log('[SEED] Error sanitario:', e.message); }
@@ -260,10 +265,14 @@
       }
 
       // 14. Comercialización de leche (entregas a tanque con laboratorio + MOFA)
+      var hace5d = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var hace15d = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var hace25d = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
       var entregasLeche = [
-        { fecha: '2025-03-05', cantidad: 1850, precioBase: 0.58, grasa: 6.2, proteina: 5.1, somaticas: 320000, germenes: 35000 },
-        { fecha: '2025-04-05', cantidad: 2010, precioBase: 0.60, grasa: 6.4, proteina: 5.3, somaticas: 280000, germenes: 28000 },
-        { fecha: '2025-05-05', cantidad: 1940, precioBase: 0.59, grasa: 6.1, proteina: 5.0, somaticas: 410000, germenes: 60000 }
+        { fecha: hace25d, cantidad: 1850, precioBase: 0.58, grasa: 6.2, proteina: 5.1, somaticas: 320000, germenes: 35000 },
+        { fecha: hace15d, cantidad: 2010, precioBase: 0.60, grasa: 6.4, proteina: 5.3, somaticas: 280000, germenes: 28000 },
+        { fecha: hace5d, cantidad: 1940, precioBase: 0.59, grasa: 6.1, proteina: 5.0, somaticas: 410000, germenes: 60000 }
       ];
       for (var elx = 0; elx < entregasLeche.length; elx++) {
         var en = entregasLeche[elx];
@@ -308,11 +317,12 @@
       if (terner2 && compCarne) {
         try {
           var pesoVivoV = 300, pesoCanalV = 168;
+          var fechaSacrificio = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
           var regVentaCarne = {
             animalId: terner2.id,
             compradorId: compCarne.id,
             contratoId: null,
-            fechaSacrificio: '2025-05-12',
+            fechaSacrificio: fechaSacrificio,
             codigoMatadero: 'ES10.05/M',
             pesoVivo: pesoVivoV,
             pesoCanal: pesoCanalV,
@@ -361,7 +371,7 @@
             animalId: terner2.id,
             fincaId: fincaId,
             numero: 'DIMOE-ALB-2025-0007',
-            fecha_emision: '2025-05-12',
+            fecha_emision: fechaSacrificio,
             origen_rega: DEMO_FINCA.rega,
             origen_nombre: DEMO_FINCA.nombre,
             destino: 'ES10.05/M',
