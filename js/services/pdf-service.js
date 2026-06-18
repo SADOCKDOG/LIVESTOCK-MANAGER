@@ -31,18 +31,76 @@ const PdfService = {
     `;
     document.body.appendChild(overlay);
 
-    overlay.querySelector("#btn-descargar-pdf").onclick = () => {
-      const opt = {
-        margin: 0.5,
-        filename: filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-      };
-      html2pdf()
-        .set(opt)
-        .from(overlay.querySelector(`#${contentId}`))
-        .save();
+    overlay.querySelector("#btn-descargar-pdf").onclick = async () => {
+      let loader;
+      try {
+        // Crear overlay de carga con barra de proceso
+        loader = document.createElement('div');
+        loader.id = 'pdf-loader-overlay';
+        loader.style.cssText = `
+          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+        `;
+        loader.innerHTML = `
+          <div style="width:280px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
+            <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
+            <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">${title}</div>
+            <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
+              <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+            </div>
+            <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+          </div>
+          <style>
+            @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+          </style>
+        `;
+        document.body.appendChild(loader);
+
+        const updateProgress = (pct, text) => {
+          const bar = loader.querySelector('#pdf-progress-bar');
+          const txt = loader.querySelector('#pdf-progress-text');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = text.toUpperCase();
+        };
+
+        updateProgress(30, 'Preparando documento...');
+        const sourceEl = overlay.querySelector(`#${contentId}`);
+        const tempContainer = document.createElement('div');
+        tempContainer.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; padding:30px;';
+        tempContainer.innerHTML = sourceEl.innerHTML;
+        document.body.appendChild(tempContainer);
+
+        const opt = {
+          margin: [12, 10, 12, 10],
+          filename: filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            width: 800,
+            height: tempContainer.scrollHeight,
+            windowHeight: tempContainer.scrollHeight
+          },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        updateProgress(70, 'Generando archivo...');
+        await html2pdf()
+          .set(opt)
+          .from(tempContainer)
+          .save();
+
+        document.body.removeChild(tempContainer);
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 500));
+        loader.remove();
+      } catch (e) {
+        console.error('[PdfService] Error:', e);
+        if (loader) loader.remove();
+      }
     };
 
     const cerrar = () => {

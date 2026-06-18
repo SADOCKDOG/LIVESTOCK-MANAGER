@@ -81,15 +81,15 @@
 
       // 3. Animales (rebanoId asignado directamente en la definición)
       var animDefs = [
-        { numero_identificacion: 'ES123456789012', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2021-03-15', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 580, rebanoId: rebVacas.id },
-        { numero_identificacion: 'ES123456789013', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2020-07-22', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 620, rebanoId: rebVacas.id },
-        { numero_identificacion: 'ES123456789014', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2022-01-10', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 510, rebanoId: rebVacas.id },
-        { numero_identificacion: 'ES123456789015', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-11-05', sexo: 'Macho', raza: 'Frisona', peso_inicial: 180, rebanoId: rebTerneros.id },
-        { numero_identificacion: 'ES123456789016', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-10-20', sexo: 'Macho', raza: 'Frisona', peso_inicial: 195, rebanoId: rebTerneros.id },
-        { numero_identificacion: 'ES654321098765', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2022-06-01', sexo: 'Hembra', raza: 'Merina', peso_inicial: 55, rebanoId: rebOvejas.id },
-        { numero_identificacion: 'ES654321098766', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2023-02-14', sexo: 'Hembra', raza: 'Merina', peso_inicial: 52, rebanoId: rebOvejas.id },
-        { numero_identificacion: 'ES654321098767', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2021-11-30', sexo: 'Hembra', raza: 'Merina', peso_inicial: 58, rebanoId: rebOvejas.id },
-        { numero_identificacion: 'ES654321098768', especie: 'Ovejas', tipo: 'Cordero', estado: 'activo', fecha_nacimiento: '2024-05-18', sexo: 'Macho', raza: 'Merina', peso_inicial: 60, rebanoId: rebOvejas.id }
+        { numero_identificacion: 'ES123456789012', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2021-03-15', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 580, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V1-2021' },
+        { numero_identificacion: 'ES123456789013', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2020-07-22', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 620, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V2-2020' },
+        { numero_identificacion: 'ES123456789014', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2022-01-10', sexo: 'Hembra', raza: 'Frisona', peso_inicial: 510, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V3-2022' },
+        { numero_identificacion: 'ES123456789015', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-11-05', sexo: 'Macho', raza: 'Frisona', peso_inicial: 180, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T1-2024', madre_id: null },
+        { numero_identificacion: 'ES123456789016', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-10-20', sexo: 'Macho', raza: 'Frisona', peso_inicial: 195, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T2-2024', madre_id: null },
+        { numero_identificacion: 'ES654321098765', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2022-06-01', sexo: 'Hembra', raza: 'Merina', peso_inicial: 55, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { numero_identificacion: 'ES654321098766', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2023-02-14', sexo: 'Hembra', raza: 'Merina', peso_inicial: 52, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { numero_identificacion: 'ES654321098767', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2021-11-30', sexo: 'Hembra', raza: 'Merina', peso_inicial: 58, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { numero_identificacion: 'ES654321098768', especie: 'Ovejas', tipo: 'Cordero', estado: 'activo', fecha_nacimiento: '2024-05-18', sexo: 'Macho', raza: 'Merina', peso_inicial: 60, rebanoId: rebOvejas.id, categoria: 'Cebo' }
       ];
       var anims = [];
       for (var a = 0; a < animDefs.length; a++) {
@@ -102,6 +102,10 @@
       var vaca1 = anims[0], vaca2 = anims[1], vaca3 = anims[2];
       var terner1 = anims[3], terner2 = anims[4];
       var oveja4 = anims[8];
+
+      // Vincular descendencia
+      if (vaca1 && terner1) { terner1.madre_id = vaca1.id; await Animales.save(terner1); }
+      if (vaca1 && terner2) { terner2.madre_id = vaca1.id; await Animales.save(terner2); }
 
       // 4. Pesajes de control para vaca1 (registro_eventos)
       if (vaca1) {

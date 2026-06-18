@@ -1,7 +1,7 @@
 {
   "name": "Livestock Manager Premium",
   "short_name": "Livestock",
-  "description": "Plataforma profesional de gestión ganadera inteligente y trazabilidad industrial v4.4.0.",
+  "description": "Plataforma profesional de gestión ganadera inteligente y trazabilidad industrial v4.5.0.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
