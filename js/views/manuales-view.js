@@ -184,8 +184,7 @@ const ManualesView = {
 
       updateProgress(20, 'Descargando manual...');
       const container = document.createElement('div');
-      // Contenedor temporal para renderizado. Se usa position: absolute y z-index negativo.
-      container.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible;';
+      container.style.cssText = 'position:fixed; left:0; top:0; width:800px; background:#fff; color:#000; opacity:0; pointer-events:none; overflow:visible;';
       document.body.appendChild(container);
 
       try {
@@ -194,7 +193,6 @@ const ManualesView = {
         const html = await resp.text();
 
         updateProgress(40, 'Procesando contenido...');
-        // Extraemos los <style> del head y el contenido del <body>.
         const styles = (html.match(/<style[\s\S]*?<\/style>/gi) || []).join('\n');
         const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
         let bodyContent = (bodyMatch ? bodyMatch[1] : html);
@@ -205,7 +203,8 @@ const ManualesView = {
                                      .replace(/<html[^>]*>/gi, '')
                                      .replace(/<\/html>/gi, '');
         }
-        bodyContent = bodyContent.replace(/src="img\//g, 'src="manual/img/');
+        bodyContent = bodyContent.replace(/src="img\//g, 'src="manual/img/')
+                                 .replace(/src='img\//g, "src='manual/img/");
 
         // Estilos específicos para PDF
         const extraCss = `<style>
@@ -315,30 +314,31 @@ const ManualesView = {
         container.innerHTML = `<div class="pdf-export-body">${styles}${extraCss}${bodyContent}</div>`;
 
         updateProgress(60, 'Cargando imágenes...');
-        // Esperar a que TODAS las imágenes carguen antes de rasterizar
-        await Promise.all(Array.from(container.querySelectorAll('img')).map(img =>
-          img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })
+        const imgs = container.querySelectorAll('img');
+        await Promise.all(Array.from(imgs).map(img =>
+          img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = () => { img.style.display = 'none'; res(); }; })
         ));
-        await new Promise(r => setTimeout(r, 600));
+        // Forzar altura real después de cargar imágenes
+        container.style.height = container.scrollHeight + 'px';
+        await new Promise(r => setTimeout(r, 800));
 
         updateProgress(80, 'Rasterizando PDF...');
         const opt = {
-          margin:       [12, 10, 12, 10],
+          margin:       [10, 8, 10, 8],
           filename:     titulo.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '').trim() + '.pdf',
-          image:        { type: 'jpeg', quality: 0.98 },
+          image:        { type: 'jpeg', quality: 0.95 },
           html2canvas:  {
             scale: 2,
             useCORS: true,
             logging: false,
             letterRendering: true,
+            backgroundColor: '#ffffff',
             width: 800,
-            scrollX: 0,
-            scrollY: 0,
             height: container.scrollHeight,
             windowHeight: container.scrollHeight
           },
           jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+          pagebreak:    { mode: ['css', 'legacy'] }
         };
 
         const pdfBlob = await html2pdf().set(opt).from(container).output('blob');

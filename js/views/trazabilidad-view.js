@@ -33,6 +33,11 @@ const TrazabilidadView = {
     // Construir timeline
     const timeline = this._buildTimeline(animal, sanitarios, pesajes, eventos, reproduccion, ventas);
 
+    // Cachear para PDF
+    this._cachedTimeline = timeline;
+    this._cachedAnimal = animal;
+    this._cachedRebano = rebano;
+
     main.innerHTML = this._buildHTML(animal, rebano, finca, timeline);
   },
 
@@ -233,24 +238,26 @@ const TrazabilidadView = {
     const totalEventos = timeline.filter(t => t.tipo === 'evento').length;
 
     return `
-      <div class="p-16" style="max-width:800px; margin:0 auto;">
-        <!-- Cabecera con botón volver -->
-        <div class="flex items-center gap-10 mb-14">
-          <button onclick="App._navigateBack()" class="text-gray" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">←</button>
+      <div style="max-width:100%; padding:12px; box-sizing:border-box;">
+        <!-- Cabecera con acciones -->
+        <div class="flex items-center gap-8 mb-14" style="flex-wrap:wrap;">
+          <button onclick="App._navigateBack()" class="btn btn-secondary btn-sm" style="padding:8px 14px;">← Volver</button>
+          <div style="flex:1;"></div>
+          <button onclick="TrazabilidadView._exportarPDF()" class="btn btn-primary btn-sm" style="padding:8px 14px;background:#b45309;">📄 Exportar PDF</button>
         </div>
 
         <!-- Datos Básicos del Animal -->
-        <div class="card p-20 mb-20">
-          <div class="grid grid-cols-2 gap-10" style="font-size:0.9rem;">
-            <div><strong class="text-amber">${animal.numero_identificacion}</strong></div>
-            <div class="text-right">
-              <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 10px; border-radius:20px; font-size:0.75rem;">${animal.estado}</span>
-            </div>
+        <div class="card p-16 mb-16">
+          <div class="flex justify-between items-center mb-10" style="flex-wrap:wrap;gap:8px;">
+            <strong class="text-amber" style="font-size:1.1rem;">${animal.numero_identificacion}</strong>
+            <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado}</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; font-size:0.85rem;">
             <div><span class="text-gray">Especie:</span> ${animal.especie || 'N/D'}</div>
             <div><span class="text-gray">Raza:</span> ${animal.raza || 'N/D'}</div>
             <div><span class="text-gray">Sexo:</span> ${animal.sexo || 'N/D'}</div>
-            <div><span class="text-gray">Categoría:</span> ${animal.categoria || 'Sin categoría'}</div>
             <div><span class="text-gray">Edad:</span> ${edad}</div>
+            <div><span class="text-gray">Categoría:</span> ${animal.categoria || 'Sin categoría'}</div>
             <div><span class="text-gray">DIB:</span> ${animal.dib || '<span class="text-red">No registrado</span>'}</div>
             ${rebano ? `<div><span class="text-gray">Rebaño:</span> ${rebano.nombre || 'N/D'}</div>` : ''}
             ${animal.procedencia_tipo ? `<div><span class="text-gray">Procedencia:</span> ${animal.procedencia_tipo}${animal.explotacion_origen ? ' ('+animal.explotacion_origen+')' : ''}</div>` : ''}
@@ -258,42 +265,160 @@ const TrazabilidadView = {
         </div>
 
         <!-- KPIs rápidos -->
-        <div class="grid gap-10 mb-20" style="grid-template-columns:repeat(4,1fr);">
-          <div class="card p-12 text-center mb-0">
-            <div class="kpi-value text-green">${totalPesajes}</div>
-            <div class="kpi-label">PESAJES</div>
-          </div>
-          <div class="card p-12 text-center mb-0">
-            <div class="kpi-value text-blue">${totalSanitarios}</div>
-            <div class="kpi-label">TRATAMIENTOS</div>
-          </div>
-          <div class="card p-12 text-center mb-0">
-            <div class="kpi-value text-violet">${totalReproduccion}</div>
-            <div class="kpi-label">REPRODUCCIÓN</div>
-          </div>
-          <div class="card p-12 text-center mb-0">
-            <div class="kpi-value text-amber">${totalEventos}</div>
-            <div class="kpi-label">EVENTOS</div>
-          </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:8px; margin-bottom:16px;">
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-green" style="font-size:1.2rem;">${totalPesajes}</div><div class="kpi-label" style="font-size:0.6rem;">PESAJES</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-blue" style="font-size:1.2rem;">${totalSanitarios}</div><div class="kpi-label" style="font-size:0.6rem;">TRATAMIENTOS</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-violet" style="font-size:1.2rem;">${totalReproduccion}</div><div class="kpi-label" style="font-size:0.6rem;">REPRODUCCIÓN</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-amber" style="font-size:1.2rem;">${totalEventos}</div><div class="kpi-label" style="font-size:0.6rem;">EVENTOS</div></div>
         </div>
 
         <!-- Timeline -->
-        <div class="mt-20">
+        <div class="mt-16">
           <h3 class="text-white" style="font-size:1rem; margin-bottom:15px;">📅 Línea de Vida</h3>
           ${timeline.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🔍</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>' : ''}
-          <div style="position:relative;">
-            <!-- Línea vertical -->
+          <div id="trazabilidad-timeline" style="position:relative;">
             <div style="position:absolute; left:18px; top:0; bottom:0; width:2px; background:#333;"></div>
             ${timeline.map(t => this._renderTimelineItem(t)).join('')}
           </div>
         </div>
 
-        <!-- Botón volver -->
         <div class="text-center mt-20" style="padding-bottom:40px;">
-          <button onclick="App._navigateBack()" class="border-muted rounded" style="background:#222; color:white; padding:10px 30px; cursor:pointer;">← Volver al animal</button>
+          <button onclick="App._navigateBack()" class="btn btn-secondary">← Volver al animal</button>
         </div>
       </div>
     `;
+  },
+
+  async _exportarPDF() {
+    const animalData = document.getElementById('app-content');
+    if (!animalData) return;
+
+    // Overlay de progreso
+    const loader = document.createElement('div');
+    loader.id = 'pdf-loader-trazabilidad';
+    loader.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;';
+    loader.innerHTML = `
+      <div style="width:280px;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:20px;animation:bounce 2s infinite;">📄</div>
+        <div style="font-weight:800;font-size:1.1rem;margin-bottom:8px;">Generando PDF</div>
+        <div style="font-size:0.85rem;color:#aaa;margin-bottom:20px;">Trazabilidad 360°</div>
+        <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;position:relative;">
+          <div id="traz-pdf-bar" style="position:absolute;left:0;top:0;height:100%;width:10%;background:#c9851f;transition:width 0.4s ease;border-radius:10px;"></div>
+        </div>
+        <div id="traz-pdf-text" style="font-size:0.7rem;color:#888;margin-top:8px;font-weight:700;">PROCESANDO...</div>
+      </div>
+      <style>@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-20px)}60%{transform:translateY(-10px)}}</style>`;
+    document.body.appendChild(loader);
+    const updateProgress = (pct, text) => {
+      const bar = document.getElementById('traz-pdf-bar');
+      const txt = document.getElementById('traz-pdf-text');
+      if (bar) bar.style.width = pct + '%';
+      if (txt) txt.textContent = text.toUpperCase();
+    };
+
+    try {
+      const finca = await Fincas.getActive().catch(() => null);
+      const fecha = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+      const fileName = `Trazabilidad_${finca?.codigo_REGA || 'animal'}_${Date.now()}.pdf`;
+
+      // Construir HTML directamente para el PDF (sin clonar DOM)
+      const timeline = window.TrazabilidadView?._cachedTimeline || [];
+      const animal = window.TrazabilidadView?._cachedAnimal || {};
+      const rebano = window.TrazabilidadView?._cachedRebano || null;
+
+      const edad = this._calcularEdad(animal.fecha_nacimiento);
+      const renderItemHtml = (item) => {
+        const colors = {
+          nacimiento: { bg: '#065f46', border: '#10b981', dot: '#10b981' },
+          sanitario: { bg: '#1e3a5f', border: '#3b82f6', dot: '#3b82f6' },
+          reproduccion: { bg: '#3b1f6e', border: '#a78bfa', dot: '#a78bfa' },
+          pesaje: { bg: '#5c3d0e', border: '#f59e0b', dot: '#f59e0b' },
+          evento: { bg: '#4a1942', border: '#ec4899', dot: '#ec4899' },
+          venta: { bg: '#4a0e0e', border: '#ef4444', dot: '#ef4444' },
+        };
+        const c = colors[item.tipo] || { bg: '#1a1a1a', border: '#555', dot: '#555' };
+        return `
+          <tr style="border-bottom:1px solid ${c.border}44;">
+            <td style="padding:8px 10px;vertical-align:top;width:80px;white-space:nowrap;color:#888;font-size:0.7rem;">${item.fecha}</td>
+            <td style="padding:8px 10px;vertical-align:top;width:30px;text-align:center;"><span style="font-size:1.1rem;">${item.icon}</span></td>
+            <td style="padding:8px 10px;vertical-align:top;">
+              <strong style="color:${c.border};font-size:0.8rem;">${item.titulo}</strong>
+              <div style="color:#555;font-size:0.7rem;margin-top:3px;line-height:1.5;">${item.detalle.replace(/<br>/g, '<br>')}</div>
+            </td>
+          </tr>`;
+      };
+
+      const pdfEl = document.createElement('div');
+      pdfEl.style.cssText = 'padding:30px;background:#fff;color:#333;font-family:Inter,system-ui,sans-serif;font-size:12px;max-width:800px;margin:0 auto;';
+      pdfEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d97706;padding-bottom:15px;margin-bottom:20px;">
+          <div><h1 style="margin:0;font-size:18px;color:#d97706;">Trazabilidad 360°</h1><p style="margin:2px 0 0;font-size:10px;color:#888;">${fecha}</p></div>
+          <div style="text-align:right;font-size:10px;color:#888;">${finca?.nombre || ''}<br>${finca?.codigo_REGA || ''}</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:15px;">
+          <tr><td style="padding:4px 8px;font-weight:bold;color:#d97706;font-size:14px;">${animal.numero_identificacion || '—'}</td><td style="text-align:right;padding:4px 8px;"><span style="background:${animal.estado === 'activo' ? '#065f46' : '#7f1d1d'};color:#fff;padding:2px 10px;border-radius:10px;font-size:10px;">${animal.estado || ''}</span></td></tr>
+          <tr><td style="padding:3px 8px;color:#888;">Especie: <strong style="color:#333;">${animal.especie || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Raza: <strong style="color:#333;">${animal.raza || 'N/D'}</strong></td></tr>
+          <tr><td style="padding:3px 8px;color:#888;">Sexo: <strong style="color:#333;">${animal.sexo || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Edad: <strong style="color:#333;">${edad}</strong></td></tr>
+          <tr><td style="padding:3px 8px;color:#888;">DIB: <strong style="color:#333;">${animal.dib || 'No registrado'}</strong></td><td style="padding:3px 8px;color:#888;">${rebano ? 'Rebaño: <strong style="color:#333;">'+rebano.nombre+'</strong>' : ''}</td></tr>
+        </table>
+        <h2 style="font-size:14px;color:#333;border-bottom:2px solid #d97706;padding-bottom:8px;margin-top:20px;">📅 Línea de Vida</h2>
+        ${timeline.length === 0 ? '<p style="color:#888;">No hay datos de trazabilidad para este animal.</p>' : `
+        <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+          <thead><tr style="background:#f5f5f5;"><th style="padding:8px 10px;text-align:left;font-size:10px;color:#888;text-transform:uppercase;">Fecha</th><th style="padding:8px 10px;width:30px;"></th><th style="padding:8px 10px;text-align:left;font-size:10px;color:#888;text-transform:uppercase;">Evento</th></tr></thead>
+          <tbody>${timeline.map(item => renderItemHtml(item)).join('')}</tbody>
+        </table>`}
+        <div style="margin-top:30px;padding-top:10px;border-top:1px solid #ddd;text-align:center;font-size:9px;color:#999;">Generado por Livestock Manager Premium — ${fecha}</div>
+      `;
+      document.body.appendChild(pdfEl);
+
+      if (typeof html2pdf === 'undefined') {
+        App.toastError('Librería PDF no disponible');
+        document.body.removeChild(pdfEl); return;
+      }
+
+      updateProgress(50, 'Preparando contenido...');
+      await new Promise(r => setTimeout(r, 500));
+
+      pdfEl.querySelectorAll('table, h2').forEach(el => el.style.cssText += ';page-break-inside:avoid;');
+
+      updateProgress(70, 'Generando PDF...');
+      const pdfBlob = await html2pdf().set({
+        margin: [10, 8, 10, 8],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: pdfEl.scrollWidth, height: pdfEl.scrollHeight, windowHeight: pdfEl.scrollHeight, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+      }).from(pdfEl).toPdf().output('blob');
+      document.body.removeChild(pdfEl);
+
+      updateProgress(100, '¡Listo!');
+      await new Promise(r => setTimeout(r, 300));
+      loader.remove();
+
+      // Compartir o descargar
+      const fileObj = {
+        blob: pdfBlob, fileName, mimeType: 'application/pdf',
+        titulo: 'Trazabilidad 360°',
+        shareTitle: 'Trazabilidad 360° - Livestock Manager',
+        shareText: `Trazabilidad del animal — ${finca?.nombre || ''}`
+      };
+      if (window.InformesView) {
+        const exito = await InformesView._ejecutarShare(fileObj);
+        if (!exito) InformesView._mostrarBotonFlotante(fileObj);
+      } else {
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url; a.download = fileName; a.style.display = 'none';
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+        App.toast('✅ PDF descargado');
+      }
+    } catch (e) {
+      console.error('[TrazabilidadPDF]', e);
+      App.toastError('Error al exportar PDF: ' + e.message);
+      if (document.getElementById('pdf-loader-trazabilidad')) document.getElementById('pdf-loader-trazabilidad').remove();
+    }
   },
 
   _renderTimelineItem(item) {

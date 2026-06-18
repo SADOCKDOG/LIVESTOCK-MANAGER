@@ -170,6 +170,24 @@ El asistente de configuración inicial permite cargar la **Ganadería Demo "Cham
 - Filtrar por **categoría contable** (7 categorías con tabs)
 - Consultar el **total acumulado** por categoría y período
 
+### 🔄 Trazabilidad 360°
+**¿Para qué sirve?** Para consultar la línea de vida completa de un animal desde que nace (o se da de alta) hasta su venta o baja. Todos los eventos se muestran en un timeline cronológico accesible desde la ficha del animal.
+
+**Qué puedes hacer:**
+- Ver el **timeline completo**: nacimiento, tratamientos sanitarios, eventos reproductivos, pesajes, movimientos y venta
+- Consultar **KPIs rápidos**: nº de pesajes, tratamientos, eventos reproductivos y movimientos
+- **Exportar a PDF** con overlay de progreso, barra animada y botón flotante para compartir en Android
+- Acceder desde la **ficha del animal** mediante el botón 🔄 360°
+
+### 📸 Escáner de Crotales Integrado
+**¿Para qué sirve?** Para leer el código de barras o QR del crotal oficial del animal usando la cámara del dispositivo, evitando errores de escritura manual.
+
+**Qué puedes hacer:**
+- Escanear **códigos de barras** (EAN-13, EAN-8, CODE-128, CODE-39) y **códigos QR**
+- Usar el **escáner nativo** en Android (plugin Capacitor) con vista de cámara a pantalla completa
+- Usar el **escáner web** (html5-qrcode) para navegadores y PWA con cámara en vivo y recuadro guía
+- El código se asigna automáticamente al campo **Nº CROTAL**, se convierte a mayúsculas y se valida el formato
+
 ---
 
 ## 📊 Centro de Informes (24 perspectivas)

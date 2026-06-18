@@ -723,13 +723,13 @@ const App = {
   async _escanearCrotal(inputId) {
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
 
-    // 1️⃣ Intentar con Capacitor nativo
+    // 1️⃣ Intentar con Capacitor nativo (Android)
     if (BarcodeScanner) {
       try {
         const perm = await BarcodeScanner.checkPermission({ force: true });
         if (!perm.granted) {
           App.toastError(perm.denied
-            ? 'Permiso de cámara denegado permanentemente. Actívalo en Ajustes > Apps > Livestock Manager > Permisos.'
+            ? 'Permiso denegado permanentemente. Actívalo en Ajustes > Apps > Permisos.'
             : 'Permiso de cámara no concedido');
           return;
         }
@@ -745,55 +745,47 @@ const App = {
         return;
       } catch (err) {
         try { await BarcodeScanner.showBackground(); } catch (_) {}
-        console.warn('[SCAN] Error nativo:', err);
-        // Fall through to web fallback
+        console.warn('[SCAN] Error nativo, usando fallback web:', err);
       }
     }
 
-    // 2️⃣ Fallback Web: BarcodeDetector API (Chrome/Edge Android)
-    try {
-      if (!('BarcodeDetector' in window)) {
-        App.toastError('Escáner no disponible en este navegador. Introduce el crotal manualmente.');
-        return;
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: 640, height: 480 }
-      });
-      // Crear overlay de escaneo
-      const overlay = document.createElement('div');
-      overlay.id = 'scanner-overlay';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
-      overlay.innerHTML = `
-        <video id="scanner-video" autoplay playsinline style="flex:1;width:100%;object-fit:cover;"></video>
-        <div style="padding:16px;text-align:center;background:#1a1a1a;">
-          <div class="text-white text-sm mb-8">🔍 Enfoca el código de barras del crotal</div>
-          <button class="btn btn-primary btn-sm" onclick="App._cancelarScanWeb()" style="background:#ef4444;">✕ Cancelar</button>
-        </div>`;
-      document.body.appendChild(overlay);
-      const video = overlay.querySelector('#scanner-video');
-      video.srcObject = stream;
-      window._scanStream = stream;
-      window._scanOverlay = overlay;
+    // 2️⃣ Fallback Web con html5-qrcode (funciona en todos los navegadores modernos)
+    if (typeof Html5Qrcode === 'undefined') {
+      App.toastError('Librería de escaneo no disponible. Introduce el crotal manualmente.');
+      return;
+    }
 
-      // Intentar detectar cada 1.5s
-      const detector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'code_93', 'data_matrix', 'itf', 'aztec'] });
-      let detectado = false;
-      const intervalo = setInterval(async () => {
-        if (detectado) return;
-        try {
-          const barcodes = await detector.detect(video);
-          if (barcodes.length > 0 && barcodes[0].rawValue) {
-            detectado = true;
-            clearInterval(intervalo);
-            this._cancelarScanWeb();
-            await this._procesarCrotalEscaneado(inputId, barcodes[0].rawValue.trim());
-          }
-        } catch (_) {}
-      }, 1500);
-      window._scanInterval = intervalo;
+    // Crear overlay con cámara en vivo
+    const overlay = document.createElement('div');
+    overlay.id = 'scanner-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
+    overlay.innerHTML = `
+      <div id="scanner-container" style="flex:1;width:100%;overflow:hidden;"></div>
+      <div style="padding:14px;text-align:center;background:#1a1a1a;">
+        <div class="text-white text-sm mb-8">🔍 Enfoca el código de barras o QR del crotal</div>
+        <button class="btn btn-primary btn-sm" onclick="App._cancelarScanWeb()" style="background:#ef4444;">✕ Cancelar</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    window._scanOverlay = overlay;
+
+    const container = document.getElementById('scanner-container');
+    const html5QrCode = new Html5Qrcode('scanner-container');
+    window._html5QrCode = html5QrCode;
+
+    try {
+      await html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.DATA_MATRIX, Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.AZTEC] },
+        (decodedText) => {
+          this._cancelarScanWeb();
+          this._procesarCrotalEscaneado(inputId, decodedText.trim());
+        },
+        () => {}
+      );
     } catch (err) {
-      console.warn('[SCAN] Error web:', err);
+      console.warn('[SCAN] Error html5-qrcode:', err);
       App.toastError('No se pudo iniciar la cámara. Introduce el crotal manualmente.');
+      this._cancelarScanWeb();
     }
   },
 
@@ -812,8 +804,10 @@ const App = {
 
   /** Cancela el escaneo web y libera recursos */
   _cancelarScanWeb() {
-    if (window._scanInterval) { clearInterval(window._scanInterval); window._scanInterval = null; }
-    if (window._scanStream) { window._scanStream.getTracks().forEach(t => t.stop()); window._scanStream = null; }
+    if (window._html5QrCode) {
+      try { window._html5QrCode.stop(); } catch (_) {}
+      window._html5QrCode = null;
+    }
     const ov = document.getElementById('scanner-overlay');
     if (ov) ov.remove();
   },
@@ -1223,6 +1217,7 @@ const App = {
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2, backgroundColor: "#000000" },
       jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      pagebreak: { mode: ['css', 'legacy'] },
     };
     html2pdf()
       .set(opt)
