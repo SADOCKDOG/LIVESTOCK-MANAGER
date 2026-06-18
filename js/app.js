@@ -1177,8 +1177,8 @@ const App = {
         }
       }
       backupData._meta = {
-        version: "3.8.0",
-        db_version: 5,
+        version: "4.5.0",
+        db_version: 9,
         exportadoEn: new Date().toISOString(),
         totalRegistros,
       };
@@ -1190,19 +1190,24 @@ const App = {
         const fsPlugin = cap?.Plugins?.Filesystem;
         const sharePlugin = cap?.Plugins?.Share;
         if (fsPlugin && sharePlugin) {
+          const fileName = `backup_livestock_${new Date().toISOString().split("T")[0]}.json`;
+
+          // Guardamos en CACHE para asegurar que el sistema de Android pueda compartirlo fácilmente
           const result = await fsPlugin.writeFile({
-            path: `backup_livestock_${new Date().toISOString().split("T")[0]}.json`,
+            path: fileName,
             data: dataStr,
-            directory: "DOCUMENTS",
+            directory: "CACHE",
             encoding: "utf8",
           });
+
           await sharePlugin.share({
             title: "Backup Livestock Manager",
-            text: `Copia de seguridad — ${totalRegistros} registros`,
+            text: `Copia de seguridad v4.5.0 — ${totalRegistros} registros`,
             url: result.uri,
             files: [result.uri],
             dialogTitle: "Compartir copia de seguridad con…",
           });
+
           App.toast(`Backup compartido ✅ (${totalRegistros} registros)`);
           return;
         }
