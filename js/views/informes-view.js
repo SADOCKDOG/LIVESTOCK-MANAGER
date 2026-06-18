@@ -1747,56 +1747,6 @@ const InformesView = {
       this._exportFallback();
     }
   },
-      pdfEl.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #d97706; padding-bottom:18px; margin-bottom:20px;">
-          <div style="display:flex; align-items:center; gap:12px;">
-            ${logoBase64 ? `<img src="${logoBase64}" style="height:50px; width:auto;" alt="Logo">` : ''}
-            <div>
-              <h1 style="margin:0; font-size:1.3rem; font-weight:900; color:#d97706; text-transform:uppercase;">Livestock Manager</h1>
-              <p style="margin:2px 0 0 0; font-size:0.7rem; color:#666;">${seccion ? seccion.charAt(0).toUpperCase() + seccion.slice(1) : 'Informe completo'}</p>
-            </div>
-          </div>
-          <div style="text-align:right; font-size:0.7rem; color:#888;">
-            <div><strong>${finca?.nombre || 'Explotación'}</strong></div>
-            <div>REGA: ${finca?.codigo_REGA || 'N/D'}</div>
-            <div>${fecha}</div>
-          </div>
-        </div>
-        ${seccionesHtml}
-        <div style="margin-top:30px; padding-top:12px; border-top:1px solid #ddd; text-align:center; font-size:0.65rem; color:#999;">
-          Informe generado por Livestock Manager Premium — ${fecha}
-        </div>
-      `;
-
-      document.body.appendChild(pdfEl);
-
-      const opt = {
-        margin: [0.4, 0.4, 0.4, 0.4],
-        filename: `Livestock_${finca?.codigo_REGA || 'export'}_${seccion || 'completo'}_${Date.now()}.pdf`,
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
-
-      const fileName = opt.filename;
-      const seccionLabel = seccion || 'completo';
-
-      // Usar el nuevo sistema de compartir
-      await this._exportarConCompartir(
-        async () => {
-          const pdfBlob = await html2pdf().set(opt).from(pdfEl).toPdf().output('blob');
-          document.body.removeChild(pdfEl);
-          return pdfBlob;
-        },
-        'PDF', fileName, 'application/pdf', seccionLabel
-      );
-    } catch (e) {
-      console.error('[PDF Export]', e);
-      App.toastError("Error al exportar PDF: " + e.message);
-      this._exportFallback();
-    }
-  },
 
   // ========= SECCIONES PDF =========
 

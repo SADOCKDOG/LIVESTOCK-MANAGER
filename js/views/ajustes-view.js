@@ -128,7 +128,7 @@ const AjustesView = {
 
         <!-- Licencia y Copyright -->
         <div class="mt-40 text-75 text-444" style="border-top:1px solid #111; padding-top:25px;">
-          © 2026 Livestock Manager Premium · v4.4.0<br>
+          © 2026 Livestock Manager Premium · v4.5.0<br>
           Todos los derechos reservados.<br>
           Licencia: Uso privado — Prohibida la redistribución sin autorización expresa del desarrollador.
         </div>
