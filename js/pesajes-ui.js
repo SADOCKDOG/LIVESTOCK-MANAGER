@@ -326,7 +326,8 @@ const PesajesUI = {
                             valor_neto: val,
                             unidad: 'L',
                             calidad: (grasa || proteina) ? { grasa, proteina } : null,
-                            rol_contable: 'INVENTARIO'
+                            rol_contable: 'INVENTARIO',
+                            snap_identificacion: a.numero_identificacion
                         });
 
                         a.pesoActual = val + 'L';
