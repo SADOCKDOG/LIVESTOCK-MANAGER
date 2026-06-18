@@ -283,10 +283,11 @@ const FormularioFinca = {
     const estilo = document.createElement("style");
     estilo.id = "formulario-finca-styles";
     estilo.textContent = `
-      .formulario-finca-cuerpo { flex: 1; overflow-y: auto; min-height: 0; }
+      .formulario-finca-cuerpo { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
       .formulario-finca-botones {
-        display: flex; gap: 12px; padding: 16px 0 0;
+        display: flex; gap: 12px; padding: 16px 16px calc(16px + var(--safe-bottom, 20px));
         border-top: 1px solid #222; flex-shrink: 0; background: #0a0a0a;
+        margin: 0 -16px -16px; /* Compensar padding del modal */
       }
       .formulario-finca-botones .btn-primario {
         flex: 1; padding: 16px 14px; border-radius: 14px; font-weight: 700;
