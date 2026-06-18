@@ -19,7 +19,6 @@ const LecheView = {
 
   async render() {
     const main = document.getElementById('app-content');
-    // NO forzar overflow-x:hidden — recorta tabs scrollables
     main.style.maxWidth = '100%';
     main.style.boxSizing = 'border-box';
     main.style.paddingLeft = '12px';
@@ -27,9 +26,31 @@ const LecheView = {
 
     this._inyectarEstilos();
 
+    const fincaId = await Fincas.getActiveId();
+    const entregas = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []);
+    const finca = await Fincas.getActive();
+
+    entregas.sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0));
+
+    // KPIs globales
+    const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
+    const numEntregas = entregas.length;
+    const precioMedio = numEntregas > 0 ? entregas.reduce((s, e) => s + (e.precioBase || 0), 0) / numEntregas : 0;
+    const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
+    const importeTotal = entregas.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
+    const alertas = entregas.filter(e => e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true).length;
+
     main.innerHTML = `
+      <!-- KPIs globales -->
+      <div class="grid grid-cols-4 gap-6 mb-14">
+        <div class="info-box-center" style="border-left:3px solid #fbbf24;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div></div>
+        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">ENTREGAS</small><div class="inf-val-lg text-blue">${numEntregas}</div></div>
+        <div class="info-box-center" style="border-left:3px solid ${mofaTotal >= 0 ? '#10b981' : '#ef4444'};"><small class="s-lbl">MOFA</small><div class="inf-val-lg" style="color:${mofaTotal >= 0 ? '#10b981' : '#ef4444'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div></div>
+        <div class="info-box-center" style="border-left:3px solid ${alertas > 0 ? '#ef4444' : '#10b981'};"><small class="s-lbl">ALERTAS</small><div class="inf-val-lg" style="color:${alertas > 0 ? '#ef4444' : '#10b981'}">${alertas}</div></div>
+      </div>
+
+      <!-- Tabs -->
       <div class="mb-14">
-        <!-- tabs scrollables sin justify-content:center -->
         <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
           <div class="leche-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
             <button class="leche-tab active" data-tab="todas" onclick="LecheView._cambiarTab('todas')">🥛 Todas</button>
@@ -42,20 +63,10 @@ const LecheView = {
       </div>
       <div id="leche-content"><div class="loader">Cargando datos lácteos...</div></div>`;
 
-    const fincaId = await Fincas.getActiveId();
-    const entregas = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []);
-    const finca = await Fincas.getActive();
-
-    entregas.sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0));
-
     // KPIs agregados
-    const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
-    const numEntregas = entregas.length;
     const mediaLitros = numEntregas > 0 ? litrosTotal / numEntregas : 0;
     const precioBaseMedio = numEntregas > 0 ? entregas.reduce((s, e) => s + (e.precioBase || 0), 0) / numEntregas : 0;
     const precioFinalMedio = numEntregas > 0 ? entregas.reduce((s, e) => s + (e.precio_final_unitario || e.precioBase || 0), 0) / numEntregas : 0;
-    const importeTotal = entregas.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
-    const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
     const costeAlimTotal = entregas.reduce((s, e) => s + (e.coste_alimentacion_periodo || 0), 0);
 
     // Analíticas agregadas

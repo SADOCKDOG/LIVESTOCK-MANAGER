@@ -10,15 +10,14 @@ const DashboardView = {
    */
   async render() {
     const main = document.getElementById('app-content');
-    // Skeleton loading inmediato
     main.innerHTML = this._buildSkeleton();
 
     const finca = await CacheService.getOrFetch('finca_active', () => Fincas.getActive(), 30000);
     const rebanos = await CacheService.getOrFetch('rebanos_all', () => Rebanos.list(), 10000);
     const animales = await CacheService.getOrFetch('animales_all', () => Animales.list(), 10000);
     const rent = await CacheService.getOrFetch('analitica_' + finca.id, () => Analitica.obtenerRentabilidadFinca(finca.id), 60000);
+    const censo = await Analitica.obtenerCensoRebanos(finca.id).catch(() => []);
 
-    // Alertas desde el servicio centralizado
     const alertas = window.AlertasService ? await window.AlertasService.getAll() : { sanitarias: [], trazabilidad: [], administrativas: [], calendario: null };
     const alertasSanitarias = alertas.sanitarias || [];
     const alertasTrazabilidad = alertas.trazabilidad || [];
@@ -26,10 +25,10 @@ const DashboardView = {
     const alertaEpoca = alertas.calendario || { titulo: '📅 Calendario', sugerencias: [] };
 
     const kpisDiarios = await this._calcularKPIsDiarios(finca, rebanos, animales);
+    const indicadoresLeche = await this._calcularIndicadoresLacteos(finca);
 
-    main.innerHTML = this._buildHTML(finca, rebanos, animales, rent, alertasSanitarias, alertasTrazabilidad, alertasAdministrativas, alertaEpoca, kpisDiarios);
+    main.innerHTML = await this._buildHTML(finca, rebanos, animales, rent, censo, alertasSanitarias, alertasTrazabilidad, alertasAdministrativas, alertaEpoca, kpisDiarios, indicadoresLeche);
 
-    // Suscripción en vivo a cambios de alertas
     this._suscribirAlertasVivo();
   },
 
@@ -94,54 +93,89 @@ const DashboardView = {
     });
   },
 
-  _buildHTML(finca, rebanos, animales, rent, alertasSanitarias, alertasTrazabilidad, alertasAdministrativas, alertaEpoca, kpisDiarios) {
+  async _buildHTML(finca, rebanos, animales, rent, censo, alertasSanitarias, alertasTrazabilidad, alertasAdministrativas, alertaEpoca, kpisDiarios, indicadoresLeche) {
+    const activos = animales.filter(a => a.estado === 'activo').length;
+    const balanceTotal = rent?.balance || 0;
+    const pctRent = rent?.ingresos > 0 ? ((balanceTotal / rent.ingresos) * 100).toFixed(1) : '0.0';
+    const totalCenso = censo.reduce((s, r) => s + r.total, 0);
+    const totalActivos = censo.reduce((s, r) => s + r.activos, 0);
+    const totalVendidos = censo.reduce((s, r) => s + r.vendidos, 0);
+
     return `
-      <!-- Resumen -->
+      <!-- Resumen General -->
       <div class="card card-accent mt-10">
-        <h3 class="text-center text-white text-2xl mb-20">Resumen Ganadero</h3>
+        <h3 class="text-center text-white text-2xl mb-20">${finca.nombre || 'Resumen Ganadero'}</h3>
         <div class="summary-table-grid">
           <div class="summary-cell c-bo"><div class="s-lbl">ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
           <div class="summary-cell c-1a"><div class="s-lbl">REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
-          <div class="summary-cell c-bo"><div class="s-lbl">ANIMALES</div><div class="s-val">${animales.length}</div></div>
+          <div class="summary-cell c-bo"><div class="s-lbl">🐑 CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
+          <div class="summary-cell c-1a"><div class="s-lbl">✅ ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
+          <div class="summary-cell c-bo"><div class="s-lbl">📦 VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
+          <div class="summary-cell c-1a"><div class="s-lbl">📊 RENTAB.</div><div class="s-val" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'}">${pctRent}%</div></div>
         </div>
       </div>
 
       ${this._renderKPIsDiariosCard(kpisDiarios)}
+
+      <!-- Alertas -->
       <div id="dash-alertas-container">
         ${this._renderAlertasSanitarias(alertasSanitarias)}
         ${this._renderAlertasTrazabilidad(alertasTrazabilidad)}
         ${this._renderAlertasAdministrativas(alertasAdministrativas)}
       </div>
 
-      <!-- Calendario Preventivo -->
-      <div class="card card-accent card-accent-blue p-20" style="background:rgba(59,130,246,0.05);">
-        <h3 class="mt-0 text-blue flex items-center gap-8"><span>📅</span> Calendario Preventivo</h3>
-        <div class="mt-10">
-          <div class="text-white font-bold text-lg mb-8">${alertaEpoca.titulo}</div>
-          <ul class="text-85 text-gray m-0 leading-normal" style="padding-left:20px;">
-            ${alertaEpoca.sugerencias.map(s => `<li>${s}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-
       <!-- Balance Económico -->
       <div class="card card-accent card-accent-green p-20">
-        <h3 class="mt-0 text-green">Balance Económico Est.</h3>
-        <div class="flex justify-between items-center">
+        <h3 class="mt-0 text-green flex items-center gap-8"><span>💰</span> Balance Económico</h3>
+        <div class="grid grid-cols-2 gap-10 mb-10">
+          <div class="info-box border-left-amber">
+            <div class="kpi-label">Ingresos</div>
+            <div class="text-2xl font-black text-amber">${(rent?.ingresos || 0).toLocaleString()}€</div>
+          </div>
+          <div class="info-box border-left-red">
+            <div class="kpi-label">Gastos</div>
+            <div class="text-2xl font-black text-red">${(rent?.gastos || 0).toLocaleString()}€</div>
+          </div>
+        </div>
+        <div class="flex justify-between items-center p-14" style="background:rgba(16,185,129,0.08);border-radius:12px;">
           <div>
-            <div class="text-xs text-999">Beneficio Neto</div>
-            <div style="font-size:1.8rem; font-weight:bold; color:${rent.balance >= 0 ? '#10b981' : '#ef4444'};">
-              ${rent.balance.toLocaleString('es-ES')} €
-            </div>
+            <div class="text-xs text-gray uppercase font-bold">Beneficio Neto</div>
+            <div class="text-xl font-black" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()} €</div>
           </div>
           <div class="text-right">
-            <div class="text-xs text-gray">Ingresos: ${rent.ingresos.toLocaleString()}€</div>
-            <div class="text-xs text-gray">Gastos: ${rent.gastos.toLocaleString()}€</div>
+            <div class="text-xs text-gray uppercase font-bold">Rentabilidad</div>
+            <div class="text-xl font-black" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'};">${pctRent}%</div>
           </div>
+        </div>
+        <div class="text-center mt-12">
+          <a href="#/informes" class="text-green no-underline text-sm font-bold">Ver Informes Detallados →</a>
         </div>
       </div>
 
-      ${this._renderIndicadoresLacteos(finca)}
+      ${this._renderIndicadoresLacteos(indicadoresLeche)}
+
+      <!-- Calendario Preventivo -->
+      <div class="card card-accent card-accent-blue p-20" style="background:rgba(59,130,246,0.05);">
+        <h3 class="mt-0 text-blue flex items-center gap-8"><span>📅</span> ${alertaEpoca.titulo || 'Calendario Preventivo'}</h3>
+        ${alertaEpoca.sugerencias?.length > 0 ? `
+        <ul class="text-85 text-gray m-0 leading-normal mt-10" style="padding-left:20px;">
+          ${alertaEpoca.sugerencias.map(s => `<li class="mb-4">${s}</li>`).join('')}
+        </ul>` : '<div class="text-gray text-sm mt-10">Sin sugerencias para esta temporada.</div>'}
+        <div class="text-center mt-12">
+          <a href="#/informes?tab=alertas" class="text-blue no-underline text-sm font-bold">Ver Alertas Completas →</a>
+        </div>
+      </div>
+
+      <!-- Accesos Rápidos -->
+      <div class="card p-20">
+        <h3 class="mt-0 text-white flex items-center gap-8"><span>⚡</span> Accesos Rápidos</h3>
+        <div class="grid grid-cols-2 gap-8 mt-10">
+          <a href="#/animales" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">🐑 Animales</a>
+          <a href="#/rebanos" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">🐄 Rebaños</a>
+          <a href="#/produccion" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📊 Producción</a>
+          <a href="#/informes" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📈 Informes</a>
+        </div>
+      </div>
     `;
   },
 
@@ -226,74 +260,64 @@ const DashboardView = {
   },
 
   /**
-   * Indicadores Lácteos — MOFA mensual, precio medio, extracto seco medio
+   * Calcula indicadores lácteos (separado del render para evitar [object Promise])
    */
-  async _renderIndicadoresLacteos(finca) {
+  async _calcularIndicadoresLacteos(finca) {
     try {
-      const fincaId = finca.id;
-      if (!fincaId) return '';
+      const fincaId = finca?.id;
+      if (!fincaId) return null;
       const entregas = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []);
-      if (!entregas.length) return '';
-
-      // Últimos 12 meses
+      if (!entregas.length) return null;
       const ahora = new Date();
       const doceMeses = new Date(ahora);
       doceMeses.setMonth(doceMeses.getMonth() - 12);
       const recientes = entregas.filter(e => new Date(e.fechaRecogida) >= doceMeses);
-
-      if (!recientes.length) return '';
-
+      if (!recientes.length) return null;
       const numEntregas = recientes.length;
       const litrosTotal = recientes.reduce((s, e) => s + (e.cantidad || 0), 0);
       const precioFinalMedio = numEntregas > 0 ? recientes.reduce((s, e) => s + (e.precio_final_unitario || e.precioBase || 0), 0) / numEntregas : 0;
       const importeTotal = recientes.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
       const mofaTotal = recientes.reduce((s, e) => s + (e.mofa || 0), 0);
       const mofaRatio = importeTotal > 0 ? (mofaTotal / importeTotal) * 100 : 0;
-
       const conLab = recientes.filter(e => e.laboratorio?.grasa != null);
-      const esTotal = conLab.reduce((s, e) => {
-        const es = e.laboratorio.extracto_seco || (e.laboratorio.grasa || 0) + (e.laboratorio.proteina || 0);
-        return s + es;
-      }, 0);
+      const esTotal = conLab.reduce((s, e) => s + (e.laboratorio.extracto_seco || (e.laboratorio.grasa || 0) + (e.laboratorio.proteina || 0)), 0);
       const esMedia = conLab.length > 0 ? esTotal / conLab.length : 0;
+      return { numEntregas, litrosTotal, precioFinalMedio, importeTotal, mofaTotal, mofaRatio, conLab, esMedia, meses: Math.max(1, Math.round((ahora - doceMeses) / 2629800000)) };
+    } catch (e) { console.warn('[Dashboard] Error indicadores lácteos:', e); return null; }
+  },
 
-      return `
-        <div class="card card-accent card-accent-amber p-20" style="background:rgba(245,158,11,0.05);">
-          <h3 class="mt-0 flex items-center gap-8 text-yellow">
-            <span>🥛</span> Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
-          </h3>
-          <div class="grid grid-cols-3 gap-10 mt-15">
-            <div class="info-box border-left-amber">
-              <div class="kpi-label">MOFA Mensual</div>
-              <div class="text-2xl font-black" style="color:${mofaRatio >= 20 ? '#10b981' : '#f59e0b'};">${Math.round(mofaTotal / Math.max(1, Math.round((ahora - doceMeses) / 2629800000))).toLocaleString()} €
-              </div>
-              <div class="kpi-sub">${mofaRatio.toFixed(1)}% sobre ingresos</div>
-            </div>
-            <div class="info-box border-left-blue">
-              <div class="kpi-label">Precio Medio</div>
-              <div class="text-white font-black text-2xl">
-                ${precioFinalMedio.toFixed(3)} €/L
-              </div>
-              <div class="kpi-sub">${(litrosTotal / Math.max(1, numEntregas)).toFixed(0)} L/entrega</div>
-            </div>
-            <div class="info-box border-left-purple">
-              <div class="kpi-label">Extracto Seco Medio</div>
-              <div class="text-white font-black text-2xl">
-                ${esMedia.toFixed(2)}%
-              </div>
-              <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L total</div>
-            </div>
+  /**
+   * Renderiza indicadores lácteos desde datos pre-calculados
+   */
+  _renderIndicadoresLacteos(indicadores) {
+    if (!indicadores) return '';
+    const { numEntregas, litrosTotal, precioFinalMedio, mofaTotal, mofaRatio, conLab, esMedia, meses } = indicadores;
+    return `
+      <div class="card card-accent card-accent-amber p-20" style="background:rgba(245,158,11,0.05);">
+        <h3 class="mt-0 flex items-center gap-8 text-yellow">
+          <span>🥛</span> Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
+        </h3>
+        <div class="grid grid-cols-3 gap-10 mt-15">
+          <div class="info-box border-left-amber">
+            <div class="kpi-label">MOFA Mensual</div>
+            <div class="text-2xl font-black" style="color:${mofaRatio >= 20 ? '#10b981' : '#f59e0b'};">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
+            <div class="kpi-sub">${mofaRatio.toFixed(1)}% sobre ingresos</div>
           </div>
-          <div class="text-center mt-12">
-            <a href="#/leche" class="text-gold no-underline text-sm font-bold">
-              Ver Control Lechero Detallado →
-            </a>
+          <div class="info-box border-left-blue">
+            <div class="kpi-label">Precio Medio</div>
+            <div class="text-white font-black text-2xl">${precioFinalMedio.toFixed(3)} €/L</div>
+            <div class="kpi-sub">${(litrosTotal / Math.max(1, numEntregas)).toFixed(0)} L/entrega</div>
           </div>
-        </div>`;
-    } catch (e) {
-      console.warn('[Dashboard] Error cargando indicadores lácteos:', e);
-      return '';
-    }
+          <div class="info-box border-left-purple">
+            <div class="kpi-label">Extracto Seco Medio</div>
+            <div class="text-white font-black text-2xl">${esMedia.toFixed(2)}%</div>
+            <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L total</div>
+          </div>
+        </div>
+        <div class="text-center mt-12">
+          <a href="#/leche" class="text-gold no-underline text-sm font-bold">Ver Control Lechero Detallado →</a>
+        </div>
+      </div>`;
   },
 
   /**

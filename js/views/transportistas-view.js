@@ -8,8 +8,15 @@ const TransportistasView = {
 
     async render(params) {
         const main = document.getElementById("app-content");
+        const todos = await Transportistas.list().catch(() => []);
+        const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
             <div style="max-width:600px; margin:0 auto;">
+                <div class="grid grid-cols-3 gap-6 mb-14">
+                    <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
+                    <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
+                    <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
+                </div>
                 <div class="tabs-scroll scroll-shadow-container mb-12 gap-6">
                     <button class="filter-pill ${this._currentFilter === 'todos' ? 'active' : ''}" onclick="TransportistasView._setFilter('todos')">TODOS</button>
                     <button class="filter-pill ${this._currentFilter === 'activos' ? 'active' : ''}" onclick="TransportistasView._setFilter('activos')">ACTIVOS</button>
