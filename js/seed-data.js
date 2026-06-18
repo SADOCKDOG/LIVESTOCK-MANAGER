@@ -260,6 +260,22 @@
         }
       }
 
+      // Registro de pesaje POR LOTE (ejemplo cárnico)
+      if (rebTerneros) {
+        try {
+          await Pesajes.registrar({
+            entidad_id: rebTerneros.id,
+            tipo_entidad: 'rebano',
+            valor_neto: 4500, // Peso total estimado del lote
+            fecha: new Date().toISOString().split('T')[0],
+            motivo_tarea: 'control',
+            unidad: 'kg',
+            rol_contable: 'INVENTARIO',
+            snap_identificacion: rebTerneros.nombre
+          });
+        } catch (e) { console.log('[SEED] Error pesaje lote carne:', e.message); }
+      }
+
       // 13. Producción de leche por vaca (cifrada + registro_eventos)
       var prodLecheVacas = [vaca1, vaca2, vaca3];
       var lecheFechas = ['2025-03-01', '2025-03-15', '2025-04-01', '2025-04-15', '2025-05-01'];
@@ -293,6 +309,38 @@
           await sleep(60);
         }
       }
+
+      // Registro de control lechero POR LOTE (ejemplo lácteo)
+      if (rebVacas) {
+        try {
+          await Pesajes.registrar({
+            entidad_id: rebVacas.id,
+            tipo_entidad: 'rebano',
+            valor_neto: 1200, // Litros totales del rebaño
+            fecha: new Date().toISOString().split('T')[0],
+            unidad: 'L',
+            motivo_tarea: 'control_lechero',
+            snap_zona: rebVacas.zonaActual,
+            snap_tipo: rebVacas.tipo,
+            snap_especie: rebVacas.especie,
+            snap_identificacion: rebVacas.nombre
+          });
+        } catch (e) { console.log('[SEED] Error control lote leche:', e.message); }
+      }
+
+      // Registro de EXPEDICIÓN DE TANQUE (ejemplo lácteo)
+      try {
+        await Pesajes.registrar({
+          entidad_id: fincaId,
+          tipo_entidad: 'finca',
+          valor_neto: 1850,
+          fecha: new Date().toISOString().split('T')[0],
+          unidad: 'L',
+          motivo_tarea: 'expedicion',
+          snap_identificacion: 'TANQUE PRINCIPAL',
+          rol_contable: 'VENTA'
+        });
+      } catch (e) { console.log('[SEED] Error expedicion tanque:', e.message); }
 
       // 14. Comercialización de leche (entregas a tanque con laboratorio + MOFA)
       var hace5d = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
