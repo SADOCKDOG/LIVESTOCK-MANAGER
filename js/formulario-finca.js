@@ -285,25 +285,20 @@ const FormularioFinca = {
     estilo.textContent = `
       .formulario-finca-cuerpo { flex: 1; overflow-y: auto; min-height: 0; }
       .formulario-finca-botones {
-        flex-shrink: 0; background: #0a0a0a; border-top: 1px solid #1a1a1a;
+        display: flex; gap: 12px; padding: 16px 0 0;
+        border-top: 1px solid #222; flex-shrink: 0; background: #0a0a0a;
       }
       .formulario-finca-botones .btn-primario {
-        flex: 1; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
-        font-weight: 700; font-size: 15px; background: #d97706; color: white;
-        transition: all 0.2s;
-      }
-      .formulario-finca-botones .btn-primario:hover:not(:disabled) {
-        background: #b45309; transform: translateY(-1px);
-      }
-      .formulario-finca-botones .btn-primario:disabled {
-        background: #222; color: #555; cursor: not-allowed;
+        flex: 1; padding: 16px 14px; border-radius: 14px; font-weight: 700;
+        font-size: 16px; cursor: pointer; text-align: center;
+        border: none; background: linear-gradient(135deg, #d97706, #b45309);
+        color: #fff; box-shadow: 0 4px 14px rgba(217,119,6,0.35);
       }
       .formulario-finca-botones .btn-secundario {
-        flex: 1; padding: 14px; border: 1px solid #333; border-radius: 12px; cursor: pointer;
-        font-weight: 700; font-size: 15px; background: #1a1a1a; color: #eee;
-        transition: all 0.2s;
+        flex: 1; padding: 16px 14px; border-radius: 14px; font-weight: 700;
+        font-size: 16px; cursor: pointer; text-align: center;
+        border: 1px solid #444; background: #1a1a1a; color: #eee;
       }
-      .formulario-finca-botones .btn-secundario:hover { background: #222; }
     `;
     document.head.appendChild(estilo);
   },
