@@ -308,17 +308,28 @@ const ComercializacionView = {
   async _guardarEdicionLeche(id) {
     try {
       const e = await window.db.get("comercializacion_leche", id);
-      e.cantidad = parseFloat(document.getElementById("le-cant").value);
-      e.precioBase = parseFloat(document.getElementById("le-pb").value);
+      e.cantidad = parseFloat(document.getElementById("le-cant").value) || e.cantidad;
+      e.precioBase = parseFloat(document.getElementById("le-pb").value) || e.precioBase;
       e.laboratorio = {
-        grasa: parseFloat(document.getElementById("le-grasa").value),
-        proteina: parseFloat(document.getElementById("le-prot").value),
-        somaticas: parseInt(document.getElementById("le-som").value),
-        germenes: parseInt(document.getElementById("le-ger").value),
+        grasa: parseFloat(document.getElementById("le-grasa").value) || 0,
+        proteina: parseFloat(document.getElementById("le-prot").value) || 0,
+        somaticas: parseInt(document.getElementById("le-som").value) || 0,
+        germenes: parseInt(document.getElementById("le-ger").value) || 0,
         antibioticos: document.getElementById("le-ant").value === "true",
+        extracto_seco: +((parseFloat(document.getElementById("le-grasa").value) || 0) + (parseFloat(document.getElementById("le-prot").value) || 0)).toFixed(2),
       };
       e.antibioticos = e.laboratorio.antibioticos;
       e.estadoAnalitica = e.antibioticos ? "Alerta Crítica" : "Validado";
+
+      // Recalcular campos económicos derivados
+      const precioExtracto = e.precio_extracto_seco || 0.012;
+      const extractoSeco = e.laboratorio.extracto_seco || 0;
+      e.precio_final_unitario = +(e.precioBase + extractoSeco * precioExtracto + (e.primas_penalizaciones || 0)).toFixed(4);
+      e.importe_total = +(e.cantidad * e.precio_final_unitario).toFixed(2);
+      if (e.coste_alimentacion_periodo != null) {
+        e.mofa = +(e.importe_total - e.coste_alimentacion_periodo).toFixed(2);
+      }
+
       await window.db.put("comercializacion_leche", e);
       App.toast("Registro lácteo actualizado.");
       this._cachedData = null;
@@ -329,13 +340,19 @@ const ComercializacionView = {
   },
 
   async _guardarEdicionGasto(id) {
-    const g = await window.db.get("gastos_ganaderia", id);
-    g.concepto = document.getElementById("ge-con").value;
-    g.monto = parseFloat(document.getElementById("ge-mon").value);
-    await window.db.put("gastos_ganaderia", g);
-    App.toast("Gasto actualizado.");
-    this._cachedData = null;
-    this.render(new Map([["tab", "gastos"]]));
+    try {
+      const g = await window.db.get("gastos_ganaderia", id);
+      g.concepto = document.getElementById("ge-con").value.trim();
+      g.monto = parseFloat(document.getElementById("ge-mon").value);
+      if (!g.concepto) return App.toastError("El concepto es obligatorio");
+      if (isNaN(g.monto) || g.monto <= 0) return App.toastError("El monto debe ser mayor a 0");
+      await Gastos.save(g);
+      App.toast("Gasto actualizado.");
+      this._cachedData = null;
+      this.render(new Map([["tab", "gastos"]]));
+    } catch (e) {
+      App.toastError(e.message);
+    }
   },
 
   // ===================== DETALLE LECHE (albaran) =====================

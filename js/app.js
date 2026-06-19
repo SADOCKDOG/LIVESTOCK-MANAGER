@@ -63,6 +63,8 @@ const App = {
         ];
         eventosRefresh.forEach(event => {
           window.EventBus.on(event, () => {
+            // Si el wizard de pesajes está activo, no refrescar para evitar condiciones de carrera
+            if (window._pesajesWizardActivo && event === 'pesaje:registrado') return;
             const hash = window.location.hash.slice(1) || '/';
             if (hash === '/' || hash === '') {
               App.renderDashboard();
@@ -70,6 +72,8 @@ const App = {
               App.renderProduccion();
             } else if (hash.startsWith('/gastos')) {
               App.renderGastos();
+            } else if (hash.startsWith('/animales')) {
+              App.renderAnimales();
             }
           });
         });
@@ -721,12 +725,15 @@ const App = {
   },
 
   async _escanearCrotal(inputId) {
+    const isCapacitor = window.Capacitor?.isNativePlatform?.() || window.hasOwnProperty('Capacitor');
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
 
     // 1️⃣ Intentar con Capacitor nativo (Android)
-    if (BarcodeScanner) {
+    if (BarcodeScanner && isCapacitor) {
       try {
+        console.log('[SCAN] Intentando escáner nativo Capacitor...');
         const perm = await BarcodeScanner.checkPermission({ force: true });
+        console.log('[SCAN] Permiso:', JSON.stringify(perm));
         if (!perm.granted) {
           App.toastError(perm.denied
             ? 'Permiso denegado permanentemente. Actívalo en Ajustes > Apps > Permisos.'
@@ -745,11 +752,14 @@ const App = {
         return;
       } catch (err) {
         try { await BarcodeScanner.showBackground(); } catch (_) {}
-        console.warn('[SCAN] Error nativo, usando fallback web:', err);
+        console.error('[SCAN] Error nativo:', err);
+        App.toast('Escáner nativo falló, usando cámara web...', 2000);
+        // Wait for background to be restored before trying web scanner
+        await new Promise(r => setTimeout(r, 1000));
       }
     }
 
-    // 2️⃣ Fallback Web con html5-qrcode (funciona en todos los navegadores modernos)
+    // 2️⃣ Fallback Web con html5-qrcode
     if (typeof Html5Qrcode === 'undefined') {
       App.toastError('Librería de escaneo no disponible. Introduce el crotal manualmente.');
       return;
@@ -768,22 +778,80 @@ const App = {
     document.body.appendChild(overlay);
     window._scanOverlay = overlay;
 
+    // Wait for DOM to be ready
+    await new Promise(r => setTimeout(r, 500));
+
     const container = document.getElementById('scanner-container');
     const html5QrCode = new Html5Qrcode('scanner-container');
     window._html5QrCode = html5QrCode;
 
     try {
-      await html5QrCode.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.DATA_MATRIX, Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.AZTEC] },
-        (decodedText) => {
+      console.log('[SCAN] Iniciando cámara web...');
+
+      // For Capacitor WebView, request camera directly with getUserMedia
+      if (isCapacitor && navigator.mediaDevices?.getUserMedia) {
+        try {
+          console.log('[SCAN] Solicitando acceso a cámara...');
+          // Use ideal instead of exact to avoid strict constraint failures
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+          });
+          console.log('[SCAN] Cámara obtenida correctamente');
+
+          // Create video element and attach stream directly
+          const video = document.createElement('video');
+          video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('autoplay', 'true');
+          video.muted = true;
+          video.srcObject = stream;
+          container.innerHTML = '';
+          container.appendChild(video);
+
+          await video.play();
+          console.log('[SCAN] Video reproduciéndose');
+
+          // Use html5-qrcode scanFile with the video element
+          await html5QrCode.scanFile(video, true);
+          
+          // Set up continuous scanning using the stream
+          const scanInterval = setInterval(async () => {
+            try {
+              const decodedText = await html5QrCode.scanFile(video, true);
+              if (decodedText) {
+                clearInterval(scanInterval);
+                stream.getTracks().forEach(track => track.stop());
+                this._cancelarScanWeb();
+                this._procesarCrotalEscaneado(inputId, decodedText.trim());
+              }
+            } catch (e) {
+              // No barcode detected yet, continue scanning
+            }
+          }, 200);
+
+          // Store interval for cleanup
+          window._scanInterval = scanInterval;
+          console.log('[SCAN] Escáner iniciado correctamente');
+        } catch (permErr) {
+          console.error('[SCAN] Error accediendo a cámara:', permErr);
+          App.toastError('No se pudo acceder a la cámara. Introduce el crotal manualmente.');
           this._cancelarScanWeb();
-          this._procesarCrotalEscaneado(inputId, decodedText.trim());
-        },
-        () => {}
-      );
+        }
+      } else {
+        // Non-Capacitor: use default html5-qrcode behavior
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.DATA_MATRIX, Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.AZTEC] },
+          (decodedText) => {
+            this._cancelarScanWeb();
+            this._procesarCrotalEscaneado(inputId, decodedText.trim());
+          },
+          () => {}
+        );
+        console.log('[SCAN] Cámara iniciada correctamente');
+      }
     } catch (err) {
-      console.warn('[SCAN] Error html5-qrcode:', err);
+      console.error('[SCAN] Error html5-qrcode:', err);
       App.toastError('No se pudo iniciar la cámara. Introduce el crotal manualmente.');
       this._cancelarScanWeb();
     }
@@ -804,6 +872,10 @@ const App = {
 
   /** Cancela el escaneo web y libera recursos */
   _cancelarScanWeb() {
+    if (window._scanInterval) {
+      clearInterval(window._scanInterval);
+      window._scanInterval = null;
+    }
     if (window._html5QrCode) {
       try { window._html5QrCode.stop(); } catch (_) {}
       window._html5QrCode = null;

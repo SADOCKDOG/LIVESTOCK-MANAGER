@@ -6,6 +6,17 @@
 const TransportistasView = {
     _currentFilter: 'todos',
 
+    _TIPO_VEHICULO_LABELS: {
+        camion: 'Camión ganadero',
+        furgoneta: 'Furgoneta',
+        remolque: 'Remolque/Bañera',
+        cisterna: 'Cisterna lechera'
+    },
+
+    _labelTipoVehiculo(valor) {
+        return this._TIPO_VEHICULO_LABELS[valor] || valor || '-';
+    },
+
     async render(params) {
         const main = document.getElementById("app-content");
         const todos = await Transportistas.list().catch(() => []);
@@ -98,7 +109,7 @@ const TransportistasView = {
                         <div><small class="text-gray">Teléfono</small><div class="text-white">${t.telefono || '-'}</div></div>
                         <div><small class="text-gray">Email</small><div class="text-white">${t.email || '-'}</div></div>
                         <div><small class="text-gray">Registro Transporte</small><div class="text-white">${t.registro_transporte || '-'}</div></div>
-                        <div><small class="text-gray">Tipo Vehículo</small><div class="text-white">${t.tipo_vehiculo || '-'}</div></div>
+                        <div><small class="text-gray">Tipo Vehículo</small><div class="text-white">${this._labelTipoVehiculo(t.tipo_vehiculo)}</div></div>
                         <div><small class="text-gray">Capacidad</small><div class="text-white">${t.capacidad_animales || '0'} animales</div></div>
                         <div><small class="text-gray">Estado</small><div class="font-bold" style="color:${t.activo ? '#10b981' : '#ef4444'};">${t.activo ? 'Activo' : 'Inactivo'}</div></div>
                     </div>

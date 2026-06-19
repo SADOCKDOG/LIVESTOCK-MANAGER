@@ -107,7 +107,7 @@
       if (vaca1 && terner1) { terner1.madre_id = vaca1.id; await Animales.save(terner1); }
       if (vaca1 && terner2) { terner2.madre_id = vaca1.id; await Animales.save(terner2); }
 
-      // 4. Pesajes de control para vaca1 (registro_eventos)
+      // 4. Pesajes de seguimiento de peso para vaca1 (vaca lechera — motivo control_peso para no contaminar cárnica)
       if (vaca1) {
         var pesajes = [
           { fecha: '2025-01-15', valor_neto: 585 },
@@ -123,7 +123,7 @@
               tipo_entidad: 'animal',
               valor_neto: pesajes[p].valor_neto,
               fecha: pesajes[p].fecha,
-              motivo_tarea: 'control',
+              motivo_tarea: 'control_peso',
               snap_zona: rebVacas.zonaActual,
               snap_tipo: rebVacas.tipo,
               snap_especie: rebVacas.especie,
@@ -137,8 +137,8 @@
 
       // 5. Compradores
       var compDefs = [
-        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765432', tipo_comprador: 'carne', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz' },
-        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654321', tipo_comprador: 'leche', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz' },
+        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765432', tipo_comprador: 'cárnico', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz' },
+        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654321', tipo_comprador: 'láctico', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz' },
         { nombre: 'Ganados del Oeste SL', nif_cif: 'B76543210', tipo_comprador: 'híbrido', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres' }
       ];
       var comps = [];
@@ -153,9 +153,9 @@
 
       // 6. Proveedores
       var provDefs = [
-        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432109', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Piensos', 'Forrajes'] },
-        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321098', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Farmacia'] },
-        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210987', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Maquinaria'] }
+        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432109', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'] },
+        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321098', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'] },
+        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210987', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'] }
       ];
       var provs = [];
       for (var pv = 0; pv < provDefs.length; pv++) {
@@ -169,8 +169,8 @@
 
       // 7. Transportistas
       var transDefs = [
-        { nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109876', matricula: '1234BCD', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'Camión ganadero', capacidad_animales: 40, certificado_bienestar: true },
-        { nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098765', matricula: '5678EFG', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'Cisterna lechera', capacidad_animales: 0, condiciones_termoneutrales: true }
+        { nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109876', matricula: '1234BCD', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'camion', capacidad_animales: 40, certificado_bienestar: true, activo: true },
+        { nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098765', matricula: '5678EFG', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'cisterna', capacidad_animales: 0, condiciones_termoneutrales: true, activo: true }
       ];
       for (var t = 0; t < transDefs.length; t++) {
         try { await Transportistas.save(transDefs[t]); } catch (e) { console.log('[SEED] Error transportista:', e.message); }
@@ -197,10 +197,10 @@
 
       var gastosDefs = [
         { concepto: 'Pienso concentrado vacuno', fecha: hace10d, monto: 2340.50, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
-        { concepto: 'Paja para cama', fecha: hace20d, monto: 680.00, categoria: 'Cama', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
+        { concepto: 'Paja para cama y lecho', fecha: hace20d, monto: 680.00, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
         { concepto: 'Vacunación trimestral', fecha: '2025-03-10', monto: 425.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null },
-        { concepto: 'Gasoil tractor', fecha: '2025-03-15', monto: 320.75, categoria: 'Combustible', proveedorId: provMaq ? provMaq.id : null },
-        { concepto: 'Mantenimiento valla parcela norte', fecha: '2025-03-20', monto: 890.00, categoria: 'Mantenimiento', rebanoId: rebVacas.id, proveedorId: provMaq ? provMaq.id : null },
+        { concepto: 'Gasoil tractor', fecha: '2025-03-15', monto: 320.75, categoria: 'Amortizacion', proveedorId: provMaq ? provMaq.id : null },
+        { concepto: 'Mantenimiento valla parcela norte', fecha: '2025-03-20', monto: 890.00, categoria: 'Amortizacion', proveedorId: provMaq ? provMaq.id : null },
         { concepto: 'Pienso lactancia corderos', fecha: hace10d, monto: 540.00, categoria: 'Alimentacion', rebanoId: rebOvejas.id, proveedorId: provPienso ? provPienso.id : null },
         { concepto: 'Veterinario revisión rebaño', fecha: hoyStr, monto: 260.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null }
       ];
@@ -266,26 +266,6 @@
         }
       }
 
-      // Registro de pesaje POR LOTE (ejemplo cárnico)
-      if (rebTerneros) {
-        try {
-          await window.db.add('registro_eventos', {
-            fincaId: fincaId,
-            fecha: hoyStr,
-            entidad_id: rebTerneros.id,
-            tipo_entidad: 'rebano',
-            valor_neto: 4500,
-            unidad: 'kg',
-            motivo_tarea: 'control',
-            rol_contable: 'INVENTARIO',
-            snap_identificacion: rebTerneros.nombre,
-            snap_zona: rebTerneros.zonaActual,
-            snap_especie: rebTerneros.especie,
-            snap_tipo: rebTerneros.tipo,
-            creadoEn: new Date().toISOString()
-          });
-        } catch (e) { console.log('[SEED] Error pesaje lote carne:', e.message); }
-      }
 
       // 13. Producción de leche (Individual, Lote y Expedición Tanque)
       var prodLecheVacas = [vaca1, vaca2, vaca3];
@@ -324,26 +304,6 @@
         }
       }
 
-      // Registro de control lechero POR LOTE (ejemplo lácteo)
-      if (rebVacas) {
-        try {
-          await window.db.add('registro_eventos', {
-            fincaId: fincaId,
-            fecha: hoyStr,
-            entidad_id: rebVacas.id,
-            tipo_entidad: 'rebano',
-            valor_neto: 1200,
-            unidad: 'L',
-            motivo_tarea: 'control_lechero',
-            rol_contable: 'INVENTARIO',
-            snap_identificacion: rebVacas.nombre,
-            snap_zona: rebVacas.zonaActual,
-            snap_especie: rebVacas.especie,
-            snap_tipo: rebVacas.tipo,
-            creadoEn: new Date().toISOString()
-          });
-        } catch (e) { console.log('[SEED] Error control lote leche:', e.message); }
-      }
 
       // Registro de EXPEDICIÓN DE TANQUE (ejemplo lácteo)
       try {

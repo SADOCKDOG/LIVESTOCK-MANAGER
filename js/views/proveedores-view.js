@@ -28,14 +28,15 @@ const ProveedoresView = {
         const proveedores = await Proveedores.list();
         const fincaId = await Fincas.getActiveId();
         const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []);
-        const totalGasto = gastos.reduce((s, g) => s + (g.monto || 0), 0);
+        const gastosConProveedor = gastos.filter(g => g.proveedorId != null);
+        const totalGasto = gastosConProveedor.reduce((s, g) => s + (g.monto || 0), 0);
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
               <div class="grid grid-cols-3 gap-6 mb-14">
                 <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">PROVEEDORES</small><div class="inf-val-lg text-purple">${proveedores.length}</div></div>
-                <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">GASTO TOTAL</small><div class="inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
-                <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">FACTURAS</small><div class="inf-val-lg text-blue">${gastos.length}</div></div>
+                <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">GASTO ASIGNADO</small><div class="inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
+                <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
               </div>`;
         }
         this._cachedData = proveedores;

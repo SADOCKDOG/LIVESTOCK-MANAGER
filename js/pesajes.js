@@ -25,7 +25,12 @@ const Pesajes = {
           const animal = await Animales.get(data.entidad_id);
           if (animal) {
             snap_especie = animal.especie || snap_especie;
-            snap_identificacion = animal.numero_identificacion || "";
+            // snap_identificacion solo acepta crotales con formato normativo (XX + 12 dígitos)
+            const crotalAnimal = (animal.numero_identificacion || "").trim().toUpperCase();
+            snap_identificacion = ErrorHandler.isCrotalValido(crotalAnimal) ? crotalAnimal : "";
+            if (!snap_identificacion) {
+              console.warn("[Pesajes] El animal ID", data.entidad_id, "tiene un número de identificación no normativo:", animal.numero_identificacion);
+            }
             if (animal.rebanoId) {
               const rebano = await Rebanos.get(animal.rebanoId);
               if (rebano) {
@@ -40,9 +45,25 @@ const Pesajes = {
             snap_zona = rebano.zonaActual || snap_zona;
             snap_tipo = rebano.tipo || snap_tipo;
             snap_especie = rebano.especie || snap_especie;
-            snap_identificacion = rebano.nombre || "";
+            // snap_identificacion debe contener crotales de animales, no el nombre del rebaño.
+            // Para pesajes de rebaño entero, el campo queda vacío; el nombre va en snap_tipo/snap_zona.
+            snap_identificacion = "";
           }
         }
+
+        // Validar el snap_identificacion que viene en data (si el llamante lo proporciona)
+        const snapIdEntrada = (data.snap_identificacion || "").trim().toUpperCase();
+        const snapIdFinal = (() => {
+          if (!snapIdEntrada) return snap_identificacion;
+          // Para entidades de tipo animal el identificador debe ser un crotal normativo
+          if (data.tipo_entidad === "animal") {
+            if (ErrorHandler.isCrotalValido(snapIdEntrada)) return snapIdEntrada;
+            console.warn("[Pesajes] snap_identificacion ignorado (no normativo):", snapIdEntrada, "— se usa el del registro del animal.");
+            return snap_identificacion;
+          }
+          // Para finca/tanque/otros se permite texto libre (ej. "TANQUE PRINCIPAL")
+          return snapIdEntrada;
+        })();
 
         // 2. Preparar el objeto consolidado
         const evento = {
@@ -56,7 +77,7 @@ const Pesajes = {
           snap_zona: data.snap_zona || snap_zona,
           snap_tipo: data.snap_tipo || snap_tipo,
           snap_especie: data.snap_especie || snap_especie,
-          snap_identificacion: data.snap_identificacion || snap_identificacion,
+          snap_identificacion: snapIdFinal,
 
           // Magnitudes
           peso_bruto: Number(data.peso_bruto) || 0,
@@ -84,17 +105,32 @@ const Pesajes = {
         };
 
         // 3. Guardar en el Registro Maestro de Eventos
+        console.log('[DEBUG Pesajes] evento a guardar:', JSON.stringify({
+            fincaId: evento.fincaId,
+            entidad_id: evento.entidad_id,
+            valor_neto: evento.valor_neto,
+            unidad: evento.unidad,
+            motivo_tarea: evento.motivo_tarea,
+            fecha: evento.fecha,
+            rol_contable: evento.rol_contable,
+        }));
         const id = await window.db.add("registro_eventos", evento);
+        console.log('[DEBUG Pesajes] evento guardado con id:', id, 'fincaId:', evento.fincaId, 'unidad:', evento.unidad);
 
         // 4. (Opcional) Guardar también en tablas legadas para compatibilidad con informes antiguos
+        //    NOTA: Si falla el guardado legacy no debe impedir el EventBus ni perder el registro principal
         if (data.tipo_entidad === "animal" && data.motivo_tarea === "control") {
-          await window.db.add("produccion_carne", {
-            animalId: Number(data.entidad_id),
-            fecha: evento.fecha,
-            peso: evento.valor_neto,
-            tipo: "Pesaje Maestro",
-            creadoEn: evento.creadoEn,
-          });
+          try {
+            await window.db.add("produccion_carne", {
+              animalId: Number(data.entidad_id),
+              fecha: evento.fecha,
+              peso: evento.valor_neto,
+              tipo: "Pesaje Maestro",
+              creadoEn: evento.creadoEn,
+            });
+          } catch (e) {
+            console.warn("[Pesajes] Guardado legacy en produccion_carne falló (no crítico):", e);
+          }
         }
 
         // 5. Notificar al sistema via EventBus

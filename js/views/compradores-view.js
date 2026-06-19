@@ -41,7 +41,7 @@ const CompradoresView = {
             window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
         ]);
         const ingresoTotal = ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0) +
-            ventasLeche.reduce((s, v) => s + ((v.cantidad || 0) * (v.precioBase || 0.45)), 0);
+            ventasLeche.reduce((s, v) => s + (v.importe_total || (v.cantidad || 0) * (v.precioBase || 0)), 0);
         const tipos = { cárnico: 0, láctico: 0, híbrido: 0 };
         compradores.forEach(c => { if (tipos[c.tipo_comprador] !== undefined) tipos[c.tipo_comprador]++; });
         const kpisContainer = document.getElementById('compr-kpis');
@@ -234,7 +234,7 @@ const CompradoresView = {
                     <div class="history-sub">${v.pesoCanal || 0} kg · Rend: ${v.rendimientoCanal || 0}%</div>
                   </div>
                   <div class="text-right">
-                    <div class="history-amount text-red">${((v.pesoCanal || 0) * 5.5).toFixed(0)} €</div>
+                    <div class="history-amount text-red">${(v.precio_total || (v.pesoCanal || 0) * 5.5).toFixed(0)} €</div>
                     <div class="kpi-sub">${v.clasificacion?.seurop || 'S/C'}</div>
                   </div>
                 </div>

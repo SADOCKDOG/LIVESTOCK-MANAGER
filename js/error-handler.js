@@ -140,23 +140,32 @@ const ErrorHandler = {
    * Valida patrón de caravana (Flexibilizado para permitir diferentes formatos)
    */
   validateCaravana(numero_identificacion) {
-    // Formato original estricto: /^[A-Z]{2}[0-9]{12}$/
-    // Nuevo formato: Alfanumérico, 4 a 16 caracteres, permite letras y números
-    const regex = /^[A-Z0-9]{4,16}$/;
+    // Normativa española SITRAN: código de país (2 letras) + 12 dígitos
+    // Ejemplo válido: ES123456789012
+    const CROTAL_REGEX = /^[A-Z]{2}\d{12}$/;
     const valorLimpio = numero_identificacion.toString().trim().toUpperCase();
 
-    if (!regex.test(valorLimpio)) {
+    if (!CROTAL_REGEX.test(valorLimpio)) {
       throw new this.AppError(
-        "El número de identificación (crotal) debe tener entre 4 y 16 caracteres alfanuméricos (letras y números)",
+        "El número de identificación (crotal) debe seguir la normativa: 2 letras de código de país seguidas de 12 dígitos (ej. ES123456789012)",
         this.ERROR_TYPES.VALIDATION,
         {
           field: "numero_identificacion",
-          format: "4-16 ALPHANUMERIC",
+          format: "XX000000000000 (2 letras + 12 dígitos)",
           value: valorLimpio,
         }
       );
     }
     return valorLimpio;
+  },
+
+  /**
+   * Comprueba si una cadena tiene formato de crotal válido (2 letras + 12 dígitos).
+   * No lanza excepción — útil para validaciones de snapshot.
+   */
+  isCrotalValido(valor) {
+    if (!valor) return false;
+    return /^[A-Z]{2}\d{12}$/.test(valor.toString().trim().toUpperCase());
   },
 
   /**

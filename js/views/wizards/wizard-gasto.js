@@ -143,7 +143,7 @@ window.GastoWizard = {
           } else if (data.categoria === "Fitosanitarios" || data.categoria === "Electricidad") {
             gasto.snap_zona = data.snap_zona;
           }
-          await window.db.add("gastos_ganaderia", gasto);
+          await Gastos.save(gasto);
           App.toast("Gasto imputado analíticamente.");
           App.renderGastos();
         } catch (e) {

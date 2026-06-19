@@ -18,6 +18,7 @@ const PesajesUI = {
 
         // Si es expedición de tanque, redirigir al wizard específico de albarán leche
         if (modoStr === 'leche_tanque') {
+            window._pesajesWizardActivo = false;
             const overlay = document.getElementById('wizard-pesaje-overlay');
             if (overlay) overlay.remove();
             if (window.App && window.App._abrirWizardAlbaranLeche) {
@@ -84,6 +85,10 @@ const PesajesUI = {
         overlay.className = "wizard-full-screen";
         overlay.style.zIndex = "5000";
 
+        // Acumulador de pesajes para modo lote
+        const _pesajesLote = [];
+        const esModoLote = entidades.length > 1;
+
         // Label y unidad según modo
         const unidadLabel = esModoLeche ? "VOLUMEN (L)" : "PESO (KG)";
         const unidadAbreviada = esModoLeche ? "L" : "kg";
@@ -91,6 +96,8 @@ const PesajesUI = {
         const tituloUnidad = esModoLeche ? "Litros" : "KG";
 
         const renderWizard = async () => {
+            // Marcar que el wizard de pesajes está activo para evitar re-renders
+            window._pesajesWizardActivo = true;
             const isLogistico = (motivo === 'expedicion' || motivo === 'entrada') && !esModoLeche;
             let necesitaAsignacion = (esAltaNueva || (animalId && !rebano)) && !esModoLeche;
 
@@ -116,7 +123,7 @@ const PesajesUI = {
 
             let html = `
             <div class="wizard-header-fixed" style="border-top: 5px solid ${unidadColor}; position:relative; text-align:center;">
-                <button onclick="document.getElementById('wizard-pesaje-overlay').remove()" class="text-zinc-200" style="background:#27272a; border:none; width:32px; height:32px; border-radius:50%; position:absolute; top:50%; transform:translateY(-50%); right:15px; z-index:5001; cursor:pointer; font-weight:bold;">✕</button>
+                <button onclick="window._pesajesWizardActivo=false;document.getElementById('wizard-pesaje-overlay').remove();window.App.route()" class="text-zinc-200" style="background:#27272a; border:none; width:32px; height:32px; border-radius:50%; position:absolute; top:50%; transform:translateY(-50%); right:15px; z-index:5001; cursor:pointer; font-weight:bold;">✕</button>
                 <h2 style="margin:0 0 4px 0; color:${unidadColor}; font-size:1.3rem; text-transform:uppercase; font-weight:900; letter-spacing:1px;">${titulo}</h2>
                 <p class="text-gray-400" style="font-size:0.8rem; margin:0; font-weight:600;">${subtitulo}</p>
             </div>
@@ -318,11 +325,11 @@ const PesajesUI = {
                             snap_identificacion: a.numero_identificacion || a.nombre || 'S/N'
                         });
 
-                        a.pesoActual = val; // Guardamos número para evitar error en input type=number
-                        window.App.toast(`✅ ${a.numero_identificacion || 'Registro'} ➟ ${val} L`);
+                        a.pesoActual = val;
+                        window.App.toast(`✅ ${a.numero_identificacion || 'Registro'}  ${val} L`);
                     } else {
-                        // MODO CARNE: registrar en Libro Maestro
-                        await Pesajes.registrar({
+                        // MODO CARNE
+                        const payload = {
                             entidad_id: a.id,
                             tipo_entidad: 'animal',
                             motivo_tarea: motivo || 'control',
@@ -332,10 +339,24 @@ const PesajesUI = {
                             matricula: isLogistico ? overlay.querySelector('#w-matricula')?.value.toUpperCase() : '',
                             rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO',
                             snap_identificacion: a.numero_identificacion || a.nombre || 'S/N'
-                        });
+                        };
+
+                        if (esModoLote) {
+                            // En modo lote: solo acumular. El registro real ocurre en FINALIZAR.
+                            _pesajesLote.push({
+                                animalId: a.id,
+                                crotal: a.numero_identificacion,
+                                peso: val,
+                                especie: a.especie,
+                                raza: a.raza
+                            });
+                        } else {
+                            console.log('[DEBUG PesajesUI] Payload individual:', JSON.stringify(payload));
+                            await Pesajes.registrar(payload);
+                        }
 
                         a.pesoActual = val;
-                        window.App.toast(`✅ ${a.numero_identificacion || 'Registro'} ➟ ${val} kg`);
+                        window.App.toast(`✅ ${a.numero_identificacion}  ${val} kg`);
                     }
 
                     // Avanzar al siguiente si es lote
@@ -345,17 +366,15 @@ const PesajesUI = {
                             selectAnimal(nextIndex);
                         } else {
                             renderTable();
-                            window.App.toast("Lote completado ✓");
+                            if (esModoLote && !esModoLeche) {
+                                window.App.toast(`📦 Lote: ${_pesajesLote.length} animales pesados. Pulsa FINALIZAR para registrar.`);
+                            } else {
+                                window.App.toast("Lote completado ✓");
+                            }
                         }
                     } else {
-                        // Feedback individual: limpiar y refrescar
                         input.value = '';
                         renderTable();
-                    }
-
-                    // Notificar refresco de vistas
-                    if (window.EventBus) {
-                        window.EventBus.emit('pesaje:registrado', { refresh: true });
                     }
                 } catch (e) {
                     console.error('[PesajesUI] Error al guardar:', e);
@@ -370,9 +389,51 @@ const PesajesUI = {
                 }
             });
 
-            overlay.querySelector('#btn-wizard-finish').onclick = () => {
-                overlay.remove();
-                window.App.route();
+            overlay.querySelector('#btn-wizard-finish').onclick = async () => {
+                window._pesajesWizardActivo = false;
+                try {
+                    // Si es modo lote cárnico, generar registros individuales para cada animal
+                    if (esModoLote && !esModoLeche && _pesajesLote.length > 0) {
+                        const fecha = overlay.querySelector('#w-fecha')?.value || new Date().toISOString().split('T')[0];
+                        const precio = (motivo === 'expedicion') ? parseFloat(overlay.querySelector('#w-precio')?.value || 0) : 0;
+                        const matricula = isLogistico ? overlay.querySelector('#w-matricula')?.value.toUpperCase() : '';
+                        const rolContable = motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO';
+                        const rebano = await Rebanos.get(rebanoId);
+
+                        for (const p of _pesajesLote) {
+                            const payload = {
+                                entidad_id: p.animalId,
+                                tipo_entidad: 'animal',
+                                motivo_tarea: motivo || 'control',
+                                fecha: fecha,
+                                valor_neto: p.peso,
+                                precio_unitario: precio,
+                                matricula: matricula,
+                                rol_contable: rolContable,
+                                snap_identificacion: p.crotal,
+                                snap_zona: rebano?.zonaActual || 'Finca',
+                                snap_especie: rebano?.especie || 'General',
+                                snap_tipo: rebano?.tipo || 'Sin clasificar',
+                                // Metadatos del lote (opcional para trazabilidad)
+                                lote_animales_count: _pesajesLote.length,
+                                lote_peso_promedio: _pesajesLote.reduce((sum, item) => sum + item.peso, 0) / _pesajesLote.length,
+                                lote_crotales: _pesajesLote.map(item => item.crotal).join(', ')
+                            };
+
+                            console.log('[DEBUG PesajesUI] Registrando lote individual:', JSON.stringify(payload));
+                            await Pesajes.registrar(payload);
+                        }
+
+                        const pesoTotal = _pesajesLote.reduce((sum, p) => sum + p.peso, 0);
+                        window.App.toast(`📦 Lote registrado: ${_pesajesLote.length} animales, ${pesoTotal.toFixed(1)} kg total`);
+                    }
+
+                    overlay.remove();
+                    await window.App.route();
+                } catch (e) {
+                    console.error('[PesajesUI] Error al finalizar:', e);
+                    window.App.toastError("Error al finalizar: " + e.message);
+                }
             };
         };
 

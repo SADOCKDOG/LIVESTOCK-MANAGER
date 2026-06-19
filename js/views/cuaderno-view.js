@@ -387,7 +387,7 @@ const CuadernoDigitalView = {
       updateProgress(50, 'Generando contenido...');
       const contenidoHTML = this._generarHTMLImprimible(data);
       const pdfEl = document.createElement('div');
-      pdfEl.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible;';
+      pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; overflow:visible;';
       pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${contenidoHTML}</div>`;
       document.body.appendChild(pdfEl);
 
@@ -605,7 +605,7 @@ const CuadernoDigitalView = {
 
         updateProgress(30, 'Generando contenido...');
         const pdfEl = document.createElement('div');
-        pdfEl.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible;';
+pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; overflow:visible;';
         pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${CuadernoDigitalView._generarHTMLImprimible(overlay._printData)}</div>`;
         document.body.appendChild(pdfEl);
 
