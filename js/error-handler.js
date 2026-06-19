@@ -232,7 +232,9 @@ const ErrorHandler = {
       return await fn();
     } catch (error) {
       if (error instanceof this.AppError) {
-        console.error(`[${error.type}] ${error.message}`, error.details);
+        // Log con warn en lugar de error para validaciones esperadas
+        const logLevel = error.type === this.ERROR_TYPES.VALIDATION ? console.warn : console.error;
+        logLevel(`[${error.type}] ${error.message}`, error.details);
         throw error;
       }
 
@@ -252,7 +254,9 @@ const ErrorHandler = {
         originalError: error,
         context,
       });
-      console.error(`[${type}] ${message}`, appError.details);
+      // Log con warn en lugar de error para validaciones esperadas
+      const logLevel = type === this.ERROR_TYPES.VALIDATION ? console.warn : console.error;
+      logLevel(`[${type}] ${message}`, appError.details);
       throw appError;
     }
   },
