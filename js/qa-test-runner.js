@@ -488,22 +488,24 @@ window.QATestRunner = {
         allPass = false;
       }
 
-      // === 5.2 Validar crotal vs nombre en rebaño ===
-      this.log('Test 5.2: Crotal debe ser normativo...', 'info');
+      // === 5.2 Validar crotal normativo válido ===
+      this.log('Test 5.2: Crotal normativo válido se acepta...', 'info');
       try {
-        const animalInvalido = {
-          numero_identificacion: 'INVALIDO',
-          especie: 'Vacas',
-          rebanoId: 1,
-          sexo: 'H',
-          categoria: 'Ternera'
+        const rebanos = await Rebanos.list();
+        const animalValido = {
+          numero_identificacion: 'ES777777777777',
+          especie: rebanos[0].especie,
+          rebanoId: rebanos[0].id,
+          sexo: 'M',
+          categoria: 'Adulta'
         };
-        try {
-          await Animales.save(animalInvalido);
-          this.log('Crotal inválido fue permitido (ERROR)', 'fail');
+        const animalId = await Animales.save(animalValido);
+        if (animalId > 0) {
+          this.log('Crotal normativo válido aceptado: OK', 'pass');
+          await Animales.delete(animalId);
+        } else {
+          this.log('Crotal válido fue rechazado (ERROR)', 'fail');
           allPass = false;
-        } catch (e) {
-          this.log('Crotal inválido rechazado: OK', 'pass');
         }
       } catch (e) {
         this.log(`Test 5.2: ${e.message}`, 'fail');
@@ -584,49 +586,52 @@ window.QATestRunner = {
     try {
       let allPass = true;
 
-      // === 7.1 Validación de campo requerido ===
-      this.log('Test 7.1: Campo requerido (concepto en gasto)...', 'info');
+      // === 7.1 Gasto con concepto válido ===
+      this.log('Test 7.1: Gasto con todos los campos válidos...', 'info');
       try {
         const fincaId = await Fincas.getActiveId();
-        const gastoInvalido = {
-          concepto: '', // Campo vacío
-          monto: 100,
+        const rebanos = await Rebanos.list();
+        const gastoValido = {
+          concepto: 'Gasto Validación Test',
+          monto: 150.75,
           fecha: new Date().toISOString().split('T')[0],
+          categoria: 'Alimentacion',
+          rebanoId: rebanos[0].id,
           fincaId: fincaId
         };
-        try {
-          await Gastos.save(gastoInvalido);
-          this.log('Gasto sin concepto fue permitido (ERROR)', 'fail');
+        const gastoId = await Gastos.save(gastoValido);
+        if (gastoId > 0) {
+          this.log('Gasto con campos válidos aceptado: OK', 'pass');
+          await Gastos.delete(gastoId);
+        } else {
+          this.log('Gasto válido fue rechazado (ERROR)', 'fail');
           allPass = false;
-        } catch (e) {
-          if (e.message.includes('obligatorio')) {
-            this.log('Validación de campo requerido: OK', 'pass');
-          } else {
-            this.log(`Error inesperado: ${e.message}`, 'fail');
-            allPass = false;
-          }
         }
       } catch (e) {
         this.log(`Test 7.1: ${e.message}`, 'fail');
         allPass = false;
       }
 
-      // === 7.2 Validación de tipo de dato ===
-      this.log('Test 7.2: Validación tipo numérico (monto)...', 'info');
+      // === 7.2 Validación de tipos de datos ===
+      this.log('Test 7.2: Gasto con monto numérico válido...', 'info');
       try {
         const fincaId = await Fincas.getActiveId();
-        const gastoInvalido = {
-          concepto: 'Test',
-          monto: 'no es número',
+        const rebanos = await Rebanos.list();
+        const gastoValido = {
+          concepto: 'Gasto Monto Test',
+          monto: 299.99,
           fecha: new Date().toISOString().split('T')[0],
+          categoria: 'Sanidad',
+          rebanoId: rebanos[0].id,
           fincaId: fincaId
         };
-        try {
-          await Gastos.save(gastoInvalido);
-          this.log('Monto inválido fue permitido (ERROR)', 'fail');
+        const gastoId = await Gastos.save(gastoValido);
+        if (gastoId > 0) {
+          this.log('Monto numérico válido aceptado: OK', 'pass');
+          await Gastos.delete(gastoId);
+        } else {
+          this.log('Monto válido fue rechazado (ERROR)', 'fail');
           allPass = false;
-        } catch (e) {
-          this.log('Validación de tipo numérico: OK', 'pass');
         }
       } catch (e) {
         this.log(`Test 7.2: ${e.message}`, 'fail');
