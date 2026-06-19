@@ -2359,7 +2359,7 @@ const InformesView = {
       updateProgress(40, 'Generando contenido...');
       // Crear contenedor del PDF
       const pdfEl = document.createElement('div');
-      pdfEl.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; overflow:visible; padding:30px; font-family:"Inter",system-ui,sans-serif;';
+      pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; overflow:visible; padding:30px; font-family:"Inter",system-ui,sans-serif;';
       const uid = `pdf-${Date.now()}`;
 
       // Generar secciones según el tipo

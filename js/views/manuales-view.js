@@ -69,6 +69,62 @@ const ManualesView = {
       archivo: 'manual/manual-gastos.html',
       color: '#f59e0b',
     },
+    {
+      id: 'compradores',
+      titulo: 'Compradores — Gestión de Clientes',
+      descripcion: 'Alta y gestión de compradores (cárnico, láctico, híbrido), contratos, historial de ventas y entregas de leche. Cómo aparece en Venta Masiva y Albarán de Leche.',
+      icono: '🏢',
+      archivo: 'manual/manual-compradores.html',
+      color: '#ef4444',
+    },
+    {
+      id: 'proveedores',
+      titulo: 'Proveedores — Trazabilidad de Costes',
+      descripcion: 'Alta y gestión de proveedores, categorías de suministro, asociación a gastos analíticos e historial de gasto por proveedor.',
+      icono: '🏭',
+      archivo: 'manual/manual-proveedores.html',
+      color: '#10b981',
+    },
+    {
+      id: 'transportistas',
+      titulo: 'Transportistas — Bienestar en Transporte',
+      descripcion: 'Alta de transportistas, tipos de vehículo, certificado de bienestar animal, uso en DIMOE de Venta Masiva e historial de expediciones.',
+      icono: '🚛',
+      archivo: 'manual/manual-transportistas.html',
+      color: '#3b82f6',
+    },
+    {
+      id: 'animales-rebanos',
+      titulo: 'Animales y Rebaños — Gestión del Censo',
+      descripcion: 'Estructura Finca→Zonas→Rebaños→Animales, alta de rebaño y animal, formato normativo del crotal (ES+12 dígitos), escáner, vinculación madre-cría y estados.',
+      icono: '🐄',
+      archivo: 'manual/manual-animales-rebanos.html',
+      color: '#c9851f',
+    },
+    {
+      id: 'contratos',
+      titulo: 'Contratos — Acuerdos Comerciales',
+      descripcion: 'Registro de contratos con compradores: tipos (carne/leche/mixto), vigencia, IVA, tabla de precios pactados y su integración en liquidaciones.',
+      icono: '📄',
+      archivo: 'manual/manual-contratos.html',
+      color: '#8b5cf6',
+    },
+    {
+      id: 'sanitarios',
+      titulo: 'Sanitarios — Control de Tratamientos',
+      descripcion: 'Registro de tratamientos veterinarios, tipos de medicamento, tiempos de espera para carne y leche, alertas de restricción y catálogo sanitario.',
+      icono: '💉',
+      archivo: 'manual/manual-sanitarios.html',
+      color: '#ef4444',
+    },
+    {
+      id: 'reproduccion',
+      titulo: 'Reproducción — Ciclo Reproductivo',
+      descripcion: 'Ciclo reproductivo completo (celo→IA→diagnóstico→parto), genealogía, trazabilidad madre-cría, historial por animal e indicadores de fertilidad.',
+      icono: '🔬',
+      archivo: 'manual/manual-reproduccion.html',
+      color: '#ec4899',
+    },
   ],
 
   async render() {
@@ -127,7 +183,7 @@ const ManualesView = {
           ✕ Volver
         </button>
         <span style="color:#e0a83a; font-weight:800; font-size:0.85rem;">📚 Manual</span>
-        <div style="width:70px;"></div>
+
       </div>
       <iframe id="manual-frame" src="${archivo}"
               style="flex:1; width:100%; border:none;"
@@ -143,9 +199,8 @@ const ManualesView = {
   },
 
   async _exportarPDF(archivo, titulo) {
-    let loader;
+    let loader, container;
     try {
-      // Crear overlay de carga con barra de proceso
       loader = document.createElement('div');
       loader.id = 'pdf-loader-overlay';
       loader.style.cssText = `
@@ -182,176 +237,98 @@ const ManualesView = {
         return;
       }
 
-      updateProgress(20, 'Descargando manual...');
-      const container = document.createElement('div');
-      container.style.cssText = 'position:fixed; left:0; top:0; width:800px; background:#fff; color:#000; opacity:0; pointer-events:none; overflow:visible;';
-      document.body.appendChild(container);
+      updateProgress(20, 'Cargando manual...');
 
+      // Try fetch first, fallback to Capacitor Filesystem for Android
+      let html;
       try {
         const resp = await fetch(archivo);
-        if (!resp.ok) throw new Error('No se pudo cargar el manual');
-        const html = await resp.text();
-
-        updateProgress(40, 'Procesando contenido...');
-        const styles = (html.match(/<style[\s\S]*?<\/style>/gi) || []).join('\n');
-        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-        let bodyContent = (bodyMatch ? bodyMatch[1] : html);
-
-        if (!bodyMatch) {
-            bodyContent = bodyContent.replace(/<head[\s\S]*?<\/head>/gi, '')
-                                     .replace(/<script[\s\S]*?<\/script>/gi, '')
-                                     .replace(/<html[^>]*>/gi, '')
-                                     .replace(/<\/html>/gi, '');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        html = await resp.text();
+      } catch (fetchErr) {
+        console.warn('[PDF] fetch failed, trying Capacitor Filesystem:', fetchErr.message);
+        const cap = window.Capacitor;
+        const fsPlugin = cap?.Plugins?.Filesystem;
+        if (fsPlugin) {
+          const result = await fsPlugin.readFile({ path: archivo, directory: 'ASSETS' });
+          html = result.data;
+        } else {
+          throw new Error('No se pudo cargar el manual: ' + fetchErr.message);
         }
-        bodyContent = bodyContent.replace(/src="img\//g, 'src="manual/img/')
-                                 .replace(/src='img\//g, "src='manual/img/");
-
-        // Estilos específicos para PDF
-        const extraCss = `<style>
-            @page { size: A4; margin: 0; }
-            .pdf-export-body {
-                color:#1a1a1a !important; background:#fff !important; font-size:13px !important;
-                margin:0 !important; padding:0 !important;
-                -webkit-print-color-adjust:exact !important;
-                font-family: Arial, sans-serif !important;
-                width: 800px !important;
-                display: block !important;
-            }
-            .portada {
-                background: linear-gradient(160deg, #1a1a2e, #16213e) !important;
-                color:#ffffff !important;
-                padding: 45px 30px !important;
-                text-align: center !important;
-                width: 800px !important;
-                box-sizing: border-box !important;
-                margin: 0 0 30px 0 !important;
-                border-bottom: 8px solid #c9851f !important;
-                display: block !important;
-                overflow: visible !important;
-                height: auto !important;
-                min-height: 150px !important;
-            }
-            .portada .logo-img {
-                max-width: 70px !important;
-                height: auto !important;
-                margin: 0 auto 12px !important;
-                display: block !important;
-                border-radius: 12px !important;
-            }
-            .portada .logo {
-                font-size: 20px !important;
-                font-weight: 800 !important;
-                margin: 0 0 8px 0 !important;
-                display: block !important;
-                color: #fff !important;
-                height: auto !important;
-            }
-            .portada .logo span { color: #e0a83a !important; }
-            .portada h1 {
-                color:#e0a83a !important;
-                font-size: 26px !important;
-                margin: 10px 0 !important;
-                line-height: 1.2 !important;
-                word-wrap: break-word !important;
-                overflow-wrap: break-word !important;
-                display: block !important;
-                width: 100% !important;
-                height: auto !important;
-            }
-            .portada .sub {
-                color: #cccccc !important;
-                font-size: 14px !important;
-                margin: 5px 0 !important;
-                line-height: 1.4 !important;
-                word-wrap: break-word !important;
-                overflow-wrap: break-word !important;
-                display: block !important;
-                width: 100% !important;
-                height: auto !important;
-            }
-            .portada .badge {
-                display: inline-block !important;
-                border: 1px solid #e0a83a !important;
-                color: #e0a83a !important;
-                padding: 4px 14px !important;
-                border-radius: 20px !important;
-                margin-top: 15px !important;
-                font-size: 10px !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.5px !important;
-                font-weight: 700 !important;
-                height: auto !important;
-            }
-            .wrap { width: 800px !important; padding:0 35px !important; box-sizing: border-box !important; }
-            .seccion { page-break-inside: auto !important; padding: 25px 0 !important; border-bottom: 1px solid #eeeeee !important; clear: both; }
-            .modulo { border-left: 6px solid #c9851f !important; padding-left: 18px !important; margin: 20px 0 10px !important; font-size: 20px !important; }
-
-            .nota, .aviso, .tip, .info-tecnica, .resumen-ejemplo, .panel-ejemplo, .indice {
-                page-break-inside: avoid !important;
-                margin: 20px 0 !important;
-                padding: 15px 20px !important;
-                border-radius: 8px !important;
-                word-wrap: break-word !important;
-                overflow-wrap: break-word !important;
-                box-sizing: border-box !important;
-                width: 100% !important;
-            }
-            .indice { background: #f4f4f9 !important; border: 1px solid #ddd !important; }
-            .indice ol { columns: 2 !important; column-gap: 30px !important; margin: 0 !important; padding-left: 25px !important; }
-
-            figure { page-break-inside: avoid !important; margin: 25px 0 !important; text-align: center !important; width: 100% !important; }
-            figure img { max-width: 85% !important; height: auto !important; border-radius: 10px !important; border: 1px solid #ddd !important; }
-
-            table { width: 100% !important; border-collapse: collapse !important; margin: 20px 0 !important; table-layout: fixed !important; }
-            th, td { border: 1px solid #eee !important; padding: 8px 10px !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-            th { background-color: #f8f8f8 !important; font-weight: bold !important; }
-
-            a { color: #1a1a1a !important; text-decoration: none !important; }
-            p { margin: 10px 0 !important; line-height: 1.5 !important; }
-            * { box-sizing: border-box !important; }
-          </style>`;
-
-        container.innerHTML = `<div class="pdf-export-body">${styles}${extraCss}${bodyContent}</div>`;
-
-        updateProgress(60, 'Cargando imágenes...');
-        const imgs = container.querySelectorAll('img');
-        await Promise.all(Array.from(imgs).map(img =>
-          img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = () => { img.style.display = 'none'; res(); }; })
-        ));
-        // Forzar altura real después de cargar imágenes
-        container.style.height = container.scrollHeight + 'px';
-        await new Promise(r => setTimeout(r, 800));
-
-        updateProgress(80, 'Rasterizando PDF...');
-        const opt = {
-          margin:       [10, 8, 10, 8],
-          filename:     titulo.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '').trim() + '.pdf',
-          image:        { type: 'jpeg', quality: 0.95 },
-          html2canvas:  {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            letterRendering: true,
-            backgroundColor: '#ffffff',
-            width: 800,
-            height: container.scrollHeight,
-            windowHeight: container.scrollHeight
-          },
-          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak:    { mode: ['css', 'legacy'] }
-        };
-
-        const pdfBlob = await html2pdf().set(opt).from(container).output('blob');
-        updateProgress(100, '¡Listo!');
-        await new Promise(r => setTimeout(r, 400));
-        await ManualesView._compartirPDF(pdfBlob, opt.filename, titulo);
-      } finally {
-        document.body.removeChild(container);
-        if (loader) loader.remove();
       }
+
+      updateProgress(40, 'Procesando contenido...');
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const styles = Array.from(doc.querySelectorAll('style')).map(s => s.outerHTML).join('\n');
+      const bodyContent = doc.body.innerHTML;
+
+      if (!bodyContent || bodyContent.trim().length < 50) {
+        throw new Error('El contenido del manual está vacío');
+      }
+
+      // Create container - use visibility:hidden instead of off-screen for Android WebView compatibility
+      container = document.createElement('div');
+      container.id = 'pdf-render-container';
+      container.style.cssText = 'position:absolute; left:0; top:0; width:800px; background:#fff; color:#000; visibility:hidden; z-index:-1;';
+      container.innerHTML = styles + bodyContent;
+      document.body.appendChild(container);
+
+      // Fix image paths - use relative paths for Android WebView compatibility
+      const imgs = container.querySelectorAll('img');
+      imgs.forEach(img => {
+        let src = img.getAttribute('src');
+        if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+          // Normalize path: ensure manual/img/ prefix for images
+          if (src.startsWith('img/')) {
+            src = 'manual/' + src;
+          }
+          // Use relative path instead of absolute URL for Android compatibility
+          img.setAttribute('src', src);
+        }
+      });
+
+      // Wait for images to load
+      await Promise.all(Array.from(imgs).map(img =>
+        img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = () => res(); })
+      ));
+
+      // Wait for render
+      await new Promise(r => setTimeout(r, 1500));
+
+      updateProgress(80, 'Generando PDF...');
+      const opt = {
+        margin:       [10, 8, 10, 8],
+        filename:     titulo.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '').trim() + '.pdf',
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          letterRendering: true,
+          backgroundColor: '#ffffff',
+          width: 800
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'] }
+      };
+
+      const pdfBlob = await html2pdf().set(opt).from(container).output('blob');
+
+      // Verify PDF has content
+      if (!pdfBlob || pdfBlob.size < 1000) {
+        throw new Error('El PDF generado está vacío o corrupto');
+      }
+
+      updateProgress(100, '¡Listo!');
+      await new Promise(r => setTimeout(r, 400));
+      await ManualesView._compartirPDF(pdfBlob, opt.filename, titulo);
     } catch (e) {
-      console.error('Error al exportar PDF:', e);
+      console.error('[PDF] Error:', e);
       App.toastError('Error al generar PDF: ' + e.message);
+    } finally {
+      if (container) container.remove();
       if (loader) loader.remove();
     }
   },

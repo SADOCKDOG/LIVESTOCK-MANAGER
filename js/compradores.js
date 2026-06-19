@@ -92,9 +92,13 @@ const Compradores = {
     async delete(id) {
         return await ErrorHandler.tryAsync(async () => {
             // Verificar que no tenga ventas asociadas
-            const ventas = await this.getVentas(id);
-            if (ventas.length > 0) {
-                throw new Error(`No se puede eliminar: el comprador tiene ${ventas.length} venta(s) registrada(s).`);
+            const [ventasCarne, entregasLeche] = await Promise.all([
+                this.getVentasCarne(id),
+                this.getEntregasLeche(id)
+            ]);
+            const totalVentas = ventasCarne.length + entregasLeche.length;
+            if (totalVentas > 0) {
+                throw new Error(`No se puede eliminar: el comprador tiene ${totalVentas} venta(s) registrada(s).`);
             }
             await window.db.delete('compradores', Number(id));
             if (window.EventBus) {

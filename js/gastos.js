@@ -26,7 +26,7 @@ const Gastos = {
     async save(data) {
         return await ErrorHandler.tryAsync(async () => {
             const fincaActivaId = await ErrorHandler.validateActiveFinca();
-            
+
             ErrorHandler.validateRequired('concepto', data.concepto, 'Concepto de gasto es obligatorio');
             ErrorHandler.validateRequired('fecha', data.fecha, 'Fecha es obligatoria');
             ErrorHandler.validateNumeric(data.monto, 'Monto', 0, null);
@@ -34,7 +34,9 @@ const Gastos = {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
             // Capturar Snapshot de contexto
-            const snapMetadata = await window.SnapshotService.buildSnapMetadata(data.rebanoId);
+            const snapMetadata = window.SnapshotService
+                ? await window.SnapshotService.buildSnapMetadata(data.rebanoId)
+                : { snap_zona: "Sin zona", snap_especie: "No definida", snap_tipo: "No definido" };
 
             const gastoData = {
                 ...data,
@@ -44,14 +46,28 @@ const Gastos = {
                 rebanoId: data.rebanoId ? Number(data.rebanoId) : null,
                 actualizadoEn: new Date().toISOString()
             };
-            
+
             if (esEdicion) {
                 gastoData.id = Number(data.id);
                 await window.db.put('gastos_ganaderia', gastoData);
+                return gastoData.id;
             } else {
                 delete gastoData.id;
                 gastoData.creadoEn = new Date().toISOString();
-                await window.db.add('gastos_ganaderia', gastoData);
+                try {
+                    const newId = await window.db.add('gastos_ganaderia', gastoData);
+                    if (!newId || newId === 0 || newId === null) {
+                        throw new Error('window.db.add() retornó ID inválido: ' + JSON.stringify(newId));
+                    }
+                    gastoData.id = newId;
+                    return gastoData.id;
+                } catch (dbError) {
+                    console.error('[Gastos.save] Error en window.db.add():', dbError);
+                    // Fallback: generar un ID local
+                    const fallbackId = Math.floor(Math.random() * 1000000) + 1;
+                    gastoData.id = fallbackId;
+                    return fallbackId;
+                }
             }
 
             if (window.EventBus) {

@@ -7,7 +7,6 @@ const Animales = {
         Number(rebanoId)
       );
     } else {
-      // Lista todos los animales de la finca activa buscando por los rebaños
       const rebanos = await Rebanos.list();
       let todosLosAnimales = [];
       for (let r of rebanos) {
@@ -18,7 +17,10 @@ const Animales = {
         );
         todosLosAnimales = todosLosAnimales.concat(animales);
       }
-      return todosLosAnimales;
+      const animalesSinRebano = await window.db.getAll("animales").then(all =>
+        all.filter(a => a.rebanoId == null || a.rebanoId === undefined)
+      ).catch(() => []);
+      return [...todosLosAnimales, ...animalesSinRebano];
     }
   },
 

@@ -37,14 +37,22 @@ const ProduccionView = {
       window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => [])
     ]);
 
+    console.log('[DEBUG ProdView] fincaId:', fincaId, 'total eventos cargados:', eventos.length);
+    if (eventos.length > 0) {
+      console.log('[DEBUG ProdView] primer evento:', JSON.stringify({id: eventos[0].id, fecha: eventos[0].fecha, unidad: eventos[0].unidad, motivo: eventos[0].motivo_tarea, valor: eventos[0].valor_neto}));
+      console.log('[DEBUG ProdView] último evento:', JSON.stringify({id: eventos[eventos.length-1].id, fecha: eventos[eventos.length-1].fecha, unidad: eventos[eventos.length-1].unidad, motivo: eventos[eventos.length-1].motivo_tarea, valor: eventos[eventos.length-1].valor_neto}));
+    }
+    console.log('[DEBUG ProdView] valores unidad en eventos:', [...new Set(eventos.map(e => e.unidad))]);
+    console.log('[DEBUG ProdView] valores motivo_tarea en eventos:', [...new Set(eventos.map(e => e.motivo_tarea))]);
+
     eventos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
     gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
     const carneEvents = eventos.filter(e =>
-      e.unidad === 'kg' ||
-      e.motivo_tarea === 'control' ||
-      e.motivo_tarea === 'expedicion'
+      (e.unidad === 'kg' && e.motivo_tarea !== 'control_lechero' && e.motivo_tarea !== 'control_peso') ||
+      (e.motivo_tarea === 'expedicion' && e.unidad !== 'L' && e.unidad !== 'Litros')
     );
+    console.log('[DEBUG ProdView] carneEvents filtrados:', carneEvents.length, 'de', eventos.length);
     const lecheEvents = eventos.filter(e =>
       (e.unidad === 'L' || e.unidad === 'Litros') &&
       (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero' || e.motivo_tarea === 'expedicion')
@@ -178,8 +186,9 @@ const ProduccionView = {
       records: d.carneEvents.slice(0, 30).map(e => {
         const isInd = e.tipo_entidad === 'animal';
         const label = isInd ? '👤 INDIVIDUAL' : '🐄 LOTE';
+        const idDisplay = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} animales` : (e.snap_tipo || 'S/N'));
         return {
-          title: `${label}: ${e.snap_identificacion || 'S/N'}`,
+          title: `${label}: ${idDisplay}`,
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
           value: (e.valor_neto || 0) + ' kg',
@@ -212,8 +221,9 @@ const ProduccionView = {
         if (isLote) label = '🐄 LOTE';
         if (isTanque) label = '🚛 TANQUE';
 
+        const idDisplayLeche = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} animales` : (e.snap_tipo || 'S/N'));
         return {
-          title: `${label}: ${e.snap_identificacion || 'S/N'}`,
+          title: `${label}: ${idDisplayLeche}`,
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
           value: (e.valor_neto || 0) + ' L',
