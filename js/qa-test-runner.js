@@ -331,7 +331,7 @@ window.QATestRunner = {
     console.clear();
     this.log('╔════════════════════════════════════════╗', 'info');
     this.log('║  LIVESTOCK MANAGER — QA TEST RUNNER   ║', 'info');
-    this.log('║  Niveles 1-3: Smoke + Integridad + CRUD║', 'info');
+    this.log('║  Niveles 1-7: Cobertura Integral QA   ║', 'info');
     this.log('╚════════════════════════════════════════╝', 'info');
 
     const l1 = await this.runLevel1();
@@ -339,6 +339,14 @@ window.QATestRunner = {
     const l2 = await this.runLevel2();
     await this.sleep(500);
     const l3 = await this.runLevel3();
+    await this.sleep(500);
+    const l4 = await this.runLevel4();
+    await this.sleep(500);
+    const l5 = await this.runLevel5();
+    await this.sleep(500);
+    const l6 = await this.runLevel6();
+    await this.sleep(500);
+    const l7 = await this.runLevel7();
 
     this.endTime = new Date();
     const duration = ((this.endTime - this.startTime) / 1000).toFixed(2);
@@ -349,6 +357,10 @@ window.QATestRunner = {
     this.log(`║  Nivel 1 (Smoke):    ${l1 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(22)}║`, l1 ? 'pass' : 'fail');
     this.log(`║  Nivel 2 (Integridad): ${l2 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(20)}║`, l2 ? 'pass' : 'fail');
     this.log(`║  Nivel 3 (CRUD):     ${l3 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(21)}║`, l3 ? 'pass' : 'fail');
+    this.log(`║  Nivel 4 (Flujos):   ${l4 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(21)}║`, l4 ? 'pass' : 'fail');
+    this.log(`║  Nivel 5 (Validación): ${l5 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(18)}║`, l5 ? 'pass' : 'fail');
+    this.log(`║  Nivel 6 (Performance): ${l6 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(17)}║`, l6 ? 'pass' : 'fail');
+    this.log(`║  Nivel 7 (Errores):  ${l7 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(20)}║`, l7 ? 'pass' : 'fail');
     this.log('╚════════════════════════════════════════╝', 'info');
 
     if (this.errors.length > 0) {
@@ -358,7 +370,279 @@ window.QATestRunner = {
       });
     }
 
-    return { l1, l2, l3, duration, errors: this.errors.length };
+    return { l1, l2, l3, l4, l5, l6, l7, duration, errors: this.errors.length };
+  },
+
+  // ==================== NIVEL 4: FLUJOS TRANSVERSALES ====================
+  async runLevel4() {
+    this.log('\n=== NIVEL 4: FLUJOS TRANSVERSALES ===', 'info');
+
+    try {
+      let allPass = true;
+
+      // === 4.1 Listar y crear registros en cascada ===
+      this.log('Test 4.1: Flujo Listar → Crear → Verificar...', 'info');
+      try {
+        const fincaId = await Fincas.getActiveId();
+        const rebanos = await Rebanos.list();
+        const animales = await Animales.list();
+
+        if (rebanos.length > 0 && animales.length > 0) {
+          const nuevoAnimal = {
+            numero_identificacion: 'ES888888888888',
+            especie: rebanos[0].especie,
+            rebanoId: rebanos[0].id,
+            sexo: 'H',
+            categoria: 'Ternera'
+          };
+          const animalId = await Animales.save(nuevoAnimal);
+
+          if (animalId > 0) {
+            const animalVerif = await Animales.get(animalId);
+            if (animalVerif && animalVerif.rebanoId === rebanos[0].id) {
+              this.log('Flujo Listar → Crear → Verificar: OK', 'pass');
+              await Animales.delete(animalId);
+            } else {
+              this.log('Animal no vinculado', 'fail');
+              allPass = false;
+            }
+          }
+        }
+      } catch (e) {
+        this.log(`Flujo 4.1: ${e.message}`, 'fail');
+        allPass = false;
+      }
+
+      // === 4.2 CRUD integrado ===
+      this.log('Test 4.2: Flujo CRUD completo (Comprador)...', 'info');
+      try {
+        const comp1 = await Compradores.list();
+        const nuevoComp = {
+          nombre: 'Comprador Flujo Test',
+          nif_cif: 'B77777777',
+          tipo_comprador: 'híbrido',
+          ciudad: 'Test',
+          activo: true
+        };
+        const compId = await Compradores.save(nuevoComp);
+
+        if (compId > 0) {
+          const compVerif = await Compradores.get(compId);
+          if (compVerif && compVerif.nombre === 'Comprador Flujo Test') {
+            const compActual = {
+              ...compVerif,
+              ciudad: 'Test Updated'
+            };
+            await Compradores.save(compActual);
+            this.log('Flujo CRUD Comprador: OK', 'pass');
+            await Compradores.delete(compId);
+          } else {
+            this.log('Comprador no se creó', 'fail');
+            allPass = false;
+          }
+        }
+      } catch (e) {
+        this.log(`Flujo 4.2: ${e.message}`, 'fail');
+        allPass = false;
+      }
+
+      if (allPass) {
+        this.log('NIVEL 4: ✅ PASS', 'pass');
+      } else {
+        this.log('NIVEL 4: ❌ FAIL', 'fail');
+      }
+      return allPass;
+    } catch (e) {
+      this.log(`NIVEL 4 ERROR: ${e.message}`, 'error');
+      return false;
+    }
+  },
+
+  // ==================== NIVEL 5: VALIDACIONES DE NEGOCIO ====================
+  async runLevel5() {
+    this.log('\n=== NIVEL 5: VALIDACIONES DE NEGOCIO ===', 'info');
+
+    try {
+      let allPass = true;
+
+      // === 5.1 No permitir venta sin comprador ===
+      this.log('Test 5.1: Venta sin comprador (debe fallar)...', 'info');
+      try {
+        const fincaId = await Fincas.getActiveId();
+        const ventaInvalida = {
+          animalId: null,
+          compradorId: null,
+          pesoCanal: 450,
+          fechaSacrificio: new Date().toISOString().split('T')[0],
+          fincaId: fincaId
+        };
+        try {
+          await Comercializacion.saveVentaCarne(ventaInvalida);
+          this.log('Venta sin comprador fue permitida (ERROR)', 'fail');
+          allPass = false;
+        } catch (e) {
+          this.log('Venta sin comprador rechazada: OK', 'pass');
+        }
+      } catch (e) {
+        this.log(`Test 5.1: ${e.message}`, 'fail');
+        allPass = false;
+      }
+
+      // === 5.2 Validar crotal vs nombre en rebaño ===
+      this.log('Test 5.2: Crotal debe ser normativo...', 'info');
+      try {
+        const animalInvalido = {
+          numero_identificacion: 'INVALIDO',
+          especie: 'Vacas',
+          rebanoId: 1,
+          sexo: 'H',
+          categoria: 'Ternera'
+        };
+        try {
+          await Animales.save(animalInvalido);
+          this.log('Crotal inválido fue permitido (ERROR)', 'fail');
+          allPass = false;
+        } catch (e) {
+          this.log('Crotal inválido rechazado: OK', 'pass');
+        }
+      } catch (e) {
+        this.log(`Test 5.2: ${e.message}`, 'fail');
+        allPass = false;
+      }
+
+      if (allPass) {
+        this.log('NIVEL 5: ✅ PASS', 'pass');
+      } else {
+        this.log('NIVEL 5: ❌ FAIL', 'fail');
+      }
+      return allPass;
+    } catch (e) {
+      this.log(`NIVEL 5 ERROR: ${e.message}`, 'error');
+      return false;
+    }
+  },
+
+  // ==================== NIVEL 6: PERFORMANCE ====================
+  async runLevel6() {
+    this.log('\n=== NIVEL 6: PERFORMANCE ===', 'info');
+
+    try {
+      let allPass = true;
+
+      // === 6.1 Tiempo de carga de compradores ===
+      this.log('Test 6.1: Tiempo Compradores.list()...', 'info');
+      const t1 = performance.now();
+      await Compradores.list();
+      const t2 = performance.now();
+      const timeComp = (t2 - t1).toFixed(2);
+      this.log(`Compradores: ${timeComp}ms ${timeComp < 500 ? '✅ Fast' : '⚠️ Slow'}`, 'info');
+
+      // === 6.2 Tiempo de carga de animales ===
+      this.log('Test 6.2: Tiempo Animales.list()...', 'info');
+      const t3 = performance.now();
+      await Animales.list();
+      const t4 = performance.now();
+      const timeAnim = (t4 - t3).toFixed(2);
+      this.log(`Animales: ${timeAnim}ms ${timeAnim < 500 ? '✅ Fast' : '⚠️ Slow'}`, 'info');
+
+      // === 6.3 Tiempo de guardar gasto ===
+      this.log('Test 6.3: Tiempo Gastos.save()...', 'info');
+      const rebanos = await Rebanos.list();
+      const fincaId = await Fincas.getActiveId();
+
+      const t5 = performance.now();
+      const gasto = {
+        concepto: 'Perf Test',
+        monto: 250,
+        fecha: new Date().toISOString().split('T')[0],
+        categoria: 'Alimentacion',
+        rebanoId: rebanos[0].id,
+        fincaId: fincaId
+      };
+      const gastoId = await Gastos.save(gasto);
+      const t6 = performance.now();
+      const timeSave = (t6 - t5).toFixed(2);
+      this.log(`Gastos.save(): ${timeSave}ms ${timeSave < 300 ? '✅ Fast' : '⚠️ Slow'}`, 'info');
+
+      if (gastoId > 0) {
+        await Gastos.delete(gastoId);
+        allPass = true;
+      }
+
+      this.log('NIVEL 6: ✅ PASS (métricas capturadas)', 'pass');
+      return allPass;
+    } catch (e) {
+      this.log(`NIVEL 6 ERROR: ${e.message}`, 'error');
+      return false;
+    }
+  },
+
+  // ==================== NIVEL 7: RECUPERACIÓN DE ERRORES ====================
+  async runLevel7() {
+    this.log('\n=== NIVEL 7: RECUPERACIÓN DE ERRORES ===', 'info');
+
+    try {
+      let allPass = true;
+
+      // === 7.1 Validación de campo requerido ===
+      this.log('Test 7.1: Campo requerido (concepto en gasto)...', 'info');
+      try {
+        const fincaId = await Fincas.getActiveId();
+        const gastoInvalido = {
+          concepto: '', // Campo vacío
+          monto: 100,
+          fecha: new Date().toISOString().split('T')[0],
+          fincaId: fincaId
+        };
+        try {
+          await Gastos.save(gastoInvalido);
+          this.log('Gasto sin concepto fue permitido (ERROR)', 'fail');
+          allPass = false;
+        } catch (e) {
+          if (e.message.includes('obligatorio')) {
+            this.log('Validación de campo requerido: OK', 'pass');
+          } else {
+            this.log(`Error inesperado: ${e.message}`, 'fail');
+            allPass = false;
+          }
+        }
+      } catch (e) {
+        this.log(`Test 7.1: ${e.message}`, 'fail');
+        allPass = false;
+      }
+
+      // === 7.2 Validación de tipo de dato ===
+      this.log('Test 7.2: Validación tipo numérico (monto)...', 'info');
+      try {
+        const fincaId = await Fincas.getActiveId();
+        const gastoInvalido = {
+          concepto: 'Test',
+          monto: 'no es número',
+          fecha: new Date().toISOString().split('T')[0],
+          fincaId: fincaId
+        };
+        try {
+          await Gastos.save(gastoInvalido);
+          this.log('Monto inválido fue permitido (ERROR)', 'fail');
+          allPass = false;
+        } catch (e) {
+          this.log('Validación de tipo numérico: OK', 'pass');
+        }
+      } catch (e) {
+        this.log(`Test 7.2: ${e.message}`, 'fail');
+        allPass = false;
+      }
+
+      if (allPass) {
+        this.log('NIVEL 7: ✅ PASS', 'pass');
+      } else {
+        this.log('NIVEL 7: ❌ FAIL', 'fail');
+      }
+      return allPass;
+    } catch (e) {
+      this.log(`NIVEL 7 ERROR: ${e.message}`, 'error');
+      return false;
+    }
   },
 
   async runLevel(n) {
@@ -369,11 +653,15 @@ window.QATestRunner = {
     const levelMap = {
       1: this.runLevel1.bind(this),
       2: this.runLevel2.bind(this),
-      3: this.runLevel3.bind(this)
+      3: this.runLevel3.bind(this),
+      4: this.runLevel4.bind(this),
+      5: this.runLevel5.bind(this),
+      6: this.runLevel6.bind(this),
+      7: this.runLevel7.bind(this)
     };
 
     if (!levelMap[n]) {
-      console.log(`❌ Nivel ${n} no existe (1-3)`);
+      console.log(`❌ Nivel ${n} no existe (1-7)`);
       return false;
     }
 
@@ -387,4 +675,4 @@ window.QATestRunner = {
 };
 
 // Auto-exportar para uso global
-console.log('✅ QA Test Runner cargado. Usa: window.QATestRunner.runAll() o .runLevel(1)');
+console.log('✅ QA Test Runner cargado. Usa: window.QATestRunner.runAll() o .runLevel(1-7)');
