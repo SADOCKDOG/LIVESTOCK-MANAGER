@@ -9,14 +9,17 @@ const App = {
   _pesadaBatch: null,
   routes: {
     "/": "renderDashboard",
+    "/ganaderia": "renderGanaderia",
     "/rebanos": "renderRebanos",
     "/rebano": "renderDetalleRebano",
-    "/produccion": "renderProduccion",
+    "/carne": "renderCarne",
+    "/hibrido": "renderHibrido",
     "/zonas": "renderZonas",
     "/zona": "renderDetalleZona",
     "/animales": "renderAnimales",
     "/animal": "renderDetalleAnimal",
     "/leche": "renderLeche",
+    "/explotacion": "renderExplotacion",
     "/gastos": "renderGastos",
     "/comercializacion": "renderComercializacion",
     "/albaran-leche": "renderDetalleLeche",
@@ -68,8 +71,14 @@ const App = {
             const hash = window.location.hash.slice(1) || '/';
             if (hash === '/' || hash === '') {
               App.renderDashboard();
-            } else if (hash.startsWith('/produccion')) {
-              App.renderProduccion();
+            } else if (hash.startsWith('/ganaderia')) {
+              App.renderGanaderia();
+            } else if (hash.startsWith('/carne')) {
+              App.renderCarne();
+            } else if (hash.startsWith('/hibrido')) {
+              App.renderHibrido();
+            } else if (hash.startsWith('/leche')) {
+              App.renderLeche();
             } else if (hash.startsWith('/gastos')) {
               App.renderGastos();
             } else if (hash.startsWith('/animales')) {
@@ -138,9 +147,12 @@ const App = {
    */
   _headerTitles: {
     '/': '',
+    '/ganaderia': 'Ganadería',
     '/rebanos': 'Rebaños',
     '/rebano': 'Ficha Rebaño',
-    '/produccion': 'Producción',
+    '/carne': 'Gestión Carne',
+    '/hibrido': 'Consola Híbrida',
+    '/explotacion': 'ExPro',
     '/zonas': 'Zonas',
     '/zona': 'Ficha Zona',
     '/animales': 'Animales',
@@ -333,6 +345,75 @@ const App = {
     if (matEl) matEl.textContent = '🚚 ' + (data.matriculaTransportista || '');
   },
 
+  async updateNavigationMenu() {
+    try {
+      const fincaId = await Fincas.getActiveId();
+      if (!fincaId) return;
+
+      const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
+
+      let tieneCarne = false;
+      let tieneLeche = false;
+      let tieneHibrido = false;
+
+      rebanos.forEach(r => {
+        const tipo = (r.tipo || '').toLowerCase();
+        if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
+        else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
+        else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
+      });
+
+      let modo = 'carne'; // Default
+      if (tieneHibrido || (tieneCarne && tieneLeche)) {
+        modo = 'hibrido';
+      } else if (tieneLeche) {
+        modo = 'leche';
+      } else if (tieneCarne) {
+        modo = 'carne';
+      }
+
+      // Limpiar Barra Inferior: Ocultar Animales y Rebaños para simplificar la interfaz a 3 botones principales
+      const navAnimales = document.getElementById('nav-animales');
+      if (navAnimales) navAnimales.style.display = 'none';
+      const navRebanos = document.getElementById('nav-rebanos');
+      if (navRebanos) navRebanos.style.display = 'none';
+
+      const navProduccion = document.getElementById('nav-produccion');
+      if (navProduccion) {
+        const labelEl = navProduccion.querySelector('.label');
+        const svgEl = navProduccion.querySelector('svg');
+        if (labelEl) labelEl.textContent = 'Ganadería';
+        navProduccion.setAttribute('href', '#/ganaderia');
+        if (svgEl) {
+          svgEl.innerHTML = `
+            <path d="M4 20h16"></path>
+            <path d="M6 20V8l6-4 6 4v12"></path>
+            <path d="M9 12h6"></path>
+          `;
+        }
+      }
+
+      // Visibilidad en el Bottom Sheet (#nav-more-sheet)
+      const sheetItems = document.querySelectorAll('#nav-more-sheet .more-sheet-item');
+      sheetItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href === '#/leche') {
+          // Ocultar si ya está como botón principal o si es solo carne o si es hibrido (ya que leche está dentro de hibrido)
+          if (modo === 'leche' || modo === 'carne' || modo === 'hibrido') {
+            item.style.display = 'none';
+          } else {
+            item.style.display = 'flex';
+          }
+        } else if (href === '#/zonas' || href === '#/comercializacion' || href === '#/gastos' || href === '#/cuaderno' || href === '#/documentos') {
+          // Ocultar duplicados que ahora están encapsulados dentro de los bloques de los módulos
+          item.style.display = 'none';
+        }
+      });
+    } catch (e) {
+      console.warn('[Navigation] Error en updateNavigationMenu:', e);
+    }
+  },
+
   _navigateBack() {
     if (window.history.length > 1) {
       window.history.back();
@@ -345,6 +426,8 @@ const App = {
     const hash = window.location.hash.slice(1) || "/";
     const [path, query] = hash.split("?");
     const params = new URLSearchParams(query);
+
+    await this.updateNavigationMenu();
 
     document.querySelectorAll(".nav-item").forEach((el) => {
       const href = el.getAttribute("href");
@@ -529,8 +612,9 @@ const App = {
 
         updateProgress(30, 'Preparando documento...');
         const sourceEl = overlay.querySelector(`#${contentId}`);
+        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
         const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; padding:30px;';
+        tempContainer.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; z-index:9990; background:#fff; color:#000; padding:30px;`;
         tempContainer.innerHTML = sourceEl.innerHTML;
         document.body.appendChild(tempContainer);
 
@@ -542,6 +626,8 @@ const App = {
             scale: 2,
             useCORS: true,
             width: 800,
+            scrollX: 0,
+            scrollY: currentScroll,
             height: tempContainer.scrollHeight,
             windowHeight: tempContainer.scrollHeight
           },
@@ -585,13 +671,13 @@ const App = {
     if (window.AlbaranLecheWizard) { return window.AlbaranLecheWizard.open(); }
     App.toastError("Error: AlbaranLecheWizard no disponible");
   },
-  async _abrirFormularioGasto() {
-    if (window.GastoWizard) { return window.GastoWizard.open(); }
+  async _abrirFormularioGasto(options = {}) {
+    if (window.GastoWizard) { return window.GastoWizard.open(options); }
     App.toastError("Error: GastoWizard no disponible");
   },
-  async _abrirAsistenteProduccion(tipo) {
+  async _abrirAsistenteProduccion(tipo, options = {}) {
     if (window.ProduccionUI && typeof ProduccionUI.iniciarAsistente === 'function') {
-      await ProduccionUI.iniciarAsistente(tipo);
+      await ProduccionUI.iniciarAsistente(tipo, options);
     } else {
       this.toastError("Error: Módulo de producción no disponible");
     }
@@ -740,17 +826,58 @@ const App = {
             : 'Permiso de cámara no concedido');
           return;
         }
+
+        // Ocultar la UI del WebView para que la cámara del scanner nativo sea visible por detrás
+        const mainApp = document.getElementById('app-content');
+        const headerApp = document.querySelector('header');
+        if (mainApp) mainApp.style.visibility = 'hidden';
+        if (headerApp) headerApp.style.visibility = 'hidden';
+        document.body.classList.add('scanner-active');
+
         await BarcodeScanner.prepare();
         await BarcodeScanner.hideBackground();
-        App.toast('Enfoca el código del crotal...', 3000);
+
+        // Crear botón de cancelar flotante en el body
+        const cancelBtn = document.createElement('button');
+        cancelBtn.id = 'scanner-cancel-btn';
+        cancelBtn.textContent = '✕ Cancelar Escaneo';
+        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#ef4444; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
+
+        const cleanupScanner = async () => {
+          document.body.classList.remove('scanner-active');
+          if (mainApp) mainApp.style.visibility = 'visible';
+          if (headerApp) headerApp.style.visibility = 'visible';
+          const btn = document.getElementById('scanner-cancel-btn');
+          if (btn) btn.remove();
+          try { await BarcodeScanner.showBackground(); } catch (_) {}
+        };
+
+        cancelBtn.onclick = async () => {
+          console.log('[SCAN] Cancelando escaneo nativo...');
+          await BarcodeScanner.stopScan();
+          await cleanupScanner();
+          App.toast('Escaneo cancelado');
+        };
+        document.body.appendChild(cancelBtn);
+
+        App.toast('Enfoca el código de barras del crotal...', 4000);
         const result = await BarcodeScanner.startScan();
-        try { await BarcodeScanner.showBackground(); } catch (_) {}
+
+        await cleanupScanner();
+
         if (result.hasContent && result.content) {
           return this._procesarCrotalEscaneado(inputId, result.content.trim());
         }
-        App.toast('Escaneo cancelado');
         return;
       } catch (err) {
+        document.body.classList.remove('scanner-active');
+        const mainApp = document.getElementById('app-content');
+        const headerApp = document.querySelector('header');
+        if (mainApp) mainApp.style.visibility = 'visible';
+        if (headerApp) headerApp.style.visibility = 'visible';
+        const btn = document.getElementById('scanner-cancel-btn');
+        if (btn) btn.remove();
+
         try { await BarcodeScanner.showBackground(); } catch (_) {}
         console.error('[SCAN] Error nativo:', err);
         App.toast('Escáner nativo falló, usando cámara web...', 2000);
@@ -1195,6 +1322,10 @@ const App = {
     if (window.DashboardView) { await DashboardView.render(); }
   },
 
+  async renderGanaderia() {
+    if (window.GanaderiaView) { await GanaderiaView.render(); }
+  },
+
   async renderRebanos() {
     if (window.RebanosView) { await RebanosView.render(); }
   },
@@ -1203,8 +1334,12 @@ const App = {
     if (window.RebanosView) { await RebanosView.renderDetalle(params); }
   },
 
-  async renderProduccion() {
-    if (window.ProduccionView) { await ProduccionView.render(); }
+  async renderCarne() {
+    if (window.CarneView) { await CarneView.render(); }
+  },
+
+  async renderHibrido() {
+    if (window.HibridoView) { await HibridoView.render(); }
   },
 
   async renderZonas() {
@@ -1225,6 +1360,10 @@ const App = {
 
   async renderLeche() {
     if (window.LecheView) { await LecheView.render(); }
+  },
+
+  async renderExplotacion() {
+    if (window.ExplotacionView) { await ExplotacionView.render(); }
   },
 
   async renderGastos() {

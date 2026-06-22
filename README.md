@@ -320,7 +320,7 @@ Generación de libros Excel con pestañas independientes por módulo (Animales, 
 Datos sensibles de producción cifrados con AES-GCM (Web Crypto API) con fallback a localStorage cuando Capacitor Filesystem no está disponible.
 
 ### 🛡️ Service Worker
-Cache-first strategy con nombre `corcho-v6.5.9` para carga instantánea en visitas repetidas.
+Cache-first strategy con nombre `corcho-v6.5.30` para carga instantánea en visitas repetidas.
 
 ---
 
@@ -375,6 +375,25 @@ C:/livestock-manager/
 | NFC/RFID | @capacitor/filesystem |
 | AI/Agent | @earendil-works/pi-agent-core |
 
+### Arquitectura funcional (Ganadería vs Explotación)
+
+| Bloque | Rol operativo |
+|--------|---------------|
+| **Ganadería** | Consulta estructural: censo, lotes/rebaños, zonas, contexto de finca |
+| **Explotación** | Punto principal de **registro** por modo (🥩 carne, 🥛 leche, 🔄 híbrido) |
+| **Comercialización/Venta** | Recepción del flujo tras cierre operativo en Explotación |
+
+En `Explotación` se centralizan wizards y controles de:
+- Producción (pesos, ordeños, tanque)
+- Alimentación/silos (cargas y consumos)
+- Sanitarios por modo
+- Gastos de producción (alimentación, energía, fitosanitarios)
+- Cumplimiento normativo fitosanitario (registro producto, dosis, plazo de seguridad, aptitud comercial)
+
+Además, se persiste trazabilidad técnica por registro con metadatos:
+- `origen_modulo` (ej. `explotacion`)
+- `modo_explotacion` (`carne`, `leche`, `hibrido`)
+
 ---
 
 ## 🔧 Mantenimiento y Build
@@ -394,10 +413,11 @@ npm run cap:open
 ```
 
 ### Flujo de desarrollo
-1. Los archivos fuente están en la **raíz** (`js/`, `css/`, etc.)
-2. `npm run build` copia de raíz → `www/`
-3. `npx cap sync android` copia de `www/` → `android/app/src/main/assets/public/`
-4. Android Studio compila desde `android/app/`
+1. Editar y consolidar cambios de implementación.
+2. Ejecutar `npm run build`.
+3. Ejecutar `.\sync-mirrors.ps1` para mantener espejos idénticos (raíz, `www`, Android assets).
+4. `npx cap sync android` cuando se prepara entrega móvil.
+5. Android Studio compila desde `android/app/`.
 
 ---
 

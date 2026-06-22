@@ -100,6 +100,8 @@ const Pesajes = {
           matricula: data.matricula || "",
           documento_ref: data.documento_ref || "",
           motivo_tarea: data.motivo_tarea || "control", // 'expedicion', 'control', 'produccion_leche', 'control_lechero', 'alimentacion'
+          origen_modulo: data.origen_modulo || window.__registroContext?.origen_modulo || null,
+          modo_explotacion: data.modo_explotacion || window.__registroContext?.modo_explotacion || null,
 
           creadoEn: new Date().toISOString(),
         };

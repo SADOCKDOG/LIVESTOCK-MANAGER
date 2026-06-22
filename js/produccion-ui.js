@@ -9,14 +9,22 @@ const ProduccionUI = {
    * @param {string} [operacionPreseleccionada] - Si se proporciona ('carne'|'leche'|'venta_masiva'|'gasto'),
    *   salta la selección de tipo y abre directamente el flujo correspondiente.
    */
-  iniciarAsistente(operacionPreseleccionada) {
+  iniciarAsistente(operacionPreseleccionada, options = {}) {
+    window.__registroContext = {
+      ...(window.__registroContext || {}),
+      origen_modulo: options.origen_modulo || null,
+      modo_explotacion: options.modo_explotacion || null
+    };
     // Atajos directos: estos tipos abren su propio formulario/wizard dedicado
     if (operacionPreseleccionada === 'venta_masiva') {
       if (window.App) window.App._abrirWizardVentaMasiva();
       return;
     }
     if (operacionPreseleccionada === 'gasto') {
-      if (window.App) window.App._abrirFormularioGasto();
+      if (window.App) window.App._abrirFormularioGasto({
+        origenModulo: options.origen_modulo || 'general',
+        modoExplotacion: options.modo_explotacion || null
+      });
       return;
     }
 
@@ -59,7 +67,10 @@ const ProduccionUI = {
             return false;
           }
           if (data.operacion === 'gasto') {
-            App._abrirFormularioGasto();
+            App._abrirFormularioGasto({
+              origenModulo: options.origen_modulo || 'general',
+              modoExplotacion: options.modo_explotacion || null
+            });
             document.getElementById('wizard-produccion-maestro').remove();
             return false;
           }

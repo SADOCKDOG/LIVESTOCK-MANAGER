@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corcho-v6.5.10';
+const CACHE_NAME = 'corcho-v6.5.30';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,12 @@ const ASSETS = [
   './js/seed-zonas.js',
   './js/app.js',
   './js/db.js',
+  './js/views/carne-view.js',
+  './js/views/hibrido-view.js',
+  './js/views/leche-view.js',
+  './js/views/ganaderia-view.js',
+  './js/views/explotacion-view.js',
+  './js/views/helpers/modo-contexto.js',
   './js/fincas.js',
   './js/idb-local.js',
   './js/pesadas.js',

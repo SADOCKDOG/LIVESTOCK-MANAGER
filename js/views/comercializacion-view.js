@@ -39,8 +39,21 @@ const ComercializacionView = {
     const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
     const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
     const gastoTotal = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
+    let pipelineInfo = null;
+    try {
+      pipelineInfo = JSON.parse(sessionStorage.getItem('lm.explotacion_pipeline') || 'null');
+    } catch (_) {
+      pipelineInfo = null;
+    }
 
     main.innerHTML = `
+      ${pipelineInfo ? `
+      <div class="card p-12 mb-12 border-222" style="border-left:4px solid #10b981;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider">Origen de flujo</div>
+        <div class="text-sm text-white mt-4">Registro finalizado en <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
+        <div class="text-xs text-aaa mt-4">Fitosanitarios con pendiente/no aptos: <strong style="color:${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? '#ef4444' : '#10b981'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong> / ${pipelineInfo.cumplimiento?.totalFitosanitarios || 0}</div>
+      </div>` : ''}
+
       <!-- KPIs globales -->
       <div class="grid grid-cols-3 gap-6 mb-14">
         <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">🥩 CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
@@ -126,53 +139,65 @@ const ComercializacionView = {
   },
 
   _renderSeccion(content, opts) {
-    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler, threeColKpis } = opts;
+    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card" style="border-left:4px solid ${color}; padding:10px 12px; margin-bottom:5px; cursor:pointer; background:rgba(0,0,0,0.3);"
-             onclick="${r.onclick || ''}">
+        <div class="card card-animal" onclick="${r.onclick || ''}" style="border-left:4px solid ${color};">
           <div class="flex justify-between items-start">
-            <div style="flex:1; min-width:0;">
-              <div class="font-extrabold truncate" style="font-size:0.88rem;">${r.title}</div>
-              <div class="text-xs text-gray mt-4">📅 ${r.date}${r.zone ? ' | 📍 ' + r.zone : ''}${r.meta || ''}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-6">
+                <span class="text-xl">${icon}</span>
+                <h3 class="section-h3 m-0 text-ellipsis">${r.title}</h3>
+              </div>
+              <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                <span>📅 ${r.date}</span>
+                ${r.zone ? `<span>·</span><span>📍 ${r.zone}</span>` : ''}
+                ${r.meta ? `<span>·</span><span>📋 ${r.meta}</span>` : ''}
+              </div>
+              ${r.badges ? `<div class="flex flex-wrap gap-6 mt-6">${r.badges}</div>` : ''}
             </div>
             <div class="text-right flex-shrink-0 ml-8">
-              <div class="font-black" style="font-size:1rem; color:${color};">${r.value}</div>
-              ${r.subvalue ? `<div class="kpi-sub">${r.subvalue}</div>` : ''}
+              <span class="badge badge-sm" style="background:${color}20;color:${color};border:1px solid ${color}40;display:block;margin-bottom:4px;">${r.value}</span>
+              ${r.subvalue ? `<div class="kpi-sub" style="font-size:0.75rem; color:#888;">${r.subvalue}</div>` : ''}
+              <span class="text-xs text-777 mt-4" style="display:block;">Ver ➔</span>
             </div>
           </div>
-          ${r.badges ? `<div class="flex flex-wrap gap-6 mt-6">${r.badges}</div>` : ''}
         </div>`).join('')
-      : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555" style="font-size:0.78rem;">📭 ${emptyMsg}</span></div>`;
+      : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card report-section" style="border-top:3px solid ${color}; padding:16px; margin-bottom:14px;">
-        <div class="flex items-center gap-12 mb-12">
-          <span class="text-2xl">${icon}</span>
-          <div>
-            <div class="font-black text-lg text-white">${title}</div>
-            ${subtitle ? `<div class="text-xs text-gray">${subtitle}</div>` : ''}
+      <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span style="font-size:1.6rem;">${icon}</span>
+            <div>
+              <div class="text-white font-900" style="font-size:1.05rem;">${title}</div>
+              ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
+            </div>
           </div>
-        </div>
-        ${kpis ? `<div style="display:grid; ${threeColKpis ? 'grid-template-columns:1fr 1fr 1fr' : 'grid-template-columns:1fr 1fr'}; gap:8px; margin-bottom:12px;">
-          ${kpis.map(k => `
-            <div class="bg-dark" style="padding:10px 8px; border-radius:8px; border-left:3px solid ${color};">
-              <small class="text-gray uppercase font-bold tracking-wide text-tiny">${k.label}</small>
-              <div class="font-black text-white" style="font-size:1.1rem;">${k.value}</div>
-            </div>`).join('')}
-        </div>` : ''}
-        <div class="text-center mb-12">
-          <button class="btn btn-primary btn-sm" onclick="${registrarHandler}"
-            style="background:linear-gradient(135deg,${color},${colorDark}); box-shadow:none;">
-            ➕ ${registrarLabel}
+          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
+            ➕ Nuevo
           </button>
         </div>
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 border-bottom-222" style="padding-bottom:5px;">
+
+        ${kpis ? `
+        <div class="flex flex-wrap gap-4 mb-14">
+          ${kpis.map((k, idx) => {
+            const badgesCls = ['badge-gold', 'badge-blue', 'badge-green', 'badge-purple', 'badge-red'];
+            const cls = badgesCls[idx % badgesCls.length];
+            return `<span class="badge badge-sm ${cls}">${k.label}: ${k.value}</span>`;
+          }).join('')}
+        </div>` : ''}
+
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
           📋 ${listName}
         </div>
-        ${recordsHtml}
-      </div>`;
+        <div class="grid gap-10">
+          ${recordsHtml}
+        </div>
+      </div>
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">➕</button>`;
   },
 
   // ===================== TAB CARNE =====================
@@ -376,7 +401,10 @@ const ComercializacionView = {
           <div><label>Gérmenes (UFC/mL)</label><input type="number" id="le-ger" value="${e.laboratorio?.germenes || 0}" class="premium-input"></div>
         </div>
         <div class="mt-20"><label>Control de Antibióticos</label><select id="le-ant" class="premium-input"><option value="false" ${!e.antibioticos ? "selected" : ""}>NEGATIVO (Apto)</option><option value="true" ${e.antibioticos ? "selected" : ""}>POSITIVO (Alerta Crítica)</option></select></div>
-        <button class="btn btn-primary" onclick="ComercializacionView._guardarEdicionLeche(${id})" style="margin-top:25px; background:#fbbf24; color:#000;">ACTUALIZAR RESULTADOS</button>
+        <div class="flex justify-end gap-10 mt-20">
+          <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=leche'">✕ Cancelar</button>
+          <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionLeche(${id})">✔ Guardar</button>
+        </div>
       </div>`;
   },
 
@@ -390,9 +418,12 @@ const ComercializacionView = {
       <div class="card" style="border-top:4px solid #3b82f6;">
         <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
         <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
-        <div class="flex gap-10" style="margin-top:25px;">
-          <button class="btn btn-primary" onclick="ComercializacionView._guardarEdicionGasto(${id})" style="flex:2; background:#3b82f6;">💾 GUARDAR</button>
-          <button class="btn btn-secondary" onclick="ComercializacionView._eliminarGasto(${id})" style="flex:1; background:#450a0a; color:white;">🗑️ BORRAR</button>
+        <div class="flex justify-between items-center mt-20">
+          <button class="btn btn-danger" onclick="ComercializacionView._eliminarGasto(${id})">🗑️ Eliminar</button>
+          <div class="flex gap-10">
+            <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=gastos'">✕ Cancelar</button>
+            <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionGasto(${id})">✔ Guardar</button>
+          </div>
         </div>
       </div>`;
   },
