@@ -119,11 +119,18 @@
         </svg>
         <span class="label">Rebaños</span>
       </a>
-      <a href="#/produccion" class="nav-item" id="nav-produccion">
+      <a href="#/ganaderia" class="nav-item" id="nav-produccion">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 3h18v18H3zM9 9h6v6H9zM3 15h6m6 0h6M15 3v6m0 6v6M3 9h6m6 0h6M9 3v6m0 6v6"></path>
         </svg>
-        <span class="label">Registros</span>
+        <span class="label">Ganadería</span>
+      </a>
+      <a href="#/explotacion" class="nav-item" id="nav-explotacion">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"></path>
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+        </svg>
+        <span class="label">ExPro</span>
       </a>
       <a class="nav-item" id="nav-more" onclick="App._toggleMenuNavegacion()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -317,8 +324,11 @@
     <script src="js/views/zonas-view.js"></script>
     <script src="js/views/rebanos-view.js"></script>
     <script src="js/views/animales-view.js"></script>
-    <script src="js/views/produccion-view.js"></script>
+    <script src="js/views/ganaderia-view.js"></script>
+    <script src="js/views/carne-view.js"></script>
+    <script src="js/views/hibrido-view.js"></script>
     <script src="js/views/leche-view.js"></script>
+    <script src="js/views/explotacion-view.js"></script>
     <script src="js/views/gastos-view.js"></script>
     <script src="js/views/comercializacion-view.js"></script>
     <script src="js/views/informes-view.js"></script>
@@ -329,6 +339,7 @@
     <script src="js/views/ajustes-view.js"></script>
 
     <!-- Helpers de UI -->
+    <script src="js/views/helpers/modo-contexto.js"></script>
     <script src="js/views/helpers/calidad-leche.js"></script>
 
     <!-- 1º Inyectar el Motor de Reglas y Trazabilidad Oficial (Validaciones y Albaranes) -->

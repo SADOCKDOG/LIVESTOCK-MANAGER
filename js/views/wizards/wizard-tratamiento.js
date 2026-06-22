@@ -3,7 +3,7 @@
  * Extraído de app.js para modularización
  */
 window.WizardTratamiento = {
-  async registrar(rebanoId) {
+  async registrar(rebanoId, options = {}) {
     if (!window.CatalogoSanitario) {
       App.toastError("Catálogo Sanitario no cargado.");
       return;
@@ -168,14 +168,20 @@ window.WizardTratamiento = {
         fecha: new Date().toISOString().split("T")[0],
         tiempo_espera_carne_dias: 0,
         tiempo_espera_leche_dias: 0,
-        prohibidoLeche: false
+        prohibidoLeche: false,
+        origen_modulo: options.origen_modulo || null,
+        modo_explotacion: options.modo_explotacion || null
       },
       steps: wizardSteps,
       onComplete: async (finalData) => {
         try {
           await window.Sanitarios.save(finalData);
           App.toast("Tratamiento registrado correctamente.");
-          App.renderDetalleRebano(new URLSearchParams(`id=${rebanoId}`));
+          if (options.returnTo === 'explotacion') {
+            await ExplotacionView.render();
+          } else {
+            App.renderDetalleRebano(new URLSearchParams(`id=${rebanoId}`));
+          }
         } catch (e) {
           App.toastError(e.message);
         }

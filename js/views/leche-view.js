@@ -1,14 +1,12 @@
 /**
- * Livestock Manager - LecheView v2.0.0
- * Vista de Control Lechero con tabs: Todas / Producción / Analíticas / Liquidaciones / MOFA
- * Reutiliza ComunidadesService y CalidadLecheHelper.
+ * Livestock Manager - LecheView v3.0.0
+ * Vista del Módulo de Leche con las 4 pestañas modulares de gestión unificada
  */
 
 const LecheView = {
-  _currentTab: 'todas',
+  _currentTab: 'patrimonio',
   _cachedData: null,
 
-  /** Formatea fecha con seguridad (evita "Invalid Date") */
   _fmtFecha(dateStr) {
     if (!dateStr) return '-';
     try {
@@ -27,116 +25,136 @@ const LecheView = {
     this._inyectarEstilos();
 
     const fincaId = await Fincas.getActiveId();
-    const entregas = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []);
     const finca = await Fincas.getActive();
+
+    // Cargar datos
+    const [rebanos, animales, entregas, eventos, todosSanitarios, todosGastos] = await Promise.all([
+      window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
+      window.db.getAll('animales').catch(() => []),
+      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
+      window.db.getAll('sanitarios_ganado').catch(() => []),
+      window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => [])
+    ]);
 
     entregas.sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0));
 
-    // KPIs globales
+    // Filtrar rebanos lecheros
+    const rebanosLeche = rebanos.filter(r => 
+      r.tipo.toLowerCase().includes('leche') || 
+      r.tipo.toLowerCase().includes('láct') || 
+      r.tipo.toLowerCase().includes('mixt') || 
+      r.tipo.toLowerCase().includes('híbr') || 
+      r.tipo.toLowerCase().includes('doble')
+    );
+    const rebanosLecheIds = rebanosLeche.map(r => r.id);
+
+    // Filtrar animales lecheros
+    const animalesLeche = animales.filter(a => rebanosLecheIds.includes(a.rebanoId));
+
+    // Filtrar controles diarios individuales/lote
+    const controlesDiarios = eventos.filter(e => 
+      (e.unidad === 'L' || e.unidad === 'Litros') &&
+      (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero') &&
+      (rebanosLecheIds.includes(e.rebanoId) || e.snap_tipo?.toLowerCase()?.includes('leche') || e.snap_tipo?.toLowerCase()?.includes('láct') || e.snap_tipo?.toLowerCase()?.includes('mixt'))
+    );
+    controlesDiarios.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+    // Filtrar tratamientos de rebaños lecheros
+    const sanitariosLeche = todosSanitarios.filter(s => rebanosLecheIds.includes(s.rebanoId));
+    sanitariosLeche.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    // Calcular periodos de supresión de leche activos
+    const hoy = new Date();
+    const tratamientosSupresionLeche = [];
+    sanitariosLeche.forEach(s => {
+      const fechaApli = new Date(s.fecha);
+      const dLeche = s.tiempo_espera_leche_dias || 0;
+      if (dLeche > 0 || s.prohibidoLeche) {
+        const fechaFin = new Date(fechaApli.getTime() + (s.prohibidoLeche ? 999 * 24 : dLeche * 24) * 60 * 60 * 1000);
+        if (fechaFin > hoy) {
+          const diasRestantes = s.prohibidoLeche ? 'INDEFINIDO' : Math.ceil((fechaFin - hoy) / (24 * 60 * 60 * 1000));
+          tratamientosSupresionLeche.push({
+            ...s,
+            diasRestantes,
+            fechaFin: s.prohibidoLeche ? 'PROHIBIDO LECHE' : fechaFin.toISOString().split('T')[0]
+          });
+        }
+      }
+    });
+
+    // KPIs de entregas
     const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
     const numEntregas = entregas.length;
-    const precioMedio = numEntregas > 0 ? entregas.reduce((s, e) => s + (e.precioBase || 0), 0) / numEntregas : 0;
     const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
     const importeTotal = entregas.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
     const alertas = entregas.filter(e => e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true).length;
-
-    main.innerHTML = `
-      <!-- KPIs globales -->
-      <div class="grid grid-cols-4 gap-6 mb-14">
-        <div class="info-box-center" style="border-left:3px solid #fbbf24;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div></div>
-        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">ENTREGAS</small><div class="inf-val-lg text-blue">${numEntregas}</div></div>
-        <div class="info-box-center" style="border-left:3px solid ${mofaTotal >= 0 ? '#10b981' : '#ef4444'};"><small class="s-lbl">MOFA</small><div class="inf-val-lg" style="color:${mofaTotal >= 0 ? '#10b981' : '#ef4444'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div></div>
-        <div class="info-box-center" style="border-left:3px solid ${alertas > 0 ? '#ef4444' : '#10b981'};"><small class="s-lbl">ALERTAS</small><div class="inf-val-lg" style="color:${alertas > 0 ? '#ef4444' : '#10b981'}">${alertas}</div></div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="mb-14">
-        <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          <div class="leche-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
-            <button class="leche-tab active" data-tab="todas" onclick="LecheView._cambiarTab('todas')">🥛 Todas</button>
-            <button class="leche-tab" data-tab="produccion" onclick="LecheView._cambiarTab('produccion')">📊 Producción</button>
-            <button class="leche-tab" data-tab="analiticas" onclick="LecheView._cambiarTab('analiticas')">🔬 Analíticas</button>
-            <button class="leche-tab" data-tab="liquidaciones" onclick="LecheView._cambiarTab('liquidaciones')">💰 Liquidaciones</button>
-            <button class="leche-tab" data-tab="mofa" onclick="LecheView._cambiarTab('mofa')">📈 MOFA</button>
-          </div>
-        </div>
-      </div>
-      <div id="leche-content"><div class="loader">Cargando datos lácteos...</div></div>`;
-
-    // KPIs agregados
-    const mediaLitros = numEntregas > 0 ? litrosTotal / numEntregas : 0;
-    const precioBaseMedio = numEntregas > 0 ? entregas.reduce((s, e) => s + (e.precioBase || 0), 0) / numEntregas : 0;
-    const precioFinalMedio = numEntregas > 0 ? entregas.reduce((s, e) => s + (e.precio_final_unitario || e.precioBase || 0), 0) / numEntregas : 0;
-    const costeAlimTotal = entregas.reduce((s, e) => s + (e.coste_alimentacion_periodo || 0), 0);
+    
+    // Controles diarios KPIs
+    const totalLitrosControles = controlesDiarios.reduce((s, c) => s + (c.valor_neto || 0), 0);
+    const numControles = controlesDiarios.length;
 
     // Analíticas agregadas
     const conLab = entregas.filter(e => e.laboratorio);
     const grasaMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.grasa || 0), 0) / conLab.length : 0;
     const protMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.proteina || 0), 0) / conLab.length : 0;
-    const esTotal = conLab.reduce((s, e) => {
-      const es = e.laboratorio.extracto_seco || (e.laboratorio.grasa || 0) + (e.laboratorio.proteina || 0);
-      return s + es;
-    }, 0);
-    const esMedia = conLab.length > 0 ? esTotal / conLab.length : 0;
-    const somaticasMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.somaticas || 0), 0) / conLab.length : 0;
-    const germenesMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.germenes || 0), 0) / conLab.length : 0;
+    
+    // Costes alimentación leche
+    const gastosAlim = todosGastos.filter(g => 
+      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+      (g.categoria || '').toLowerCase() === 'alimentación' ||
+      (g.concepto || '').toLowerCase().includes('pienso') ||
+      (g.concepto || '').toLowerCase().includes('forraje') ||
+      (g.concepto || '').toLowerCase().includes('pasto')
+    );
+    const totalGastosAlim = gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
 
-    // Alertas y rechazos
-    const alertasCount = entregas.filter(e => e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true).length;
-    const pendientesCount = entregas.filter(e => !e.estadoAnalitica || e.estadoAnalitica === 'Pendiente').length;
-    const validadasCount = entregas.filter(e => e.estadoAnalitica === 'Validado').length;
-
-    // MOFA ratio
-    const mofaRatio = importeTotal > 0 ? (mofaTotal / importeTotal) * 100 : 0;
+    main.innerHTML = `
+      <div class="mb-14">
+        <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
+          <div class="leche-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
+            <button class="leche-tab active" data-tab="patrimonio" onclick="LecheView._cambiarTab('patrimonio')">🏰 Patrimonio y Ganadería</button>
+            <button class="leche-tab" data-tab="comercializacion" onclick="LecheView._cambiarTab('comercializacion')">🚚 Logística y Transporte, Comercialización Ventas</button>
+            <button class="leche-tab" data-tab="legislacion" onclick="LecheView._cambiarTab('legislacion')">🛡️ Registros Legislación, Cumplimiento Sanitario</button>
+          </div>
+        </div>
+      </div>
+      <div id="leche-content"><div class="loader">Cargando datos lácteos...</div></div>`;
 
     this._cachedData = {
-      entregas, finca,
+      fincaId,
+      siloEventos: eventos.filter(e => e.tipo_entidad === 'silo_pienso'),
+      entregas,
+      controlesDiarios,
+      finca,
+      rebanosLeche,
+      animalesLeche,
+      tratamientosSupresionLeche,
+      sanitariosLeche,
       kpis: {
-        todas: [
-          { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
-          { label: 'Entregas', value: numEntregas },
-          { label: 'Media/Entrega', value: this._fmt(Math.round(mediaLitros)) + ' L' },
-          { label: 'Validadas', value: validadasCount },
-          { label: 'Alertas', value: alertasCount, color: alertasCount > 0 ? '#ef4444' : '#10b981' },
-          { label: 'Pendientes', value: pendientesCount },
+        patrimonio: [
+          { label: 'Censo Leche', value: animalesLeche.length + ' cabezas' },
+          { label: 'Lotes Lecheros', value: rebanosLeche.length },
+          { label: 'Raza Principal', value: animalesLeche.length > 0 ? (animalesLeche[0].raza || 'Assaf') : 'Lacaune' }
         ],
-        produccion: [
-          { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
-          { label: 'Entregas', value: numEntregas },
-          { label: 'Media/Entrega', value: this._fmt(Math.round(mediaLitros)) + ' L' },
-          { label: 'Precio Medio €/L', value: precioBaseMedio.toFixed(3) + ' €' },
-          { label: 'Importe Total', value: this._fmt(Math.round(importeTotal)) + ' €' },
-          { label: 'Precio Final Medio', value: precioFinalMedio.toFixed(3) + ' €' },
-        ],
-        analiticas: [
+        explotacion: [
+          { label: 'Litros Control', value: totalLitrosControles.toLocaleString() + ' L' },
           { label: 'Grasa Media', value: grasaMedia.toFixed(2) + '%' },
-          { label: 'Proteína Media', value: protMedia.toFixed(2) + '%' },
-          { label: 'Extracto Seco Medio', value: esMedia.toFixed(2) + '%' },
-          { label: 'Cél. Somáticas Medias', value: this._fmt(Math.round(somaticasMedia)) + '/mL' },
-          { label: 'UFC Medias', value: this._fmt(Math.round(germenesMedia)) + '/mL' },
-          { label: 'Con Laboratorio', value: conLab.length },
+          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: '#ef4444' }
         ],
-        liquidaciones: [
-          { label: 'Precio Base Medio', value: precioBaseMedio.toFixed(3) + ' €' },
-          { label: 'Precio Final Medio', value: precioFinalMedio.toFixed(3) + ' €' },
-          { label: 'Importe Total', value: this._fmt(Math.round(importeTotal)) + ' €' },
-          { label: 'Coste Alimentación', value: this._fmt(Math.round(costeAlimTotal)) + ' €' },
-          { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €', color: mofaTotal >= 0 ? '#10b981' : '#ef4444' },
-          { label: 'Ratio MOFA', value: mofaRatio.toFixed(1) + '%', color: mofaRatio >= 20 ? '#10b981' : '#f59e0b' },
-        ],
-        mofa: [
-          { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €', color: mofaTotal >= 0 ? '#10b981' : '#ef4444' },
-          { label: 'Coste Alimentación', value: this._fmt(Math.round(costeAlimTotal)) + ' €' },
-          { label: 'Ingresos Totales', value: this._fmt(Math.round(importeTotal)) + ' €' },
-          { label: 'MOFA/Entrega', value: numEntregas > 0 ? this._fmt(Math.round(mofaTotal / numEntregas)) + ' €' : '0 €' },
-          { label: 'Ratio MOFA', value: mofaRatio.toFixed(1) + '%', color: mofaRatio >= 20 ? '#10b981' : '#f59e0b' },
+        comercializacion: [
+          { label: 'Litros Entregados', value: litrosTotal.toLocaleString() + ' L', color: '#fbbf24' },
           { label: 'Entregas', value: numEntregas },
+          { label: 'Facturación Leche', value: Math.round(importeTotal).toLocaleString() + ' €', color: '#10b981' }
         ],
+        legislacion: [
+          { label: 'Alertas Lácteas', value: alertas + tratamientosSupresionLeche.length, color: alertas + tratamientosSupresionLeche.length > 0 ? '#ef4444' : '#10b981' },
+          { label: 'Tratamientos Act.', value: sanitariosLeche.length }
+        ]
       }
     };
 
     this._renderTabActual();
-
   },
 
   _inyectarEstilos() {
@@ -154,6 +172,19 @@ const LecheView = {
       .leche-tab.active { background: #d97706; color: #fff; border-color: #d97706; box-shadow: 0 0 14px rgba(217,119,6,0.35); }
       .leche-tab:active { transform: scale(0.95); }
       #leche-content .report-section { max-width:100%; overflow:hidden; }
+      .leche-alerta-box {
+        background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444;
+        padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #fca5a5;
+        font-size: 0.8rem; line-height: 1.4;
+      }
+      .widget-link-btn {
+        background: #27272a; color: #fff; border: 1px solid #3f3f46;
+        padding: 10px 14px; border-radius: 8px; text-align: center;
+        font-size: 0.78rem; font-weight: bold; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: all 0.2s; text-decoration: none;
+      }
+      .widget-link-btn:active { transform: scale(0.95); background: #3f3f46; }
     `;
     document.head.appendChild(style);
   },
@@ -174,16 +205,12 @@ const LecheView = {
     if (!content) return;
 
     switch (this._currentTab) {
-      case 'todas': this._renderTodas(content, d); break;
-      case 'produccion': this._renderProduccion(content, d); break;
-      case 'analiticas': this._renderAnaliticas(content, d); break;
-      case 'liquidaciones': this._renderLiquidaciones(content, d); break;
-      case 'mofa': this._renderMOFA(content, d); break;
-      default: this._renderTodas(content, d);
+      case 'patrimonio': this._renderPatrimonio(content, d); break;
+      case 'comercializacion': this._renderComercializacion(content, d); break;
+      case 'legislacion': this._renderLegislacion(content, d); break;
+      default: this._renderPatrimonio(content, d);
     }
   },
-
-  // ========== HELPER: kpi grid genérico (3 columnas) ==========
 
   _kpiGrid(kpis, color) {
     if (!kpis || !kpis.length) return '';
@@ -196,284 +223,301 @@ const LecheView = {
     </div>`;
   },
 
-  // ========== TAB: TODAS ==========
+  _inyectarAlertaSupresion(d) {
+    if (d.tratamientosSupresionLeche.length === 0) return '';
+    return `
+      <div class="leche-alerta-box">
+        <strong>⚠️ CRÍTICO - SUPRESIÓN DE LECHE EN CURSO (ANTIBIÓTICOS/INHIBIDORES):</strong>
+        <ul style="margin:5px 0 0 15px; padding:0;">
+          ${d.tratamientosSupresionLeche.map(s => `
+            <li>Rebaño treated: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> de supresión para ordeño (Finaliza: ${s.fechaFin})</li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+  },
 
-  _renderTodas(content, d) {
+  // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
+  _renderPatrimonio(content, d) {
     const html = `
       <div class="card report-section leche-report-card border-top-3px border-top-3px-orange">
         <div class="leche-report-title">
-          <span class="leche-report-icon">🥛</span>
+          <span class="leche-report-icon">🏰</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Todas las Entregas</div>
-            <div class="leche-report-title-sub">${d.kpis.todas.length} indicadores</div>
+            <div class="leche-report-title-main">Patrimonio y Ganadería</div>
+            <div class="leche-report-title-sub">Gestión de censo y rebaños lácteos</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.todas, '#f59e0b')}
+        ${this._kpiGrid(d.kpis.patrimonio, '#d97706')}
+
+        <!-- Accesos directos táctiles -->
+        <div class="grid grid-cols-3 gap-8 mb-16">
+          <a href="#/animales" class="widget-link-btn">🐄 Animales</a>
+          <a href="#/rebanos" class="widget-link-btn">🐏 Rebaños</a>
+          <a href="#/zonas" class="widget-link-btn">📍 Zonas</a>
+        </div>
+
+        <div class="leche-list-header">
+          📋 Rebaños Lácteos Activos (${d.rebanosLeche.length})
+        </div>
+        <div class="grid gap-10">
+          ${d.rebanosLeche.length > 0
+            ? d.rebanosLeche.map(r => `
+                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid #d97706;">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-6">
+                        <span class="text-xl">🐏</span>
+                        <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
+                      </div>
+                      <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                        <span>Especie: ${r.especie}</span>
+                        <span>·</span>
+                        <span>Ubicación: ${r.zonaActual || 'Sin zona'}</span>
+                      </div>
+                    </div>
+                    <div class="text-right flex-shrink-0 ml-8">
+                      <span class="badge badge-sm badge-gold" style="display:block; margin-bottom:4px;">${r.cantidad_animales || 0} cabezas</span>
+                      <span class="text-xs text-777">Ficha ➔</span>
+                    </div>
+                  </div>
+                </div>`).join('')
+            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin lotes registrados.</span></div>`
+          }
+        </div>
+      </div>
+    `;
+    content.innerHTML = html;
+  },
+
+
+
+  // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
+  _renderComercializacion(content, d) {
+    const html = `
+      <div class="card report-section leche-report-card border-top-3px border-top-3px-green">
+        <div class="leche-report-title">
+          <span class="leche-report-icon">🚚</span>
+          <div class="leche-report-title-text">
+            <div class="leche-report-title-main">Logística y Transporte, Comercialización Ventas</div>
+            <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
+          </div>
+        </div>
+        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
+
         <div class="text-center mb-12">
-          <button class="btn btn-primary btn-sm leche-action-btn" style="--btn-start-color:#f59e0b; --btn-end-color:#b45309;" onclick="App._abrirWizardAlbaranLeche()">
-            ➕ Nueva Entrega
+          <button class="btn btn-create btn-sm" onclick="App._abrirWizardAlbaranLeche()">
+            ➕ Nueva Entrega (Cisterna)
           </button>
         </div>
+
+        <!-- Accesos directos comerciales -->
+        <div class="grid grid-cols-3 gap-8 mb-16">
+          <a href="#/compradores" class="widget-link-btn">👥 Compradores</a>
+          <a href="#/transportistas" class="widget-link-btn">🚛 Cisternas</a>
+          <a href="#/comercializacion" class="widget-link-btn">📄 Comercial</a>
+        </div>
+
         <div class="leche-list-header">
-          📋 Lista de Entregas (${d.entregas.length})
+          📋 Historial de Entregas a Cisterna
         </div>
         ${d.entregas.length > 0
-          ? d.entregas.slice(0, 50).map(e => this._cardEntrega(e)).join('')
-          : `<div class="empty-state"><div class="empty-state-icon">📭</div><p class="empty-state-text">Sin entregas registradas. Usa "Nueva Entrega" para añadir.</p></div>`
+          ? d.entregas.slice(0, 15).map(e => this._cardEntrega(e)).join('')
+          : `<div class="empty-state"><p class="empty-state-text">Sin entregas a cisterna.</p></div>`
         }
-      </div>`;
+      </div>
+    `;
+    content.innerHTML = html;
+  },
+
+  // ========== BLOQUE 4: REGISTROS, LEGISLACIÓN Y CUMPLIMIENTO SANITARIO ==========
+  _renderLegislacion(content, d) {
+    const html = `
+      ${this._inyectarAlertaSupresion(d)}
+      <div class="card report-section leche-report-card border-top-3px" style="border-top-color:#8b5cf6;">
+        <div class="leche-report-title">
+          <span class="leche-report-icon">🛡️</span>
+          <div class="leche-report-title-text">
+            <div class="leche-report-title-main">Registros Legislación, Cumplimiento Sanitario</div>
+            <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
+          </div>
+        </div>
+        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
+
+        <div class="text-center mb-12">
+          <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6; width:auto; display:inline-flex;" onclick="LecheView._abrirAsistenteTratamientoLeche()">
+            💉 Registrar Tratamiento
+          </button>
+        </div>
+
+        <!-- Accesos directos de legislación -->
+        <div class="grid grid-cols-2 gap-8 mb-16">
+          <a href="#/documentos" class="widget-link-btn">📄 Documentos</a>
+          <a href="#/cuaderno" class="widget-link-btn">🛡️ Cuaderno Oficial</a>
+        </div>
+
+        <div class="leche-list-header">
+          📋 Historial Sanitario Lácteo (${d.sanitariosLeche.length})
+        </div>
+        <div class="grid gap-10">
+          ${d.sanitariosLeche.length > 0
+            ? d.sanitariosLeche.slice(0, 15).map(s => {
+                const enSup = d.tratamientosSupresionLeche.some(ts => ts.id === s.id);
+                return `
+                  <div class="card card-animal" style="border-left:4px solid ${enSup ? '#ef4444' : '#8b5cf6'};">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-6">
+                          <span class="text-xl">💉</span>
+                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento}</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                          <span>📅 ${this._fmtFecha(s.fecha)}</span>
+                          <span>·</span>
+                          <span>Espera Leche: <strong>${s.tiempo_espera_leche_dias || 0} días</strong></span>
+                        </div>
+                      </div>
+                      <div class="text-right flex-shrink-0 ml-8">
+                        <span class="badge badge-sm" style="background:${enSup ? 'rgba(239,68,68,0.15)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}40;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                      </div>
+                    </div>
+                  </div>`;
+              }).join('')
+            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin tratamientos sanitarios registrados.</span></div>`
+          }
+        </div>
+      </div>
+    `;
     content.innerHTML = html;
   },
 
   _cardEntrega(e) {
     const esAlerta = e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true;
-    const lab = e.laboratorio || {};
-    const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toFixed(1) : '--');
-    const badges = window.CalidadLecheHelper ? window.CalidadLecheHelper.badgesCompletos(e) : '';
     const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
 
     return `
       <div class="leche-entrega-card" style="--entrega-border-color:${esAlerta ? '#ef4444' : semaforo.color};" onclick="location.hash='/albaran-leche?id=${e.id}'">
         <div class="leche-entrega-content">
           <div class="leche-entrega-left">
-            <div class="leche-entrega-vehicle">
-              🚛 ${e.matriculaCisterna || '—'}${e.comunidad_autonoma ? ' | ' + (e.comunidad_autonoma === 'andalucia' ? '🌿 Andalucía' : '🌿 Extremadura') : ''}
-            </div>
-            <div class="leche-entrega-date">
-              📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} | 🌡️ ${e.temperatura || '--'}°C${e.contrato_numero ? ' | 📄 ' + e.contrato_numero : ''}
-            </div>
-            ${badges ? `<div class="mt-2 flex gap-4 flex-wrap">${badges}</div>` : ''}
+            <div>📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${(e.cantidad || 0).toLocaleString()} L</div>
+            <div class="text-xs text-gray mt-2">Cisterna: ${e.matriculaCisterna || '—'}</div>
           </div>
-          <div class="leche-entrega-right">
-            <div class="leche-entrega-litros">${(e.cantidad || 0).toLocaleString()} L</div>
-            <div class="leche-entrega-precio">
-              ${e.precio_final_unitario ? (e.precio_final_unitario).toFixed(3) + ' €/L' : ''}
-              ${e.mofa ? '<br>📈 MOFA: ' + (e.mofa >= 0 ? '+' : '') + Math.round(e.mofa) + ' €' : ''}
-            </div>
-            <div class="leche-entrega-status-badge"
-                 style="background:${esAlerta ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'};
-                        color:${esAlerta ? '#ef4444' : '#10b981'};
-                        border:1px solid ${esAlerta ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'};">${e.estadoAnalitica || 'PENDIENTE'}</div>
+          <div class="text-right">
+            <span class="badge badge-sm" style="background:${esAlerta ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}; color:${esAlerta ? '#ef4444' : '#10b981'};">${e.estadoAnalitica || 'PENDIENTE'}</span>
           </div>
         </div>
       </div>`;
   },
 
-  // ========== TAB: PRODUCCIÓN ==========
+  // ========== EDITAR REGISTROS DE ORDEÑO ==========
+  async _abrirOpcionesControl(id) {
+    try {
+      const evento = await window.db.get('registro_eventos', id);
+      if (!evento) return;
 
-  _renderProduccion(content, d) {
-    const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-blue">
-        <div class="leche-report-title">
-          <span class="leche-report-icon">📊</span>
-          <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Indicadores de Producción</div>
-            <div class="leche-report-title-sub">Métricas agregadas de producción láctea</div>
-          </div>
-        </div>
-        ${this._kpiGrid(d.kpis.produccion, '#3b82f6')}
-        <div class="text-center mb-12">
-          <button class="btn btn-primary btn-sm leche-action-btn" style="--btn-start-color:#3b82f6; --btn-end-color:#1d4ed8;" onclick="App._abrirWizardAlbaranLeche()">
-            ➕ Nueva Entrega
-          </button>
-        </div>
-        <div class="leche-list-header">
-          📋 Últimas entregas
-        </div>
-        ${d.entregas.slice(0, 20).map(e => `
-          <div class="leche-entrega-card" style="--entrega-border-color:#3b82f6;" onclick="location.hash='/albaran-leche?id=${e.id}'">
-            <div class="leche-entrega-content">
-              <div class="leche-entrega-left">
-                <div>📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} — 🚛 ${e.matriculaCisterna || '—'}</div>
-              </div>
-              <div class="leche-entrega-right">
-                <div class="leche-entrega-litros text-blue">${(e.cantidad || 0).toLocaleString()} L</div>
-              </div>
-            </div>
-          </div>`).join('')}
-      </div>`;
-    content.innerHTML = html;
-  },
+      const overlay = document.createElement("div");
+      overlay.className = "wizard-full-screen";
+      overlay.style.justifyContent = "center";
+      overlay.style.alignItems = "center";
+      overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+      overlay.innerHTML = `
+          <div class="card p-25" style="max-width:420px; border-top:5px solid #3b82f6;">
+              <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
+              <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
-  // ========== TAB: ANALÍTICAS ==========
-
-  _renderAnaliticas(content, d) {
-    const umbrales = window.ComunidadesService ? window.ComunidadesService.CALIDAD_LECHE_OVINO_UMBRALES : null;
-    const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-purple">
-        <div class="leche-report-title">
-          <span class="leche-report-icon">🔬</span>
-          <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Resultados Analíticos</div>
-            <div class="leche-report-title-sub">Parámetros de calidad láctea y umbrales de referencia</div>
-          </div>
-        </div>
-        ${this._kpiGrid(d.kpis.analiticas, '#8b5cf6')}
-        ${umbrales ? `
-        <div class="info-box-sm mb-12">
-          <div class="text-xs text-gray font-bold uppercase mb-2">⚡ Umbrales de Calidad (Ovino Leche)</div>
-          <div class="grid grid-cols-2 gap-4 text-xs">
-            <span>🧈 Grasa: <strong class="text-white">≥${umbrales.grasa.min}%</strong></span>
-            <span>🥩 Proteína: <strong class="text-white">≥${umbrales.proteina.min}%</strong></span>
-            <span>📊 Extracto Seco: <strong class="text-white">≥${umbrales.extracto_seco.min}%</strong></span>
-            <span>🔬 Somáticas: <strong class="text-white">≤${(umbrales.somaticas.max / 1000).toFixed(0)}k/mL</strong></span>
-            <span>🦠 Bacterias: <strong class="text-white">≤${(umbrales.bacterias.max / 1000).toFixed(0)}k UFC/mL</strong></span>
-            <span>🌡️ Temperatura: <strong class="text-white">≤${umbrales.temperatura.max}°C</strong></span>
-          </div>
-        </div>` : ''}
-        <div class="leche-list-header">
-          📋 Analíticas por entrega
-        </div>
-        ${d.entregas.slice(0, 30).map(e => {
-          const lab = e.laboratorio || {};
-          const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toFixed(1) : '--');
-          const hasLab = lab.grasa != null || lab.proteina != null;
-          return `
-            <div class="leche-entrega-card-sm" style="--entrega-border-color-sm:${hasLab ? '#8b5cf6' : '#555'};"
-                 onclick="location.hash='/albaran-leche?id=${e.id}'">
-              <div class="leche-entrega-content-sm">
-                <div class="leche-entrega-left-sm">
-                  <div class="leche-entrega-left-main">
-                    📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${e.matriculaCisterna || '—'}
-                  </div>
-                  <div class="leche-entrega-left-detail">
-                    ${hasLab
-                      ? `🧈 ${lab.grasa || '--'}% · 🥩 ${lab.proteina || '--'}% · 📊 ${es}% · 🔬 ${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '--'} · 🦠 ${lab.germenes ? (lab.germenes / 1000).toFixed(0) + 'k' : '--'}`
-                      : '⏳ Sin analítica registrada'}
-                  </div>
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Litros (L)</label>
+                    <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
                 </div>
-                <div class="leche-entrega-right-sm">
-                  <div class="leche-analytic-status"
-                       style="background:${e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos ? 'rgba(239,68,68,0.15)' : e.estadoAnalitica === 'Validado' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)'};
-                              color:${e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos ? '#ef4444' : e.estadoAnalitica === 'Validado' ? '#10b981' : '#f59e0b'};">${e.estadoAnalitica || 'PENDIENTE'}</div>
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Fecha</label>
+                    <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
                 </div>
               </div>
-            </div>`;
-        }).join('')}
-      </div>`;
-    content.innerHTML = html;
-  },
 
-  // ========== TAB: LIQUIDACIONES ==========
-
-  _renderLiquidaciones(content, d) {
-    const preciosRef = window.ComunidadesService ? window.ComunidadesService.PRECIO_EXTRACTO_SECO_REF : null;
-    const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-green">
-        <div class="leche-report-title">
-          <span class="leche-report-icon">💰</span>
-          <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Liquidaciones y Precios</div>
-            <div class="leche-report-title-sub">Desglose económico de entregas de leche</div>
-          </div>
-        </div>
-        ${this._kpiGrid(d.kpis.liquidaciones, '#10b981')}
-        ${preciosRef ? `
-        <div class="info-box-sm mb-12">
-          <div class="text-xs text-gray font-bold uppercase mb-2">📋 PREG — Precios de Referencia</div>
-          <div class="grid grid-cols-2 gap-4 text-xs">
-            <span>Base: <strong class="text-white">${preciosRef.precio_base_referencia} €/L</strong></span>
-            <span>Punto Extracto Seco: <strong class="text-white">${preciosRef.precio_por_punto_extracto} €</strong></span>
-            <span>Prima Calidad: <strong class="text-white">+${preciosRef.prima_calidad_extra} €/L</strong></span>
-            <span>Tasa INLAC: <strong class="text-white">${preciosRef.tasa_INLAC_defecto} €/L</strong></span>
-          </div>
-        </div>` : ''}
-        <div class="leche-list-header">
-          📋 Detalle de liquidaciones
-        </div>
-        ${d.entregas.slice(0, 30).map(e => {
-          const pFinal = e.precio_final_unitario || e.precioBase || 0;
-          const iTotal = e.importe_total || (e.cantidad || 0) * (e.precioBase || 0);
-          return `
-            <div class="leche-entrega-card" style="--entrega-border-color:#10b981;" onclick="location.hash='/albaran-leche?id=${e.id}'">
-              <div class="leche-entrega-content">
-                <div class="leche-entrega-left">
-                  <div class="leche-entrega-vehicle">
-                    📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${(e.cantidad || 0).toLocaleString()} L
-                  </div>
-                </div>
-                <div class="leche-entrega-right">
-                  <div class="leche-entrega-litros">${(e.precioBase || 0).toFixed(3)} €/L</div>
-                  <div class="leche-entrega-precio">
-                    ${e.precio_extracto_seco ? ' · P.Ext.: ' + e.precio_extracto_seco + ' €' : ''}
-                    ${e.primas_penalizaciones ? ' · Ajuste: ' + (e.primas_penalizaciones >= 0 ? '+' : '') + e.primas_penalizaciones + ' €' : ''}
-                    · Final: ${pFinal.toFixed(3)} €/L
-                  </div>
-                  <div class="leche-entrega-status-badge">
-                    <div class="font-bold text-lg text-green">${Math.round(iTotal).toLocaleString()} €</div>
-                    <div class="text-xs text-gray">MOFA: ${e.mofa != null ? (e.mofa >= 0 ? '+' : '') + Math.round(e.mofa) + ' €' : 'N/D'}</div>
-                  </div>
-                </div>
+              <div class="wizard-input-group">
+                  <label class="wizard-label">Identificación (Crotal/Lote)</label>
+                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
               </div>
-            </div>`;
-        }).join('')}
-      </div>`;
-    content.innerHTML = html;
+
+              <div class="flex gap-10 mt-20">
+                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="flex:2;">💾 Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🗑️ Borrar</button>
+              </div>
+              <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+          </div>`;
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('#btn-save-reg').onclick = async () => {
+        const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
+        const fecha = overlay.querySelector('#edit-reg-fecha').value;
+        const ident = overlay.querySelector('#edit-reg-ident').value.trim();
+
+        if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
+
+        evento.valor_neto = val;
+        evento.fecha = fecha;
+        evento.snap_identificacion = ident;
+        evento.actualizadoEn = new Date().toISOString();
+
+        await window.db.put('registro_eventos', evento);
+        App.toast("Registro lácteo actualizado");
+        overlay.remove();
+        LecheView.render();
+      };
+
+      overlay.querySelector('#btn-del-reg').onclick = async () => {
+        if (!confirm("¿Eliminar este control de forma permanente?")) return;
+        await window.db.delete('registro_eventos', id);
+        App.toast("Registro lácteo eliminado");
+        overlay.remove();
+        LecheView.render();
+      };
+    } catch (e) {
+      App.toastError(e.message);
+    }
   },
 
-  // ========== TAB: MOFA ==========
-
-  _renderMOFA(content, d) {
-    const conMOFA = d.entregas.filter(e => e.mofa != null);
-    const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-red">
-        <div class="leche-report-title">
-          <span class="leche-report-icon">📈</span>
-          <div class="leche-report-title-text">
-            <div class="leche-report-title-main">MOFA — Margen sobre Coste de Alimentación</div>
-            <div class="leche-report-title-sub">Ingresos lácteos menos costes de alimentación del período</div>
-          </div>
+  async _abrirAsistenteTratamientoLeche() {
+    const d = this._cachedData;
+    if (!d || d.rebanosLeche.length === 0) {
+      App.toastError("No hay rebaños lecheros en esta finca para tratar.");
+      return;
+    }
+    
+    if (d.rebanosLeche.length === 1) {
+      await window.WizardTratamiento.registrar(d.rebanosLeche[0].id);
+      return;
+    }
+    
+    const overlay = document.createElement("div");
+    overlay.className = "wizard-full-screen";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+    overlay.innerHTML = `
+      <div class="card p-25" style="max-width:380px; border-top:5px solid #fbbf24;">
+        <h3 class="mt-0 text-white font-900">💉 Aplicar Tratamiento Lácteo</h3>
+        <label class="wizard-label mb-10">Selecciona el rebaño lechero a tratar:</label>
+        <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
+          ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
+        </select>
+        <div class="flex gap-10">
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ➔</button>
+          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
-        ${this._kpiGrid(d.kpis.mofa, '#ef4444')}
-
-        <div class="info-box mb-12">
-          <div class="text-xs text-gray font-bold uppercase mb-2">💡 ¿Qué es el MOFA?</div>
-          <div class="text-sm text-gray leading-normal">
-            El <strong class="text-white">MOFA</strong> (Margen sobre Coste de Alimentación) mide la rentabilidad de la actividad láctea
-            descontando el principal coste variable: la alimentación del rebaño.
-            Un MOFA positivo indica que los ingresos por leche cubren la alimentación.
-            <br><strong class="text-green">Objetivo: ≥20%</strong> sobre ingresos totales.
-          </div>
-        </div>
-
-        <div class="leche-list-header">
-          📋 MOFA por entrega ${conMOFA.length < d.entregas.length ? '(solo ' + conMOFA.length + ' de ' + d.entregas.length + ' con datos)' : ''}
-        </div>
-        ${conMOFA.length > 0
-          ? conMOFA.slice(0, 30).map(e => {
-              const ratio = e.importe_total > 0 ? (e.mofa / e.importe_total) * 100 : 0;
-              return `
-                <div class="leche-mofa-card" style="--mofa-border-color:${e.mofa >= 0 ? '#10b981' : '#ef4444'};"
-                     onclick="location.hash='/albaran-leche?id=${e.id}'">
-                  <div class="leche-mofa-content">
-                    <div class="leche-mofa-left">
-                      <div class="leche-mofa-left-main">
-                        📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${(e.cantidad || 0).toLocaleString()} L
-                      </div>
-                      <div class="leche-mofa-left-detail">
-                        💰 ${Math.round(e.importe_total || 0).toLocaleString()} € ingresos · 🍽️ ${Math.round(e.coste_alimentacion_periodo || 0).toLocaleString()} € coste alim.
-                      </div>
-                    </div>
-                    <div class="leche-mofa-right">
-                      <div class="leche-mofa-amount">
-                        ${e.mofa >= 0 ? '+' : ''}${Math.round(e.mofa).toLocaleString()} €
-                      </div>
-                      <div class="leche-mofa-ratio">
-                        ${ratio.toFixed(1)}%
-                      </div>
-                    </div>
-                  </div>
-                </div>`;
-            }).join('')
-          : `<div class="empty-state"><div class="empty-state-icon">📭</div><p class="empty-state-text">Sin datos MOFA. Usa el wizard de albarán lácteo con todos los pasos completados.</p></div>`
-        }
-      </div>`;
-    content.innerHTML = html;
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    overlay.querySelector('#btn-treat-next').onclick = async () => {
+      const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
+      overlay.remove();
+      await window.WizardTratamiento.registrar(rebId);
+      setTimeout(() => LecheView.render(), 1000);
+    };
   },
-
-  _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
-  }
 };
 
 window.LecheView = LecheView;
