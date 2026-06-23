@@ -8,7 +8,7 @@
     "url": "https://github.com/SADOCKDOG/LIVESTOCK-MANAGER.git"
   },
   "scripts": {
-    "build": "powershell -Command \"Copy-Item -Path index.html, css, js, icons, manifest.webmanifest, sw.js -Destination www -Recurse -Force\"",
+    "build": "powershell -NoProfile -Command \"if (-not (Test-Path www)) { New-Item -ItemType Directory -Path www | Out-Null }; Copy-Item -Path index.html, manifest.webmanifest, sw.js -Destination www -Force; foreach ($d in 'css','js','icons') { Copy-Item -Path $d -Destination www -Recurse -Force } \"",
     "cap:add": "npx cap add android",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:open": "npx cap open android"

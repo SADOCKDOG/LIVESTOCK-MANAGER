@@ -1,0 +1,695 @@
+/**
+ * Livestock Manager - SIGGAN QA Test Suite v1.0.0
+ *
+ * Pruebas automatizadas específicas de la adaptación al Sistema Integrado de
+ * Gestión Ganadera (SIGGAN, Junta de Andalucía) y BADIGEX (Extremadura):
+ *
+ *   1. Validación de formato REGA (RD 479/2004)
+ *   2. Catálogos normativos (campañas, vías, motivos, tipos de explotación)
+ *   3. Libro de Movimientos inter-explotación (guía de origen y sanidad)
+ *   4. Libro de Saneamientos (campañas ADSG, calificación sanitaria)
+ *   5. Libro de Tratamientos Veterinarios (vía, motivo, tiempos de espera)
+ *   6. Exportación oficial CSV/XML (REGA, SIA/PIGGAN)
+ *   7. Cuaderno Digital (renderizado de secciones SIGGAN)
+ *   8. Rendimiento de consultas con DB v10
+ *
+ * EJECUCIÓN: Pegar en la consola del navegador (DevTools) con la app abierta.
+ * Uso: await SigganQA.runAll();
+ *      await SigganQA.run("rega");
+ *      await SigganQA.cleanup();
+ */
+
+const SigganQA = {
+  _MARKER: 'SIGGAN-QA',
+  _results: [],
+
+  // ============================================================
+  // UTILIDADES
+  // ============================================================
+  _ts: () => new Date().toISOString().split('T')[1].split('.')[0],
+  _wait: (ms) => new Promise(r => setTimeout(r, ms)),
+
+  _log(status, module, detail, category = '') {
+    const icon = status === 'PASS' ? '✅' : status === 'FAIL' ? '❌' : status === 'WARN' ? '⚠️' : '⏳';
+    const cat = category ? ` [${category}]` : '';
+    console.log(`[${this._ts()}] ${icon} [${module}]${cat} ${detail}`);
+    this._results.push({ status, module, detail, category, time: this._ts() });
+  },
+
+  /** Aserción simple: registra PASS si cond es truthy, FAIL en caso contrario. */
+  _assert(cond, module, detail, category = '') {
+    this._log(cond ? 'PASS' : 'FAIL', module, detail, category);
+    return !!cond;
+  },
+
+  /**
+   * Ejecuta una función async esperando que LANCE una excepción.
+   * Silencia console.error durante la llamada (los errores son esperados).
+   */
+  async _expectThrow(fn, module, detail, category = 'VALIDACIÓN') {
+    const backup = console.error;
+    console.error = () => {};
+    let threw = false;
+    try {
+      await fn();
+    } catch (e) {
+      threw = true;
+    } finally {
+      console.error = backup;
+    }
+    this._log(threw ? 'PASS' : 'FAIL', module, detail, category);
+    return threw;
+  },
+
+  _checkLayoutIntegrity(module) {
+    const content = document.getElementById('app-content');
+    if (!content) {
+      this._log('WARN', module, 'Elemento #app-content no encontrado', 'LAYOUT');
+      return false;
+    }
+    const issues = [];
+    if (content.scrollWidth > content.clientWidth + 5) {
+      issues.push(`overflow-x: ${content.scrollWidth}px > ${content.clientWidth}px`);
+    }
+    const brokenStyles = content.querySelectorAll('[style*="undefined"]');
+    if (brokenStyles.length > 0) issues.push(`${brokenStyles.length} estilos con 'undefined'`);
+    if (issues.length > 0) {
+      this._log('FAIL', module, `Problemas de layout: ${issues.join('; ')}`, 'LAYOUT');
+      return false;
+    }
+    this._log('PASS', module, 'Layout íntegro (sin overflow, estilos correctos)', 'LAYOUT');
+    return true;
+  },
+
+  /** Verifica un registro en IndexedDB contra los campos esperados. */
+  async _verifyInDB(storeName, id, expectedFields) {
+    const record = await window.db.get(storeName, Number(id));
+    if (!record) return { ok: false, reason: `No existe en ${storeName} con id=${id}` };
+    for (const [key, expected] of Object.entries(expectedFields)) {
+      if (record[key] !== expected) {
+        return { ok: false, reason: `${key}: esperado=${expected}, obtenido=${record[key]}` };
+      }
+    }
+    return { ok: true, record };
+  },
+
+  // ============================================================
+  // TEST 1: VALIDACIÓN DE FORMATO REGA (RD 479/2004)
+  // ============================================================
+  async testValidacionREGA() {
+    const M = 'VALIDACIÓN REGA';
+    this._log('RUN', M, 'Iniciando validación de códigos REGA');
+
+    const CS = window.ComunidadesService;
+    if (!this._assert(CS, M, 'ComunidadesService disponible', 'PRE-REQ')) return false;
+
+    // Normalización: quita separadores y mayúsculas
+    const norm = CS.normalizarREGA('es 04.123.0000123');
+    this._assert(norm === 'ES041230000123', `normalizarREGA limpia separadores → "${norm}"`, 'NORMALIZACIÓN');
+
+    // Formato válido (sin comunidad)
+    const ok = CS.validarFormatoREGA('ES041230000123');
+    this._assert(ok.valido === true && ok.provinciaINE === '04',
+      `Acepta REGA válido ES041230000123 (provincia INE=${ok.provinciaINE})`, 'FORMATO');
+
+    // Provincia coherente con la comunidad (04 = Almería ∈ Andalucía)
+    const okCcaa = CS.validarFormatoREGA('ES041230000123', 'andalucia');
+    this._assert(okCcaa.valido === true,
+      'Acepta REGA cuya provincia pertenece a Andalucía', 'COMUNIDAD');
+
+    // Provincia que NO pertenece a la comunidad (99 inexistente en Andalucía)
+    const badProv = CS.validarFormatoREGA('ES991230000123', 'andalucia');
+    this._assert(badProv.valido === false,
+      'Rechaza REGA con provincia ajena a Andalucía', 'COMUNIDAD');
+
+    // Formato inválido
+    const badFmt = CS.validarFormatoREGA('REGA-INVALIDO');
+    this._assert(badFmt.valido === false,
+      'Rechaza REGA con formato incorrecto', 'FORMATO');
+
+    // Vacío
+    const vacio = CS.validarFormatoREGA('');
+    this._assert(vacio.valido === false,
+      'Rechaza REGA vacío', 'FORMATO');
+
+    this._log('PASS', M, '✅ COMPLETADO — Validación REGA verificada');
+    return !this._hasFail(M);
+  },
+
+  // ============================================================
+  // TEST 2: CATÁLOGOS NORMATIVOS SIGGAN
+  // ============================================================
+  async testCatalogosSiggan() {
+    const M = 'CATÁLOGOS SIGGAN';
+    this._log('RUN', M, 'Verificando catálogos normativos');
+
+    const CS = window.ComunidadesService;
+    if (!this._assert(CS, M, 'ComunidadesService disponible', 'PRE-REQ')) return false;
+
+    // Campañas de saneamiento
+    const campanas = CS.getCampanasSaneamiento();
+    this._assert(Array.isArray(campanas) && campanas.some(c => c.value === 'tuberculosis'),
+      `Campañas de saneamiento (${campanas.length}) incluyen tuberculosis`, 'CAMPAÑAS');
+
+    // Vías de administración + etiqueta legible
+    const vias = CS.getViasAdministracion();
+    const viaLabel = CS.getViaAdministracionLabel('intramuscular');
+    this._assert(vias.some(v => v.value === 'intramuscular') && viaLabel === 'Intramuscular (IM)',
+      `Vías de administración con etiqueta legible ("${viaLabel}")`, 'TRATAMIENTOS');
+
+    // Motivos de tratamiento + etiqueta legible
+    const motivos = CS.getMotivosTratamiento();
+    const motivoLabel = CS.getMotivoTratamientoLabel('profilaxis');
+    this._assert(motivos.some(m => m.value === 'profilaxis') && motivoLabel === 'Profilaxis / prevención',
+      `Motivos de tratamiento con etiqueta legible ("${motivoLabel}")`, 'TRATAMIENTOS');
+
+    // Motivos de movimiento
+    const motMov = CS.getMotivosMovimiento();
+    this._assert(motMov.some(m => m.value === 'vida'),
+      `Motivos de movimiento (${motMov.length}) incluyen "vida"`, 'MOVIMIENTOS');
+
+    // Tipos de explotación REGA
+    const tipos = CS.getTiposExplotacionREGA();
+    this._assert(Array.isArray(tipos) && tipos.length > 0,
+      `Tipos de explotación REGA disponibles (${tipos.length})`, 'EXPLOTACIÓN');
+
+    // Configuración por comunidad
+    const confA = CS.getConfiguracionCCAA('andalucia');
+    this._assert(confA && confA.sistema_movimiento === 'SIGGAN',
+      `Andalucía → plataforma ${confA?.sistema_movimiento}`, 'COMUNIDAD');
+    this._assert(CS.esREGAObligatorio('andalucia') === true,
+      'Andalucía exige REGA obligatorio', 'COMUNIDAD');
+
+    const confE = CS.getConfiguracionCCAA('extremadura');
+    this._assert(confE && confE.sistema_movimiento === 'BADIGEX',
+      `Extremadura → plataforma ${confE?.sistema_movimiento}`, 'COMUNIDAD');
+
+    this._log('PASS', M, '✅ COMPLETADO — Catálogos SIGGAN verificados');
+    return !this._hasFail(M);
+  },
+
+  // ============================================================
+  // TEST 3: LIBRO DE MOVIMIENTOS (guía de origen y sanidad)
+  // ============================================================
+  async testLibroMovimientos() {
+    const M = 'LIBRO MOVIMIENTOS';
+    this._log('RUN', M, 'Iniciando ciclo de movimiento inter-explotación');
+
+    if (!this._assert(window.Movimientos, M, 'Módulo Movimientos disponible', 'PRE-REQ')) return false;
+
+    try {
+      const fincaId = await Fincas.getActiveId();
+      const animales = await Animales.list();
+      const animalId = animales.length > 0 ? animales[0].id : null;
+      const crotal = animales.length > 0 ? animales[0].numero_identificacion : 'ES000000000000';
+
+      // --- FASE 1: Alta de movimiento de salida válido ---
+      const t0 = performance.now();
+      const movData = {
+        fincaId,
+        tipo: 'salida',
+        numero_guia: 'QA-' + Date.now().toString().slice(-8),
+        rega_origen: 'ES041230000123',
+        rega_destino: 'ES411230000456',
+        explotacion_contraparte: 'Explotación QA Destino',
+        motivo: 'vida',
+        especie: 'Ovino',
+        num_animales: 1,
+        animalId: animalId != null ? [animalId] : [],
+        crotales: [crotal],
+        fecha: new Date().toISOString().split('T')[0],
+        desinsectacion_certificada: true,
+        comunidad_autonoma: 'andalucia',
+        notas: this._MARKER + ' movimiento de prueba',
+      };
+      const movId = await Movimientos.save(movData);
+      const elapsed = performance.now() - t0;
+      this._assert(movId != null, `Movimiento guardado (id=${movId}) en ${elapsed.toFixed(0)}ms`, 'PERSISTENCIA');
+
+      // --- FASE 2: Verificar persistencia + REGA normalizado + plataforma ---
+      const check = await this._verifyInDB('movimientos_ganado', movId, {
+        tipo: 'salida',
+        rega_origen: 'ES041230000123',
+        rega_destino: 'ES411230000456',
+        plataforma: 'SIGGAN',
+      });
+      this._assert(check.ok, check.ok
+        ? 'IndexedDB: REGA normalizado y plataforma SIGGAN asignada'
+        : `IndexedDB: ${check.reason}`, 'PERSISTENCIA');
+
+      // --- FASE 3: Aparece en el listado filtrado ---
+      const lista = await Movimientos.list({ fincaId, tipo: 'salida' });
+      this._assert(lista.some(m => m.id === movId),
+        'Aparece en Movimientos.list({tipo:salida})', 'LISTA');
+
+      // --- FASE 4: Trazabilidad por animal + evento en cuaderno ---
+      if (animalId != null) {
+        const porAnimal = await Movimientos.getByAnimal(animalId);
+        this._assert(porAnimal.some(m => m.id === movId),
+          'getByAnimal() devuelve el movimiento del animal', 'TRAZABILIDAD');
+
+        const eventos = await window.db.getAll('registro_eventos').catch(() => []);
+        const evt = eventos.find(e => e.tipo === 'movimiento' &&
+          Number(e.entidad_id) === Number(animalId) &&
+          (e.notas || '').includes(this._MARKER));
+        this._assert(!!evt,
+          'Se registró evento de movimiento en el cuaderno (registro_eventos)', 'TRAZABILIDAD');
+      } else {
+        this._log('WARN', M, 'Sin animales: se omite verificación de trazabilidad por animal', 'TRAZABILIDAD');
+      }
+
+      // --- FASE 5: Validación de formato REGA inválido ---
+      await this._expectThrow(
+        () => Movimientos.save({ ...movData, id: undefined, rega_destino: 'XX-NO-VALIDO' }),
+        M, 'Rechaza movimiento con REGA destino inválido');
+
+      // --- FASE 6: Exige certificar desinsectación en Andalucía ---
+      await this._expectThrow(
+        () => Movimientos.save({ ...movData, id: undefined, desinsectacion_certificada: false }),
+        M, 'Exige certificar desinsectación en Andalucía');
+
+      this._log('PASS', M, `✅ COMPLETADO — Movimiento ${movData.numero_guia} (id=${movId})`);
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
+  // TEST 4: LIBRO DE SANEAMIENTOS (campañas ADSG)
+  // ============================================================
+  async testLibroSaneamientos() {
+    const M = 'LIBRO SANEAMIENTOS';
+    this._log('RUN', M, 'Iniciando ciclo de saneamiento oficial');
+
+    if (!this._assert(window.Saneamientos, M, 'Módulo Saneamientos disponible', 'PRE-REQ')) return false;
+
+    try {
+      const fincaId = await Fincas.getActiveId();
+
+      // --- FASE 1: Alta de saneamiento (tuberculosis, indemne) ---
+      const t0 = performance.now();
+      const sanId = await Saneamientos.save({
+        fincaId,
+        campana: 'tuberculosis',
+        fecha: new Date().toISOString().split('T')[0],
+        veterinario: 'Dra. QA Veterinaria',
+        veterinario_colegiado: 'COL-QA-001',
+        adsg_nombre: 'ADSG QA',
+        especie: 'Bovino',
+        num_examinados: 50,
+        num_positivos: 0,
+        calificacion: 'indemne',
+        notas: this._MARKER + ' saneamiento de prueba',
+      });
+      const elapsed = performance.now() - t0;
+      this._assert(sanId != null, `Saneamiento guardado (id=${sanId}) en ${elapsed.toFixed(0)}ms`, 'PERSISTENCIA');
+
+      // --- FASE 2: Persistencia + etiqueta legible de campaña ---
+      const check = await this._verifyInDB('saneamientos', sanId, {
+        campana: 'tuberculosis',
+        calificacion: 'indemne',
+        num_examinados: 50,
+      });
+      this._assert(check.ok, check.ok ? 'IndexedDB: saneamiento verificado' : `IndexedDB: ${check.reason}`, 'PERSISTENCIA');
+
+      const label = Saneamientos.labelCampana('tuberculosis');
+      this._assert(/tuberculosis/i.test(label),
+        `Etiqueta legible de campaña: "${label}"`, 'ETIQUETAS');
+
+      // --- FASE 3: Calificación sanitaria actual de la finca ---
+      const calif = await Saneamientos.calificacionActual(fincaId);
+      this._assert(calif === 'indemne',
+        `Calificación sanitaria actual de la finca: "${calif}"`, 'CALIFICACIÓN');
+
+      // --- FASE 4: Validaciones ---
+      await this._expectThrow(
+        () => Saneamientos.save({ fincaId, campana: 'tuberculosis', num_examinados: 10, num_positivos: 20 }),
+        M, 'Rechaza nº de positivos mayor que examinados');
+
+      await this._expectThrow(
+        () => Saneamientos.save({ fincaId, fecha: new Date().toISOString().split('T')[0] }),
+        M, 'Rechaza saneamiento sin campaña');
+
+      this._log('PASS', M, `✅ COMPLETADO — Saneamiento tuberculosis (id=${sanId})`);
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
+  // TEST 5: LIBRO DE TRATAMIENTOS VETERINARIOS
+  // ============================================================
+  async testLibroTratamientos() {
+    const M = 'LIBRO TRATAMIENTOS';
+    this._log('RUN', M, 'Iniciando registro de tratamiento veterinario');
+
+    if (!this._assert(window.Sanitarios, M, 'Módulo Sanitarios disponible', 'PRE-REQ')) return false;
+
+    try {
+      const rebanos = await Rebanos.list();
+      if (rebanos.length === 0) {
+        this._log('FAIL', M, 'No hay rebaños disponibles', 'PRE-REQ');
+        return false;
+      }
+      const rebano = rebanos[0];
+
+      // --- FASE 1: Alta de tratamiento con campos SIGGAN ---
+      const t0 = performance.now();
+      const tratId = await Sanitarios.save({
+        rebanoId: rebano.id,
+        tipo_tratamiento: 'Antibiótico',
+        medicamento: 'Amoxicilina QA',
+        fecha: new Date().toISOString().split('T')[0],
+        via_administracion: 'intramuscular',
+        motivo_tratamiento: 'infeccion',
+        tiempo_espera_carne_dias: 28,
+        tiempo_espera_leche_dias: 7,
+        prohibidoLeche: true,
+        notas: this._MARKER + ' tratamiento de prueba',
+      });
+      const elapsed = performance.now() - t0;
+      this._assert(tratId != null, `Tratamiento guardado (id=${tratId}) en ${elapsed.toFixed(0)}ms`, 'PERSISTENCIA');
+
+      // --- FASE 2: Persistencia de campos del libro de tratamientos ---
+      const check = await this._verifyInDB('sanitarios_ganado', tratId, {
+        via_administracion: 'intramuscular',
+        motivo_tratamiento: 'infeccion',
+        tiempo_espera_carne_dias: 28,
+        tiempo_espera_leche_dias: 7,
+      });
+      this._assert(check.ok, check.ok
+        ? 'IndexedDB: vía, motivo y tiempos de espera persistidos'
+        : `IndexedDB: ${check.reason}`, 'PERSISTENCIA');
+
+      // --- FASE 3: Etiquetas legibles para el libro/cuaderno ---
+      const CS = window.ComunidadesService;
+      const viaLabel = CS.getViaAdministracionLabel('intramuscular');
+      const motLabel = CS.getMotivoTratamientoLabel('infeccion');
+      this._assert(viaLabel === 'Intramuscular (IM)' && /infeccioso/i.test(motLabel),
+        `Etiquetas legibles: vía "${viaLabel}", motivo "${motLabel}"`, 'ETIQUETAS');
+
+      // --- FASE 4: Tiempo de espera marca prohibición de leche ---
+      this._assert(check.record && check.record.prohibidoLeche === true,
+        'Tratamiento con supresión marca prohibidoLeche', 'SUPRESIÓN');
+
+      this._log('PASS', M, `✅ COMPLETADO — Tratamiento (id=${tratId})`);
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
+  // TEST 6: EXPORTACIÓN OFICIAL CSV / XML (REGA, SIA)
+  // ============================================================
+  async testExportacion() {
+    const M = 'EXPORTACIÓN REGA/SIA';
+    this._log('RUN', M, 'Generando ficheros de exportación oficial');
+
+    if (!this._assert(window.ExportService, M, 'Módulo ExportService disponible', 'PRE-REQ')) return false;
+
+    try {
+      const finca = await Fincas.getActive();
+      const animales = await Animales.list();
+      const rebanos = await Rebanos.list();
+
+      // --- Censo REGA (CSV) ---
+      const csvCenso = window.ExportService.generarCSV_CensoREGA(finca, animales, rebanos);
+      this._assert(typeof csvCenso === 'string' &&
+        csvCenso.includes('EXPORTACION REGA') &&
+        csvCenso.includes('ID;CROTAL;ESPECIE'),
+        'Censo REGA CSV con cabecera y detalle de animales', 'REGA');
+
+      // --- Explotación REGA (XML) ---
+      if (typeof window.ExportService.generarXML_REGA === 'function') {
+        const xml = window.ExportService.generarXML_REGA(finca, animales, rebanos);
+        this._assert(typeof xml === 'string' && xml.trim().length > 0 && xml.includes('<'),
+          'Explotación REGA XML generado', 'REGA');
+      } else {
+        this._log('WARN', M, 'generarXML_REGA no disponible', 'REGA');
+      }
+
+      // --- Movimientos SIA/PIGGAN (CSV) ---
+      const eventos = await window.db.getAll('registro_eventos').catch(() => []);
+      const csvMov = window.ExportService.generarCSV_Movimientos(eventos, animales, finca);
+      this._assert(typeof csvMov === 'string' &&
+        csvMov.includes('FECHA;TIPO_MOVIMIENTO'),
+        'Movimientos SIA CSV con cabecera correcta', 'SIA');
+
+      this._log('PASS', M, '✅ COMPLETADO — Exportaciones generadas');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
+  // TEST 7: CUADERNO DIGITAL (renderizado de secciones SIGGAN)
+  // ============================================================
+  async testCuadernoView() {
+    const M = 'CUADERNO DIGITAL';
+    this._log('RUN', M, 'Navegando al Cuaderno Digital');
+
+    const backup = console.error;
+    const errores = [];
+    console.error = (...a) => { errores.push(a.join(' ')); backup.apply(console, a); };
+
+    try {
+      location.hash = '#/cuaderno';
+      await this._wait(900);
+
+      const content = document.getElementById('app-content');
+      const texto = content ? content.textContent : '';
+
+      this._assert(texto.length > 0, 'El Cuaderno renderiza contenido', 'RENDERIZADO');
+
+      const tieneLibro = /Libro de Registro|Registro|Censo|Movimientos|Sanidad/i.test(texto);
+      this._assert(tieneLibro, 'Renderiza secciones del libro de registro SIGGAN', 'SECCIONES');
+
+      this._checkLayoutIntegrity(M);
+
+      const realErr = errores.filter(e => !/timeout/i.test(e) && !/warn/i.test(e));
+      this._assert(realErr.length === 0,
+        realErr.length === 0 ? 'Sin errores JS en consola' : `Errores: ${realErr.slice(0, 2).join(' | ')}`,
+        'CONSOLA');
+
+      this._log('PASS', M, '✅ COMPLETADO — Cuaderno Digital verificado');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    } finally {
+      console.error = backup;
+    }
+  },
+
+  // ============================================================
+  // TEST 8: RENDIMIENTO DE CONSULTAS (DB v10)
+  // ============================================================
+  async testRendimiento() {
+    const M = 'RENDIMIENTO SIGGAN';
+    this._log('RUN', M, 'Insertando lote de movimientos para medir consultas');
+
+    try {
+      const fincaId = await Fincas.getActiveId();
+      const N = 50;
+      const hoy = new Date().toISOString().split('T')[0];
+
+      const t0 = performance.now();
+      for (let i = 0; i < N; i++) {
+        await window.db.add('movimientos_ganado', {
+          fincaId,
+          tipo: i % 2 === 0 ? 'entrada' : 'salida',
+          numero_guia: 'QA-PERF-' + i,
+          rega_origen: 'ES041230000123',
+          rega_destino: 'ES411230000456',
+          especie: 'Ovino',
+          num_animales: 1,
+          animalId: [],
+          crotales: [],
+          fecha: hoy,
+          comunidad_autonoma: 'andalucia',
+          plataforma: 'SIGGAN',
+          notas: this._MARKER + ' perf',
+          creadoEn: new Date().toISOString(),
+        });
+      }
+      const insertMs = performance.now() - t0;
+      this._assert(true, `Insertados ${N} movimientos en ${insertMs.toFixed(0)}ms (${(insertMs / N).toFixed(1)}ms/reg)`, 'INSERCIÓN');
+
+      // Consulta filtrada
+      const t1 = performance.now();
+      const lista = await Movimientos.list({ fincaId });
+      const listMs = performance.now() - t1;
+      this._assert(lista.length >= N,
+        `Movimientos.list() devuelve ${lista.length} registros en ${listMs.toFixed(0)}ms`, 'CONSULTA');
+      this._assert(listMs < 1500,
+        listMs < 1500 ? `Consulta rápida (${listMs.toFixed(0)}ms < 1500ms)` : `Consulta lenta: ${listMs.toFixed(0)}ms`, 'CONSULTA');
+
+      this._log('PASS', M, '✅ COMPLETADO — Rendimiento medido');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
+  // UTIL: detectar si un módulo registró algún FAIL en esta corrida
+  // ============================================================
+  _runStartIndex: 0,
+  _hasFail(module) {
+    return this._results
+      .slice(this._runStartIndex)
+      .some(r => r.module === module && r.status === 'FAIL');
+  },
+
+  // ============================================================
+  // EJECUCIÓN PRINCIPAL
+  // ============================================================
+  async runAll() {
+    console.log('\n' + '='.repeat(75));
+    console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
+    console.log('📅 ' + new Date().toLocaleString());
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno');
+    console.log('='.repeat(75) + '\n');
+
+    if (!window.db) {
+      console.error('❌ ERROR: window.db no disponible. Espera a que la app cargue.');
+      return;
+    }
+    if (!window.ComunidadesService) {
+      console.error('❌ ERROR: ComunidadesService no disponible.');
+      return;
+    }
+    const fincaId = await Fincas.getActiveId();
+    if (!fincaId) {
+      console.error('❌ ERROR: No hay finca activa. Carga la Demo CHAMORRO en Ajustes.');
+      return;
+    }
+    console.log(`📍 Finca activa: ${fincaId}\n`);
+
+    this._results = [];
+    this._runStartIndex = 0;
+
+    const tests = [
+      { name: 'Validación REGA', fn: () => this.testValidacionREGA() },
+      { name: 'Catálogos SIGGAN', fn: () => this.testCatalogosSiggan() },
+      { name: 'Libro de Movimientos', fn: () => this.testLibroMovimientos() },
+      { name: 'Libro de Saneamientos', fn: () => this.testLibroSaneamientos() },
+      { name: 'Libro de Tratamientos', fn: () => this.testLibroTratamientos() },
+      { name: 'Exportación REGA/SIA', fn: () => this.testExportacion() },
+      { name: 'Cuaderno Digital', fn: () => this.testCuadernoView() },
+      { name: 'Rendimiento', fn: () => this.testRendimiento() },
+    ];
+
+    const startTime = Date.now();
+    let passed = 0, failed = 0;
+
+    for (const test of tests) {
+      console.log(`\n${'─'.repeat(60)}`);
+      console.log(`▶️  [${tests.indexOf(test) + 1}/${tests.length}] ${test.name}`);
+      console.log('─'.repeat(60));
+      try {
+        const result = await test.fn();
+        if (result) passed++; else failed++;
+      } catch (e) {
+        this._log('FAIL', test.name, `Excepción no controlada: ${e.message}`, 'EXCEPCIÓN');
+        failed++;
+      }
+      await this._wait(200);
+    }
+
+    const totalTime = Date.now() - startTime;
+
+    // ---- REPORTE FINAL ----
+    console.log('\n' + '='.repeat(75));
+    console.log('📊 REPORTE FINAL — SIGGAN QA v1.0');
+    console.log('='.repeat(75));
+    console.log(`⏱️  Tiempo total: ${(totalTime / 1000).toFixed(2)}s`);
+    console.log(`✅ Tests OK: ${passed}/${tests.length}`);
+    console.log(`❌ Tests con fallo: ${failed}/${tests.length}`);
+
+    const failures = this._results.filter(r => r.status === 'FAIL');
+    if (failures.length > 0) {
+      console.log('\n❌ DETALLE DE FALLOS:');
+      console.log('─'.repeat(60));
+      failures.forEach(f => console.log(`  ❌ [${f.module}]${f.category ? ` [${f.category}]` : ''} ${f.detail}`));
+    }
+
+    console.log('\n📋 RESUMEN POR CATEGORÍA:');
+    console.log('─'.repeat(50));
+    const cats = [...new Set(this._results.map(r => r.category).filter(Boolean))];
+    cats.forEach(cat => {
+      const cr = this._results.filter(r => r.category === cat);
+      const p = cr.filter(r => r.status === 'PASS').length;
+      const f = cr.filter(r => r.status === 'FAIL').length;
+      const w = cr.filter(r => r.status === 'WARN').length;
+      console.log(`  ${f === 0 ? '✅' : '❌'} ${cat.padEnd(18)} ${p}✅ ${f}❌ ${w}⚠️`);
+    });
+
+    console.log('\n' + '='.repeat(75));
+    console.log(failed === 0 ? '🎉 TODOS LOS TESTS SIGGAN PASARON' : '⚠️ HAY TESTS SIGGAN FALLIDOS — Revisar detalle arriba');
+    console.log('💡 Ejecuta await SigganQA.cleanup() para eliminar los datos de prueba.');
+    console.log('='.repeat(75) + '\n');
+
+    return { passed, failed, total: tests.length, results: this._results };
+  },
+
+  // Ejecutar un test individual
+  async run(testName) {
+    const map = {
+      'rega': () => this.testValidacionREGA(),
+      'catalogos': () => this.testCatalogosSiggan(),
+      'movimientos': () => this.testLibroMovimientos(),
+      'saneamientos': () => this.testLibroSaneamientos(),
+      'tratamientos': () => this.testLibroTratamientos(),
+      'export': () => this.testExportacion(),
+      'cuaderno': () => this.testCuadernoView(),
+      'rendimiento': () => this.testRendimiento(),
+    };
+    const fn = map[(testName || '').toLowerCase()];
+    if (!fn) {
+      console.log(`Test "${testName}" no encontrado. Opciones: ${Object.keys(map).join(', ')}`);
+      return;
+    }
+    this._runStartIndex = this._results.length;
+    console.log(`\n▶️  Ejecutando test SIGGAN: ${testName}...\n`);
+    return await fn();
+  },
+
+  // Limpiar datos de prueba generados por la suite
+  async cleanup() {
+    console.log('🧹 Limpiando datos de prueba SIGGAN...');
+    const stores = ['movimientos_ganado', 'saneamientos', 'sanitarios_ganado', 'registro_eventos'];
+    let total = 0;
+    for (const store of stores) {
+      try {
+        const all = await window.db.getAll(store).catch(() => []);
+        const testItems = all.filter(item => JSON.stringify(item).includes(this._MARKER));
+        for (const item of testItems) {
+          await window.db.delete(store, item.id);
+          total++;
+        }
+        if (testItems.length > 0) {
+          console.log(`  🗑️  ${store}: ${testItems.length} registros eliminados`);
+        }
+      } catch (e) {
+        console.warn(`  ⚠️  Error limpiando ${store}: ${e.message}`);
+      }
+    }
+    console.log(`✅ Limpieza completada (${total} registros eliminados)`);
+  },
+};
+
+window.SigganQA = SigganQA;
+console.log('✅ SIGGAN QA Suite v1.0 cargado.');
+console.log('   await SigganQA.runAll()        → Ejecutar todos los tests SIGGAN');
+console.log('   await SigganQA.run("movimientos") → Test individual');
+console.log('   await SigganQA.cleanup()        → Limpiar datos de prueba');
