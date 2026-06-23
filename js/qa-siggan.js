@@ -170,6 +170,21 @@ const SigganQA = {
     this._assert(motMov.some(m => m.value === 'vida'),
       `Motivos de movimiento (${motMov.length}) incluyen "vida"`, 'MOVIMIENTOS');
 
+    // Formas de alta en el censo (catálogo cerrado)
+    const tiposAlta = CS.getTiposAlta();
+    this._assert(Array.isArray(tiposAlta) && tiposAlta.some(t => t.value === 'Nacimiento') && tiposAlta.some(t => t.value === 'Compra'),
+      `Tipos de alta (${tiposAlta.length}) incluyen Nacimiento y Compra`, 'CENSO');
+
+    // Categorías zootécnicas por especie (catálogo cerrado)
+    const catBovino = CS.getCategoriasAnimal('Bovino');
+    const catOvino = CS.getCategoriasAnimal('Ovejas');
+    this._assert(Array.isArray(catBovino) && catBovino.some(c => /Vaca/i.test(c)),
+      `Categorías de bovino (${catBovino.length}) incluyen "Vaca"`, 'CENSO');
+    this._assert(Array.isArray(catOvino) && catOvino.some(c => /Oveja/i.test(c)),
+      `Categorías de ovino (${catOvino.length}) incluyen "Oveja" (normaliza sinónimos)`, 'CENSO');
+    this._assert(CS.getGrupoEspecie('Vacas Frisonas') === 'bovino',
+      'getGrupoEspecie normaliza "Vacas Frisonas" → bovino', 'CENSO');
+
     // Tipos de explotación REGA
     const tipos = CS.getTiposExplotacionREGA();
     this._assert(Array.isArray(tipos) && tipos.length > 0,
@@ -674,13 +689,172 @@ const SigganQA = {
   },
 
   // ============================================================
+  // TEST 11: PARTO → ALTA DE CRÍA Y GENEALOGÍA (RD 787/2023 · Libro de Registro)
+  // ============================================================
+  async testPartoGenealogia() {
+    const M = 'PARTO GENEALOGÍA';
+    this._log('RUN', M, 'Validando alta automática de cría y vínculo madre-cría en el parto');
+
+    if (!this._assert(window.Reproduccion && typeof Reproduccion.saveEvento === 'function', M,
+      'Reproduccion.saveEvento disponible', 'PRE-REQ')) return false;
+
+    let criaId = null, partoEventoId = null, madreId = null, madreOriginal = null;
+    try {
+      const fincaId = await Fincas.getActiveId();
+      const animales = await Animales.list();
+      const madre = animales.find(a => a.sexo === 'H' && (a.estado || 'activo') !== 'baja');
+      if (!madre) {
+        this._log('WARN', M, 'Sin hembra disponible: se omite el test de parto', 'PARTO');
+        return true;
+      }
+      madreId = madre.id;
+      madreOriginal = {
+        numero_partos: madre.numero_partos || 0,
+        estado_reproductivo: madre.estado_reproductivo || null
+      };
+
+      const crotalCria = 'ES' + String(Date.now()).slice(-12);
+      const fecha = new Date().toISOString().split('T')[0];
+
+      partoEventoId = await Reproduccion.saveEvento({
+        animalId: madre.id,
+        tipo_evento: 'Parto',
+        fecha,
+        fincaId,
+        notas: this._MARKER + ' parto de prueba',
+        resultado: this._MARKER,
+        crias: [{ crotal: crotalCria, sexo: 'H' }],
+        crias_vivas: 1,
+        crias_muertas: 0
+      });
+
+      // La cría debe existir en el censo con genealogía
+      const todos = await Animales.list();
+      const cria = todos.find(a => a.numero_identificacion === crotalCria);
+      if (this._assert(!!cria, M, `Cría dada de alta en el censo (crotal ${crotalCria})`, 'ALTA')) {
+        criaId = cria.id;
+        this._assert(cria.tipoAlta === 'Nacimiento', M,
+          'Cría con tipoAlta="Nacimiento" (cuenta en el libro de registro)', 'ALTA');
+        this._assert(cria.madre_id === madre.id, M,
+          `Vínculo genealógico madre-cría correcto (madre_id=${madre.id})`, 'GENEALOGÍA');
+        this._assert(cria.especie === madre.especie, M,
+          'Cría hereda la especie de la madre', 'GENEALOGÍA');
+
+        // Evento de nacimiento en el libro de registro (registro_eventos)
+        const evs = await window.db.getAllFromIndex('registro_eventos', 'entidad_id', cria.id).catch(() => []);
+        const nacimiento = evs.find(e => e.motivo_tarea === 'alta_nacimiento');
+        this._assert(!!nacimiento, M,
+          'Evento "alta_nacimiento" registrado en el libro de registro', 'CUADERNO');
+      }
+
+      // El contador de partos de la madre se incrementa
+      const madreActual = await Animales.get(madre.id);
+      this._assert((madreActual.numero_partos || 0) === madreOriginal.numero_partos + 1, M,
+        'Nº de partos de la madre incrementado', 'MADRE');
+
+      this._log('PASS', M, '✅ COMPLETADO — El parto genera la cría con genealogía y evento de nacimiento');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    } finally {
+      // Limpieza: el test no deja datos de prueba
+      try {
+        if (criaId != null) {
+          const evs = await window.db.getAllFromIndex('registro_eventos', 'entidad_id', criaId).catch(() => []);
+          for (const ev of evs) { if (ev.id != null) await window.db.delete('registro_eventos', ev.id).catch(() => {}); }
+          await window.db.delete('animales', Number(criaId)).catch(() => {});
+        }
+        if (partoEventoId != null) await window.db.delete('reproduccion_eventos', Number(partoEventoId)).catch(() => {});
+        if (madreId != null && madreOriginal) {
+          const m = await Animales.get(madreId).catch(() => null);
+          if (m) {
+            m.numero_partos = madreOriginal.numero_partos;
+            m.estado_reproductivo = madreOriginal.estado_reproductivo;
+            await Animales.save(m).catch(() => {});
+          }
+        }
+      } catch (_) { /* limpieza best-effort */ }
+    }
+  },
+
+  // ============================================================
+  // TEST 12: EVENTOS DE CENSO (ALTA / BAJA) EN EL LIBRO DE REGISTRO
+  // ============================================================
+  async testEventosCenso() {
+    const M = 'EVENTOS CENSO';
+    this._log('RUN', M, 'Validando que el alta y la baja de un animal generan evento en el libro de registro');
+
+    if (!this._assert(window.Animales && typeof Animales.save === 'function', M,
+      'Animales.save disponible', 'PRE-REQ')) return false;
+
+    let animalId = null;
+    try {
+      const crotal = 'ES' + String(Date.now()).slice(-12);
+      const hoy = new Date().toISOString().split('T')[0];
+
+      // --- ALTA (compra) ---
+      animalId = await Animales.save({
+        numero_identificacion: crotal,
+        especie: 'Bovino',
+        sexo: 'M',
+        tipoAlta: 'Compra',
+        fecha_alta: hoy,
+        fecha_nacimiento: hoy,
+        rega_origen: 'ES041230000123',
+        estado: 'activo',
+        notas: this._MARKER + ' alta de prueba'
+      });
+      this._assert(!!animalId, M, `Animal dado de alta (crotal ${crotal})`, 'ALTA');
+
+      let evs = await window.db.getAllFromIndex('registro_eventos', 'entidad_id', animalId).catch(() => []);
+      const alta = evs.find(e => e.motivo_tarea === 'alta_compra' && e.tipo === 'alta');
+      this._assert(!!alta, M,
+        'Evento de alta ("alta_compra") registrado en el libro de registro', 'ALTA');
+
+      // --- BAJA (muerte) ---
+      const animal = await Animales.get(animalId);
+      animal.estado = 'baja';
+      animal.motivo_baja = 'muerte';
+      animal.fecha_baja = hoy;
+      await Animales.save(animal);
+
+      evs = await window.db.getAllFromIndex('registro_eventos', 'entidad_id', animalId).catch(() => []);
+      const baja = evs.find(e => e.tipo === 'baja');
+      this._assert(!!baja, M,
+        'Evento de baja registrado en el libro de registro', 'BAJA');
+      this._assert(baja && baja.motivo_baja === 'muerte', M,
+        'La baja conserva el motivo ("muerte")', 'BAJA');
+
+      // --- No duplica el alta al editar ---
+      const altas = evs.filter(e => e.tipo === 'alta');
+      this._assert(altas.length === 1, M,
+        'La edición no duplica el evento de alta', 'INTEGRIDAD');
+
+      this._log('PASS', M, '✅ COMPLETADO — Alta y baja quedan trazadas en el libro de registro');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    } finally {
+      try {
+        if (animalId != null) {
+          const evs = await window.db.getAllFromIndex('registro_eventos', 'entidad_id', animalId).catch(() => []);
+          for (const ev of evs) { if (ev.id != null) await window.db.delete('registro_eventos', ev.id).catch(() => {}); }
+          await window.db.delete('animales', Number(animalId)).catch(() => {});
+        }
+      } catch (_) { /* limpieza best-effort */ }
+    }
+  },
+
+  // ============================================================
   // EJECUCIÓN PRINCIPAL
   // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
     console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
     console.log('📅 ' + new Date().toLocaleString());
-    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo');
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
@@ -711,6 +885,8 @@ const SigganQA = {
       { name: 'Cuaderno Digital', fn: () => this.testCuadernoView() },
       { name: 'Validación Crotal', fn: () => this.testValidacionCrotal() },
       { name: 'Traslado Interno y Aforo', fn: () => this.testTrasladoInterno() },
+      { name: 'Parto y Genealogía', fn: () => this.testPartoGenealogia() },
+      { name: 'Eventos de Censo (Alta/Baja)', fn: () => this.testEventosCenso() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -779,6 +955,8 @@ const SigganQA = {
       'cuaderno': () => this.testCuadernoView(),
       'crotal': () => this.testValidacionCrotal(),
       'traslado': () => this.testTrasladoInterno(),
+      'parto': () => this.testPartoGenealogia(),
+      'censo': () => this.testEventosCenso(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];

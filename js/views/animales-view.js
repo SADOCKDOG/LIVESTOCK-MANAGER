@@ -192,14 +192,22 @@ const AnimalesView = {
     };
     if (!esNuevo) a = await Animales.get(id);
 
-    const [especies, rebanos] = await Promise.all([
+    const [especies, rebanos, todosAnimales] = await Promise.all([
       window.db.getAll("config_especies"),
       Rebanos.list(),
+      Animales.list().catch(() => []),
     ]);
+
+    const idActual = esNuevo ? null : Number(id);
+    const hembras = (todosAnimales || []).filter(
+      (x) => x.sexo === "H" && (x.estado || "activo") !== "baja" && x.id !== idActual
+    );
 
     const CS = window.ComunidadesService;
     const paisesNac = CS ? CS.getPaisesNacimiento() : [{ value: 'ES', label: 'España (ES)' }];
     const motivosBaja = CS ? CS.getMotivosBaja() : [];
+    const tiposAlta = CS && CS.getTiposAlta ? CS.getTiposAlta() : [{ value: 'Nacimiento', label: 'Nacimiento' }, { value: 'Compra', label: 'Compra' }];
+    const categoriasAnimal = CS && CS.getCategoriasAnimal ? CS.getCategoriasAnimal(a.especie) : [];
     const mostrarDIB = CS ? CS.especieRequiereDIB(a.especie) : false;
     const esCompra = a.tipoAlta === "Compra";
     const esBaja = a.estado === "baja" || a.estado === "Baja";
@@ -268,10 +276,16 @@ const AnimalesView = {
             <div>
               <label class="form-label">TIPO ALTA</label>
               <select id="a-tipoalta" class="form-input form-input-lg" onchange="AnimalesView._onTipoAltaChange(this)">
-                <option value="Nacimiento" ${a.tipoAlta === "Nacimiento" ? "selected" : ""}>Nacimiento</option>
-                <option value="Compra" ${a.tipoAlta === "Compra" ? "selected" : ""}>Compra</option>
+                ${tiposAlta.map((t) => `<option value="${t.value}" ${a.tipoAlta === t.value ? "selected" : ""}>${t.label}</option>`).join("")}
               </select>
             </div>
+          </div>
+          <div class="mb-12">
+            <label class="form-label">CATEGORÍA (libro de registro)</label>
+            <select id="a-categoria" class="form-input form-input-lg">
+              <option value="">— Sin clasificar —</option>
+              ${categoriasAnimal.map((c) => `<option value="${c}" ${a.categoria === c ? "selected" : ""}>${c}</option>`).join("")}
+            </select>
           </div>
           <div class="grid grid-cols-2 gap-12 mb-12">
             <div>
@@ -315,6 +329,13 @@ const AnimalesView = {
             <div id="a-procedencia-section" class="mb-12" style="display:${esCompra ? 'block' : 'none'};">
               <label class="form-label">REGA DE PROCEDENCIA (explotación origen)</label>
               <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="Ej: ES041230000123" class="form-input form-input-lg">
+            </div>
+            <div class="mb-12">
+              <label class="form-label">MADRE (genealogía)</label>
+              <select id="a-madre" class="form-select-gold">
+                <option value="">Sin asignar</option>
+                ${hembras.map((h) => `<option value="${h.id}" ${a.madre_id == h.id ? "selected" : ""}>${h.numero_identificacion || ('#' + h.id)}${h.especie ? ' · ' + h.especie : ''}</option>`).join("")}
+              </select>
             </div>
             <div id="a-dib-section" class="mb-12" style="display:${mostrarDIB ? 'block' : 'none'};">
               <label class="form-label">DIB / Nº PASAPORTE (bovino/equino)</label>
@@ -409,6 +430,7 @@ const AnimalesView = {
         raza: document.getElementById("a-raza").value.trim(),
         rebanoId: rebanoIdFinal,
         tipoAlta: document.getElementById("a-tipoalta").value,
+        categoria: document.getElementById("a-categoria")?.value || "",
         fecha_nacimiento: document.getElementById("a-fecha").value,
         notas: document.getElementById("a-notas").value.trim(),
         rfid_codigo: document.getElementById("a-rfid").value.trim(),
@@ -417,6 +439,7 @@ const AnimalesView = {
         notificado_rega: document.getElementById("a-notificado").checked,
         // Libro de registro SIGGAN
         pais_nacimiento: document.getElementById("a-pais-nac")?.value || "ES",
+        madre_id: document.getElementById("a-madre")?.value ? Number(document.getElementById("a-madre").value) : null,
         fecha_alta: document.getElementById("a-fecha-alta")?.value || "",
         rega_origen: (document.getElementById("a-rega-origen")?.value || "").trim().toUpperCase(),
         dib: (document.getElementById("a-dib")?.value || "").trim().toUpperCase(),
@@ -507,12 +530,20 @@ const AnimalesView = {
   },
 
   _onEspecieChange(selectEl) {
+    const CS = window.ComunidadesService;
     const section = document.getElementById('a-dib-section');
-    if (!section) return;
-    const requiere = window.ComunidadesService
-      ? window.ComunidadesService.especieRequiereDIB(selectEl.value)
-      : false;
-    section.style.display = requiere ? 'block' : 'none';
+    if (section) {
+      const requiere = CS ? CS.especieRequiereDIB(selectEl.value) : false;
+      section.style.display = requiere ? 'block' : 'none';
+    }
+    // Refrescar el catálogo de categorías según la nueva especie
+    const catSel = document.getElementById('a-categoria');
+    if (catSel && CS && CS.getCategoriasAnimal) {
+      const prev = catSel.value;
+      const cats = CS.getCategoriasAnimal(selectEl.value);
+      catSel.innerHTML = '<option value="">— Sin clasificar —</option>' +
+        cats.map((c) => `<option value="${c}" ${prev === c ? 'selected' : ''}>${c}</option>`).join('');
+    }
   },
 
   _onEstadoChange(selectEl) {

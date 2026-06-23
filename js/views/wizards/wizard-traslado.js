@@ -99,12 +99,38 @@ window.WizardTraslado = {
             data.rebano.zonaActual,
             data.selectedIds.length
           );
+          const fincaId = (window.Fincas && Fincas.getActiveId)
+            ? await Fincas.getActiveId().catch(() => null)
+            : null;
+          const hoy = new Date().toISOString().split("T")[0];
+          let trasladados = 0;
           for (let id of data.selectedIds) {
             const a = await Animales.get(id);
+            if (!a) continue;
+            const origenId = a.rebanoId;
+            if (origenId === data.rebano.id) continue;
             a.rebanoId = data.rebano.id;
             await Animales.save(a);
+            trasladados++;
+            // Trazabilidad SIGGAN: evento de movimiento interno en el libro de registro
+            try {
+              await window.db.add("registro_eventos", {
+                fincaId,
+                entidad_id: id,
+                tipo_entidad: "animal",
+                tipo: "movimiento",
+                motivo_tarea: "traslado_interno",
+                fecha: hoy,
+                rebano_origen: origenId || null,
+                rebano_destino: data.rebano.id,
+                descripcion: `Traslado interno · ${a.numero_identificacion || "#" + id} → rebaño "${data.rebano.nombre}"${data.rebano.zonaActual ? " (zona " + data.rebano.zonaActual + ")" : ""}`,
+                creadoEn: new Date().toISOString(),
+              });
+            } catch (e) {
+              console.warn("[Traslado] No se pudo registrar el evento de movimiento:", e?.message);
+            }
           }
-          App.toast("Traslado completado");
+          App.toast(`Traslado completado · ${trasladados} animal(es)`);
           App.renderDetalleRebano(new URLSearchParams(`id=${data.rebano.id}`));
         } catch (e) {
           App.toastError(e.message);
