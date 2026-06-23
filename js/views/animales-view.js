@@ -203,6 +203,7 @@ const AnimalesView = {
     const mostrarDIB = CS ? CS.especieRequiereDIB(a.especie) : false;
     const esCompra = a.tipoAlta === "Compra";
     const esBaja = a.estado === "baja" || a.estado === "Baja";
+    const esSalida = esBaja || a.estado === "vendido";
 
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
@@ -336,8 +337,8 @@ const AnimalesView = {
                 </select>
               </div>
             </div>
-            <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esBaja ? 'block' : 'none'}; margin-top:12px;">
-              <label class="form-label">FECHA DE BAJA</label>
+            <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esSalida ? 'block' : 'none'}; margin-top:12px;">
+              <label class="form-label">FECHA DE SALIDA / BAJA</label>
               <input type="date" id="a-fecha-baja" value="${a.fecha_baja || ""}" class="form-input form-input-lg">
             </div>
           </div>
@@ -436,9 +437,12 @@ const AnimalesView = {
       if (data.estado === "baja" && !data.motivo_baja) {
         return App.toastError("Indica el motivo de baja para el libro de registro.");
       }
-      if (data.estado !== "baja") {
+      if (data.estado === "activo") {
         data.motivo_baja = "";
         data.fecha_baja = "";
+      } else if (data.estado === "vendido") {
+        // La venta es una salida: conserva la fecha de salida pero no usa motivo de baja.
+        data.motivo_baja = "";
       }
 
       const nuevoId = await Animales.save(data);
@@ -479,12 +483,17 @@ const AnimalesView = {
     const counter = document.getElementById('crotal-length-counter');
     if (counter) counter.textContent = len + '/14';
 
+    // Para animales de origen extranjero (compra intracomunitaria) el identificador
+    // no empieza por "ES"; solo se marca en rojo cuando se espera un crotal español.
+    const paisSel = document.getElementById('a-pais-nac');
+    const pais = paisSel ? paisSel.value : 'ES';
+
     if (len < 4) {
       input.style.color = "#888";
     } else if (len < 14) {
       input.style.color = "#fbbf24"; // dorado mientras se escribe
-    } else if (!cleanVal.startsWith("ES")) {
-      input.style.color = "#ef4444"; // rojo si no empieza por ES (SITRAN español)
+    } else if (pais === 'ES' && !cleanVal.startsWith("ES")) {
+      input.style.color = "#ef4444"; // rojo: español debe empezar por ES (SITRAN)
     } else {
       input.style.color = "#10b981"; // verde si está completo y correcto
     }
@@ -508,10 +517,13 @@ const AnimalesView = {
 
   _onEstadoChange(selectEl) {
     const esBaja = selectEl.value === 'baja';
+    const esSalida = esBaja || selectEl.value === 'vendido';
     const motivo = document.getElementById('a-motivo-baja-wrap');
     const fecha = document.getElementById('a-fecha-baja-wrap');
+    // El motivo de baja solo aplica a bajas (muerte/sacrificio...); la venta no lo usa.
     if (motivo) motivo.style.display = esBaja ? 'block' : 'none';
-    if (fecha) fecha.style.display = esBaja ? 'block' : 'none';
+    // La fecha se captura tanto en venta (fecha de salida) como en baja, para el libro de registro.
+    if (fecha) fecha.style.display = esSalida ? 'block' : 'none';
   },
 
   _salirRegistro() {

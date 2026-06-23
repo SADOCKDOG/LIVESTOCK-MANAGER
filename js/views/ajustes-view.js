@@ -207,8 +207,8 @@ const AjustesView = {
       <div class="card card-left-purple mb-20">
         <h3>🏛️ Trámites SIGGAN</h3>
         <p class="text-gray mt-5 text-85">Genera la guía de movimiento inter-explotación y la declaración censal para su tramitación oficial (SIGGAN / BADIGEX).</p>
-        <button class="btn btn-primary btn-full" onclick="App._abrirWizardGuiaMovimiento()" style="background:#8b5cf6;">🔄 Guía de Movimiento</button>
-        <button class="btn btn-primary btn-full-sm mt-10" onclick="App._abrirWizardCenso()" style="background:#3b82f6;">📊 Declaración Censal Anual</button>
+        <button class="btn btn-create btn-full" onclick="App._abrirWizardGuiaMovimiento()">🔄 Guía de Movimiento</button>
+        <button class="btn btn-create btn-full-sm mt-10" onclick="App._abrirWizardCenso()">📊 Declaración Censal Anual</button>
       </div>
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
