@@ -9,15 +9,34 @@ const RebanosView = {
     const main = document.getElementById("app-content");
     const rebanos = await Rebanos.list();
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
+    const totalRebanos = rebanos.length;
+    const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
     let html = `
-      <div class="text-center mb-25">
-        <div class="flex justify-center gap-8">
-          <button class="btn btn-primary btn-sm" onclick="RebanosView._crearRebano()">➕ Nuevo Rebaño</button>
+      <div class="mb-16">
+        <div class="flex justify-between items-center">
+          <div class="flex gap-8">
+            <button class="btn btn-create btn-sm" onclick="RebanosView._crearRebano()">➕ Nuevo</button>
+          </div>
+          ${totalRebanos > 0 ? `<span class="text-xs text-gray">${rebanosActivos}/${totalRebanos} activos</span>` : ''}
         </div>
       </div>`;
+
     if (rebanos.length === 0)
       html += `<div class="empty-state"><div class="empty-state-icon">🐑</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
     else {
+      // Barra de resumen de Rebaños
+      const carneCount = rebanos.filter(r => r.tipo.toLowerCase().includes('carne') || r.tipo.toLowerCase().includes('cárn')).length;
+      const lecheCount = rebanos.filter(r => r.tipo.toLowerCase().includes('leche') || r.tipo.toLowerCase().includes('láct')).length;
+      const hibridoCount = rebanos.filter(r => r.tipo.toLowerCase().includes('mixt') || r.tipo.toLowerCase().includes('híbr') || r.tipo.toLowerCase().includes('doble')).length;
+
+      html += `
+        <div class="flex flex-wrap gap-4 mb-10">
+          <span class="badge badge-sm badge-gold">🥩 Carne: ${carneCount}</span>
+          <span class="badge badge-sm badge-blue">🥛 Leche: ${lecheCount}</span>
+          <span class="badge badge-sm badge-purple">🔄 Híbridos: ${hibridoCount}</span>
+          <span class="badge badge-sm badge-green">✅ ${rebanosActivos} activos</span>
+        </div>`;
+
       html += `<div class="grid gap-15">`;
       for (let r of rebanos) {
         const animales = await Animales.list(r.id);
@@ -27,25 +46,40 @@ const RebanosView = {
         const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
         const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
         const iconoEsp = r.especie === 'Vacas' ? '🐄' : r.especie === 'Ovejas' ? '🐑' : r.especie === 'Cabras' ? '🐐' : '🐾';
+        const colorEstado = r.estado !== 'inactivo' ? '#10b981' : '#6b7280';
+
         html += `
-          <div class="card card-left-amber" onclick="location.hash='/rebano?id=${r.id}'" style="cursor:pointer; padding:15px;">
+          <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid ${colorEstado};">
             <div class="flex justify-between items-start">
-              <div>
-                <h3 class="m-0">${iconoEsp} ${r.nombre}</h3>
-                <p class="text-ccc text-85" style="margin:5px 0;">${r.especie} · ${r.tipo} · 📍 ${r.zonaActual || "S/N"}</p>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-6">
+                  <span class="text-xl">${iconoEsp}</span>
+                  <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
+                </div>
+                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                  <span>🧬 ${r.especie}</span>
+                  <span>·</span>
+                  <span>🏷️ ${r.tipo}</span>
+                  <span>·</span>
+                  <span>📍 ${r.zonaActual || "S/N"}</span>
+                </div>
+                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                  <span>🐑 ${n} animales (${activos} activos)</span>
+                  ${prodLeche > 0 ? `<span>·</span><span>🥛 ${prodLeche.toFixed(0)} L</span>` : ''}
+                  ${ultimoEvento ? `<span>·</span><span>📅 Últ. Act: ${new Date(ultimoEvento.fecha).toLocaleDateString('es-ES')}</span>` : ''}
+                </div>
               </div>
-              <span class="text-555 text-sm">Ficha ➔</span>
+              <div class="text-right flex-shrink-0">
+                <span class="badge badge-sm" style="background:${colorEstado}20;color:${colorEstado};border:1px solid ${colorEstado}40;display:block;margin-bottom:4px;">${(r.estado || 'activo').toUpperCase()}</span>
+                <span class="text-xs text-777">Ficha ➔</span>
+              </div>
             </div>
-            <div class="flex gap-12 mt-8">
-              <div class="text-amber font-bold">${n} animales</div>
-              <div class="text-green">${activos} activos</div>
-              ${prodLeche > 0 ? `<div class="text-gold">🥛 ${prodLeche.toFixed(0)}L</div>` : ''}
-            </div>
-            ${ultimoEvento ? `<div class="text-gray text-xs mt-4">📅 Últ. actividad: ${new Date(ultimoEvento.fecha).toLocaleDateString('es-ES')}</div>` : ''}
           </div>`;
       }
       html += `</div>`;
     }
+    html += `<!-- Botón Flotante de Acción para móviles -->
+      <button class="fab-btn" onclick="RebanosView._crearRebano()" title="Nuevo Rebaño">➕</button>`;
     main.innerHTML = html;
   },
 
@@ -102,23 +136,35 @@ const RebanosView = {
               ${tipos.map((t) => `<option value="${t.nombre}" ${rebano.tipo === t.nombre ? "selected" : ""}>${t.nombre}</option>`).join("")}
             </select></div>
           </div>
-          <div><label class="form-label">Ubicación (Zona)</label>
-          <select id="r-edit-zona" class="premium-input border-gold">
-            <option value="">Sin asignar</option>
-            ${zonas.map((z) => `<option value="${z.nombre}" ${rebano.zonaActual === z.nombre ? "selected" : ""}>${z.nombre}</option>`).join("")}
-          </select></div>
+          <div class="grid grid-cols-2 gap-10">
+            <div><label class="form-label">Capacidad Máxima</label>
+            <input type="number" id="r-edit-capacidad" value="${rebano.capacidad_total || ''}" class="premium-input"></div>
+            <div><label class="form-label">Código de Lote</label>
+            <input type="text" id="r-edit-lote" value="${rebano.codigo_lote || ''}" class="premium-input"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-10">
+            <div><label class="form-label">Fecha Constitución</label>
+            <input type="date" id="r-edit-fecha" value="${rebano.fecha_constitucion || ''}" class="premium-input"></div>
+            <div><label class="form-label">Ubicación (Zona)</label>
+            <select id="r-edit-zona" class="premium-input border-gold">
+              <option value="">Sin asignar</option>
+              ${zonas.map((z) => `<option value="${z.nombre}" ${rebano.zonaActual === z.nombre ? "selected" : ""}>${z.nombre}</option>`).join("")}
+            </select></div>
+          </div>
+          <div><label class="form-label">Notas / Observaciones</label>
+          <textarea id="r-edit-notas" class="premium-input" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
         </div>
         <div class="flex gap-10 mt-20">
-          <button class="btn btn-primary" onclick="RebanosView._guardarRebano(${id})" style="flex:2;">💾 Guardar</button>
-          <button class="btn btn-secondary" onclick="RebanosView._eliminarRebano(${id})" style="flex:1; background:#450a0a; color:white; border:none;">🗑️ Borrar</button>
+          <button class="btn btn-secondary btn-danger" onclick="RebanosView._eliminarRebano(${id})" style="flex:1;">🗑️ Eliminar</button>
+          <button class="btn btn-primary btn-success" onclick="RebanosView._guardarRebano(${id})" style="flex:2;">✔ Guardar</button>
         </div>
       </div>
-
+      
       <!-- Sanidad -->
       <div class="card mb-20 border-top-3px border-top-3px-green" style="background:rgba(16,185,129,0.05);">
         <div class="flex justify-between items-center">
           <div class="inf-card-title m-0">💉 Sanidad</div>
-          <button class="btn btn-primary" onclick="App._registrarTratamiento(${id})" style="padding:5px 12px; font-size:0.8rem; background:#10b981;">➕ Añadir</button>
+          <button class="btn btn-primary btn-add" onclick="App._registrarTratamiento(${id})" style="padding:5px 12px; font-size:0.8rem;">➕ Añadir</button>
         </div>
         <div id="lista-sanitarios-rebano" class="mt-10"></div>
       </div>
@@ -126,7 +172,7 @@ const RebanosView = {
       <!-- Animales -->
       <div class="flex justify-between items-center mb-15">
         <h3 class="m-0">🐑 Animales (${animales.length})</h3>
-        <button class="btn btn-primary" onclick="App._abrirSelectorAnimales(${id})" style="padding:8px 15px;">🔃 Mover</button>
+        <button class="btn btn-primary btn-edit" onclick="App._abrirSelectorAnimales(${id})" style="padding:8px 15px;">🔃 Mover</button>
       </div>
       <div class="grid gap-10">
         ${animales.map((a) => {
@@ -169,6 +215,7 @@ const RebanosView = {
       container.innerHTML = '<p class="text-red text-sm">Error cargando historial</p>';
     }
   },
+
   async _guardarRebano(id) {
     try {
       const r = await Rebanos.get(id);
@@ -176,6 +223,10 @@ const RebanosView = {
       r.especie = document.getElementById("r-edit-especie").value;
       r.tipo = document.getElementById("r-edit-tipo").value;
       r.zonaActual = document.getElementById("r-edit-zona").value;
+      r.capacidad_total = Number(document.getElementById("r-edit-capacidad").value) || 0;
+      r.codigo_lote = document.getElementById("r-edit-lote").value.trim();
+      r.fecha_constitucion = document.getElementById("r-edit-fecha").value;
+      r.notes = document.getElementById("r-edit-notas").value.trim();
       if (!r.nombre) return App.toastError("Nombre requerido");
       await Rebanos.save(r);
       App.toast("Rebaño actualizado");
@@ -246,6 +297,42 @@ const RebanosView = {
           data.tipo = document.getElementById('w-reb-tipo')?.value || data.tipo;
           data.zonaActual = document.getElementById('w-reb-zona')?.value || data.zonaActual;
         }
+      },
+      {
+        content: (data) => `
+          <div style="margin-top:10px;">
+            <div class="wizard-input-group">
+              <label class="wizard-label">CAPACIDAD / AFORO MÁXIMO</label>
+              <input type="number" id="w-reb-capacidad" value="${data.capacidad_total || ''}" placeholder="Ej: 100 (opcional)" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">CÓDIGO DE LOTE / TRAZABILIDAD</label>
+              <input type="text" id="w-reb-lote" value="${data.codigo_lote || ''}" placeholder="Ej: LOTE-2026-A (opcional)" class="wizard-input">
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.capacidad_total = Number(document.getElementById('w-reb-capacidad')?.value) || 0;
+          data.codigo_lote = document.getElementById('w-reb-lote')?.value.trim() || '';
+        }
+      },
+      {
+        content: (data) => `
+          <div style="margin-top:10px;">
+            <div class="wizard-input-group">
+              <label class="wizard-label">FECHA DE CONSTITUCIÓN</label>
+              <input type="date" id="w-reb-fecha" value="${data.fecha_constitucion}" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">NOTAS / OBSERVACIONES</label>
+              <textarea id="w-reb-notas" placeholder="Ración, ADSG, detalles..." class="wizard-input" style="height:80px; resize:none;">${data.notes || ''}</textarea>
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.fecha_constitucion = document.getElementById('w-reb-fecha')?.value || data.fecha_constitucion;
+          data.notes = document.getElementById('w-reb-notas')?.value.trim() || '';
+        }
       }
     ];
 
@@ -256,7 +343,11 @@ const RebanosView = {
         nombre: "",
         especie: especies[0].nombre,
         tipo: tipos[0].nombre,
-        zonaActual: ""
+        zonaActual: "",
+        capacidad_total: "",
+        codigo_lote: "",
+        fecha_constitucion: new Date().toISOString().split("T")[0],
+        notes: ""
       },
       steps: wizardSteps,
       onComplete: async (finalData) => {
@@ -266,7 +357,10 @@ const RebanosView = {
             especie: finalData.especie,
             tipo: finalData.tipo,
             zonaActual: finalData.zonaActual,
-            capacidad_total: 0,
+            capacidad_total: Number(finalData.capacidad_total) || 0,
+            codigo_lote: finalData.codigo_lote,
+            fecha_constitucion: finalData.fecha_constitucion,
+            notes: finalData.notes,
             estado: "activo",
           });
           App.toast("Rebaño creado exitosamente");

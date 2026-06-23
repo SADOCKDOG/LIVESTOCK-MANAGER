@@ -123,6 +123,9 @@ Error no controlado (excepción). Revisa el stack trace en consola.
 2. Expande cada tabla (rebanos, animales, etc.)
 3. Cuenta manualmente y compara con el expected
 4. Si discrepancia, la demo no cargó correctamente → Reload + Cargar Demo
+2. Abre el fichero `qa-test-runner.js` en tu editor.
+3. Busca la sección `// === NIVEL 1: SMOKE TEST ===`.
+4. Compara el valor `expected` de la prueba que falló con la cantidad real de datos en la demo. Si la demo ha cambiado, actualiza el valor `expected` en el script.
 
 ---
 
@@ -146,6 +149,9 @@ Error no controlado (excepción). Revisa el stack trace en consola.
 2. Abre seed-data.js
 3. Busca el valor esperado vs. actual
 4. Corrige el seed
+2. Abre `qa-test-runner.js` y localiza la prueba fallida en la sección de Nivel 2.
+3. Verifica si la lógica de la prueba (`fn`) o el valor esperado (`expected`) son correctos según la versión actual de `seed-data.js`.
+4. Corrige el `seed-data.js` o la prueba en `qa-test-runner.js` según corresponda.
 5. Limpia localStorage y recarga demo
 
 ---

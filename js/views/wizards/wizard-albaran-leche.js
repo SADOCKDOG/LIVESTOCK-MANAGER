@@ -16,6 +16,49 @@ window.AlbaranLecheWizard = {
       ? window.ComunidadesService.PRECIO_EXTRACTO_SECO_REF
       : { precio_base_referencia: 0.45, precio_por_punto_extracto: 0.045, tasa_INLAC_defecto: 0.0012 };
 
+    // Definición de funciones de cálculo en el ámbito global del App para los onchange/oninput
+    App._recalcularPrecioLeche = function() {
+      const pbInput = document.getElementById('w-l-pb');
+      const pexInput = document.getElementById('w-l-pex');
+      const primInput = document.getElementById('w-l-prim');
+      const cantInput = document.getElementById('w-l-cant');
+      const esDisplay = document.getElementById('w-l-es-display');
+      const precioDisplay = document.getElementById('w-l-precio-final-display');
+      const importeDisplay = document.getElementById('w-l-importe-display');
+
+      if (!pbInput || !pexInput || !primInput || !cantInput || !precioDisplay || !importeDisplay) return;
+
+      const pb = parseFloat(pbInput.value) || 0;
+      const pex = parseFloat(pexInput.value) || 0;
+      const prim = parseFloat(primInput.value) || 0;
+      const cant = parseFloat(cantInput.value) || 0;
+      const es = esDisplay ? (parseFloat(esDisplay.textContent) || 0) : 0;
+      const tasa = refPrecios.tasa_INLAC_defecto;
+
+      const precioFinal = parseFloat((pb + (es * pex) - tasa + prim).toFixed(4));
+      const importeTotal = parseFloat((cant * precioFinal).toFixed(2));
+
+      precioDisplay.textContent = precioFinal.toFixed(4) + ' €/L';
+      importeDisplay.textContent = importeTotal.toFixed(2) + ' €';
+    };
+
+    App._recalcularMOFA = function() {
+      const costPerInput = document.getElementById('w-l-cost-per');
+      const mofaDisplay = document.getElementById('w-l-resumen-mofa');
+      const costeDisplay = document.getElementById('w-l-resumen-coste');
+      const importeDisplay = document.getElementById('w-l-resumen-importe');
+
+      if (!costPerInput || !mofaDisplay || !costeDisplay || !importeDisplay) return;
+
+      const costeAlim = parseFloat(costPerInput.value) || 0;
+      const importeTotal = parseFloat(importeDisplay.textContent) || 0;
+      const mofa = parseFloat((importeTotal - costeAlim).toFixed(2));
+
+      costeDisplay.textContent = costeAlim.toFixed(2) + ' €';
+      mofaDisplay.innerHTML = mofa.toFixed(2) + ' € ' + (mofa >= 0 ? '✅' : '⚠️');
+      mofaDisplay.style.color = mofa >= 0 ? '#10b981' : '#ef4444';
+    };
+
     const wizardSteps = [
       // =====================================================
       // PASO 1: Datos Generales + CCAA + Contrato + ADSG
@@ -302,7 +345,8 @@ window.AlbaranLecheWizard = {
           <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">VOLUMEN RECOGIDO (LITROS)</label>
-              <input type="number" id="w-l-cant" value="${data.l}" class="wizard-input border-green" style="font-size:1rem;">
+              <input type="number" id="w-l-cant" value="${data.l}" class="wizard-input border-green" style="font-size:1rem;"
+                onchange="App._recalcularPrecioLeche()" oninput="App._recalcularPrecioLeche()">
             </div>
             <div class="grid grid-cols-2 gap-8">
               <div class="wizard-input-group">
@@ -323,7 +367,7 @@ window.AlbaranLecheWizard = {
             </div>
             <div class="bg-darker border-muted rounded-10" style="padding:14px; margin-top:12px;">
               <div class="grid grid-cols-2 gap-8 text-sm">
-                <div>Extracto seco: <strong class="text-gold">${es}%</strong></div>
+                <div>Extracto seco: <strong class="text-gold" id="w-l-es-display">${es}</strong>%</div>
                 <div>Tasa INLAC: <strong class="text-gray">${tasa} €</strong></div>
                 <div>Precio final unitario: <strong id="w-l-precio-final-display" class="text-green">${precioFinal.toFixed(4)} €/L</strong></div>
                 <div>Importe total: <strong id="w-l-importe-display" class="text-green">${importeTotal.toFixed(2)} €</strong></div>
@@ -381,10 +425,10 @@ window.AlbaranLecheWizard = {
                 <tr><td class="text-gray" class="py-4">Volumen</td><td class="text-right text-white" class="py-4">${vol.toLocaleString()} L</td></tr>
                 <tr><td class="text-gray" class="py-4">Extracto seco</td><td class="text-right text-gold" class="py-4">${es}%</td></tr>
                 <tr><td class="text-gray" class="py-4">Precio final</td><td class="text-right text-green" class="py-4">${precioFinal.toFixed(4)} €/L</td></tr>
-                <tr><td class="text-gray" class="py-4">Importe total</td><td class="text-right text-green font-bold" class="py-4">${importeTotal.toFixed(2)} €</td></tr>
-                <tr><td class="text-gray" class="py-4">Coste alimentación</td><td class="text-right text-red" class="py-4">${costeAlim.toFixed(2)} €</td></tr>
+                <tr><td class="text-gray" class="py-4">Importe total</td><td class="text-right text-green font-bold" class="py-4" id="w-l-resumen-importe">${importeTotal.toFixed(2)} €</td></tr>
+                <tr><td class="text-gray" class="py-4">Coste alimentación</td><td class="text-right text-red" class="py-4" id="w-l-resumen-coste">${costeAlim.toFixed(2)} €</td></tr>
                 <tr><td class="text-white font-bold" style="padding:6px 0 0; border-top:1px solid #333;">MOFA</td>
-                  <td class="font-bold" style="text-align:right; border-top:1px solid #333; color:${mofa >= 0 ? '#10b981' : '#ef4444'}; font-size:1rem;">
+                  <td class="font-bold" style="text-align:right; border-top:1px solid #333; color:${mofa >= 0 ? '#10b981' : '#ef4444'}; font-size:1rem;" id="w-l-resumen-mofa">
                     ${mofa.toFixed(2)} € ${mofa >= 0 ? '✅' : '⚠️'}</td></tr>
               </table>
               ${mofa < 0 ? '<p class="text-red text-xs mt-8">⚠️ El MOFA es negativo — el coste de alimentación supera los ingresos. Revisa la ración o el precio de venta.</p>' : ''}
@@ -467,7 +511,7 @@ window.AlbaranLecheWizard = {
             comunidad_autonoma: dataLeche.comunidad_autonoma || null,
             contrato_numero: dataLeche.contrato_numero || '',
             adsg_codigo: dataLeche.adsg_codigo || '',
-            rega_origen: finca.codigo_REGA || '',
+            rega_origen: finca.codigo_REGA || finca.rega || '',
             numero_infolac: dataLeche.numero_infolac || '',
             numero_muestreo_oficial: dataLeche.numero_muestreo_oficial || '',
             cadena_frio_cumplida: dataLeche.cadena_frio_cumplida || false,

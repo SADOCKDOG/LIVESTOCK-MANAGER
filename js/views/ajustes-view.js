@@ -18,13 +18,13 @@ const AjustesView = {
     main.innerHTML = `
       <!-- ===================== MIS FINCAS ===================== -->
       <div class="card card-left-gold mb-25">
-        <div class="flex justify-between items-center mb-15"><h3>🏠 Mis Fincas</h3><button class="btn btn-primary btn-sm" onclick="App._showFincaForm()">➕ Nueva</button></div>
+        <div class="flex justify-between items-center mb-15"><h3>🏠 Mis Fincas</h3><button class="btn btn-create btn-sm" onclick="App._showFincaForm()">➕ Nueva</button></div>
         <div class="grid gap-10">${fincas.map((f) => {
           const anims = animales.filter(a => a.rebanoId && rebanos.some(r => r.id === a.rebanoId && r.fincaId === f.id));
           return `<div class="flex justify-between items-center rounded-sm" style="background:#222; padding:12px; border:1px solid ${f.id === activeId ? "var(--p-cork)" : "#333"};">
           <div>
             <div class="font-bold" style="color:${f.id === activeId ? "var(--p-cork)" : "#fff"};">${f.nombre}</div>
-            <div class="text-gray" style="font-size:0.75rem;">REGA: ${f.codigo_REGA || "N/D"} · 🐑 ${anims.length} animales</div>
+            <div class="text-gray" style="font-size:0.75rem;">REGA: ${f.codigo_REGA || f.rega || "N/D"} · 🐑 ${anims.length} animales</div>
           </div>
           <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Activar</button>` : `<span class="badge badge-gold text-xs" style="padding:4px 10px;">Activa</span>`}</div>
         </div>`;
@@ -37,7 +37,7 @@ const AjustesView = {
         <p class="text-gray mt-5 text-85">Exporta o importa todos los datos de la aplicación en formato JSON.</p>
         ${lastBackup ? `<div class="text-xs text-gray mb-8">📅 Último backup: ${new Date(lastBackup).toLocaleDateString('es-ES')}</div>` : ''}
         <div class="flex gap-10">
-          <button class="btn btn-primary flex-1" onclick="App.exportBackup()" style="background:#1e3a8a;">⬇️ Exportar</button>
+          <button class="btn btn-success flex-1" onclick="App.exportBackup()">⬇️ Exportar</button>
           <button class="btn btn-secondary flex-1" onclick="document.getElementById('import-backup-file').click()">⬆️ Importar</button>
         </div>
         <input type="file" id="import-backup-file" style="display:none" onchange="App.importBackup(event)">
@@ -62,7 +62,7 @@ const AjustesView = {
         <div class="text-gray-500 mt-8 rounded-sm" style="font-size:0.72rem; padding:8px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.15);">
           📌 El contrato lácteo debe tener una duración mínima de 1 año. Las declaraciones INFOLAC son mensuales y obligatorias.
         </div>` : '<p class="text-555">Activa una finca para ver los datos de contratación láctea.</p>'}
-        <button class="btn btn-primary btn-full" onclick="App._editarFincaActiva()" style="background:#f59e0b;">✏️ Editar Contrato Lácteo</button>
+        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">✏️ Editar Contrato Lácteo</button>
       </div>
 
       <!-- ===================== ADSG ===================== -->
@@ -80,7 +80,7 @@ const AjustesView = {
             <div><span class="text-gray">Vencimiento:</span> <strong style="color:${activeFinca.adsg_fecha_vencimiento ? '#f59e0b' : '#888'};">${activeFinca.adsg_fecha_vencimiento || '—'}${activeFinca.adsg_fecha_vencimiento ? AjustesView._diasRestantes(activeFinca.adsg_fecha_vencimiento) : ''}</strong></div>
           </div>
         </div>` : '<p class="text-555">Activa una finca para gestionar los datos ADSG.</p>'}
-        <button class="btn btn-primary btn-full" onclick="App._editarFincaActiva()" style="background:#3b82f6;">✏️ Editar ADSG</button>
+        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">✏️ Editar ADSG</button>
       </div>
 
       <!-- ===================== CONFIGURACIÓN AUTONÓMICA ===================== -->
@@ -110,8 +110,8 @@ const AjustesView = {
               <a href="${plataformaUrl}" target="_blank" rel="noopener" class="btn btn-secondary text-xs flex-1 text-center" style="padding:6px;border:1px solid #8b5cf6;">🔗 Ir a ${plataforma || 'Plataforma'}</a>
             </div>` : '<p class="text-555">Configura la comunidad autónoma en la ficha de la finca.</p>'}
           </div>`; })() : '<p class="text-555">Activa una finca para ver la configuración autonómica.</p>'}
-        <button class="btn btn-primary btn-full" onclick="App._editarFincaActiva()" style="background:#8b5cf6;">✏️ Editar Configuración</button>
-        <button class="btn btn-secondary bg-card text-purple btn-full-sm" onclick="App._mostrarGuiaNormativas()" style="border:1px solid #8b5cf6;">📖 Comparativa Normativa CCAA</button>
+        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">✏️ Editar Configuración</button>
+        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarGuiaNormativas()">📖 Comparativa Normativa CCAA</button>
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
@@ -133,7 +133,7 @@ const AjustesView = {
         <h3>🧬 Especies y Razas</h3>
         <p class="text-gray mt-5 text-85">Gestiona las especies activas en tu explotación y sus parámetros de referencia.</p>
         <div id="especies-container" class="mt-10">${this._renderEspecies(config)}</div>
-        <button class="btn btn-secondary btn-full-sm mt-8" onclick="AjustesView._agregarEspecie()" style="border:1px solid #f59e0b;">➕ Añadir Especie</button>
+        <button class="btn btn-create btn-full-sm mt-8" onclick="AjustesView._agregarEspecie()">➕ Añadir Especie</button>
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
@@ -192,29 +192,29 @@ const AjustesView = {
           <div><span class="text-gray">Rebaños:</span> <strong class="text-white">${rebanos.length}</strong></div>
           <div><span class="text-gray">Service Worker:</span> <strong class="text-white">${'serviceWorker' in navigator ? '✅ Activo' : '❌ No soportado'}</strong></div>
         </div>
-        <button class="btn btn-secondary btn-full-sm mt-10" onclick="AjustesView._limpiarCache()" style="border:1px solid #ef4444;color:#ef4444;">🗑️ Limpiar Caché Local</button>
+        <button class="btn btn-danger btn-full-sm mt-10" onclick="AjustesView._limpiarCache()">🗑️ Limpiar Caché Local</button>
       </div>
 
       <!-- ===================== GESTIÓN DE TRAZABILIDAD ===================== -->
       <div class="card card-left-green mb-20">
         <h3>🏷️ Gestión de Trazabilidad</h3>
         <p class="text-gray mt-5 text-85">Genera solicitudes oficiales de remesas de crotales para tu ADSG o Administración.</p>
-        <button class="btn btn-primary btn-full" onclick="App._abrirWizardPedidoCrotales()" style="background:#10b981;">📄 Generar Pedido de Crotales</button>
-        <button class="btn btn-secondary bg-card text-green btn-full-sm" onclick="App._mostrarAyudaCrotales()" style="border:1px solid #10b981;">📖 Normativa de Identificación</button>
+        <button class="btn btn-create btn-full" onclick="App._abrirWizardPedidoCrotales()">📄 Generar Pedido de Crotales</button>
+        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarAyudaCrotales()">📖 Normativa de Identificación</button>
       </div>
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
       <div class="card card-left-red mb-20">
         <h3>⚕️ Guía Farmacológica</h3>
         <p class="text-gray mt-5 text-85">Tabla de tiempos de retiro, supresión y dosificación para evitar residuos.</p>
-        <button class="btn btn-primary btn-full" onclick="App._mostrarAyudaMedicamentos()" style="background:#ef4444;">📚 Ver Tiempos de Retiro y Dosis</button>
+        <button class="btn btn-secondary btn-full" onclick="App._mostrarAyudaMedicamentos()">📚 Ver Tiempos de Retiro y Dosis</button>
       </div>
 
       <!-- ===================== MANUAL DE USUARIO ===================== -->
       <div class="card card-left-gold mb-20">
         <h3>📖 Manual de Usuario</h3>
         <p class="text-gray mt-5 text-85">Guía paso a paso del uso de la aplicación, con capturas de cada módulo.</p>
-        <button class="btn btn-primary btn-full" onclick="AjustesView._abrirManual()" style="background:#c9851f;">📖 Abrir Manual</button>
+        <button class="btn btn-secondary btn-full" onclick="AjustesView._abrirManual()">📖 Abrir Manual</button>
       </div>
 
       <!-- ===================== FOOTER ===================== -->
@@ -286,7 +286,7 @@ const AjustesView = {
         <span class="text-white font-bold text-sm flex-1">${e.nombre}</span>
         <span class="text-gray text-xs">${e.consumoAgua || '—'} L/día</span>
         <span class="text-gray text-xs">Precio: ${e.precioRef || '—'}€</span>
-        <button class="text-xs text-red" style="background:none;border:none;cursor:pointer;" onclick="AjustesView._eliminarEspecie(${i})">✕</button>
+        <button class="btn btn-danger btn-sm text-xs" style="padding:4px 8px;" onclick="AjustesView._eliminarEspecie(${i})">✕</button>
       </div>`).join('');
   },
 
@@ -302,9 +302,9 @@ const AjustesView = {
           <div class="wizard-input-group"><label class="wizard-label">Consumo Agua (L/día)</label><input type="number" id="esp-agua" value="10" class="wizard-input"></div>
           <div class="wizard-input-group"><label class="wizard-label">Precio Ref. (€)</label><input type="number" id="esp-precio" value="0.00" step="0.01" class="wizard-input"></div>
         </div>
-        <div class="flex gap-10 mt-20">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-esp-guardar">💾 Guardar</button>
-          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+        <div class="flex justify-end gap-10 mt-20">
+          <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">✕ Cancelar</button>
+          <button class="btn btn-success" id="btn-esp-guardar">✔ Guardar</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -358,7 +358,7 @@ const AjustesView = {
     overlay.innerHTML = `
       <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#1a1a1a; color:#fff;">
         <strong style="color:#e0a83a;">📖 Manual de Usuario</strong>
-        <button onclick="this.closest('.wizard-full-screen').remove()" style="background:#c9851f; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:700;">✕ Cerrar</button>
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">✕ Cerrar</button>
       </div>
       <iframe src="manual/index.html" style="flex:1; width:100%; border:none; background:#fff;"></iframe>`;
     document.body.appendChild(overlay);

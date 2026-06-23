@@ -192,8 +192,7 @@ const GastosView = {
             </div>`).join('')}
         </div>` : ''}
         <div class="text-center mb-12">
-          <button class="btn btn-primary btn-sm" onclick="${registrarHandler}"
-            style="background:linear-gradient(135deg,${color},${colorDark}); box-shadow:none;">
+          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
             ➕ ${registrarLabel}
           </button>
         </div>
@@ -201,7 +200,8 @@ const GastosView = {
           📋 ${listName}
         </div>
         ${recordsHtml}
-      </div>`;
+      </div>
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="${registrarLabel}">➕</button>`;
   },
 
   _fmt(n) {

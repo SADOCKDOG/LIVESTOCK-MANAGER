@@ -67,8 +67,9 @@ const PdfService = {
 
         updateProgress(30, 'Preparando documento...');
         const sourceEl = overlay.querySelector(`#${contentId}`);
+        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
         const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; padding:30px;';
+        tempContainer.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; z-index:9990; background:#fff; color:#000; padding:30px;`;
         tempContainer.innerHTML = sourceEl.innerHTML;
         document.body.appendChild(tempContainer);
 
@@ -80,6 +81,8 @@ const PdfService = {
             scale: 2,
             useCORS: true,
             width: 800,
+            scrollX: 0,
+            scrollY: currentScroll,
             height: tempContainer.scrollHeight,
             windowHeight: tempContainer.scrollHeight
           },

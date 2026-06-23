@@ -172,7 +172,21 @@ const DashboardView = {
         <div class="grid grid-cols-2 gap-8 mt-10">
           <a href="#/animales" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">🐑 Animales</a>
           <a href="#/rebanos" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">🐄 Rebaños</a>
-          <a href="#/produccion" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📊 Producción</a>
+          ${(() => {
+            let tieneCarne = false;
+            let tieneLeche = false;
+            let tieneHibrido = false;
+            rebanos.forEach(r => {
+              const tipo = (r.tipo || '').toLowerCase();
+              if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
+              else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
+              else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
+            });
+            let modo = 'carne';
+            if (tieneHibrido || (tieneCarne && tieneLeche)) modo = 'hibrido';
+            else if (tieneLeche) modo = 'leche';
+            return `<a href="#/${modo}" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📊 Módulo ${modo === 'hibrido' ? 'Híbrido' : modo === 'leche' ? 'Leche' : 'Carne'}</a>`;
+          })()}
           <a href="#/informes" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📈 Informes</a>
         </div>
       </div>

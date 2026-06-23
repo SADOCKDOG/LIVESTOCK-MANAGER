@@ -1,10 +1,26 @@
 const Fincas = {
     async list() {
-        return window.db.getAll('fincas');
+        const list = await window.db.getAll('fincas');
+        if (list) {
+            list.forEach(f => {
+                if (f) {
+                    const regaVal = (f.rega || f.codigo_REGA || '').toString().trim().toUpperCase();
+                    f.rega = regaVal;
+                    f.codigo_REGA = regaVal;
+                }
+            });
+        }
+        return list;
     },
 
     async get(id) {
-        return window.db.get('fincas', Number(id));
+        const f = await window.db.get('fincas', Number(id));
+        if (f) {
+            const regaVal = (f.rega || f.codigo_REGA || '').toString().trim().toUpperCase();
+            f.rega = regaVal;
+            f.codigo_REGA = regaVal;
+        }
+        return f;
     },
 
     async getActiveId() {
@@ -57,6 +73,12 @@ const Fincas = {
     },
 
     async save(data) {
+        if (data) {
+            const regaVal = (data.rega || data.codigo_REGA || '').toString().trim().toUpperCase();
+            data.rega = regaVal;
+            data.codigo_REGA = regaVal;
+        }
+
         const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
         if (esEdicion) {
@@ -176,6 +198,7 @@ const Fincas = {
                 throw new Error(`Ya existe una finca con nombre "${datos.nombre}"`);
             }
 
+            const regaVal = (datos.rega || datos.codigo_REGA || '').toString().trim().toUpperCase();
             // Crear finca nueva
             const nuevaFinca = {
                 nombre: datos.nombre.trim(),
@@ -184,7 +207,8 @@ const Fincas = {
                 telefonoContacto: (datos.telefonoContacto || '').trim(),
                 nif_cif: (datos.nif_cif || '').trim(),
                 email: (datos.email || '').trim(),
-                rega: (datos.rega || datos.codigo_REGA || '').toString().trim().toUpperCase(),
+                rega: regaVal,
+                codigo_REGA: regaVal,
                 cea: (datos.cea || '').toString().trim().toUpperCase(),
                 adsg_nombre: (datos.adsg_nombre || '').trim(),
                 zonas: datos.zonas || [],
