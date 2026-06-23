@@ -21,9 +21,14 @@ window.ComunidadesService = (() => {
       label: 'Andalucía',
       provincias: Object.freeze(['Huelva', 'Sevilla', 'Cádiz', 'Córdoba', 'Jaén', 'Málaga', 'Granada', 'Almería']),
       codigo_provincia_prefijo: '21',           // Huelva
+      // Códigos INE de provincia (2 dígitos) usados en el código REGA oficial
+      codigos_provincia_INE: Object.freeze({
+        'Almería': '04', 'Cádiz': '11', 'Córdoba': '14', 'Granada': '18',
+        'Huelva': '21', 'Jaén': '23', 'Málaga': '29', 'Sevilla': '41',
+      }),
       distancia_minima_REGA_m: 500,             // Decreto 14/2006
       umbral_PAC_corderos_oveja: 0.6,           // 0.6 corderos/oveja/año
-      sistema_movimiento: 'SIGGAN',             // Sistema de Información de Gestión Ganadera
+      sistema_movimiento: 'SIGGAN',             // Sistema Integrado de Gestión Ganadera
       plataforma_tramitacion: 'PIMA',
       url_tramitacion: 'https://www.juntadeandalucia.es/servicios/sede/tramites/procedimientos/detalle/146.html',
       guia_automatica_si_saneada: true,         // Emisión guía 365 días si explotación saneada
@@ -31,12 +36,15 @@ window.ComunidadesService = (() => {
       adsg_subvencion: 'alta',                  // ADSG subvenciona vacunas
       formulario_crotales: 'SIGGAN',            // Sistema de pedido de crotales
       requiere_desinsectacion_movimiento: true, // Certificar desinsectación 48h previas
+      rega_obligatorio: true,                   // SIGGAN exige REGA para operar
+      requiere_guia_movimiento: true,           // Guía de origen y sanidad pecuaria obligatoria
     }),
 
     extremadura: Object.freeze({
       label: 'Extremadura',
       provincias: Object.freeze(['Badajoz', 'Cáceres']),
       codigo_provincia_prefijo: '06',           // Badajoz
+      codigos_provincia_INE: Object.freeze({ 'Badajoz': '06', 'Cáceres': '10' }),
       distancia_minima_REGA_m: 1000,            // Decreto 163/2022
       umbral_PAC_corderos_oveja: 0.4,           // 0.4 corderos/oveja/año
       sistema_movimiento: 'BADIGEX',            // Base de Datos Identificación Ganadera Extremadura
@@ -47,8 +55,98 @@ window.ComunidadesService = (() => {
       adsg_subvencion: 'media',                 // Control estricto ADSG
       formulario_crotales: 'BADIGEX',           // Sistema de pedido de crotales
       requiere_desinsectacion_movimiento: true, // + restricción movimientos nocturnos
+      rega_obligatorio: false,
+      requiere_guia_movimiento: true,
     }),
   });
+
+  // ============================================================
+  // 1.b. CATÁLOGOS SIGGAN (Junta de Andalucía)
+  // ============================================================
+
+  // Tipos/clasificación de explotación según REGA (RD 479/2004 y normativa SIGGAN)
+  const TIPOS_EXPLOTACION_REGA = Object.freeze([
+    'Producción y reproducción',
+    'Reproducción para abasto',
+    'Reproducción para selección',
+    'Recría de novillas',
+    'Cebo o engorde (Cebadero)',
+    'Tratante u operador comercial',
+    'Centro de tipificación',
+    'Pasto / aprovechamiento estacional',
+    'Autoconsumo',
+    'Especial (mixta)',
+  ]);
+
+  // Clasificación zootécnica
+  const CLASIFICACION_ZOOTECNICA = Object.freeze([
+    'Intensivo',
+    'Extensivo',
+    'Semiextensivo',
+    'Trashumante / trasterminante',
+  ]);
+
+  // Especies autorizables en la explotación (para REGA)
+  const ESPECIES_AUTORIZABLES = Object.freeze([
+    'Bovino', 'Ovino', 'Caprino', 'Porcino', 'Equino', 'Avícola', 'Apícola',
+  ]);
+
+  // Especies que requieren documento de identificación individual tipo pasaporte/DIB
+  const ESPECIES_CON_DIB = Object.freeze(['Bovino', 'Equino']);
+
+  // Países de nacimiento más habituales (código ISO + etiqueta) para el libro de registro
+  const PAISES_NACIMIENTO = Object.freeze([
+    { value: 'ES', label: 'España (ES)' },
+    { value: 'PT', label: 'Portugal (PT)' },
+    { value: 'FR', label: 'Francia (FR)' },
+    { value: 'DE', label: 'Alemania (DE)' },
+    { value: 'NL', label: 'Países Bajos (NL)' },
+    { value: 'IE', label: 'Irlanda (IE)' },
+    { value: 'IT', label: 'Italia (IT)' },
+    { value: 'OTRO', label: 'Otro' },
+  ]);
+
+  // Motivos de baja en el libro de registro (SIGGAN)
+  const MOTIVOS_BAJA = Object.freeze([
+    { value: 'muerte', label: 'Muerte en la explotación' },
+    { value: 'sacrificio', label: 'Sacrificio en matadero' },
+    { value: 'sacrificio_obligatorio', label: 'Sacrificio obligatorio (saneamiento)' },
+    { value: 'venta', label: 'Venta / salida a otra explotación' },
+    { value: 'desaparicion', label: 'Desaparición / robo' },
+    { value: 'autoconsumo', label: 'Sacrificio domiciliario (autoconsumo)' },
+    { value: 'otro', label: 'Otro' },
+  ]);
+
+  // Motivos de movimiento inter-explotación (guía de origen y sanidad pecuaria)
+  const MOTIVOS_MOVIMIENTO = Object.freeze([
+    { value: 'vida', label: 'Vida / reproducción' },
+    { value: 'cebo', label: 'Cebo / engorde' },
+    { value: 'matadero', label: 'Sacrificio (matadero)' },
+    { value: 'pasto', label: 'Pasto / aprovechamiento' },
+    { value: 'concentracion', label: 'Concentración / certamen' },
+    { value: 'tratante', label: 'Operador comercial / tratante' },
+    { value: 'otro', label: 'Otro' },
+  ]);
+
+  // Campañas oficiales de saneamiento ganadero (ADSG / Junta de Andalucía)
+  const CAMPANAS_SANEAMIENTO = Object.freeze([
+    { value: 'tuberculosis', label: 'Tuberculosis bovina (TBC)', especies: ['Bovino', 'Caprino'] },
+    { value: 'brucelosis_b', label: 'Brucelosis bovina (B. abortus)', especies: ['Bovino'] },
+    { value: 'brucelosis_om', label: 'Brucelosis ovina y caprina (B. melitensis)', especies: ['Ovino', 'Caprino'] },
+    { value: 'leucosis', label: 'Leucosis enzoótica bovina (LEB)', especies: ['Bovino'] },
+    { value: 'perineumonia', label: 'Perineumonía contagiosa bovina (PPCB)', especies: ['Bovino'] },
+    { value: 'lengua_azul', label: 'Lengua azul (vacunación obligatoria)', especies: ['Bovino', 'Ovino', 'Caprino'] },
+    { value: 'otra', label: 'Otra campaña', especies: ESPECIES_AUTORIZABLES },
+  ]);
+
+  // Calificaciones sanitarias de la explotación (resultado de saneamiento)
+  const CALIFICACIONES_SANITARIAS = Object.freeze([
+    { value: 'indemne', label: 'Oficialmente indemne (T3/M3/B4)', color: '#10b981' },
+    { value: 'calificada', label: 'Calificada', color: '#3b82f6' },
+    { value: 'en_proceso', label: 'En proceso de calificación', color: '#f59e0b' },
+    { value: 'positiva', label: 'Con positivos / inmovilizada', color: '#ef4444' },
+    { value: 'sin_calificar', label: 'Sin calificar', color: '#888888' },
+  ]);
 
   // ============================================================
   // 2. ESTRUCTURA DE COSTES LÁCTEOS (Referencia sectorial)
@@ -159,6 +257,118 @@ window.ComunidadesService = (() => {
     const conf = COMUNIDADES[ccaa];
     return conf ? conf.sistema_movimiento : 'No configurado';
   }
+
+  // ============================================================
+  // FUNCIONES SIGGAN — REGA, EXPLOTACIÓN, MOVIMIENTOS, SANEAMIENTO
+  // ============================================================
+
+  /** Indica si el REGA es obligatorio para la comunidad indicada */
+  function esREGAObligatorio(ccaa) {
+    const conf = COMUNIDADES[ccaa];
+    return conf ? !!conf.rega_obligatorio : false;
+  }
+
+  /** Indica si los movimientos inter-explotación requieren guía oficial */
+  function requiereGuiaMovimiento(ccaa) {
+    const conf = COMUNIDADES[ccaa];
+    return conf ? !!conf.requiere_guia_movimiento : true;
+  }
+
+  /**
+   * Normaliza un código REGA quitando separadores y pasando a mayúsculas.
+   * @param {string} rega
+   * @returns {string}
+   */
+  function normalizarREGA(rega) {
+    return (rega || '').toString().trim().toUpperCase().replace(/[\s./_]+/g, '');
+  }
+
+  /**
+   * Valida el formato oficial del código REGA (RD 479/2004).
+   * Estructura: ES + provincia(2 dígitos INE) + municipio(3 dígitos) +
+   * secuencial(7 dígitos). Total 14 dígitos tras el prefijo "ES".
+   * Para Andalucía además comprueba que la provincia INE sea de la comunidad.
+   * @param {string} rega
+   * @param {'andalucia'|'extremadura'|null} ccaa
+   * @returns {{valido:boolean, mensaje:string, provinciaINE?:string}}
+   */
+  function validarFormatoREGA(rega, ccaa = null) {
+    const limpio = normalizarREGA(rega);
+    if (!limpio) return { valido: false, mensaje: 'El código REGA está vacío.' };
+
+    const re = /^ES(\d{2})(\d{3})(\d{7})$/;
+    const m = limpio.match(re);
+    if (!m) {
+      return {
+        valido: false,
+        mensaje: 'Formato REGA inválido. Debe ser ES + 2 díg. provincia + 3 díg. municipio + 7 díg. secuencial (ej: ES041230000123).',
+      };
+    }
+
+    const provinciaINE = m[1];
+    const conf = ccaa ? COMUNIDADES[ccaa] : null;
+    if (conf && conf.codigos_provincia_INE) {
+      const validas = Object.values(conf.codigos_provincia_INE);
+      if (!validas.includes(provinciaINE)) {
+        return {
+          valido: false,
+          mensaje: `La provincia (${provinciaINE}) del REGA no pertenece a ${conf.label}.`,
+          provinciaINE,
+        };
+      }
+    }
+    return { valido: true, mensaje: 'Código REGA válido.', provinciaINE };
+  }
+
+  /** Devuelve el código INE de una provincia (busca en todas las comunidades) */
+  function getCodigoProvinciaINE(provincia) {
+    for (const conf of Object.values(COMUNIDADES)) {
+      if (conf.codigos_provincia_INE && conf.codigos_provincia_INE[provincia]) {
+        return conf.codigos_provincia_INE[provincia];
+      }
+    }
+    return null;
+  }
+
+  /** Lista de provincias de una comunidad */
+  function getProvincias(ccaa) {
+    const conf = COMUNIDADES[ccaa];
+    return conf ? [...conf.provincias] : [];
+  }
+
+  /** Catálogo de tipos de explotación REGA */
+  function getTiposExplotacionREGA() { return [...TIPOS_EXPLOTACION_REGA]; }
+
+  /** Catálogo de clasificación zootécnica */
+  function getClasificacionZootecnica() { return [...CLASIFICACION_ZOOTECNICA]; }
+
+  /** Catálogo de especies autorizables */
+  function getEspeciesAutorizables() { return [...ESPECIES_AUTORIZABLES]; }
+
+  /** Indica si una especie requiere DIB/pasaporte individual */
+  function especieRequiereDIB(especie) {
+    if (!especie) return false;
+    const norm = especie.toString().trim().toLowerCase();
+    // Sinónimos habituales en la app (config_especies usa "Vacas", etc.)
+    const bovino = ['bovino', 'vacuno', 'vaca', 'toro', 'buey', 'ternero', 'novillo', 'añojo'];
+    const equino = ['equino', 'caballo', 'yegua', 'potro', 'equido', 'équido'];
+    return [...bovino, ...equino].some(k => norm.includes(k));
+  }
+
+  /** Catálogo de países de nacimiento */
+  function getPaisesNacimiento() { return PAISES_NACIMIENTO.map(p => ({ ...p })); }
+
+  /** Catálogo de motivos de baja */
+  function getMotivosBaja() { return MOTIVOS_BAJA.map(m => ({ ...m })); }
+
+  /** Catálogo de motivos de movimiento */
+  function getMotivosMovimiento() { return MOTIVOS_MOVIMIENTO.map(m => ({ ...m })); }
+
+  /** Catálogo de campañas de saneamiento */
+  function getCampanasSaneamiento() { return CAMPANAS_SANEAMIENTO.map(c => ({ ...c })); }
+
+  /** Catálogo de calificaciones sanitarias */
+  function getCalificacionesSanitarias() { return CALIFICACIONES_SANITARIAS.map(c => ({ ...c })); }
 
   /**
    * Retorna el umbral PAC de corderos/oveja/año
@@ -355,10 +565,34 @@ window.ComunidadesService = (() => {
     TIPOS_EXPLOTACION,
     SISTEMAS_EXPLOTACION,
     PRECIO_EXTRACTO_SECO_REF,
+    TIPOS_EXPLOTACION_REGA,
+    CLASIFICACION_ZOOTECNICA,
+    ESPECIES_AUTORIZABLES,
+    ESPECIES_CON_DIB,
+    PAISES_NACIMIENTO,
+    MOTIVOS_BAJA,
+    MOTIVOS_MOVIMIENTO,
+    CAMPANAS_SANEAMIENTO,
+    CALIFICACIONES_SANITARIAS,
     getConfiguracionCCAA,
     getComunidades,
     getOpcionesComunidad,
     getPlataformaMovimiento,
+    esREGAObligatorio,
+    requiereGuiaMovimiento,
+    normalizarREGA,
+    validarFormatoREGA,
+    getCodigoProvinciaINE,
+    getProvincias,
+    getTiposExplotacionREGA,
+    getClasificacionZootecnica,
+    getEspeciesAutorizables,
+    especieRequiereDIB,
+    getPaisesNacimiento,
+    getMotivosBaja,
+    getMotivosMovimiento,
+    getCampanasSaneamiento,
+    getCalificacionesSanitarias,
     getUmbralPAC,
     getDistanciaMinimaREGA,
     getCostesLecheReferencia,
