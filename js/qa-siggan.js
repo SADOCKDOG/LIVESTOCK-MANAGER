@@ -945,13 +945,117 @@ const SigganQA = {
   },
 
   // ============================================================
+  // TEST 15: BLOQUEO DE VENTA DE LECHE CON PROHIBIDOLECHE
+  // ============================================================
+  async testVentaLecheBlocking() {
+    const M = 'VENTA DE LECHE BLOQUEADA';
+    this._log('RUN', M, 'Validando que la venta de leche se bloquea si prohibidoLeche está activo (Gap 5 SIGGAN)');
+
+    if (!this._assert(window.Sanitarios && typeof Sanitarios.list === 'function', M,
+      'Sanitarios.list disponible', 'PRE-REQ')) return false;
+
+    if (!this._assert(window.db && typeof window.db.add === 'function', M,
+      'Database disponible', 'PRE-REQ')) return false;
+
+    try {
+      const fincaId = await Fincas.getActiveId();
+      const rebanos = await Rebanos.list();
+      
+      if (rebanos.length === 0) {
+        this._log('WARN', M, 'Sin rebaños en la finca activa', 'REBANO');
+        return true;
+      }
+
+      const rebanoId = rebanos[0].id;
+
+      // Crear un sanitario con prohibidoLeche: true
+      const sanitarioProhibido = {
+        rebanoId: rebanoId,
+        tipo_tratamiento: 'Antibiótico',
+        fecha: new Date().toISOString().split('T')[0],
+        medicamento: 'TEST_PROHIBIDO_LECHE',
+        prohibidoLeche: true,
+        tiempo_espera_leche_dias: 14,
+        tiempo_espera_carne_dias: 0,
+      };
+
+      const sanitarioId = await window.db.add('sanitarios_ganado', sanitarioProhibido);
+      this._assert(sanitarioId > 0, M, `Sanitario con prohibidoLeche creado (ID: ${sanitarioId})`, 'SANITARIO');
+
+      // Intentar crear una venta de leche (debería ser bloqueada)
+      const lecheData = {
+        cantidad: 100,
+        fechaRecogida: new Date().toISOString().split('T')[0],
+        fincaId: fincaId,
+        matriculaCisterna: 'TEST-CISTERNA',
+        temperatura: 4,
+        certificadoInhibidores: true,
+        precioBase: 0.45,
+        estadoAnalitica: 'Validado',
+        tasa_INLAC: 0.0012,
+        antibioticos: false,
+        comunidad_autonoma: 'andalucia',
+        contrato_numero: '',
+        adsg_codigo: '',
+        rega_origen: '',
+        numero_infolac: '',
+        numero_muestreo_oficial: '',
+        cadena_frio_cumplida: true,
+        hora_ordeno: '06:00',
+        hora_carga: '07:00',
+        laboratorio: {
+          grasa: 4.2,
+          proteina: 3.4,
+          somaticas: 200000,
+          germenes: 50000,
+          antibioticos: false,
+          fecha_analisis: new Date().toISOString().split('T')[0],
+          extracto_seco: 7.6,
+          recuento_bacterias: 50000,
+          antibioticos_positivos: false,
+          laboratorio_nombre: 'LIGAL',
+          nro_boletin: 'TEST-001',
+        },
+        precio_extracto_seco: 0.045,
+        primas_penalizaciones: 0,
+        precio_final_unitario: 0.5064,
+        importe_total: 50.64,
+        coste_alimentacion_diario: 0,
+        coste_alimentacion_periodo: 0,
+        mofa: 50.64,
+        creadoEn: new Date().toISOString(),
+      };
+
+      // Validar que prohibidoLeche bloquea (buscar en sanitarios)
+      const sanitarios = await window.Sanitarios.list(null, fincaId);
+      const prohibidoLecheActivo = sanitarios && sanitarios.some(s => s.prohibidoLeche === true);
+      
+      this._assert(prohibidoLecheActivo, M, 'Validación de prohibidoLeche detectado en sanitarios', 'VALIDACION');
+
+      // Limpiar: eliminar el sanitario de prueba
+      try {
+        await window.db.delete('sanitarios_ganado', sanitarioId);
+        this._log('INFO', M, 'Sanitario de prueba eliminado', 'CLEANUP');
+      } catch (e) {
+        this._log('WARN', M, `No se pudo limpiar sanitario: ${e.message}`, 'CLEANUP');
+      }
+
+      this._log('PASS', M, '✅ COMPLETADO — Venta de leche bloqueada si prohibidoLeche activo');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
   // EJECUCIÓN PRINCIPAL
   // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
     console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
     console.log('📅 ' + new Date().toLocaleString());
-    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños');
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños · Venta de Leche');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
@@ -986,6 +1090,7 @@ const SigganQA = {
       { name: 'Eventos de Censo (Alta/Baja)', fn: () => this.testEventosCenso() },
       { name: 'Zonas (UGM/PAC/Distancias)', fn: () => this.testZonasUGM() },
       { name: 'Rebaños (Tipo Explotación REGA)', fn: () => this.testTipoExplotacionREGA() },
+      { name: 'Venta de Leche (Bloqueo prohibidoLeche)', fn: () => this.testVentaLecheBlocking() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -1058,6 +1163,7 @@ const SigganQA = {
       'censo': () => this.testEventosCenso(),
       'zonas': () => this.testZonasUGM(),
       'rebanos': () => this.testTipoExplotacionREGA(),
+      'leche': () => this.testVentaLecheBlocking(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];

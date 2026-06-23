@@ -480,6 +480,15 @@ window.AlbaranLecheWizard = {
       steps: wizardSteps,
       onComplete: async (dataLeche) => {
         try {
+          // Validación GAP 5: Bloquear venta de leche si prohibidoLeche está activo
+          const sanitarios = await window.Sanitarios.list(null, fincaId);
+          const prohibidoLecheActivo = sanitarios && sanitarios.some(s => s.prohibidoLeche === true);
+          if (prohibidoLecheActivo) {
+            const motivo = sanitarios.find(s => s.prohibidoLeche === true);
+            App.toastError(`🚫 VENTA DE LECHE PROHIBIDA: Se ha detectado un tratamiento con restricción. Consultá con Inspección (${motivo.tipo_tratamiento || 'medicamento'}). Revisa SANEAMIENTOS.`);
+            return;
+          }
+
           // Calcular campos derivados
           const extractoSeco = parseFloat((parseFloat(dataLeche.grasa || 0) + parseFloat(dataLeche.proteina || 0)).toFixed(2));
           const pBase = parseFloat(dataLeche.pb) || 0;
