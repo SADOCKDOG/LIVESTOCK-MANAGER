@@ -301,8 +301,8 @@ const CuadernoDigitalView = {
           ${d.saneamientos.slice(0, 20).map(s =>
             `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
               <span class="text-gray">${s.fecha || '—'}</span>
-              <span class="text-gold font-semibold"> · ${(window.ComunidadesService && ComunidadesService.getCampanasSaneamiento ? (ComunidadesService.getCampanasSaneamiento().find(c => c.codigo === s.campana)?.nombre) : null) || s.campana || '—'}</span>
-              <span class="text-gray"> · Examinados: ${s.examinados ?? '—'} / Positivos: ${s.positivos ?? '—'}</span>
+              <span class="text-gold font-semibold"> · ${(window.ComunidadesService && ComunidadesService.getCampanasSaneamiento ? (ComunidadesService.getCampanasSaneamiento().find(c => c.value === s.campana)?.label) : null) || s.campana || '—'}</span>
+              <span class="text-gray"> · Examinados: ${s.num_examinados ?? s.examinados ?? '—'} / Positivos: ${s.num_positivos ?? s.positivos ?? '—'}</span>
               <span class="text-gray-500" style="float:right;">${s.calificacion || ''}</span>
             </div>`
           ).join('') || '<p class="empty-state-text mb-0">Sin campañas de saneamiento registradas.</p>'}
@@ -382,7 +382,7 @@ const CuadernoDigitalView = {
         <h3 class="section-h3 text-blue-400">8. 🚛 Transportistas</h3>
         ${d.transportistas.length > 0 ? d.transportistas.map(t => `
         <div class="flex justify-between rounded-sm mb-6 bg-dark text-82 px-12 py-8">
-          <span class="text-white">${t.nombre} (${t.nif || '—'})</span>
+          <span class="text-white">${t.nombre} (${t.nif_cif || t.nif || '—'})</span>
           <span class="text-gray">Matrícula: ${t.matricula || '—'}</span>
 <span class="${t.certificado_bienestar_fin ? 'text-amber' : 'text-gray-500'}">Cert: ${t.certificado_bienestar_fin || 'No registrado'}</span>
         </div>`).join('') : '<p class="empty-state-text mb-0">Sin transportistas registrados.</p>'}
@@ -807,7 +807,7 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
     ${d.transportistas.length > 0 ? `
     <table>
       <tr><th>Nombre</th><th>NIF</th><th>Matrícula</th><th>Cert. Bienestar</th></tr>
-      ${d.transportistas.map(t => `<tr><td>${t.nombre}</td><td>${t.nif || '—'}</td><td>${t.matricula || '—'}</td><td>${t.certificado_bienestar_fin || '—'}</td></tr>`).join('')}
+      ${d.transportistas.map(t => `<tr><td>${t.nombre}</td><td>${t.nif_cif || t.nif || '—'}</td><td>${t.matricula || '—'}</td><td>${t.certificado_bienestar_fin || '—'}</td></tr>`).join('')}
     </table>` : '<p>Sin transportistas registrados.</p>'}
 
     <div class="footer">
@@ -851,28 +851,32 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
 
       lineas.push(fila(['SECCION', 'CENSO A FECHA']));
       lineas.push(fila(['Especie', 'Cabezas']));
-      Object.entries(d.censo || {}).forEach(([esp, n]) => lineas.push(fila([esp, n])));
+      Object.entries(d.censo || {}).forEach(([esp, n]) => lineas.push(fila([esp, (n && typeof n === 'object') ? n.total : n])));
       lineas.push(fila(['TOTAL', d.totalActivos]));
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'ENTRADAS']));
       lineas.push(fila(['Fecha', 'Guia', 'REGA origen', 'REGA destino', 'Motivo', 'Transportista', 'Animales']));
-      d.entradas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista, (m.animalId || []).join('|')])));
+      d.entradas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista_nombre || m.transportista, (m.animalId || []).join('|')])));
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'SALIDAS']));
       lineas.push(fila(['Fecha', 'Guia', 'REGA origen', 'REGA destino', 'Motivo', 'Transportista', 'Animales']));
-      d.salidas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista, (m.animalId || []).join('|')])));
+      d.salidas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista_nombre || m.transportista, (m.animalId || []).join('|')])));
       lineas.push('');
+
+      // Mapa id -> crotal para resolver la madre por su identificación oficial
+      const crotalPorId = {};
+      (d.todosAnimales || []).forEach(a => { crotalPorId[a.id] = a.numero_identificacion || a.crotal || a.identificacion || ''; });
 
       lineas.push(fila(['SECCION', 'NACIMIENTOS']));
       lineas.push(fila(['Crotal', 'Especie', 'Sexo', 'Fecha nacimiento', 'Madre']));
-      d.nacimientos.forEach(a => lineas.push(fila([a.crotal || a.identificacion, a.especie, a.sexo, a.fecha_nacimiento || a.fecha_alta, a.madre || a.id_madre])));
+      d.nacimientos.forEach(a => lineas.push(fila([a.numero_identificacion || a.crotal || a.identificacion, a.especie, a.sexo, a.fecha_nacimiento || a.fecha_alta, crotalPorId[a.madre_id] || a.madre_id || ''])));
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'MUERTES']));
       lineas.push(fila(['Crotal', 'Especie', 'Fecha baja', 'Motivo']));
-      d.muertes.forEach(a => lineas.push(fila([a.crotal || a.identificacion, a.especie, a.fecha_baja, a.motivo_baja])));
+      d.muertes.forEach(a => lineas.push(fila([a.numero_identificacion || a.crotal || a.identificacion, a.especie, a.fecha_baja, a.motivo_baja])));
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'TRATAMIENTOS']));
@@ -882,7 +886,7 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
 
       lineas.push(fila(['SECCION', 'SANEAMIENTOS']));
       lineas.push(fila(['Fecha', 'Campana', 'Examinados', 'Positivos', 'Calificacion']));
-      d.saneamientos.forEach(s => lineas.push(fila([s.fecha, s.campana, s.examinados, s.positivos, s.calificacion])));
+      d.saneamientos.forEach(s => lineas.push(fila([s.fecha, s.campana, s.num_examinados ?? s.examinados, s.num_positivos ?? s.positivos, s.calificacion])));
 
       const csv = '\uFEFF' + lineas.join('\r\n');
       const fechaHoy = new Date().toISOString().split('T')[0];
