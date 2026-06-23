@@ -1069,11 +1069,11 @@ const SigganQA = {
       const genCrotal = () => 'ES' + Math.random().toString().substr(2, 12).padEnd(12, '0').substr(0, 12);
       const crotalMuerte = genCrotal();
       const animalMuerte = {
-        crotal: crotalMuerte,
+        numero_identificacion: crotalMuerte,
         especie: 'Vacas',
         categoria: 'Hembra',
         tipoAlta: 'Compra',
-        fincaId: fincaId,
+        rebanoId: null,
         estado: 'Baja',
         motivo_baja: 'muerte',
         fecha_baja: new Date().toISOString().split('T')[0],
@@ -1095,11 +1095,11 @@ const SigganQA = {
       // Crear animal con motivo_baja = "sacrificio_obligatorio" → SANDACH Cat II
       const crotalSacrificio = genCrotal();
       const animalSacrificio = {
-        crotal: crotalSacrificio,
+        numero_identificacion: crotalSacrificio,
         especie: 'Vacas',
         categoria: 'Hembra',
         tipoAlta: 'Compra',
-        fincaId: fincaId,
+        rebanoId: null,
         estado: 'Baja',
         motivo_baja: 'sacrificio_obligatorio',
         fecha_baja: new Date().toISOString().split('T')[0],
@@ -1120,11 +1120,11 @@ const SigganQA = {
       // Crear animal con motivo_baja = "autoconsumo" → SANDACH Cat III
       const crotalAutoconsumo = genCrotal();
       const animalAutoconsumo = {
-        crotal: crotalAutoconsumo,
+        numero_identificacion: crotalAutoconsumo,
         especie: 'Vacas',
         categoria: 'Hembra',
         tipoAlta: 'Compra',
-        fincaId: fincaId,
+        rebanoId: null,
         estado: 'Baja',
         motivo_baja: 'autoconsumo',
         fecha_baja: new Date().toISOString().split('T')[0],
