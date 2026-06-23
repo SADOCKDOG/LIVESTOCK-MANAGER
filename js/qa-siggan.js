@@ -901,11 +901,57 @@ const SigganQA = {
   },
 
   // ============================================================
+  // TEST 14: TIPO DE EXPLOTACIÓN REGA EN REBAÑOS
+  // ============================================================
+  async testTipoExplotacionREGA() {
+    const M = 'REBAÑOS TIPO EXPLOTACIÓN REGA';
+    this._log('RUN', M, 'Validando que los rebaños tienen tipo_explotacion_rega del catálogo (Gap 8 SIGGAN)');
+
+    if (!this._assert(window.Rebanos && typeof Rebanos.list === 'function', M,
+      'Rebanos.list disponible', 'PRE-REQ')) return false;
+
+    try {
+      const rebanos = await Rebanos.list();
+      if (rebanos.length === 0) {
+        this._log('WARN', M, 'Sin rebaños en la finca activa', 'REBANO');
+        return true;
+      }
+
+      const tiposREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
+      this._assert(tiposREGA.length > 0, M,
+        `Catálogo TIPOS_EXPLOTACION_REGA disponible (${tiposREGA.length} opciones)`, 'CATALOGO');
+
+      let validosCount = 0;
+      for (let reb of rebanos.slice(0, 3)) {
+        if (reb.tipo_explotacion_rega && tiposREGA.includes(reb.tipo_explotacion_rega)) {
+          validosCount++;
+          this._assert(true, M,
+            `Rebaño "${reb.nombre}": tipo_explotacion_rega="${reb.tipo_explotacion_rega}" (válido)`, 'TIPO_REGA');
+        } else {
+          this._assert(false, M,
+            `Rebaño "${reb.nombre}": tipo_explotacion_rega no encontrado o inválido`, 'TIPO_REGA');
+        }
+      }
+
+      this._assert(validosCount > 0, M,
+        `${validosCount} rebaño(s) con tipo_explotacion_rega válido`, 'COBERTURA');
+
+      this._log('PASS', M, '✅ COMPLETADO — Rebaños con tipo_explotacion_rega normativo');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
+  // EJECUCIÓN PRINCIPAL
+  // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
     console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
     console.log('📅 ' + new Date().toLocaleString());
-    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo');
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
@@ -939,6 +985,7 @@ const SigganQA = {
       { name: 'Parto y Genealogía', fn: () => this.testPartoGenealogia() },
       { name: 'Eventos de Censo (Alta/Baja)', fn: () => this.testEventosCenso() },
       { name: 'Zonas (UGM/PAC/Distancias)', fn: () => this.testZonasUGM() },
+      { name: 'Rebaños (Tipo Explotación REGA)', fn: () => this.testTipoExplotacionREGA() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -1010,6 +1057,7 @@ const SigganQA = {
       'parto': () => this.testPartoGenealogia(),
       'censo': () => this.testEventosCenso(),
       'zonas': () => this.testZonasUGM(),
+      'rebanos': () => this.testTipoExplotacionREGA(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];
