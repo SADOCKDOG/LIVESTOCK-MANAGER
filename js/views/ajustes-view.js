@@ -16,6 +16,25 @@ const AjustesView = {
     const lastBackup = localStorage.getItem('last_backup_date');
 
     main.innerHTML = `
+      <!-- ===================== GESTOR DE FINCA ===================== -->
+      ${activeFinca ? `
+      <div class="card card-left-green mb-25">
+        <h3>🏠 Gestor de Finca Activa</h3>
+        <div class="info-box mt-10">
+          <div class="grid grid-cols-2 gap-6 text-82">
+            <div><span class="text-gray">Finca:</span> <strong class="text-white">${activeFinca.nombre}</strong></div>
+            <div><span class="text-gray">REGA:</span> <strong class="text-white">${activeFinca.codigo_REGA || activeFinca.rega || "N/D"}</strong></div>
+            <div><span class="text-gray">CCAA:</span> <strong class="text-white">${activeFinca.comunidad_autonoma === 'andalucia' ? '🌿 Andalucía' : activeFinca.comunidad_autonoma === 'extremadura' ? '🌿 Extremadura' : 'No configurada'}</strong></div>
+            <div><span class="text-gray">Tipo:</span> <strong class="text-white">${activeFinca.tipo_explotacion || '—'}</strong></div>
+          </div>
+        </div>
+        <div class="flex gap-10 mt-10">
+          <button class="btn btn-edit flex-1" onclick="AjustesView._editarFincaPrincipal()">✏️ Editar Datos</button>
+          <button class="btn btn-secondary flex-1" onclick="AjustesView._gestionarZonas()">🗺️ Zonas</button>
+        </div>
+      </div>
+      ` : ''}
+
       <!-- ===================== MIS FINCAS ===================== -->
       <div class="card card-left-gold mb-25">
         <div class="flex justify-between items-center mb-15"><h3>🏠 Mis Fincas</h3><button class="btn btn-create btn-sm" onclick="App._showFincaForm()">➕ Nueva</button></div>
@@ -357,6 +376,265 @@ const AjustesView = {
     await Fincas.setActiveId(id);
     App.toast('🏠 Finca activa cambiada');
     App.renderAjustes();
+  },
+
+  async _editarFincaPrincipal() {
+    const finca = await Fincas.getActive();
+    if (!finca) { App.toastError('No hay finca activa'); return; }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-overlay';
+    overlay.innerHTML = `
+      <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
+        <div class="wizard-header">
+          <h2>✏️ Editar Datos de Finca</h2>
+          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">✕ Cerrar</button>
+        </div>
+        <div class="wizard-body" style="padding:20px;">
+          <div class="grid gap-12">
+            <div>
+              <label class="text-xs text-gold font-bold">NOMBRE DE FINCA *</label>
+              <input type="text" id="edit-nombre" value="${finca.nombre || ''}" class="wizard-input">
+            </div>
+            <div class="grid grid-cols-2 gap-10">
+              <div>
+                <label class="text-xs text-gold font-bold">CÓDIGO REGA *</label>
+                <input type="text" id="edit-rega" value="${finca.codigo_REGA || finca.rega || ''}" class="wizard-input" placeholder="ES-...">
+              </div>
+              <div>
+                <label class="text-xs text-gold font-bold">COMUNIDAD AUTÓNOMA</label>
+                <select id="edit-ccaa" class="wizard-input">
+                  <option value="">— Seleccionar —</option>
+                  <option value="andalucia" ${finca.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>Andalucía</option>
+                  <option value="extremadura" ${finca.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>Extremadura</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-gold font-bold">TIPO DE EXPLOTACIÓN</label>
+              <input type="text" id="edit-tipo" value="${finca.tipo_explotacion || ''}" class="wizard-input" placeholder="Ej: Bovino Lechero">
+            </div>
+            <div class="grid grid-cols-2 gap-10">
+              <div>
+                <label class="text-xs text-gold font-bold">SUPERFICIE TOTAL (ha)</label>
+                <input type="number" id="edit-superficie" value="${finca.superficie || ''}" class="wizard-input" step="0.1">
+              </div>
+              <div>
+                <label class="text-xs text-gold font-bold">LATITUD / LONGITUD</label>
+                <input type="text" id="edit-coordenadas" value="${finca.coordenadas || ''}" class="wizard-input" placeholder="0,0">
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-gold font-bold">NÚMERO DE ANIMALES TOTALES</label>
+              <input type="number" id="edit-total-animales" value="${finca.total_animales || ''}" class="wizard-input">
+            </div>
+            <div class="flex gap-10 mt-15">
+              <button class="btn btn-success flex-1" onclick="AjustesView._guardarFincaPrincipal()">💾 Guardar</button>
+              <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">✕ Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:6000; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; padding:20px;';
+    document.body.appendChild(overlay);
+  },
+
+  async _guardarFincaPrincipal() {
+    const fincaId = await Fincas.getActiveId();
+    const finca = await Fincas.get(fincaId);
+    
+    finca.nombre = document.getElementById('edit-nombre').value || finca.nombre;
+    finca.codigo_REGA = document.getElementById('edit-rega').value || finca.codigo_REGA;
+    finca.rega = document.getElementById('edit-rega').value || finca.rega;
+    finca.comunidad_autonoma = document.getElementById('edit-ccaa').value || finca.comunidad_autonoma;
+    finca.tipo_explotacion = document.getElementById('edit-tipo').value || finca.tipo_explotacion;
+    finca.superficie = parseFloat(document.getElementById('edit-superficie').value) || finca.superficie;
+    finca.coordenadas = document.getElementById('edit-coordenadas').value || finca.coordenadas;
+    finca.total_animales = parseInt(document.getElementById('edit-total-animales').value) || finca.total_animales;
+    finca.actualizadoEn = new Date().toISOString();
+
+    try {
+      await window.db.put('fincas', finca);
+      document.querySelector('.wizard-overlay').remove();
+      App.toast('✅ Datos de finca guardados');
+      App.renderAjustes();
+    } catch (e) {
+      App.toastError('Error al guardar: ' + e.message);
+    }
+  },
+
+  async _gestionarZonas() {
+    const finca = await Fincas.getActive();
+    if (!finca) { App.toastError('No hay finca activa'); return; }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-overlay';
+    const zonas = finca.zonas || [];
+    
+    let zonasHtml = '';
+    if (zonas.length === 0) {
+      zonasHtml = '<p class="text-gray" style="text-align:center; padding:20px;">Sin zonas definidas</p>';
+    } else {
+      zonasHtml = `<div class="grid gap-10">
+        ${zonas.map((z, idx) => `
+          <div class="flex justify-between items-center rounded-sm" style="background:#222; padding:12px; border-left:3px solid #d97706;">
+            <div>
+              <div class="font-bold text-white">${z.nombre}</div>
+              <div class="text-gray text-2xs">Superficie: ${z.superficie || 0} ha · Aforo: ${z.aforoMax || z.aforo_maximo || 50}</div>
+              ${z.tipo_explotacion_rega ? `<div class="text-gold text-2xs">REGA: ${z.tipo_explotacion_rega}</div>` : ''}
+              ${z.carga_ganadera ? `<div class="text-amber text-2xs">Carga: ${z.carga_ganadera} UGM/ha</div>` : ''}
+            </div>
+            <div class="flex gap-6">
+              <button class="btn btn-secondary" style="padding:6px 10px; font-size:0.7rem;" onclick="AjustesView._editarZona(${idx})">✏️</button>
+              <button class="btn btn-danger" style="padding:6px 10px; font-size:0.7rem;" onclick="AjustesView._eliminarZona(${idx})">🗑️</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    overlay.innerHTML = `
+      <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
+        <div class="wizard-header">
+          <h2>🗺️ Gestionar Zonas</h2>
+          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">✕ Cerrar</button>
+        </div>
+        <div class="wizard-body" style="padding:20px;">
+          ${zonasHtml}
+          <button class="btn btn-create btn-full mt-15" onclick="AjustesView._crearNuevaZona()">➕ Nueva Zona</button>
+        </div>
+      </div>`;
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:6000; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; padding:20px;';
+    document.body.appendChild(overlay);
+  },
+
+  async _crearNuevaZona() {
+    const finca = await Fincas.getActive();
+    if (!finca) return;
+    
+    const zonas = finca.zonas || [];
+    const nombreZona = prompt('Nombre de la nueva zona:');
+    if (!nombreZona) return;
+
+    zonas.push({
+      nombre: nombreZona,
+      superficie: 0,
+      aforoMax: 50,
+      aforo_maximo: 50,
+      tipo_explotacion_rega: 'Producción y reproducción',
+      carga_ganadera: 0,
+      codigo_pac: '',
+      distancia_agua_m: 0
+    });
+
+    finca.zonas = zonas;
+    finca.actualizadoEn = new Date().toISOString();
+    try {
+      await window.db.put('fincas', finca);
+      App.toast('✅ Zona creada');
+      AjustesView._gestionarZonas();
+    } catch (e) {
+      App.toastError('Error: ' + e.message);
+    }
+  },
+
+  async _editarZona(idx) {
+    const finca = await Fincas.getActive();
+    if (!finca || !finca.zonas || !finca.zonas[idx]) return;
+    
+    const z = finca.zonas[idx];
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-overlay';
+    overlay.innerHTML = `
+      <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
+        <div class="wizard-header">
+          <h2>✏️ Editar Zona: ${z.nombre}</h2>
+          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">✕ Cerrar</button>
+        </div>
+        <div class="wizard-body" style="padding:20px;">
+          <div class="grid gap-12">
+            <div>
+              <label class="text-xs text-gold font-bold">NOMBRE</label>
+              <input type="text" id="edit-zona-nombre" value="${z.nombre}" class="wizard-input">
+            </div>
+            <div class="grid grid-cols-2 gap-10">
+              <div>
+                <label class="text-xs text-gold font-bold">SUPERFICIE (ha)</label>
+                <input type="number" id="edit-zona-sup" value="${z.superficie || 0}" class="wizard-input" step="0.1">
+              </div>
+              <div>
+                <label class="text-xs text-gold font-bold">AFORO MÁXIMO</label>
+                <input type="number" id="edit-zona-aforo" value="${z.aforoMax || z.aforo_maximo || 50}" class="wizard-input">
+              </div>
+            </div>
+            <div>
+              <label class="text-xs text-gold font-bold">TIPO EXPLOTACIÓN REGA</label>
+              <select id="edit-zona-rega" class="wizard-input">
+                <option value="Producción y reproducción" ${z.tipo_explotacion_rega === 'Producción y reproducción' ? 'selected' : ''}>Producción y reproducción</option>
+                <option value="Reproducción para abasto" ${z.tipo_explotacion_rega === 'Reproducción para abasto' ? 'selected' : ''}>Reproducción para abasto</option>
+                <option value="Cebo o engorde (Cebadero)" ${z.tipo_explotacion_rega === 'Cebo o engorde (Cebadero)' ? 'selected' : ''}>Cebo o engorde (Cebadero)</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-10">
+              <div>
+                <label class="text-xs text-gold font-bold">CÓDIGO PAC</label>
+                <input type="text" id="edit-zona-pac" value="${z.codigo_pac || ''}" class="wizard-input" placeholder="ES...">
+              </div>
+              <div>
+                <label class="text-xs text-gold font-bold">DISTANCIA AGUA (m)</label>
+                <input type="number" id="edit-zona-dist" value="${z.distancia_agua_m || 0}" class="wizard-input">
+              </div>
+            </div>
+            <div class="flex gap-10 mt-15">
+              <button class="btn btn-success flex-1" onclick="AjustesView._guardarZona(${idx})">💾 Guardar</button>
+              <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">✕ Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:6000; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; padding:20px;';
+    document.body.appendChild(overlay);
+  },
+
+  async _guardarZona(idx) {
+    const finca = await Fincas.getActive();
+    if (!finca || !finca.zonas || !finca.zonas[idx]) return;
+    
+    finca.zonas[idx].nombre = document.getElementById('edit-zona-nombre').value;
+    finca.zonas[idx].superficie = parseFloat(document.getElementById('edit-zona-sup').value) || 0;
+    finca.zonas[idx].aforoMax = parseInt(document.getElementById('edit-zona-aforo').value) || 50;
+    finca.zonas[idx].aforo_maximo = finca.zonas[idx].aforoMax;
+    finca.zonas[idx].tipo_explotacion_rega = document.getElementById('edit-zona-rega').value;
+    finca.zonas[idx].codigo_pac = document.getElementById('edit-zona-pac').value;
+    finca.zonas[idx].distancia_agua_m = parseInt(document.getElementById('edit-zona-dist').value) || 0;
+    finca.actualizadoEn = new Date().toISOString();
+
+    try {
+      await window.db.put('fincas', finca);
+      document.querySelector('.wizard-overlay').remove();
+      App.toast('✅ Zona guardada');
+      AjustesView._gestionarZonas();
+    } catch (e) {
+      App.toastError('Error: ' + e.message);
+    }
+  },
+
+  async _eliminarZona(idx) {
+    if (!confirm('¿Eliminar esta zona? Los rebaños que la usan perderán la referencia.')) return;
+    
+    const finca = await Fincas.getActive();
+    if (!finca || !finca.zonas) return;
+    
+    finca.zonas.splice(idx, 1);
+    finca.actualizadoEn = new Date().toISOString();
+
+    try {
+      await window.db.put('fincas', finca);
+      App.toast('🗑️ Zona eliminada');
+      AjustesView._gestionarZonas();
+    } catch (e) {
+      App.toastError('Error: ' + e.message);
+    }
   },
 
   _abrirManual() {
