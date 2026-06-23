@@ -735,6 +735,8 @@ const CuadernoDigitalView = {
 
   _generarHTMLImprimible(d) {
     const f = d.finca || {};
+    const crotalPorId = {};
+    (d.todosAnimales || []).forEach(a => { crotalPorId[a.id] = a.numero_identificacion || a.crotal || a.identificacion || ''; });
     const totalLeche = d.ventasLeche.reduce((s, v) => s + (v.litros || v.cantidad || 0), 0);
     const totalCarneKg = d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0);
     const ingresosCarne = d.ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0);
@@ -768,19 +770,47 @@ const CuadernoDigitalView = {
       `).join('')}
     </table>
 
-    <h2>3. Movimientos y Eventos</h2>
+    <h2>3. Movimientos Inter-explotación (SIGGAN)</h2>
     <div class="grid3">
-      <div class="stat-box"><div class="stat-num">${d.eventos.length}</div><div class="stat-label">Eventos totales</div></div>
+      <div class="stat-box"><div class="stat-num">${d.entradas.length}</div><div class="stat-label">Entradas (año)</div></div>
+      <div class="stat-box"><div class="stat-num">${d.salidas.length}</div><div class="stat-label">Salidas (año)</div></div>
       <div class="stat-box"><div class="stat-num">${d.bajasAnio}</div><div class="stat-label">Bajas este año</div></div>
-      <div class="stat-box"><div class="stat-num">${d.ventasCarne.length}</div><div class="stat-label">Expediciones</div></div>
     </div>
+    <h3 style="font-size:11px; margin:8px 0 4px;">3.1 Entradas</h3>
+    ${d.entradas.length > 0 ? `
+    <table>
+      <tr><th>Fecha</th><th>Guía</th><th>REGA origen</th><th>REGA destino</th><th>Motivo</th><th>Transportista</th><th>Nº anim.</th></tr>
+      ${d.entradas.map(m => `<tr><td>${m.fecha || '—'}</td><td>${m.numero_guia || '—'}</td><td>${m.rega_origen || '—'}</td><td>${m.rega_destino || '—'}</td><td>${m.motivo || '—'}</td><td>${m.transportista_nombre || m.transportista || '—'}</td><td>${[].concat(m.animalId || []).length || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin entradas registradas.</p>'}
+    <h3 style="font-size:11px; margin:8px 0 4px;">3.2 Salidas</h3>
+    ${d.salidas.length > 0 ? `
+    <table>
+      <tr><th>Fecha</th><th>Guía</th><th>REGA origen</th><th>REGA destino</th><th>Motivo</th><th>Transportista</th><th>Nº anim.</th></tr>
+      ${d.salidas.map(m => `<tr><td>${m.fecha || '—'}</td><td>${m.numero_guia || '—'}</td><td>${m.rega_origen || '—'}</td><td>${m.rega_destino || '—'}</td><td>${m.motivo || '—'}</td><td>${m.transportista_nombre || m.transportista || '—'}</td><td>${[].concat(m.animalId || []).length || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin salidas registradas.</p>'}
+
+    <h2>4. Nacimientos y Bajas (${d.year})</h2>
+    <h3 style="font-size:11px; margin:8px 0 4px;">4.1 Nacimientos</h3>
+    ${d.nacimientos.length > 0 ? `
+    <table>
+      <tr><th>Crotal</th><th>Especie</th><th>Sexo</th><th>Fecha nac.</th><th>Madre</th></tr>
+      ${d.nacimientos.map(a => `<tr><td>${a.numero_identificacion || a.crotal || a.identificacion || '—'}</td><td>${a.especie || '—'}</td><td>${a.sexo || '—'}</td><td>${a.fecha_nacimiento || a.fecha_alta || '—'}</td><td>${crotalPorId[a.madre_id] || a.madre_id || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin nacimientos registrados.</p>'}
+    <h3 style="font-size:11px; margin:8px 0 4px;">4.2 Muertes y Bajas</h3>
+    ${d.muertes.length > 0 ? `
+    <table>
+      <tr><th>Crotal</th><th>Especie</th><th>Fecha baja</th><th>Motivo</th></tr>
+      ${d.muertes.map(a => `<tr><td>${a.numero_identificacion || a.crotal || a.identificacion || '—'}</td><td>${a.especie || '—'}</td><td>${a.fecha_baja || '—'}</td><td>${a.motivo_baja || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin bajas registradas.</p>'}
+
+    <h2>5. Eventos Generales</h2>
     ${d.eventos.length > 0 ? `
     <table>
       <tr><th>Fecha</th><th>Tipo</th><th>Descripción</th></tr>
       ${d.eventos.slice(0, 20).map(e => `<tr><td>${e.fecha || '—'}</td><td>${e.motivo_tarea || e.tipo || '—'}</td><td>${(e.descripcion || e.notas || '').substring(0, 50)}</td></tr>`).join('')}
-    </table>` : '<p>Sin movimientos registrados.</p>'}
+    </table>` : '<p>Sin eventos registrados.</p>'}
 
-    <h2>4. Registro Sanitario</h2>
+    <h2>6. Registro Sanitario</h2>
     <div class="grid2">
       <div class="stat-box"><div class="stat-num">${d.sanitarios.length}</div><div class="stat-label">Tratamientos totales</div></div>
       <div class="stat-box"><div class="stat-num">${d.tratamientosActivos.length}</div><div class="stat-label">En periodo de supresión</div></div>
@@ -791,26 +821,33 @@ const CuadernoDigitalView = {
       ${d.sanitarios.slice(0, 15).map(t => `<tr><td>${t.fecha || '—'}</td><td>${t.medicamento || t.producto || '—'}</td><td>${t.motivo_tratamiento ? (window.ComunidadesService ? window.ComunidadesService.getMotivoTratamientoLabel(t.motivo_tratamiento) : t.motivo_tratamiento) : '—'}</td><td>${t.via_administracion ? (window.ComunidadesService ? window.ComunidadesService.getViaAdministracionLabel(t.via_administracion) : t.via_administracion) : '—'}</td><td>${t.num_animales_tratados || '—'}</td><td>${t.lote_medicamento || '—'}</td><td>${t.tiempo_espera_carne_dias || '—'}</td><td>${t.tiempo_espera_leche_dias || '—'}</td><td>${t.veterinario_prescriptor || '—'}${t.veterinario_colegiado ? ' (' + t.veterinario_colegiado + ')' : ''}</td><td>${t.numero_receta || '—'}</td><td>${d.rebanos.find(r => r.id === t.rebanoId)?.nombre || '—'}</td></tr>`).join('')}
     </table>` : '<p>Sin tratamientos registrados.</p>'}
 
-    <h2>5. Registro Reproductivo</h2>
+    <h2>7. Saneamientos Oficiales</h2>
+    ${d.saneamientos.length > 0 ? `
+    <table>
+      <tr><th>Fecha</th><th>Campaña</th><th>Examinados</th><th>Positivos</th><th>Calificación</th></tr>
+      ${d.saneamientos.map(s => `<tr><td>${s.fecha || '—'}</td><td>${s.campana || '—'}</td><td>${s.num_examinados ?? s.examinados ?? '—'}</td><td>${s.num_positivos ?? s.positivos ?? '—'}</td><td>${s.calificacion || '—'}</td></tr>`).join('')}
+    </table>` : '<p>Sin campañas de saneamiento registradas.</p>'}
+
+    <h2>8. Registro Reproductivo</h2>
     <div class="grid3">
       <div class="stat-box"><div class="stat-num">${d.cubriciones}</div><div class="stat-label">Cubriciones/Celos</div></div>
       <div class="stat-box"><div class="stat-num">${d.gestaciones}</div><div class="stat-label">Gestaciones</div></div>
       <div class="stat-box"><div class="stat-num">${d.partos}</div><div class="stat-label">Partos</div></div>
     </div>
 
-    <h2>6. Producción</h2>
+    <h2>9. Producción</h2>
     <div class="grid2">
       <div class="stat-box"><div class="stat-num">${totalLeche.toFixed(0)} L</div><div class="stat-label">Leche total</div></div>
       <div class="stat-box"><div class="stat-num">${totalCarneKg.toFixed(0)} kg</div><div class="stat-label">Carne (peso canal)</div></div>
     </div>
 
-    <h2>7. Resumen Económico</h2>
+    <h2>10. Resumen Económico</h2>
     <div class="grid2">
       <div class="stat-box"><div class="stat-num">${ingresosCarne.toFixed(2)} €</div><div class="stat-label">Ingresos Carne</div></div>
       <div class="stat-box"><div class="stat-num">${ingresosLeche.toFixed(2)} €</div><div class="stat-label">Ingresos Leche</div></div>
     </div>
 
-    <h2>8. Transportistas</h2>
+    <h2>11. Transportistas</h2>
     ${d.transportistas.length > 0 ? `
     <table>
       <tr><th>Nombre</th><th>NIF</th><th>Matrícula</th><th>Cert. Bienestar</th></tr>
@@ -864,12 +901,12 @@ const CuadernoDigitalView = {
 
       lineas.push(fila(['SECCION', 'ENTRADAS']));
       lineas.push(fila(['Fecha', 'Guia', 'REGA origen', 'REGA destino', 'Motivo', 'Transportista', 'Animales']));
-      d.entradas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista_nombre || m.transportista, (m.animalId || []).join('|')])));
+      d.entradas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista_nombre || m.transportista, [].concat(m.animalId || []).join('|')])));
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'SALIDAS']));
       lineas.push(fila(['Fecha', 'Guia', 'REGA origen', 'REGA destino', 'Motivo', 'Transportista', 'Animales']));
-      d.salidas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista_nombre || m.transportista, (m.animalId || []).join('|')])));
+      d.salidas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista_nombre || m.transportista, [].concat(m.animalId || []).join('|')])));
       lineas.push('');
 
       // Mapa id -> crotal para resolver la madre por su identificación oficial
