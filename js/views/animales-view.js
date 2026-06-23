@@ -429,6 +429,55 @@ const AnimalesView = {
       // Listener para cambios futuros
       motivoBajaSelect.addEventListener('change', actualizarSANDACH);
     }
+
+    // Gap 11: Listener para notificado_rega
+    const notificadoCheckbox = document.getElementById("a-notificado");
+    if (notificadoCheckbox && window.NotificacionesREGA) {
+      notificadoCheckbox.addEventListener('change', async (evt) => {
+        if (!evt.target.checked) return; // Solo procesar cuando se marca
+
+        // Validar datos mínimos antes de notificar
+        const crotal = document.getElementById("a-crotal")?.value?.trim().toUpperCase();
+        const finca = await window.Fincas?.getActive().catch(() => null);
+
+        const validacion = window.NotificacionesREGA.validarNotificacionPosible(
+          { numero_identificacion: crotal, estado: document.getElementById("a-estado")?.value },
+          finca
+        );
+
+        if (!validacion.valido) {
+          evt.target.checked = false;
+          return App.toastError(`Notificación REGA: ${validacion.mensaje}`);
+        }
+
+        try {
+          const notificacionId = await window.NotificacionesREGA.registrar({
+            animal_id: id || 'nuevo',
+            finca_id: finca?.id,
+            animal_numero: crotal,
+            finca_rega: finca?.rega || finca?.codigo_REGA,
+            tipo_evento: 'cambio_estado'
+          });
+
+          // Simular envío a REGA
+          const resultado = await window.NotificacionesREGA.enviarAREGA({
+            id: notificacionId,
+            animal_numero: crotal,
+            finca_rega: finca?.rega,
+            tipo_evento: 'cambio_estado'
+          });
+
+          if (resultado.exito) {
+            App.toast(`✅ ${resultado.mensaje}`);
+          } else {
+            App.toastError(`⚠️ ${resultado.mensaje}`);
+          }
+        } catch (err) {
+          App.toastError(`Error notificando REGA: ${err.message}`);
+          evt.target.checked = false;
+        }
+      });
+    }
   },
   async _guardarAnimalDetalle(id) {
     try {
