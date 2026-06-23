@@ -77,11 +77,15 @@ const Fincas = {
             finca.zonas.forEach((zona, idx) => {
                 if (zona) {
                     if (!zona.hasOwnProperty('codigo_pac')) {
-                        finca.zonas[idx].codigo_pac = '';
+                        // Auto-generar código PAC basado en índice: ES-BA-{fincaId}-{zonaIdx}
+                        // Formato: ES-BA-0001-001, ES-BA-0001-002, etc.
+                        const fincaNum = String(finca.id || 1).padStart(4, '0');
+                        const zonaNum = String(idx + 1).padStart(3, '0');
+                        finca.zonas[idx].codigo_pac = `ES-BA-${fincaNum}-${zonaNum}`;
                         needsUpdate = true;
                     }
                     if (!zona.hasOwnProperty('distancia_agua_m')) {
-                        finca.zonas[idx].distancia_agua_m = 0;
+                        finca.zonas[idx].distancia_agua_m = 100; // Default 100m
                         needsUpdate = true;
                     }
                 }
