@@ -1049,13 +1049,135 @@ const SigganQA = {
   },
 
   // ============================================================
+  // TEST 16: CLASIFICACIÓN SANDACH POR MOTIVO DE BAJA
+  // ============================================================
+  async testSANDACHClassificacion() {
+    const M = 'SANDACH CLASIFICACIÓN';
+    this._log('RUN', M, 'Validando que motivo_baja se mapea a categoría SANDACH (Gap 7 SIGGAN, Reg. UE 1069/2009)');
+
+    if (!this._assert(window.Animales && typeof Animales.save === 'function', M,
+      'Animales.save disponible', 'PRE-REQ')) return false;
+
+    if (!this._assert(window.ComunidadesService && typeof ComunidadesService.getSANDACHCategoria === 'function', M,
+      'ComunidadesService.getSANDACHCategoria disponible', 'PRE-REQ')) return false;
+
+    try {
+      const fincaId = await Fincas.getActiveId();
+      
+      // Crear animal con motivo_baja = "Muerte en la explotación" → SANDACH Cat I
+      const crotalMuerte = `TEST${Math.random().toString().substr(2, 8)}`;
+      const animalMuerte = {
+        crotal: crotalMuerte,
+        especie: 'Vacas',
+        categoria: 'Hembra',
+        tipoAlta: 'Compra',
+        fincaId: fincaId,
+        estado: 'Baja',
+        motivo_baja: 'muerte',
+        fecha_baja: new Date().toISOString().split('T')[0],
+      };
+      
+      const idMuerte = await Animales.save(animalMuerte);
+      this._assert(idMuerte, M, `Animal con muerte guardado (id: ${idMuerte})`, 'ALTA');
+      
+      // Recuperar y validar sandach_categoria
+      const savedMuerte = await window.db.get('animales', idMuerte);
+      const sandachMuerte = ComunidadesService.getSANDACHCategoria('muerte');
+      
+      this._assert(sandachMuerte === 1, M, 
+        `Muerte → SANDACH Cat I (${sandachMuerte})`, 'SANDACH');
+      
+      this._assert(savedMuerte.sandach_categoria === 1, M,
+        `Animal muerte.sandach_categoria = 1`, 'PERSISTENCIA');
+
+      // Crear animal con motivo_baja = "sacrificio_obligatorio" → SANDACH Cat II
+      const crotalSacrificio = `TEST${Math.random().toString().substr(2, 8)}`;
+      const animalSacrificio = {
+        crotal: crotalSacrificio,
+        especie: 'Vacas',
+        categoria: 'Hembra',
+        tipoAlta: 'Compra',
+        fincaId: fincaId,
+        estado: 'Baja',
+        motivo_baja: 'sacrificio_obligatorio',
+        fecha_baja: new Date().toISOString().split('T')[0],
+      };
+      
+      const idSacrificio = await Animales.save(animalSacrificio);
+      this._assert(idSacrificio, M, `Animal con sacrificio obligatorio guardado (id: ${idSacrificio})`, 'ALTA');
+      
+      const savedSacrificio = await window.db.get('animales', idSacrificio);
+      const sandachSacrificio = ComunidadesService.getSANDACHCategoria('sacrificio_obligatorio');
+      
+      this._assert(sandachSacrificio === 2, M,
+        `Sacrificio obligatorio → SANDACH Cat II (${sandachSacrificio})`, 'SANDACH');
+      
+      this._assert(savedSacrificio.sandach_categoria === 2, M,
+        `Animal sacrificio.sandach_categoria = 2`, 'PERSISTENCIA');
+
+      // Crear animal con motivo_baja = "autoconsumo" → SANDACH Cat III
+      const crotalAutoconsumo = `TEST${Math.random().toString().substr(2, 8)}`;
+      const animalAutoconsumo = {
+        crotal: crotalAutoconsumo,
+        especie: 'Vacas',
+        categoria: 'Hembra',
+        tipoAlta: 'Compra',
+        fincaId: fincaId,
+        estado: 'Baja',
+        motivo_baja: 'autoconsumo',
+        fecha_baja: new Date().toISOString().split('T')[0],
+      };
+      
+      const idAutoconsumo = await Animales.save(animalAutoconsumo);
+      this._assert(idAutoconsumo, M, `Animal con autoconsumo guardado (id: ${idAutoconsumo})`, 'ALTA');
+      
+      const savedAutoconsumo = await window.db.get('animales', idAutoconsumo);
+      const sandachAutoconsumo = ComunidadesService.getSANDACHCategoria('autoconsumo');
+      
+      this._assert(sandachAutoconsumo === 3, M,
+        `Autoconsumo → SANDACH Cat III (${sandachAutoconsumo})`, 'SANDACH');
+      
+      this._assert(savedAutoconsumo.sandach_categoria === 3, M,
+        `Animal autoconsumo.sandach_categoria = 3`, 'PERSISTENCIA');
+
+      // Validar descripciones SANDACH
+      const desc1 = ComunidadesService.getSANDACHDescripcion(1);
+      const desc2 = ComunidadesService.getSANDACHDescripcion(2);
+      const desc3 = ComunidadesService.getSANDACHDescripcion(3);
+      
+      this._assert(desc1 && desc1.length > 0, M,
+        `SANDACH Cat I descripción: "${desc1}"`, 'DESCRIPCIÓN');
+      this._assert(desc2 && desc2.length > 0, M,
+        `SANDACH Cat II descripción: "${desc2}"`, 'DESCRIPCIÓN');
+      this._assert(desc3 && desc3.length > 0, M,
+        `SANDACH Cat III descripción: "${desc3}"`, 'DESCRIPCIÓN');
+
+      // Limpiar: eliminar animales de prueba
+      try {
+        await window.db.delete('animales', idMuerte);
+        await window.db.delete('animales', idSacrificio);
+        await window.db.delete('animales', idAutoconsumo);
+        this._log('INFO', M, 'Animales de prueba eliminados', 'CLEANUP');
+      } catch (e) {
+        this._log('WARN', M, `No se pudieron limpiar animales: ${e.message}`, 'CLEANUP');
+      }
+
+      this._log('PASS', M, '✅ COMPLETADO — Motivos de baja clasificados correctamente a SANDACH');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
   // EJECUCIÓN PRINCIPAL
   // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
     console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
     console.log('📅 ' + new Date().toLocaleString());
-    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños · Venta de Leche');
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños · Venta de Leche · SANDACH');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
@@ -1091,6 +1213,7 @@ const SigganQA = {
       { name: 'Zonas (UGM/PAC/Distancias)', fn: () => this.testZonasUGM() },
       { name: 'Rebaños (Tipo Explotación REGA)', fn: () => this.testTipoExplotacionREGA() },
       { name: 'Venta de Leche (Bloqueo prohibidoLeche)', fn: () => this.testVentaLecheBlocking() },
+      { name: 'SANDACH Clasificación (Bajas)', fn: () => this.testSANDACHClassificacion() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -1164,6 +1287,7 @@ const SigganQA = {
       'zonas': () => this.testZonasUGM(),
       'rebanos': () => this.testTipoExplotacionREGA(),
       'leche': () => this.testVentaLecheBlocking(),
+      'sandach': () => this.testSANDACHClassificacion(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];
