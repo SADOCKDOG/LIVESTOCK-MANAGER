@@ -1746,6 +1746,18 @@ const App = {
     }
   },
 
+  async _abrirWizardGuiaMovimiento() {
+    if (window.WizardGuiaMovimiento) {
+      await window.WizardGuiaMovimiento.abrir();
+    }
+  },
+
+  async _abrirWizardCenso() {
+    if (window.WizardCenso) {
+      await window.WizardCenso.abrir();
+    }
+  },
+
   async _generarPDFPedidoCrotales(finca, data) {
     if (window.WizardCrotales) {
       await window.WizardCrotales.generarPDF(finca, data);

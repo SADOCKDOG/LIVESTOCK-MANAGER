@@ -198,8 +198,10 @@ const Fincas = {
                 throw new Error(`Ya existe una finca con nombre "${datos.nombre}"`);
             }
 
-            const regaVal = (datos.rega || datos.codigo_REGA || '').toString().trim().toUpperCase();
             // Crear finca nueva
+            const regaNorm = (window.ComunidadesService
+                ? window.ComunidadesService.normalizarREGA(datos.rega || datos.codigo_REGA || '')
+                : (datos.rega || datos.codigo_REGA || '').toString().trim().toUpperCase());
             const nuevaFinca = {
                 nombre: datos.nombre.trim(),
                 propietario: datos.propietario.trim(),
@@ -207,10 +209,18 @@ const Fincas = {
                 telefonoContacto: (datos.telefonoContacto || '').trim(),
                 nif_cif: (datos.nif_cif || '').trim(),
                 email: (datos.email || '').trim(),
-                rega: regaVal,
-                codigo_REGA: regaVal,
+                rega: regaNorm,
+                // Espejo para compatibilidad con vistas que leen codigo_REGA
+                codigo_REGA: regaNorm,
                 cea: (datos.cea || '').toString().trim().toUpperCase(),
                 adsg_nombre: (datos.adsg_nombre || '').trim(),
+                comunidad_autonoma: datos.comunidad_autonoma || '',
+                provincia: datos.provincia || '',
+                municipio: (datos.municipio || '').trim(),
+                tipo_explotacion: datos.tipo_explotacion || '',
+                clasificacion_zootecnica: datos.clasificacion_zootecnica || '',
+                capacidad_maxima: datos.capacidad_maxima != null ? Number(datos.capacidad_maxima) : null,
+                especies_autorizadas: Array.isArray(datos.especies_autorizadas) ? datos.especies_autorizadas : [],
                 zonas: datos.zonas || [],
                 creadoEn: new Date().toISOString()
             };

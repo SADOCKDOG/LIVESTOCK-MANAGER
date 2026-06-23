@@ -186,7 +186,7 @@ const AjustesView = {
         <p class="text-gray mt-5 text-85">Estado de la base de datos local y versión de la aplicación.</p>
         <div class="grid grid-cols-2 gap-6 mt-10" style="font-size:0.8rem;">
           <div><span class="text-gray">Versión App:</span> <strong class="text-white">v4.5.0</strong></div>
-          <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IndexedDB v9</strong></div>
+          <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IndexedDB v10</strong></div>
           <div><span class="text-gray">Fincas:</span> <strong class="text-white">${fincas.length}</strong></div>
           <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
           <div><span class="text-gray">Rebaños:</span> <strong class="text-white">${rebanos.length}</strong></div>
@@ -201,6 +201,14 @@ const AjustesView = {
         <p class="text-gray mt-5 text-85">Genera solicitudes oficiales de remesas de crotales para tu ADSG o Administración.</p>
         <button class="btn btn-create btn-full" onclick="App._abrirWizardPedidoCrotales()">📄 Generar Pedido de Crotales</button>
         <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarAyudaCrotales()">📖 Normativa de Identificación</button>
+      </div>
+
+      <!-- ===================== TRÁMITES SIGGAN ===================== -->
+      <div class="card card-left-purple mb-20">
+        <h3>🏛️ Trámites SIGGAN</h3>
+        <p class="text-gray mt-5 text-85">Genera la guía de movimiento inter-explotación y la declaración censal para su tramitación oficial (SIGGAN / BADIGEX).</p>
+        <button class="btn btn-primary btn-full" onclick="App._abrirWizardGuiaMovimiento()" style="background:#8b5cf6;">🔄 Guía de Movimiento</button>
+        <button class="btn btn-primary btn-full-sm mt-10" onclick="App._abrirWizardCenso()" style="background:#3b82f6;">📊 Declaración Censal Anual</button>
       </div>
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
