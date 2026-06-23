@@ -129,12 +129,35 @@ window.WizardCrotales = {
       },
       steps: wizardSteps,
       onComplete: async (data) => {
-        await WizardCrotales.generarPDF(finca, data);
+        try {
+          // Gap 10: Guardar pedido en BD ANTES de generar PDF
+          const pedidoId = await PedidosCrotales.save({
+            fincaId: finca.id,
+            especie: data.especie,
+            tipo: data.tipo,
+            cantidad: data.cantidad,
+            adsg_nombre: data.adsg_nombre,
+            adsg_codigo: data.adsg_codigo || '',
+            adsg_veterinario: data.adsg_veterinario || '',
+            adsg_vet_colegiado: data.adsg_vet_colegiado || '',
+            adsg_vet_nif: data.adsg_vet_nif || '',
+            estado: 'pendiente',  // Estado inicial
+            fecha_pedido: new Date().toISOString(),
+          });
+          console.log(`[wizard-crotales] Pedido guardado en BD: id=${pedidoId}`);
+          App.toast(`✅ Pedido guardado (nº ${pedidoId})`);
+          
+          // Generar PDF DESPUÉS de persistir
+          await WizardCrotales.generarPDF(finca, data, pedidoId);
+        } catch (e) {
+          console.error('[wizard-crotales] Error al guardar pedido:', e.message);
+          App.toastError(`Error al guardar pedido: ${e.message}`);
+        }
       }
     });
   },
 
-  async generarPDF(finca, data) {
+  async generarPDF(finca, data, pedidoId = null) {
     App.toast("Generando documento oficial...");
     const overlay = document.createElement('div');
     overlay.id = "pedido-pdf-overlay";
