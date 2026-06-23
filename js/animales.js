@@ -92,7 +92,8 @@ const Animales = {
           actualizadoEn: new Date().toISOString(),
         };
 
-        const rebanoAnterior = esEdicion ? (await this.get(Number(data.id)))?.rebanoId : null;
+        const animalAnterior = esEdicion ? await this.get(Number(data.id)) : null;
+        const rebanoAnterior = animalAnterior ? animalAnterior.rebanoId : null;
         const rebanoNuevo = animalData.rebanoId;
 
         let animalId;
@@ -137,10 +138,72 @@ const Animales = {
           }
         }
 
+        // 4. Libro de registro SIGGAN: eventos de alta y baja (trazabilidad)
+        await this._registrarEventoCenso(esEdicion, animalData, animalAnterior);
+
         return animalId;
       },
       { entity: "Animales", action: "save" }
     );
+  },
+
+  /**
+   * Libro de registro SIGGAN: escribe en registro_eventos un evento de ALTA
+   * al crear el animal (motivo según tipoAlta) y de BAJA cuando pasa a estado "baja".
+   * Best-effort: no interrumpe el guardado del animal si falla.
+   */
+  async _registrarEventoCenso(esEdicion, animal, anterior) {
+    try {
+      if (!window.db || !animal || animal.id == null) return;
+      const hoy = new Date().toISOString().split("T")[0];
+      let fincaId = animal.fincaId || null;
+      if (!fincaId && window.Fincas && typeof Fincas.getActiveId === "function") {
+        fincaId = await Fincas.getActiveId().catch(() => null);
+      }
+      const crotal = animal.numero_identificacion || "#" + animal.id;
+
+      if (!esEdicion) {
+        // ALTA en el censo
+        const mapAlta = {
+          Nacimiento: "alta_nacimiento",
+          Compra: "alta_compra",
+          Traslado: "alta_traslado",
+          Importación: "alta_importacion",
+        };
+        const motivo = mapAlta[animal.tipoAlta] || "alta";
+        await window.db.add("registro_eventos", {
+          fincaId,
+          entidad_id: animal.id,
+          tipo_entidad: "animal",
+          tipo: "alta",
+          motivo_tarea: motivo,
+          fecha: animal.fecha_alta || animal.fecha_nacimiento || hoy,
+          descripcion: `Alta en censo (${animal.tipoAlta || "alta"}) · crotal ${crotal}`,
+          origen_rega: animal.rega_origen || null,
+          creadoEn: new Date().toISOString(),
+        });
+        return;
+      }
+
+      // BAJA: sólo en la transición a estado "baja" (la venta se registra como expedición)
+      const estadoAnt = anterior?.estado || "activo";
+      const estadoNue = animal.estado || "activo";
+      if (estadoNue === "baja" && estadoAnt !== "baja") {
+        await window.db.add("registro_eventos", {
+          fincaId,
+          entidad_id: animal.id,
+          tipo_entidad: "animal",
+          tipo: "baja",
+          motivo_tarea: "baja",
+          motivo_baja: animal.motivo_baja || null,
+          fecha: animal.fecha_baja || hoy,
+          descripcion: `Baja del censo (${animal.motivo_baja || "sin motivo"}) · crotal ${crotal}`,
+          creadoEn: new Date().toISOString(),
+        });
+      }
+    } catch (e) {
+      console.warn("[Animales] No se pudo registrar el evento de censo:", e?.message);
+    }
   },
 
   async delete(id) {

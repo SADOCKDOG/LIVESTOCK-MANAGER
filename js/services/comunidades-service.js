@@ -117,6 +117,24 @@ window.ComunidadesService = (() => {
     { value: 'otro', label: 'Otro' },
   ]);
 
+  // Formas de alta en el censo (libro de registro SIGGAN / RD 787/2023)
+  const TIPOS_ALTA = Object.freeze([
+    { value: 'Nacimiento', label: 'Nacimiento en la explotación' },
+    { value: 'Compra', label: 'Compra / entrada nacional' },
+    { value: 'Importación', label: 'Importación (intracomunitaria / país tercero)' },
+    { value: 'Traslado', label: 'Traslado desde otra explotación propia' },
+  ]);
+
+  // Categorías zootécnicas del animal por especie (clasificación del libro de registro)
+  const CATEGORIAS_ANIMAL = Object.freeze({
+    bovino: Object.freeze(['Ternero/a (<8 meses)', 'Añojo/a (8-12 meses)', 'Novillo/a (12-24 meses)', 'Vaca', 'Toro semental', 'Buey']),
+    ovino: Object.freeze(['Cordero/a (<4 meses)', 'Ternasco / Recental', 'Borrego/a (4-12 meses)', 'Oveja', 'Carnero semental']),
+    caprino: Object.freeze(['Cabrito/a (<4 meses)', 'Chivo/a (4-12 meses)', 'Cabra', 'Macho cabrío semental']),
+    porcino: Object.freeze(['Lechón', 'Cerdo de cebo', 'Cerda reproductora', 'Verraco semental']),
+    equino: Object.freeze(['Potro/a (<12 meses)', 'Yegua', 'Caballo / Semental', 'Castrado']),
+    otro: Object.freeze(['Cría', 'Reproductor/a', 'Cebo / engorde', 'Otro']),
+  });
+
   // Motivos de movimiento inter-explotación (guía de origen y sanidad pecuaria)
   const MOTIVOS_MOVIMIENTO = Object.freeze([
     { value: 'vida', label: 'Vida / reproducción' },
@@ -388,6 +406,26 @@ window.ComunidadesService = (() => {
   /** Catálogo de motivos de baja */
   function getMotivosBaja() { return MOTIVOS_BAJA.map(m => ({ ...m })); }
 
+  /** Catálogo de formas de alta en el censo (libro de registro) */
+  function getTiposAlta() { return TIPOS_ALTA.map(t => ({ ...t })); }
+
+  /** Normaliza una especie (con sinónimos) a su grupo zootécnico */
+  function getGrupoEspecie(especie) {
+    const n = (especie || '').toString().trim().toLowerCase();
+    if (/(bovin|vacun|vaca|toro|buey|ternero|ternera|novill|añojo|anojo|becerr)/.test(n)) return 'bovino';
+    if (/(ovin|oveja|cordero|borrego|carnero|ternasco|recental)/.test(n)) return 'ovino';
+    if (/(caprin|cabra|cabrito|chivo|macho cabr)/.test(n)) return 'caprino';
+    if (/(porcin|cerd|lech[oó]n|verraco|cochin|guarro|marran)/.test(n)) return 'porcino';
+    if (/(equin|équid|equid|caballo|yegua|potro|mula|asno|burro)/.test(n)) return 'equino';
+    return 'otro';
+  }
+
+  /** Catálogo de categorías zootécnicas válidas para una especie */
+  function getCategoriasAnimal(especie) {
+    const grupo = getGrupoEspecie(especie);
+    return [...(CATEGORIAS_ANIMAL[grupo] || CATEGORIAS_ANIMAL.otro)];
+  }
+
   /** Catálogo de motivos de movimiento */
   function getMotivosMovimiento() { return MOTIVOS_MOVIMIENTO.map(m => ({ ...m })); }
 
@@ -613,6 +651,8 @@ window.ComunidadesService = (() => {
     ESPECIES_CON_DIB,
     PAISES_NACIMIENTO,
     MOTIVOS_BAJA,
+    TIPOS_ALTA,
+    CATEGORIAS_ANIMAL,
     MOTIVOS_MOVIMIENTO,
     CAMPANAS_SANEAMIENTO,
     CALIFICACIONES_SANITARIAS,
@@ -634,6 +674,9 @@ window.ComunidadesService = (() => {
     especieRequiereDIB,
     getPaisesNacimiento,
     getMotivosBaja,
+    getTiposAlta,
+    getGrupoEspecie,
+    getCategoriasAnimal,
     getMotivosMovimiento,
     getCampanasSaneamiento,
     getCalificacionesSanitarias,

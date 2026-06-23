@@ -280,10 +280,10 @@
       // 11. Eventos reproductivos (vaca1, alineados con ejemplos de manual)
       if (vaca1) {
         var repDefs = [
-          { tipo_evento: 'Celo', fecha: '2026-06-01', animalId: vaca1.id },
-          { tipo_evento: 'Inseminación Artificial', fecha: '2026-06-02', animalId: vaca1.id, semenalId: 'Reproductor-5' },
-          { tipo_evento: 'Diagnóstico Gestación', fecha: '2026-06-30', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 28 },
-          { tipo_evento: 'Parto', fecha: '2027-03-09', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
+          { tipo_evento: 'Celo', fecha: '2025-08-20', animalId: vaca1.id },
+          { tipo_evento: 'Inseminación Artificial', fecha: '2025-08-21', animalId: vaca1.id, semenalId: 'Reproductor-5' },
+          { tipo_evento: 'Diagnóstico Gestación', fecha: '2025-09-20', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 30 },
+          { tipo_evento: 'Parto', fecha: '2026-05-30', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
         ];
         for (var r2 = 0; r2 < repDefs.length; r2++) {
           try { await Reproduccion.saveEvento(repDefs[r2]); } catch (e) { console.log('[SEED] Error reproducción:', e.message); }
