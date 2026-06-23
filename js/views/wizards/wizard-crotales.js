@@ -138,7 +138,7 @@ window.WizardCrotales = {
                   <div>
                       <h4 style="border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:0;">DATOS DE LA EXPLOTACIÓN</h4>
                       <p><strong>Nombre Finca:</strong> ${finca.nombre}<br>
-                      <strong>Código REGA:</strong> ${finca.codigo_REGA || 'No especificado'}<br>
+                      <strong>Código REGA:</strong> ${finca.codigo_REGA || finca.rega || 'No especificado'}<br>
                       <strong>Comunidad Autónoma:</strong> ${ccaaLabel}<br>
                       <strong>Plataforma Destino:</strong> ${plataforma}<br>
                       <strong>Dirigido a (ADSG/OCA):</strong> ${data.adsg_nombre}</p>
@@ -240,14 +240,15 @@ window.WizardCrotales = {
         }
 
         updateProgress(30, 'Preparando documento...');
+        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
         const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = 'position:absolute; left:0; top:0; width:800px; z-index:-1000; background:#fff; color:#000; padding:40px; font-family:serif;';
+        tempContainer.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; z-index:9990; background:#fff; color:#000; padding:40px; font-family:serif;`;
         tempContainer.innerHTML = el.innerHTML;
         document.body.appendChild(tempContainer);
 
         const opt = {
           margin: [12, 10, 12, 10],
-          filename: `Solicitud_Crotales_${finca.codigo_REGA}.pdf`,
+          filename: `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2,
@@ -255,6 +256,8 @@ window.WizardCrotales = {
             logging: false,
             backgroundColor: '#ffffff',
             width: 800,
+            scrollX: 0,
+            scrollY: currentScroll,
             height: tempContainer.scrollHeight,
             windowHeight: tempContainer.scrollHeight
           },
@@ -296,7 +299,7 @@ window.WizardCrotales = {
             });
             await sharePlugin.share({
               title: 'Pedido de Crotales',
-              text: `Solicitud de material de identificación para ${finca.codigo_REGA}`,
+              text: `Solicitud de material de identificación para ${finca.codigo_REGA || finca.rega}`,
               url: result.uri,
               files: [result.uri],
               dialogTitle: 'Compartir Pedido de Crotales con…'
@@ -313,7 +316,7 @@ window.WizardCrotales = {
             const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
             await navigator.share({
               title: 'Pedido de Crotales',
-              text: `Solicitud de material de identificación para ${finca.codigo_REGA}`,
+              text: `Solicitud de material de identificación para ${finca.codigo_REGA || finca.rega}`,
               files: [file]
             });
             return;
@@ -327,7 +330,7 @@ window.WizardCrotales = {
       } catch (e) {
         console.warn("Error en generación PDF Crotales:", e);
         if (loader) loader.remove();
-        WizardCrotales._fallbackPDF(document.getElementById(contentId), `Solicitud_Crotales_${finca.codigo_REGA}.pdf`);
+        WizardCrotales._fallbackPDF(document.getElementById(contentId), `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}.pdf`);
       }
     };
   },

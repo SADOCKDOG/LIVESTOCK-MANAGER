@@ -46,6 +46,11 @@ body {
     overflow-x: hidden;
 }
 
+body.scanner-active {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
 /* ============================================
    HEADER COMPACTO (toolbar móvil)
    ============================================ */
@@ -272,9 +277,17 @@ nav.bottom-nav {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.btn:active, 
+.wizard-btn-action:active,
+.sub-tabs button:active,
+.list-card:active,
+.dashboard-card:active,
+.menu-item:active {
+    transform: scale(0.97);
+    filter: brightness(0.9);
 }
 
 .btn-primary { 
@@ -290,7 +303,7 @@ nav.bottom-nav {
 .toast {
     position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
     background: #fbbf24; color: #000; padding: 15px 30px; border-radius: 30px;
-    font-weight: 800; z-index: 3000; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    font-weight: 800; z-index: 6000; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
 }
 .toast.error { background: #ef4444; color: #fff; }
 
@@ -2247,3 +2260,77 @@ label {
 #app-content .card h3, #app-content h3 { font-size: 1.05rem !important; }
 #app-content table, #app-content .table-scroll td, #app-content .table-scroll th { font-size: 0.85rem !important; }
 #app-content .badge, #app-content .chip, #app-content small:not(.s-lbl):not(.wizard-label) { font-size: 0.75rem !important; }
+
+/* ============================================================
+   ESTANDARIZACIÓN DE BOTONES
+   ============================================================ */
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3) !important;
+    border: none !important;
+}
+.btn-danger {
+    background: #7f1d1d !important;
+    color: #fff !important;
+    border: 1px solid #991b1b !important;
+}
+.btn-edit {
+    background: #1e3a8a !important;
+    color: #fff !important;
+    border: none !important;
+}
+.btn-pdf {
+    background: #b45309 !important;
+    color: #fff !important;
+    border: none !important;
+}
+.btn-pdf-seccion {
+    background: #c2410c !important;
+    color: #fff !important;
+    border: none !important;
+}
+.btn-excel {
+    background: linear-gradient(135deg, #065f46 0%, #059669 100%) !important;
+    color: #fff !important;
+    border: 1px solid #10b981 !important;
+}
+.btn-create, .btn-add {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #fff !important;
+    border: none !important;
+}
+.wizard-btn-danger {
+    background: #7f1d1d !important;
+    color: #fff !important;
+    border: 1px solid #991b1b !important;
+}
+
+/* Botón Flotante de Acción (FAB) táctil móvil */
+.fab-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+}
+.fab-btn:active {
+    transform: scale(0.92);
+}
+@media (min-width: 769px) {
+    .fab-btn { display: none !important; }
+}
+

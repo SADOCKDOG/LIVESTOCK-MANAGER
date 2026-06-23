@@ -12,7 +12,7 @@ const ZonasView = {
     const zonas = finca.zonas || [];
     let html = `
       <div class="text-center mb-25">
-        <button class="btn btn-primary btn-sm" onclick="ZonasView._crearZona()">➕ Nueva Zona</button>
+        <button class="btn btn-create btn-sm" onclick="ZonasView._crearZona()">➕ Nueva Zona</button>
       </div>`;
     if (zonas.length === 0)
       html += `<div class="empty-state"><div class="empty-state-icon">🗺️</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
@@ -87,7 +87,7 @@ const ZonasView = {
           </div>
         </div>`;
     }
-    main.innerHTML = html;
+    main.innerHTML = html + `<button class="fab-btn" onclick="ZonasView._crearZona()" aria-label="Nueva Zona">➕</button>`;
   },
 
   async renderDetalle(params) {
@@ -109,9 +109,12 @@ const ZonasView = {
           <div><label class="form-label">Localización</label>
           <textarea id="z-edit-localizacion" class="premium-input" style="min-height:60px; resize:none;">${zona.localizacion || ""}</textarea></div>
         </div>
-        <div class="flex gap-10 mt-20">
-          <button class="btn btn-primary" onclick="ZonasView._guardarZona(${index})" style="flex:2;">💾 Guardar</button>
-          <button class="btn btn-secondary" onclick="ZonasView._eliminarZona(${index})" style="flex:1; background:#450a0a; color:white; border:none;">🗑️ Borrar</button>
+        <div class="flex justify-between items-center mt-20">
+          <button class="btn btn-danger" onclick="ZonasView._eliminarZona(${index})">🗑️ Eliminar</button>
+          <div class="flex gap-10">
+            <button class="btn btn-secondary" onclick="location.hash='/zonas'">✕ Cancelar</button>
+            <button class="btn btn-success" onclick="ZonasView._guardarZona(${index})">✔ Guardar</button>
+          </div>
         </div>
       </div>`;
   },

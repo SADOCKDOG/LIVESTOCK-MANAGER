@@ -386,8 +386,9 @@ const CuadernoDigitalView = {
 
       updateProgress(50, 'Generando contenido...');
       const contenidoHTML = this._generarHTMLImprimible(data);
+      const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
       const pdfEl = document.createElement('div');
-      pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; overflow:visible;';
+      pdfEl.style.cssText = `position:absolute; left:0; top:${currentScroll}px; z-index:9990; width:800px; background:#fff; color:#000; overflow:visible;`;
       pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${contenidoHTML}</div>`;
       document.body.appendChild(pdfEl);
 
@@ -404,7 +405,7 @@ const CuadernoDigitalView = {
             backgroundColor: '#ffffff',
             width: 800,
             scrollX: 0,
-            scrollY: 0,
+            scrollY: currentScroll,
             height: pdfEl.scrollHeight,
             windowHeight: pdfEl.scrollHeight
           },
@@ -604,8 +605,9 @@ const CuadernoDigitalView = {
         const fileName = `Cuaderno_Digital_${nombreFinca}_${fechaHoy}.pdf`;
 
         updateProgress(30, 'Generando contenido...');
+        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
         const pdfEl = document.createElement('div');
-pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; overflow:visible;';
+        pdfEl.style.cssText = `position:absolute; left:0; top:${currentScroll}px; z-index:9990; width:800px; background:#fff; color:#000; overflow:visible;`;
         pdfEl.innerHTML = `<div style="padding:30px; font-family:'Courier New',monospace; color:#000; background:#fff;">${CuadernoDigitalView._generarHTMLImprimible(overlay._printData)}</div>`;
         document.body.appendChild(pdfEl);
 
@@ -621,7 +623,7 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
             backgroundColor: '#ffffff',
             width: 800,
             scrollX: 0,
-            scrollY: 0,
+            scrollY: currentScroll,
             height: pdfEl.scrollHeight,
             windowHeight: pdfEl.scrollHeight
           },

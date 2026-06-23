@@ -129,48 +129,63 @@ const ProduccionView = {
   _renderSeccion(content, opts) {
     const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
     const recordsHtml = records.length > 0
-      ? records.map(r => `
-        <div class="card mb-6" onclick="${r.onclick || ''}"
-             style="border-left:4px solid ${r.typeColor || color}; padding:12px 14px; cursor:pointer; background:rgba(0,0,0,0.3);">
+      ? records.map(r => {
+        const borderCls = r.typeColor || color;
+        return `
+        <div class="card card-animal" onclick="${r.onclick || ''}" style="border-left:4px solid ${borderCls};">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
-              <div class="text-white font-800 nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${r.title}</div>
-              <div class="text-gray" style="font-size:0.72rem; margin-top:3px;">📅 ${r.date}${r.zone ? ' | 📍 ' + r.zone : ''}</div>
+              <div class="flex items-center gap-6">
+                <span class="text-xl">${icon}</span>
+                <h3 class="section-h3 m-0 text-ellipsis">${r.title}</h3>
+              </div>
+              <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                <span>📅 ${r.date}</span>
+                ${r.zone ? `<span>·</span><span>📍 ${r.zone}</span>` : ''}
+                ${r.meta ? `<span>·</span><span>📋 ${r.meta}</span>` : ''}
+              </div>
             </div>
             <div class="text-right flex-shrink-0 ml-8">
-              <div class="font-900" style="font-size:1rem; color:${r.typeColor || color};">${r.value}</div>
+              <span class="badge badge-sm" style="background:${borderCls}20;color:${borderCls};border:1px solid ${borderCls}40;display:block;margin-bottom:4px;">${r.value}</span>
+              <span class="text-xs text-777">Ver ➔</span>
             </div>
           </div>
-        </div>`).join('')
+        </div>`;
+      }).join('')
       : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
       <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
-        <div class="flex items-center gap-12 mb-12">
-          <span style="font-size:1.6rem;">${icon}</span>
-          <div>
-            <div class="text-white font-900" style="font-size:1.05rem;">${title}</div>
-            ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span style="font-size:1.6rem;">${icon}</span>
+            <div>
+              <div class="text-white font-900" style="font-size:1.05rem;">${title}</div>
+              ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
+            </div>
           </div>
-        </div>
-        ${kpis ? `<div class="grid grid-cols-2 gap-8 mb-12">
-          ${kpis.map(k => `
-            <div class="bg-dark" style="padding:10px 8px; border-radius:8px; border-left:3px solid ${color};">
-              <small class="text-gray text-tiny" style="text-transform:uppercase; font-weight:700; letter-spacing:0.3px;">${k.label}</small>
-              <div class="text-white font-900" style="font-size:1.1rem;">${k.value}</div>
-            </div>`).join('')}
-        </div>` : ''}
-        <div class="text-center mb-12">
-          <button class="btn btn-primary btn-sm" onclick="${registrarHandler}"
-            style="background:linear-gradient(135deg,${color},${colorDark}); box-shadow:none;">
-            ➕ ${registrarLabel}
+          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
+            ➕ Nuevo
           </button>
         </div>
+
+        ${kpis ? `
+        <div class="flex flex-wrap gap-4 mb-14">
+          ${kpis.map((k, idx) => {
+            const badgesCls = ['badge-gold', 'badge-blue', 'badge-green', 'badge-purple', 'badge-red'];
+            const cls = badgesCls[idx % badgesCls.length];
+            return `<span class="badge badge-sm ${cls}">${k.label}: ${k.value}</span>`;
+          }).join('')}
+        </div>` : ''}
+
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
           📋 ${listName}
         </div>
-        ${recordsHtml}
-      </div>`;
+        <div class="grid gap-10">
+          ${recordsHtml}
+        </div>
+      </div>
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">➕</button>`;
   },
 
   _renderCarne(content, d) {

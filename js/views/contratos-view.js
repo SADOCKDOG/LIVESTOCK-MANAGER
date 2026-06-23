@@ -99,7 +99,7 @@ const ContratosView = {
             <div class="mt-16 mb-12">
               <div class="flex justify-between items-center mb-8">
                 <h3 class="text-gold m-0 text-85">💰 Tabla de Precios</h3>
-                <button onclick="ContratosView._addPrecioRow()" class="text-green" style="padding:5px 12px; border-radius:8px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); font-size:0.65rem; font-weight:800; cursor:pointer;">➕ Añadir precio</button>
+                <button onclick="ContratosView._addPrecioRow()" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">➕ Añadir precio</button>
               </div>
               <div id="ct-precios-container">
                 ${contrato.precios && contrato.precios.length > 0 ?
@@ -114,9 +114,12 @@ const ContratosView = {
               <span>Contrato activo</span>
             </label>
 
-            <div class="grid grid-cols-2 gap-10">
-              <button onclick="ContratosView._guardar('${id || ''}')" class="btn btn-primary text-85" style="height:48px; background:linear-gradient(135deg,#8b5cf6,#6d28d9);">💾 GUARDAR CONTRATO</button>
-              <button onclick="location.hash='${comprador ? '#/comprador?id='+contrato.compradorId : '#/compradores'}'" class="btn btn-secondary text-85" style="height:48px;">✖ CANCELAR</button>
+            <div class="flex justify-between items-center mt-20">
+              ${esEdicion ? `<button onclick="App.toastError('Para eliminar el contrato, desactívelo.')" class="btn btn-danger" style="opacity: 0.5;">🗑️ Eliminar</button>` : '<div></div>'}
+              <div class="flex gap-10">
+                <button onclick="location.hash='${comprador ? '#/comprador?id='+contrato.compradorId : '#/compradores'}'" class="btn btn-secondary">✕ Cancelar</button>
+                <button onclick="ContratosView._guardar('${id || ''}')" class="btn btn-success">✔ Guardar</button>
+              </div>
             </div>
           </div>
         `;
@@ -145,7 +148,7 @@ const ContratosView = {
             </div>
             <div>
               <label class="kpi-label">&nbsp;</label>
-              <button onclick="this.closest('.precio-row').remove()" class="text-red" style="display:block; width:100%; padding:8px; border-radius:8px; background:#450a0a; border:none; font-size:0.7rem; font-weight:800; cursor:pointer;">✕</button>
+              <button onclick="this.closest('.precio-row').remove()" class="btn btn-danger" style="display:block; width:100%; padding:8px; border-radius:8px; font-size:0.7rem; font-weight:800;">✕</button>
             </div>
           </div>`;
     },
