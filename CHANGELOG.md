@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.5.3] - 2026-06-23
+### Added
+- **Trazabilidad individual:** la línea de tiempo del animal muestra ahora todos los datos del libro de tratamientos veterinarios (motivo, vía de administración, nº de animales tratados, lote, caducidad, veterinario prescriptor con nº colegiado y nº de receta).
+- **Cuaderno Digital — listado de sanidad:** cada tratamiento muestra el motivo y la vía de administración junto al veterinario y la receta.
+
+### Changed
+- **Etiquetas legibles:** el listado, el PDF y el CSV del cuaderno y la trazabilidad muestran las etiquetas completas de motivo y vía (p. ej. «Intramuscular (IM)») en lugar de los códigos internos, mediante los nuevos helpers `getViaAdministracionLabel` y `getMotivoTratamientoLabel` de `ComunidadesService`.
+- Service Worker: `corcho-v6.5.32` → `corcho-v6.5.33`.
+
 ## [v4.5.2] - 2026-06-23
 ### Added
 - **Libro de Tratamientos Veterinarios (cumplimiento SIGGAN):** El wizard de Tratamiento Sanitario incorpora un segundo paso con los datos exigidos por el RD 1749/1998 y la tramitación SIGGAN:

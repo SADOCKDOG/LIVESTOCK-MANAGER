@@ -121,8 +121,11 @@ const TrazabilidadView = {
     });
 
     // 2. SANITARIOS (cada tratamiento es un evento)
+    const CS = window.ComunidadesService;
     for (const s of sanitarios) {
       const supresion = s.tiempo_espera_carne_dias > 0 ? ` (supresión: ${s.tiempo_espera_carne_dias}d)` : '';
+      const motivo = s.motivo_tratamiento ? (CS ? CS.getMotivoTratamientoLabel(s.motivo_tratamiento) : s.motivo_tratamiento) : '';
+      const via = s.via_administracion ? (CS ? CS.getViaAdministracionLabel(s.via_administracion) : s.via_administracion) : '';
       timeline.push({
         fecha: s.fecha || 'N/D',
         tipo: 'sanitario',
@@ -131,8 +134,15 @@ const TrazabilidadView = {
         detalle: `
           <strong>Tipo:</strong> ${s.tipo_tratamiento || 'N/D'}<br>
           <strong>Producto:</strong> ${s.medicamento || 'N/D'}<br>
+          ${motivo ? `<strong>Motivo:</strong> ${motivo}<br>` : ''}
+          ${via ? `<strong>Vía:</strong> ${via}<br>` : ''}
+          ${s.num_animales_tratados ? `<strong>Nº animales tratados:</strong> ${s.num_animales_tratados}<br>` : ''}
+          ${s.lote_medicamento ? `<strong>Lote:</strong> ${s.lote_medicamento}<br>` : ''}
+          ${s.caducidad_medicamento ? `<strong>Caducidad:</strong> ${s.caducidad_medicamento}<br>` : ''}
           <strong>Supresión carne:</strong> ${s.tiempo_espera_carne_dias || 0} días${supresion}<br>
           ${s.prohibidoLeche ? '<strong class="text-red">PROHIBIDO para leche</strong><br>' : ''}
+          ${s.veterinario_prescriptor ? `<strong>Veterinario:</strong> ${s.veterinario_prescriptor}${s.veterinario_colegiado ? ' (Nº ' + s.veterinario_colegiado + ')' : ''}<br>` : ''}
+          ${s.numero_receta ? `<strong>Nº receta:</strong> ${s.numero_receta}<br>` : ''}
         `
       });
     }
