@@ -29,7 +29,8 @@ const CuadernoDigitalView = {
     const finca = await Fincas.getActive();
     const activeId = await Fincas.getActiveId();
     const [animales, rebanos, sanitarios, eventos, reproduccion,
-           ventasCarne, ventasLeche, pesajes, transportistas, docs] = await Promise.all([
+           ventasCarne, ventasLeche, pesajes, transportistas, docs,
+           movimientos, saneamientos] = await Promise.all([
       window.db.getAll('animales').catch(() => []),
       window.db.getAll('rebanos').catch(() => []),
       window.db.getAll('sanitarios_ganado').catch(() => []),
@@ -40,6 +41,8 @@ const CuadernoDigitalView = {
       window.db.getAll('produccion_carne').catch(() => []),
       window.db.getAll('transportistas').catch(() => []),
       window.db.getAll('documentos_legales').catch(() => []),
+      window.db.getAll('movimientos_ganado').catch(() => []),
+      window.db.getAll('saneamientos').catch(() => []),
     ]);
 
     const activos = animales.filter(a => a.estado === 'activo' || a.estado === 'Activo');
@@ -84,12 +87,27 @@ const CuadernoDigitalView = {
     const yearStart = new Date(year, 0, 1);
     const bajasAnio = bajas.filter(a => a.fecha_baja && new Date(a.fecha_baja) >= yearStart).length;
 
+    // Secciones SIGGAN: entradas, salidas, nacimientos, muertes (del año en curso)
+    const movsAnio = movimientos.filter(m => m.fecha && new Date(m.fecha) >= yearStart);
+    const entradas = movsAnio.filter(m => m.tipo === 'entrada');
+    const salidas = movsAnio.filter(m => m.tipo === 'salida');
+    const nacimientos = animales.filter(a =>
+      (a.tipoAlta === 'Nacimiento' || !a.tipoAlta) &&
+      (a.fecha_alta || a.fecha_nacimiento) &&
+      new Date(a.fecha_alta || a.fecha_nacimiento) >= yearStart
+    );
+    const muertes = bajas.filter(a =>
+      ['muerte', 'sacrificio', 'sacrificio_obligatorio', 'autoconsumo'].includes(a.motivo_baja) &&
+      a.fecha_baja && new Date(a.fecha_baja) >= yearStart
+    );
+
     return {
       finca,
       censo: censoPorEspecie,
       totalActivos: activos.length,
       rebanos,
       animales: activos,
+      todosAnimales: animales,
       sanitarios: sanitarios.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
       tratamientosActivos,
       eventos: eventos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
@@ -102,6 +120,12 @@ const CuadernoDigitalView = {
       pesajes,
       transportistas,
       docs,
+      movimientos: movimientos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
+      saneamientos: saneamientos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
+      entradas,
+      salidas,
+      nacimientos,
+      muertes,
       bajasAnio,
       totalBajas: bajas.length,
       totalIncidencias: incidenciasEventos.length,
@@ -134,6 +158,7 @@ const CuadernoDigitalView = {
         <div class="text-gold text-82">RD 787/2023 — Explotación Ganadera</div>
         <div class="mt-8 flex justify-center gap-10 flex-wrap">
           <button class="btn btn-primary" onclick="CuadernoDigitalView._exportarPDF()">📄 Exportar PDF Completo</button>
+          <button class="btn btn-secondary" onclick="CuadernoDigitalView._exportarCSV()">📊 Exportar CSV (SIGGAN)</button>
           <button class="btn btn-secondary" onclick="CuadernoDigitalView._imprimir()">🖨 Imprimir</button>
         </div>
       </div>
@@ -180,6 +205,39 @@ const CuadernoDigitalView = {
           </div>
         </div>
         `).join('')}
+      </div>
+
+      <!-- 3.b ENTRADAS / SALIDAS / NACIMIENTOS / MUERTES (SIGGAN) -->
+      <div class="card card-left-purple">
+        <h3 class="section-h3 text-purple-400" id="seccion-siggan-movs">3.b 📋 Libro de Registro SIGGAN (${d.year})</h3>
+        <div class="grid grid-cols-4 gap-10 mb-12">
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-green font-black text-2xl">${d.entradas.length}</div>
+            <div class="text-gray text-2xs">Entradas</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-amber font-black text-2xl">${d.salidas.length}</div>
+            <div class="text-gray text-2xs">Salidas</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-blue-400 font-black text-2xl">${d.nacimientos.length}</div>
+            <div class="text-gray text-2xs">Nacimientos</div>
+          </div>
+          <div class="rounded-sm p-10 text-center bg-dark">
+            <div class="text-red font-black text-2xl">${d.muertes.length}</div>
+            <div class="text-gray text-2xs">Muertes</div>
+          </div>
+        </div>
+        <div class="text-sm" style="max-height:220px; overflow-y:auto;">
+          ${d.movimientos.slice(0, 30).map(m =>
+            `<div class="flex justify-between" style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+              <span class="text-gray">${m.fecha || '—'}</span>
+              <span class="${m.tipo === 'entrada' ? 'text-green' : 'text-amber'}">${(m.tipo || '').toUpperCase()}</span>
+              <span class="text-ccc">Guía: ${m.numero_guia || '—'}</span>
+              <span class="text-gray-500">${m.rega_origen || '—'} → ${m.rega_destino || '—'}</span>
+            </div>`
+          ).join('') || '<p class="empty-state-text mb-0">Sin movimientos inter-explotación registrados.</p>'}
+        </div>
       </div>
 
       <!-- 3. MOVIMIENTOS -->
@@ -233,6 +291,21 @@ const CuadernoDigitalView = {
               <span class="text-gray-500" style="float:right;">Espera: ${t.tiempo_espera_carne_dias || '?'}d</span>
             </div>`;
           }).join('') || '<p class="empty-state-text mb-0">Sin tratamientos registrados.</p>'}
+        </div>
+      </div>
+
+      <!-- 4.b SANEAMIENTOS / CAMPAÑAS OFICIALES (SIGGAN) -->
+      <div class="card card-left-red">
+        <h3 class="section-h3 text-red" id="seccion-saneamientos">4.b 🩺 Campañas de Saneamiento (ADSG)</h3>
+        <div class="text-sm" style="max-height:200px; overflow-y:auto;">
+          ${d.saneamientos.slice(0, 20).map(s =>
+            `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+              <span class="text-gray">${s.fecha || '—'}</span>
+              <span class="text-gold font-semibold"> · ${(window.ComunidadesService && ComunidadesService.getCampanasSaneamiento ? (ComunidadesService.getCampanasSaneamiento().find(c => c.codigo === s.campana)?.nombre) : null) || s.campana || '—'}</span>
+              <span class="text-gray"> · Examinados: ${s.examinados ?? '—'} / Positivos: ${s.positivos ?? '—'}</span>
+              <span class="text-gray-500" style="float:right;">${s.calificacion || ''}</span>
+            </div>`
+          ).join('') || '<p class="empty-state-text mb-0">Sin campañas de saneamiento registradas.</p>'}
         </div>
       </div>
 
@@ -745,6 +818,92 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
 
   _imprimir() {
     this._abrirVistaImprimible();
+  },
+
+  /**
+   * Exportar CSV compatible con la tramitación SIGGAN.
+   * Genera un fichero con las secciones del libro de registro
+   * (identificación, censo, entradas, salidas, nacimientos, muertes,
+   * tratamientos y saneamientos) en formato importable.
+   */
+  async _exportarCSV() {
+    try {
+      const d = await this._recopilarDatos();
+      const SEP = ';';
+      const esc = (v) => {
+        if (v === null || v === undefined) return '';
+        const s = String(v).replace(/"/g, '""');
+        return /[";\n]/.test(s) ? `"${s}"` : s;
+      };
+      const fila = (arr) => arr.map(esc).join(SEP);
+      const lineas = [];
+
+      const finca = d.finca || {};
+      lineas.push(fila(['SECCION', 'IDENTIFICACION']));
+      lineas.push(fila(['REGA', finca.codigo_REGA || finca.rega || '']));
+      lineas.push(fila(['Explotacion', finca.nombre || '']));
+      lineas.push(fila(['Comunidad', finca.comunidad_autonoma || '']));
+      lineas.push(fila(['Provincia', finca.provincia || '']));
+      lineas.push(fila(['Municipio', finca.municipio || '']));
+      lineas.push(fila(['Tipo explotacion', finca.tipo_explotacion || '']));
+      lineas.push(fila(['Fecha censo', new Date().toISOString().split('T')[0]]));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'CENSO A FECHA']));
+      lineas.push(fila(['Especie', 'Cabezas']));
+      Object.entries(d.censo || {}).forEach(([esp, n]) => lineas.push(fila([esp, n])));
+      lineas.push(fila(['TOTAL', d.totalActivos]));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'ENTRADAS']));
+      lineas.push(fila(['Fecha', 'Guia', 'REGA origen', 'REGA destino', 'Motivo', 'Transportista', 'Animales']));
+      d.entradas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista, (m.animalId || []).join('|')])));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'SALIDAS']));
+      lineas.push(fila(['Fecha', 'Guia', 'REGA origen', 'REGA destino', 'Motivo', 'Transportista', 'Animales']));
+      d.salidas.forEach(m => lineas.push(fila([m.fecha, m.numero_guia, m.rega_origen, m.rega_destino, m.motivo, m.transportista, (m.animalId || []).join('|')])));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'NACIMIENTOS']));
+      lineas.push(fila(['Crotal', 'Especie', 'Sexo', 'Fecha nacimiento', 'Madre']));
+      d.nacimientos.forEach(a => lineas.push(fila([a.crotal || a.identificacion, a.especie, a.sexo, a.fecha_nacimiento || a.fecha_alta, a.madre || a.id_madre])));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'MUERTES']));
+      lineas.push(fila(['Crotal', 'Especie', 'Fecha baja', 'Motivo']));
+      d.muertes.forEach(a => lineas.push(fila([a.crotal || a.identificacion, a.especie, a.fecha_baja, a.motivo_baja])));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'TRATAMIENTOS']));
+      lineas.push(fila(['Fecha', 'Medicamento', 'Espera carne (d)', 'Espera leche (d)']));
+      d.sanitarios.forEach(t => lineas.push(fila([t.fecha, t.medicamento || t.producto, t.tiempo_espera_carne_dias, t.tiempo_espera_leche_dias])));
+      lineas.push('');
+
+      lineas.push(fila(['SECCION', 'SANEAMIENTOS']));
+      lineas.push(fila(['Fecha', 'Campana', 'Examinados', 'Positivos', 'Calificacion']));
+      d.saneamientos.forEach(s => lineas.push(fila([s.fecha, s.campana, s.examinados, s.positivos, s.calificacion])));
+
+      const csv = '\uFEFF' + lineas.join('\r\n');
+      const fechaHoy = new Date().toISOString().split('T')[0];
+      const nombreFinca = (finca.nombre || 'explotacion').replace(/\s+/g, '_').toLowerCase();
+      const fileName = `Libro_Registro_SIGGAN_${nombreFinca}_${fechaHoy}.csv`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      if (window.App && App.toast) App.toast('CSV SIGGAN generado correctamente');
+    } catch (e) {
+      console.error('Error exportando CSV SIGGAN:', e);
+      if (window.App && App.toastError) App.toastError('Error al generar el CSV');
+    }
   },
 };
 
