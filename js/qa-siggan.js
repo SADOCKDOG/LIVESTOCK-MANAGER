@@ -11,7 +11,9 @@
  *   5. Libro de Tratamientos Veterinarios (vía, motivo, tiempos de espera)
  *   6. Exportación oficial CSV/XML (REGA, SIA/PIGGAN)
  *   7. Cuaderno Digital (renderizado de secciones SIGGAN)
- *   8. Rendimiento de consultas con DB v10
+ *   8. Validación de crotal normativo (RD 787/2023 · país + 12 dígitos)
+ *   9. Traslado interno entre rebaños y aforo de zona (RD 787/2023)
+ *  10. Rendimiento de consultas con DB v10
  *
  * EJECUCIÓN: Pegar en la consola del navegador (DevTools) con la app abierta.
  * Uso: await SigganQA.runAll();
@@ -541,6 +543,127 @@ const SigganQA = {
   },
 
   // ============================================================
+  // TEST 9: VALIDACIÓN DE CROTAL NORMATIVO (RD 787/2023 · SITRAN)
+  // ============================================================
+  async testValidacionCrotal() {
+    const M = 'VALIDACIÓN CROTAL';
+    this._log('RUN', M, 'Validando formato normativo de crotal (país + 12 dígitos)');
+
+    const EH = window.ErrorHandler;
+    if (!this._assert(EH, M, 'ErrorHandler disponible', 'PRE-REQ')) return false;
+
+    // --- Crotal nacional válido (ES + 12 dígitos) ---
+    this._assert(EH.isCrotalValido('ES041234567890') === true,
+      'Acepta crotal nacional ES + 12 dígitos', 'FORMATO');
+
+    // --- Crotal extranjero válido (otro código de país + 12 dígitos) ---
+    this._assert(EH.isCrotalValido('FR123456789012') === true,
+      'Acepta crotal extranjero (FR) con 12 dígitos', 'PAÍS');
+    this._assert(EH.isCrotalValido('PT987654321098') === true,
+      'Acepta crotal extranjero (PT) con 12 dígitos', 'PAÍS');
+
+    // --- Normaliza minúsculas/espacios antes de validar ---
+    this._assert(EH.isCrotalValido('  es041234567890  ') === true,
+      'Normaliza espacios y minúsculas antes de validar', 'NORMALIZACIÓN');
+
+    // --- Rechazos de formato ---
+    this._assert(EH.isCrotalValido('ES12345') === false,
+      'Rechaza crotal demasiado corto', 'FORMATO');
+    this._assert(EH.isCrotalValido('041234567890') === false,
+      'Rechaza crotal sin código de país', 'FORMATO');
+    this._assert(EH.isCrotalValido('ESABCDEFGHIJKL') === false,
+      'Rechaza crotal con letras donde van dígitos', 'FORMATO');
+    this._assert(EH.isCrotalValido('ES0412345678901') === false,
+      'Rechaza crotal con 13 dígitos (demasiado largo)', 'FORMATO');
+    this._assert(EH.isCrotalValido('') === false,
+      'Rechaza crotal vacío', 'FORMATO');
+
+    // --- validateCaravana: devuelve el valor normalizado y lanza si es inválido ---
+    this._assert(EH.validateCaravana('es041234567890') === 'ES041234567890',
+      'validateCaravana normaliza y acepta crotal válido', 'NORMATIVA');
+    await this._expectThrow(
+      () => EH.validateCaravana('XX-INVALIDO'),
+      M, 'validateCaravana lanza excepción con crotal inválido');
+
+    this._log('PASS', M, '✅ COMPLETADO — Validación de crotal verificada');
+    return !this._hasFail(M);
+  },
+
+  // ============================================================
+  // TEST 10: TRASLADO INTERNO Y AFORO DE ZONA (RD 787/2023)
+  // ============================================================
+  async testTrasladoInterno() {
+    const M = 'TRASLADO INTERNO';
+    this._log('RUN', M, 'Validando traslado interno entre rebaños y aforo de zona');
+
+    const TZ = window.Trazabilidad;
+    if (!this._assert(TZ && typeof TZ.validarAforoZona === 'function', M,
+      'Trazabilidad.validarAforoZona disponible', 'PRE-REQ')) return false;
+
+    try {
+      // --- FASE 1: Reasignación de rebaño (traslado interno entre rebaños) ---
+      const rebanos = await Rebanos.list();
+      if (rebanos.length < 2) {
+        this._log('WARN', M, `Se requieren ≥2 rebaños (hay ${rebanos.length}): se omite la reasignación`, 'TRASLADO');
+      } else {
+        const animales = await Animales.list();
+        const origen = rebanos[0];
+        const destino = rebanos.find(r => r.id !== origen.id) || rebanos[1];
+        const animal = animales.find(a => a.rebanoId == origen.id) || animales[0];
+
+        if (animal) {
+          const rebanoOriginal = animal.rebanoId;
+          try {
+            await Animales.save({ ...animal, rebanoId: destino.id });
+            const check = await this._verifyInDB('animales', animal.id, { rebanoId: destino.id });
+            this._assert(check.ok, check.ok
+              ? `Animal ${animal.numero_identificacion} trasladado al rebaño "${destino.nombre}"`
+              : `IndexedDB: ${check.reason}`, 'TRASLADO');
+          } finally {
+            // Restaura el estado original — el test no deja datos de prueba
+            const restore = await Animales.get(animal.id);
+            if (restore) { restore.rebanoId = rebanoOriginal; await Animales.save(restore); }
+          }
+        } else {
+          this._log('WARN', M, 'Sin animales disponibles: se omite la reasignación', 'TRASLADO');
+        }
+      }
+
+      // --- FASE 2: Validación de aforo (capacidad técnica de la zona) ---
+      const fincas = await window.db.getAll('fincas').catch(() => []);
+      let zonaConAforo = null;
+      for (const f of fincas) {
+        zonaConAforo = (f.zonas || []).find(z => z && z.aforoMax > 0);
+        if (zonaConAforo) break;
+      }
+
+      // Dentro de capacidad (añadir 0 animales) → resuelve true
+      const zonaName = zonaConAforo
+        ? zonaConAforo.nombre
+        : (fincas[0]?.zonas?.[0]?.nombre || '__zona_inexistente__');
+      let okDentro = false;
+      try { okDentro = await TZ.validarAforoZona(window.db, zonaName, 0); } catch (_) { okDentro = false; }
+      this._assert(okDentro === true,
+        `validarAforoZona acepta censo dentro de capacidad (zona "${zonaName}")`, 'AFORO');
+
+      if (zonaConAforo) {
+        // Exceder el aforo máximo → rechaza
+        await this._expectThrow(
+          () => TZ.validarAforoZona(window.db, zonaConAforo.nombre, zonaConAforo.aforoMax + 9999),
+          M, `Rechaza traslado que supera el aforo de "${zonaConAforo.nombre}" (máx. ${zonaConAforo.aforoMax})`, 'AFORO');
+      } else {
+        this._log('WARN', M, 'Ninguna zona tiene aforoMax definido: se omite la prueba de exceso', 'AFORO');
+      }
+
+      this._log('PASS', M, '✅ COMPLETADO — Traslado interno y aforo verificados');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
+  // ============================================================
   // UTIL: detectar si un módulo registró algún FAIL en esta corrida
   // ============================================================
   _runStartIndex: 0,
@@ -557,7 +680,7 @@ const SigganQA = {
     console.log('\n' + '='.repeat(75));
     console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
     console.log('📅 ' + new Date().toLocaleString());
-    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno');
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
@@ -586,6 +709,8 @@ const SigganQA = {
       { name: 'Libro de Tratamientos', fn: () => this.testLibroTratamientos() },
       { name: 'Exportación REGA/SIA', fn: () => this.testExportacion() },
       { name: 'Cuaderno Digital', fn: () => this.testCuadernoView() },
+      { name: 'Validación Crotal', fn: () => this.testValidacionCrotal() },
+      { name: 'Traslado Interno y Aforo', fn: () => this.testTrasladoInterno() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -652,6 +777,8 @@ const SigganQA = {
       'tratamientos': () => this.testLibroTratamientos(),
       'export': () => this.testExportacion(),
       'cuaderno': () => this.testCuadernoView(),
+      'crotal': () => this.testValidacionCrotal(),
+      'traslado': () => this.testTrasladoInterno(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];
