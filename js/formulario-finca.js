@@ -11,6 +11,12 @@ const FormularioFinca = {
    * @returns {HTMLElement} Elemento del formulario
    */
   crear(onSubmit, onCancel) {
+    const CS = window.ComunidadesService;
+    const opcionesCCAA = CS ? CS.getOpcionesComunidad() : [];
+    const tiposExplotacion = CS ? CS.getTiposExplotacionREGA() : [];
+    const clasificacionZootecnica = CS ? CS.getClasificacionZootecnica() : [];
+    const especiesAutorizables = CS ? CS.getEspeciesAutorizables() : [];
+
     const formulario = document.createElement("div");
     formulario.className = "formulario-finca-contenedor";
     formulario.innerHTML = `
@@ -101,14 +107,69 @@ const FormularioFinca = {
                             <input type="text" id="adsgFinca" name="adsg_nombre" placeholder="Ej: ADSG Ovino Sierra Norte" maxlength="100" />
                         </div>
 
+                        <!-- BLOQUE SIGGAN / REGA -->
                         <div class="formulario-finca-grupo">
-                            <label for="regaFinca">Código REGA (Opcional)</label>
-                            <input type="text" id="regaFinca" name="rega" placeholder="Ej: ES-XX-XXXXXX-XXX" maxlength="25" />
+                            <label for="ccaaFinca">Comunidad Autónoma</label>
+                            <select id="ccaaFinca" name="comunidad_autonoma">
+                                <option value="">— Selecciona —</option>
+                                ${opcionesCCAA.map(o => `<option value="${o.value}">${o.label}</option>`).join("")}
+                            </select>
+                            <small class="formulario-finca-ayuda" id="ayudaSiggan"></small>
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label for="provinciaFinca">Provincia</label>
+                            <select id="provinciaFinca" name="provincia">
+                                <option value="">— Selecciona comunidad primero —</option>
+                            </select>
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label for="municipioFinca">Municipio</label>
+                            <input type="text" id="municipioFinca" name="municipio" placeholder="Ej: Aracena" maxlength="80" />
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label for="regaFinca"><span class="requerido" id="regaReq" style="display:none;">*</span> Código REGA</label>
+                            <input type="text" id="regaFinca" name="rega" placeholder="Ej: ES041230000123" maxlength="25" />
+                            <span class="formulario-finca-error" data-campo="rega"></span>
+                            <small class="formulario-finca-ayuda">ES + 2 díg. provincia + 3 díg. municipio + 7 díg. secuencial</small>
                         </div>
 
                         <div class="formulario-finca-grupo">
                             <label for="ceaFinca">Código CEA (Opcional)</label>
                             <input type="text" id="ceaFinca" name="cea" placeholder="Ej: XX-XXXXX-XX" maxlength="20" />
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label for="tipoExpFinca">Tipo de Explotación (REGA)</label>
+                            <select id="tipoExpFinca" name="tipo_explotacion">
+                                <option value="">— Selecciona —</option>
+                                ${tiposExplotacion.map(t => `<option value="${t}">${t}</option>`).join("")}
+                            </select>
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label for="claseZootFinca">Clasificación Zootécnica</label>
+                            <select id="claseZootFinca" name="clasificacion_zootecnica">
+                                <option value="">— Selecciona —</option>
+                                ${clasificacionZootecnica.map(c => `<option value="${c}">${c}</option>`).join("")}
+                            </select>
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label for="capacidadFinca">Capacidad Máxima (nº cabezas)</label>
+                            <input type="number" id="capacidadFinca" name="capacidad_maxima" min="0" step="1" placeholder="Ej: 500" />
+                        </div>
+
+                        <div class="formulario-finca-grupo">
+                            <label>Especies Autorizadas</label>
+                            <div class="formulario-finca-especies" id="especiesAutorizadas">
+                                ${especiesAutorizables.map(e => `
+                                <label class="formulario-finca-chk">
+                                    <input type="checkbox" name="especies_autorizadas" value="${e}"> ${e}
+                                </label>`).join("")}
+                            </div>
                         </div>
 
                         <div class="formulario-finca-mensaje-exito" style="display: none;"></div>
@@ -160,6 +221,34 @@ const FormularioFinca = {
       formulario.remove();
     });
 
+    // Interactividad SIGGAN: CCAA -> provincias + obligatoriedad de REGA
+    const selCcaa = formulario.querySelector("#ccaaFinca");
+    const selProv = formulario.querySelector("#provinciaFinca");
+    const regaReq = formulario.querySelector("#regaReq");
+    const ayudaSiggan = formulario.querySelector("#ayudaSiggan");
+    if (selCcaa) {
+      selCcaa.addEventListener("change", () => {
+        const CS = window.ComunidadesService;
+        const ccaa = selCcaa.value;
+        // Repoblar provincias
+        if (selProv) {
+          const provincias = CS && ccaa ? CS.getProvincias(ccaa) : [];
+          selProv.innerHTML = provincias.length
+            ? `<option value="">— Selecciona —</option>` + provincias.map(p => `<option value="${p}">${p}</option>`).join("")
+            : `<option value="">— Selecciona comunidad primero —</option>`;
+        }
+        // REGA obligatorio según comunidad
+        const obligatorio = CS && ccaa ? CS.esREGAObligatorio(ccaa) : false;
+        if (regaReq) regaReq.style.display = obligatorio ? "inline" : "none";
+        if (ayudaSiggan) {
+          const conf = CS && ccaa ? CS.getConfiguracionCCAA(ccaa) : null;
+          ayudaSiggan.textContent = conf
+            ? `Plataforma de tramitación: ${conf.sistema_movimiento}. ${obligatorio ? "REGA obligatorio." : "REGA recomendado."}`
+            : "";
+        }
+      });
+    }
+
     return formulario;
   },
 
@@ -175,6 +264,10 @@ const FormularioFinca = {
 
       // Obtener datos del formulario
       const datos = new FormData(formElement);
+      const especiesAutorizadas = datos.getAll("especies_autorizadas");
+      const regaNorm = window.ComunidadesService && datos.get("rega")
+        ? window.ComunidadesService.normalizarREGA(datos.get("rega"))
+        : (datos.get("rega") ? datos.get("rega").trim().toUpperCase() : "");
       const fincaData = {
         nombre: datos.get("nombre").trim(),
         propietario: datos.get("propietario").trim(),
@@ -183,8 +276,15 @@ const FormularioFinca = {
         nif_cif: datos.get("nif_cif") ? datos.get("nif_cif").trim() : "",
         email: datos.get("email") ? datos.get("email").trim() : "",
         adsg_nombre: datos.get("adsg_nombre") ? datos.get("adsg_nombre").trim() : "",
-        rega: datos.get("rega") ? datos.get("rega").trim().toUpperCase() : "",
+        comunidad_autonoma: datos.get("comunidad_autonoma") || "",
+        provincia: datos.get("provincia") || "",
+        municipio: datos.get("municipio") ? datos.get("municipio").trim() : "",
+        rega: regaNorm,
         cea: datos.get("cea") ? datos.get("cea").trim().toUpperCase() : "",
+        tipo_explotacion: datos.get("tipo_explotacion") || "",
+        clasificacion_zootecnica: datos.get("clasificacion_zootecnica") || "",
+        capacidad_maxima: datos.get("capacidad_maxima") ? Number(datos.get("capacidad_maxima")) : null,
+        especies_autorizadas: especiesAutorizadas,
         zonas: [],
       };
 
@@ -272,6 +372,22 @@ const FormularioFinca = {
       });
     }
 
+    // Validación SIGGAN del código REGA
+    const CS = window.ComunidadesService;
+    const ccaa = datos.comunidad_autonoma || null;
+    const regaObligatorio = CS && ccaa ? CS.esREGAObligatorio(ccaa) : false;
+    if (regaObligatorio && !datos.rega) {
+      errores.push({
+        campo: "rega",
+        mensaje: "El código REGA es obligatorio para esta comunidad (SIGGAN).",
+      });
+    } else if (datos.rega && CS) {
+      const res = CS.validarFormatoREGA(datos.rega, ccaa);
+      if (!res.valido) {
+        errores.push({ campo: "rega", mensaje: res.mensaje });
+      }
+    }
+
     return errores;
   },
 
@@ -300,6 +416,10 @@ const FormularioFinca = {
         font-size: 16px; cursor: pointer; text-align: center;
         border: 1px solid #444; background: #1a1a1a; color: #eee;
       }
+      .formulario-finca-ayuda { display:block; color:#888; font-size:11px; margin-top:4px; }
+      .formulario-finca-especies { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:4px; }
+      .formulario-finca-chk { display:flex; align-items:center; gap:6px; font-size:13px; color:#ddd; cursor:pointer; }
+      .formulario-finca-chk input { width:auto; }
     `;
     document.head.appendChild(estilo);
   },
