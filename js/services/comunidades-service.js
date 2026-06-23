@@ -139,6 +139,33 @@ window.ComunidadesService = (() => {
     { value: 'otra', label: 'Otra campaña', especies: ESPECIES_AUTORIZABLES },
   ]);
 
+  // Vías de administración del medicamento (Libro de Tratamientos Veterinarios SIGGAN)
+  const VIAS_ADMINISTRACION = Object.freeze([
+    { value: 'intramuscular', label: 'Intramuscular (IM)' },
+    { value: 'subcutanea', label: 'Subcutánea (SC)' },
+    { value: 'intravenosa', label: 'Intravenosa (IV)' },
+    { value: 'oral', label: 'Oral / en pienso o agua' },
+    { value: 'topica', label: 'Tópica / pour-on' },
+    { value: 'intramamaria', label: 'Intramamaria' },
+    { value: 'intrauterina', label: 'Intrauterina' },
+    { value: 'ocular', label: 'Ocular' },
+    { value: 'otra', label: 'Otra' },
+  ]);
+
+  // Motivos / diagnóstico del tratamiento (Libro de Tratamientos Veterinarios SIGGAN)
+  const MOTIVOS_TRATAMIENTO = Object.freeze([
+    { value: 'profilaxis', label: 'Profilaxis / prevención' },
+    { value: 'vacunacion', label: 'Vacunación programada' },
+    { value: 'desparasitacion', label: 'Desparasitación' },
+    { value: 'infeccion', label: 'Proceso infeccioso' },
+    { value: 'mamitis', label: 'Mamitis' },
+    { value: 'podal', label: 'Proceso podal / cojeras' },
+    { value: 'reproductivo', label: 'Trastorno reproductivo' },
+    { value: 'metabolico', label: 'Trastorno metabólico / nutricional' },
+    { value: 'lesion', label: 'Lesión / traumatismo' },
+    { value: 'otro', label: 'Otro' },
+  ]);
+
   // Calificaciones sanitarias de la explotación (resultado de saneamiento)
   const CALIFICACIONES_SANITARIAS = Object.freeze([
     { value: 'indemne', label: 'Oficialmente indemne (T3/M3/B4)', color: '#10b981' },
@@ -366,9 +393,12 @@ window.ComunidadesService = (() => {
 
   /** Catálogo de campañas de saneamiento */
   function getCampanasSaneamiento() { return CAMPANAS_SANEAMIENTO.map(c => ({ ...c })); }
-
   /** Catálogo de calificaciones sanitarias */
   function getCalificacionesSanitarias() { return CALIFICACIONES_SANITARIAS.map(c => ({ ...c })); }
+  /** Catálogo de vías de administración (libro de tratamientos) */
+  function getViasAdministracion() { return VIAS_ADMINISTRACION.map(v => ({ ...v })); }
+  /** Catálogo de motivos/diagnóstico de tratamiento (libro de tratamientos) */
+  function getMotivosTratamiento() { return MOTIVOS_TRATAMIENTO.map(m => ({ ...m })); }
 
   /**
    * Retorna el umbral PAC de corderos/oveja/año
@@ -574,6 +604,8 @@ window.ComunidadesService = (() => {
     MOTIVOS_MOVIMIENTO,
     CAMPANAS_SANEAMIENTO,
     CALIFICACIONES_SANITARIAS,
+    VIAS_ADMINISTRACION,
+    MOTIVOS_TRATAMIENTO,
     getConfiguracionCCAA,
     getComunidades,
     getOpcionesComunidad,
@@ -593,6 +625,8 @@ window.ComunidadesService = (() => {
     getMotivosMovimiento,
     getCampanasSaneamiento,
     getCalificacionesSanitarias,
+    getViasAdministracion,
+    getMotivosTratamiento,
     getUmbralPAC,
     getDistanciaMinimaREGA,
     getCostesLecheReferencia,

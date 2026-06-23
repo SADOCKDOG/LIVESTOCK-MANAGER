@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.5.2] - 2026-06-23
+### Added
+- **Libro de Tratamientos Veterinarios (cumplimiento SIGGAN):** El wizard de Tratamiento Sanitario incorpora un segundo paso con los datos exigidos por el RD 1749/1998 y la tramitación SIGGAN:
+  - Motivo/diagnóstico, vía de administración y nº de animales tratados.
+  - Nº de lote y caducidad del medicamento.
+  - Veterinario prescriptor (nombre + nº colegiado, autorrellenado desde la ADSG de la finca) y nº de receta.
+  - Nuevos catálogos `VIAS_ADMINISTRACION` y `MOTIVOS_TRATAMIENTO` centralizados en `ComunidadesService`.
+- **Cuaderno Digital:** la sección 4 (Sanidad) muestra y exporta a PDF los nuevos campos del libro de tratamientos.
+- **Exportación CSV SIGGAN:** la sección TRATAMIENTOS incluye motivo, vía, animales tratados, lote, caducidad, veterinario, colegiado y nº de receta.
+
+### Changed
+- Service Worker: `corcho-v6.5.31` → `corcho-v6.5.32`.
+
 ## [v4.5.1] - 2026-06-17
 ### Added
 - **Tour de inicio flotante en pantalla de bienvenida:** Wizard de 4 pasos que guía al usuario en sus primeros pasos.

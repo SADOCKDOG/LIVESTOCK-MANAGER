@@ -284,10 +284,12 @@ const CuadernoDigitalView = {
         <div class="text-sm" style="max-height:200px; overflow-y:auto;">
           ${d.sanitarios.slice(0, 20).map(t => {
             const rb = d.rebanos.find(r => r.id === t.rebanoId);
+            const vet = t.veterinario_prescriptor ? ` · Vet: ${t.veterinario_prescriptor}${t.veterinario_colegiado ? ' (' + t.veterinario_colegiado + ')' : ''}` : '';
+            const receta = t.numero_receta ? ` · Receta ${t.numero_receta}` : '';
             return `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
               <span class="text-gray">${t.fecha || '—'}</span>
               <span class="text-gold font-semibold">${t.medicamento || t.producto || '—'}</span>
-              <span class="text-gray"> · ${rb?.nombre || ''}</span>
+              <span class="text-gray"> · ${rb?.nombre || ''}${vet}${receta}</span>
               <span class="text-gray-500" style="float:right;">Espera: ${t.tiempo_espera_carne_dias || '?'}d</span>
             </div>`;
           }).join('') || '<p class="empty-state-text mb-0">Sin tratamientos registrados.</p>'}
@@ -780,8 +782,8 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
     </div>
     ${d.sanitarios.length > 0 ? `
     <table>
-      <tr><th>Fecha</th><th>Medicamento</th><th>Días Espera</th><th>Rebano</th></tr>
-      ${d.sanitarios.slice(0, 15).map(t => `<tr><td>${t.fecha || '—'}</td><td>${t.medicamento || t.producto || '—'}</td><td>${t.tiempo_espera_carne_dias || '—'}</td><td>${d.rebanos.find(r => r.id === t.rebanoId)?.nombre || '—'}</td></tr>`).join('')}
+      <tr><th>Fecha</th><th>Medicamento</th><th>Motivo</th><th>Vía</th><th>Nº anim.</th><th>Lote</th><th>Esp. carne (d)</th><th>Esp. leche (d)</th><th>Veterinario (colegiado)</th><th>Nº receta</th><th>Rebaño</th></tr>
+      ${d.sanitarios.slice(0, 15).map(t => `<tr><td>${t.fecha || '—'}</td><td>${t.medicamento || t.producto || '—'}</td><td>${t.motivo_tratamiento || '—'}</td><td>${t.via_administracion || '—'}</td><td>${t.num_animales_tratados || '—'}</td><td>${t.lote_medicamento || '—'}</td><td>${t.tiempo_espera_carne_dias || '—'}</td><td>${t.tiempo_espera_leche_dias || '—'}</td><td>${t.veterinario_prescriptor || '—'}${t.veterinario_colegiado ? ' (' + t.veterinario_colegiado + ')' : ''}</td><td>${t.numero_receta || '—'}</td><td>${d.rebanos.find(r => r.id === t.rebanoId)?.nombre || '—'}</td></tr>`).join('')}
     </table>` : '<p>Sin tratamientos registrados.</p>'}
 
     <h2>5. Registro Reproductivo</h2>
@@ -880,8 +882,8 @@ pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; backgro
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'TRATAMIENTOS']));
-      lineas.push(fila(['Fecha', 'Medicamento', 'Espera carne (d)', 'Espera leche (d)']));
-      d.sanitarios.forEach(t => lineas.push(fila([t.fecha, t.medicamento || t.producto, t.tiempo_espera_carne_dias, t.tiempo_espera_leche_dias])));
+      lineas.push(fila(['Fecha', 'Medicamento', 'Motivo', 'Via administracion', 'Animales tratados', 'Lote', 'Caducidad', 'Espera carne (d)', 'Espera leche (d)', 'Veterinario', 'Nº colegiado', 'Nº receta']));
+      d.sanitarios.forEach(t => lineas.push(fila([t.fecha, t.medicamento || t.producto, t.motivo_tratamiento, t.via_administracion, t.num_animales_tratados, t.lote_medicamento, t.caducidad_medicamento, t.tiempo_espera_carne_dias, t.tiempo_espera_leche_dias, t.veterinario_prescriptor, t.veterinario_colegiado, t.numero_receta])));
       lineas.push('');
 
       lineas.push(fila(['SECCION', 'SANEAMIENTOS']));
