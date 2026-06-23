@@ -27,7 +27,7 @@ const WizardManager = {
           <div style="text-align: center; color: #d97706; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;">PASO ${currentStepIndex + 1} DE ${steps.length}</div>
         </div>
 
-        <div id="wizard-content-area" class="wizard-content-scrollable">
+        <div id="wizard-content-area" class="wizard-content-scrollable animate-in">
           ${contentHtml}
         </div>
 

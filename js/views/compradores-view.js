@@ -11,7 +11,6 @@ const CompradoresView = {
         const main = document.getElementById("app-content");
         main.innerHTML = `
           <div class="mb-16">
-            <div id="compr-kpis"></div>
             <div class="flex gap-6 flex-wrap mb-10">
               ${['todos','cárnico','láctico','híbrido'].map(t => `
                 <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}" data-tab="${t}"
@@ -25,10 +24,11 @@ const CompradoresView = {
               <input type="search" id="search-compradores" placeholder="🔍 Buscar por nombre, NIF o ciudad..."
                 oninput="CompradoresView._filtrar(this.value)"
                 class="search-input">
-              <button class="btn btn-primary btn-sm" onclick="CompradoresView.renderFormulario()">➕ Nuevo</button>
+              <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">➕ Nuevo</button>
             </div>
           </div>
-          <div id="compr-lista"><div class="loader">Cargando compradores...</div></div>`;
+          <div id="compr-lista"><div class="loader">Cargando compradores...</div></div>
+          <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">➕</button>`;
 
         await this._cargarDatos();
     },
@@ -44,16 +44,6 @@ const CompradoresView = {
             ventasLeche.reduce((s, v) => s + (v.importe_total || (v.cantidad || 0) * (v.precioBase || 0)), 0);
         const tipos = { cárnico: 0, láctico: 0, híbrido: 0 };
         compradores.forEach(c => { if (tipos[c.tipo_comprador] !== undefined) tipos[c.tipo_comprador]++; });
-        const kpisContainer = document.getElementById('compr-kpis');
-        if (kpisContainer) {
-            kpisContainer.innerHTML = `
-              <div class="grid grid-cols-4 gap-6 mb-14">
-                <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${compradores.length}</div></div>
-                <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">CÁRNICOS</small><div class="inf-val-lg text-red">${tipos.cárnico}</div></div>
-                <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">LÁCTEOS</small><div class="inf-val-lg text-amber">${tipos.láctico}</div></div>
-                <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${ingresoTotal.toLocaleString()}€</div></div>
-              </div>`;
-        }
         this._cachedData = compradores;
         this._renderLista(compradores);
     },
@@ -98,7 +88,7 @@ const CompradoresView = {
               <div class="empty-state">
                 <div class="empty-state-icon">🏢</div>
                 <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
-                <button class="btn btn-primary btn-sm" onclick="CompradoresView.renderFormulario()">➕ Registrar primer comprador</button>
+                <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">➕ Registrar primer comprador</button>
               </div>`;
             return;
         }
@@ -170,8 +160,8 @@ const CompradoresView = {
                 </div>
               </div>
               <div class="flex gap-6">
-                <button onclick="CompradoresView.renderFormulario(${id})" class="btn-action-blue">✏️ Editar</button>
-                <button onclick="CompradoresView._eliminar(${id})" class="btn-action-red">🗑️</button>
+                <button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+                <button onclick="CompradoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">✏️ Editar</button>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
@@ -206,7 +196,7 @@ const CompradoresView = {
           <div class="card p-16">
             <h3 class="section-h3 flex justify-between items-center">
               <span>📄 Contratos</span>
-              <button onclick="CompradoresView._nuevoContrato(${id})" class="text-purple" style="padding:5px 12px; border-radius:10px; background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.3); font-size:0.65rem; cursor:pointer;">➕ Añadir</button>
+              <button onclick="CompradoresView._nuevoContrato(${id})" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">➕ Añadir</button>
             </h3>
             ${contratos.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin contratos registrados.</p></div>' :
               contratos.map(c => `
@@ -346,9 +336,12 @@ const CompradoresView = {
               <span>Comprador activo</span>
             </label>
 
-            <div class="grid grid-cols-2 gap-10">
-              <button onclick="CompradoresView._guardar(${id || ''})" class="btn btn-primary text-85" style="height:48px;">💾 GUARDAR</button>
-              <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="btn btn-secondary text-85" style="height:48px;">✖ CANCELAR</button>
+            <div class="flex justify-between items-center mt-20">
+              ${esEdicion ? `<button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger">🗑️ Eliminar</button>` : '<div></div>'}
+              <div class="flex gap-10">
+                <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="btn btn-secondary">✕ Cancelar</button>
+                <button onclick="CompradoresView._guardar(${id || ''})" class="btn btn-success">✔ Guardar</button>
+              </div>
             </div>
           </div>
         `;

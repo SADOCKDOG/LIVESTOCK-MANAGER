@@ -24,7 +24,7 @@ const AnimalesView = {
       <div class="mb-16">
         <div class="flex justify-between items-center">
           <div class="flex gap-8">
-            <button class="btn btn-primary btn-sm" onclick="location.hash='/animal'">➕ Nuevo</button>
+            <button class="btn btn-primary btn-sm btn-create" onclick="location.hash='/animal'">➕ Nuevo</button>
           </div>
           ${animales.length > 0 ? `<span class="text-xs text-gray">${activos}/${animales.length} activos</span>` : ''}
         </div>
@@ -48,23 +48,31 @@ const AnimalesView = {
         <span class="badge badge-sm badge-red">📦 ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
       </div>`;
 
-    // Filtros rápidos
+    // Búsqueda + selector de especie compacto
     html += `
-      <div class="flex flex-wrap gap-4 mb-10" style="overflow-x:auto;white-space:nowrap;">
-        ${['Todas','Vacas','Ovejas','Cabras','Cerdos'].map(esp => `
-          <button class="btn btn-${this._filtroActivo.especie === (esp === 'Todas' ? '' : esp) ? 'primary' : 'secondary'} btn-xs" style="padding:4px 10px;font-size:0.7rem;border-radius:12px;" onclick="AnimalesView._setFiltro('especie', '${esp === 'Todas' ? '' : esp}')">${esp}</button>
-        `).join('')}
-      </div>
       <div class="sticky-top" style="padding-bottom:10px;">
-        <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
-               oninput="AnimalesView._filtrar(this.value)"
-               class="search-input">
+        <div class="flex gap-8 items-center">
+          <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
+                 oninput="AnimalesView._filtrar(this.value)"
+                 class="search-input" style="flex:1;min-width:0;">
+          <select id="animales-filtro-especie" class="form-select-gold"
+                  onchange="AnimalesView._setFiltro('especie', this.value)"
+                  style="width:130px;min-width:120px;">
+            <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
+            <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
+            <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
+            <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
+            <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
+          </select>
+        </div>
       </div>
       <div id="animales-lista" class="grid gap-12">`;
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
     html += `</div>
+      <!-- Botón Flotante de Acción para móviles -->
+      <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">➕</button>
       <div id="animales-empty-search" class="empty-state-search" style="display:none;">
         <div class="text-2xl mb-8">🔍</div>
         <p class="text-gray-500">No se encontraron animales con ese criterio.</p>
@@ -84,17 +92,12 @@ const AnimalesView = {
 
   _setFiltro(tipo, valor) {
     this._filtroActivo[tipo] = valor;
+    if (tipo === 'especie') {
+      const select = document.getElementById('animales-filtro-especie');
+      if (select) select.value = valor || '';
+    }
     const texto = document.getElementById('search-animales')?.value || '';
     this._filtrar(texto);
-    // Actualizar visual de botones
-    document.querySelectorAll('[onclick^="AnimalesView._setFiltro"]').forEach(b => {
-      const match = b.getAttribute('onclick').match(/'([^']*)'/g);
-      if (match && match.length >= 2) {
-        const bt = match[0].slice(1, -1);
-        const bv = match[1].slice(1, -1);
-        b.className = `btn btn-${bt === tipo && bv === (this._filtroActivo[tipo] || '') ? 'primary' : 'secondary'} btn-xs`;
-      }
-    });
   },
 
   _renderCard(a, r) {
@@ -200,6 +203,7 @@ const AnimalesView = {
     const mostrarDIB = CS ? CS.especieRequiereDIB(a.especie) : false;
     const esCompra = a.tipoAlta === "Compra";
     const esBaja = a.estado === "baja" || a.estado === "Baja";
+    const esSalida = esBaja || a.estado === "vendido";
 
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
@@ -219,12 +223,12 @@ const AnimalesView = {
             <label class="wizard-crotal-label">Nº CROTAL</label>
             <input type="text" id="a-crotal"
                    value="${a.numero_identificacion}"
-                   placeholder="Ej: ES1409912345 (14-16 caracteres)" maxlength="16"
+                   placeholder="Ej: ES123456789012 (2 letras + 12 dígitos)" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
                    class="wizard-crotal-input">
             <div class="text-777 text-tiny mt-4" style="line-height:1.3; padding:0 8px;">
-              Formato REGA: ES + provincia + nº animal (máx. 16)<br>
-              <span class="text-gold" id="crotal-length-counter">0/16</span>
+              Formato REGA: ES + 12 dígitos<br>
+              <span class="text-gold" id="crotal-length-counter">0/14</span>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-12 mb-12">
@@ -333,8 +337,8 @@ const AnimalesView = {
                 </select>
               </div>
             </div>
-            <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esBaja ? 'block' : 'none'}; margin-top:12px;">
-              <label class="form-label">FECHA DE BAJA</label>
+            <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esSalida ? 'block' : 'none'}; margin-top:12px;">
+              <label class="form-label">FECHA DE SALIDA / BAJA</label>
               <input type="date" id="a-fecha-baja" value="${a.fecha_baja || ""}" class="form-input form-input-lg">
             </div>
           </div>
@@ -355,9 +359,9 @@ const AnimalesView = {
             </button>` : ""}
         </div>
         <div class="wizard-footer-fixed grid grid-cols-3 gap-8">
-          ${!esNuevo ? `<button onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action" style="background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;font-weight:800;">🔄 360°</button>` : '<div></div>'}
-          <button onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">✖ SALIR</button>
-          <button id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">✔ GUARDAR</button>
+          ${!esNuevo ? `<button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action" style="background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;font-weight:800;">🔄 Ver 360°</button>` : '<div></div>'}
+          <button type="button" onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">✕ Salir</button>
+          <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">✔ Guardar</button>
         </div>
       </div>`;
 
@@ -433,9 +437,12 @@ const AnimalesView = {
       if (data.estado === "baja" && !data.motivo_baja) {
         return App.toastError("Indica el motivo de baja para el libro de registro.");
       }
-      if (data.estado !== "baja") {
+      if (data.estado === "activo") {
         data.motivo_baja = "";
         data.fecha_baja = "";
+      } else if (data.estado === "vendido") {
+        // La venta es una salida: conserva la fecha de salida pero no usa motivo de baja.
+        data.motivo_baja = "";
       }
 
       const nuevoId = await Animales.save(data);
@@ -445,25 +452,50 @@ const AnimalesView = {
       location.hash = "#/animales";
     } catch (e) {
       App.toastError(e.message);
+      const msgLower = (e.message || "").toLowerCase();
+      if (msgLower.includes("crotal") || msgLower.includes("identificaci") || msgLower.includes("caravana")) {
+        const crotalInput = document.getElementById("a-crotal");
+        if (crotalInput) {
+          crotalInput.focus();
+          if (typeof crotalInput.select === "function") crotalInput.select();
+        }
+      }
     }
   },
 
   _validarCrotalUI(input) {
-    input.value = input.value.toUpperCase();
-    const len = input.value.length;
+    // 1. Convertir a mayúsculas y limpiar caracteres no permitidos
+    let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+    // 2. Restringir formato: primeras 2 posiciones letras, del resto números
+    let cleanVal = '';
+    for (let i = 0; i < val.length; i++) {
+      const char = val[i];
+      if (i < 2) {
+        if (/[A-Z]/.test(char)) cleanVal += char;
+      } else {
+        if (/[0-9]/.test(char)) cleanVal += char;
+      }
+    }
+    input.value = cleanVal;
+
+    const len = cleanVal.length;
     const counter = document.getElementById('crotal-length-counter');
-    if (counter) counter.textContent = len + '/16';
+    if (counter) counter.textContent = len + '/14';
+
+    // Para animales de origen extranjero (compra intracomunitaria) el identificador
+    // no empieza por "ES"; solo se marca en rojo cuando se espera un crotal español.
+    const paisSel = document.getElementById('a-pais-nac');
+    const pais = paisSel ? paisSel.value : 'ES';
 
     if (len < 4) {
-      input.style.color = "#555";
+      input.style.color = "#888";
     } else if (len < 14) {
       input.style.color = "#fbbf24"; // dorado mientras se escribe
-    } else if (len > 16) {
-      input.style.color = "#ef4444"; // rojo si excede
-    } else if (!input.value.startsWith("ES") && /^[A-Z]{2}/.test(input.value)) {
-      input.style.color = "#ef4444"; // prefijo extranjero
+    } else if (pais === 'ES' && !cleanVal.startsWith("ES")) {
+      input.style.color = "#ef4444"; // rojo: español debe empezar por ES (SITRAN)
     } else {
-      input.style.color = "#10b981"; // verde si todo OK
+      input.style.color = "#10b981"; // verde si está completo y correcto
     }
   },
 
@@ -485,10 +517,13 @@ const AnimalesView = {
 
   _onEstadoChange(selectEl) {
     const esBaja = selectEl.value === 'baja';
+    const esSalida = esBaja || selectEl.value === 'vendido';
     const motivo = document.getElementById('a-motivo-baja-wrap');
     const fecha = document.getElementById('a-fecha-baja-wrap');
+    // El motivo de baja solo aplica a bajas (muerte/sacrificio...); la venta no lo usa.
     if (motivo) motivo.style.display = esBaja ? 'block' : 'none';
-    if (fecha) fecha.style.display = esBaja ? 'block' : 'none';
+    // La fecha se captura tanto en venta (fecha de salida) como en baja, para el libro de registro.
+    if (fecha) fecha.style.display = esSalida ? 'block' : 'none';
   },
 
   _salirRegistro() {

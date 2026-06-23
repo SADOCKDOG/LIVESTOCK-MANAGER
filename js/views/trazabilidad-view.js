@@ -358,8 +358,9 @@ const TrazabilidadView = {
           </tr>`;
       };
 
+      const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
       const pdfEl = document.createElement('div');
-      pdfEl.style.cssText = 'padding:30px;background:#fff;color:#333;font-family:Inter,system-ui,sans-serif;font-size:12px;max-width:800px;margin:0 auto;';
+      pdfEl.style.cssText = `position:absolute; left:0; top:${currentScroll}px; z-index:9990; padding:30px; background:#fff; color:#333; font-family:Inter,system-ui,sans-serif; font-size:12px; width:800px; overflow:visible;`;
       pdfEl.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d97706;padding-bottom:15px;margin-bottom:20px;">
           <div><h1 style="margin:0;font-size:18px;color:#d97706;">Trazabilidad 360°</h1><p style="margin:2px 0 0;font-size:10px;color:#888;">${fecha}</p></div>
@@ -396,7 +397,17 @@ const TrazabilidadView = {
         margin: [10, 8, 10, 8],
         filename: fileName,
         image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: pdfEl.scrollWidth, height: pdfEl.scrollHeight, windowHeight: pdfEl.scrollHeight, logging: false },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          width: 800,
+          scrollX: 0,
+          scrollY: currentScroll,
+          height: pdfEl.scrollHeight,
+          windowHeight: pdfEl.scrollHeight,
+          logging: false
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'] }
       }).from(pdfEl).toPdf().output('blob');

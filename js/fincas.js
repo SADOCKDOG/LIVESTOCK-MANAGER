@@ -1,10 +1,34 @@
 const Fincas = {
+    // Normalización única del código REGA: usa ComunidadesService (criterio SIGGAN:
+    // mayúsculas + elimina separadores) con fallback simple si no está cargado.
+    _normalizarREGA(value) {
+        return window.ComunidadesService
+            ? window.ComunidadesService.normalizarREGA(value || '')
+            : (value || '').toString().trim().toUpperCase();
+    },
+
     async list() {
-        return window.db.getAll('fincas');
+        const list = await window.db.getAll('fincas');
+        if (list) {
+            list.forEach(f => {
+                if (f) {
+                    const regaVal = this._normalizarREGA(f.rega || f.codigo_REGA);
+                    f.rega = regaVal;
+                    f.codigo_REGA = regaVal;
+                }
+            });
+        }
+        return list;
     },
 
     async get(id) {
-        return window.db.get('fincas', Number(id));
+        const f = await window.db.get('fincas', Number(id));
+        if (f) {
+            const regaVal = this._normalizarREGA(f.rega || f.codigo_REGA);
+            f.rega = regaVal;
+            f.codigo_REGA = regaVal;
+        }
+        return f;
     },
 
     async getActiveId() {
@@ -57,6 +81,12 @@ const Fincas = {
     },
 
     async save(data) {
+        if (data) {
+            const regaVal = this._normalizarREGA(data.rega || data.codigo_REGA);
+            data.rega = regaVal;
+            data.codigo_REGA = regaVal;
+        }
+
         const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
         if (esEdicion) {
@@ -109,6 +139,10 @@ const Fincas = {
                     // Validar campos requeridos
                     ErrorHandler.validateRequired('nombre', finca.nombre, 'Nombre es requerido');
                     ErrorHandler.validateRequired('propietario', finca.propietario, 'Propietario es requerido');
+
+                    const regaVal = this._normalizarREGA(finca.rega || finca.codigo_REGA);
+                    finca.rega = regaVal;
+                    finca.codigo_REGA = regaVal;
 
                     // Buscar si finca con mismo nombre ya existe
                     const existentes = await this.list();
@@ -177,9 +211,7 @@ const Fincas = {
             }
 
             // Crear finca nueva
-            const regaNorm = (window.ComunidadesService
-                ? window.ComunidadesService.normalizarREGA(datos.rega || datos.codigo_REGA || '')
-                : (datos.rega || datos.codigo_REGA || '').toString().trim().toUpperCase());
+            const regaNorm = this._normalizarREGA(datos.rega || datos.codigo_REGA);
             const nuevaFinca = {
                 nombre: datos.nombre.trim(),
                 propietario: datos.propietario.trim(),

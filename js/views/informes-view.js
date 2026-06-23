@@ -18,12 +18,6 @@ const InformesView = {
     main.style.paddingRight = '12px';
 
     main.innerHTML = `
-      <div id="inf-kpis-bar" class="grid grid-cols-4 gap-6 mb-14" style="display:none;">
-        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">CENSO</small><div class="inf-val-lg text-green" id="inf-kpi-censo">—</div></div>
-        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">BALANCE</small><div class="inf-val-lg" id="inf-kpi-balance" style="color:#10b981;">—</div></div>
-        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-blue" id="inf-kpi-ingresos">—</div></div>
-        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red" id="inf-kpi-gastos">—</div></div>
-      </div>
       <div class="mb-14">
         <div class="scroll-shadow-container" style="margin:0 -12px 8px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
           <div class="informes-tabs" style="display:inline-flex; gap:6px; padding:4px 0;">
@@ -32,7 +26,6 @@ const InformesView = {
             <button class="inf-tab" data-tab="leche" onclick="InformesView._cambiarTab('leche')">🥛 Lácteo</button>
             <button class="inf-tab" data-tab="reproductivo" onclick="InformesView._cambiarTab('reproductivo')">🧬 Reproductivo</button>
             <button class="inf-tab" data-tab="sanidad" onclick="InformesView._cambiarTab('sanidad')">⚕️ Sanidad</button>
-            <button class="inf-tab" data-tab="censo" onclick="InformesView._cambiarTab('censo')">🐑 Censo</button>
             <button class="inf-tab" data-tab="ventas" onclick="InformesView._cambiarTab('ventas')">📒 Ventas</button>
             <button class="inf-tab" data-tab="compradores" onclick="InformesView._cambiarTab('compradores')">🏢 Compradores</button>
             <button class="inf-tab" data-tab="proveedores" onclick="InformesView._cambiarTab('proveedores')">📦 Proveedores</button>
@@ -109,20 +102,6 @@ const InformesView = {
         this._obtenerDatosPAC(fId),
         window.db.getAll('sanitarios_ganado').catch(() => []),
       ]);
-
-      // Poblar barra de KPIs globales
-      const kpiBar = document.getElementById('inf-kpis-bar');
-      if (kpiBar) {
-        const totalCenso = censo.reduce((s, r) => s + r.total, 0);
-        document.getElementById('inf-kpi-censo').textContent = totalCenso;
-        const balance = rent?.balance || 0;
-        const balEl = document.getElementById('inf-kpi-balance');
-        balEl.textContent = (balance >= 0 ? '+' : '') + balance.toLocaleString() + '€';
-        balEl.style.color = balance >= 0 ? '#10b981' : '#ef4444';
-        document.getElementById('inf-kpi-ingresos').textContent = (rent?.ingresos || 0).toLocaleString() + '€';
-        document.getElementById('inf-kpi-gastos').textContent = (rent?.gastos || 0).toLocaleString() + '€';
-        kpiBar.style.display = 'grid';
-      }
 
       // Cachear data para los tabs
       this._cachedData = {
@@ -233,11 +212,11 @@ const InformesView = {
   _sectionActionsHTML(seccion, label) {
     return `<div class="mb-12" style="display:flex; justify-content:center;">
       <div style="display:inline-flex; gap:6px; align-items:center; background:rgba(194,65,12,0.05); border:1px solid rgba(194,65,12,0.15); border-radius:14px; padding:8px 16px;">
-        <button class="btn btn-primary btn-sm" onclick="InformesView._exportPDF()" style="padding:4px 10px; font-size:0.7rem; background:#b45309;">📄 Completo</button>
+        <button class="btn btn-primary btn-sm btn-pdf" onclick="InformesView._exportPDF()" style="padding:4px 10px; font-size:0.7rem;">📄 Completo</button>
         <span style="width:1px; height:18px; background:rgba(194,65,12,0.2); display:inline-block;"></span>
-        <button class="btn btn-primary btn-sm" onclick="InformesView._exportPDFSeccion('${seccion}')" style="padding:4px 10px; font-size:0.7rem; background:#c2410c;">📄 ${label}</button>
+        <button class="btn btn-primary btn-sm btn-pdf-seccion" onclick="InformesView._exportPDFSeccion('${seccion}')" style="padding:4px 10px; font-size:0.7rem;">📄 ${label}</button>
         <span style="width:1px; height:18px; background:rgba(16,185,129,0.2); display:inline-block;"></span>
-        <button class="btn btn-primary btn-sm" onclick="InformesView._exportExcel()" style="background:linear-gradient(135deg,#065f46,#059669); border-color:#10b981; padding:4px 10px; font-size:0.7rem;">📊 Excel</button>
+        <button class="btn btn-primary btn-sm btn-excel" onclick="InformesView._exportExcel()" style="padding:4px 10px; font-size:0.7rem;">📊 Excel</button>
       </div>
     </div>`;
   },
@@ -769,8 +748,10 @@ const InformesView = {
   // ===================== LIBRO DE VENTAS =====================
 
   _renderVentas(content, d) {
-    const { ventasCompleto, docsLegales, finca } = d;
-    const ventas = (ventasCompleto || []).sort((a, b) => new Date(b.fechaSacrificio || b.fecha_emision || 0) - new Date(a.fechaSacrificio || a.fecha_emision || 0));
+    const { ventasCompleto, docsLegales, finca, fId } = d;
+    const ventas = (ventasCompleto || [])
+      .filter(v => Number(v.fincaId) === Number(fId))
+      .sort((a, b) => new Date(b.fechaSacrificio || b.fecha_emision || 0) - new Date(a.fechaSacrificio || a.fecha_emision || 0));
 
     const totalKg = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
     const totalImporte = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
@@ -932,7 +913,7 @@ const InformesView = {
               <tr>
                 <td><strong>${c.nombre}</strong></td>
                 <td class="text-gray text-xs">${c.nif || '-'}</td>
-                <td><span class="badge badge-sm ${c.tipo === 'cárnico' ? 'badge-amber' : c.tipo === 'lácteo' ? 'badge-gold' : 'badge-blue'}">${c.tipo || 'mixto'}</span></td>
+                <td><span class="badge badge-sm ${c.tipo === 'cárnico' ? 'badge-amber' : (c.tipo === 'lácteo' || c.tipo === 'láctico') ? 'badge-gold' : 'badge-blue'}">${c.tipo || 'mixto'}</span></td>
                 <td class="text-right">${c.numVentas}</td>
                 <td class="text-right">${c.kg.toFixed(1)}</td>
                 <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
@@ -2193,7 +2174,7 @@ const InformesView = {
 
       const fId = await Fincas.getActiveId();
       const finca = await Fincas.getActive();
-      const [animales, ventas, leche, gastos, sanitarios, rebanos, censo] = await Promise.all([
+      const [animales, ventas, leche, gastos, sanitarios, rebanos, censo, ccVentas, clEntregas] = await Promise.all([
         window.db.getAll('animales').catch(() => []),
         Produccion.listVentas(fId).catch(() => []),
         Produccion.listLeche(fId).catch(() => []),
@@ -2201,6 +2182,8 @@ const InformesView = {
         window.db.getAll('sanitarios_ganado').catch(() => []),
         Rebanos.list().catch(() => []),
         Analitica.obtenerCensoRebanos(fId).catch(() => []),
+        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fId).catch(() => []),
+        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fId).catch(() => []),
       ]);
       const cd = this._cachedData || {};
 
@@ -2217,22 +2200,69 @@ const InformesView = {
       }
 
       // Hoja 2: Ventas Carne
+      const totalVentasCarne = [];
       if (ventas.length > 0) {
-        const data = ventas.map(v => ({
-          Fecha: v.fechaSacrificio || v.fecha_venta, Animales: v.animal_id_list?.length || v.cantidad || 1,
-          'Peso Canal': v.pesoCanal, 'Precio Total': v.precio_total,
-          'Precio Kg': v.precioKg, Comprador: v.comprador
-        }));
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Ventas Carne');
+        ventas.forEach(v => {
+          totalVentasCarne.push({
+            Fecha: v.fechaSacrificio || v.fecha_venta || v.fecha || '-',
+            Albarán: v.numero_albaran || '-',
+            Comprador: v.comprador || v.razonSocial || v.nombreComprador || '-',
+            Animales: v.animal_id_list?.length || v.cantidad || 1,
+            'Peso Canal (kg)': v.pesoCanal || v.pesoVivo || 0,
+            'Base Imponible': ((v.precio_total || 0) - (v.importe_iva || 0)),
+            IVA: v.importe_iva || 0,
+            'Precio Total': v.precio_total || 0,
+            Origen: 'Ganado'
+          });
+        });
+      }
+      if (ccVentas.length > 0) {
+        ccVentas.forEach(v => {
+          totalVentasCarne.push({
+            Fecha: v.fechaSacrificio || v.fecha_emision || v.fecha || '-',
+            Albarán: v.numero_albaran || '-',
+            Comprador: v.razonSocial || v.nombreComprador || v.comprador || '-',
+            Animales: v.animal_id_list?.length || v.cantidad || 1,
+            'Peso Canal (kg)': v.pesoCanal || v.pesoVivo || 0,
+            'Base Imponible': ((v.precio_total || 0) - (v.importe_iva || 0)),
+            IVA: v.importe_iva || 0,
+            'Precio Total': v.precio_total || 0,
+            Origen: 'Comercialización'
+          });
+        });
+      }
+      if (totalVentasCarne.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(totalVentasCarne), 'Ventas Carne');
       }
 
       // Hoja 3: Leche
+      const totalLeche = [];
       if (leche.length > 0) {
-        const data = leche.map(l => ({
-          Fecha: l.fecha, Litros: l.cantidad, 'Precio Base': l.precioBase,
-          'Total €': (l.cantidad || 0) * (l.precioBase || 0.45), Calidad: l.estadoAnalitica
-        }));
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Producción Leche');
+        leche.forEach(l => {
+          totalLeche.push({
+            Fecha: l.fecha || l.fechaRecogida || '-',
+            Litros: l.cantidad || l.litros || 0,
+            'Precio Base': l.precioBase || 0.45,
+            'Total €': (l.cantidad || 0) * (l.precioBase || 0.45),
+            Calidad: l.estadoAnalitica || '-',
+            Origen: 'Producción'
+          });
+        });
+      }
+      if (clEntregas.length > 0) {
+        clEntregas.forEach(l => {
+          totalLeche.push({
+            Fecha: l.fechaRecogida || l.fecha || '-',
+            Litros: l.litros || l.cantidad || 0,
+            'Precio Base': l.precioBase || l.precio || 0,
+            'Total €': l.importe_total || l.importe || ((l.litros || l.cantidad || 0) * (l.precioBase || l.precio || 0)),
+            Calidad: l.estadoAnalitica || l.calidad || '-',
+            Origen: 'Comercialización'
+          });
+        });
+      }
+      if (totalLeche.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(totalLeche), 'Producción Leche');
       }
 
       // Hoja 4: Gastos
@@ -2358,8 +2388,9 @@ const InformesView = {
 
       updateProgress(40, 'Generando contenido...');
       // Crear contenedor del PDF
+      const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
       const pdfEl = document.createElement('div');
-      pdfEl.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; overflow:visible; padding:30px; font-family:"Inter",system-ui,sans-serif;';
+      pdfEl.style.cssText = `position:absolute; left:0; top:${currentScroll}px; z-index:9990; width:800px; background:#fff; color:#000; overflow:visible; padding:30px; font-family:"Inter",system-ui,sans-serif;`;
       const uid = `pdf-${Date.now()}`;
 
       // Generar secciones según el tipo
@@ -2471,7 +2502,7 @@ const InformesView = {
           backgroundColor: '#ffffff',
           width: 800,
           scrollX: 0,
-          scrollY: 0,
+          scrollY: currentScroll,
           height: pdfEl.scrollHeight,
           windowHeight: pdfEl.scrollHeight
         },
@@ -2597,9 +2628,11 @@ const InformesView = {
   },
 
   _pdfSeccionVentas(d) {
-    const { ventasCompleto, docsLegales } = d;
+    const { ventasCompleto, docsLegales, fId } = d;
     if (!ventasCompleto?.length) return '';
-    const ventas = ventasCompleto.sort((a, b) => new Date(b.fechaSacrificio || b.fecha_emision || 0) - new Date(a.fechaSacrificio || a.fecha_emision || 0));
+    const ventas = ventasCompleto
+      .filter(v => Number(v.fincaId) === Number(fId))
+      .sort((a, b) => new Date(b.fechaSacrificio || b.fecha_emision || 0) - new Date(a.fechaSacrificio || a.fecha_emision || 0));
     const totalKg = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
     const totalImporte = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
     const totalIVA = ventas.reduce((s, v) => s + (v.importe_iva || 0), 0);
