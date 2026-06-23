@@ -67,9 +67,9 @@
 
       // 2. Rebaños
       var rebDefs = [
-        { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId },
-        { nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId },
-        { nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId }
+        { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId, tipo_explotacion_rega: 'Producción y reproducción' },
+        { nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' },
+        { nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' }
       ];
       var rebs = [];
       for (var i = 0; i < rebDefs.length; i++) {
