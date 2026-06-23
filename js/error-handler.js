@@ -142,9 +142,16 @@ const ErrorHandler = {
   validateCaravana(numero_identificacion) {
     // Normativa española SITRAN: código de país (2 letras) + 12 dígitos
     // Ejemplo válido: ES123456789012
+    if (!numero_identificacion) {
+      throw new this.AppError(
+        "El número de identificación (crotal) es obligatorio",
+        this.ERROR_TYPES.VALIDATION,
+        { field: "numero_identificacion", required: true }
+      );
+    }
+    
     const CROTAL_REGEX = /^[A-Z]{2}\d{12}$/;
-    const valorLimpio = numero_identificacion
-      .toString()
+    const valorLimpio = String(numero_identificacion)
       .trim()
       .toUpperCase()
       .replace(/[\s-]/g, "");
