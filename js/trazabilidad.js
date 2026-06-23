@@ -170,64 +170,39 @@ const MotorTrazabilidad = {
   // INFRAESTRUCTURA: CONTROLADOR DE CAPACIDAD TÉCNICA (validarAforoZona)
   // =========================================================================
   async validarAforoZona(db, zonaNombre, censoAAñadir) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const transaction = db.transaction(
-          ["fincas", "rebanos", "animales"],
-          "readonly"
-        );
-        const fincasStore = transaction.objectStore("fincas");
-        const rebanosStore = transaction.objectStore("rebanos");
-        const animalesStore = transaction.objectStore("animales");
+    const transaction = db.transaction(
+      ["fincas", "rebanos", "animales"],
+      "readonly"
+    );
+    const fincasStore = transaction.objectStore("fincas");
+    const rebanosStore = transaction.objectStore("rebanos");
+    const animalesStore = transaction.objectStore("animales");
 
-        const allFincas = await new Promise((res) => {
-          const req = fincasStore.getAll();
-          req.onsuccess = () => res(req.result);
-        });
+    const allFincas = await fincasStore.getAll();
 
-        let zona = null;
-        for (let f of allFincas) {
-          zona = f.zonas?.find((z) => z.nombre === zonaNombre);
-          if (zona) break;
-        }
+    let zona = null;
+    for (let f of allFincas) {
+      zona = f.zonas?.find((z) => z.nombre === zonaNombre);
+      if (zona) break;
+    }
 
-        if (!zona || !zona.aforoMax) return resolve(true);
+    if (!zona || !zona.aforoMax) return true;
 
-        let censoActual = 0;
-        const rebanos = await new Promise((res) => {
-          const req = rebanosStore.openCursor();
-          const list = [];
-          req.onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) {
-              if (cursor.value.zonaActual === zonaNombre)
-                list.push(cursor.value);
-              cursor.continue();
-            } else res(list);
-          };
-        });
+    let censoActual = 0;
+    const allRebanos = await rebanosStore.getAll();
+    const rebanosEnZona = allRebanos.filter(r => r.zonaActual === zonaNombre);
 
-        for (let r of rebanos) {
-          const count = await new Promise((res) => {
-            const req = animalesStore.index("rebanoId").count(Number(r.id));
-            req.onsuccess = () => res(req.result);
-          });
-          censoActual += count;
-        }
+    for (let r of rebanosEnZona) {
+      const count = await animalesStore.index("rebanoId").count(Number(r.id));
+      censoActual += count;
+    }
 
-        if (censoActual + censoAAñadir > zona.aforoMax) {
-          reject(
-            new Error(
-              `Validación de Aforo Denegada (Rule 1): La zona física [${zonaNombre}] superaría su capacidad técnica autorizada de ${zona.aforoMax} animales.`
-            )
-          );
-        } else {
-          resolve(true);
-        }
-      } catch (error) {
-        reject(error);
-      }
-    });
+    if (censoActual + censoAAñadir > zona.aforoMax) {
+      throw new Error(
+        `Validación de Aforo Denegada (Rule 1): La zona física [${zonaNombre}] superaría su capacidad técnica autorizada de ${zona.aforoMax} animales.`
+      );
+    }
+    return true;
   },
 
   // =========================================================================
@@ -375,7 +350,7 @@ const MotorTrazabilidad = {
         fecha_emision: new Date().toISOString().split("T")[0],
         vendedor: {
           nombre: finca.nombre || finca.Nombre || "Explotación Ganadera",
-          rega: finca.codigo_REGA || finca.codigoREGA || "Sin Registro REGA",
+          rega: finca.codigo_REGA || finca.rega || finca.codigoREGA || "Sin Registro REGA",
           direccion:
             finca.direccion || finca.Dirección || "Dirección no registrada",
         },

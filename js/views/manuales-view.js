@@ -262,16 +262,20 @@ const ManualesView = {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       const styles = Array.from(doc.querySelectorAll('style')).map(s => s.outerHTML).join('\n');
-      const bodyContent = doc.body.innerHTML;
+      // Reemplazar <header> por <div> para evitar conflictos con el selector global "header" de styles.css
+      const bodyContent = doc.body.innerHTML
+        .replace(/<header\b/gi, '<div')
+        .replace(/<\/header>/gi, '</div>');
 
       if (!bodyContent || bodyContent.trim().length < 50) {
         throw new Error('El contenido del manual está vacío');
       }
 
-      // Create container - use visibility:hidden instead of off-screen for Android WebView compatibility
+      // Create container - use z-index positioning under the loader overlay to prevent offscreen rendering bugs
+      const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
       container = document.createElement('div');
       container.id = 'pdf-render-container';
-      container.style.cssText = 'position:absolute; left:0; top:0; width:800px; background:#fff; color:#000; visibility:hidden; z-index:-1;';
+      container.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; background:#fff; color:#000; z-index:9990; overflow:visible;`;
       container.innerHTML = styles + bodyContent;
       document.body.appendChild(container);
 
@@ -308,7 +312,11 @@ const ManualesView = {
           logging: false,
           letterRendering: true,
           backgroundColor: '#ffffff',
-          width: 800
+          width: 800,
+          scrollX: 0,
+          scrollY: currentScroll,
+          height: container.scrollHeight,
+          windowHeight: container.scrollHeight
         },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak:    { mode: ['css', 'legacy'] }

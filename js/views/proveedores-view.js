@@ -15,11 +15,11 @@ const ProveedoresView = {
               <input type="search" id="search-proveedores" placeholder="🔍 Buscar por nombre, NIF o ciudad..."
                 oninput="ProveedoresView._filtrar(this.value)"
                 class="search-input">
-              <button class="btn btn-primary btn-sm" onclick="ProveedoresView.renderFormulario()"
-                style="background:#059669; border-color:#059669;">➕ Nuevo</button>
+              <button class="btn btn-create btn-sm" onclick="ProveedoresView.renderFormulario()">➕ Nuevo</button>
             </div>
           </div>
-          <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>`;
+          <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
+          <button class="fab-btn" onclick="ProveedoresView.renderFormulario()" aria-label="Nuevo Proveedor">➕</button>`;
 
         await this._cargarDatos();
     },
@@ -65,7 +65,7 @@ const ProveedoresView = {
                 <div class="empty-state-icon">🏭</div>
                 <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
                 <button onclick="ProveedoresView.renderFormulario()"
-                  class="btn btn-primary btn-sm mt-10">➕ Registrar primer proveedor</button>
+                  class="btn btn-create btn-sm mt-10">➕ Registrar primer proveedor</button>
               </div>`;
             return;
         }
@@ -117,8 +117,8 @@ const ProveedoresView = {
                 </div>
               </div>
               <div class="flex gap-6">
-                <button onclick="ProveedoresView.renderFormulario(${id})" class="btn-action-blue">✏️ Editar</button>
-                <button onclick="ProveedoresView._eliminar(${id})" class="btn-action-red">🗑️</button>
+                <button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+                <button onclick="ProveedoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">✏️ Editar</button>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
@@ -278,9 +278,12 @@ const ProveedoresView = {
               <span>Proveedor activo</span>
             </label>
 
-            <div class="grid grid-cols-2 gap-10">
-              <button onclick="ProveedoresView._guardar(${id || ''})" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg,#059669,#047857);">💾 GUARDAR</button>
-              <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="btn btn-secondary btn-sm">✖ CANCELAR</button>
+            <div class="flex justify-between items-center mt-20">
+              ${esEdicion ? `<button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger">🗑️ Eliminar</button>` : '<div></div>'}
+              <div class="flex gap-10">
+                <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="btn btn-secondary">✕ Cancelar</button>
+                <button onclick="ProveedoresView._guardar(${id || ''})" class="btn btn-success">✔ Guardar</button>
+              </div>
             </div>
           </div>
         `;

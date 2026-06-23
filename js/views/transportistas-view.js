@@ -34,10 +34,11 @@ const TransportistasView = {
                     <button class="filter-pill ${this._currentFilter === 'inactivos' ? 'active' : ''}" onclick="TransportistasView._setFilter('inactivos')">INACTIVOS</button>
                 </div>
                 <div class="mb-14">
-                    <button class="btn btn-primary btn-sm w-full" onclick="TransportistasView._abrirFormulario()">➕ NUEVO TRANSPORTISTA</button>
+                    <button class="btn btn-create btn-sm w-full" onclick="TransportistasView._abrirFormulario()">➕ Nuevo Transportista</button>
                 </div>
                 <div id="trans-list"></div>
             </div>
+            <button class="fab-btn" onclick="TransportistasView._abrirFormulario()" aria-label="Nuevo Transportista">➕</button>
         `;
         await this._renderLista();
     },
@@ -130,9 +131,9 @@ const TransportistasView = {
                     </div>
                 </div>
 
-                <div class="flex gap-10">
-                    <button onclick="TransportistasView._abrirFormulario(${t.id})" class="btn btn-primary" style="flex:1; background:linear-gradient(135deg,#3b82f6,#1d4ed8);">✏️ EDITAR</button>
-                    <button onclick="TransportistasView._eliminar(${t.id})" class="btn btn-primary" style="flex:1; background:linear-gradient(135deg,#dc2626,#b91c1c);">🗑️ ELIMINAR</button>
+                <div class="flex justify-between items-center mt-20">
+                    <button onclick="TransportistasView._eliminar(${t.id})" class="btn btn-danger">🗑️ Eliminar</button>
+                    <button onclick="TransportistasView._abrirFormulario(${t.id})" class="btn btn-edit">✏️ Editar</button>
                 </div>
             </div>
         `;
@@ -228,9 +229,12 @@ const TransportistasView = {
                     <textarea id="tf-notas" class="wizard-input" style="min-height:50px; resize:none;" placeholder="Observaciones...">${t?.notas || ''}</textarea>
                 </div>
 
-                <div class="flex gap-10 mt-20">
-                    <button class="wizard-btn-action wizard-btn-primary" id="btn-save-trans" style="flex:2;">💾 GUARDAR</button>
-                    <button class="wizard-btn-action wizard-btn-secondary" style="flex:1;" onclick="this.closest('.wizard-full-screen').remove()">CANCELAR</button>
+                <div class="flex justify-between items-center mt-20">
+                    ${isEdit ? `<button onclick="TransportistasView._eliminar(${t.id}); this.closest('.wizard-full-screen').remove();" class="btn btn-danger">🗑️ Eliminar</button>` : '<div></div>'}
+                    <div class="flex gap-10">
+                        <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">✕ Cancelar</button>
+                        <button class="btn btn-success" id="btn-save-trans">✔ Guardar</button>
+                    </div>
                 </div>
                 <div id="trans-form-error" class="text-red text-xs mt-8" style="display:none;"></div>
             </div>

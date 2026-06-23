@@ -67,9 +67,9 @@
 
       // 2. Rebaños
       var rebDefs = [
-        { nombre: 'Vacas Frisonas', tipo: 'Madres', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId },
-        { nombre: 'Terneros Cebo', tipo: 'Cebo', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId },
-        { nombre: 'Ovejas Merinas', tipo: 'Madres', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId }
+        { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId },
+        { nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId },
+        { nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId }
       ];
       var rebs = [];
       for (var i = 0; i < rebDefs.length; i++) {
@@ -177,15 +177,42 @@
         await sleep(100);
       }
 
-      // 8. Contratos
+      // 8. Contratos (alineados con ejemplos de manual)
       if (compCarne) {
         try {
-          await Contratos.save({ compradorId: compCarne.id, numero_contrato: 'CT-' + new Date().getFullYear() + '-001', tipo: 'carne', fecha_inicio: new Date().getFullYear() + '-01-01', fecha_fin: (new Date().getFullYear() + 1) + '-12-31', iva_pct: 10, retencion_pct: 0, condiciones: 'Pago 30 días', precios: [{ producto: 'Cordero cebo', precio_unitario: 6.50, unidad: 'kg' }] });
+          await Contratos.save({
+            compradorId: compCarne.id,
+            numero_contrato: 'CT-2026-001',
+            tipo: 'carne',
+            fecha_inicio: '2026-01-01',
+            fecha_fin: '2026-12-31',
+            iva_pct: 21,
+            retencion_pct: 0,
+            condiciones: 'Mínimo 500 kg/entrega. Transporte a cargo del comprador.',
+            precios: [
+              { producto: 'Cordero 18-24 kg', precio_unitario: 3.20, unidad: 'kg' },
+              { producto: 'Cordero 24-28 kg', precio_unitario: 3.05, unidad: 'kg' },
+              { producto: 'Vaca adulta', precio_unitario: 2.80, unidad: 'kg' }
+            ]
+          });
         } catch (e) { console.log('[SEED] Error contrato carne:', e.message); }
       }
       if (compLeche) {
         try {
-          await Contratos.save({ compradorId: compLeche.id, numero_contrato: 'CT-' + new Date().getFullYear() + '-002', tipo: 'leche', fecha_inicio: new Date().getFullYear() + '-01-01', fecha_fin: (new Date().getFullYear() + 1) + '-12-31', iva_pct: 10, retencion_pct: 0, condiciones: 'Pago 15 días', precios: [{ producto: 'Leche cruda', precio_unitario: 0.58, unidad: 'L' }] });
+          await Contratos.save({
+            compradorId: compLeche.id,
+            numero_contrato: 'CT-2026-002',
+            tipo: 'leche',
+            fecha_inicio: '2026-01-01',
+            fecha_fin: '2026-06-30',
+            iva_pct: 10,
+            retencion_pct: 0,
+            condiciones: 'Recogida cada 2 días. Bonificación +0,02€ si grasa >3,8%. Almacenamiento 4°C.',
+            precios: [
+              { producto: 'Leche estándar', precio_unitario: 0.38, unidad: 'L' },
+              { producto: 'Leche ecológica', precio_unitario: 0.48, unidad: 'L' }
+            ]
+          });
         } catch (e) { console.log('[SEED] Error contrato leche:', e.message); }
       }
       await sleep(150);
@@ -209,24 +236,54 @@
         await sleep(80);
       }
 
-      // 10. Sanitarios
+      // 10. Sanitarios (alineados con ejemplos de manual)
       var sanDefs = [
-        { tipo_tratamiento: 'Vacunación', medicamento: 'Cydectin 1%', fecha: '2025-02-01', tiempo_espera_carne_dias: 14, tiempo_espera_leche_dias: 7, prohibidoLeche: false, rebanoId: rebVacas.id },
-        { tipo_tratamiento: 'Desparasitación', medicamento: 'Eprinex Pour-On', fecha: '2025-01-15', tiempo_espera_carne_dias: 7, tiempo_espera_leche_dias: 0, prohibidoLeche: false, rebanoId: rebVacas.id },
-        { tipo_tratamiento: 'Antibiótico', medicamento: 'Marbocyl 10%', fecha: hoyStr, tiempo_espera_carne_dias: 28, tiempo_espera_leche_dias: 0, prohibidoLeche: true, rebanoId: rebVacas.id, notas: 'Tratamiento activo para ver alertas', enfermedad: 'Mamitis' }
+        {
+          tipo_tratamiento: 'Vacunación',
+          medicamento: 'Nobivac IP',
+          fecha: '2026-06-10',
+          dosis: '2 ml inyectable',
+          tiempo_espera_carne_dias: 0,
+          tiempo_espera_leche_dias: 0,
+          prohibidoLeche: false,
+          rebanoId: rebVacas.id
+        },
+        {
+          tipo_tratamiento: 'Desparasitación',
+          medicamento: 'Ivermectina 1%',
+          fecha: '2026-06-01',
+          dosis: '1 ml/50kg',
+          tiempo_espera_carne_dias: 21,
+          tiempo_espera_leche_dias: 28,
+          prohibidoLeche: false,
+          rebanoId: rebVacas.id
+        },
+        {
+          tipo_tratamiento: 'Antibiótico',
+          medicamento: 'Penicilina G inyectable (500.000 UI)',
+          fecha: '2026-06-05',
+          dosis: '2 inyecciones cada 12h (4 dosis total)',
+          veterinario: 'Dr. García',
+          tiempo_espera_carne_dias: 28,
+          tiempo_espera_leche_dias: 7,
+          prohibidoLeche: false,
+          rebanoId: rebVacas.id,
+          notas: 'Mastitis clínica tratada. Seguimiento el 15/06.',
+          enfermedad: 'Mamitis'
+        }
       ];
       for (var s = 0; s < sanDefs.length; s++) {
         try { await Sanitarios.save(sanDefs[s]); } catch (e) { console.log('[SEED] Error sanitario:', e.message); }
         await sleep(80);
       }
 
-      // 11. Eventos reproductivos (vaca1)
+      // 11. Eventos reproductivos (vaca1, alineados con ejemplos de manual)
       if (vaca1) {
         var repDefs = [
-          { tipo_evento: 'Celo', fecha: '2024-11-10', animalId: vaca1.id },
-          { tipo_evento: 'Inseminación Artificial', fecha: '2024-11-20', animalId: vaca1.id },
-          { tipo_evento: 'Diagnóstico Gestación', fecha: '2024-12-20', animalId: vaca1.id, resultado: 'Positivo' },
-          { tipo_evento: 'Parto', fecha: '2025-03-20', animalId: vaca1.id, crias_vivas: 1 }
+          { tipo_evento: 'Celo', fecha: '2026-06-01', animalId: vaca1.id },
+          { tipo_evento: 'Inseminación Artificial', fecha: '2026-06-02', animalId: vaca1.id, semenalId: 'Reproductor-5' },
+          { tipo_evento: 'Diagnóstico Gestación', fecha: '2026-06-30', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 28 },
+          { tipo_evento: 'Parto', fecha: '2027-03-09', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
         ];
         for (var r2 = 0; r2 < repDefs.length; r2++) {
           try { await Reproduccion.saveEvento(repDefs[r2]); } catch (e) { console.log('[SEED] Error reproducción:', e.message); }

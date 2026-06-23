@@ -143,7 +143,11 @@ const ErrorHandler = {
     // Normativa española SITRAN: código de país (2 letras) + 12 dígitos
     // Ejemplo válido: ES123456789012
     const CROTAL_REGEX = /^[A-Z]{2}\d{12}$/;
-    const valorLimpio = numero_identificacion.toString().trim().toUpperCase();
+    const valorLimpio = numero_identificacion
+      .toString()
+      .trim()
+      .toUpperCase()
+      .replace(/[\s-]/g, "");
 
     if (!CROTAL_REGEX.test(valorLimpio)) {
       throw new this.AppError(
