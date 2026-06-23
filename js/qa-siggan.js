@@ -1172,6 +1172,101 @@ const SigganQA = {
     }
   },
 
+  async testNotificacionesREGA() {
+    const M = 'TEST 17 — Notificaciones a REGA (Gap 11)';
+    this._startTest(M);
+    
+    try {
+      // Validar que módulo existe
+      this._assert(window.NotificacionesREGA, M, 'Módulo NotificacionesREGA cargado', 'CARGA');
+      
+      if (!window.NotificacionesREGA) {
+        this._log('FAIL', M, 'NotificacionesREGA no está disponible', 'CARGA');
+        return false;
+      }
+
+      const finca = await Fincas.getActive();
+      if (!finca) {
+        this._log('WARN', M, 'No hay finca activa, saltando tests', 'SETUP');
+        return true;
+      }
+
+      // Crear animal de prueba
+      const animalTest = {
+        numero_identificacion: `ES${Math.random().toString().substr(2, 12).padEnd(12, '0').substr(0, 12)}`,
+        especie: 'Ovejas',
+        sexo: 'H',
+        raza: 'Merino',
+        rebanoId: null,
+        tipoAlta: 'Compra',
+        fecha_nacimiento: new Date().toISOString().split('T')[0],
+        estado: 'activo',
+        notificado_rega: false
+      };
+
+      const animalId = await Animales.save(animalTest);
+      this._assert(animalId, M, `Animal de prueba creado (id: ${animalId})`, 'SETUP');
+
+      // TEST: Validar condiciones para notificar
+      const validacion1 = NotificacionesREGA.validarNotificacionPosible(animalTest, finca);
+      this._assert(validacion1.valido === true, M, 
+        `Validación: animal activo con crotal = válido`, 'VALIDACIÓN');
+
+      // TEST: Animal sin crotal no debe poder notificarse
+      const animalSinCrotal = { ...animalTest, numero_identificacion: null };
+      const validacion2 = NotificacionesREGA.validarNotificacionPosible(animalSinCrotal, finca);
+      this._assert(validacion2.valido === false, M, 
+        `Validación: animal sin crotal = inválido`, 'VALIDACIÓN');
+
+      // TEST: Registrar notificación
+      const notificacionId = await NotificacionesREGA.registrar({
+        animal_id: animalId,
+        finca_id: finca.id,
+        animal_numero: animalTest.numero_identificacion,
+        finca_rega: finca.rega || finca.codigo_REGA,
+        tipo_evento: 'cambio_estado'
+      });
+      this._assert(notificacionId, M, 
+        `Notificación registrada (id: ${notificacionId})`, 'REGISTRO');
+
+      // TEST: Verificar que animal fue notificado
+      const yaNotificado = await NotificacionesREGA.yaFueNotificado(animalId);
+      this._assert(yaNotificado === true, M, 
+        `Animal marcado como notificado`, 'PERSISTENCIA');
+
+      // TEST: Obtener historial
+      const historial = await NotificacionesREGA.obtenerHistorial(animalId);
+      this._assert(historial.length > 0, M, 
+        `Historial de notificaciones recuperado (${historial.length} registros)`, 'HISTORIAL');
+
+      // TEST: Actualizar estado de notificación
+      await NotificacionesREGA.actualizarEstado(notificacionId, 'enviado');
+      const historialActualizado = await NotificacionesREGA.obtenerHistorial(animalId);
+      const notificacionActualizada = historialActualizado[0];
+      this._assert(notificacionActualizada.estado_notificacion === 'enviado', M, 
+        `Estado actualizado a 'enviado'`, 'ESTADO');
+
+      // TEST: Simular envío a REGA
+      const resultado = await NotificacionesREGA.enviarAREGA(notificacionActualizada);
+      this._assert(resultado.exito === true, M, 
+        `Envío a REGA simulado exitosamente`, 'ENVÍO');
+
+      // Limpiar
+      try {
+        await window.db.delete('animales', animalId);
+        this._log('INFO', M, 'Animal de prueba eliminado', 'CLEANUP');
+      } catch (e) {
+        this._log('WARN', M, `No se pudo limpiar: ${e.message}`, 'CLEANUP');
+      }
+
+      this._log('PASS', M, '✅ COMPLETADO — Notificaciones a REGA funcionan correctamente');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
   // ============================================================
   // EJECUCIÓN PRINCIPAL
   // ============================================================
@@ -1216,6 +1311,7 @@ const SigganQA = {
       { name: 'Rebaños (Tipo Explotación REGA)', fn: () => this.testTipoExplotacionREGA() },
       { name: 'Venta de Leche (Bloqueo prohibidoLeche)', fn: () => this.testVentaLecheBlocking() },
       { name: 'SANDACH Clasificación (Bajas)', fn: () => this.testSANDACHClassificacion() },
+      { name: 'Notificaciones a REGA', fn: () => this.testNotificacionesREGA() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -1290,6 +1386,7 @@ const SigganQA = {
       'rebanos': () => this.testTipoExplotacionREGA(),
       'leche': () => this.testVentaLecheBlocking(),
       'sandach': () => this.testSANDACHClassificacion(),
+      'notificaciones': () => this.testNotificacionesREGA(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];
