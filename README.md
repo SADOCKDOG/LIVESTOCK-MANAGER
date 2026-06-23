@@ -242,13 +242,29 @@ Informe oficial para inspecciones con 8 secciones y **navegación rápida**:
 | 1 | 🏠 Explotación | Datos REGA, CEA, ADSG, veterinario |
 | 2 | 🐑 Censo | Por especie, sexo, categoría productiva |
 | 3 | 🔄 Movimientos | Eventos registro, altas, bajas, movimientos |
+| 3.b | 📋 Libro Registro SIGGAN | Entradas, salidas, nacimientos y muertes del año con nº de guía y REGA origen/destino |
 | 4 | 💉 Sanidad | Tratamientos activos, tiempos de espera |
+| 4.b | 🩺 Saneamientos (ADSG) | Campañas oficiales (tuberculosis, brucelosis…) con examinados, positivos y calificación |
 | 5 | 🧬 Reproductivo | Partos, cubriciones, gestaciones |
 | 6 | 📦 Producción | Ventas carne y leche, pesajes |
 | 7 | 💰 Económico | Balance estimado |
 | 8 | 🚛 Transportistas | Registro de transportistas |
 
 KPIs superiores: **Censo · Partos · Tratamientos · Ventas**
+
+Exportación: **PDF oficial**, **Impresión** y **CSV compatible con la tramitación SIGGAN** (libro de registro por secciones: identificación, censo a fecha, entradas, salidas, nacimientos, muertes, tratamientos y saneamientos).
+
+### 🇪🇸 Cumplimiento SIGGAN (Junta de Andalucía)
+
+Para explotaciones andaluzas el sistema aplica automáticamente las reglas del **Sistema Integrado de Gestión Ganadera (SIGGAN)**:
+
+- **Código REGA obligatorio y validado** con el formato oficial `ES` + provincia (INE) + municipio + secuencial (p. ej. `ES041230000123`).
+- **Datos de explotación SIGGAN** en el formulario de finca: provincia/municipio (códigos INE), tipo de explotación (producción y reproducción, cebadero…), clasificación zootécnica, capacidad máxima y especies autorizadas.
+- **Libro de registro animal** completo: país de nacimiento, explotación de procedencia (REGA origen), fecha de alta, motivo y fecha de baja (muerte/sacrificio/venta) y datos de pasaporte/DIB para bovino.
+- **Movimientos inter-explotación** como entidad propia (guía de sanidad pecuaria con código, REGA origen/destino, transportista, fechas y certificación de desinsectación cuando la comunidad lo exige), enlazados al animal y al cuaderno.
+- **Campañas de saneamiento** (tuberculosis, brucelosis, etc.) y libro de tratamientos veterinarios vinculados a la ADSG.
+- **Wizards de tramitación**: *Pedido de Crotales SIGGAN*, *Guía de Movimiento SIGGAN* y *Declaración Censal anual* (censo a 1 de enero por especie/categoría).
+- Todas las reglas (formato REGA, obligatoriedad de guías, desinsectación) se centralizan en `ComunidadesService`, de modo que el comportamiento cambia automáticamente entre **Andalucía (SIGGAN)** y **Extremadura (BADIGEX)**.
 
 <div align="center">
   <img src="docs/cap-cuaderno.jpg" width="200" alt="Cuaderno Digital"/>

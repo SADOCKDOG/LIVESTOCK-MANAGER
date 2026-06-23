@@ -197,6 +197,13 @@ const AnimalesView = {
       Rebanos.list(),
     ]);
 
+    const CS = window.ComunidadesService;
+    const paisesNac = CS ? CS.getPaisesNacimiento() : [{ value: 'ES', label: 'España (ES)' }];
+    const motivosBaja = CS ? CS.getMotivosBaja() : [];
+    const mostrarDIB = CS ? CS.especieRequiereDIB(a.especie) : false;
+    const esCompra = a.tipoAlta === "Compra";
+    const esBaja = a.estado === "baja" || a.estado === "Baja";
+
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
         <div class="wizard-header-fixed flex justify-between items-center">
@@ -226,7 +233,7 @@ const AnimalesView = {
           <div class="grid grid-cols-2 gap-12 mb-12">
             <div>
               <label class="form-label">ESPECIE</label>
-              <select id="a-especie" class="form-input form-input-lg">
+              <select id="a-especie" class="form-input form-input-lg" onchange="AnimalesView._onEspecieChange(this)">
                 ${especies.map((e) => `<option value="${e.nombre}" ${a.especie === e.nombre ? "selected" : ""}>${e.nombre}</option>`).join("")}
               </select>
             </div>
@@ -259,7 +266,7 @@ const AnimalesView = {
             </div>
             <div>
               <label class="form-label">TIPO ALTA</label>
-              <select id="a-tipoalta" class="form-input form-input-lg">
+              <select id="a-tipoalta" class="form-input form-input-lg" onchange="AnimalesView._onTipoAltaChange(this)">
                 <option value="Nacimiento" ${a.tipoAlta === "Nacimiento" ? "selected" : ""}>Nacimiento</option>
                 <option value="Compra" ${a.tipoAlta === "Compra" ? "selected" : ""}>Compra</option>
               </select>
@@ -288,6 +295,53 @@ const AnimalesView = {
               <span>Alta comunicada oficialmente a PIGGAN/SIA</span>
             </label>
           </div>
+
+          <!-- LIBRO DE REGISTRO SIGGAN -->
+          <div class="badge-crotal" style="margin-bottom:12px;">
+            <div class="badge-crotal-header">📒 LIBRO DE REGISTRO (SIGGAN)</div>
+            <div class="grid grid-cols-2 gap-12 mb-12" style="margin-top:10px;">
+              <div>
+                <label class="form-label">PAÍS DE NACIMIENTO</label>
+                <select id="a-pais-nac" class="form-input form-input-lg">
+                  ${paisesNac.map((p) => `<option value="${p.value}" ${(a.pais_nacimiento || 'ES') === p.value ? "selected" : ""}>${p.label}</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <label class="form-label">FECHA ALTA EN EXPLOTACIÓN</label>
+                <input type="date" id="a-fecha-alta" value="${a.fecha_alta || ""}" class="form-input form-input-lg">
+              </div>
+            </div>
+            <div id="a-procedencia-section" class="mb-12" style="display:${esCompra ? 'block' : 'none'};">
+              <label class="form-label">REGA DE PROCEDENCIA (explotación origen)</label>
+              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="Ej: ES041230000123" class="form-input form-input-lg">
+            </div>
+            <div id="a-dib-section" class="mb-12" style="display:${mostrarDIB ? 'block' : 'none'};">
+              <label class="form-label">DIB / Nº PASAPORTE (bovino/equino)</label>
+              <input type="text" id="a-dib" value="${a.dib || ""}" placeholder="Documento de Identificación Bovina" class="form-input form-input-lg">
+            </div>
+            <div class="grid grid-cols-2 gap-12">
+              <div>
+                <label class="form-label">ESTADO</label>
+                <select id="a-estado" class="form-input form-input-lg" onchange="AnimalesView._onEstadoChange(this)">
+                  <option value="activo" ${(a.estado || 'activo') === 'activo' ? "selected" : ""}>Activo</option>
+                  <option value="vendido" ${a.estado === 'vendido' ? "selected" : ""}>Vendido</option>
+                  <option value="baja" ${esBaja ? "selected" : ""}>Baja</option>
+                </select>
+              </div>
+              <div id="a-motivo-baja-wrap" style="display:${esBaja ? 'block' : 'none'};">
+                <label class="form-label">MOTIVO DE BAJA</label>
+                <select id="a-motivo-baja" class="form-input form-input-lg">
+                  <option value="">— Selecciona —</option>
+                  ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label}</option>`).join("")}
+                </select>
+              </div>
+            </div>
+            <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esBaja ? 'block' : 'none'}; margin-top:12px;">
+              <label class="form-label">FECHA DE BAJA</label>
+              <input type="date" id="a-fecha-baja" value="${a.fecha_baja || ""}" class="form-input form-input-lg">
+            </div>
+          </div>
+
           <textarea id="a-notas" placeholder="NOTAS / OBSERVACIONES..."
                     class="wizard-notas">${a.notas || ""}</textarea>
           ${!esNuevo ? `
@@ -360,9 +414,32 @@ const AnimalesView = {
         fecha_identificacion: document.getElementById("a-fecha-ident").value,
         tipo_identificacion: document.getElementById("a-tipo-ident").value,
         notificado_rega: document.getElementById("a-notificado").checked,
-        estado: existing.estado || "activo",
+        // Libro de registro SIGGAN
+        pais_nacimiento: document.getElementById("a-pais-nac")?.value || "ES",
+        fecha_alta: document.getElementById("a-fecha-alta")?.value || "",
+        rega_origen: (document.getElementById("a-rega-origen")?.value || "").trim().toUpperCase(),
+        dib: (document.getElementById("a-dib")?.value || "").trim().toUpperCase(),
+        estado: document.getElementById("a-estado")?.value || existing.estado || "activo",
+        motivo_baja: document.getElementById("a-motivo-baja")?.value || "",
+        fecha_baja: document.getElementById("a-fecha-baja")?.value || "",
         actualizadoEn: new Date().toISOString(),
       };
+
+      // Validación SIGGAN: REGA de procedencia (si se indica)
+      if (data.tipoAlta === "Compra" && data.rega_origen && window.ComunidadesService) {
+        const finca = await Fincas.getActive().catch(() => null);
+        const ccaa = finca ? finca.comunidad_autonoma : null;
+        const res = window.ComunidadesService.validarFormatoREGA(data.rega_origen, ccaa);
+        if (!res.valido) return App.toastError("REGA de procedencia: " + res.mensaje);
+      }
+      // Coherencia de baja
+      if (data.estado === "baja" && !data.motivo_baja) {
+        return App.toastError("Indica el motivo de baja para el libro de registro.");
+      }
+      if (data.estado !== "baja") {
+        data.motivo_baja = "";
+        data.fecha_baja = "";
+      }
 
       const nuevoId = await Animales.save(data);
       this._animalGuardado = true;
@@ -418,6 +495,23 @@ const AnimalesView = {
     if (section) {
       section.style.display = selectEl.value === 'Compra' ? 'block' : 'none';
     }
+  },
+
+  _onEspecieChange(selectEl) {
+    const section = document.getElementById('a-dib-section');
+    if (!section) return;
+    const requiere = window.ComunidadesService
+      ? window.ComunidadesService.especieRequiereDIB(selectEl.value)
+      : false;
+    section.style.display = requiere ? 'block' : 'none';
+  },
+
+  _onEstadoChange(selectEl) {
+    const esBaja = selectEl.value === 'baja';
+    const motivo = document.getElementById('a-motivo-baja-wrap');
+    const fecha = document.getElementById('a-fecha-baja-wrap');
+    if (motivo) motivo.style.display = esBaja ? 'block' : 'none';
+    if (fecha) fecha.style.display = esBaja ? 'block' : 'none';
   },
 
   _salirRegistro() {

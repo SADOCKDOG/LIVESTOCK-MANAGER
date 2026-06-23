@@ -6,11 +6,35 @@ window.WizardCrotales = {
   async abrirPedido() {
     const finca = await Fincas.getActive();
     if (!finca) { App.toastError("No hay finca activa"); return; }
+
+    // Validación previa del REGA de la explotación (SIGGAN)
+    const CS = window.ComunidadesService;
+    const regaFinca = finca.codigo_REGA || finca.rega || '';
+    if (CS) {
+      const ccaa = finca.comunidad_autonoma || null;
+      if (!regaFinca) {
+        App.toastError("La explotación no tiene código REGA. Complétalo antes de pedir crotales.");
+        return;
+      }
+      const res = CS.validarFormatoREGA(regaFinca, ccaa);
+      if (!res.valido) {
+        App.toastError("REGA de la explotación inválido: " + res.mensaje);
+        return;
+      }
+    }
+    const especiesPedido = CS ? CS.getEspeciesAutorizables() : ['Bovino', 'Ovino', 'Caprino'];
+
     const wizardSteps = [
       {
         content: (data) => `
           <div class="mt-10">
             <h3 class="text-green mb-15">📦 Material Solicitado</h3>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ESPECIE</label>
+              <select id="w-pd-especie" class="wizard-input wizard-select">
+                ${especiesPedido.map(e => `<option value="${e}" ${data.especie === e ? "selected" : ""}>${e}</option>`).join("")}
+              </select>
+            </div>
             <div class="wizard-input-group">
               <label class="wizard-label">TIPO DE CROTAL / MATERIAL</label>
               <select id="w-pd-tipo" class="wizard-input wizard-select">
@@ -20,8 +44,8 @@ window.WizardCrotales = {
               </select>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">CANTIDAD (PARES SOLICITADOS)</label>
-              <input type="number" id="w-pd-cant" value="${data.cantidad}" class="wizard-input text-xl border-green">
+              <label class="wizard-label">CANTIDAD (Nº DE IDENTIFICACIONES / PARES)</label>
+              <input type="number" id="w-pd-cant" value="${data.cantidad}" min="1" class="wizard-input text-xl border-green">
             </div>
             <div class="rounded-sm" style="background:rgba(16,185,129,0.1); padding:12px; margin-top:10px; border-left:3px solid #10b981;">
               <div class="text-xs text-aaa">
@@ -32,6 +56,7 @@ window.WizardCrotales = {
           </div>
         `,
         onChange: async (data) => {
+          data.especie = document.getElementById('w-pd-especie')?.value || data.especie;
           data.tipo = document.getElementById('w-pd-tipo')?.value || data.tipo;
           data.cantidad = parseInt(document.getElementById('w-pd-cant')?.value) || 0;
         },
@@ -94,6 +119,7 @@ window.WizardCrotales = {
       title: 'PEDIDO OFICIAL CROTALES',
       initialData: {
         tipo: "Bandera + Botón (EID)",
+        especie: especiesPedido[0] || "Ovino",
         cantidad: 50,
         adsg_nombre: finca.adsg_nombre || "",
         adsg_codigo: finca.adsg_codigo || "",
@@ -171,7 +197,7 @@ window.WizardCrotales = {
                       </thead>
                       <tbody>
                           <tr>
-                              <td style="padding:10px; border:1px solid #ccc;">${data.tipo}</td>
+                              <td style="padding:10px; border:1px solid #ccc;">${data.tipo}${data.especie ? ` · ${data.especie}` : ''}</td>
                               <td style="padding:10px; border:1px solid #ccc; text-align:center; font-weight:bold; font-size:1.2rem;">${data.cantidad}</td>
                           </tr>
                       </tbody>
