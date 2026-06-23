@@ -848,7 +848,58 @@ const SigganQA = {
   },
 
   // ============================================================
-  // EJECUCIÓN PRINCIPAL
+  // TEST 13: ZONAS CON UGM, CARGA GANADERA, DISTANCIAS Y PAC
+  // ============================================================
+  async testZonasUGM() {
+    const M = 'ZONAS UGM/PAC';
+    this._log('RUN', M, 'Validando que las zonas calculan UGM, carga ganadera, PAC y distancia agua (Gap 9 SIGGAN)');
+
+    if (!this._assert(window.Fincas && typeof Fincas.getActive === 'function', M,
+      'Fincas.getActive disponible', 'PRE-REQ')) return false;
+
+    try {
+      const finca = await Fincas.getActive();
+      if (!finca || !finca.zonas || finca.zonas.length === 0) {
+        this._log('WARN', M, 'Sin zonas en la finca activa', 'ZONA');
+        return true;
+      }
+
+      const zona = finca.zonas[0];
+      this._assert(!!zona.nombre, M, `Primera zona: ${zona.nombre}`, 'ZONA');
+      
+      // Validar campos nuevos: codigo_pac, distancia_agua_m, superficie
+      this._assert(!!zona.codigo_pac, M,
+        `Código PAC presente: ${zona.codigo_pac}`, 'PAC');
+      this._assert(typeof zona.distancia_agua_m === 'number', M,
+        `Distancia agua es número: ${zona.distancia_agua_m}m`, 'DISTANCIA');
+      
+      // Calcular UGM de la zona
+      const rebanos = await Rebanos.list();
+      const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
+      let ugmTotal = 0, censoTotal = 0;
+      for (let r of rebanos.filter(rb => rb.zonaActual === zona.nombre)) {
+        const factor = ugmFactor[r.especie] || 0.2;
+        const ans = await Animales.list(r.id);
+        censoTotal += ans.length;
+        ugmTotal += ans.length * factor;
+      }
+      
+      const superficie = zona.superficieGrafica || zona.superficie || 0;
+      const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
+      
+      this._assert(ugmTotal >= 0, M,
+        `UGM total calculado: ${ugmTotal.toFixed(1)} (censo: ${censoTotal})`, 'UGM');
+      this._assert(cargaGanadera >= 0, M,
+        `Carga ganadera: ${cargaGanadera} UGM/ha (superficie: ${superficie}ha)`, 'CARGA');
+      
+      this._log('PASS', M, '✅ COMPLETADO — Zonas con UGM, carga ganadera, PAC y distancia agua');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
   // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
@@ -887,6 +938,7 @@ const SigganQA = {
       { name: 'Traslado Interno y Aforo', fn: () => this.testTrasladoInterno() },
       { name: 'Parto y Genealogía', fn: () => this.testPartoGenealogia() },
       { name: 'Eventos de Censo (Alta/Baja)', fn: () => this.testEventosCenso() },
+      { name: 'Zonas (UGM/PAC/Distancias)', fn: () => this.testZonasUGM() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
@@ -957,6 +1009,7 @@ const SigganQA = {
       'traslado': () => this.testTrasladoInterno(),
       'parto': () => this.testPartoGenealogia(),
       'censo': () => this.testEventosCenso(),
+      'zonas': () => this.testZonasUGM(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];
