@@ -1093,7 +1093,7 @@ const SigganQA = {
         `Animal muerte.sandach_categoria = 1`, 'PERSISTENCIA');
 
       // Crear animal con motivo_baja = "sacrificio_obligatorio" → SANDACH Cat II
-      const crotalSacrificio = `TEST${Math.random().toString().substr(2, 8)}`;
+      const crotalSacrificio = genCrotal();
       const animalSacrificio = {
         crotal: crotalSacrificio,
         especie: 'Vacas',
@@ -1118,7 +1118,7 @@ const SigganQA = {
         `Animal sacrificio.sandach_categoria = 2`, 'PERSISTENCIA');
 
       // Crear animal con motivo_baja = "autoconsumo" → SANDACH Cat III
-      const crotalAutoconsumo = `TEST${Math.random().toString().substr(2, 8)}`;
+      const crotalAutoconsumo = genCrotal();
       const animalAutoconsumo = {
         crotal: crotalAutoconsumo,
         especie: 'Vacas',
