@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 9;
+const DB_VERSION = 10;
 
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
@@ -206,6 +206,30 @@ async function initDB() {
                 }
                 if (!carneStore.indexNames.contains('autorizacion_veterinaria')) {
                     carneStore.createIndex('autorizacion_veterinaria', 'autorizacion_veterinaria');
+                }
+            }
+
+            // v10: SIGGAN — Movimientos oficiales inter-explotación y Saneamientos
+            if (oldVersion < 10) {
+                // MOVIMIENTOS DE GANADO (guía de origen y sanidad pecuaria)
+                if (!db.objectStoreNames.contains('movimientos_ganado')) {
+                    const store = db.createObjectStore('movimientos_ganado', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('tipo', 'tipo');                 // entrada | salida
+                    store.createIndex('numero_guia', 'numero_guia');
+                    store.createIndex('rega_origen', 'rega_origen');
+                    store.createIndex('rega_destino', 'rega_destino');
+                    store.createIndex('fecha', 'fecha');
+                    store.createIndex('animalId', 'animalId', { multiEntry: true });
+                }
+
+                // SANEAMIENTOS (campañas oficiales: TBC, brucelosis, etc.)
+                if (!db.objectStoreNames.contains('saneamientos')) {
+                    const store = db.createObjectStore('saneamientos', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('campana', 'campana');
+                    store.createIndex('fecha', 'fecha');
+                    store.createIndex('calificacion', 'calificacion');
                 }
             }
         },
