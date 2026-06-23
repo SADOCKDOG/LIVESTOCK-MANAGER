@@ -92,6 +92,11 @@ const Animales = {
           actualizadoEn: new Date().toISOString(),
         };
 
+        // Gap 7: Mapear motivo_baja a categoría SANDACH
+        if (data.motivo_baja && window.ComunidadesService) {
+          animalData.sandach_categoria = ComunidadesService.getSANDACHCategoria(data.motivo_baja);
+        }
+
         const animalAnterior = esEdicion ? await this.get(Number(data.id)) : null;
         const rebanoAnterior = animalAnterior ? animalAnterior.rebanoId : null;
         const rebanoNuevo = animalData.rebanoId;
