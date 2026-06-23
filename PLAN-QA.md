@@ -145,6 +145,55 @@ Validar el flujo completo de la aplicación mediante 7 niveles de testing que ve
 
 ---
 
+## NIVEL 8 — SIGGAN (Sistema Integrado de Gestión Ganadera)
+
+Suite automatizada dedicada en `js/qa-siggan.js`. Ejecución desde la consola
+del navegador (DevTools) con la app abierta:
+
+```js
+await SigganQA.runAll();          // todos los tests SIGGAN
+await SigganQA.run("movimientos"); // un test individual
+await SigganQA.cleanup();          // eliminar datos de prueba
+```
+
+### 8.1 Validación REGA (`rega`)
+- Normaliza `ES 04.123.0000123` → `ES041230000123`
+- Acepta formato oficial (ES + 2 prov. INE + 3 muni + 7 secuencial)
+- Rechaza provincia ajena a la comunidad, formato incorrecto y vacío
+
+### 8.2 Catálogos SIGGAN (`catalogos`)
+- Campañas de saneamiento, vías de administración, motivos de tratamiento,
+  motivos de movimiento y tipos de explotación REGA
+- Etiquetas legibles y configuración por comunidad (Andalucía=SIGGAN,
+  Extremadura=BADIGEX)
+
+### 8.3 Libro de Movimientos (`movimientos`)
+- Alta de guía de origen y sanidad pecuaria con REGA normalizado
+- Plataforma SIGGAN asignada por comunidad
+- Trazabilidad por animal + evento en cuaderno (`registro_eventos`)
+- Rechaza REGA inválido y exige certificar desinsectación en Andalucía
+
+### 8.4 Libro de Saneamientos (`saneamientos`)
+- Alta de campaña (tuberculosis, calificación indemne)
+- Etiqueta legible de campaña y calificación sanitaria actual de la finca
+- Rechaza positivos > examinados y campaña vacía
+
+### 8.5 Libro de Tratamientos Veterinarios (`tratamientos`)
+- Persistencia de vía de administración, motivo y tiempos de espera
+- Etiquetas legibles + marca de supresión (prohibidoLeche)
+
+### 8.6 Exportación REGA/SIA (`export`)
+- Censo REGA (CSV), explotación REGA (XML) y movimientos SIA (CSV) con
+  cabeceras correctas
+
+### 8.7 Cuaderno Digital (`cuaderno`)
+- Renderiza las secciones del libro de registro sin errores de consola
+
+### 8.8 Rendimiento (`rendimiento`)
+- Inserta 50 movimientos y mide la consulta filtrada (< 1500 ms)
+
+---
+
 ## NIVEL 7 — Performance
 
 ### 7.1 Listados Grandes
@@ -168,5 +217,7 @@ Validar el flujo completo de la aplicación mediante 7 niveles de testing que ve
 | 5 | Trazabilidad | ✅ |
 | 6 | Validaciones | ✅ |
 | 7 | Performance | ✅ |
+| 8 | SIGGAN (REGA, libros, export, cuaderno) | ✅ |
 
 **GLOBAL: READY FOR PRODUCTION**
+
