@@ -69,7 +69,34 @@ const Fincas = {
     async getActive() {
         const id = await this.getActiveId();
         if (!id) return null;
-        return this.get(id);
+        const finca = await this.get(id);
+        
+        // Migración Gap 9: Ensure zonas tienen codigo_pac y distancia_agua_m
+        if (finca && finca.zonas && Array.isArray(finca.zonas)) {
+            let needsUpdate = false;
+            finca.zonas.forEach((zona, idx) => {
+                if (zona) {
+                    if (!zona.hasOwnProperty('codigo_pac')) {
+                        finca.zonas[idx].codigo_pac = '';
+                        needsUpdate = true;
+                    }
+                    if (!zona.hasOwnProperty('distancia_agua_m')) {
+                        finca.zonas[idx].distancia_agua_m = 0;
+                        needsUpdate = true;
+                    }
+                }
+            });
+            if (needsUpdate) {
+                finca.actualizadoEn = new Date().toISOString();
+                try {
+                    await window.db.put('fincas', finca);
+                } catch (e) {
+                    console.warn('[Fincas] Error guardando migración de zonas:', e.message);
+                }
+            }
+        }
+        
+        return finca;
     },
 
     async setActiveId(id) {
