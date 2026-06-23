@@ -108,13 +108,13 @@ window.ComunidadesService = (() => {
 
   // Motivos de baja en el libro de registro (SIGGAN)
   const MOTIVOS_BAJA = Object.freeze([
-    { value: 'muerte', label: 'Muerte en la explotación' },
-    { value: 'sacrificio', label: 'Sacrificio en matadero' },
-    { value: 'sacrificio_obligatorio', label: 'Sacrificio obligatorio (saneamiento)' },
-    { value: 'venta', label: 'Venta / salida a otra explotación' },
-    { value: 'desaparicion', label: 'Desaparición / robo' },
-    { value: 'autoconsumo', label: 'Sacrificio domiciliario (autoconsumo)' },
-    { value: 'otro', label: 'Otro' },
+    { value: 'muerte', label: 'Muerte en la explotación', sandach_categoria: 1 },
+    { value: 'sacrificio', label: 'Sacrificio en matadero', sandach_categoria: null },
+    { value: 'sacrificio_obligatorio', label: 'Sacrificio obligatorio (saneamiento)', sandach_categoria: 2 },
+    { value: 'venta', label: 'Venta / salida a otra explotación', sandach_categoria: null },
+    { value: 'desaparicion', label: 'Desaparición / robo', sandach_categoria: 1 },
+    { value: 'autoconsumo', label: 'Sacrificio domiciliario (autoconsumo)', sandach_categoria: 3 },
+    { value: 'otro', label: 'Otro', sandach_categoria: 1 },
   ]);
 
   // Formas de alta en el censo (libro de registro SIGGAN / RD 787/2023)
@@ -406,6 +406,23 @@ window.ComunidadesService = (() => {
   /** Catálogo de motivos de baja */
   function getMotivosBaja() { return MOTIVOS_BAJA.map(m => ({ ...m })); }
 
+  /** Obtener categoría SANDACH (Reg. UE 1069/2009) a partir de motivo de baja */
+  function getSANDACHCategoria(motivoBaja) {
+    if (!motivoBaja) return null;
+    const motivo = MOTIVOS_BAJA.find(m => m.value === motivoBaja);
+    return motivo ? motivo.sandach_categoria : null;
+  }
+
+  /** Descripción de categoría SANDACH */
+  function getSANDACHDescripcion(categoria) {
+    const descs = {
+      1: 'Categoría I (Subproductos SPA de mayor riesgo: muerte, desaparición)',
+      2: 'Categoría II (Subproductos SPA de riesgo medio: sacrificio por saneamiento)',
+      3: 'Categoría III (Subproductos SPA de menor riesgo: autoconsumo)',
+    };
+    return descs[categoria] || null;
+  }
+
   /** Catálogo de formas de alta en el censo (libro de registro) */
   function getTiposAlta() { return TIPOS_ALTA.map(t => ({ ...t })); }
 
@@ -684,6 +701,8 @@ window.ComunidadesService = (() => {
     getMotivosTratamiento,
     getViaAdministracionLabel,
     getMotivoTratamientoLabel,
+    getSANDACHCategoria,
+    getSANDACHDescripcion,
     getUmbralPAC,
     getDistanciaMinimaREGA,
     getCostesLecheReferencia,
