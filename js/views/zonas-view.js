@@ -51,12 +51,24 @@ const ZonasView = {
         const colorCenso = pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
         const estadoTexto = pct > 100 ? '🔴 Sobrecarga' : pct >= 80 ? '🟡 Óptimo' : pct >= 50 ? '🟢 Aceptable' : '⚪ Infrautilizada';
 
+        const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
+        let ugmTotal = 0;
+        for (let r of rebsEnZona) {
+          const factor = ugmFactor[r.especie] || 0.2;
+          const ans = await Animales.list(r.id);
+          ugmTotal += ans.length * factor;
+        }
+        const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
+        const pacTexto = z.codigo_pac ? `PAC: ${z.codigo_pac}` : 'PAC: pendiente';
+        const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
+
         html += `
           <div class="card" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px;" onclick="location.hash='/zona?index=${index}'">
             <div class="flex justify-between items-start mb-8">
               <div>
                 <h3 class="m-0">${z.nombre}</h3>
                 <p class="m-0 text-gray text-xs">${z.usoPrincipal || 'Sin uso'}${superficie ? ` · ${superficie} ha` : ''}${especiesEnZona.size ? ` · ${[...especiesEnZona].join(', ')}` : ''}</p>
+                <p class="m-0 text-gray text-2xs mt-2">${pacTexto} · ${distAgua} · 🐄 ${ugmTotal.toFixed(1)} UGM (${cargaGanadera} UGM/ha)</p>
               </div>
               <div class="text-right"><span class="text-xs font-bold" style="color:${colorCenso}">${estadoTexto}</span><br><span class="text-555 text-xs">Ficha ➔</span></div>
             </div>
@@ -94,6 +106,19 @@ const ZonasView = {
     const index = params.get("index");
     const finca = await Fincas.getActive();
     const zona = finca.zonas[parseInt(index)];
+    
+    // Calcular UGM
+    const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
+    const rebanos = await Rebanos.list();
+    let ugmTotal = 0;
+    const superficie = zona.superficie || zona.superficieGrafica || 0;
+    for (let r of rebanos.filter(rb => rb.zonaActual === zona.nombre)) {
+      const factor = ugmFactor[r.especie] || 0.2;
+      const ans = await Animales.list(r.id);
+      ugmTotal += ans.length * factor;
+    }
+    const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
+    
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">📍 Detalle Zona</h2></div>
       <div class="card border-top-3px border-top-3px-orange">
@@ -105,6 +130,14 @@ const ZonasView = {
             <input type="number" id="z-edit-aforo" value="${zona.aforoMax || ""}" class="premium-input"></div>
             <div><label class="form-label">Superficie (ha)</label>
             <input type="number" id="z-edit-superficie" value="${zona.superficieGrafica || ""}" step="0.01" class="premium-input"></div>
+          </div>
+          <div><label class="form-label">Código PAC (Parcela Agraria)</label>
+          <input type="text" id="z-edit-pac" value="${zona.codigo_pac || ""}" placeholder="Ej: ES01A123456789" class="premium-input"></div>
+          <div><label class="form-label">Distancia a Fuente de Agua (m)</label>
+          <input type="number" id="z-edit-agua" value="${zona.distancia_agua_m || ""}" placeholder="Metros" class="premium-input"></div>
+          <div class="text-gray text-xs mt-8">
+            <strong>📊 Métricas SIGGAN (solo lectura):</strong><br/>
+            UGM Total: <strong>${ugmTotal.toFixed(1)}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
           </div>
           <div><label class="form-label">Localización</label>
           <textarea id="z-edit-localizacion" class="premium-input" style="min-height:60px; resize:none;">${zona.localizacion || ""}</textarea></div>
@@ -125,6 +158,8 @@ const ZonasView = {
       zona.nombre = document.getElementById("z-edit-nombre").value.trim();
       zona.aforoMax = parseInt(document.getElementById("z-edit-aforo").value) || 0;
       zona.superficieGrafica = parseFloat(document.getElementById("z-edit-superficie").value) || 0;
+      zona.codigo_pac = document.getElementById("z-edit-pac").value.trim();
+      zona.distancia_agua_m = parseInt(document.getElementById("z-edit-agua").value) || 0;
       zona.localizacion = document.getElementById("z-edit-localizacion").value.trim();
       if (!zona.nombre) return App.toastError("Nombre requerido");
       await Fincas.save(finca);
@@ -149,6 +184,10 @@ const ZonasView = {
               <input type="number" id="w-zona-aforo" value="${data.aforoMax}" class="wizard-input">
             </div>
             <div class="wizard-input-group">
+              <label class="wizard-label">SUPERFICIE (ha)</label>
+              <input type="number" id="w-zona-superficie" value="${data.superficie}" step="0.01" placeholder="Ej: 42.5" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
               <label class="wizard-label">USO PRINCIPAL (Opcional)</label>
               <input type="text" id="w-zona-uso" value="${data.usoPrincipal}" placeholder="Ej: Engorde, Pasto libre..." class="wizard-input">
             </div>
@@ -157,6 +196,7 @@ const ZonasView = {
         onChange: async (data) => {
           data.nombre = document.getElementById('w-zona-nombre')?.value.trim() || data.nombre;
           data.aforoMax = parseInt(document.getElementById('w-zona-aforo')?.value) || 50;
+          data.superficie = parseFloat(document.getElementById('w-zona-superficie')?.value) || 0;
           data.usoPrincipal = document.getElementById('w-zona-uso')?.value.trim() || data.usoPrincipal;
         },
         validate: async (data) => {
@@ -166,13 +206,33 @@ const ZonasView = {
           }
           return true;
         }
+      },
+      {
+        content: (data) => `
+          <div style="margin-top:10px;">
+            <div class="wizard-input-group">
+              <label class="wizard-label">CÓDIGO PAC (Parcela Agraria SIGGAN)</label>
+              <input type="text" id="w-zona-pac" value="${data.codigo_pac}" placeholder="Ej: ES01A123456789" class="wizard-input">
+              <small class="text-gray">Requisito para subvenciones CCAA</small>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">DISTANCIA A FUENTE DE AGUA (m)</label>
+              <input type="number" id="w-zona-agua" value="${data.distancia_agua_m}" placeholder="Metros a abrevadero o agua" class="wizard-input">
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.codigo_pac = document.getElementById('w-zona-pac')?.value.trim() || data.codigo_pac;
+          data.distancia_agua_m = parseInt(document.getElementById('w-zona-agua')?.value) || 0;
+        },
+        validate: async (data) => true
       }
     ];
 
     window.WizardManager.create({
       id: 'wizard-nueva-zona',
       title: 'NUEVA ZONA',
-      initialData: { nombre: "", aforoMax: 50, usoPrincipal: "" },
+      initialData: { nombre: "", aforoMax: 50, superficie: 0, usoPrincipal: "", codigo_pac: "", distancia_agua_m: 0 },
       steps: wizardSteps,
       onComplete: async (finalData) => {
         try {
@@ -181,7 +241,10 @@ const ZonasView = {
           finca.zonas.push({
             nombre: finalData.nombre,
             aforoMax: finalData.aforoMax,
+            superficieGrafica: finalData.superficie,
             usoPrincipal: finalData.usoPrincipal,
+            codigo_pac: finalData.codigo_pac,
+            distancia_agua_m: finalData.distancia_agua_m,
             creadoEn: Date.now(),
           });
           await Fincas.save(finca);
