@@ -356,6 +356,10 @@ const AnimalesView = {
                   <option value="">— Selecciona —</option>
                   ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label}</option>`).join("")}
                 </select>
+                <div id="a-sandach-wrap" style="display:none; margin-top:8px; padding:8px; background:#f0f9ff; border:1px solid #0ea5e9; border-radius:6px; font-size:12px;">
+                  <div style="color:#0369a1; font-weight:600; margin-bottom:4px;">ℹ️ CLASIFICACIÓN SANDACH (Reg. UE 1069/2009)</div>
+                  <div id="a-sandach-categoria" style="color:#475569; margin-top:4px;"></div>
+                </div>
               </div>
             </div>
             <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esSalida ? 'block' : 'none'}; margin-top:12px;">
@@ -394,6 +398,36 @@ const AnimalesView = {
     } else if (!esNuevo) {
       const ref = document.getElementById("tabla-referencia");
       if (ref) ref.innerHTML = '<em class="text-333">Sin rebaño asignado</em>';
+    }
+
+    // Gap 7: Listener para actualizar categoría SANDACH al cambiar motivo_baja
+    const motivoBajaSelect = document.getElementById("a-motivo-baja");
+    if (motivoBajaSelect && window.ComunidadesService) {
+      const actualizarSANDACH = () => {
+        const motivo = motivoBajaSelect.value;
+        const sandachWrap = document.getElementById("a-sandach-wrap");
+        const sandachCatDiv = document.getElementById("a-sandach-categoria");
+        
+        if (motivo) {
+          const categoria = ComunidadesService.getSANDACHCategoria(motivo);
+          const descripcion = ComunidadesService.getSANDACHDescripcion(categoria);
+          
+          if (categoria) {
+            sandachWrap.style.display = 'block';
+            sandachCatDiv.innerHTML = `<strong>Categoría ${categoria}:</strong> ${descripcion || 'Subproductos ganaderos'}`;
+          } else {
+            sandachWrap.style.display = 'none';
+          }
+        } else {
+          sandachWrap.style.display = 'none';
+        }
+      };
+      
+      // Ejecutar al cargar
+      actualizarSANDACH();
+      
+      // Listener para cambios futuros
+      motivoBajaSelect.addEventListener('change', actualizarSANDACH);
     }
   },
   async _guardarAnimalDetalle(id) {
