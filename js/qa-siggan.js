@@ -1065,7 +1065,9 @@ const SigganQA = {
       const fincaId = await Fincas.getActiveId();
       
       // Crear animal con motivo_baja = "Muerte en la explotación" → SANDACH Cat I
-      const crotalMuerte = `TEST${Math.random().toString().substr(2, 8)}`;
+      // Crotal válido: ES + 12 dígitos (formato normativo)
+      const genCrotal = () => 'ES' + Math.random().toString().substr(2, 12).padEnd(12, '0').substr(0, 12);
+      const crotalMuerte = genCrotal();
       const animalMuerte = {
         crotal: crotalMuerte,
         especie: 'Vacas',
