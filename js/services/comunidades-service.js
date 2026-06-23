@@ -399,6 +399,18 @@ window.ComunidadesService = (() => {
   function getViasAdministracion() { return VIAS_ADMINISTRACION.map(v => ({ ...v })); }
   /** Catálogo de motivos/diagnóstico de tratamiento (libro de tratamientos) */
   function getMotivosTratamiento() { return MOTIVOS_TRATAMIENTO.map(m => ({ ...m })); }
+  /** Etiqueta legible de una vía de administración a partir de su valor */
+  function getViaAdministracionLabel(value) {
+    if (!value) return '';
+    const v = VIAS_ADMINISTRACION.find(x => x.value === value);
+    return v ? v.label : value;
+  }
+  /** Etiqueta legible de un motivo/diagnóstico de tratamiento a partir de su valor */
+  function getMotivoTratamientoLabel(value) {
+    if (!value) return '';
+    const m = MOTIVOS_TRATAMIENTO.find(x => x.value === value);
+    return m ? m.label : value;
+  }
 
   /**
    * Retorna el umbral PAC de corderos/oveja/año
@@ -627,6 +639,8 @@ window.ComunidadesService = (() => {
     getCalificacionesSanitarias,
     getViasAdministracion,
     getMotivosTratamiento,
+    getViaAdministracionLabel,
+    getMotivoTratamientoLabel,
     getUmbralPAC,
     getDistanciaMinimaREGA,
     getCostesLecheReferencia,
