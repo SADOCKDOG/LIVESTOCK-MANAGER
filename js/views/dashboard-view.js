@@ -126,7 +126,7 @@ const DashboardView = {
 
       <!-- Balance Económico -->
       <div class="card card-accent card-accent-green p-20">
-        <h3 class="mt-0 text-green flex items-center gap-8"><span>💰</span> Balance Económico</h3>
+        <h3 class="mt-0 text-green flex items-center gap-8">${Icons.dinero()} Balance Económico</h3>
         <div class="grid grid-cols-2 gap-10 mb-10">
           <div class="info-box border-left-amber">
             <div class="kpi-label">Ingresos</div>
@@ -156,7 +156,7 @@ const DashboardView = {
 
       <!-- Calendario Preventivo -->
       <div class="card card-accent card-accent-blue p-20" style="background:rgba(59,130,246,0.05);">
-        <h3 class="mt-0 text-blue flex items-center gap-8"><span>📅</span> ${alertaEpoca.titulo || 'Calendario Preventivo'}</h3>
+        <h3 class="mt-0 text-blue flex items-center gap-8">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}️]+\s*/u, '')}</h3>
         ${alertaEpoca.sugerencias?.length > 0 ? `
         <ul class="text-85 text-gray m-0 leading-normal mt-10" style="padding-left:20px;">
           ${alertaEpoca.sugerencias.map(s => `<li class="mb-4">${s}</li>`).join('')}
@@ -168,10 +168,10 @@ const DashboardView = {
 
       <!-- Accesos Rápidos -->
       <div class="card p-20">
-        <h3 class="mt-0 text-white flex items-center gap-8"><span>⚡</span> Accesos Rápidos</h3>
+        <h3 class="mt-0 text-white flex items-center gap-8">${Icons.rayo()} Accesos Rápidos</h3>
         <div class="grid grid-cols-2 gap-8 mt-10">
-          <a href="#/animales" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">🐑 Animales</a>
-          <a href="#/rebanos" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">🐄 Rebaños</a>
+          <a href="#/animales" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.animales()} Animales</a>
+          <a href="#/rebanos" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.rebanos()} Rebaños</a>
           ${(() => {
             let tieneCarne = false;
             let tieneLeche = false;
@@ -185,9 +185,9 @@ const DashboardView = {
             let modo = 'carne';
             if (tieneHibrido || (tieneCarne && tieneLeche)) modo = 'hibrido';
             else if (tieneLeche) modo = 'leche';
-            return `<a href="#/${modo}" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📊 Módulo ${modo === 'hibrido' ? 'Híbrido' : modo === 'leche' ? 'Leche' : 'Carne'}</a>`;
+            return `<a href="#/${modo}" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.grafico()} Módulo ${modo === 'hibrido' ? 'Híbrido' : modo === 'leche' ? 'Leche' : 'Carne'}</a>`;
           })()}
-          <a href="#/informes" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">📈 Informes</a>
+          <a href="#/informes" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.tendencia()} Informes</a>
         </div>
       </div>
     `;
@@ -198,7 +198,7 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-red p-20" style="background:rgba(239,68,68,0.05);">
         <h3 class="mt-0 text-red flex items-center gap-8">
-          <span>⚠️</span> Alertas Sanitarias <span class="badge rounded-xl text-white text-2xs" style="background:#ef4444; padding:2px 10px;">${alertas.length}</span>
+          ${Icons.alerta()} Alertas Sanitarias <span class="badge rounded-xl text-white text-2xs" style="background:#ef4444; padding:2px 10px;">${alertas.length}</span>
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 3).map(a => `
@@ -225,7 +225,7 @@ const DashboardView = {
     return `
       <div class="card card-accent p-20" style="background:rgba(249,115,22,0.05); border-top-color:#f97316;">
         <h3 class="mt-0 flex items-center gap-8 text-orange">
-          <span>⚠️</span> Alertas Trazabilidad (SIA) <span class="badge rounded-xl text-white text-2xs" style="background:#f97316; padding:2px 10px;">${alertas.length}</span>
+          ${Icons.alerta()} Alertas Trazabilidad (SIA) <span class="badge rounded-xl text-white text-2xs" style="background:#f97316; padding:2px 10px;">${alertas.length}</span>
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 3).map(a => `
@@ -249,7 +249,7 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-purple p-20" style="background:rgba(139,92,246,0.05);">
         <h3 class="mt-0 text-purple flex items-center gap-8">
-          <span>📋</span> Gestión / PAC <span class="badge rounded-xl text-white text-2xs" style="background:#8b5cf6; padding:2px 10px;">${alertas.length}</span>
+          ${Icons.documento()} Gestión / PAC <span class="badge rounded-xl text-white text-2xs" style="background:#8b5cf6; padding:2px 10px;">${alertas.length}</span>
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 4).map(a => {
@@ -309,7 +309,7 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-amber p-20" style="background:rgba(245,158,11,0.05);">
         <h3 class="mt-0 flex items-center gap-8 text-yellow">
-          <span>🥛</span> Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
+          ${Icons.leche()} Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
         </h3>
         <div class="grid grid-cols-3 gap-10 mt-15">
           <div class="info-box border-left-amber">
@@ -415,7 +415,7 @@ const DashboardView = {
       return `
         <div class="card card-accent card-accent-purple p-20" style="background:rgba(168,85,247,0.05);">
           <h3 class="mt-0 flex items-center gap-8 text-violet">
-            <span>📊</span> KPIs Diarios
+            ${Icons.grafico()} KPIs Diarios
           </h3>
           <div class="empty-state" style="padding:15px;">
             <p class="empty-state-text">No hay suficientes datos para calcular KPIs diarios.</p>
@@ -441,7 +441,7 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-purple p-20" style="background:rgba(168,85,247,0.05);">
         <h3 class="mt-0 flex items-center gap-8 text-violet">
-          <span>📊</span> KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
+          ${Icons.grafico()} KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
         </h3>
         <div class="grid grid-cols-3 gap-10 mt-15">
 

@@ -345,6 +345,9 @@ const Icons = {
       '<polyline points="3.27 6.96 12 12.01 20.73 6.96"/>' +
       '<line x1="12" y1="22.08" x2="12" y2="12"/>'
     );
+  },
+  rayo() {
+    return this._svg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>');
   }
 };
 
