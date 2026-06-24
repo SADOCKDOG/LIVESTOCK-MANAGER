@@ -89,6 +89,22 @@ body.scanner-active {
 }
 
 /* ============================================
+   SISTEMA DE ICONOS (Icons.* → SVG)
+   Hereda color vía currentColor. Tamaño con clases.
+   ============================================ */
+.icon {
+    width: 1.2em;
+    height: 1.2em;
+    flex-shrink: 0;
+    vertical-align: -0.18em;   /* alinea con la línea base del texto */
+    stroke-width: 2;
+}
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+.icon-lg { width: 24px; height: 24px; }
+.icon-xl { width: 28px; height: 28px; }
+
+/* ============================================
    HEADER COMPACTO (toolbar móvil)
    ============================================ */
 header {

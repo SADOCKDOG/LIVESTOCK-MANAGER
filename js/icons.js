@@ -6,10 +6,14 @@
 
 const Icons = {
   _svg(tag, attrs) {
-    const a = Object.entries(attrs || {})
+    attrs = attrs || {};
+    // La clase base `.icon` permite dimensionar/alinear el SVG con el texto.
+    const cls = ('icon ' + (attrs.class || '')).trim();
+    const rest = Object.entries(attrs)
+      .filter(([k]) => k !== 'class')
       .map(([k, v]) => `${k}="${v}"`)
       .join(' ');
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${a}>${tag}</svg>`;
+    return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${rest}>${tag}</svg>`;
   },
 
   // ── Navegación principal ──
@@ -260,6 +264,86 @@ const Icons = {
     return this._svg(
       '<path d="M12 2a10 10 0 1 0 10 10H12V2z"/>' +
       '<circle cx="12" cy="12" r="3"/>'
+    );
+  },
+
+  // ── Dominios / Informes (sustituyen emojis funcionales) ──
+  dinero() {
+    return this._svg(
+      '<line x1="12" y1="1" x2="12" y2="23"/>' +
+      '<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'
+    );
+  },
+  reproduccion() {
+    return this._svg(
+      '<circle cx="12" cy="9" r="5"/>' +
+      '<line x1="12" y1="14" x2="12" y2="22"/>' +
+      '<line x1="9" y1="19" x2="15" y2="19"/>'
+    );
+  },
+  sanidad() {
+    return this._svg(
+      '<path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z"/>'
+    );
+  },
+  fitosanitario() {
+    return this._svg(
+      '<path d="M9 2h6"/>' +
+      '<path d="M10 2v6.5L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9.5V2"/>' +
+      '<line x1="7" y1="14" x2="17" y2="14"/>'
+    );
+  },
+  grafico() {
+    return this._svg(
+      '<line x1="18" y1="20" x2="18" y2="10"/>' +
+      '<line x1="12" y1="20" x2="12" y2="4"/>' +
+      '<line x1="6" y1="20" x2="6" y2="14"/>'
+    );
+  },
+  tendencia() {
+    return this._svg(
+      '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>' +
+      '<polyline points="17 6 23 6 23 12"/>'
+    );
+  },
+  balanza() {
+    return this._svg(
+      '<line x1="12" y1="3" x2="12" y2="21"/>' +
+      '<path d="M5 7h14"/>' +
+      '<path d="M5 7l-3 6a3 3 0 0 0 6 0z"/>' +
+      '<path d="M19 7l-3 6a3 3 0 0 0 6 0z"/>'
+    );
+  },
+  pac() {
+    return this._svg(
+      '<path d="M12 22V8"/>' +
+      '<path d="M12 8c0-3 2-5 5-5 0 3-2 5-5 5z"/>' +
+      '<path d="M12 11c0-3-2-5-5-5 0 3 2 5 5 5z"/>'
+    );
+  },
+  rotacion() {
+    return this._svg(
+      '<polyline points="23 4 23 10 17 10"/>' +
+      '<polyline points="1 20 1 14 7 14"/>' +
+      '<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>'
+    );
+  },
+  edificio() {
+    return this._svg(
+      '<rect x="4" y="2" width="16" height="20" rx="2"/>' +
+      '<line x1="9" y1="6" x2="9" y2="6"/>' +
+      '<line x1="15" y1="6" x2="15" y2="6"/>' +
+      '<line x1="9" y1="10" x2="9" y2="10"/>' +
+      '<line x1="15" y1="10" x2="15" y2="10"/>' +
+      '<path d="M9 22v-4h6v4"/>'
+    );
+  },
+  paquete() {
+    return this._svg(
+      '<path d="M16.5 9.4 7.5 4.21"/>' +
+      '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>' +
+      '<polyline points="3.27 6.96 12 12.01 20.73 6.96"/>' +
+      '<line x1="12" y1="22.08" x2="12" y2="12"/>'
     );
   }
 };
