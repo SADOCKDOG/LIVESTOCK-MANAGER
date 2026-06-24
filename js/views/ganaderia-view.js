@@ -47,9 +47,9 @@ const GanaderiaView = {
     main.innerHTML = `
       <div class="mb-14 text-center">
         <div class="ganaderia-mode-switch">
-          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">🥩 Cárnico</button>
-          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">🥛 Lácteo</button>
-          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="GanaderiaView._changeMode('hibrido')">🔄 Híbrido</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
         </div>
       </div>
 
@@ -75,14 +75,14 @@ const GanaderiaView = {
       </div>
 
       <div class="grid grid-cols-3 gap-10 mb-14">
-        <a href="#/animales" class="widget-link-btn">🐄 Animales</a>
-        <a href="#/rebanos" class="widget-link-btn">🐑 Rebaños</a>
-        <a href="#/zonas" class="widget-link-btn">📍 Zonas</a>
+        <a href="#/animales" class="widget-link-btn">${Icons.animales()} Animales</a>
+        <a href="#/rebanos" class="widget-link-btn">${Icons.rebanos()} Rebaños</a>
+        <a href="#/zonas" class="widget-link-btn">${Icons.zonas()} Zonas</a>
       </div>
 
       <div class="card p-14 mb-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-          📋 Rebaños del modo ${meta.label}
+          ${Icons.documento()} Rebaños del modo ${meta.label}
         </div>
         <div class="grid gap-8">
           ${rebanosModo.length > 0
@@ -104,7 +104,7 @@ const GanaderiaView = {
 
       <div class="card p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-          📋 Censo reciente (${especies.size} especie(s))
+          ${Icons.documento()} Censo reciente (${especies.size} especie(s))
         </div>
         <div class="grid gap-8">
           ${animalesModo.length > 0
