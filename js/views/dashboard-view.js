@@ -108,10 +108,10 @@ const DashboardView = {
         <div class="summary-table-grid">
           <div class="summary-cell c-bo"><div class="s-lbl">ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
           <div class="summary-cell c-1a"><div class="s-lbl">REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
-          <div class="summary-cell c-bo"><div class="s-lbl">🐑 CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl">✅ ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
-          <div class="summary-cell c-bo"><div class="s-lbl">📦 VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl">📊 RENTAB.</div><div class="s-val" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'}">${pctRent}%</div></div>
+          <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.animales()} CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
+          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.check()} ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
+          <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.paquete()} VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
+          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.grafico()} RENTAB.</div><div class="s-val" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'}">${pctRent}%</div></div>
         </div>
       </div>
 
@@ -446,7 +446,7 @@ const DashboardView = {
         <div class="grid grid-cols-3 gap-10 mt-15">
 
           <div class="info-box" style="border-left:3px solid ${kpiColor};">
-            <div class="kpi-label">🐑 Litros/Oveja/Día</div>
+            <div class="kpi-label flex items-center gap-4">${Icons.leche()} Litros/Oveja/Día</div>
             <div class="text-2xl font-black" style="color:${kpiColor};">
               ${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}
             </div>
@@ -458,7 +458,7 @@ const DashboardView = {
           </div>
 
           <div class="info-box" style="border-left:3px solid ${piensoColor};">
-            <div class="kpi-label">🌾 Eficiencia Pienso</div>
+            <div class="kpi-label flex items-center gap-4">${Icons.pac()} Eficiencia Pienso</div>
             <div class="text-2xl font-black" style="color:${piensoColor};">
               ${eficienciaPienso != null ? eficienciaPienso.toLocaleString() + ' g/L' : '—'}
             </div>
@@ -468,7 +468,7 @@ const DashboardView = {
           </div>
 
           <div class="info-box" style="border-left:3px solid ${bajasColor};">
-            <div class="kpi-label">💊 % Bajas/Mamitis</div>
+            <div class="kpi-label flex items-center gap-4">${Icons.sanidad()} % Bajas/Mamitis</div>
             <div class="text-2xl font-black" style="color:${bajasColor};">
               ${pctBajas != null ? pctBajas + '%' : '—'}
             </div>

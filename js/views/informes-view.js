@@ -21,29 +21,29 @@ const InformesView = {
       <div class="mb-14">
         <div class="scroll-shadow-container" style="margin:0 -12px 8px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
           <div class="informes-tabs" style="display:inline-flex; gap:6px; padding:4px 0;">
-            <button class="inf-tab active" data-tab="general" onclick="InformesView._cambiarTab('general')">📊 General</button>
-            <button class="inf-tab" data-tab="carne" onclick="InformesView._cambiarTab('carne')">🥩 Cárnico</button>
-            <button class="inf-tab" data-tab="leche" onclick="InformesView._cambiarTab('leche')">🥛 Lácteo</button>
-            <button class="inf-tab" data-tab="reproductivo" onclick="InformesView._cambiarTab('reproductivo')">🧬 Reproductivo</button>
-            <button class="inf-tab" data-tab="sanidad" onclick="InformesView._cambiarTab('sanidad')">⚕️ Sanidad</button>
-            <button class="inf-tab" data-tab="ventas" onclick="InformesView._cambiarTab('ventas')">📒 Ventas</button>
-            <button class="inf-tab" data-tab="compradores" onclick="InformesView._cambiarTab('compradores')">🏢 Compradores</button>
-            <button class="inf-tab" data-tab="proveedores" onclick="InformesView._cambiarTab('proveedores')">📦 Proveedores</button>
-            <button class="inf-tab" data-tab="fitosanitario" onclick="InformesView._cambiarTab('fitosanitario')">🧪 Fitosanitario</button>
-            <button class="inf-tab" data-tab="alertas" onclick="InformesView._cambiarTab('alertas')">🚨 Alertas</button>
-            <button class="inf-tab" data-tab="por-finca" onclick="InformesView._cambiarTab('por-finca')">🏠 Por Finca</button>
-            <button class="inf-tab" data-tab="rega" onclick="InformesView._cambiarTab('rega')">📋 REGA</button>
-            <button class="inf-tab" data-tab="exportar" onclick="InformesView._cambiarTab('exportar')">📤 Exportar</button>
-            <button class="inf-tab" data-tab="pyg" onclick="InformesView._cambiarTab('pyg')">💰 PyG</button>
-            <button class="inf-tab" data-tab="coste-prod" onclick="InformesView._cambiarTab('coste-prod')">🐄 Coste/Animal</button>
-            <button class="inf-tab" data-tab="eficiencia" onclick="InformesView._cambiarTab('eficiencia')">📊 Eficiencia</button>
-            <button class="inf-tab" data-tab="cargas" onclick="InformesView._cambiarTab('cargas')">📐 Aforos</button>
-            <button class="inf-tab" data-tab="rotacion" onclick="InformesView._cambiarTab('rotacion')">🔄 Rotación</button>
-            <button class="inf-tab" data-tab="flujo-caja" onclick="InformesView._cambiarTab('flujo-caja')">📈 Flujo Caja</button>
-            <button class="inf-tab" data-tab="rent-esp" onclick="InformesView._cambiarTab('rent-esp')">🧬 Rent. Especie</button>
-            <button class="inf-tab" data-tab="curva-prod" onclick="InformesView._cambiarTab('curva-prod')">📉 Curva Prod.</button>
-            <button class="inf-tab" data-tab="breakeven" onclick="InformesView._cambiarTab('breakeven')">⚖️ Break-Even</button>
-            <button class="inf-tab" data-tab="subvenciones" onclick="InformesView._cambiarTab('subvenciones')">🌾 PAC</button>
+            <button class="inf-tab active" data-tab="general" onclick="InformesView._cambiarTab('general')">${Icons.grafico()} General</button>
+            <button class="inf-tab" data-tab="carne" onclick="InformesView._cambiarTab('carne')">${Icons.carne()} Cárnico</button>
+            <button class="inf-tab" data-tab="leche" onclick="InformesView._cambiarTab('leche')">${Icons.leche()} Lácteo</button>
+            <button class="inf-tab" data-tab="reproductivo" onclick="InformesView._cambiarTab('reproductivo')">${Icons.reproduccion()} Reproductivo</button>
+            <button class="inf-tab" data-tab="sanidad" onclick="InformesView._cambiarTab('sanidad')">${Icons.sanidad()} Sanidad</button>
+            <button class="inf-tab" data-tab="ventas" onclick="InformesView._cambiarTab('ventas')">${Icons.libroVentas()} Ventas</button>
+            <button class="inf-tab" data-tab="compradores" onclick="InformesView._cambiarTab('compradores')">${Icons.compradores()} Compradores</button>
+            <button class="inf-tab" data-tab="proveedores" onclick="InformesView._cambiarTab('proveedores')">${Icons.proveedores()} Proveedores</button>
+            <button class="inf-tab" data-tab="fitosanitario" onclick="InformesView._cambiarTab('fitosanitario')">${Icons.fitosanitario()} Fitosanitario</button>
+            <button class="inf-tab" data-tab="alertas" onclick="InformesView._cambiarTab('alertas')">${Icons.alerta()} Alertas</button>
+            <button class="inf-tab" data-tab="por-finca" onclick="InformesView._cambiarTab('por-finca')">${Icons.finca()} Por Finca</button>
+            <button class="inf-tab" data-tab="rega" onclick="InformesView._cambiarTab('rega')">${Icons.informeRega()} REGA</button>
+            <button class="inf-tab" data-tab="exportar" onclick="InformesView._cambiarTab('exportar')">${Icons.exportar()} Exportar</button>
+            <button class="inf-tab" data-tab="pyg" onclick="InformesView._cambiarTab('pyg')">${Icons.dinero()} PyG</button>
+            <button class="inf-tab" data-tab="coste-prod" onclick="InformesView._cambiarTab('coste-prod')">${Icons.animales()} Coste/Animal</button>
+            <button class="inf-tab" data-tab="eficiencia" onclick="InformesView._cambiarTab('eficiencia')">${Icons.tendencia()} Eficiencia</button>
+            <button class="inf-tab" data-tab="cargas" onclick="InformesView._cambiarTab('cargas')">${Icons.balanza()} Aforos</button>
+            <button class="inf-tab" data-tab="rotacion" onclick="InformesView._cambiarTab('rotacion')">${Icons.rotacion()} Rotación</button>
+            <button class="inf-tab" data-tab="flujo-caja" onclick="InformesView._cambiarTab('flujo-caja')">${Icons.tendencia()} Flujo Caja</button>
+            <button class="inf-tab" data-tab="rent-esp" onclick="InformesView._cambiarTab('rent-esp')">${Icons.reproduccion()} Rent. Especie</button>
+            <button class="inf-tab" data-tab="curva-prod" onclick="InformesView._cambiarTab('curva-prod')">${Icons.grafico()} Curva Prod.</button>
+            <button class="inf-tab" data-tab="breakeven" onclick="InformesView._cambiarTab('breakeven')">${Icons.balanza()} Break-Even</button>
+            <button class="inf-tab" data-tab="subvenciones" onclick="InformesView._cambiarTab('subvenciones')">${Icons.pac()} PAC</button>
           </div>
         </div>
       </div>
@@ -134,6 +134,7 @@ const InformesView = {
         flex: 0 0 auto; padding: 7px 12px; border-radius: 16px; border: 1px solid #333;
         background: #1a1a1a; color: #888; font-size: 0.75rem; font-weight: 800;
         cursor: pointer; white-space: nowrap; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
+        display: inline-flex; align-items: center; gap: 4px;
       }
       .inf-tab.active { background: #d97706; color: #fff; border-color: #d97706; box-shadow: 0 0 12px rgba(217,119,6,0.3); }
       .inf-tab:active { transform: scale(0.95); }
@@ -249,7 +250,7 @@ const InformesView = {
 
       <!-- Rentabilidad -->
       <div class="card report-section border-top-3px border-top-3px-green report-card">
-        <div class="inf-card-title pb-8">💰 Rentabilidad General</div>
+        <div class="inf-card-title pb-8 flex items-center gap-6">${Icons.dinero()} Rentabilidad General</div>
         <div class="grid grid-cols-2 gap-10 mb-10">
           <div class="info-box border-left-red">
             <small class="s-lbl">CÁRNICA</small>
@@ -270,7 +271,7 @@ const InformesView = {
 
       <!-- Margen Neto -->
       <div class="card report-section border-top-3px border-top-3px-green report-card">
-        <div class="inf-card-title">📊 Margen Neto por Animal</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Margen Neto por Animal</div>
         ${margenA && margenA.length > 0
         ? '<div class="chart-wrap"><canvas id="chart-margen-animal" class="chart-canvas"></canvas></div>'
         : '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p class="empty-state-text">No hay datos de ventas para calcular márgenes individuales. Registra ventas de carne para ver esta gráfica.</p></div>'}
@@ -279,7 +280,7 @@ const InformesView = {
       <!-- Repro y Sanidad compactos -->
       <div class="grid grid-cols-2 gap-12 mb-14">
         <div class="card border-top-3px border-top-3px-purple p-14">
-          <div class="inf-card-title mb-8">🧬 Reproductivo</div>
+          <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.reproduccion()} Reproductivo</div>
           <div class="flex justify-between text-sm text-aaa">
             <div>Fertilidad: <strong class="text-violet">${kpisRepro.tasaFertilidadPct}%</strong></div>
             <div>IEP: <strong class="text-violet">${kpisRepro.intervaloEntrePartosDias}d</strong></div>
@@ -287,7 +288,7 @@ const InformesView = {
           </div>
         </div>
         <div class="card border-top-3px border-top-3px-red p-14">
-          <div class="inf-card-title mb-8">⚕️ Sanidad</div>
+          <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.sanidad()} Sanidad</div>
           <div class="flex justify-between text-sm text-aaa">
             <div>Tratamientos: <strong class="text-red">${estadisticasSanidad.totalTratamientos || 0}</strong></div>
             <div>Supresión: <strong class="text-red">${estadisticasSanidad.retencionesActivas || 0}</strong></div>
@@ -305,7 +306,7 @@ const InformesView = {
         const diffBalance = actual.balance - (anterior?.balance || 0);
         const diffIngresos = actual.ingresos - (anterior?.ingresos || 0);
         return `<div class="card report-section border-top-3px border-top-3px-blue report-card">
-          <div class="inf-card-title">📅 Comparativa Mensual</div>
+          <div class="inf-card-title flex items-center gap-6">${Icons.calendar()} Comparativa Mensual</div>
           <div class="grid grid-cols-2 gap-8 mb-8">
             <div class="info-box border-left-blue">
               <small class="s-lbl">MES ACTUAL</small>
@@ -325,7 +326,7 @@ const InformesView = {
       })() : ''}
 
       ${lecheStats.totalLitros > 0 ? `<div class="card report-section border-top-3px border-top-3px-amber report-card">
-        <div class="inf-card-title">🥛 Producción Lechera</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.leche()} Producción Lechera</div>
         <div class="grid grid-cols-3 gap-8 mb-10">
           <div class="info-box-sm text-center"><div class="s-lbl">TOTAL</div><div class="inf-val-lg text-gold">${lecheStats.totalLitros.toFixed(1)}</div></div>
           <div class="info-box-sm text-center"><div class="s-lbl">PROM/DÍA</div><div class="inf-val-lg text-amber">${lecheStats.promedioDiario.toFixed(1)}</div></div>
@@ -356,7 +357,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('carne', 'Cárnico') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-orange report-card">
-        <div class="inf-card-title">🥩 Resumen Cárnico</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.carne()} Resumen Cárnico</div>
         <div class="grid grid-cols-2 gap-10 mb-12">
           <div class="info-box border-left-amber">
             <small class="s-lbl">INGRESOS TOTALES</small>
@@ -452,7 +453,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('leche', 'Lácteo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
-        <div class="inf-card-title">🥛 Producción Láctea</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.leche()} Producción Láctea</div>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box border-left-gold">
             <small class="s-lbl">TOTAL LITROS</small>
@@ -548,7 +549,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('reproductivo', 'Reproductivo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
-        <div class="inf-card-title">🧬 KPIs Reproductivos</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} KPIs Reproductivos</div>
         <div class="grid grid-cols-2 gap-10 mb-12">
           <div class="info-box border-left-violet">
             <small class="s-lbl">FERTILIDAD</small>
@@ -620,7 +621,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('sanidad', 'Sanidad') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
-        <div class="inf-card-title">⚕️ Sanidad y Tratamientos</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.sanidad()} Sanidad y Tratamientos</div>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box border-left-red">
             <small class="s-lbl">TRATAMIENTOS</small>
@@ -652,7 +653,7 @@ const InformesView = {
       </div>
       ${gastosCat.length > 0 ? `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
-        <div class="inf-card-title">💸 Gastos por Categoría</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.gastos()} Gastos por Categoría</div>
         <div class="grid grid-cols-2 gap-10 mb-10">
           ${gastosCat.slice(0, 6).map(g => `
             <div class="info-box-sm">
@@ -692,7 +693,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('censo', 'Censo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-gold report-card">
-        <div class="inf-card-title">🐑 Censo General</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.animales()} Censo General</div>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box-center border-left-blue">
             <small class="s-lbl">TOTAL</small>
@@ -760,7 +761,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('ventas', 'Ventas') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
-        <div class="inf-card-title">📒 Libro de Ventas</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.libroVentas()} Libro de Ventas</div>
         <div class="grid grid-cols-3 gap-10 mb-14">
           <div class="info-box border-left-blue">
             <small class="s-lbl">TOTAL VENTAS</small>
@@ -870,7 +871,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('compradores', 'Compradores') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
-        <div class="inf-card-title">🏢 Informe por Comprador</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.compradores()} Informe por Comprador</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-blue">
             <small class="s-lbl">COMPRADORES</small>
@@ -973,7 +974,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('proveedores', 'Proveedores') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
-        <div class="inf-card-title">📦 Informe por Proveedor</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.proveedores()} Informe por Proveedor</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-amber">
             <small class="s-lbl">PROVEEDORES</small>
@@ -1069,7 +1070,7 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('fitosanitario', 'Fitosanitario') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
-        <div class="inf-card-title">🧪 Informe Fitosanitario</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.fitosanitario()} Informe Fitosanitario</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-green">
             <small class="s-lbl">GASTO TOTAL</small>
@@ -1135,7 +1136,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('alertas', 'Alertas') + `
       <div class="inf-report mb-14">
         <div class="card report-section border-top-3px border-top-3px-red report-card">
-          <div class="inf-card-title">🚨 Panel de Alertas</div>
+          <div class="inf-card-title flex items-center gap-6">${Icons.alerta()} Panel de Alertas</div>
           <div class="grid grid-cols-3 gap-10 mb-14">
             <div class="info-box-center border-left-red">
               <small class="s-lbl">TOTAL ALERTAS</small>
@@ -1226,7 +1227,7 @@ const InformesView = {
       <div class="inf-report mb-14">
         <!-- Ficha Explotación -->
         <div class="card report-section border-top-3px border-top-3px-gold report-card">
-          <div class="inf-card-title">🏠 ${finca.nombre || 'Explotación'}</div>
+          <div class="inf-card-title flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'Explotación'}</div>
           <div class="grid grid-cols-2 gap-10 mb-14">
             <div class="info-box border-left-gold">
               <small class="s-lbl">REGA</small>
@@ -1258,7 +1259,7 @@ const InformesView = {
         <!-- Resumen Económico -->
         ${rent ? `
         <div class="card report-section border-top-3px border-top-3px-green report-card">
-          <div class="inf-card-title">💰 Resumen Económico</div>
+          <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Resumen Económico</div>
           <div class="grid grid-cols-3 gap-10">
             <div class="info-box border-left-amber">
               <small class="s-lbl">INGRESOS</small>
@@ -1278,7 +1279,7 @@ const InformesView = {
         <!-- Rebaños -->
         ${rebanos?.length > 0 ? `
         <div class="card report-section border-top-3px border-top-3px-purple report-card">
-          <div class="inf-card-title">🐑 Rebaños</div>
+          <div class="inf-card-title flex items-center gap-6">${Icons.rebanos()} Rebaños</div>
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
               <thead><tr><th>Rebaño</th><th>Tipo</th><th class="text-center">Animales</th><th class="text-center">Activos</th></tr></thead>
