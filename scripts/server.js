@@ -23,7 +23,11 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = path.join(WWW_DIR, req.url === '/' ? 'index.html' : req.url);
+  // Quitar query string (?v=...) y hash para que los assets versionados
+  // (p. ej. styles.css?v=5.3.0) resuelvan al fichero real y no caigan al
+  // fallback SPA. En Capacitor el query se ignora; aquí hay que limpiarlo.
+  const urlPath = decodeURIComponent(req.url.split('?')[0].split('#')[0]);
+  let filePath = path.join(WWW_DIR, urlPath === '/' ? 'index.html' : urlPath);
 
   // Prevenir path traversal
   if (!filePath.startsWith(WWW_DIR)) {
