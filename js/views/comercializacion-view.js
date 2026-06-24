@@ -309,6 +309,9 @@ const ComercializacionView = {
         a.estado = "activo";
         await Animales.save(a);
       }
+      if (v?.movimientoId && window.Movimientos?.delete) {
+        await window.Movimientos.delete(v.movimientoId).catch(() => {});
+      }
       await window.db.delete("comercializacion_carne", id);
       App.toast("Venta eliminada.");
       this._cachedData = null;
