@@ -1274,10 +1274,10 @@ const SigganQA = {
   // TEST 18: Validación de Cobertura BD DEMO CHAMORRO
   async testCoberturaDemo() {
     const M = 'COBERTURA BD DEMO';
-    this._initModule(M);
+    this._log('RUN', M, 'Validando cobertura de módulos en la demo CHAMORRO');
     try {
       const finca = await Fincas.getActive();
-      this._assert(finca, M, `[PRE-REQ] Finca activa existe`, 'PRE-REQ');
+      if (!this._assert(finca, M, `[PRE-REQ] Finca activa existe`, 'PRE-REQ')) return false;
       this._assert(finca.rega === 'ES041230000123', M, `[PRE-REQ] REGA correcto en demo (ES041230000123)`, 'PRE-REQ');
 
       // Módulos y cobertura esperada
