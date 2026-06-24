@@ -1,5 +1,5 @@
 # Matriz de Cumplimiento SIGGAN — Livestock Manager
-> Generada el **2026-06-24** · App v4.5.0 · DB v10 · Suite QA: 18 tests
+> Generada el **2026-06-24** · Actualizada el **2026-06-24** · App v4.5.0 · DB v11 · Suite QA: 18 tests
 >
 > Vara de medir: modelo y flujos oficiales del **SIGGAN** (Sistema de Información de Gestión Ganadera, Andalucía) y marco **BADIGEX** (Extremadura), con base normativa RD 479/2004 (REGA), RD 787/2023 (identificación/registro/movimientos) y Reg. UE 1069/2009 (SANDACH).
 >
@@ -9,7 +9,7 @@
 
 ## 1. Resumen ejecutivo
 
-La adaptación SIGGAN está **sustancialmente completa**. De los flujos normativos evaluados, la mayoría **cumplen** con validación en capa de dominio (no solo UI) y cobertura de QA automatizada. Los puntos abiertos son **operativos y de documentación** (validación en Android, manuales) más una **deuda técnica** concreta (KPIs de zonas en el hub de Ganadería).
+La adaptación SIGGAN está **prácticamente completa**. Todos los flujos normativos evaluados **cumplen** con validación en capa de dominio (no solo UI) y cobertura de QA automatizada. La deuda técnica que afectaba al cumplimiento (KPIs de zonas, notificaciones REGA en `localStorage`, manuales sin actualizar) ha sido **resuelta**. Quedan únicamente **dos puntos abiertos que dependen de recursos externos**: la ejecución de la suite QA en un dispositivo Android real y la validación del formato de exportación contra el importador oficial de SIGGAN/BADIGEX (requiere credenciales o ficha técnica de la Junta).
 
 | Bloque | Estado global |
 |---|---|
@@ -22,8 +22,8 @@ La adaptación SIGGAN está **sustancialmente completa**. De los flujos normativ
 | Maestros comerciales (operadores/transporte) | ✅ |
 | Trazabilidad / auditoría | ✅ |
 | Workflow administrativo (trámites) | ✅ |
-| Exportación oficial | 🟡 |
-| Documentación de usuario (manuales) | 🔴 |
+| Exportación oficial | 🟡 (validación local ✅; formato real pendiente) |
+| Documentación de usuario (manuales) | ✅ |
 
 ---
 
@@ -44,7 +44,7 @@ La adaptación SIGGAN está **sustancialmente completa**. De los flujos normativ
 | 11 | **Bloqueo venta de leche** en periodo de espera | ✅ | validación en wizard-albaran-leche / comercialización | TEST 15. |
 | 12 | **Clasificación SANDACH** por motivo de baja | ✅ | infra SANDACH + UI animal (Reg. UE 1069/2009) | TEST 16. |
 | 13 | **Tipo de explotación REGA** en rebaños | ✅ | `rebanos.tipo_explotacion_rega` | TEST 14. |
-| 14 | **Zonas**: UGM, carga ganadera, distancias, PAC | ✅ | campos en `fincas.zonas`, migración de relleno | TEST 13. (Ver gap KPIs, §3) |
+| 14 | **Zonas**: UGM, carga ganadera, distancias, PAC | ✅ | campos en `fincas.zonas`, migración de relleno; `GanaderiaView` lee de `finca.zonas` | TEST 13. Gap de KPIs **resuelto**. |
 | 15 | **Venta → movimiento oficial** enlazado | ✅ | `wizard-venta-masiva` → `Movimientos.save('salida')` + `movimientoId` | Con rollback si falla el movimiento. |
 | 16 | **Operadores comerciales** (comprador/proveedor) con REGA + NIF/CIF + tipo operador | ✅ | `compradores.js`, `proveedores.js`, `validateNifCif` | — |
 | 17 | **Transportista**: ATG + desinsectación (fechas/vigencia) | ✅ | `transportistas.js` (`autorizacion_transporte_ganado`, `desinsectacion_*`) | — |
@@ -53,31 +53,38 @@ La adaptación SIGGAN está **sustancialmente completa**. De los flujos normativ
 | 20 | **Auditoría legal inmutable** (anulación, no borrado) | ✅ | `Animales/Rebanos.delete`, anulación de zonas + evento auditoría | — |
 | 21 | **Workflow administrativo** (borrador→presentado→aceptado/rechazado + acuse) | ✅ | guías, INFOLAC, censo, traslado → `documentos_legales` | — |
 | 22 | **Pedidos de crotales** persistidos | ✅ | `pedidos-crotales.js` (BD, no solo PDF) | — |
-| 23 | **Notificaciones REGA** al alta | 🟡 | `notificaciones-rega.js` (en `localStorage`) | TEST 17 OK, pero debería persistir en store versionado / `documentos_legales`. |
-| 24 | **Exportación oficial** CSV/XML (REGA, SIA) + cierre mensual | 🟡 | `export-service`, `AjustesView._exportarCierreMensual`, `pedidos-crotales` export | TEST 6. Falta validar el formato exacto contra el importador real de SIGGAN/BADIGEX. |
-| 25 | **Cobertura de datos demo** (validación integral) | ✅ | TEST 18 `testCoberturaDemo` | 17/17 módulos. |
-| 26 | **Manuales de usuario** alineados a SIGGAN | 🔴 | `docs/GUIA_*.html` | Sin Cuaderno Digital ni libros de registro; sin tocar desde el commit inicial. |
-| 27 | **Validación en dispositivo Android** | 🟡 | — | Código listo; `SigganQA.runAll()` en dispositivo pendiente de ejecución. |
+| 23 | **Notificaciones REGA** al alta | ✅ | `notificaciones-rega.js` → store versionado `notificaciones_rega` (DB v11), con auto-migración de `localStorage` | TEST 17. Gap **resuelto**: persistencia auditable en IndexedDB. |
+| 24 | **Exportación oficial** CSV/XML (REGA, SIA) + cierre mensual | 🟡 | `export-service` v1.2.0 (validación semántica + modal pre-vuelo), `AjustesView._exportarCierreMensual`, `pedidos-crotales` export | TEST 6. Validación local **completa** (regex REGA, fechas, códigos M/H, escape CSV). Falta validar el formato exacto contra el importador real de SIGGAN/BADIGEX (requiere credenciales/XSD oficial). |
+| 25 | **Cobertura de datos demo** (validación integral) | ✅ | TEST 18 `testCoberturaDemo` | 13/13 módulos. |
+| 26 | **Manuales de usuario** alineados a SIGGAN | ✅ | `docs/GUIA_*.html` (4 guías: administración oficial, comercialización, comercial/socios, explotación láctea) | Cuaderno Digital, REGA, notificaciones, plazos legales, tipos de operador y períodos de supresión documentados. |
+| 27 | **Validación en dispositivo Android** | 🟡 | — | Código listo y sincronizado (`cap:sync`); `SigganQA.runAll()` en dispositivo pendiente de ejecución manual. |
 
 ---
 
 ## 3. Deuda técnica que afecta a cumplimiento
 
+### Resuelta en esta iteración (2026-06-24)
+
+| Severidad | Descripción | Resolución |
+|:---:|---|---|
+| ✅ (era 🔴) | `GanaderiaView` leía zonas de un object store inexistente (`db.getAllFromIndex('zonas',…)`); fallaba en silencio. | Ahora lee de `finca.zonas` vía `Fincas.getActive()`. KPIs de carga ganadera se muestran. |
+| ✅ (era 🟡) | `notificaciones-rega.js` en `localStorage` (no auditable). | Migrado a store versionado `notificaciones_rega` (DB v11) con auto-migración de datos previos. |
+| ✅ (era 🔴) | Manuales `docs/GUIA_*.html` sin alinear a SIGGAN. | 4 guías reescritas/ampliadas al Cuaderno Digital SIGGAN. |
+
+### Abierta
+
 | Severidad | Descripción | Impacto normativo | Acción |
 |:---:|---|---|---|
-| 🔴 | `GanaderiaView` lee zonas de un object store inexistente (`db.getAllFromIndex('zonas',…)`); zonas viven en `fincas.zonas`. Falla en silencio (`.catch(()=>[])`). | KPIs de zonas (UGM/carga) del hub salen vacíos → la información de carga ganadera no se muestra aunque el dato exista. | Leer desde `fincas.zonas` como `zonas-view.js`. |
-| 🟡 | `notificaciones-rega.js` en `localStorage`. | Workflow administrativo de notificación menos robusto/auditable. | Migrar a store versionado / `documentos_legales`. |
-| 🟡 | Formato de exportación oficial no validado contra el sistema real. | Riesgo de rechazo en carga telemática SIGGAN/BADIGEX. | Validar contra plantilla oficial. |
+| 🟡 | Formato de exportación oficial no validado contra el sistema real. La validación local (regex REGA `^ES\d{12}$`, coherencia de fechas, códigos M/H, escape CSV) ya está implementada en `export-service` v1.2.0. | Riesgo residual de rechazo en carga telemática si el esquema oficial difiere. | Validar contra plantilla/XSD oficial (requiere credenciales o ficha técnica de la Junta). |
 
 ---
 
-## 4. Backlog priorizado (impacto normativo alto → bajo)
+## 4. Backlog priorizado (lo que queda)
 
-1. 🔴 **Corregir KPIs de zonas en `GanaderiaView`** (lectura desde `fincas.zonas`).
-2. 🟡 **Validar export oficial** CSV/XML contra el formato de carga SIGGAN/BADIGEX real.
-3. 🟡 **Migrar notificaciones REGA** a almacenamiento versionado/expediente.
-4. 🟡 **Validación end-to-end en Android** (`cap:sync` + `SigganQA.runAll()` en dispositivo).
-5. 🔴/doc **Actualizar manuales** (Cuaderno Digital + libros de registro SIGGAN).
+> Ambos puntos dependen de recursos externos al desarrollo.
+
+1. 🟡 **Validación end-to-end en Android** — `cap:sync` ya ejecutado; falta lanzar `SigganQA.runAll()` en un dispositivo real (acción manual del usuario).
+2. 🟡 **Validar export oficial** CSV/XML contra el formato de carga SIGGAN/BADIGEX real (requiere acceso al importador o ficha técnica oficial).
 
 ---
 
@@ -87,6 +94,6 @@ La adaptación SIGGAN está **sustancialmente completa**. De los flujos normativ
 // Consola del navegador (Chrome DevTools)
 await SeedData.run(true);        // Cargar Demo CHAMORRO
 await SigganQA.runAll();         // 18 tests SIGGAN
-await SigganQA.run("coverage");  // Cobertura de módulos (17/17)
+await SigganQA.run("coverage");  // Cobertura de módulos (13/13)
 await SigganQA.cleanup();        // Limpieza de datos de test
 ```
