@@ -3240,14 +3240,18 @@ const InformesView = {
   async _exportREGA() {
     const d = InformesView._cachedData;
     if (!d || !window.ExportService) return App.toastError('Datos no disponibles');
-    App.toast('Generando exportación REGA...');
-    await ExportService.exportarREGA(d.finca, d.animales, d.rebanos);
+    InformesView._preflight('Exportación REGA (Censo)', d.finca, d.animales, null, async () => {
+      App.toast('Generando exportación REGA...');
+      await ExportService.exportarREGA(d.finca, d.animales, d.rebanos, { skipPreflight: true });
+    });
   },
   async _exportMovimientos() {
     const d = InformesView._cachedData;
     if (!d || !window.ExportService) return App.toastError('Datos no disponibles');
-    App.toast('Generando exportación movimientos...');
-    await ExportService.exportarMovimientos(d.eventos, d.animales, d.finca);
+    InformesView._preflight('Exportación Movimientos SIA', d.finca, d.animales, d.eventos, async () => {
+      App.toast('Generando exportación movimientos...');
+      await ExportService.exportarMovimientos(d.eventos, d.animales, d.finca, { skipPreflight: true });
+    });
   },
   async _exportProduccion() {
     const d = InformesView._cachedData;
@@ -3260,8 +3264,119 @@ const InformesView = {
     const d = InformesView._cachedData;
     if (!d || !window.ExportService) return App.toastError('Datos no disponibles');
     const prodLeche = InformesView._cachedLeche || [];
-    App.toast('Generando exportación completa...');
-    await ExportService.exportarCompleto(d.finca, d.animales, d.rebanos, d.eventos, prodLeche, d.ventasCompleto || []);
+    InformesView._preflight('Exportación Completa (REGA + SIA + PIGGAN)', d.finca, d.animales, d.eventos, async () => {
+      App.toast('Generando exportación completa...');
+      await ExportService.exportarCompleto(d.finca, d.animales, d.rebanos, d.eventos, prodLeche, d.ventasCompleto || [], { skipPreflight: true });
+    });
+  },
+
+  // =========== PRE-FLIGHT CHECK (validación previa con modal) ===========
+  /**
+   * Ejecuta la validación semántica y decide el flujo:
+   *  - errores bloqueantes  → modal de error (sin descarga)
+   *  - solo avisos          → modal de confirmación (tabla + "Descargar igualmente")
+   *  - censo limpio         → descarga directa
+   * @param {string} titulo
+   * @param {object} finca
+   * @param {object[]} animales
+   * @param {object[]|null} eventos
+   * @param {Function} onConfirm - callback que lanza la descarga real
+   */
+  _preflight(titulo, finca, animales, eventos, onConfirm) {
+    const reporte = ExportService.validarPreExportacion(finca, animales, eventos || []);
+    if (!reporte.valido) {
+      InformesView._renderValidacionModal({ titulo, reporte, onConfirm: null });
+      return;
+    }
+    if (!reporte.avisos.length) {
+      onConfirm(); // todo correcto → directo
+      return;
+    }
+    InformesView._renderValidacionModal({ titulo, reporte, onConfirm });
+  },
+
+  _renderValidacionModal({ titulo, reporte, onConfirm }) {
+    const bloqueante = !reporte.valido;
+    const accent = bloqueante ? '#ef4444' : '#f59e0b';
+    const icon = bloqueante ? '⛔' : '⚠️';
+
+    const erroresHtml = reporte.errores.length ? `
+      <div style="margin-bottom:16px;">
+        <h4 style="color:#ef4444;margin:0 0 8px;">Errores que impiden la exportación</h4>
+        <ul style="margin:0;padding-left:20px;color:#fca5a5;font-size:0.85rem;">
+          ${reporte.errores.map(e => `<li style="margin-bottom:4px;">${InformesView._esc(e)}</li>`).join('')}
+        </ul>
+      </div>` : '';
+
+    const avisosHtml = reporte.avisos.length ? `
+      <div>
+        <h4 style="color:#f59e0b;margin:0 0 8px;">Avisos (${reporte.avisos.length}) — no impiden la exportación</h4>
+        <div style="max-height:260px;overflow-y:auto;border:1px solid #333;border-radius:8px;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+            <thead>
+              <tr style="position:sticky;top:0;background:#1f2937;">
+                <th style="padding:8px 10px;text-align:left;color:#9ca3af;width:40px;">#</th>
+                <th style="padding:8px 10px;text-align:left;color:#9ca3af;">Incidencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${reporte.avisos.map((a, i) => `
+                <tr style="border-top:1px solid #2d2d2d;">
+                  <td style="padding:6px 10px;color:#6b7280;">${i + 1}</td>
+                  <td style="padding:6px 10px;color:#e5e7eb;">${InformesView._esc(a)}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <p style="color:#9ca3af;font-size:0.75rem;margin:10px 0 0;">
+          La plataforma autonómica (SIGGAN/BADIGEX) procesará el resto del censo y rechazará o advertirá únicamente las líneas afectadas.
+        </p>
+      </div>` : '';
+
+    const botones = bloqueante ? `
+      <button class="btn" onclick="ModalManager.close('modal-validacion-export')"
+        style="background:#374151;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">Entendido</button>
+    ` : `
+      <button class="btn" onclick="ModalManager.close('modal-validacion-export')"
+        style="background:#374151;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">Cancelar</button>
+      <button class="btn" onclick="InformesView._confirmExport()"
+        style="background:${accent};color:#111;font-weight:bold;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">⬇ Descargar igualmente</button>
+    `;
+
+    InformesView._pendingExport = onConfirm || null;
+
+    const content = `
+      <div style="background:#0f0f0f;border:1px solid ${accent}55;border-radius:14px;max-width:620px;width:92%;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+        <div style="padding:20px 24px;border-bottom:1px solid #222;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.6rem;">${icon}</span>
+          <div>
+            <h3 style="margin:0;color:#fff;font-size:1.1rem;">${InformesView._esc(titulo)}</h3>
+            <p style="margin:2px 0 0;color:#9ca3af;font-size:0.8rem;">Verificación previa antes de generar el fichero</p>
+          </div>
+        </div>
+        <div style="padding:24px;">
+          ${erroresHtml}
+          ${avisosHtml}
+        </div>
+        <div style="padding:16px 24px;border-top:1px solid #222;display:flex;justify-content:flex-end;gap:12px;">
+          ${botones}
+        </div>
+      </div>`;
+
+    ModalManager.show('modal-validacion-export', content, { closeOnOverlayClick: !bloqueante });
+  },
+
+  _confirmExport() {
+    const fn = InformesView._pendingExport;
+    InformesView._pendingExport = null;
+    ModalManager.close('modal-validacion-export');
+    if (typeof fn === 'function') fn();
+  },
+
+  _esc(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   },
 
   _exportFallback() {
