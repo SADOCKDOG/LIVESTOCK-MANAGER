@@ -1457,6 +1457,8 @@ const SigganQA = {
       'leche': () => this.testVentaLecheBlocking(),
       'sandach': () => this.testSANDACHClassificacion(),
       'notificaciones': () => this.testNotificacionesREGA(),
+      'coverage': () => this.testCoberturaDemo(),
+      'cobertura': () => this.testCoberturaDemo(),
       'rendimiento': () => this.testRendimiento(),
     };
     const fn = map[(testName || '').toLowerCase()];
