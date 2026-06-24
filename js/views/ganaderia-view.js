@@ -21,11 +21,12 @@ const GanaderiaView = {
       return;
     }
 
-    const [rebanos, animales, zonas] = await Promise.all([
+    const [rebanos, animales, fincaActiva] = await Promise.all([
       window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
       window.db.getAll('animales').catch(() => []),
-      window.db.getAllFromIndex('zonas', 'fincaId', fincaId).catch(() => [])
+      Fincas.getActive().catch(() => null)
     ]);
+    const zonas = fincaActiva?.zonas || [];
 
     this._activeMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('ganaderia', rebanos)
