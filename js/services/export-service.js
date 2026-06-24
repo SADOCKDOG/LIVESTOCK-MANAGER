@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - ExportService v1.1.0
+ * Livestock Manager - ExportService v1.2.0
  * Exportación oficial CSV/XML para REGA, SIA y PIGGAN.
  * Genera ficheros compatibles con las plataformas autonómicas (SIGGAN/BADIGEX).
  *
@@ -12,6 +12,9 @@
  *   1. Formato estricto del código REGA (^ES\d{12}$)
  *   2. Coherencia de fechas (no futuras; movimiento ≥ nacimiento)
  *   3. Normalización a códigos oficiales (Sexo M/H, Especie canónica)
+ * v1.2.0 — Modal de pre-vuelo en la UI (InformesView._preflight):
+ *   - opción { skipPreflight } para que la UI sea dueña del mensaje
+ *   - tabla de avisos confirmable antes de descargar; REGA inválido bloquea
  */
 
 // ── Constantes oficiales ────────────────────────────────────────────────────
