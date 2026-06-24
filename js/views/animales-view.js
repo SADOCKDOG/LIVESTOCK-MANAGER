@@ -24,7 +24,7 @@ const AnimalesView = {
       <div class="mb-16">
         <div class="flex justify-between items-center">
           <div class="flex gap-8">
-            <button class="btn btn-primary btn-sm btn-create" onclick="location.hash='/animal'">➕ Nuevo</button>
+            <button class="btn btn-primary btn-sm btn-create" onclick="location.hash='/animal'">${Icons.agregar()} Nuevo</button>
           </div>
           ${animales.length > 0 ? `<span class="text-xs text-gray">${activos}/${animales.length} activos</span>` : ''}
         </div>
@@ -34,7 +34,7 @@ const AnimalesView = {
       html += `<div class="empty-state">
         <div class="empty-state-icon">🐄</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <button class="btn btn-primary btn-sm mt-12" onclick="location.hash='/animal'">➕ Registrar primer animal</button>
+        <button class="btn btn-primary btn-sm mt-12" onclick="location.hash='/animal'">${Icons.agregar()} Registrar primer animal</button>
       </div>`;
       main.innerHTML = html;
       return;
@@ -72,7 +72,7 @@ const AnimalesView = {
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
     html += `</div>
       <!-- Botón Flotante de Acción para móviles -->
-      <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">➕</button>
+      <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
       <div id="animales-empty-search" class="empty-state-search" style="display:none;">
         <div class="text-2xl mb-8">🔍</div>
         <p class="text-gray-500">No se encontraron animales con ese criterio.</p>
@@ -222,7 +222,7 @@ const AnimalesView = {
               🛜 NFC
             </button>
             <button onclick="App._escanearCrotal('a-crotal')" class="wizard-btn-action wizard-btn-primary wizard-btn-scan">
-              📷 SCAN
+              ${Icons.foto()} SCAN
             </button>
           </div>
         </div>
@@ -313,7 +313,7 @@ const AnimalesView = {
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
           <div class="badge-crotal" style="margin-bottom:12px;">
-            <div class="badge-crotal-header">📒 LIBRO DE REGISTRO (SIGGAN)</div>
+            <div class="badge-crotal-header flex items-center gap-6">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12" style="margin-top:10px;">
               <div>
                 <label class="form-label">PAÍS DE NACIMIENTO</label>
@@ -380,13 +380,13 @@ const AnimalesView = {
               <div id="tabla-reproduccion" class="badge-crotal-loading">Cargando...</div>
             </div>
             <button id="btn-reproduccion" onclick="App._abrirWizardReproduccion('${id}')" class="wizard-btn-action wizard-btn-reproduccion">
-              🧬 GESTIÓN REPRODUCTIVA
+              ${Icons.reproduccion()} GESTIÓN REPRODUCTIVA
             </button>` : ""}
         </div>
         <div class="wizard-footer-fixed grid grid-cols-3 gap-8">
-          ${!esNuevo ? `<button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action" style="background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;font-weight:800;">🔄 Ver 360°</button>` : '<div></div>'}
-          <button type="button" onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">✕ Salir</button>
-          <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">✔ Guardar</button>
+          ${!esNuevo ? `<button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action" style="background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;font-weight:800;">${Icons.rotacion()} Ver 360°</button>` : '<div></div>'}
+          <button type="button" onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">${Icons.cerrar()} Salir</button>
+          <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">${Icons.guardar()} Guardar</button>
         </div>
       </div>`;
 
