@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 10;
+const DB_VERSION = 11;
 
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
@@ -206,6 +206,17 @@ async function initDB() {
                 }
                 if (!carneStore.indexNames.contains('autorizacion_veterinaria')) {
                     carneStore.createIndex('autorizacion_veterinaria', 'autorizacion_veterinaria');
+                }
+            }
+
+            // v11: SIGGAN — Notificaciones a REGA (migración desde localStorage)
+            if (oldVersion < 11) {
+                if (!db.objectStoreNames.contains('notificaciones_rega')) {
+                    const store = db.createObjectStore('notificaciones_rega', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('animal_id', 'animal_id');
+                    store.createIndex('finca_id', 'finca_id');
+                    store.createIndex('fecha_notificacion', 'fecha_notificacion');
+                    store.createIndex('estado_notificacion', 'estado_notificacion');
                 }
             }
 
