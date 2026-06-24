@@ -114,6 +114,15 @@ const Fincas = {
     async save(data) {
         if (data) {
             const regaVal = this._normalizarREGA(data.rega || data.codigo_REGA);
+            if (regaVal && window.ComunidadesService?.validarFormatoREGA) {
+                const validacion = window.ComunidadesService.validarFormatoREGA(
+                    regaVal,
+                    data.comunidad_autonoma || null
+                );
+                if (!validacion?.valido) {
+                    throw new Error(validacion?.mensaje || 'Código REGA inválido');
+                }
+            }
             data.rega = regaVal;
             data.codigo_REGA = regaVal;
         }

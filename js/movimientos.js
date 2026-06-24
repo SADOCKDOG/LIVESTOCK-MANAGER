@@ -17,6 +17,9 @@ const Movimientos = {
   async list(filtros = {}) {
     return await ErrorHandler.tryAsync(async () => {
       let movs = await window.db.getAll('movimientos_ganado').catch(() => []);
+      if (!filtros.includeAnulados) {
+        movs = movs.filter(m => !m?.anulado);
+      }
       if (filtros.fincaId != null) {
         movs = movs.filter(m => Number(m.fincaId) === Number(filtros.fincaId));
       }
@@ -68,6 +71,31 @@ const Movimientos = {
       const animalIds = Array.isArray(data.animalId)
         ? data.animalId.map(Number).filter(n => !Number.isNaN(n))
         : (data.animalId != null ? [Number(data.animalId)] : []);
+      const crotales = Array.isArray(data.crotales) ? data.crotales : [];
+      const numAnimalesDeclarado = Number(data.num_animales) || animalIds.length || 0;
+
+      if (numAnimalesDeclarado <= 0) {
+        throw new Error('El número de animales debe ser mayor que cero.');
+      }
+      if (crotales.length > 0 && crotales.length !== numAnimalesDeclarado) {
+        throw new Error('El número de crotales debe coincidir con el número de animales declarado.');
+      }
+      for (const crotal of crotales) {
+        if (window.ErrorHandler?.validateCaravana) {
+          window.ErrorHandler.validateCaravana(crotal);
+        }
+      }
+
+      const estadoTramite = (data.estado_tramite || 'borrador').toString().trim().toLowerCase();
+      const fechaPresentacion = (data.fecha_presentacion || '').toString().trim();
+      const numeroRegistroOficial = (data.numero_registro_oficial || '').toString().trim();
+      const acuseRecibo = (data.acuse_recibo || '').toString().trim();
+      if (estadoTramite !== 'borrador' && !fechaPresentacion) {
+        throw new Error('La fecha de presentación es obligatoria cuando el trámite no está en borrador.');
+      }
+      if ((estadoTramite === 'aceptado' || estadoTramite === 'rechazado') && (!numeroRegistroOficial || !acuseRecibo)) {
+        throw new Error('Número de registro oficial y acuse son obligatorios para trámite aceptado/rechazado.');
+      }
 
       const movData = {
         fincaId: data.fincaId != null ? Number(data.fincaId) : null,
@@ -78,9 +106,10 @@ const Movimientos = {
         explotacion_contraparte: (data.explotacion_contraparte || '').trim(),
         motivo: data.motivo || '',
         especie: data.especie || '',
-        num_animales: Number(data.num_animales) || animalIds.length || 0,
+        num_animales: numAnimalesDeclarado,
         animalId: animalIds,
-        crotales: Array.isArray(data.crotales) ? data.crotales : [],
+        crotales,
+        tipo_operador_destino: (data.tipo_operador_destino || '').toString().trim().toLowerCase(),
         transportistaId: data.transportistaId != null ? Number(data.transportistaId) : null,
         transportista_nombre: (data.transportista_nombre || '').trim(),
         matricula: (data.matricula || '').trim().toUpperCase(),
@@ -88,6 +117,10 @@ const Movimientos = {
         desinsectacion_certificada: !!data.desinsectacion_certificada,
         comunidad_autonoma: ccaa || '',
         plataforma: conf ? conf.sistema_movimiento : (data.plataforma || ''),
+        estado_tramite: estadoTramite,
+        fecha_presentacion: fechaPresentacion || null,
+        numero_registro_oficial: numeroRegistroOficial || '',
+        acuse_recibo: acuseRecibo || '',
         notas: (data.notas || '').trim(),
         actualizadoEn: new Date().toISOString(),
       };
@@ -117,8 +150,23 @@ const Movimientos = {
 
   async delete(id) {
     return await ErrorHandler.tryAsync(async () => {
-      await window.db.delete('movimientos_ganado', Number(id));
-      if (window.EventBus) window.EventBus.emit('movimiento:deleted', { id: Number(id) });
+      const mov = await window.db.get('movimientos_ganado', Number(id));
+      if (!mov) return;
+      mov.anulado = true;
+      mov.anuladoEn = new Date().toISOString();
+      mov.estado_tramite = 'anulado';
+      await window.db.put('movimientos_ganado', mov);
+      await window.db.add('registro_eventos', {
+        fincaId: mov.fincaId,
+        entidad_id: mov.id,
+        tipo_entidad: 'movimiento_ganado',
+        tipo: 'auditoria',
+        motivo_tarea: 'anulacion_movimiento',
+        fecha: new Date().toISOString().split('T')[0],
+        observaciones: `Movimiento oficial ${mov.numero_guia || mov.id} anulado`,
+        creadoEn: new Date().toISOString(),
+      });
+      if (window.EventBus) window.EventBus.emit('movimiento:deleted', { id: Number(id), anulacion: true });
     }, { entity: 'Movimientos', action: 'delete', id });
   },
 
@@ -127,7 +175,7 @@ const Movimientos = {
     const movs = await window.db.getAll('movimientos_ganado').catch(() => []);
     const numId = Number(animalId);
     return movs
-      .filter(m => Array.isArray(m.animalId) && m.animalId.map(Number).includes(numId))
+      .filter(m => !m?.anulado && Array.isArray(m.animalId) && m.animalId.map(Number).includes(numId))
       .sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
   },
 

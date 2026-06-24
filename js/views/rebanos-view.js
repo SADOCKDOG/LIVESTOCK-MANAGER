@@ -88,7 +88,7 @@ const RebanosView = {
     const rebano = await Rebanos.get(id);
     const animales = await Animales.list(id);
     const finca = await Fincas.getActive();
-    const zonas = finca ? finca.zonas || [] : [];
+    const zonas = finca ? (finca.zonas || []).filter(z => !z?.anulada) : [];
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
     const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
@@ -233,7 +233,7 @@ const RebanosView = {
       r.codigo_lote = document.getElementById("r-edit-lote").value.trim();
       r.fecha_constitucion = document.getElementById("r-edit-fecha").value;
       r.tipo_explotacion_rega = document.getElementById("r-edit-tipo-explotacion-rega").value;
-      r.notes = document.getElementById("r-edit-notas").value.trim();
+      r.notas = document.getElementById("r-edit-notas").value.trim();
       if (!r.nombre) return App.toastError("Nombre requerido");
       await Rebanos.save(r);
       App.toast("Rebaño actualizado");
@@ -350,13 +350,13 @@ const RebanosView = {
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">NOTAS / OBSERVACIONES</label>
-              <textarea id="w-reb-notas" placeholder="Ración, ADSG, detalles..." class="wizard-input" style="height:80px; resize:none;">${data.notes || ''}</textarea>
+              <textarea id="w-reb-notas" placeholder="Ración, ADSG, detalles..." class="wizard-input" style="height:80px; resize:none;">${data.notas || ''}</textarea>
             </div>
           </div>
         `,
         onChange: async (data) => {
           data.fecha_constitucion = document.getElementById('w-reb-fecha')?.value || data.fecha_constitucion;
-          data.notes = document.getElementById('w-reb-notas')?.value.trim() || '';
+          data.notas = document.getElementById('w-reb-notas')?.value.trim() || '';
         }
       }
     ];
@@ -373,7 +373,7 @@ const RebanosView = {
         capacidad_total: "",
         codigo_lote: "",
         fecha_constitucion: new Date().toISOString().split("T")[0],
-        notes: ""
+        notas: ""
       },
       steps: wizardSteps,
       onComplete: async (finalData) => {
@@ -387,7 +387,7 @@ const RebanosView = {
             capacidad_total: Number(finalData.capacidad_total) || 0,
             codigo_lote: finalData.codigo_lote,
             fecha_constitucion: finalData.fecha_constitucion,
-            notes: finalData.notes,
+            notas: finalData.notas,
             estado: "activo",
           });
           App.toast("Rebaño creado exitosamente");
@@ -401,12 +401,12 @@ const RebanosView = {
 
   async _eliminarRebano(id) {
     const ans = await Animales.list(id);
-    if (ans.length > 0)
+    if (ans.filter(a => (a.estado || 'activo') === 'activo').length > 0)
       return App.toastError("No se puede eliminar un rebaño con animales.");
-    if (!confirm("¿Eliminar este rebaño?")) return;
+    if (!confirm("¿Anular este rebaño? Se conservará histórico de auditoría.")) return;
     try {
       await Rebanos.delete(id);
-      App.toast("Eliminado");
+      App.toast("Rebaño anulado");
       location.hash = "#/rebanos";
     } catch (e) {
       App.toastError(e.message);

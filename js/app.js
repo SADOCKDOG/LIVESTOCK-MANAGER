@@ -323,7 +323,14 @@ const App = {
     try {
       const t = await Transportistas.get(val);
       if (!t) return;
-      App._showTransportistaInfo({ transportistaId: val, nombreTransportista: t.nombre, nifTransportista: t.nif_cif, matriculaTransportista: t.matricula });
+      App._showTransportistaInfo({
+        transportistaId: val,
+        nombreTransportista: t.nombre,
+        nifTransportista: t.nif_cif,
+        matriculaTransportista: t.matricula,
+        atgTransportista: t.autorizacion_transporte_ganado,
+        desinsectacionVencimiento: t.desinsectacion_vencimiento,
+      });
     } catch(e) {
       console.warn(e);
     }
@@ -343,6 +350,13 @@ const App = {
     if (nifEl) nifEl.textContent = 'NIF: ' + (data.nifTransportista || '');
     const matEl = document.getElementById('w-v-transportista-matricula');
     if (matEl) matEl.textContent = '🚚 ' + (data.matriculaTransportista || '');
+    const atgEl = document.getElementById('w-v-transportista-atg');
+    if (atgEl) atgEl.textContent = 'ATG: ' + (data.atgTransportista || 'pendiente');
+    const desEl = document.getElementById('w-v-transportista-desinsectacion');
+    if (desEl) {
+      const v = data.desinsectacionVencimiento || '';
+      desEl.textContent = 'Desinsectación: ' + (v ? ('vigente hasta ' + v) : 'sin vencimiento informado');
+    }
   },
 
   async updateNavigationMenu() {
@@ -1351,6 +1365,13 @@ const App = {
   async _guardarEdicionLeche(id) {
     try {
       const e = await window.db.get("comercializacion_leche", id);
+      const anterior = {
+        cantidad: e.cantidad,
+        precioBase: e.precioBase,
+        laboratorio: { ...(e.laboratorio || {}) },
+        antibioticos: e.antibioticos,
+        estadoAnalitica: e.estadoAnalitica,
+      };
       e.cantidad = parseFloat(document.getElementById("le-cant").value);
       e.precioBase = parseFloat(document.getElementById("le-pb").value);
       e.laboratorio = {
@@ -1362,6 +1383,21 @@ const App = {
       };
       e.antibioticos = e.laboratorio.antibioticos;
       e.estadoAnalitica = e.antibioticos ? "Alerta Crítica" : "Validado";
+      const cambios = {};
+      if (anterior.cantidad !== e.cantidad) cambios.cantidad = { antes: anterior.cantidad, despues: e.cantidad };
+      if (anterior.precioBase !== e.precioBase) cambios.precioBase = { antes: anterior.precioBase, despues: e.precioBase };
+      ["grasa", "proteina", "somaticas", "germenes", "antibioticos"].forEach((k) => {
+        const a = anterior.laboratorio?.[k];
+        const d = e.laboratorio?.[k];
+        if (a !== d) cambios[`laboratorio.${k}`] = { antes: a, despues: d };
+      });
+      if (Object.keys(cambios).length > 0) {
+        e.auditoria_analitica = Array.isArray(e.auditoria_analitica) ? e.auditoria_analitica : [];
+        e.auditoria_analitica.push({
+          fecha: new Date().toISOString(),
+          cambios,
+        });
+      }
       await window.db.put("comercializacion_leche", e);
       this.toast("Registro lácteo actualizado.");
       location.hash = "#/comercializacion?tab=leche";

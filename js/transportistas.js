@@ -34,7 +34,7 @@ const Transportistas = {
 
     async getByNif(nif) {
         try {
-            return await window.db.getFromIndex('transportistas', 'nif_cif', nif.trim().toUpperCase());
+            return await window.db.getFromIndex('transportistas', 'nif_cif', ErrorHandler.normalizeNifCif(nif));
         } catch (e) {
             return null;
         }
@@ -53,17 +53,23 @@ const Transportistas = {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
             ErrorHandler.validateRequired('nombre', data.nombre, 'Nombre o razón social es obligatorio');
-            ErrorHandler.validateRequired('nif_cif', data.nif_cif, 'NIF/CIF es obligatorio');
+            const nifVal = ErrorHandler.validateNifCif(data.nif_cif, { required: true });
+            ErrorHandler.validateRequired('autorizacion_transporte_ganado', data.autorizacion_transporte_ganado, 'La autorización ATG es obligatoria');
+            const ultimaDesinsectacion = (data.desinsectacion_ultima_fecha || '').trim();
+            const vencimientoDesinsectacion = (data.desinsectacion_vencimiento || '').trim();
+            if (vencimientoDesinsectacion && ultimaDesinsectacion && new Date(vencimientoDesinsectacion) < new Date(ultimaDesinsectacion)) {
+                throw new Error('La fecha de vencimiento de desinsectación no puede ser anterior a la última desinsectación');
+            }
 
             // Validar NIF único (excepto para el mismo registro en edición)
-            const existente = await this.getByNif(data.nif_cif);
+            const existente = await this.getByNif(nifVal);
             if (existente && (!esEdicion || existente.id !== Number(data.id))) {
-                throw new Error(`Ya existe un transportista con NIF/CIF "${data.nif_cif}"`);
+                throw new Error(`Ya existe un transportista con NIF/CIF "${nifVal}"`);
             }
 
             const transportistaData = {
                 nombre: data.nombre.trim(),
-                nif_cif: data.nif_cif.trim().toUpperCase(),
+                nif_cif: nifVal,
                 direccion: (data.direccion || '').trim(),
                 codigo_postal: (data.codigo_postal || '').trim(),
                 ciudad: (data.ciudad || '').trim(),
@@ -72,6 +78,10 @@ const Transportistas = {
                 email: (data.email || '').trim(),
                 matricula: (data.matricula || '').trim().toUpperCase(),
                 registro_transporte: (data.registro_transporte || '').trim(),
+                autorizacion_transporte_ganado: (data.autorizacion_transporte_ganado || '').trim().toUpperCase(),
+                desinsectacion_ultima_fecha: ultimaDesinsectacion,
+                desinsectacion_vencimiento: vencimientoDesinsectacion,
+                desinsectacion_vigente: !vencimientoDesinsectacion || new Date(vencimientoDesinsectacion) >= new Date(new Date().toISOString().split('T')[0]),
                 certificado_bienestar: data.certificado_bienestar || false,
                 condiciones_termoneutrales: data.condiciones_termoneutrales || false,
                 capacidad_animales: parseInt(data.capacidad_animales) || 0,

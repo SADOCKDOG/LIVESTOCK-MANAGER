@@ -12,8 +12,13 @@ const AjustesView = {
     const activeFinca = activeId ? await Fincas.get(activeId) : null;
     const animales = activeId ? await Animales.list().catch(() => []) : [];
     const rebanos = activeId ? await Rebanos.list().catch(() => []) : [];
+    const eventos = activeId ? await window.db.getAllFromIndex('registro_eventos', 'fincaId', activeId).catch(() => []) : [];
+    const docsLegales = await window.db.getAll('documentos_legales').catch(() => []);
+    const tramitesFinca = activeId ? docsLegales.filter(d => Number(d.fincaId) === Number(activeId)) : [];
     const config = await this._loadConfig();
     const lastBackup = localStorage.getItem('last_backup_date');
+    const catalogoTiposREGA = window.ComunidadesService?.getTiposExplotacionREGA ? window.ComunidadesService.getTiposExplotacionREGA().slice(0, 5) : [];
+    const catalogoEspeciesREGA = window.ComunidadesService?.getEspeciesAutorizables ? window.ComunidadesService.getEspeciesAutorizables() : [];
 
     main.innerHTML = `
       <!-- ===================== GESTOR DE FINCA ===================== -->
@@ -228,6 +233,43 @@ const AjustesView = {
         <p class="text-gray mt-5 text-85">Genera la guía de movimiento inter-explotación y la declaración censal para su tramitación oficial (SIGGAN / BADIGEX).</p>
         <button class="btn btn-create btn-full" onclick="App._abrirWizardGuiaMovimiento()">🔄 Guía de Movimiento</button>
         <button class="btn btn-create btn-full-sm mt-10" onclick="App._abrirWizardCenso()">📊 Declaración Censal Anual</button>
+        <button class="btn btn-secondary btn-full-sm mt-10" onclick="AjustesView._exportarCierreMensual()">📦 Cierre mensual + export SIGGAN</button>
+      </div>
+
+      <!-- ===================== CATÁLOGOS REGA ===================== -->
+      <div class="card card-left-blue mb-20">
+        <h3>🧾 Catálogos REGA</h3>
+        <p class="text-gray mt-5 text-85">Consulta rápida de catálogos normativos expuestos para configuración de explotación y especies.</p>
+        <div class="info-box mt-10">
+          <div class="text-xs text-gray mb-6">Tipos explotación (top 5):</div>
+          <div class="text-white text-xs">${catalogoTiposREGA.length ? catalogoTiposREGA.join(' · ') : 'No disponible'}</div>
+          <div class="text-xs text-gray mt-10 mb-6">Especies autorizables:</div>
+          <div class="text-white text-xs">${catalogoEspeciesREGA.length ? catalogoEspeciesREGA.join(' · ') : 'No disponible'}</div>
+        </div>
+      </div>
+
+      <!-- ===================== HISTORIAL TRÁMITES ===================== -->
+      <div class="card card-left-gold mb-20">
+        <h3>🗂️ Historial de Trámites</h3>
+        <p class="text-gray mt-5 text-85">Últimos documentos y eventos de tramitación oficial vinculados a la finca activa.</p>
+        <div class="info-box mt-10 text-xs">
+          <div><span class="text-gray">Documentos legales:</span> <strong class="text-white">${tramitesFinca.length}</strong></div>
+          <div><span class="text-gray">Eventos de registro:</span> <strong class="text-white">${eventos.length}</strong></div>
+        </div>
+        <div class="mt-10">
+          ${tramitesFinca.slice(-5).reverse().map(d => `
+            <div style="padding:8px; border:1px solid #333; border-radius:8px; margin-bottom:6px;">
+              <div class="text-white text-xs"><strong>${d.tipo || 'documento'}</strong> · ${d.numero || 'sin número'}</div>
+              <div class="text-gray text-2xs">${d.fecha_emision || d.created_at || ''}</div>
+              ${(d.estado_tramite || d.numero_registro_oficial || d.acuse_recibo) ? `
+              <div class="text-2xs mt-4">
+                <span class="text-gray">Estado:</span> <strong class="text-white">${(d.estado_tramite || 'borrador').toUpperCase()}</strong>
+                ${d.numero_registro_oficial ? ` · <span class="text-gray">Reg.:</span> <strong class="text-white">${d.numero_registro_oficial}</strong>` : ''}
+                ${d.acuse_recibo ? ` · <span class="text-gray">Acuse:</span> <strong class="text-white">${d.acuse_recibo}</strong>` : ''}
+              </div>` : ''}
+            </div>
+          `).join('') || '<div class="text-gray text-xs">Sin trámites registrados.</div>'}
+        </div>
       </div>
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
@@ -428,6 +470,10 @@ const AjustesView = {
               <label class="text-xs text-gold font-bold">NÚMERO DE ANIMALES TOTALES</label>
               <input type="number" id="edit-total-animales" value="${finca.total_animales || ''}" class="wizard-input">
             </div>
+            <div>
+              <label class="text-xs text-gold font-bold">TELÉFONO VETERINARIO ADSG</label>
+              <input type="tel" id="edit-vet-tel" value="${finca.adsg_vet_telefono || ''}" class="wizard-input" placeholder="600123123">
+            </div>
             <div class="flex gap-10 mt-15">
               <button class="btn btn-success flex-1" onclick="AjustesView._guardarFincaPrincipal()">💾 Guardar</button>
               <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">✕ Cancelar</button>
@@ -451,10 +497,11 @@ const AjustesView = {
     finca.superficie = parseFloat(document.getElementById('edit-superficie').value) || finca.superficie;
     finca.coordenadas = document.getElementById('edit-coordenadas').value || finca.coordenadas;
     finca.total_animales = parseInt(document.getElementById('edit-total-animales').value) || finca.total_animales;
+    finca.adsg_vet_telefono = document.getElementById('edit-vet-tel').value || finca.adsg_vet_telefono;
     finca.actualizadoEn = new Date().toISOString();
 
     try {
-      await window.db.put('fincas', finca);
+      await Fincas.save(finca);
       document.querySelector('.wizard-overlay').remove();
       App.toast('✅ Datos de finca guardados');
       App.renderAjustes();
@@ -634,6 +681,45 @@ const AjustesView = {
       AjustesView._gestionarZonas();
     } catch (e) {
       App.toastError('Error: ' + e.message);
+    }
+  },
+
+  async _exportarCierreMensual() {
+    try {
+      const fincaId = await Fincas.getActiveId();
+      const finca = await Fincas.get(fincaId);
+      if (!fincaId || !finca) {
+        App.toastError('No hay finca activa para cierre mensual');
+        return;
+      }
+      if (!window.ExportService?.generarCSV_Movimientos) {
+        App.toastError('ExportService no disponible');
+        return;
+      }
+      const hoy = new Date();
+      const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+      const animales = await window.Animales.list().catch(() => []);
+      const eventos = await window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []);
+      const eventosMes = eventos.filter(e => {
+        if (!e.fecha) return false;
+        const f = new Date(e.fecha);
+        return f >= inicioMes && f <= finMes;
+      });
+      const csv = window.ExportService.generarCSV_Movimientos(eventosMes, animales, finca);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const ym = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+      a.href = url;
+      a.download = `cierre_siggan_${ym}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      App.toast(`📦 Cierre mensual exportado (${eventosMes.length} eventos)`);
+    } catch (e) {
+      App.toastError('No se pudo exportar cierre mensual: ' + e.message);
     }
   },
 
