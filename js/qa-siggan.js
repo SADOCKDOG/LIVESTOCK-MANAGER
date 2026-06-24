@@ -1271,6 +1271,71 @@ const SigganQA = {
     }
   },
 
+  // TEST 18: Validación de Cobertura BD DEMO CHAMORRO
+  async testCoberturaDemo() {
+    const M = 'COBERTURA BD DEMO';
+    this._initModule(M);
+    try {
+      const finca = await Fincas.getActive();
+      this._assert(finca, M, `[PRE-REQ] Finca activa existe`, 'PRE-REQ');
+      this._assert(finca.rega === 'ES041230000123', M, `[PRE-REQ] REGA correcto en demo (ES041230000123)`, 'PRE-REQ');
+
+      // Módulos y cobertura esperada
+      const coverage = {
+        'fincas': { expectedMin: 1, store: 'fincas', desc: 'Finca + Zonas (3)' },
+        'rebanos': { expectedMin: 3, store: 'rebanos', desc: 'Rebaños (Vacas Frisonas, Terneros Cebo, Ovejas Merinas)' },
+        'animales': { expectedMin: 9, store: 'animales', desc: 'Animales (9: 3 vacas, 2 terneros, 4 ovejas)' },
+        'compradores': { expectedMin: 3, store: 'compradores', desc: 'Compradores (Cárnicas, Lácteos, Ganados)' },
+        'proveedores': { expectedMin: 3, store: 'proveedores', desc: 'Proveedores (Piensos, Vet, Maquinaria)' },
+        'transportistas': { expectedMin: 2, store: 'transportistas', desc: 'Transportistas (Carga, Cisterna)' },
+        'contratos': { expectedMin: 2, store: 'contratos', desc: 'Contratos (Carne, Leche)' },
+        'gastos': { expectedMin: 7, store: 'gastos', desc: 'Gastos (Alimentación, Sanidad, Amortización)' },
+        'sanitarios_ganado': { expectedMin: 3, store: 'sanitarios_ganado', desc: 'Tratamientos (Vacunación, Desparasitación, Antibiótico)' },
+        'produccion_leche': { expectedMin: 5, store: 'produccion_leche', desc: 'Producción de Leche (5 fechas × 3 vacas)' },
+        'comercializacion_leche': { expectedMin: 3, store: 'comercializacion_leche', desc: 'Comercialización Leche (3 entregas)' },
+        'comercializacion_carne': { expectedMin: 1, store: 'comercializacion_carne', desc: 'Comercialización Carne (1 venta ternero)' },
+        'registro_eventos': { expectedMin: 30, store: 'registro_eventos', desc: 'Registro de Eventos (movimientos, producciones, partos)' }
+      };
+
+      let totalModulos = 0, modulosCubiertos = 0, modulosFallidos = [];
+
+      for (const [key, config] of Object.entries(coverage)) {
+        totalModulos++;
+        try {
+          const items = await window.db.getAll(config.store).catch(() => []);
+          const count = items ? items.length : 0;
+          const isCovered = count >= config.expectedMin;
+
+          if (isCovered) {
+            modulosCubiertos++;
+            this._log('PASS', M, `${config.desc}: ${count} registros (≥${config.expectedMin})`, 'COBERTURA');
+          } else {
+            modulosFallidos.push(`${key}: ${count}/${config.expectedMin}`);
+            this._log('WARN', M, `${config.desc}: ${count} registros (<${config.expectedMin})`, 'COBERTURA');
+          }
+        } catch (e) {
+          modulosFallidos.push(`${key}: ERROR (${e.message})`);
+          this._log('WARN', M, `${config.desc}: ERROR - ${e.message}`, 'COBERTURA');
+        }
+      }
+
+      // Resumen
+      const porcentajeCubertura = Math.round((modulosCubiertos / totalModulos) * 100);
+      this._assert(modulosCubiertos === totalModulos, M, 
+        `Cobertura de módulos SIGGAN: ${modulosCubiertos}/${totalModulos} (${porcentajeCubertura}%)`, 'COBERTURA');
+
+      if (modulosFallidos.length > 0) {
+        console.log(`  ⚠️  Módulos incompletos: ${modulosFallidos.join(', ')}`);
+      }
+
+      this._log('PASS', M, '✅ COMPLETADO — BD DEMO CHAMORRO cubre todos los módulos');
+      return !this._hasFail(M);
+    } catch (e) {
+      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
+      return false;
+    }
+  },
+
   // ============================================================
   // EJECUCIÓN PRINCIPAL
   // ============================================================
@@ -1316,6 +1381,7 @@ const SigganQA = {
       { name: 'Venta de Leche (Bloqueo prohibidoLeche)', fn: () => this.testVentaLecheBlocking() },
       { name: 'SANDACH Clasificación (Bajas)', fn: () => this.testSANDACHClassificacion() },
       { name: 'Notificaciones a REGA', fn: () => this.testNotificacionesREGA() },
+      { name: 'Cobertura BD DEMO CHAMORRO', fn: () => this.testCoberturaDemo() },
       { name: 'Rendimiento', fn: () => this.testRendimiento() },
     ];
 
