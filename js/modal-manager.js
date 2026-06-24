@@ -86,3 +86,209 @@ const ModalManager = {
 };
 
 window.ModalManager = ModalManager;
+
+/**
+ * Toast Utility - Livestock Manager
+ * Soporte de colas, tipos semánticos y animaciones fluidas
+ */
+const Toast = {
+    _queue: [],
+    _active: null,
+
+    show: function (msg, type = '', ms = 3000) {
+        this._queue.push({ msg, type, ms });
+        this._processQueue();
+    },
+
+    _processQueue: function () {
+        if (this._active || this._queue.length === 0) return;
+
+        const { msg, type, ms } = this._queue.shift();
+        const container = document.getElementById("toast-container") || document.body;
+        
+        const t = document.createElement("div");
+        t.className = "toast" + (type ? " " + type : "");
+        
+        let icon = "";
+        if (type === 'success') icon = "✅ ";
+        else if (type === 'warning') icon = "⚠️ ";
+        else if (type === 'error') icon = "❌ ";
+        else if (type === 'info') icon = "ℹ️ ";
+        
+        t.textContent = icon + msg;
+        
+        // Animación de entrada fluida
+        t.style.opacity = '0';
+        t.style.transition = 'opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+        t.style.transform = 'translate(-50%, 20px)';
+        
+        container.appendChild(t);
+        this._active = t;
+
+        // Forzar reflow
+        t.offsetHeight;
+        t.style.opacity = '1';
+        t.style.transform = 'translate(-50%, 0)';
+
+        setTimeout(() => {
+            // Animación de salida fluida
+            t.style.opacity = '0';
+            t.style.transform = 'translate(-50%, -20px)';
+            setTimeout(() => {
+                t.remove();
+                this._active = null;
+                this._processQueue();
+            }, 250);
+        }, ms);
+    },
+
+    success: function (msg, ms) { this.show(msg, 'success', ms); },
+    warning: function (msg, ms) { this.show(msg, 'warning', ms); },
+    error: function (msg, ms) { this.show(msg, 'error', ms); },
+    info: function (msg, ms) { this.show(msg, 'info', ms); },
+
+    clear: function () {
+        this._queue = [];
+        if (this._active) {
+            this._active.remove();
+            this._active = null;
+        }
+    }
+};
+
+window.Toast = Toast;
+
+/**
+ * Confirm Utility - Livestock Manager
+ * Reemplazo estilizado y asíncrono para confirm() usando ModalManager
+ */
+const Confirm = {
+    /**
+     * Muestra un diálogo de confirmación personalizado.
+     * @param {Object} options
+     * @param {string} options.title - Título del diálogo.
+     * @param {string} options.msg - Mensaje del diálogo.
+     * @param {Function} options.onOk - Callback si el usuario hace clic en Aceptar.
+     * @param {Function} [options.onCancel] - Callback si el usuario cancela.
+     * @param {boolean} [options.danger=false] - Si es una acción destructiva/peligrosa.
+     * @param {string} [options.okText='Aceptar'] - Texto del botón de confirmación.
+     * @param {string} [options.cancelText='Cancelar'] - Texto del botón de cancelación.
+     */
+    show: function (options) {
+        const {
+            title,
+            msg,
+            onOk,
+            onCancel,
+            danger = false,
+            okText = 'Aceptar',
+            cancelText = 'Cancelar'
+        } = options;
+
+        const id = 'confirm-dialog-' + Date.now();
+        
+        const icon = danger ? '⚠️' : '❓';
+        const titleColor = danger ? 'var(--c-danger)' : 'var(--p-gold)';
+        const btnPrimaryStyle = danger 
+            ? 'background: linear-gradient(135deg, var(--c-danger), #991b1b);' 
+            : 'background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000;';
+
+        const contentHtml = `
+            <div class="error-dialog" style="border-color: ${danger ? 'var(--c-danger)' : 'var(--p-gold)'}; margin: 16px; box-sizing: border-box;">
+                <div class="error-dialog-icon">${icon}</div>
+                <div class="error-dialog-title" style="color: ${titleColor};">${title}</div>
+                <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
+                <div class="error-dialog-actions">
+                    <button class="error-dialog-btn secondary" id="${id}-cancel">${cancelText}</button>
+                    <button class="error-dialog-btn primary" id="${id}-ok" style="${btnPrimaryStyle}">${okText}</button>
+                </div>
+            </div>
+        `;
+
+        const overlay = ModalManager.show(id, contentHtml, { closeOnOverlayClick: false });
+
+        if (overlay) {
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+            overlay.style.backdropFilter = 'blur(6px)';
+            overlay.style.webkitBackdropFilter = 'blur(6px)';
+        }
+
+        let resolved = false;
+
+        const cleanUpAndClose = () => {
+            if (resolved) return;
+            resolved = true;
+            ModalManager.close(id);
+        };
+
+        const handleOk = () => {
+            cleanUpAndClose();
+            if (typeof onOk === 'function') onOk();
+        };
+
+        const handleCancel = () => {
+            cleanUpAndClose();
+            if (typeof onCancel === 'function') onCancel();
+        };
+
+        document.getElementById(`${id}-ok`).addEventListener('click', handleOk);
+        document.getElementById(`${id}-cancel`).addEventListener('click', handleCancel);
+
+        // Atajar tecla Escape para cancelar correctamente
+        const escapeListener = (e) => {
+            if (e.key === 'Escape' && !resolved) {
+                document.removeEventListener('keydown', escapeListener);
+                handleCancel();
+            }
+        };
+        document.addEventListener('keydown', escapeListener);
+    },
+
+    /**
+     * Helper Promise-based para un uso secuencial limpio
+     */
+    confirm: function (title, msg, danger = false, okText = 'Aceptar', cancelText = 'Cancelar') {
+        return new Promise((resolve) => {
+            this.show({
+                title,
+                msg,
+                danger,
+                okText,
+                cancelText,
+                onOk: () => resolve(true),
+                onCancel: () => resolve(false)
+            });
+        });
+    },
+
+    /**
+     * Helper Promise-based para alertas personalizadas sin usar alert() nativo
+     */
+    alert: function (title, msg) {
+        return new Promise((resolve) => {
+            const id = 'alert-dialog-' + Date.now();
+            const contentHtml = `
+                <div class="error-dialog" style="border-color: var(--p-gold); margin: 16px; box-sizing: border-box;">
+                    <div class="error-dialog-icon">ℹ️</div>
+                    <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
+                    <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
+                    <div class="error-dialog-actions" style="justify-content: center;">
+                        <button class="error-dialog-btn primary" id="${id}-ok" style="background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000; max-width: 150px;">Aceptar</button>
+                    </div>
+                </div>
+            `;
+            const overlay = ModalManager.show(id, contentHtml, { closeOnOverlayClick: false });
+            if (overlay) {
+                overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+                overlay.style.backdropFilter = 'blur(6px)';
+                overlay.style.webkitBackdropFilter = 'blur(6px)';
+            }
+            document.getElementById(`${id}-ok`).addEventListener('click', () => {
+                ModalManager.close(id);
+                resolve();
+            });
+        });
+    }
+};
+
+window.Confirm = Confirm;

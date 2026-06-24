@@ -400,7 +400,7 @@ const AjustesView = {
   },
 
   async _limpiarCache() {
-    if (!confirm('¿Limpiar caché local? Se recargarán los datos desde la base de datos.')) return;
+    if (!await Confirm.confirm("Limpiar Caché", "¿Limpiar caché local? Se recargarán los datos desde la base de datos.", true)) return;
     if (window.CacheService) CacheService.clearAll();
     localStorage.removeItem('seed_data_completed');
     App.toast('🗑️ Caché limpiada');
@@ -667,7 +667,7 @@ const AjustesView = {
   },
 
   async _eliminarZona(idx) {
-    if (!confirm('¿Eliminar esta zona? Los rebaños que la usan perderán la referencia.')) return;
+    if (!await Confirm.confirm("Eliminar Zona", "¿Eliminar esta zona? Los rebaños que la usan perderán la referencia.", true)) return;
     
     const finca = await Fincas.getActive();
     if (!finca || !finca.zonas) return;

@@ -532,7 +532,7 @@ const CarneView = {
       };
 
       overlay.querySelector('#btn-del-reg').onclick = async () => {
-        if (!confirm("¿Eliminar este pesaje de forma permanente?")) return;
+        if (!await Confirm.confirm("Eliminar Pesaje", "¿Eliminar este pesaje de forma permanente?", true)) return;
         await window.db.delete('registro_eventos', id);
         App.toast("Registro de pesaje eliminado");
         overlay.remove();

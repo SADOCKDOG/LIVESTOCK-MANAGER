@@ -158,7 +158,7 @@ const AsistenteConfiguracion = {
         const btnDemo = contenedor.querySelector('#btn-demo');
         if (btnDemo) {
             btnDemo.addEventListener('click', async () => {
-                if (!confirm('Se cargará la explotación de ejemplo "DEMO CHAMORRO" con datos en todos los módulos (animales, leche, ventas, gastos, sanidad, informes...).\n\n¿Continuar?')) return;
+                if (!await Confirm.confirm("Cargar Demo", 'Se cargará la explotación de ejemplo "DEMO CHAMORRO" con datos en todos los módulos (animales, leche, ventas, gastos, sanidad, informes...).\n\n¿Continuar?', false)) return;
 
                 const opciones = contenedor.querySelector('.asistente-opciones');
                 const mensaje = contenedor.querySelector('#asistente-mensaje');
@@ -234,7 +234,13 @@ const AsistenteConfiguracion = {
             const textProgreso = contenedor.querySelector('#texto-progreso');
             const btnConfirmar = contenedor.querySelector('#btn-importar-confirmar');
 
-            const deseaSobrescribir = confirm("¿Deseas SOBRESCRIBIR completamente la base de datos con esta copia? \\n\\n[Aceptar] = Borrar los datos actuales y cargar el backup.\\n[Cancelar] = Mezclar los datos del backup con los datos actuales.");
+            const deseaSobrescribir = await Confirm.confirm(
+                "Restaurar Copia de Seguridad",
+                "¿Deseas SOBRESCRIBIR completamente la base de datos con esta copia?\n\n[Aceptar] = Borrar los datos actuales y cargar el backup.\n[Cancelar] = Mezclar los datos del backup con los datos actuales.",
+                true,
+                "Sobrescribir",
+                "Mezclar"
+            );
 
             progreso.style.display = 'block';
             btnConfirmar.disabled = true;
@@ -251,18 +257,18 @@ const AsistenteConfiguracion = {
                         this._mostrarWizardSeleccionFinca(res.fincas, contenedor);
                     } else {
                         await window.Fincas.setActiveId(res.fincas[0].id);
-                        alert("✅ Base de datos restaurada. Reiniciando...");
+                        await Confirm.alert("Copia de Seguridad Restaurada", "Base de datos restaurada correctamente. Reiniciando...");
                         window.location.reload();
                     }
                 } catch (err) {
-                    alert("❌ Error crítico en restauración: " + err.message);
+                    await Confirm.alert("Error Crítico", "Error crítico en restauración: " + err.message);
                     window.location.reload();
                 }
             };
             reader.readAsText(archivo);
 
         } catch (error) {
-            alert("❌ Error en Importación\n" + error.message);
+            await Confirm.alert("Error de Importación", "Error en Importación: " + error.message);
             window.location.reload();
         }
     },
@@ -296,7 +302,7 @@ const AsistenteConfiguracion = {
 
     async _finalizarConFinca(id) {
         await window.Fincas.setActiveId(id);
-        alert("✅ Finca seleccionada correctamente. Iniciando aplicación.");
+        await Confirm.alert("Finca Seleccionada", "Finca seleccionada correctamente. Iniciando aplicación.");
         window.location.reload();
     },
 
@@ -503,7 +509,7 @@ const AsistenteConfiguracion = {
     },
 
     /** Ejecuta acciones contextuales del tour */
-    _ejecutarAccionTour(metodo, contenedor) {
+    async _ejecutarAccionTour(metodo, contenedor) {
         const overlay = document.getElementById('tour-flotante-overlay');
         if (overlay) overlay.remove();
         if (contenedor) contenedor.remove();
@@ -511,7 +517,7 @@ const AsistenteConfiguracion = {
         switch (metodo) {
             case 'cargarDemo':
                 if (window.SeedData && typeof window.SeedData.run === 'function') {
-                    if (!confirm('¿Cargar la explotación de ejemplo "DEMO CHAMORRO"? Se añadirán datos de ejemplo en todos los módulos.')) return;
+                    if (!await Confirm.confirm("Cargar Demo", '¿Cargar la explotación de ejemplo "DEMO CHAMORRO"? Se añadirán datos de ejemplo en todos los módulos.', false)) return;
                     const msgDiv = document.createElement('div');
                     msgDiv.style.cssText = 'position:fixed; inset:0; z-index:9999; background:#000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:15px;';
                     msgDiv.innerHTML = '<div style="font-size:2rem;">⏳</div><div style="color:#d97706; font-weight:700;">Cargando datos demo...</div><div style="color:#888; font-size:0.8rem;">Esto puede tardar unos segundos.</div>';
@@ -521,12 +527,12 @@ const AsistenteConfiguracion = {
                             await window.SeedData.run(true);
                             window.location.reload();
                         } catch (e) {
-                            alert('Error: ' + e.message);
+                            await Confirm.alert("Error", 'Error: ' + e.message);
                             window.location.reload();
                         }
                     }, 300);
                 } else {
-                    alert('Módulo de datos demo no disponible.');
+                    await Confirm.alert("Error", 'Módulo de datos demo no disponible.');
                 }
                 break;
 
