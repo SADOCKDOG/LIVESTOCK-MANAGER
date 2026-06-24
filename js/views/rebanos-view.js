@@ -15,7 +15,7 @@ const RebanosView = {
       <div class="mb-16">
         <div class="flex justify-between items-center">
           <div class="flex gap-8">
-            <button class="btn btn-create btn-sm" onclick="RebanosView._crearRebano()">➕ Nuevo</button>
+            <button class="btn btn-create btn-sm" onclick="RebanosView._crearRebano()">${Icons.agregar()} Nuevo</button>
           </div>
           ${totalRebanos > 0 ? `<span class="text-xs text-gray">${rebanosActivos}/${totalRebanos} activos</span>` : ''}
         </div>
@@ -31,10 +31,10 @@ const RebanosView = {
 
       html += `
         <div class="flex flex-wrap gap-4 mb-10">
-          <span class="badge badge-sm badge-gold">🥩 Carne: ${carneCount}</span>
-          <span class="badge badge-sm badge-blue">🥛 Leche: ${lecheCount}</span>
-          <span class="badge badge-sm badge-purple">🔄 Híbridos: ${hibridoCount}</span>
-          <span class="badge badge-sm badge-green">✅ ${rebanosActivos} activos</span>
+          <span class="badge badge-sm badge-gold flex items-center gap-4">${Icons.carne()} Carne: ${carneCount}</span>
+          <span class="badge badge-sm badge-blue flex items-center gap-4">${Icons.leche()} Leche: ${lecheCount}</span>
+          <span class="badge badge-sm badge-purple flex items-center gap-4">${Icons.rotacion()} Híbridos: ${hibridoCount}</span>
+          <span class="badge badge-sm badge-green flex items-center gap-4">${Icons.check()} ${rebanosActivos} activos</span>
         </div>`;
 
       html += `<div class="grid gap-15">`;
@@ -56,17 +56,17 @@ const RebanosView = {
                   <span class="text-xl">${iconoEsp}</span>
                   <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                 </div>
-                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                  <span>🧬 ${r.especie}</span>
+                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray items-center">
+                  <span class="flex items-center gap-4">${Icons.reproduccion()} ${r.especie}</span>
                   <span>·</span>
-                  <span>🏷️ ${r.tipo}</span>
+                  <span class="flex items-center gap-4">🏷️ ${r.tipo}</span>
                   <span>·</span>
-                  <span>📍 ${r.zonaActual || "S/N"}</span>
+                  <span class="flex items-center gap-4">${Icons.zonas()} ${r.zonaActual || "S/N"}</span>
                 </div>
-                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                  <span>🐑 ${n} animales (${activos} activos)</span>
-                  ${prodLeche > 0 ? `<span>·</span><span>🥛 ${prodLeche.toFixed(0)} L</span>` : ''}
-                  ${ultimoEvento ? `<span>·</span><span>📅 Últ. Act: ${new Date(ultimoEvento.fecha).toLocaleDateString('es-ES')}</span>` : ''}
+                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray items-center">
+                  <span class="flex items-center gap-4">${Icons.animales()} ${n} animales (${activos} activos)</span>
+                  ${prodLeche > 0 ? `<span>·</span><span class="flex items-center gap-4">${Icons.leche()} ${prodLeche.toFixed(0)} L</span>` : ''}
+                  ${ultimoEvento ? `<span>·</span><span class="flex items-center gap-4">${Icons.calendar()} Últ. Act: ${new Date(ultimoEvento.fecha).toLocaleDateString('es-ES')}</span>` : ''}
                 </div>
               </div>
               <div class="text-right flex-shrink-0">
@@ -79,7 +79,7 @@ const RebanosView = {
       html += `</div>`;
     }
     html += `<!-- Botón Flotante de Acción para móviles -->
-      <button class="fab-btn" onclick="RebanosView._crearRebano()" title="Nuevo Rebaño">➕</button>`;
+      <button class="fab-btn" onclick="RebanosView._crearRebano()" title="Nuevo Rebaño">${Icons.agregar()}</button>`;
     main.innerHTML = html;
   },
 
@@ -102,28 +102,28 @@ const RebanosView = {
     animales.forEach(a => { const c = a.categoria || 'Sin categoría'; porCategoria[c] = (porCategoria[c] || 0) + 1; });
 
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/rebanos" class="link-back">← Volver</a><h2 class="mt-10">🐑 ${rebano.nombre}</h2></div>
+      <div class="mb-20"><a href="#/rebanos" class="link-back">← Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
 
       <!-- KPIs -->
       <div class="grid grid-cols-3 gap-8 mb-20">
         <div class="info-box-center border-left-amber"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-amber">${animales.length}</div></div>
         <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos}</div></div>
         <div class="info-box-center border-left-red"><small class="s-lbl">VENDIDOS</small><div class="inf-val-lg text-red">${vendidos}</div></div>
-        <div class="info-box-center border-left-blue"><small class="s-lbl">🥩 KG</small><div class="inf-val-lg text-blue">${totalKg.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-gold"><small class="s-lbl">🥛 LITROS</small><div class="inf-val-lg text-gold">${totalLeche.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-purple"><small class="s-lbl">EVENTOS</small><div class="inf-val-lg text-purple">${eventosReb.length}</div></div>
+        <div class="info-box-center border-left-blue"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} KG</small><div class="inf-val-lg text-blue">${totalKg.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-gold"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold">${totalLeche.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-purple"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.registros()} EVENTOS</small><div class="inf-val-lg text-purple">${eventosReb.length}</div></div>
       </div>
 
       <!-- Categorías -->
       ${Object.keys(porCategoria).length > 0 ? `
       <div class="card mb-20 border-top-3px border-top-3px-purple" style="padding:12px;">
-        <div class="inf-section-title mb-6">📋 Por categoría</div>
+        <div class="inf-section-title mb-6 flex items-center gap-8">${Icons.documento()} Por categoría</div>
         <div class="flex flex-wrap gap-4">${Object.entries(porCategoria).map(([c, n]) => `<span class="badge badge-sm badge-purple">${c}: ${n}</span>`).join('')}</div>
       </div>` : ''}
 
       <!-- Edición -->
       <div class="card border-top-3px border-top-3px-gold mb-25">
-        <div class="inf-card-title">✏️ Datos del Rebaño</div>
+        <div class="inf-card-title flex items-center gap-8">${Icons.editar()} Datos del Rebaño</div>
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
           <input type="text" id="r-edit-nombre" value="${rebano.nombre}" class="premium-input"></div>
@@ -161,24 +161,24 @@ const RebanosView = {
           <textarea id="r-edit-notas" class="premium-input" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
         </div>
         <div class="flex gap-10 mt-20">
-          <button class="btn btn-secondary btn-danger" onclick="RebanosView._eliminarRebano(${id})" style="flex:1;">🗑️ Eliminar</button>
-          <button class="btn btn-primary btn-success" onclick="RebanosView._guardarRebano(${id})" style="flex:2;">✔ Guardar</button>
+          <button class="btn btn-secondary btn-danger" onclick="RebanosView._eliminarRebano(${id})" style="flex:1;">${Icons.eliminar()} Eliminar</button>
+          <button class="btn btn-primary btn-success" onclick="RebanosView._guardarRebano(${id})" style="flex:2;">${Icons.guardar()} Guardar</button>
         </div>
       </div>
       
       <!-- Sanidad -->
       <div class="card mb-20 border-top-3px border-top-3px-green" style="background:rgba(16,185,129,0.05);">
         <div class="flex justify-between items-center">
-          <div class="inf-card-title m-0">💉 Sanidad</div>
-          <button class="btn btn-primary btn-add" onclick="App._registrarTratamiento(${id})" style="padding:5px 12px; font-size:0.8rem;">➕ Añadir</button>
+          <div class="inf-card-title m-0 flex items-center gap-8">${Icons.sanidad()} Sanidad</div>
+          <button class="btn btn-primary btn-add" onclick="App._registrarTratamiento(${id})" style="padding:5px 12px; font-size:0.8rem;">${Icons.agregar()} Añadir</button>
         </div>
         <div id="lista-sanitarios-rebano" class="mt-10"></div>
       </div>
 
       <!-- Animales -->
       <div class="flex justify-between items-center mb-15">
-        <h3 class="m-0">🐑 Animales (${animales.length})</h3>
-        <button class="btn btn-primary btn-edit" onclick="App._abrirSelectorAnimales(${id})" style="padding:8px 15px;">🔃 Mover</button>
+        <h3 class="m-0 flex items-center gap-8">${Icons.animales()} Animales (${animales.length})</h3>
+        <button class="btn btn-primary btn-edit" onclick="App._abrirSelectorAnimales(${id})" style="padding:8px 15px;">${Icons.rotacion()} Mover</button>
       </div>
       <div class="grid gap-10">
         ${animales.map((a) => {
