@@ -24,7 +24,7 @@ const AjustesView = {
       <!-- ===================== GESTOR DE FINCA ===================== -->
       ${activeFinca ? `
       <div class="card card-left-green mb-25">
-        <h3>🏠 Gestor de Finca Activa</h3>
+        <h3 class="flex items-center gap-8">${Icons.finca()} Gestor de Finca Activa</h3>
         <div class="info-box mt-10">
           <div class="grid grid-cols-2 gap-6 text-82">
             <div><span class="text-gray">Finca:</span> <strong class="text-white">${activeFinca.nombre}</strong></div>
@@ -34,15 +34,15 @@ const AjustesView = {
           </div>
         </div>
         <div class="flex gap-10 mt-10">
-          <button class="btn btn-edit flex-1" onclick="AjustesView._editarFincaPrincipal()">✏️ Editar Datos</button>
-          <button class="btn btn-secondary flex-1" onclick="AjustesView._gestionarZonas()">🗺️ Zonas</button>
+          <button class="btn btn-edit flex-1" onclick="AjustesView._editarFincaPrincipal()">${Icons.editar()} Editar Datos</button>
+          <button class="btn btn-secondary flex-1" onclick="AjustesView._gestionarZonas()">${Icons.zonas()} Zonas</button>
         </div>
       </div>
       ` : ''}
 
       <!-- ===================== MIS FINCAS ===================== -->
       <div class="card card-left-gold mb-25">
-        <div class="flex justify-between items-center mb-15"><h3>🏠 Mis Fincas</h3><button class="btn btn-create btn-sm" onclick="App._showFincaForm()">➕ Nueva</button></div>
+        <div class="flex justify-between items-center mb-15"><h3 class="flex items-center gap-8">${Icons.finca()} Mis Fincas</h3><button class="btn btn-create btn-sm" onclick="App._showFincaForm()">${Icons.agregar()} Nueva</button></div>
         <div class="grid gap-10">${fincas.map((f) => {
           const anims = animales.filter(a => a.rebanoId && rebanos.some(r => r.id === a.rebanoId && r.fincaId === f.id));
           return `<div class="flex justify-between items-center rounded-sm" style="background:#222; padding:12px; border:1px solid ${f.id === activeId ? "var(--p-cork)" : "#333"};">
@@ -57,12 +57,12 @@ const AjustesView = {
 
       <!-- ===================== COPIA DE SEGURIDAD ===================== -->
       <div class="card card-left-blue mb-20">
-        <h3>💾 Copias de Seguridad</h3>
+        <h3 class="flex items-center gap-8">${Icons.guardar()} Copias de Seguridad</h3>
         <p class="text-gray mt-5 text-85">Exporta o importa todos los datos de la aplicación en formato JSON.</p>
         ${lastBackup ? `<div class="text-xs text-gray mb-8">📅 Último backup: ${new Date(lastBackup).toLocaleDateString('es-ES')}</div>` : ''}
         <div class="flex gap-10">
-          <button class="btn btn-success flex-1" onclick="App.exportBackup()">⬇️ Exportar</button>
-          <button class="btn btn-secondary flex-1" onclick="document.getElementById('import-backup-file').click()">⬆️ Importar</button>
+          <button class="btn btn-success flex-1" onclick="App.exportBackup()">${Icons.exportar()} Exportar</button>
+          <button class="btn btn-secondary flex-1" onclick="document.getElementById('import-backup-file').click()">${Icons.importar()} Importar</button>
         </div>
         <input type="file" id="import-backup-file" style="display:none" onchange="App.importBackup(event)">
         <label class="flex items-center gap-6 mt-10 text-xs text-gray cursor-pointer" onclick="const c=document.getElementById('auto-backup'); if(c){c.checked=!c.checked;AjustesView._toggleAutoBackup(c.checked)}">
@@ -72,7 +72,7 @@ const AjustesView = {
 
       <!-- ===================== PAQUETE LÁCTEO ===================== -->
       <div class="card card-left-amber mb-20">
-        <h3>🥛 Paquete Lácteo — Contratación</h3>
+        <h3 class="flex items-center gap-8">${Icons.leche()} Paquete Lácteo — Contratación</h3>
         <p class="text-gray mt-5 text-85">Gestión de contratos lácteos obligatorios (RD 752/2016) y declaraciones INFOLAC.</p>
         ${activeFinca ? `
         <div class="info-box mt-10">
@@ -86,12 +86,12 @@ const AjustesView = {
         <div class="text-gray-500 mt-8 rounded-sm" style="font-size:0.72rem; padding:8px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.15);">
           📌 El contrato lácteo debe tener una duración mínima de 1 año. Las declaraciones INFOLAC son mensuales y obligatorias.
         </div>` : '<p class="text-555">Activa una finca para ver los datos de contratación láctea.</p>'}
-        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">✏️ Editar Contrato Lácteo</button>
+        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar Contrato Lácteo</button>
       </div>
 
       <!-- ===================== ADSG ===================== -->
       <div class="card card-left-blue mb-20">
-        <h3>⚕️ ADSG — Sanidad Ganadera</h3>
+        <h3 class="flex items-center gap-8">${Icons.sanidad()} ADSG — Sanidad Ganadera</h3>
         <p class="text-gray mt-5 text-85">Agrupación de Defensa Sanitaria Ganadera. Datos del veterinario de explotación y códigos ADSG.</p>
         ${activeFinca ? `
         <div class="info-box mt-10">
@@ -104,12 +104,12 @@ const AjustesView = {
             <div><span class="text-gray">Vencimiento:</span> <strong style="color:${activeFinca.adsg_fecha_vencimiento ? '#f59e0b' : '#888'};">${activeFinca.adsg_fecha_vencimiento || '—'}${activeFinca.adsg_fecha_vencimiento ? AjustesView._diasRestantes(activeFinca.adsg_fecha_vencimiento) : ''}</strong></div>
           </div>
         </div>` : '<p class="text-555">Activa una finca para gestionar los datos ADSG.</p>'}
-        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">✏️ Editar ADSG</button>
+        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar ADSG</button>
       </div>
 
       <!-- ===================== CONFIGURACIÓN AUTONÓMICA ===================== -->
       <div class="card card-left-purple mb-20">
-        <h3>🌍 Configuración Autonómica</h3>
+        <h3 class="flex items-center gap-8">${Icons.globo()} Configuración Autonómica</h3>
         <p class="text-gray mt-5 text-85">Normativa autonómica activa, plataforma de movimiento y umbrales PAC.</p>
         ${activeFinca ? (() => {
           const ccaa = activeFinca.comunidad_autonoma;
@@ -131,16 +131,16 @@ const AjustesView = {
               📌 ${ccaa === 'andalucia' ? 'Guías sanitarias automáticas (365d). Plataforma PIMA. Subvención ADSG directa.' : 'Guías requieren confirmación. Plataforma Arado/Laboreo. Control ADSG estricto.'}
             </div>
             <div class="flex gap-6 mt-10">
-              <a href="${plataformaUrl}" target="_blank" rel="noopener" class="btn btn-secondary text-xs flex-1 text-center" style="padding:6px;border:1px solid #8b5cf6;">🔗 Ir a ${plataforma || 'Plataforma'}</a>
+              <a href="${plataformaUrl}" target="_blank" rel="noopener" class="btn btn-secondary text-xs flex-1 text-center" style="padding:6px;border:1px solid #8b5cf6;">${Icons.enlace()} Ir a ${plataforma || 'Plataforma'}</a>
             </div>` : '<p class="text-555">Configura la comunidad autónoma en la ficha de la finca.</p>'}
           </div>`; })() : '<p class="text-555">Activa una finca para ver la configuración autonómica.</p>'}
-        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">✏️ Editar Configuración</button>
-        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarGuiaNormativas()">📖 Comparativa Normativa CCAA</button>
+        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar Configuración</button>
+        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarGuiaNormativas()">${Icons.libro()} Comparativa Normativa CCAA</button>
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
       <div class="card card-left-green mb-20">
-        <h3>🎯 Objetivos de Explotación</h3>
+        <h3 class="flex items-center gap-8">${Icons.objetivo()} Objetivos de Explotación</h3>
         <p class="text-gray mt-5 text-85">Define las metas productivas para el Panel de Eficiencia Técnica (semáforos 🟢🟡🔴).</p>
         <div class="grid grid-cols-2 gap-6 mt-10">
           <div><label class="text-xs text-gray">GMD Objetivo (kg/día)</label><input type="number" id="obj-gmd" value="${config.objGmd || 0.8}" step="0.1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
@@ -154,15 +154,15 @@ const AjustesView = {
 
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
       <div class="card card-left-amber mb-20">
-        <h3>🧬 Especies y Razas</h3>
+        <h3 class="flex items-center gap-8">${Icons.reproduccion()} Especies y Razas</h3>
         <p class="text-gray mt-5 text-85">Gestiona las especies activas en tu explotación y sus parámetros de referencia.</p>
         <div id="especies-container" class="mt-10">${this._renderEspecies(config)}</div>
-        <button class="btn btn-create btn-full-sm mt-8" onclick="AjustesView._agregarEspecie()">➕ Añadir Especie</button>
+        <button class="btn btn-create btn-full-sm mt-8" onclick="AjustesView._agregarEspecie()">${Icons.agregar()} Añadir Especie</button>
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
       <div class="card card-left-red mb-20">
-        <h3>🔔 Gestión de Alertas</h3>
+        <h3 class="flex items-center gap-8">${Icons.campana()} Gestión de Alertas</h3>
         <p class="text-gray mt-5 text-85">Activa o desactiva los tipos de alerta que quieres recibir en el Dashboard.</p>
         <div class="grid gap-6 mt-10">
           ${[
@@ -181,7 +181,7 @@ const AjustesView = {
 
       <!-- ===================== PREFERENCIAS ===================== -->
       <div class="card card-left-purple mb-20">
-        <h3>🌙 Preferencias</h3>
+        <h3 class="flex items-center gap-8">${Icons.ajustes()} Preferencias</h3>
         <p class="text-gray mt-5 text-85">Configura el comportamiento general de la aplicación.</p>
         <div class="grid gap-6 mt-10">
           <label class="flex items-center gap-8 text-sm text-gray cursor-pointer" style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
@@ -206,7 +206,7 @@ const AjustesView = {
 
       <!-- ===================== INFORMACIÓN DEL SISTEMA ===================== -->
       <div class="card card-left-gold mb-20">
-        <h3>🗂️ Información del Sistema</h3>
+        <h3 class="flex items-center gap-8">${Icons.info()} Información del Sistema</h3>
         <p class="text-gray mt-5 text-85">Estado de la base de datos local y versión de la aplicación.</p>
         <div class="grid grid-cols-2 gap-6 mt-10" style="font-size:0.8rem;">
           <div><span class="text-gray">Versión App:</span> <strong class="text-white">v4.5.0</strong></div>
@@ -216,29 +216,29 @@ const AjustesView = {
           <div><span class="text-gray">Rebaños:</span> <strong class="text-white">${rebanos.length}</strong></div>
           <div><span class="text-gray">Service Worker:</span> <strong class="text-white">${'serviceWorker' in navigator ? '✅ Activo' : '❌ No soportado'}</strong></div>
         </div>
-        <button class="btn btn-danger btn-full-sm mt-10" onclick="AjustesView._limpiarCache()">🗑️ Limpiar Caché Local</button>
+        <button class="btn btn-danger btn-full-sm mt-10" onclick="AjustesView._limpiarCache()">${Icons.eliminar()} Limpiar Caché Local</button>
       </div>
 
       <!-- ===================== GESTIÓN DE TRAZABILIDAD ===================== -->
       <div class="card card-left-green mb-20">
-        <h3>🏷️ Gestión de Trazabilidad</h3>
+        <h3 class="flex items-center gap-8">${Icons.trazabilidad()} Gestión de Trazabilidad</h3>
         <p class="text-gray mt-5 text-85">Genera solicitudes oficiales de remesas de crotales para tu ADSG o Administración.</p>
-        <button class="btn btn-create btn-full" onclick="App._abrirWizardPedidoCrotales()">📄 Generar Pedido de Crotales</button>
-        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarAyudaCrotales()">📖 Normativa de Identificación</button>
+        <button class="btn btn-create btn-full" onclick="App._abrirWizardPedidoCrotales()">${Icons.documento()} Generar Pedido de Crotales</button>
+        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarAyudaCrotales()">${Icons.libro()} Normativa de Identificación</button>
       </div>
 
       <!-- ===================== TRÁMITES SIGGAN ===================== -->
       <div class="card card-left-purple mb-20">
-        <h3>🏛️ Trámites SIGGAN</h3>
+        <h3 class="flex items-center gap-8">${Icons.edificio()} Trámites SIGGAN</h3>
         <p class="text-gray mt-5 text-85">Genera la guía de movimiento inter-explotación y la declaración censal para su tramitación oficial (SIGGAN / BADIGEX).</p>
-        <button class="btn btn-create btn-full" onclick="App._abrirWizardGuiaMovimiento()">🔄 Guía de Movimiento</button>
-        <button class="btn btn-create btn-full-sm mt-10" onclick="App._abrirWizardCenso()">📊 Declaración Censal Anual</button>
-        <button class="btn btn-secondary btn-full-sm mt-10" onclick="AjustesView._exportarCierreMensual()">📦 Cierre mensual + export SIGGAN</button>
+        <button class="btn btn-create btn-full" onclick="App._abrirWizardGuiaMovimiento()">${Icons.rotacion()} Guía de Movimiento</button>
+        <button class="btn btn-create btn-full-sm mt-10" onclick="App._abrirWizardCenso()">${Icons.documento()} Declaración Censal Anual</button>
+        <button class="btn btn-secondary btn-full-sm mt-10" onclick="AjustesView._exportarCierreMensual()">${Icons.paquete()} Cierre mensual + export SIGGAN</button>
       </div>
 
       <!-- ===================== CATÁLOGOS REGA ===================== -->
       <div class="card card-left-blue mb-20">
-        <h3>🧾 Catálogos REGA</h3>
+        <h3 class="flex items-center gap-8">${Icons.libroVentas()} Catálogos REGA</h3>
         <p class="text-gray mt-5 text-85">Consulta rápida de catálogos normativos expuestos para configuración de explotación y especies.</p>
         <div class="info-box mt-10">
           <div class="text-xs text-gray mb-6">Tipos explotación (top 5):</div>
@@ -250,7 +250,7 @@ const AjustesView = {
 
       <!-- ===================== HISTORIAL TRÁMITES ===================== -->
       <div class="card card-left-gold mb-20">
-        <h3>🗂️ Historial de Trámites</h3>
+        <h3 class="flex items-center gap-8">${Icons.documento()} Historial de Trámites</h3>
         <p class="text-gray mt-5 text-85">Últimos documentos y eventos de tramitación oficial vinculados a la finca activa.</p>
         <div class="info-box mt-10 text-xs">
           <div><span class="text-gray">Documentos legales:</span> <strong class="text-white">${tramitesFinca.length}</strong></div>
@@ -274,16 +274,16 @@ const AjustesView = {
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
       <div class="card card-left-red mb-20">
-        <h3>⚕️ Guía Farmacológica</h3>
+        <h3 class="flex items-center gap-8">${Icons.sanidad()} Guía Farmacológica</h3>
         <p class="text-gray mt-5 text-85">Tabla de tiempos de retiro, supresión y dosificación para evitar residuos.</p>
-        <button class="btn btn-secondary btn-full" onclick="App._mostrarAyudaMedicamentos()">📚 Ver Tiempos de Retiro y Dosis</button>
+        <button class="btn btn-secondary btn-full" onclick="App._mostrarAyudaMedicamentos()">${Icons.libro()} Ver Tiempos de Retiro y Dosis</button>
       </div>
 
       <!-- ===================== MANUAL DE USUARIO ===================== -->
       <div class="card card-left-gold mb-20">
-        <h3>📖 Manual de Usuario</h3>
+        <h3 class="flex items-center gap-8">${Icons.libro()} Manual de Usuario</h3>
         <p class="text-gray mt-5 text-85">Guía paso a paso del uso de la aplicación, con capturas de cada módulo.</p>
-        <button class="btn btn-secondary btn-full" onclick="AjustesView._abrirManual()">📖 Abrir Manual</button>
+        <button class="btn btn-secondary btn-full" onclick="AjustesView._abrirManual()">${Icons.libro()} Abrir Manual</button>
       </div>
 
       <!-- ===================== FOOTER ===================== -->
@@ -355,7 +355,7 @@ const AjustesView = {
         <span class="text-white font-bold text-sm flex-1">${e.nombre}</span>
         <span class="text-gray text-xs">${e.consumoAgua || '—'} L/día</span>
         <span class="text-gray text-xs">Precio: ${e.precioRef || '—'}€</span>
-        <button class="btn btn-danger btn-sm text-xs" style="padding:4px 8px;" onclick="AjustesView._eliminarEspecie(${i})">✕</button>
+        <button class="btn btn-danger btn-sm text-xs" style="padding:4px 8px;" onclick="AjustesView._eliminarEspecie(${i})">${Icons.eliminar()}</button>
       </div>`).join('');
   },
 
@@ -365,15 +365,15 @@ const AjustesView = {
     overlay.style.cssText = 'position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;';
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:340px;border-top:5px solid #f59e0b;">
-        <h3 class="mt-0 text-gold">🧬 Nueva Especie</h3>
+        <h3 class="mt-0 text-gold flex items-center gap-8">${Icons.reproduccion()} Nueva Especie</h3>
         <div class="wizard-input-group"><label class="wizard-label">Nombre</label><input type="text" id="esp-nombre" placeholder="Vacas, Ovejas, Cabras..." class="wizard-input"></div>
         <div class="grid grid-cols-2 gap-10">
           <div class="wizard-input-group"><label class="wizard-label">Consumo Agua (L/día)</label><input type="number" id="esp-agua" value="10" class="wizard-input"></div>
           <div class="wizard-input-group"><label class="wizard-label">Precio Ref. (€)</label><input type="number" id="esp-precio" value="0.00" step="0.01" class="wizard-input"></div>
         </div>
         <div class="flex justify-end gap-10 mt-20">
-          <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">✕ Cancelar</button>
-          <button class="btn btn-success" id="btn-esp-guardar">✔ Guardar</button>
+          <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} Cancelar</button>
+          <button class="btn btn-success" id="btn-esp-guardar">${Icons.guardar()} Guardar</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -429,8 +429,8 @@ const AjustesView = {
     overlay.innerHTML = `
       <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
         <div class="wizard-header">
-          <h2>✏️ Editar Datos de Finca</h2>
-          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">✕ Cerrar</button>
+          <h2 class="flex items-center gap-8">${Icons.editar()} Editar Datos de Finca</h2>
+          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">${Icons.cerrar()} Cerrar</button>
         </div>
         <div class="wizard-body" style="padding:20px;">
           <div class="grid gap-12">
@@ -475,8 +475,8 @@ const AjustesView = {
               <input type="tel" id="edit-vet-tel" value="${finca.adsg_vet_telefono || ''}" class="wizard-input" placeholder="600123123">
             </div>
             <div class="flex gap-10 mt-15">
-              <button class="btn btn-success flex-1" onclick="AjustesView._guardarFincaPrincipal()">💾 Guardar</button>
-              <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">✕ Cancelar</button>
+              <button class="btn btn-success flex-1" onclick="AjustesView._guardarFincaPrincipal()">${Icons.guardar()} Guardar</button>
+              <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">${Icons.cerrar()} Cancelar</button>
             </div>
           </div>
         </div>
@@ -532,8 +532,8 @@ const AjustesView = {
               ${z.carga_ganadera ? `<div class="text-amber text-2xs">Carga: ${z.carga_ganadera} UGM/ha</div>` : ''}
             </div>
             <div class="flex gap-6">
-              <button class="btn btn-secondary" style="padding:6px 10px; font-size:0.7rem;" onclick="AjustesView._editarZona(${idx})">✏️</button>
-              <button class="btn btn-danger" style="padding:6px 10px; font-size:0.7rem;" onclick="AjustesView._eliminarZona(${idx})">🗑️</button>
+              <button class="btn btn-secondary" style="padding:6px 10px; font-size:0.7rem;" onclick="AjustesView._editarZona(${idx})">${Icons.editar()}</button>
+              <button class="btn btn-danger" style="padding:6px 10px; font-size:0.7rem;" onclick="AjustesView._eliminarZona(${idx})">${Icons.eliminar()}</button>
             </div>
           </div>
         `).join('')}
@@ -543,12 +543,12 @@ const AjustesView = {
     overlay.innerHTML = `
       <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
         <div class="wizard-header">
-          <h2>🗺️ Gestionar Zonas</h2>
-          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">✕ Cerrar</button>
+          <h2 class="flex items-center gap-8">${Icons.zonas()} Gestionar Zonas</h2>
+          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">${Icons.cerrar()} Cerrar</button>
         </div>
         <div class="wizard-body" style="padding:20px;">
           ${zonasHtml}
-          <button class="btn btn-create btn-full mt-15" onclick="AjustesView._crearNuevaZona()">➕ Nueva Zona</button>
+          <button class="btn btn-create btn-full mt-15" onclick="AjustesView._crearNuevaZona()">${Icons.agregar()} Nueva Zona</button>
         </div>
       </div>`;
     overlay.style.cssText = 'position:fixed; inset:0; z-index:6000; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; padding:20px;';
@@ -595,8 +595,8 @@ const AjustesView = {
     overlay.innerHTML = `
       <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
         <div class="wizard-header">
-          <h2>✏️ Editar Zona: ${z.nombre}</h2>
-          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">✕ Cerrar</button>
+          <h2 class="flex items-center gap-8">${Icons.editar()} Editar Zona: ${z.nombre}</h2>
+          <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">${Icons.cerrar()} Cerrar</button>
         </div>
         <div class="wizard-body" style="padding:20px;">
           <div class="grid gap-12">
@@ -633,8 +633,8 @@ const AjustesView = {
               </div>
             </div>
             <div class="flex gap-10 mt-15">
-              <button class="btn btn-success flex-1" onclick="AjustesView._guardarZona(${idx})">💾 Guardar</button>
-              <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">✕ Cancelar</button>
+              <button class="btn btn-success flex-1" onclick="AjustesView._guardarZona(${idx})">${Icons.guardar()} Guardar</button>
+              <button class="btn btn-secondary flex-1" onclick="this.closest('.wizard-overlay').remove()">${Icons.cerrar()} Cancelar</button>
             </div>
           </div>
         </div>
@@ -729,8 +729,8 @@ const AjustesView = {
     overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:#fff; display:flex; flex-direction:column;';
     overlay.innerHTML = `
       <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#1a1a1a; color:#fff;">
-        <strong style="color:#e0a83a;">📖 Manual de Usuario</strong>
-        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">✕ Cerrar</button>
+        <strong style="color:#e0a83a;" class="inline-flex items-center gap-6">${Icons.libro()} Manual de Usuario</strong>
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">${Icons.cerrar()} Cerrar</button>
       </div>
       <iframe src="manual/index.html" style="flex:1; width:100%; border:none; background:#fff;"></iframe>`;
     document.body.appendChild(overlay);

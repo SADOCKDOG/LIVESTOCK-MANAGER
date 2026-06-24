@@ -348,6 +348,59 @@ const Icons = {
   },
   rayo() {
     return this._svg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>');
+  },
+  guardar() {
+    return this._svg(
+      '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>' +
+      '<polyline points="17 21 17 13 7 13 7 21"/>' +
+      '<polyline points="7 3 7 8 15 8"/>'
+    );
+  },
+  globo() {
+    return this._svg(
+      '<circle cx="12" cy="12" r="10"/>' +
+      '<line x1="2" y1="12" x2="22" y2="12"/>' +
+      '<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'
+    );
+  },
+  objetivo() {
+    return this._svg(
+      '<circle cx="12" cy="12" r="10"/>' +
+      '<circle cx="12" cy="12" r="6"/>' +
+      '<circle cx="12" cy="12" r="2"/>'
+    );
+  },
+  campana() {
+    return this._svg(
+      '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>' +
+      '<path d="M13.73 21a2 2 0 0 1-3.46 0"/>'
+    );
+  },
+  libro() {
+    return this._svg(
+      '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>' +
+      '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'
+    );
+  },
+  info() {
+    return this._svg(
+      '<circle cx="12" cy="12" r="10"/>' +
+      '<line x1="12" y1="16" x2="12" y2="12"/>' +
+      '<line x1="12" y1="8" x2="12.01" y2="8"/>'
+    );
+  },
+  importar() {
+    return this._svg(
+      '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
+      '<polyline points="17 8 12 3 7 8"/>' +
+      '<line x1="12" y1="3" x2="12" y2="15"/>'
+    );
+  },
+  enlace() {
+    return this._svg(
+      '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>' +
+      '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
+    );
   }
 };
 
