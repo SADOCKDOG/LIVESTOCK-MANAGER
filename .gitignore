@@ -16,6 +16,10 @@ Private/
 # Claude Code — configuración personal del asistente
 .claude/
 
+# IDEs — configuración personal del editor
+.idea/
+.vscode/
+
 # Sistema
 .DS_Store
 Thumbs.db
