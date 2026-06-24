@@ -9,38 +9,166 @@ const InformesView = {
   _currentTab: 'general',
   _cachedData: null,
 
+  _categories: {
+    general: {
+      label: "Resumen",
+      icon: Icons.grafico(),
+      tabs: {
+        "general": "General",
+        "por-finca": "Por Finca",
+        "alertas": "Alertas"
+      }
+    },
+    operaciones: {
+      label: "Producción",
+      icon: Icons.sanidad(),
+      tabs: {
+        "carne": "Cárnico",
+        "leche": "Lácteo",
+        "reproductivo": "Repro",
+        "sanidad": "Sanidad",
+        "fitosanitario": "Fitosanitario",
+        "curva-prod": "Curva"
+      }
+    },
+    economico: {
+      label: "Finanzas",
+      icon: Icons.dinero(),
+      tabs: {
+        "pyg": "P y G",
+        "flujo-caja": "Flujo Caja",
+        "breakeven": "Break-Even",
+        "subvenciones": "PAC",
+        "coste-prod": "Coste/Animal",
+        "eficiencia": "Eficiencia"
+      }
+    },
+    comercial: {
+      label: "Comercial",
+      icon: Icons.libroVentas(),
+      tabs: {
+        "ventas": "Ventas",
+        "compradores": "Compradores",
+        "proveedores": "Proveedores",
+        "rega": "REGA",
+        "cargas": "Aforos",
+        "rotacion": "Rotación"
+      }
+    },
+    exportar: {
+      label: "Exportar",
+      icon: Icons.exportar(),
+      tabs: {
+        "exportar": "Exportar"
+      }
+    }
+  },
+
+  _obtenerCategoriaDeTab(tab) {
+    for (const [catKey, cat] of Object.entries(this._categories)) {
+      if (tab in cat.tabs) return catKey;
+    }
+    return 'general';
+  },
+
+  _obtenerIconoDeSubTab(tab) {
+    switch (tab) {
+      case 'general': return Icons.grafico();
+      case 'por-finca': return Icons.finca();
+      case 'alertas': return Icons.alerta();
+      case 'carne': return Icons.carne();
+      case 'leche': return Icons.leche();
+      case 'reproductivo': return Icons.reproduccion();
+      case 'sanidad': return Icons.sanidad();
+      case 'fitosanitario': return Icons.fitosanitario();
+      case 'curva-prod': return Icons.grafico();
+      case 'pyg': return Icons.dinero();
+      case 'flujo-caja': return Icons.tendencia();
+      case 'breakeven': return Icons.balanza();
+      case 'subvenciones': return Icons.pac();
+      case 'coste-prod': return Icons.animales();
+      case 'eficiencia': return Icons.tendencia();
+      case 'ventas': return Icons.libroVentas();
+      case 'compradores': return Icons.compradores();
+      case 'proveedores': return Icons.proveedores();
+      case 'rega': return Icons.informeRega();
+      case 'cargas': return Icons.balanza();
+      case 'rotacion': return Icons.rotacion();
+      case 'exportar': return Icons.exportar();
+      default: return '';
+    }
+  },
+
+  _renderTabsHeader() {
+    const activeCatKey = this._obtenerCategoriaDeTab(this._currentTab);
+
+    // 1. Renderizar Nivel 1: Categorías
+    let catsHtml = `
+      <div class="scroll-shadow-container" style="margin:0 -12px 6px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
+        <div class="informes-categories" style="display:inline-flex; gap:6px; padding:4px 0;">
+    `;
+    for (const [catKey, cat] of Object.entries(this._categories)) {
+      const activeClass = catKey === activeCatKey ? 'active' : '';
+      catsHtml += `
+        <button class="inf-cat-tab ${activeClass}" onclick="InformesView._cambiarCategoria('${catKey}')">
+          ${cat.icon} ${cat.label}
+        </button>
+      `;
+    }
+    catsHtml += `
+        </div>
+      </div>
+    `;
+
+    // 2. Renderizar Nivel 2: Sub-tabs de la categoría activa
+    const activeCat = this._categories[activeCatKey];
+    let subTabsHtml = `
+      <div class="scroll-shadow-container" style="margin:0 -12px 12px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
+        <div class="informes-tabs" style="display:inline-flex; gap:6px; padding:2px 0;">
+    `;
+    for (const [tabKey, tabLabel] of Object.entries(activeCat.tabs)) {
+      const activeClass = tabKey === this._currentTab ? 'active' : '';
+      const subTabIcon = this._obtenerIconoDeSubTab(tabKey);
+      subTabsHtml += `
+        <button class="inf-tab ${activeClass}" data-tab="${tabKey}" onclick="InformesView._cambiarTab('${tabKey}')">
+          ${subTabIcon} ${tabLabel}
+        </button>
+      `;
+    }
+    subTabsHtml += `
+        </div>
+      </div>
+    `;
+
+    return catsHtml + subTabsHtml;
+  },
+
+  _cambiarCategoria(catKey) {
+    const firstTab = Object.keys(this._categories[catKey].tabs)[0];
+    this._currentTab = firstTab;
+    this._actualizarHeader();
+    this._renderTabActual();
+  },
+
+  _cambiarTab(tab) {
+    this._currentTab = tab;
+    this._actualizarHeader();
+    this._renderTabActual();
+  },
+
+  _actualizarHeader() {
+    const headerContainer = document.getElementById("informes-header-navigation");
+    if (headerContainer) {
+      headerContainer.innerHTML = this._renderTabsHeader();
+    }
+  },
+
   async render() {
     const main = document.getElementById("app-content");
 
     main.innerHTML = `
-      <div class="mb-14">
-        <div class="scroll-shadow-container" style="margin:0 -12px 8px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          <div class="informes-tabs" style="display:inline-flex; gap:6px; padding:4px 0;">
-            <button class="inf-tab active" data-tab="general" onclick="InformesView._cambiarTab('general')">${Icons.grafico()} General</button>
-            <button class="inf-tab" data-tab="carne" onclick="InformesView._cambiarTab('carne')">${Icons.carne()} Cárnico</button>
-            <button class="inf-tab" data-tab="leche" onclick="InformesView._cambiarTab('leche')">${Icons.leche()} Lácteo</button>
-            <button class="inf-tab" data-tab="reproductivo" onclick="InformesView._cambiarTab('reproductivo')">${Icons.reproduccion()} Reproductivo</button>
-            <button class="inf-tab" data-tab="sanidad" onclick="InformesView._cambiarTab('sanidad')">${Icons.sanidad()} Sanidad</button>
-            <button class="inf-tab" data-tab="ventas" onclick="InformesView._cambiarTab('ventas')">${Icons.libroVentas()} Ventas</button>
-            <button class="inf-tab" data-tab="compradores" onclick="InformesView._cambiarTab('compradores')">${Icons.compradores()} Compradores</button>
-            <button class="inf-tab" data-tab="proveedores" onclick="InformesView._cambiarTab('proveedores')">${Icons.proveedores()} Proveedores</button>
-            <button class="inf-tab" data-tab="fitosanitario" onclick="InformesView._cambiarTab('fitosanitario')">${Icons.fitosanitario()} Fitosanitario</button>
-            <button class="inf-tab" data-tab="alertas" onclick="InformesView._cambiarTab('alertas')">${Icons.alerta()} Alertas</button>
-            <button class="inf-tab" data-tab="por-finca" onclick="InformesView._cambiarTab('por-finca')">${Icons.finca()} Por Finca</button>
-            <button class="inf-tab" data-tab="rega" onclick="InformesView._cambiarTab('rega')">${Icons.informeRega()} REGA</button>
-            <button class="inf-tab" data-tab="exportar" onclick="InformesView._cambiarTab('exportar')">${Icons.exportar()} Exportar</button>
-            <button class="inf-tab" data-tab="pyg" onclick="InformesView._cambiarTab('pyg')">${Icons.dinero()} PyG</button>
-            <button class="inf-tab" data-tab="coste-prod" onclick="InformesView._cambiarTab('coste-prod')">${Icons.animales()} Coste/Animal</button>
-            <button class="inf-tab" data-tab="eficiencia" onclick="InformesView._cambiarTab('eficiencia')">${Icons.tendencia()} Eficiencia</button>
-            <button class="inf-tab" data-tab="cargas" onclick="InformesView._cambiarTab('cargas')">${Icons.balanza()} Aforos</button>
-            <button class="inf-tab" data-tab="rotacion" onclick="InformesView._cambiarTab('rotacion')">${Icons.rotacion()} Rotación</button>
-            <button class="inf-tab" data-tab="flujo-caja" onclick="InformesView._cambiarTab('flujo-caja')">${Icons.tendencia()} Flujo Caja</button>
-            <button class="inf-tab" data-tab="rent-esp" onclick="InformesView._cambiarTab('rent-esp')">${Icons.reproduccion()} Rent. Especie</button>
-            <button class="inf-tab" data-tab="curva-prod" onclick="InformesView._cambiarTab('curva-prod')">${Icons.grafico()} Curva Prod.</button>
-            <button class="inf-tab" data-tab="breakeven" onclick="InformesView._cambiarTab('breakeven')">${Icons.balanza()} Break-Even</button>
-            <button class="inf-tab" data-tab="subvenciones" onclick="InformesView._cambiarTab('subvenciones')">${Icons.pac()} PAC</button>
-          </div>
-        </div>
+      <div id="informes-header-navigation" class="mb-14">
+        ${this._renderTabsHeader()}
       </div>
       <div id="informes-content"><div class="loader">Cargando indicadores...</div></div>`;
 
@@ -123,6 +251,17 @@ const InformesView = {
     const style = document.createElement('style');
     style.id = 'inf-tab-styles';
     style.textContent = `
+      .informes-categories { scrollbar-width: none; }
+      .informes-categories::-webkit-scrollbar { display: none; }
+      .inf-cat-tab {
+        flex: 0 0 auto; padding: 6px 12px; border-radius: 12px; border: 1px solid #2a2a2a;
+        background: #0f0f11; color: #aaa; font-size: 0.72rem; font-weight: 800;
+        cursor: pointer; white-space: nowrap; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
+        display: inline-flex; align-items: center; gap: 4px;
+      }
+      .inf-cat-tab.active { background: #1e3a8a; color: #fff; border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
+      .inf-cat-tab:active { transform: scale(0.95); }
+
       .informes-tabs { scrollbar-width: none; }
       .informes-tabs::-webkit-scrollbar { display: none; }
       .inf-tab {
@@ -150,14 +289,6 @@ const InformesView = {
       .inf-report .inf-card-title { font-size: 1.1rem !important; font-weight: 800; margin: 0 0 10px 0; }
     `;
     document.head.appendChild(style);
-  },
-
-  _cambiarTab(tab) {
-    this._currentTab = tab;
-    document.querySelectorAll('.inf-tab').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-    });
-    this._renderTabActual();
   },
 
   _renderTabActual() {
