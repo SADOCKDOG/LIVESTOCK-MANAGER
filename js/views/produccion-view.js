@@ -385,7 +385,7 @@ const ProduccionView = {
       };
 
       overlay.querySelector('#btn-del-reg').onclick = async () => {
-        if (!confirm("¿Eliminar este registro de forma permanente?")) return;
+        if (!await Confirm.confirm("Eliminar Registro", "¿Eliminar este registro de forma permanente?", true)) return;
         await window.db.delete('registro_eventos', id);
         App.toast("Registro eliminado");
         overlay.remove();
@@ -480,7 +480,7 @@ const ProduccionView = {
       };
 
       overlay.querySelector('#btn-del-gasto').onclick = async () => {
-        if (!confirm("¿Eliminar este gasto de forma permanente?")) return;
+        if (!await Confirm.confirm("Eliminar Gasto", "¿Eliminar este gasto de forma permanente?", true)) return;
         await window.db.delete('gastos_ganaderia', numId);
         App.toast("Gasto eliminado");
         overlay.remove();

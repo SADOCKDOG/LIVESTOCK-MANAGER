@@ -271,7 +271,7 @@ const ZonasView = {
       App.toastError("Debes indicar un motivo de anulación.");
       return;
     }
-    if (!confirm("¿Anular zona? Se conservará histórico para auditoría.")) return;
+    if (!await Confirm.confirm("Anular Zona", "¿Anular zona? Se conservará histórico para auditoría.", true)) return;
     try {
       const finca = await Fincas.getActive();
       const zona = finca?.zonas?.[index];

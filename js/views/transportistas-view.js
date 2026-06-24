@@ -296,7 +296,7 @@ const TransportistasView = {
     },
 
     async _eliminar(id) {
-        if (!confirm('¿Eliminar este transportista de forma permanente?')) return;
+        if (!await Confirm.confirm("Eliminar Transportista", "¿Eliminar este transportista de forma permanente?", true)) return;
         try {
             await Transportistas.delete(id);
             App.toast('Transportista eliminado ✔');

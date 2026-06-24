@@ -220,13 +220,8 @@ const App = {
       // 3. Si es el Dashboard principal → preguntar si desea salir
       if (hash === '/') {
         const doExit = () => { if (AppPlugin.exitApp) AppPlugin.exitApp(); };
-        const Dialog = window.Capacitor.Plugins?.Dialog;
-        if (Dialog?.confirm) {
-          Dialog.confirm({ title: 'Salir', message: '¿Deseas salir de la aplicación?' })
-            .then(r => { if (r.value) doExit(); });
-        } else {
-          if (confirm('¿Deseas salir de la aplicación?')) doExit();
-        }
+        Confirm.confirm('Salir', '¿Deseas salir de la aplicación?', false)
+          .then(ok => { if (ok) doExit(); });
         return;
       }
 
@@ -495,23 +490,29 @@ const App = {
   },
 
   toast(msg, duracionMs) {
-    const container = document.getElementById("toast-container");
-    if (!container) return;
-    const t = document.createElement("div");
-    t.className = "toast";
-    t.textContent = msg;
-    container.appendChild(t);
-    setTimeout(() => t.remove(), duracionMs || 3000);
+    if (typeof msg !== 'string') return;
+    let type = '';
+    let text = msg;
+    if (msg.startsWith('✅')) {
+      type = 'success';
+      text = msg.replace(/^✅\s*/, '');
+    } else if (msg.startsWith('❌')) {
+      type = 'error';
+      text = msg.replace(/^❌\s*/, '');
+    } else if (msg.startsWith('⚠️')) {
+      type = 'warning';
+      text = msg.replace(/^⚠️\s*/, '');
+    } else if (msg.startsWith('ℹ️') || msg.startsWith('info')) {
+      type = 'info';
+      text = msg.replace(/^(ℹ️|info)\s*/, '');
+    }
+    window.Toast.show(text, type, duracionMs);
   },
 
   toastError(msg) {
-    const container = document.getElementById("toast-container");
-    if (!container) return;
-    const t = document.createElement("div");
-    t.className = "toast error";
-    t.textContent = `❌ ${msg}`;
-    container.appendChild(t);
-    setTimeout(() => t.remove(), 5000);
+    if (typeof msg !== 'string') return;
+    const text = msg.replace(/^❌\s*/, '');
+    window.Toast.error(text);
   },
 
   // ==========================================
@@ -1310,7 +1311,7 @@ const App = {
   },
 
   async _eliminarVentaCarneDetalle(id) {
-    if (!confirm("¿Eliminar este registro de venta? El animal volverá a estar ACTIVO en el censo.")) return;
+    if (!await Confirm.confirm("Eliminar Registro de Venta", "¿Eliminar este registro de venta? El animal volverá a estar ACTIVO en el censo.", true)) return;
     try {
       const v = await window.db.get("comercializacion_carne", id);
       if (v.animalId) {
@@ -1431,10 +1432,7 @@ const App = {
   },
 
   async _eliminarVentaCarne(id) {
-    if (
-      !confirm("¿Eliminar registro de venta? El animal volverá a estar ACTIVO.")
-    )
-      return;
+    if (!await Confirm.confirm("Eliminar Venta", "¿Eliminar registro de venta? El animal volverá a estar ACTIVO.", true)) return;
     try {
       const v = await window.db.get("comercializacion_carne", id);
       const a = await window.db.get("animales", v.animalId);
@@ -1454,7 +1452,7 @@ const App = {
   },
 
   async _eliminarGasto(id) {
-    if (!confirm("¿Eliminar este registro de gasto?")) return;
+    if (!await Confirm.confirm("Eliminar Gasto", "¿Eliminar este registro de gasto?", true)) return;
     try {
       await Gastos.delete(id);
       this.toast("Gasto eliminado.");
@@ -1761,9 +1759,11 @@ const App = {
           e.target.result
         );
         App.toast(`Backup restaurado ✅ (${res.fincas.length} finca${res.fincas.length > 1 ? 's' : ''})`);
-        if (res.multiplesFincas)
-          alert("Base de datos restaurada. Detectadas múltiples fincas.");
-        else await window.Fincas.setActiveId(res.fincas[0].id);
+        if (res.multiplesFincas) {
+          await Confirm.alert("Restauración Completada", "Base de datos restaurada. Detectadas múltiples fincas.");
+        } else {
+          await window.Fincas.setActiveId(res.fincas[0].id);
+        }
         window.location.reload();
       } catch (error) {
         App.toastError(error.message);

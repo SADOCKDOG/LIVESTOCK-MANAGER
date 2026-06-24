@@ -307,7 +307,7 @@ const ComercializacionView = {
   // ===================== ELIMINAR / EDITAR (desde app.js) =====================
 
   async _eliminarVentaCarne(id) {
-    if (!confirm("¿Eliminar registro de venta? El animal volverá a estar ACTIVO.")) return;
+    if (!await Confirm.confirm("Eliminar Registro de Venta", "¿Eliminar registro de venta? El animal volverá a estar ACTIVO.", true)) return;
     try {
       const v = await window.db.get("comercializacion_carne", id);
       const a = await window.db.get("animales", v.animalId);
@@ -328,7 +328,7 @@ const ComercializacionView = {
   },
 
   async _eliminarGasto(id) {
-    if (!confirm("¿Eliminar este registro de gasto?")) return;
+    if (!await Confirm.confirm("Eliminar Gasto", "¿Eliminar este registro de gasto?", true)) return;
     try {
       await Gastos.delete(id);
       App.toast("Gasto eliminado.");

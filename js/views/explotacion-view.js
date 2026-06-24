@@ -775,10 +775,10 @@ const ExplotacionView = {
     };
   },
 
-  _irAComercializacionDesdeExplotacion(modo) {
+  async _irAComercializacionDesdeExplotacion(modo) {
     const resumen = this._resumenCumplimientoModo(modo);
     if (resumen.pendientesFitosanitarios > 0) {
-      const ok = confirm(`Hay ${resumen.pendientesFitosanitarios} registro(s) fitosanitario(s) con control normativo pendiente o no aptos para comercialización. ¿Deseas continuar igualmente a Comercialización?`);
+      const ok = await Confirm.confirm("Control Normativo Pendiente", `Hay ${resumen.pendientesFitosanitarios} registro(s) fitosanitario(s) con control normativo pendiente o no aptos para comercialización. ¿Deseas continuar igualmente a Comercialización?`, false);
       if (!ok) return;
     }
 
@@ -998,7 +998,7 @@ const ExplotacionView = {
       overlay.querySelector('#btn-del-reg').onclick = async () => {
         const motivoAnulacion = overlay.querySelector('#edit-reg-motivo')?.value.trim();
         if (!motivoAnulacion) return App.toastError("El motivo de anulación es obligatorio");
-        if (!confirm("¿Anular este registro? Se conservará para auditoría.")) return;
+        if (!await Confirm.confirm("Anular Registro", "¿Anular este registro? Se conservará para auditoría.", true)) return;
 
         evento.anulado = true;
         evento.anuladoEn = new Date().toISOString();

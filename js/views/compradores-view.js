@@ -417,7 +417,7 @@ const CompradoresView = {
     },
 
     async _eliminar(id) {
-        if (!confirm('¿Eliminar este comprador permanentemente?')) return;
+        if (!await Confirm.confirm("Eliminar Comprador", "¿Eliminar este comprador permanentemente?", true)) return;
         try {
             await Compradores.delete(id);
             App.toast('Comprador eliminado');

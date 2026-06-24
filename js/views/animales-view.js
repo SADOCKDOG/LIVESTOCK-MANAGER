@@ -663,8 +663,8 @@ const AnimalesView = {
     if (fecha) fecha.style.display = esSalida ? 'block' : 'none';
   },
 
-  _salirRegistro() {
-    if (!this._animalGuardado && !confirm("¿Cerrar sin guardar datos?")) return;
+  async _salirRegistro() {
+    if (!this._animalGuardado && !await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false)) return;
     location.hash = "#/animales";
   },
 
@@ -674,7 +674,7 @@ const AnimalesView = {
       App.toastError("Debes indicar un motivo de anulación.");
       return;
     }
-    if (!confirm("¿Anular ficha del animal? Se conservará histórico para auditoría.")) return;
+    if (!await Confirm.confirm("Anular Animal", "¿Anular ficha del animal? Se conservará histórico para auditoría.", true)) return;
     try {
       await Animales.delete(id, motivo.trim());
       App.toast("Animal anulado");

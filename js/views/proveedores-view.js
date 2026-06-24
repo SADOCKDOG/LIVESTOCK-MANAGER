@@ -349,7 +349,7 @@ const ProveedoresView = {
     },
 
     async _eliminar(id) {
-        if (!confirm('¿Eliminar este proveedor permanentemente?')) return;
+        if (!await Confirm.confirm("Eliminar Proveedor", "¿Eliminar este proveedor permanentemente?", true)) return;
         try {
             await Proveedores.delete(id);
             App.toast('Proveedor eliminado');

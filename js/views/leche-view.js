@@ -468,7 +468,7 @@ const LecheView = {
       };
 
       overlay.querySelector('#btn-del-reg').onclick = async () => {
-        if (!confirm("¿Eliminar este control de forma permanente?")) return;
+        if (!await Confirm.confirm("Eliminar Control", "¿Eliminar este control de forma permanente?", true)) return;
         await window.db.delete('registro_eventos', id);
         App.toast("Registro lácteo eliminado");
         overlay.remove();

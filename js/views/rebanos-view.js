@@ -403,7 +403,7 @@ const RebanosView = {
     const ans = await Animales.list(id);
     if (ans.filter(a => (a.estado || 'activo') === 'activo').length > 0)
       return App.toastError("No se puede eliminar un rebaño con animales.");
-    if (!confirm("¿Anular este rebaño? Se conservará histórico de auditoría.")) return;
+    if (!await Confirm.confirm("Anular Rebaño", "¿Anular este rebaño? Se conservará histórico de auditoría.", true)) return;
     try {
       await Rebanos.delete(id);
       App.toast("Rebaño anulado");
