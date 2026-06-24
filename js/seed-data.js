@@ -17,10 +17,10 @@
     telefonoContacto: '+34 654 123 456',
     nif_cif: 'B12345678',
     email: 'demo.chamorro@example.com',
-    rega: 'ES061230000123',  // Badajoz (06) + municipio (123) + secuencial (0000123) — formato REGA válido
+    rega: 'ES041230000123',  // Cádiz (04) + municipio (123) + secuencial (0000123) — formato REGA válido
     cea: 'BA-12345-67',
     adsg_nombre: 'ADSG Tierra de Barros',
-    comunidad_autonoma: 'Extremadura',
+    comunidad_autonoma: 'Andalucía',
     tipo_explotacion: 'Mixto',
     sistema_explotacion: 'Semiextensivo',
     zonas: [
