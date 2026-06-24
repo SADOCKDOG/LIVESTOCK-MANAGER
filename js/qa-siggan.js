@@ -1288,8 +1288,8 @@ const SigganQA = {
         'compradores': { expectedMin: 3, store: 'compradores', desc: 'Compradores (Cárnicas, Lácteos, Ganados)' },
         'proveedores': { expectedMin: 3, store: 'proveedores', desc: 'Proveedores (Piensos, Vet, Maquinaria)' },
         'transportistas': { expectedMin: 2, store: 'transportistas', desc: 'Transportistas (Carga, Cisterna)' },
-        'contratos': { expectedMin: 2, store: 'contratos', desc: 'Contratos (Carne, Leche)' },
-        'gastos': { expectedMin: 7, store: 'gastos', desc: 'Gastos (Alimentación, Sanidad, Amortización)' },
+        'contratos': { expectedMin: 2, store: 'contratos_compra', desc: 'Contratos (Carne, Leche)' },
+        'gastos': { expectedMin: 7, store: 'gastos_ganaderia', desc: 'Gastos (Alimentación, Sanidad, Amortización)' },
         'sanitarios_ganado': { expectedMin: 3, store: 'sanitarios_ganado', desc: 'Tratamientos (Vacunación, Desparasitación, Antibiótico)' },
         'produccion_leche': { expectedMin: 5, store: 'produccion_leche', desc: 'Producción de Leche (5 fechas × 3 vacas)' },
         'comercializacion_leche': { expectedMin: 3, store: 'comercializacion_leche', desc: 'Comercialización Leche (3 entregas)' },
@@ -1328,7 +1328,11 @@ const SigganQA = {
         console.log(`  ⚠️  Módulos incompletos: ${modulosFallidos.join(', ')}`);
       }
 
-      this._log('PASS', M, '✅ COMPLETADO — BD DEMO CHAMORRO cubre todos los módulos');
+      if (modulosFallidos.length === 0) {
+        this._log('PASS', M, '✅ COMPLETADO — BD DEMO CHAMORRO cubre todos los módulos');
+      } else {
+        this._log('WARN', M, '⚠️ COMPLETADO CON OBSERVACIONES — Hay módulos incompletos en la DEMO', 'COBERTURA');
+      }
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
