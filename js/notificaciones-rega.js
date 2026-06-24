@@ -49,11 +49,16 @@ window.NotificacionesREGA = (() => {
   /**
    * Registra una notificación a REGA para un animal
    * @param {Object} data - {animal_id, finca_id, animal_numero, finca_rega, tipo_evento}
-   * @returns {Promise<number>} ID de la notificación
+   * @returns {Promise<{exito: boolean, numero_seguimiento: string, mensaje: string}>}
    */
   async function registrar(data) {
     const fincaId = data.finca_id || (await window.Fincas?.getActiveId());
     if (!fincaId) throw new Error('No hay finca activa');
+
+    // Generar número de seguimiento único: YYYYMMDD-{fincaId}-{random}
+    const hoy = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const numeroSeguimiento = `${hoy}-${fincaId}-${random}`;
 
     const notificacionData = {
       animal_id: data.animal_id,
@@ -63,10 +68,36 @@ window.NotificacionesREGA = (() => {
       tipo_evento: data.tipo_evento || 'cambio_estado', // alta, baja, cambio_estado, etc.
       estado_notificacion: 'pendiente', // pendiente, enviado, confirmado, error
       fecha_notificacion: new Date().toISOString(),
+      numero_seguimiento: numeroSeguimiento,
       observaciones: data.observaciones || ''
     };
 
     try {
+      // Verificar si la tabla existe; si no, usar almacenamiento simple (fallback)
+      if (!window.db || !window.db.objectStoreNames) {
+        console.warn('[NotificacionesREGA] IndexedDB no disponible, usando localStorage fallback');
+        const fallback = JSON.parse(localStorage.getItem('notificaciones_rega_fallback') || '[]');
+        fallback.push(notificacionData);
+        localStorage.setItem('notificaciones_rega_fallback', JSON.stringify(fallback));
+        return {
+          exito: true,
+          numero_seguimiento: numeroSeguimiento,
+          mensaje: `Notificación registrada (fallback): ${numeroSeguimiento}`
+        };
+      }
+
+      if (!window.db.objectStoreNames.contains(STORE_NAME)) {
+        console.warn(`[NotificacionesREGA] Tabla ${STORE_NAME} no existe aún. Usando localStorage.`);
+        const fallback = JSON.parse(localStorage.getItem('notificaciones_rega_fallback') || '[]');
+        fallback.push(notificacionData);
+        localStorage.setItem('notificaciones_rega_fallback', JSON.stringify(fallback));
+        return {
+          exito: true,
+          numero_seguimiento: numeroSeguimiento,
+          mensaje: `Notificación registrada (fallback): ${numeroSeguimiento}`
+        };
+      }
+
       const tx = window.db.transaction([STORE_NAME], 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       const result = await new Promise((resolve, reject) => {
@@ -74,8 +105,13 @@ window.NotificacionesREGA = (() => {
         req.onsuccess = () => resolve(req.result);
         req.onerror = () => reject(req.error);
       });
-      console.log(`[NotificacionesREGA] Notificación registrada: animal=${data.animal_numero}, tipo=${data.tipo_evento}`);
-      return result;
+      console.log(`[NotificacionesREGA] Notificación registrada: animal=${data.animal_numero}, número=${numeroSeguimiento}`);
+      return {
+        exito: true,
+        numero_seguimiento: numeroSeguimiento,
+        mensaje: `Notificación registrada: ${numeroSeguimiento}`,
+        id: result
+      };
     } catch (e) {
       console.error('[NotificacionesREGA] Error al registrar:', e.message);
       throw e;
