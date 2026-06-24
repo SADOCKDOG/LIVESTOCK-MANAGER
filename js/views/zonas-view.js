@@ -9,17 +9,20 @@ const ZonasView = {
     const main = document.getElementById("app-content");
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
-    const zonas = finca.zonas || [];
+    const zonasConIndice = (finca.zonas || [])
+      .map((zona, realIndex) => ({ zona, realIndex }))
+      .filter(({ zona }) => !zona?.anulada);
     let html = `
       <div class="text-center mb-25">
         <button class="btn btn-create btn-sm" onclick="ZonasView._crearZona()">➕ Nueva Zona</button>
       </div>`;
-    if (zonas.length === 0)
+    if (zonasConIndice.length === 0)
       html += `<div class="empty-state"><div class="empty-state-icon">🗺️</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
     else {
       let totalAforo = 0, totalOcupacion = 0;
       html += `<div class="grid gap-15">`;
-      for (let [index, z] of zonas.entries()) {
+      for (const item of zonasConIndice) {
+        const z = item.zona;
         let censoTotal = 0;
         const rebsEnZona = rebanos.filter((r) => r.zonaActual === z.nombre);
         const especiesEnZona = new Set();
@@ -63,7 +66,7 @@ const ZonasView = {
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
         html += `
-          <div class="card" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px;" onclick="location.hash='/zona?index=${index}'">
+          <div class="card" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px;" onclick="location.hash='/zona?index=${item.realIndex}'">
             <div class="flex justify-between items-start mb-8">
               <div>
                 <h3 class="m-0">${z.nombre}</h3>
@@ -106,6 +109,11 @@ const ZonasView = {
     const index = params.get("index");
     const finca = await Fincas.getActive();
     const zona = finca.zonas[parseInt(index)];
+    if (!zona || zona.anulada) {
+      App.toastError("Zona no disponible");
+      location.hash = "#/zonas";
+      return;
+    }
     
     // Calcular UGM
     const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
@@ -258,12 +266,36 @@ const ZonasView = {
   },
 
   async _eliminarZona(index) {
-    if (!confirm("¿Borrar zona?")) return;
+    const motivo = prompt("Motivo de anulación (obligatorio):", "rectificacion_zonas");
+    if (!motivo || !motivo.trim()) {
+      App.toastError("Debes indicar un motivo de anulación.");
+      return;
+    }
+    if (!confirm("¿Anular zona? Se conservará histórico para auditoría.")) return;
     try {
       const finca = await Fincas.getActive();
-      finca.zonas.splice(index, 1);
+      const zona = finca?.zonas?.[index];
+      if (!zona) {
+        App.toastError("Zona no encontrada.");
+        return;
+      }
+      zona.anulada = true;
+      zona.anuladaEn = new Date().toISOString();
+      zona.anuladoMotivo = motivo.trim();
+      zona.actualizadoEn = new Date().toISOString();
       await Fincas.save(finca);
-      App.toast("Eliminada");
+      await window.db.add("registro_eventos", {
+        fincaId: finca.id || await Fincas.getActiveId().catch(() => null),
+        tipo: "auditoria",
+        tipo_entidad: "zona",
+        entidad_id: index,
+        fecha: new Date().toISOString().split("T")[0],
+        motivo_tarea: "anulacion_zona",
+        descripcion: `Anulación de zona ${zona.nombre || "#" + index}`,
+        observaciones: motivo.trim(),
+        creadoEn: new Date().toISOString(),
+      }).catch(() => {});
+      App.toast("Zona anulada");
       location.hash = "#/zonas";
     } catch (e) {
       App.toastError(e.message);

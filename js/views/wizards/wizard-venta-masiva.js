@@ -404,6 +404,7 @@ window.VentaMasivaWizard = {
               if (c) {
                 data.nifComprador = c.nif_cif || '';
                 data.razonSocial = c.nombre || '';
+                data.regaDestino = c.rega || '';
                 const contrato = await window.Contratos.getActivo(data.compradorId, 'carne');
                 if (contrato) {
                   data.ivaPct = contrato.iva_pct;
@@ -430,6 +431,19 @@ window.VentaMasivaWizard = {
           const c = await window.Compradores.get(data.compradorId).catch(() => null);
           if (!c || c.activo === false) {
             App.toastError("El comprador seleccionado no está activo.");
+            return false;
+          }
+          if (!c.rega) {
+            App.toastError("El comprador debe tener REGA destino configurado.");
+            return false;
+          }
+          if (!c.tipo_operador) {
+            App.toastError("El comprador debe tener tipo de operador SIGGAN.");
+            return false;
+          }
+          const tiposDestinoPermitidos = new Set(['matadero', 'operador_comercial', 'tratante', 'cebadero']);
+          if (!tiposDestinoPermitidos.has((c.tipo_operador || '').toLowerCase())) {
+            App.toastError("El tipo de operador del comprador no es válido para salida de animales.");
             return false;
           }
           const contrato = await window.Contratos.getActivo(data.compradorId, 'carne').catch(() => null);
@@ -464,6 +478,8 @@ window.VentaMasivaWizard = {
                 <div class="text-white text-sm" id="w-v-transportista-nombre"><strong>${data.nombreTransportista || ''}</strong></div>
                 <div class="text-gray text-xs mt-4" id="w-v-transportista-nif">NIF: ${data.nifTransportista || ''}</div>
                 <div class="text-gray text-xs" id="w-v-transportista-matricula">🚚 ${data.matriculaTransportista || ''}</div>
+                <div class="text-gray text-xs" id="w-v-transportista-atg">ATG: ${data.atgTransportista || 'pendiente'}</div>
+                <div class="text-gray text-xs" id="w-v-transportista-desinsectacion">Desinsectación: ${data.desinsectacionVencimiento ? ('vigente hasta ' + data.desinsectacionVencimiento) : 'sin vencimiento informado'}</div>
               </div>
 
               <h4 class="text-purple text-sm" style="margin:16px 0 12px;">🩺 AUTORIZACIÓN VETERINARIA</h4>
@@ -520,11 +536,15 @@ window.VentaMasivaWizard = {
                 data.nombreTransportista = t.nombre || '';
                 data.nifTransportista = t.nif_cif || '';
                 data.matriculaTransportista = t.matricula || '';
+                data.atgTransportista = t.autorizacion_transporte_ganado || '';
+                data.desinsectacionVencimiento = t.desinsectacion_vencimiento || '';
               }
             } else {
               data.nombreTransportista = '';
               data.nifTransportista = '';
               data.matriculaTransportista = '';
+              data.atgTransportista = '';
+              data.desinsectacionVencimiento = '';
             }
           }
           data.vet_nombre = document.getElementById('w-v-vet-nombre')?.value || data.vet_nombre;
@@ -538,6 +558,19 @@ window.VentaMasivaWizard = {
           }
           if (!data.transportistaId) {
             App.toastError("Selecciona un transportista para la expedición.");
+            return false;
+          }
+          const t = await window.Transportistas.get(data.transportistaId).catch(() => null);
+          if (!t?.autorizacion_transporte_ganado) {
+            App.toastError("El transportista debe tener ATG (autorización de transporte ganado) para continuar.");
+            return false;
+          }
+          if (!t?.desinsectacion_ultima_fecha) {
+            App.toastError("El transportista debe registrar fecha de última desinsectación.");
+            return false;
+          }
+          if (t?.desinsectacion_vencimiento && new Date(t.desinsectacion_vencimiento) < new Date(new Date().toISOString().split('T')[0])) {
+            App.toastError("La desinsectación del transportista está vencida.");
             return false;
           }
           return true;
@@ -556,6 +589,17 @@ window.VentaMasivaWizard = {
           const fincaActiva = await window.Fincas.getActive().catch(() => null);
           const regaOrigenFinca = (fincaActiva?.rega || fincaActiva?.codigo_REGA || '').toString();
           const ccaaFinca = (fincaActiva?.comunidad_autonoma || '').toString();
+          let contratoActivo = null;
+          const compradorActual = finalData.compradorId
+            ? await window.Compradores.get(finalData.compradorId).catch(() => null)
+            : null;
+          if (finalData.compradorId) {
+            contratoActivo = await window.Contratos.getActivo(finalData.compradorId, 'carne').catch(() => null);
+            if (contratoActivo) {
+              finalData.ivaPct = contratoActivo.iva_pct;
+              finalData.retencionPct = contratoActivo.retencion_pct;
+            }
+          }
           let primerAlbaran = null;
           const N = finalData.seleccionados.length;
           const year = new Date().getFullYear();
@@ -597,6 +641,9 @@ window.VentaMasivaWizard = {
               razonSocial: finalData.razonSocial,
               codigoDocumento_ICA: finalData.codigoICA,
               numero_Guia_Sanitaria: finalData.numeroGuia,
+              estado_tramite: 'presentado',
+              fecha_presentacion: finalData.fechaSacrificio || new Date().toISOString().split('T')[0],
+              acuse_recibo: finalData.codigoICA || '',
               IVA: finalData.ivaPct,
               retencionREAGP: finalData.retencionPct,
               Gasto_Transporte: N > 0 ? finalData.gTrans / N : 0,
@@ -614,12 +661,7 @@ window.VentaMasivaWizard = {
               }
             };
             // Asignar contrato activo si existe
-            if (finalData.compradorId) {
-              try {
-                const cActivo = await window.Contratos.getActivo(finalData.compradorId, 'carne');
-                if (cActivo) reg.contratoId = cActivo.id;
-              } catch(e) { /* no hay contratos module */ }
-            }
+            if (contratoActivo) reg.contratoId = contratoActivo.id;
             const idV = await window.db.add("comercializacion_carne", reg);
 
             // PRIORIDAD NORMATIVA 1: cada venta debe generar su movimiento oficial
@@ -636,6 +678,11 @@ window.VentaMasivaWizard = {
               };
               const regaDestinoNorm = normalizarREGA(finalData.regaDestino || '');
               const regaDestinoValido = /^[A-Z]{2}\d{12}$/.test(regaDestinoNorm) ? regaDestinoNorm : '';
+              if (!regaDestinoValido) {
+                throw new Error("El comprador seleccionado no tiene REGA destino válido.");
+              }
+              const fechaOperacion = finalData.fechaSacrificio || new Date().toISOString().split('T')[0];
+              const desinsectacionValida = !finalData.desinsectacionVencimiento || new Date(finalData.desinsectacionVencimiento) >= new Date(fechaOperacion);
 
               const movimientoId = await window.Movimientos.save({
                 fincaId: fId,
@@ -643,6 +690,7 @@ window.VentaMasivaWizard = {
                 numero_guia: finalData.numeroGuia || '',
                 rega_origen: normalizarREGA(regaOrigenFinca),
                 rega_destino: regaDestinoValido,
+                tipo_operador_destino: compradorActual?.tipo_operador || '',
                 explotacion_contraparte: finalData.razonSocial || finalData.codigoMatadero || 'Destino matadero',
                 motivo: 'matadero',
                 especie: animal.especie || rebano.especie || '',
@@ -652,9 +700,13 @@ window.VentaMasivaWizard = {
                 transportistaId: finalData.transportistaId || null,
                 transportista_nombre: finalData.nombreTransportista || '',
                 matricula: finalData.matriculaTransportista || '',
-                fecha: finalData.fechaSacrificio || new Date().toISOString().split('T')[0],
-                desinsectacion_certificada: true,
+                fecha: fechaOperacion,
+                desinsectacion_certificada: desinsectacionValida,
                 comunidad_autonoma: ccaaFinca,
+                estado_tramite: 'presentado',
+                fecha_presentacion: fechaOperacion,
+                numero_registro_oficial: finalData.numeroGuia || '',
+                acuse_recibo: finalData.codigoICA || '',
                 notas: `Venta comercial ${numeroAlbaran} · DIMOE DIMOE-${numeroAlbaran}`
               });
 

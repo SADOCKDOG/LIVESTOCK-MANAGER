@@ -267,7 +267,8 @@ const CompradoresView = {
         const esEdicion = !!id;
         const c = esEdicion ? await Compradores.get(id) : {
             nombre: '', nif_cif: '', direccion: '', codigo_postal: '', ciudad: '', provincia: '',
-            telefono: '', email: '', tipo_comprador: 'híbrido', condiciones_pago: '', notas: '', activo: true
+            telefono: '', email: '', tipo_comprador: 'híbrido', tipo_operador: 'operador_comercial',
+            rega: '', comunidad_autonoma: '', condiciones_pago: '', notas: '', activo: true
         };
 
         const main = document.getElementById("app-content");
@@ -292,6 +293,30 @@ const CompradoresView = {
                   <option value="cárnico" ${c.tipo_comprador === 'cárnico' ? 'selected' : ''}>🥩 Cárnico</option>
                   <option value="láctico" ${c.tipo_comprador === 'láctico' ? 'selected' : ''}>🥛 Láctico</option>
                   <option value="híbrido" ${c.tipo_comprador === 'híbrido' || !c.tipo_comprador ? 'selected' : ''}>🔄 Híbrido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-10 mb-12">
+              <div>
+                <label class="form-label">TIPO OPERADOR SIGGAN</label>
+                <select id="c-tipo-operador" class="premium-input">
+                  <option value="matadero" ${c.tipo_operador === 'matadero' ? 'selected' : ''}>Matadero</option>
+                  <option value="industria_lactea" ${c.tipo_operador === 'industria_lactea' ? 'selected' : ''}>Industria láctea</option>
+                  <option value="operador_comercial" ${!c.tipo_operador || c.tipo_operador === 'operador_comercial' ? 'selected' : ''}>Operador comercial</option>
+                  <option value="tratante" ${c.tipo_operador === 'tratante' ? 'selected' : ''}>Tratante</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">REGA DESTINO</label>
+                <input type="text" id="c-rega" value="${c.rega || ''}" class="premium-input" placeholder="ES041230000123">
+              </div>
+              <div>
+                <label class="form-label">CCAA</label>
+                <select id="c-ccaa" class="premium-input">
+                  <option value="">—</option>
+                  <option value="andalucia" ${c.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>Andalucía</option>
+                  <option value="extremadura" ${c.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>Extremadura</option>
                 </select>
               </div>
             </div>
@@ -354,6 +379,9 @@ const CompradoresView = {
                 nombre: document.getElementById('c-nombre').value.trim(),
                 nif_cif: document.getElementById('c-nif').value.trim(),
                 tipo_comprador: document.getElementById('c-tipo').value,
+                tipo_operador: document.getElementById('c-tipo-operador').value,
+                rega: document.getElementById('c-rega').value.trim(),
+                comunidad_autonoma: document.getElementById('c-ccaa').value,
                 direccion: document.getElementById('c-dir').value.trim(),
                 codigo_postal: document.getElementById('c-cp').value.trim(),
                 ciudad: document.getElementById('c-ciudad').value.trim(),

@@ -69,6 +69,17 @@ window.WizardGuiaMovimiento = {
               <label class="wizard-label">NOMBRE EXPLOTACIÓN CONTRAPARTE</label>
               <input type="text" id="w-mv-contra-nombre" value="${data.explotacion_contraparte}" placeholder="Titular o explotación" class="wizard-input">
             </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">TIPO OPERADOR DESTINO</label>
+              <select id="w-mv-tipo-operador" class="wizard-input wizard-select">
+                <option value="">— Seleccionar —</option>
+                <option value="matadero" ${data.tipo_operador_destino === 'matadero' ? 'selected' : ''}>Matadero</option>
+                <option value="operador_comercial" ${data.tipo_operador_destino === 'operador_comercial' ? 'selected' : ''}>Operador comercial</option>
+                <option value="tratante" ${data.tipo_operador_destino === 'tratante' ? 'selected' : ''}>Tratante</option>
+                <option value="cebadero" ${data.tipo_operador_destino === 'cebadero' ? 'selected' : ''}>Cebadero</option>
+                <option value="industria_lactea" ${data.tipo_operador_destino === 'industria_lactea' ? 'selected' : ''}>Industria láctea</option>
+              </select>
+            </div>
             <div class="grid grid-cols-2 gap-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPECIE</label>
@@ -92,6 +103,7 @@ window.WizardGuiaMovimiento = {
           if (esSalida) { data.rega_origen = propia; data.rega_destino = contra; }
           else { data.rega_destino = propia; data.rega_origen = contra; }
           data.explotacion_contraparte = document.getElementById('w-mv-contra-nombre')?.value.trim() || '';
+          data.tipo_operador_destino = document.getElementById('w-mv-tipo-operador')?.value || '';
           data.especie = document.getElementById('w-mv-especie')?.value.trim() || '';
           data.num_animales = parseInt(document.getElementById('w-mv-num')?.value) || 0;
           data.crotales = (document.getElementById('w-mv-crotales')?.value || '')
@@ -99,6 +111,29 @@ window.WizardGuiaMovimiento = {
         },
         validate: async (data) => {
           if (data.num_animales <= 0) { App.toastError("Indica el nº de animales"); return false; }
+          if (!data.especie) { App.toastError("Indica la especie del movimiento"); return false; }
+          if (data.tipo === 'salida' && !data.tipo_operador_destino) {
+            App.toastError("Selecciona el tipo de operador destino para la salida.");
+            return false;
+          }
+          if (data.crotales.length === 0) {
+            App.toastError("Debes informar todos los crotales del movimiento.");
+            return false;
+          }
+          if (data.crotales.length !== data.num_animales) {
+            App.toastError("El nº de crotales debe coincidir con el nº de animales.");
+            return false;
+          }
+          for (const crotal of data.crotales) {
+            if (window.ErrorHandler?.validateCaravana) {
+              try {
+                window.ErrorHandler.validateCaravana(crotal);
+              } catch (err) {
+                App.toastError(err.message || `Crotal inválido: ${crotal}`);
+                return false;
+              }
+            }
+          }
           const contraRega = data.tipo === 'salida' ? data.rega_destino : data.rega_origen;
           if (CS && contraRega) {
             const r = CS.validarFormatoREGA(contraRega, null);
@@ -157,6 +192,54 @@ window.WizardGuiaMovimiento = {
           }
           return true;
         }
+      },
+      {
+        content: (data) => `
+          <div class="mt-10">
+            <h3 class="text-green mb-15">🏛️ Tramitación Oficial</h3>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ESTADO DEL TRÁMITE</label>
+              <select id="w-mv-estado" class="wizard-input wizard-select">
+                <option value="borrador" ${data.estado_tramite === 'borrador' ? 'selected' : ''}>Borrador</option>
+                <option value="presentado" ${data.estado_tramite === 'presentado' ? 'selected' : ''}>Presentado</option>
+                <option value="aceptado" ${data.estado_tramite === 'aceptado' ? 'selected' : ''}>Aceptado</option>
+                <option value="rechazado" ${data.estado_tramite === 'rechazado' ? 'selected' : ''}>Rechazado</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-10">
+              <div class="wizard-input-group">
+                <label class="wizard-label">FECHA PRESENTACIÓN</label>
+                <input type="date" id="w-mv-fecha-pres" value="${data.fecha_presentacion || ''}" class="wizard-input">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">Nº REGISTRO OFICIAL</label>
+                <input type="text" id="w-mv-reg-of" value="${data.numero_registro_oficial || ''}" class="wizard-input" placeholder="Nº asiento oficial">
+              </div>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ACUSE / JUSTIFICANTE</label>
+              <input type="text" id="w-mv-acuse" value="${data.acuse_recibo || ''}" class="wizard-input" placeholder="Código de acuse o justificante">
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.estado_tramite = document.getElementById('w-mv-estado')?.value || data.estado_tramite;
+          data.fecha_presentacion = document.getElementById('w-mv-fecha-pres')?.value || '';
+          data.numero_registro_oficial = document.getElementById('w-mv-reg-of')?.value.trim() || '';
+          data.acuse_recibo = document.getElementById('w-mv-acuse')?.value.trim() || '';
+        },
+        validate: async (data) => {
+          if (data.estado_tramite !== 'borrador' && !data.fecha_presentacion) {
+            App.toastError("La fecha de presentación es obligatoria.");
+            return false;
+          }
+          if ((data.estado_tramite === 'aceptado' || data.estado_tramite === 'rechazado') &&
+              (!data.numero_registro_oficial || !data.acuse_recibo)) {
+            App.toastError("Registro oficial y acuse son obligatorios para estado aceptado/rechazado.");
+            return false;
+          }
+          return true;
+        }
       }
     ];
 
@@ -173,10 +256,15 @@ window.WizardGuiaMovimiento = {
         especie: '',
         num_animales: 1,
         crotales: [],
+        tipo_operador_destino: '',
         transportistaId: '',
         transportista_nombre: '',
         matricula: '',
         desinsectacion_certificada: false,
+        estado_tramite: 'borrador',
+        fecha_presentacion: '',
+        numero_registro_oficial: '',
+        acuse_recibo: '',
         notas: '',
       },
       onComplete: async (data) => {
@@ -198,15 +286,32 @@ window.WizardGuiaMovimiento = {
             especie: data.especie,
             num_animales: data.num_animales,
             crotales: data.crotales,
+            tipo_operador_destino: data.tipo_operador_destino || '',
             transportistaId: data.transportistaId || null,
             transportista_nombre: transpNombre,
             matricula,
             fecha: data.fecha,
             desinsectacion_certificada: data.desinsectacion_certificada,
             comunidad_autonoma: ccaa,
+            estado_tramite: data.estado_tramite || 'borrador',
+            fecha_presentacion: data.fecha_presentacion || '',
+            numero_registro_oficial: data.numero_registro_oficial || '',
+            acuse_recibo: data.acuse_recibo || '',
             notas: data.notas,
           });
           const mov = await Movimientos.get(movId);
+          await window.db.add('documentos_legales', {
+            tipo: 'guia_movimiento',
+            fincaId: await Fincas.getActiveId(),
+            numero: mov.numero_guia,
+            fecha_emision: mov.fecha,
+            estado_tramite: mov.estado_tramite || 'borrador',
+            fecha_presentacion: mov.fecha_presentacion || null,
+            numero_registro_oficial: mov.numero_registro_oficial || '',
+            acuse_recibo: mov.acuse_recibo || '',
+            plataforma: mov.plataforma || '',
+            created_at: new Date().toISOString(),
+          }).catch(() => {});
           App.toast("Guía de movimiento registrada ✅");
           WizardGuiaMovimiento.generarDocumento(finca, mov);
         } catch (e) {
@@ -261,6 +366,15 @@ window.WizardGuiaMovimiento = {
           <p style="margin:0;"><strong>Transportista:</strong> ${mov.transportista_nombre || '—'} &nbsp;·&nbsp;
           <strong>Matrícula:</strong> ${mov.matricula || '—'}<br>
           <strong>Desinsectación certificada:</strong> ${mov.desinsectacion_certificada ? 'Sí' : 'No'}</p>
+        </div>
+        <div style="margin-bottom:20px;font-size:0.9rem;">
+          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">TRAMITACIÓN ADMINISTRATIVA</h4>
+          <p style="margin:0;">
+            <strong>Estado:</strong> ${(mov.estado_tramite || 'borrador').toUpperCase()}<br>
+            <strong>Fecha presentación:</strong> ${mov.fecha_presentacion || '—'}<br>
+            <strong>Nº registro oficial:</strong> ${mov.numero_registro_oficial || '—'}<br>
+            <strong>Acuse:</strong> ${mov.acuse_recibo || '—'}
+          </p>
         </div>
         <div style="padding:16px;border:1px solid #ccc;background:#f9f9f9;font-size:0.82rem;">
           Documento generado para su tramitación en <strong>${plataforma}</strong>. El titular se responsabiliza de la

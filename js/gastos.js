@@ -26,6 +26,7 @@ const Gastos = {
     async save(data) {
         return await ErrorHandler.tryAsync(async () => {
             const fincaActivaId = await ErrorHandler.validateActiveFinca();
+            const fincaActiva = await window.Fincas.get(fincaActivaId).catch(() => null);
 
             ErrorHandler.validateRequired('concepto', data.concepto, 'Concepto de gasto es obligatorio');
             ErrorHandler.validateRequired('fecha', data.fecha, 'Fecha es obligatoria');
@@ -42,15 +43,36 @@ const Gastos = {
                 ...data,
                 ...snapMetadata,
                 fincaId: fincaActivaId,
+                comunidad_autonoma: fincaActiva?.comunidad_autonoma || null,
                 monto: Number(data.monto),
                 rebanoId: data.rebanoId ? Number(data.rebanoId) : null,
                 actualizadoEn: new Date().toISOString()
             };
 
+            const esSanidad = (gastoData.categoria || '').toLowerCase().includes('sanidad')
+                || (gastoData.concepto || '').toLowerCase().includes('sanidad');
+            if (esSanidad && !gastoData.sanitarioId) {
+                try {
+                    const sanitarios = await window.db.getAllFromIndex('sanitarios_ganado', 'fincaId', fincaActivaId);
+                    const fechaGasto = new Date(gastoData.fecha);
+                    const candidatos = sanitarios
+                        .filter(s => !gastoData.rebanoId || Number(s.rebanoId) === Number(gastoData.rebanoId))
+                        .filter(s => !!s.fecha)
+                        .map(s => ({ ...s, _diasDiff: Math.abs((fechaGasto - new Date(s.fecha)) / 86400000) }))
+                        .filter(s => s._diasDiff <= 30)
+                        .sort((a, b) => a._diasDiff - b._diasDiff);
+                    if (candidatos.length > 0) gastoData.sanitarioId = candidatos[0].id;
+                } catch (e) {
+                    console.warn('[Gastos.save] No se pudo vincular sanitario:', e.message);
+                }
+            }
+
+            let savedId;
+
             if (esEdicion) {
                 gastoData.id = Number(data.id);
                 await window.db.put('gastos_ganaderia', gastoData);
-                return gastoData.id;
+                savedId = gastoData.id;
             } else {
                 delete gastoData.id;
                 gastoData.creadoEn = new Date().toISOString();
@@ -60,13 +82,13 @@ const Gastos = {
                         throw new Error('window.db.add() retornó ID inválido: ' + JSON.stringify(newId));
                     }
                     gastoData.id = newId;
-                    return gastoData.id;
+                    savedId = gastoData.id;
                 } catch (dbError) {
                     console.error('[Gastos.save] Error en window.db.add():', dbError);
                     // Fallback: generar un ID local
                     const fallbackId = Math.floor(Math.random() * 1000000) + 1;
                     gastoData.id = fallbackId;
-                    return fallbackId;
+                    savedId = fallbackId;
                 }
             }
 
@@ -74,7 +96,29 @@ const Gastos = {
                 window.EventBus.emit('gasto:created', { gasto: gastoData });
             }
 
-            return gastoData.id;
+            try {
+                await window.db.add('registro_eventos', {
+                    fincaId: fincaActivaId,
+                    entidad_id: savedId,
+                    tipo_entidad: 'gasto',
+                    motivo_tarea: 'gasto_registrado',
+                    fecha: gastoData.fecha,
+                    valor_neto: gastoData.monto,
+                    unidad: 'EUR',
+                    snap_zona: gastoData.snap_zona || 'Sin zona',
+                    snap_especie: gastoData.snap_especie || 'No definida',
+                    snap_tipo: gastoData.snap_tipo || 'No definido',
+                    comunidad_autonoma: gastoData.comunidad_autonoma || null,
+                    observaciones: esSanidad
+                        ? `Gasto sanitario registrado${gastoData.sanitarioId ? ` · Vinculado a tratamiento #${gastoData.sanitarioId}` : ''}`
+                        : `Gasto registrado: ${gastoData.concepto || 'sin concepto'}`,
+                    creadoEn: new Date().toISOString()
+                });
+            } catch (eventErr) {
+                console.warn('[Gastos.save] No se pudo registrar evento de gasto:', eventErr.message);
+            }
+
+            return savedId;
         }, { entity: 'Gastos', action: 'save' });
     },
 

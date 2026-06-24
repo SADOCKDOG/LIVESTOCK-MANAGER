@@ -669,10 +669,15 @@ const AnimalesView = {
   },
 
   async _eliminarAnimal(id) {
-    if (!confirm("¿Borrar animal de la base de datos?")) return;
+    const motivo = prompt("Motivo de anulación (obligatorio):", "rectificacion_censo");
+    if (!motivo || !motivo.trim()) {
+      App.toastError("Debes indicar un motivo de anulación.");
+      return;
+    }
+    if (!confirm("¿Anular ficha del animal? Se conservará histórico para auditoría.")) return;
     try {
-      await Animales.delete(id);
-      App.toast("Borrado");
+      await Animales.delete(id, motivo.trim());
+      App.toast("Animal anulado");
       location.hash = "#/animales";
     } catch (e) {
       App.toastError(e.message);

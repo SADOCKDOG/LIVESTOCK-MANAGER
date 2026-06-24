@@ -39,7 +39,7 @@ const Proveedores = {
 
     async getByNif(nif) {
         try {
-            return await window.db.getFromIndex('proveedores', 'nif_cif', nif.trim().toUpperCase());
+            return await window.db.getFromIndex('proveedores', 'nif_cif', ErrorHandler.normalizeNifCif(nif));
         } catch (e) {
             return null;
         }
@@ -50,23 +50,27 @@ const Proveedores = {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
             ErrorHandler.validateRequired('nombre', data.nombre, 'Nombre o razón social es obligatorio');
+            const nifVal = ErrorHandler.validateNifCif(data.nif_cif, { required: true });
+            const regaVal = ErrorHandler.validateREGA(data.rega || '', data.comunidad_autonoma || null, { required: false });
+            const tipoOperador = (data.tipo_operador || '').trim() || 'proveedor_servicios';
 
-            if (data.nif_cif) {
-                const existente = await this.getByNif(data.nif_cif);
-                if (existente && (!esEdicion || existente.id !== Number(data.id))) {
-                    throw new Error(`Ya existe un proveedor con NIF/CIF "${data.nif_cif}"`);
-                }
+            const existente = await this.getByNif(nifVal);
+            if (existente && (!esEdicion || existente.id !== Number(data.id))) {
+                throw new Error(`Ya existe un proveedor con NIF/CIF "${nifVal}"`);
             }
 
             const proveedorData = {
                 nombre: data.nombre.trim(),
-                nif_cif: (data.nif_cif || '').trim().toUpperCase(),
+                nif_cif: nifVal,
                 direccion: (data.direccion || '').trim(),
                 codigo_postal: (data.codigo_postal || '').trim(),
                 ciudad: (data.ciudad || '').trim(),
                 provincia: (data.provincia || '').trim(),
                 telefono: (data.telefono || '').trim(),
                 email: (data.email || '').trim(),
+                tipo_operador: tipoOperador,
+                rega: regaVal,
+                comunidad_autonoma: (data.comunidad_autonoma || '').trim().toLowerCase(),
                 categorias: Array.isArray(data.categorias) ? data.categorias : [],
                 condiciones_pago: (data.condiciones_pago || '').trim(),
                 notas: (data.notas || '').trim(),

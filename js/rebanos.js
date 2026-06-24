@@ -3,7 +3,7 @@ const Rebanos = {
         const fincaId = await Fincas.getActiveId();
         if (!fincaId) return [];
         const all = await window.db.getAll('rebanos');
-        return all.filter(r => Number(r.fincaId) === Number(fincaId));
+        return all.filter(r => Number(r.fincaId) === Number(fincaId) && !r?.anulado);
     },
 
     async get(id) {
@@ -38,10 +38,27 @@ const Rebanos = {
     async delete(id) {
         const numId = Number(id);
         const animales = await window.db.getAllFromIndex('animales', 'rebanoId', numId);
-        if (animales.length > 0) {
+        const activos = (animales || []).filter(a => !a?.anulado && (a.estado || 'activo') === 'activo');
+        if (activos.length > 0) {
             throw new Error('No se puede eliminar el rebaño porque tiene animales asociados.');
         }
-        return window.db.delete('rebanos', numId);
+        const rebano = await this.get(numId);
+        if (!rebano) return;
+        rebano.estado = 'inactivo';
+        rebano.anulado = true;
+        rebano.anuladoEn = new Date().toISOString();
+        rebano.actualizadoEn = new Date().toISOString();
+        await window.db.put('rebanos', rebano);
+        await window.db.add('registro_eventos', {
+            fincaId: rebano.fincaId || await Fincas.getActiveId().catch(() => null),
+            entidad_id: numId,
+            tipo_entidad: 'rebano',
+            tipo: 'auditoria',
+            motivo_tarea: 'anulacion_rebano',
+            fecha: new Date().toISOString().split('T')[0],
+            descripcion: `Anulación de rebaño "${rebano.nombre || numId}"`,
+            creadoEn: new Date().toISOString(),
+        }).catch(() => {});
     }
 };
 

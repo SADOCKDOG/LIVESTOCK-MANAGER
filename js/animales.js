@@ -1,11 +1,12 @@
 const Animales = {
   async list(rebanoId = null) {
     if (rebanoId) {
-      return window.db.getAllFromIndex(
+      const rows = await window.db.getAllFromIndex(
         "animales",
         "rebanoId",
         Number(rebanoId)
       );
+      return (rows || []).filter(a => !a?.anulado);
     } else {
       const rebanos = await Rebanos.list();
       let todosLosAnimales = [];
@@ -20,7 +21,7 @@ const Animales = {
       const animalesSinRebano = await window.db.getAll("animales").then(all =>
         all.filter(a => a.rebanoId == null || a.rebanoId === undefined)
       ).catch(() => []);
-      return [...todosLosAnimales, ...animalesSinRebano];
+      return [...todosLosAnimales, ...animalesSinRebano].filter(a => !a?.anulado);
     }
   },
 
@@ -211,7 +212,7 @@ const Animales = {
     }
   },
 
-  async delete(id) {
+  async delete(id, motivo = "") {
     return await ErrorHandler.tryAsync(
       async () => {
         const numId = Number(id);
@@ -219,7 +220,7 @@ const Animales = {
 
         if (!animal) return;
 
-        // 1. Proteger integridad referencial
+        // Proteger integridad referencial comercial
         const [prodCarne, comCarne, eventos] = await Promise.all([
           window.db.getAllFromIndex("produccion_carne", "animalId", numId),
           window.db.getAllFromIndex(
@@ -230,10 +231,6 @@ const Animales = {
           window.db.getAllFromIndex("registro_eventos", "entidad_id", numId),
         ]);
 
-        if (prodCarne.length > 0 || eventos.length > 0)
-          throw new Error(
-            "No se puede eliminar: tiene pesajes o eventos registrados."
-          );
         if (comCarne.length > 0)
           throw new Error(
             "No se puede eliminar: ya tiene registros de venta/comercialización."
@@ -246,11 +243,51 @@ const Animales = {
           );
         }
 
-        await window.db.delete("animales", numId);
+        const fechaBaja = animal.fecha_baja || new Date().toISOString().split("T")[0];
+        const motivoAnulacion = (motivo || "").trim() || "anulacion_registro";
+        const animalAnulado = {
+          ...animal,
+          estado: "baja",
+          motivo_baja: animal.motivo_baja || motivoAnulacion,
+          fecha_baja: fechaBaja,
+          anulado: true,
+          anuladoEn: new Date().toISOString(),
+          anuladoMotivo: motivoAnulacion,
+          actualizadoEn: new Date().toISOString(),
+        };
+        await window.db.put("animales", animalAnulado);
+        await window.db.add("registro_eventos", {
+          fincaId: await Fincas.getActiveId().catch(() => null),
+          entidad_id: numId,
+          tipo_entidad: "animal",
+          tipo: "auditoria",
+          motivo_tarea: "anulacion_registro",
+          fecha: fechaBaja,
+          descripcion: `Anulación de ficha animal ${animal.numero_identificacion || "#" + numId}`,
+          observaciones: motivoAnulacion,
+          creadoEn: new Date().toISOString(),
+        });
+        if (eventos.length > 0 || prodCarne.length > 0) {
+          await window.db.add("registro_eventos", {
+            fincaId: await Fincas.getActiveId().catch(() => null),
+            entidad_id: numId,
+            tipo_entidad: "animal",
+            tipo: "auditoria",
+            motivo_tarea: "rectificacion_historico",
+            fecha: new Date().toISOString().split("T")[0],
+            descripcion: "Conservación histórica aplicada (sin borrado físico)",
+            observaciones: `Histórico protegido: ${eventos.length} eventos, ${prodCarne.length} pesajes`,
+            creadoEn: new Date().toISOString(),
+          });
+        }
 
         // 3. Notificar al sistema via EventBus
         if (window.EventBus) {
-          window.EventBus.emit('animal:deleted', { id: numId, crotal: animal.numero_identificacion });
+          window.EventBus.emit('animal:deleted', {
+            id: numId,
+            crotal: animal.numero_identificacion,
+            anulacion: true,
+          });
         }
       },
       { entity: "Animales", action: "delete" }
