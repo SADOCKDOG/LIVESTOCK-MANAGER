@@ -137,9 +137,9 @@
 
       // 5. Compradores
       var compDefs = [
-        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765432', tipo_comprador: 'cárnico', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz' },
-        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654321', tipo_comprador: 'láctico', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz' },
-        { nombre: 'Ganados del Oeste SL', nif_cif: 'B76543210', tipo_comprador: 'híbrido', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres' }
+        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765432', tipo_comprador: 'cárnico', tipo_operador: 'matadero', rega: 'ES061234000456', comunidad_autonoma: 'Extremadura', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz', activo: true },
+        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654321', tipo_comprador: 'láctico', tipo_operador: 'quesería', rega: 'ES061234000789', comunidad_autonoma: 'Extremadura', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz', activo: true },
+        { nombre: 'Ganados del Oeste SL', nif_cif: 'B76543210', tipo_comprador: 'híbrido', tipo_operador: 'intermediario', rega: 'ES061234001012', comunidad_autonoma: 'Extremadura', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres', activo: true }
       ];
       var comps = [];
       for (var c = 0; c < compDefs.length; c++) {
@@ -153,9 +153,9 @@
 
       // 6. Proveedores
       var provDefs = [
-        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432109', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'] },
-        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321098', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'] },
-        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210987', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'] }
+        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432109', tipo_operador: 'fabricante_pienso', rega: 'ES061234001345', comunidad_autonoma: 'Extremadura', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'], activo: true },
+        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321098', tipo_operador: 'veterinario', rega: 'ES061234001678', comunidad_autonoma: 'Extremadura', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'], activo: true },
+        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210987', tipo_operador: 'proveedor_equipos', rega: 'ES061234002011', comunidad_autonoma: 'Extremadura', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'], activo: true }
       ];
       var provs = [];
       for (var pv = 0; pv < provDefs.length; pv++) {
@@ -169,8 +169,8 @@
 
       // 7. Transportistas
       var transDefs = [
-        { nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109876', matricula: '1234BCD', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'camion', capacidad_animales: 40, certificado_bienestar: true, activo: true },
-        { nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098765', matricula: '5678EFG', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'cisterna', capacidad_animales: 0, condiciones_termoneutrales: true, activo: true }
+        { nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109876', matricula: '1234BCD', autorizacion_transporte_ganado: 'ATG-BA-2024-001', desinsectacion_ultima_fecha: '2026-06-10', desinsectacion_vencimiento: '2026-09-10', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'camion', capacidad_animales: 40, certificado_bienestar: true, activo: true },
+        { nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098765', matricula: '5678EFG', autorizacion_transporte_ganado: 'ATG-BA-2024-002', desinsectacion_ultima_fecha: '2026-06-05', desinsectacion_vencimiento: '2026-09-05', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'cisterna', capacidad_animales: 0, condiciones_termoneutrales: true, activo: true }
       ];
       for (var t = 0; t < transDefs.length; t++) {
         try { await Transportistas.save(transDefs[t]); } catch (e) { console.log('[SEED] Error transportista:', e.message); }
