@@ -26,7 +26,8 @@ const GanaderiaView = {
       window.db.getAll('animales').catch(() => []),
       Fincas.getActive().catch(() => null)
     ]);
-    const zonas = fincaActiva?.zonas || [];
+    // Se excluyen las zonas anuladas, igual que en ZonasView.
+    const zonas = (fincaActiva?.zonas || []).filter(z => z && !z.anulada);
 
     this._activeMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('ganaderia', rebanos)
