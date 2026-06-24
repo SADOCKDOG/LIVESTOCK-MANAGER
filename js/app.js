@@ -464,6 +464,9 @@ const App = {
     }
 
     const main = document.getElementById("app-content");
+    if (main) {
+      main.removeAttribute("style");
+    }
     const fincaId = await Fincas.getActiveId();
     if (!fincaId && path !== "/ajustes")
       return await AsistenteConfiguracion.mostrarAsistente();

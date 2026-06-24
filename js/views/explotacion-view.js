@@ -23,10 +23,6 @@ const ExplotacionView = {
 
   async render() {
     const main = document.getElementById('app-content');
-    main.style.maxWidth = '100%';
-    main.style.boxSizing = 'border-box';
-    main.style.paddingLeft = '12px';
-    main.style.paddingRight = '12px';
 
     this._inyectarEstilos();
 

@@ -11,11 +11,6 @@ const InformesView = {
 
   async render() {
     const main = document.getElementById("app-content");
-    // NO forzar overflow-x:hidden — recorta tabs. Usar box-sizing solo.
-    main.style.maxWidth = '100%';
-    main.style.boxSizing = 'border-box';
-    main.style.paddingLeft = '12px';
-    main.style.paddingRight = '12px';
 
     main.innerHTML = `
       <div class="mb-14">
