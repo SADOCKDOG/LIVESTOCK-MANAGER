@@ -27,6 +27,8 @@ Cifras medidas sobre el código (50 archivos JS):
 ## 2. Inventario de problemas (por categoría)
 
 ### 2.1 Iconografía — `[ALTA]`
+> **Hallazgo crítico (verificado).** `js/icons.js` **no estaba cargado** en `index.html` y `Icons.*()` **no se invocaba en ninguna parte** del código: la "librería centralizada de iconos" era **código muerto**. Por eso el 100% de los iconos eran emojis. → *Corregido en Fase 2: se conecta la librería, se amplía con los glifos de dominio que faltaban y se añade el sistema de tamaños `.icon`/`.icon-sm/md/lg/xl`. Queda pendiente la migración de los ~1.110 emojis vista por vista.*
+
 - Existe `js/icons.js` (`Icons.home()`, SVG con `currentColor`, `stroke-width: 2`) **pero se usa poco**.
 - **1.110 emojis** (🐄 💰 📊 ✅ 🥩 🥛) dispersos por las vistas. En Android cada emoji se renderiza con el set del sistema: tamaño, peso y color inconsistentes, **no heredan el dorado del tema** y descolocan la alineación vertical.
 - El propio `WizardManager` usa flechas emoji en sus botones (`⬅ Volver`, `Siguiente ➔`, `Finalizar ✔`) en lugar de `Icons`.
@@ -205,7 +207,7 @@ Orden por **impacto visual / riesgo**. Cada fase es entregable y verificable de 
 |---|---|---|---|
 | **0. Tokens y bugs base** | Definir `--p-gold` y demás tokens; corregir botón "volver"; documentar escala. Sin cambios de layout. | Muy bajo | Medio |
 | **1. Consolidación CSS** | Unificar inputs (alias), FAB único, familia `.btn`, eliminar duplicados y parche `:has()` (migrando los `<h2>` afectados). | Bajo | Medio |
-| **2. Iconos** | Ampliar `Icons`; migrar emojis → SVG por vista (empezar por nav, `informes`, `ajustes`). | Bajo | **Alto** |
+| **2. Iconos** | ✅ *Hecho:* conectar `icons.js` (estaba sin cargar), ampliar `Icons`, sistema `.icon`. ⏳ *Pendiente:* migrar ~1.110 emojis → SVG vista por vista (empezar por nav, `informes`, `ajustes`, `dashboard`). | Bajo | **Alto** |
 | **3. Mensajes** | Implementar `Toast`/`Confirm` unificados; reemplazar `alert`/`confirm` nativos. | Medio | Alto |
 | **4. Estilos inline** | Migrar `style="..."` → utilidades/clases, vista por vista (priorizar `informes`, `explotacion`, `pesajes-ui`). | Medio | Medio |
 | **5. Formularios y wizards** | Unificar `.form-*`; migrar `formulario-finca` y `asistente-configuracion` a `WizardManager`; limpiar inline del wizard. | Medio-alto | Medio |
