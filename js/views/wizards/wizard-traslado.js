@@ -14,7 +14,7 @@ window.WizardTraslado = {
       return;
     }
 
-    const allAnimales = await Animales.list();
+    const allAnimales = (await Animales.list()).filter((a) => !a?.anulado && (a.estado || "activo") === "activo");
     const rebano = await Rebanos.get(rebanoId);
 
     if (!rebano) {
@@ -80,6 +80,51 @@ window.WizardTraslado = {
             </div>
           `;
         }
+      },
+      {
+        // PASO 3: Tramitación administrativa SIGGAN
+        content: (data) => `
+          <div class="mt-10">
+            <div class="wizard-input-group">
+              <label class="wizard-label">ESTADO DE TRÁMITE</label>
+              <select id="w-tras-estado" class="wizard-input">
+                <option value="borrador" ${data.estado_tramite === "borrador" ? "selected" : ""}>Borrador</option>
+                <option value="presentado" ${data.estado_tramite === "presentado" ? "selected" : ""}>Presentado</option>
+                <option value="aceptado" ${data.estado_tramite === "aceptado" ? "selected" : ""}>Aceptado</option>
+                <option value="rechazado" ${data.estado_tramite === "rechazado" ? "selected" : ""}>Rechazado</option>
+              </select>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">FECHA PRESENTACIÓN</label>
+              <input type="date" id="w-tras-fecha" value="${data.fecha_presentacion || ""}" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">NÚMERO REGISTRO OFICIAL</label>
+              <input type="text" id="w-tras-registro" value="${data.numero_registro_oficial || ""}" placeholder="Ej: SIGGAN-2026-000123" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ACUSE RECIBO</label>
+              <textarea id="w-tras-acuse" class="wizard-input" style="min-height:70px;resize:none;">${data.acuse_recibo || ""}</textarea>
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.estado_tramite = document.getElementById("w-tras-estado")?.value || data.estado_tramite;
+          data.fecha_presentacion = document.getElementById("w-tras-fecha")?.value || "";
+          data.numero_registro_oficial = document.getElementById("w-tras-registro")?.value.trim() || "";
+          data.acuse_recibo = document.getElementById("w-tras-acuse")?.value.trim() || "";
+        },
+        validate: async (data) => {
+          if (data.estado_tramite !== "borrador" && !data.fecha_presentacion) {
+            App.toastError("Indica fecha de presentación para continuar.");
+            return false;
+          }
+          if ((data.estado_tramite === "aceptado" || data.estado_tramite === "rechazado") && !data.numero_registro_oficial) {
+            App.toastError("El número de registro oficial es obligatorio para trámites resueltos.");
+            return false;
+          }
+          return true;
+        }
       }
     ];
 
@@ -89,7 +134,11 @@ window.WizardTraslado = {
       initialData: {
         rebano,
         allAnimales,
-        selectedIds: []
+        selectedIds: [],
+        estado_tramite: "borrador",
+        fecha_presentacion: "",
+        numero_registro_oficial: "",
+        acuse_recibo: ""
       },
       steps: wizardSteps,
       onComplete: async (data) => {
@@ -99,12 +148,59 @@ window.WizardTraslado = {
             data.rebano.zonaActual,
             data.selectedIds.length
           );
+          const fincaId = (window.Fincas && Fincas.getActiveId)
+            ? await Fincas.getActiveId().catch(() => null)
+            : null;
+          const hoy = new Date().toISOString().split("T")[0];
+          const ahoraIso = new Date().toISOString();
+          const numeroGuia = `TRASLADO-${Date.now()}`;
+          const documentoId = await window.db.add("documentos_legales", {
+            tipo: "GUIA_TRASLADO_INTERNO",
+            fecha: hoy,
+            fincaId,
+            descripcion: `Traslado interno de ${data.selectedIds.length} animales a ${data.rebano.nombre}`,
+            numero_referencia: numeroGuia,
+            estado_tramite: data.estado_tramite || "borrador",
+            fecha_presentacion: data.fecha_presentacion || null,
+            numero_registro_oficial: data.numero_registro_oficial || null,
+            acuse_recibo: data.acuse_recibo || null,
+            creadoEn: ahoraIso,
+            actualizadoEn: ahoraIso
+          });
+          let trasladados = 0;
           for (let id of data.selectedIds) {
             const a = await Animales.get(id);
+            if (!a) continue;
+            const origenId = a.rebanoId;
+            if (origenId === data.rebano.id) continue;
             a.rebanoId = data.rebano.id;
             await Animales.save(a);
+            trasladados++;
+            // Trazabilidad SIGGAN: evento de movimiento interno en el libro de registro
+            try {
+              await window.db.add("registro_eventos", {
+                fincaId,
+                entidad_id: id,
+                tipo_entidad: "animal",
+                tipo: "movimiento",
+                motivo_tarea: "traslado_interno",
+                fecha: hoy,
+                rebano_origen: origenId || null,
+                rebano_destino: data.rebano.id,
+                numero_guia: numeroGuia,
+                documento_legal_id: documentoId,
+                estado_tramite: data.estado_tramite || "borrador",
+                fecha_presentacion: data.fecha_presentacion || null,
+                numero_registro_oficial: data.numero_registro_oficial || null,
+                acuse_recibo: data.acuse_recibo || null,
+                descripcion: `Traslado interno · ${a.numero_identificacion || "#" + id} → rebaño "${data.rebano.nombre}"${data.rebano.zonaActual ? " (zona " + data.rebano.zonaActual + ")" : ""}`,
+                creadoEn: ahoraIso,
+              });
+            } catch (e) {
+              console.warn("[Traslado] No se pudo registrar el evento de movimiento:", e?.message);
+            }
           }
-          App.toast("Traslado completado");
+          App.toast(`Traslado completado · ${trasladados} animal(es)`);
           App.renderDetalleRebano(new URLSearchParams(`id=${data.rebano.id}`));
         } catch (e) {
           App.toastError(e.message);

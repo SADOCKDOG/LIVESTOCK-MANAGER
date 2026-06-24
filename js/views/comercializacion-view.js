@@ -217,14 +217,17 @@ const ComercializacionView = {
       listName: 'Lista de Ventas',
       registrarHandler: "App._abrirWizardVentaMasiva()",
       records: d.ventas.slice(0, 50).map(v => {
-        const badge = badgeHtml(v);
+        const estadoTramite = (v.estado_tramite || '').toString().trim();
+        const badgeTramite = estadoTramite
+          ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">🏛️ ${estadoTramite.toUpperCase()}</span>`
+          : '';
         return {
           title: '🔖 ' + (v.razonSocial || 'Matadero Central'),
           date: v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-',
           zone: v.snap_zona || '',
           value: (v.pesoCanal || 0) + ' kg',
           subvalue: 'Rend: ' + (v.rendimientoCanal || 0) + '%',
-          badges: badgeHtml(v),
+          badges: [badgeHtml(v), badgeTramite].filter(Boolean).join(' '),
           onclick: "App._abrirDetalleVentaCarne(" + v.id + ")"
         };
       }),
@@ -258,6 +261,9 @@ const ComercializacionView = {
         }
         if (e.comunidad_autonoma) {
           extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3);">${e.comunidad_autonoma === 'andalucia' ? '🌿 AND' : '🌿 EXT'}</span>`;
+        }
+        if (e.estado_tramite_infolac) {
+          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.35);">🏛️ INFOLAC: ${String(e.estado_tramite_infolac).toUpperCase()}</span>`;
         }
         const allBadges = [badges, extraBadges].filter(Boolean).join(' ');
 
@@ -308,6 +314,9 @@ const ComercializacionView = {
       if (a) {
         a.estado = "activo";
         await Animales.save(a);
+      }
+      if (v?.movimientoId && window.Movimientos?.delete) {
+        await window.Movimientos.delete(v.movimientoId).catch(() => {});
       }
       await window.db.delete("comercializacion_carne", id);
       App.toast("Venta eliminada.");

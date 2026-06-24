@@ -170,6 +170,20 @@ const TransportistasView = {
                     <label class="wizard-label">REGISTRO DE TRANSPORTE</label>
                     <input type="text" id="tf-registro" value="${t?.registro_transporte || ''}" class="wizard-input" placeholder="Nº registro oficial...">
                 </div>
+                <div class="wizard-input-group">
+                    <label class="wizard-label">AUTORIZACIÓN TRANSPORTE GANADO (ATG) <span class="text-red">*</span></label>
+                    <input type="text" id="tf-atg" value="${t?.autorizacion_transporte_ganado || ''}" class="wizard-input" placeholder="ATG-...">
+                </div>
+                <div class="grid grid-cols-2 gap-12">
+                    <div class="wizard-input-group">
+                        <label class="wizard-label">ÚLTIMA DESINSECTACIÓN</label>
+                        <input type="date" id="tf-desinsectacion" value="${t?.desinsectacion_ultima_fecha || ''}" class="wizard-input">
+                    </div>
+                    <div class="wizard-input-group">
+                        <label class="wizard-label">VENCIMIENTO DESINSECTACIÓN</label>
+                        <input type="date" id="tf-desinsectacion-venc" value="${t?.desinsectacion_vencimiento || ''}" class="wizard-input">
+                    </div>
+                </div>
                 <div class="grid grid-cols-2 gap-12">
                     <div class="wizard-input-group">
                         <label class="wizard-label">TELÉFONO</label>
@@ -250,6 +264,9 @@ const TransportistasView = {
                 nif_cif: overlay.querySelector('#tf-nif').value.trim(),
                 matricula: overlay.querySelector('#tf-matricula').value.trim(),
                 registro_transporte: overlay.querySelector('#tf-registro').value.trim(),
+                autorizacion_transporte_ganado: overlay.querySelector('#tf-atg').value.trim(),
+                desinsectacion_ultima_fecha: overlay.querySelector('#tf-desinsectacion').value,
+                desinsectacion_vencimiento: overlay.querySelector('#tf-desinsectacion-venc').value,
                 telefono: overlay.querySelector('#tf-telefono').value.trim(),
                 email: overlay.querySelector('#tf-email').value.trim(),
                 direccion: overlay.querySelector('#tf-direccion').value.trim(),

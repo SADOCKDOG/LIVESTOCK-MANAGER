@@ -65,14 +65,97 @@ window.WizardCenso = {
           }
           return true;
         }
+      },
+      {
+        content: (data) => `
+          <div class="mt-10">
+            <h3 class="text-green mb-15">🗂️ Tramitación Administrativa</h3>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ESTADO DE TRÁMITE</label>
+              <select id="w-cs-estado" class="wizard-input">
+                <option value="borrador" ${data.estado_tramite === "borrador" ? "selected" : ""}>Borrador</option>
+                <option value="presentado" ${data.estado_tramite === "presentado" ? "selected" : ""}>Presentado</option>
+                <option value="aceptado" ${data.estado_tramite === "aceptado" ? "selected" : ""}>Aceptado</option>
+                <option value="rechazado" ${data.estado_tramite === "rechazado" ? "selected" : ""}>Rechazado</option>
+              </select>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">FECHA PRESENTACIÓN</label>
+              <input type="date" id="w-cs-presentacion" value="${data.fecha_presentacion || ""}" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">NÚMERO REGISTRO OFICIAL</label>
+              <input type="text" id="w-cs-registro" value="${data.numero_registro_oficial || ""}" class="wizard-input" placeholder="Ej: CENSO-2026-0001">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ACUSE RECIBO</label>
+              <textarea id="w-cs-acuse" class="wizard-input" style="min-height:70px;resize:none;">${data.acuse_recibo || ""}</textarea>
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.estado_tramite = document.getElementById("w-cs-estado")?.value || data.estado_tramite;
+          data.fecha_presentacion = document.getElementById("w-cs-presentacion")?.value || "";
+          data.numero_registro_oficial = document.getElementById("w-cs-registro")?.value.trim() || "";
+          data.acuse_recibo = document.getElementById("w-cs-acuse")?.value.trim() || "";
+        },
+        validate: async (data) => {
+          if (data.estado_tramite !== "borrador" && !data.fecha_presentacion) {
+            App.toastError("Indica la fecha de presentación.");
+            return false;
+          }
+          if ((data.estado_tramite === "aceptado" || data.estado_tramite === "rechazado") && !data.numero_registro_oficial) {
+            App.toastError("Indica el número de registro oficial.");
+            return false;
+          }
+          return true;
+        }
       }
     ];
 
     window.WizardManager.create({
       id: 'wizard-censo',
       title: 'DECLARACIÓN CENSAL',
-      initialData: { fecha: `${year}-01-01`, _censo: null },
+      initialData: {
+        fecha: `${year}-01-01`,
+        _censo: null,
+        estado_tramite: "borrador",
+        fecha_presentacion: "",
+        numero_registro_oficial: "",
+        acuse_recibo: ""
+      },
+      steps,
       onComplete: async (data) => {
+        const fechaHoy = new Date().toISOString().split("T")[0];
+        const ahoraIso = new Date().toISOString();
+        const fincaId = await Fincas.getActiveId().catch(() => null);
+        const documentoId = await window.db.add("documentos_legales", {
+          fincaId,
+          tipo: "DECLARACION_CENSAL",
+          fecha: data.fecha || fechaHoy,
+          descripcion: `Declaración censal (${data._censo?.total || 0} animales)`,
+          estado_tramite: data.estado_tramite || "borrador",
+          fecha_presentacion: data.fecha_presentacion || null,
+          numero_registro_oficial: data.numero_registro_oficial || null,
+          acuse_recibo: data.acuse_recibo || null,
+          payload: data._censo || null,
+          creadoEn: ahoraIso,
+          actualizadoEn: ahoraIso
+        });
+        await window.db.add("registro_eventos", {
+          fincaId,
+          tipo: "declaracion_censal",
+          tipo_entidad: "finca",
+          entidad_id: fincaId || 0,
+          fecha: data.fecha || fechaHoy,
+          descripcion: `Declaración censal registrada (${data._censo?.total || 0} animales)`,
+          estado_tramite: data.estado_tramite || "borrador",
+          fecha_presentacion: data.fecha_presentacion || null,
+          numero_registro_oficial: data.numero_registro_oficial || null,
+          acuse_recibo: data.acuse_recibo || null,
+          documento_legal_id: documentoId,
+          creadoEn: ahoraIso
+        }).catch(() => {});
         WizardCenso.generarDocumento(finca, data.fecha, data._censo);
       }
     });
@@ -84,6 +167,7 @@ window.WizardCenso = {
     const porEspecie = {};
     let total = 0;
     animales.forEach(a => {
+      if (a?.anulado) return;
       // Activo a la fecha: dado de alta antes/igual y no dado de baja antes de la fecha
       const alta = a.fecha_alta ? new Date(a.fecha_alta) : (a.fecha_nacimiento ? new Date(a.fecha_nacimiento) : null);
       if (alta && alta > ref) return;

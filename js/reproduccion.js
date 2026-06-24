@@ -74,12 +74,23 @@ const Reproduccion = {
                 eventoId = await window.db.add('reproduccion_eventos', eventoData);
             }
 
-            // Integración opcional con eventos globales si es un parto o evento crítico
-            if (eventoData.tipo_evento === 'Parto' && window.Trazabilidad) {
+            // Parto: actualizar contador de la madre y dar de alta las crías
+            if (eventoData.tipo_evento === 'Parto') {
                 // Actualizar número de partos del animal
                 animal.numero_partos = (animal.numero_partos || 0) + 1;
                 animal.estado_reproductivo = 'Vacía';
                 await Animales.save(animal);
+
+                // Alta automática de crías en el libro de registro (genealogía madre-cría).
+                // Solo en altas nuevas para no duplicar crías al editar el evento.
+                if (!esEdicion && Array.isArray(data.crias) && data.crias.length > 0) {
+                    const idsCrias = await this._registrarCriasParto(animal, data.crias, eventoData.fecha, eventoId, fincaActivaId);
+                    eventoData.crias_ids = idsCrias;
+                    eventoData.crias_vivas = idsCrias.length;
+                    eventoData.crias_muertas = Number(data.crias_muertas) || 0;
+                    eventoData.id = eventoId;
+                    await window.db.put('reproduccion_eventos', eventoData);
+                }
             }
 
             if (eventoData.tipo_evento === 'Diagnóstico Gestación' && eventoData.resultado === 'Positivo') {
@@ -103,6 +114,50 @@ const Reproduccion = {
 
     async deleteEvento(id) {
         return await window.db.delete('reproduccion_eventos', Number(id));
+    },
+
+    /**
+     * Da de alta automáticamente las crías de un parto en el censo (libro de registro),
+     * con vínculo genealógico a la madre y un evento de nacimiento en registro_eventos.
+     * @returns {Promise<number[]>} IDs de las crías creadas
+     */
+    async _registrarCriasParto(madre, crias, fecha, partoEventoId, fincaId) {
+        const ids = [];
+        for (const cria of crias) {
+            try {
+                const crotal = (cria.crotal || '').trim().toUpperCase();
+                if (!crotal) {
+                    console.warn('[Reproduccion] Cría sin crotal: se omite el alta automática');
+                    continue;
+                }
+                const criaData = {
+                    numero_identificacion: crotal,
+                    especie: madre.especie || null,
+                    sexo: cria.sexo || 'H',
+                    raza: cria.raza || madre.raza || '',
+                    rebanoId: madre.rebanoId || null,
+                    fecha_nacimiento: fecha,
+                    fecha_alta: fecha,
+                    fecha_identificacion: fecha,
+                    tipoAlta: 'Nacimiento',
+                    madre_id: madre.id,
+                    pais_nacimiento: madre.pais_nacimiento || 'ES',
+                    estado: 'activo',
+                    notas: `Alta automática por parto de ${madre.numero_identificacion || ('#' + madre.id)}`
+                };
+                const criaId = await Animales.save(criaData);
+                ids.push(criaId);
+                // El evento "alta_nacimiento" en registro_eventos lo escribe
+                // automáticamente Animales.save() (tipoAlta="Nacimiento").
+            } catch (e) {
+                console.warn('[Reproduccion] No se pudo dar de alta la cría:', e?.message);
+                if (window.App && App.toastError) App.toastError('Cría no registrada: ' + e.message);
+            }
+        }
+        if (window.EventBus) {
+            window.EventBus.emit('animales:changed', { motivo: 'nacimiento', madreId: madre.id, criasIds: ids });
+        }
+        return ids;
     },
 
     /**

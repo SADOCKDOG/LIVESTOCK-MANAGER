@@ -137,14 +137,150 @@ const ErrorHandler = {
   },
 
   /**
+   * Normaliza NIF/CIF/NIE eliminando separadores y pasando a mayúsculas.
+   */
+  normalizeNifCif(value) {
+    return (value || "")
+      .toString()
+      .trim()
+      .toUpperCase()
+      .replace(/[\s-]/g, "");
+  },
+
+  /**
+   * Valida NIF/NIE/CIF español con dígito/letra de control.
+   */
+  validateNifCif(nifCif, { required = true } = {}) {
+    const valor = this.normalizeNifCif(nifCif);
+    if (!valor) {
+      if (required) {
+        throw new this.AppError(
+          "El NIF/CIF es obligatorio",
+          this.ERROR_TYPES.VALIDATION,
+          { field: "nif_cif", required: true }
+        );
+      }
+      return "";
+    }
+
+    const letrasDni = "TRWAGMYFPDXBNJZSQVHLCKE";
+    const esDni = /^\d{8}[A-Z]$/.test(valor);
+    const esNie = /^[XYZ]\d{7}[A-Z]$/.test(valor);
+    const esCif = /^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/.test(valor);
+
+    if (esDni) {
+      const numero = parseInt(valor.slice(0, 8), 10);
+      const letra = valor.slice(-1);
+      if (letrasDni[numero % 23] !== letra) {
+        throw new this.AppError("NIF inválido", this.ERROR_TYPES.VALIDATION, {
+          field: "nif_cif",
+          value: valor,
+        });
+      }
+      return valor;
+    }
+
+    if (esNie) {
+      const prefijo = valor[0] === "X" ? "0" : valor[0] === "Y" ? "1" : "2";
+      const numero = parseInt(prefijo + valor.slice(1, 8), 10);
+      const letra = valor.slice(-1);
+      if (letrasDni[numero % 23] !== letra) {
+        throw new this.AppError("NIE inválido", this.ERROR_TYPES.VALIDATION, {
+          field: "nif_cif",
+          value: valor,
+        });
+      }
+      return valor;
+    }
+
+    if (esCif) {
+      const letraInicial = valor[0];
+      const digitos = valor.slice(1, 8);
+      const control = valor[8];
+      let sumaPar = 0;
+      let sumaImpar = 0;
+      for (let i = 0; i < digitos.length; i++) {
+        const n = parseInt(digitos[i], 10);
+        if (i % 2 === 0) {
+          const doblado = n * 2;
+          sumaImpar += Math.floor(doblado / 10) + (doblado % 10);
+        } else {
+          sumaPar += n;
+        }
+      }
+      const total = sumaPar + sumaImpar;
+      const controlNum = (10 - (total % 10)) % 10;
+      const controlLetra = "JABCDEFGHI"[controlNum];
+
+      const soloNumero = "ABEH";
+      const soloLetra = "KPQS";
+      const esValido = soloNumero.includes(letraInicial)
+        ? control === String(controlNum)
+        : soloLetra.includes(letraInicial)
+          ? control === controlLetra
+          : control === String(controlNum) || control === controlLetra;
+
+      if (!esValido) {
+        throw new this.AppError("CIF inválido", this.ERROR_TYPES.VALIDATION, {
+          field: "nif_cif",
+          value: valor,
+        });
+      }
+      return valor;
+    }
+
+    throw new this.AppError(
+      "Formato de NIF/CIF inválido",
+      this.ERROR_TYPES.VALIDATION,
+      { field: "nif_cif", value: valor }
+    );
+  },
+
+  /**
+   * Valida REGA (opcional por defecto) usando ComunidadesService.
+   */
+  validateREGA(rega, ccaa = null, { required = false } = {}) {
+    const normalizado = window.ComunidadesService?.normalizarREGA
+      ? window.ComunidadesService.normalizarREGA(rega || "")
+      : (rega || "").toString().trim().toUpperCase().replace(/[\s-]/g, "");
+    if (!normalizado) {
+      if (required) {
+        throw new this.AppError("El REGA es obligatorio", this.ERROR_TYPES.VALIDATION, {
+          field: "rega",
+          required: true,
+        });
+      }
+      return "";
+    }
+    if (window.ComunidadesService?.validarFormatoREGA) {
+      const res = window.ComunidadesService.validarFormatoREGA(normalizado, ccaa || null);
+      if (!res?.valido) {
+        throw new this.AppError(res?.mensaje || "REGA inválido", this.ERROR_TYPES.VALIDATION, {
+          field: "rega",
+          value: normalizado,
+          ccaa: ccaa || null,
+        });
+      }
+    }
+    return normalizado;
+  },
+
+  /**
    * Valida patrón de caravana (Flexibilizado para permitir diferentes formatos)
    */
   validateCaravana(numero_identificacion) {
     // Normativa española SITRAN: código de país (2 letras) + 12 dígitos
     // Ejemplo válido: ES123456789012
+    if (!numero_identificacion) {
+      throw new this.AppError(
+        "El número de identificación (crotal) es obligatorio",
+        this.ERROR_TYPES.VALIDATION,
+        { field: "numero_identificacion", required: true }
+      );
+    }
+    
     const CROTAL_REGEX = /^[A-Z]{2}\d{12}$/;
-    const valorLimpio = numero_identificacion
-      .toString()
+    const valorLimpio = String(numero_identificacion)
       .trim()
       .toUpperCase()
       .replace(/[\s-]/g, "");

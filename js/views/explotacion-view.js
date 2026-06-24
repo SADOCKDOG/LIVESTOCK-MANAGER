@@ -39,7 +39,7 @@ const ExplotacionView = {
     }
 
     // Cargar datos comunes
-    const [rebanos, animales, eventos, todosGastos, entregasLeche, ventasCarne] = await Promise.all([
+    const [rebanos, animales, eventosRaw, todosGastos, entregasLeche, ventasCarne] = await Promise.all([
       window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
       window.db.getAll('animales').catch(() => []),
       window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
@@ -47,6 +47,7 @@ const ExplotacionView = {
       window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
       window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => [])
     ]);
+    const eventos = (eventosRaw || []).filter(e => !e?.anulado);
 
     this._activeMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('explotacion', rebanos)
@@ -917,7 +918,7 @@ const ExplotacionView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
           <div class="card p-25" style="max-width:420px; border-top:5px solid ${themeColor}; margin:16px; width:100%;">
-              <h3 class="mt-0 text-white font-900">Editar Registro Físico</h3>
+              <h3 class="mt-0 text-white font-900">Rectificar / Anular Registro Físico</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -935,10 +936,14 @@ const ExplotacionView = {
                   <label class="wizard-label">Identificación (Crotal/Lote)</label>
                   <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
               </div>
+              <div class="wizard-input-group">
+                  <label class="wizard-label">Motivo de rectificación / anulación</label>
+                  <textarea id="edit-reg-motivo" class="wizard-input" rows="2" placeholder="Indica motivo legal/auditable..."></textarea>
+              </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="background:${themeColor}; border-color:${themeColor}; flex:2;">💾 Guardar</button>
-                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🗑️ Borrar</button>
+                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="background:${themeColor}; border-color:${themeColor}; flex:2;">📝 Rectificar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🚫 Anular</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
           </div>`;
@@ -948,24 +953,73 @@ const ExplotacionView = {
         const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
         const fecha = overlay.querySelector('#edit-reg-fecha').value;
         const ident = overlay.querySelector('#edit-reg-ident').value.trim();
+        const motivoRectificacion = overlay.querySelector('#edit-reg-motivo')?.value.trim();
 
         if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
+        if (!motivoRectificacion) return App.toastError("El motivo de rectificación es obligatorio");
+
+        const original = { ...evento };
 
         evento.valor_neto = val;
         evento.fecha = fecha;
         evento.snap_identificacion = ident;
+        evento.rectificado = true;
+        evento.rectificadoEn = new Date().toISOString();
+        evento.rectificadoMotivo = motivoRectificacion;
+        evento.rectificacionDe = original.id;
         evento.actualizadoEn = new Date().toISOString();
 
         await window.db.put('registro_eventos', evento);
+        await window.db.add('registro_eventos', {
+          fincaId: evento.fincaId,
+          entidad_id: evento.entidad_id,
+          tipo_entidad: evento.tipo_entidad || 'registro',
+          tipo: 'auditoria',
+          motivo_tarea: 'rectificacion_registro',
+          fecha: new Date().toISOString().split('T')[0],
+          observaciones: `Rectificación registro ${original.id}: ${motivoRectificacion}`,
+          auditoria: {
+            evento_origen_id: original.id,
+            antes: original,
+            despues: {
+              valor_neto: evento.valor_neto,
+              fecha: evento.fecha,
+              snap_identificacion: evento.snap_identificacion
+            },
+            motivo: motivoRectificacion
+          },
+          creadoEn: new Date().toISOString()
+        });
         App.toast("Registro actualizado");
         overlay.remove();
         await ExplotacionView.render();
       };
 
       overlay.querySelector('#btn-del-reg').onclick = async () => {
-        if (!confirm("¿Eliminar este registro de forma permanente?")) return;
-        await window.db.delete('registro_eventos', id);
-        App.toast("Registro eliminado");
+        const motivoAnulacion = overlay.querySelector('#edit-reg-motivo')?.value.trim();
+        if (!motivoAnulacion) return App.toastError("El motivo de anulación es obligatorio");
+        if (!confirm("¿Anular este registro? Se conservará para auditoría.")) return;
+
+        evento.anulado = true;
+        evento.anuladoEn = new Date().toISOString();
+        evento.anuladoMotivo = motivoAnulacion;
+        evento.actualizadoEn = new Date().toISOString();
+        await window.db.put('registro_eventos', evento);
+        await window.db.add('registro_eventos', {
+          fincaId: evento.fincaId,
+          entidad_id: evento.entidad_id,
+          tipo_entidad: evento.tipo_entidad || 'registro',
+          tipo: 'auditoria',
+          motivo_tarea: 'anulacion_registro',
+          fecha: new Date().toISOString().split('T')[0],
+          observaciones: `Anulación registro ${evento.id}: ${motivoAnulacion}`,
+          auditoria: {
+            evento_origen_id: evento.id,
+            motivo: motivoAnulacion
+          },
+          creadoEn: new Date().toISOString()
+        });
+        App.toast("Registro anulado");
         overlay.remove();
         await ExplotacionView.render();
       };

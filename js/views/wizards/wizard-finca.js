@@ -125,6 +125,7 @@ window.WizardFinca = {
                 <div class="wizard-input-group"><label class="wizard-label">VETERINARIO ADSG</label><input type="text" id="w-f-adsg-vet" value="${data.adsg_veterinario || ''}" class="wizard-input"></div>
                 <div class="wizard-input-group"><label class="wizard-label">Nº COLEGIADO</label><input type="text" id="w-f-adsg-col" value="${data.adsg_vet_colegiado || ''}" class="wizard-input"></div>
               </div>
+              <div class="wizard-input-group"><label class="wizard-label">TELÉFONO VETERINARIO</label><input type="tel" id="w-f-adsg-tel" value="${data.adsg_vet_telefono || ''}" class="wizard-input"></div>
               <div class="wizard-input-group"><label class="wizard-label">NIF VETERINARIO</label><input type="text" id="w-f-adsg-nif" value="${data.adsg_vet_nif || ''}" class="wizard-input"></div>
               <div class="wizard-input-group"><label class="wizard-label">FECHA VENCIMIENTO ADSG</label><input type="date" id="w-f-adsg-fin" value="${data.adsg_fecha_vencimiento || ''}" class="wizard-input"></div>
               <div class="wizard-input-group"><label class="wizard-label">EMAIL ADSG / GESTOR</label><input type="email" id="w-f-email" value="${data.email || ''}" class="wizard-input"></div>
@@ -142,6 +143,7 @@ window.WizardFinca = {
           data.adsg_codigo = document.getElementById('w-f-adsg-cod')?.value.trim() || data.adsg_codigo;
           data.adsg_veterinario = document.getElementById('w-f-adsg-vet')?.value.trim() || data.adsg_veterinario;
           data.adsg_vet_colegiado = document.getElementById('w-f-adsg-col')?.value.trim() || data.adsg_vet_colegiado;
+          data.adsg_vet_telefono = document.getElementById('w-f-adsg-tel')?.value.trim() || data.adsg_vet_telefono;
           data.adsg_vet_nif = document.getElementById('w-f-adsg-nif')?.value.trim() || data.adsg_vet_nif;
           data.adsg_fecha_vencimiento = document.getElementById('w-f-adsg-fin')?.value || data.adsg_fecha_vencimiento;
           data.email = document.getElementById('w-f-email')?.value.trim() || data.email;

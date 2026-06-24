@@ -89,6 +89,29 @@ window.AlbaranLecheWizard = {
               <label class="wizard-label">CÓDIGO ADSG</label>
               <input type="text" id="w-l-adsg" value="${data.adsg_codigo || finca.adsg_codigo || ''}" placeholder="Código ADSG" class="wizard-input">
             </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ESTADO DECLARACIÓN INFOLAC</label>
+              <select id="w-l-estado-tramite" class="wizard-input wizard-select">
+                <option value="borrador" ${data.estado_tramite_infolac === 'borrador' ? 'selected' : ''}>Borrador</option>
+                <option value="presentado" ${data.estado_tramite_infolac === 'presentado' ? 'selected' : ''}>Presentado</option>
+                <option value="aceptado" ${data.estado_tramite_infolac === 'aceptado' ? 'selected' : ''}>Aceptado</option>
+                <option value="rechazado" ${data.estado_tramite_infolac === 'rechazado' ? 'selected' : ''}>Rechazado</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-8">
+              <div class="wizard-input-group">
+                <label class="wizard-label">FECHA PRESENTACIÓN</label>
+                <input type="date" id="w-l-fecha-pres" value="${data.fecha_presentacion_infolac || ''}" class="wizard-input">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">Nº REGISTRO OFICIAL</label>
+                <input type="text" id="w-l-reg-of" value="${data.numero_registro_infolac || ''}" class="wizard-input" placeholder="Asiento oficial">
+              </div>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">ACUSE / JUSTIFICANTE</label>
+              <input type="text" id="w-l-acuse" value="${data.acuse_infolac || ''}" class="wizard-input" placeholder="Código de acuse">
+            </div>
           </div>
         `;
         },
@@ -116,9 +139,25 @@ window.AlbaranLecheWizard = {
           data.comunidad_autonoma = document.getElementById('w-l-ccaa')?.value || data.comunidad_autonoma;
           data.contrato_numero = document.getElementById('w-l-ctr')?.value.trim() || data.contrato_numero;
           data.adsg_codigo = document.getElementById('w-l-adsg')?.value.trim() || data.adsg_codigo;
+          data.estado_tramite_infolac = document.getElementById('w-l-estado-tramite')?.value || data.estado_tramite_infolac;
+          data.fecha_presentacion_infolac = document.getElementById('w-l-fecha-pres')?.value || '';
+          data.numero_registro_infolac = document.getElementById('w-l-reg-of')?.value.trim() || '';
+          data.acuse_infolac = document.getElementById('w-l-acuse')?.value.trim() || '';
         },
         validate: async (data) => {
           if (!data.fecha) { App.toastError("La fecha de recogida es obligatoria"); return false; }
+          if (!data.comunidad_autonoma) { App.toastError("Selecciona la comunidad autónoma"); return false; }
+          if (!data.contrato_numero) { App.toastError("El nº de contrato lácteo es obligatorio"); return false; }
+          if (!data.adsg_codigo) { App.toastError("El código ADSG es obligatorio"); return false; }
+          if (data.estado_tramite_infolac !== 'borrador' && !data.fecha_presentacion_infolac) {
+            App.toastError("La fecha de presentación INFOLAC es obligatoria.");
+            return false;
+          }
+          if ((data.estado_tramite_infolac === 'aceptado' || data.estado_tramite_infolac === 'rechazado') &&
+              (!data.numero_registro_infolac || !data.acuse_infolac)) {
+            App.toastError("Número de registro y acuse INFOLAC son obligatorios para estado aceptado/rechazado.");
+            return false;
+          }
           return true;
         }
       },
@@ -470,6 +509,10 @@ window.AlbaranLecheWizard = {
         fecha_analisis: new Date().toISOString().split("T")[0],
         nro_boletin: '',
         laboratorio_nombre: 'LIGAL',
+        estado_tramite_infolac: 'borrador',
+        fecha_presentacion_infolac: '',
+        numero_registro_infolac: '',
+        acuse_infolac: '',
         l: 0,
         pb: refPrecios.precio_base_referencia,
         precio_extracto_seco: refPrecios.precio_por_punto_extracto,
@@ -480,6 +523,15 @@ window.AlbaranLecheWizard = {
       steps: wizardSteps,
       onComplete: async (dataLeche) => {
         try {
+          // Validación GAP 5: Bloquear venta de leche si prohibidoLeche está activo
+          const sanitarios = await window.Sanitarios.list(null, fincaId);
+          const prohibidoLecheActivo = sanitarios && sanitarios.some(s => s.prohibidoLeche === true);
+          if (prohibidoLecheActivo) {
+            const motivo = sanitarios.find(s => s.prohibidoLeche === true);
+            App.toastError(`🚫 VENTA DE LECHE PROHIBIDA: Se ha detectado un tratamiento con restricción. Consultá con Inspección (${motivo.tipo_tratamiento || 'medicamento'}). Revisa SANEAMIENTOS.`);
+            return;
+          }
+
           // Calcular campos derivados
           const extractoSeco = parseFloat((parseFloat(dataLeche.grasa || 0) + parseFloat(dataLeche.proteina || 0)).toFixed(2));
           const pBase = parseFloat(dataLeche.pb) || 0;
@@ -511,6 +563,10 @@ window.AlbaranLecheWizard = {
             comunidad_autonoma: dataLeche.comunidad_autonoma || null,
             contrato_numero: dataLeche.contrato_numero || '',
             adsg_codigo: dataLeche.adsg_codigo || '',
+            estado_tramite_infolac: dataLeche.estado_tramite_infolac || 'borrador',
+            fecha_presentacion_infolac: dataLeche.fecha_presentacion_infolac || null,
+            numero_registro_infolac: dataLeche.numero_registro_infolac || '',
+            acuse_infolac: dataLeche.acuse_infolac || '',
             rega_origen: finca.codigo_REGA || finca.rega || '',
             numero_infolac: dataLeche.numero_infolac || '',
             numero_muestreo_oficial: dataLeche.numero_muestreo_oficial || '',
@@ -541,6 +597,20 @@ window.AlbaranLecheWizard = {
           };
 
           const idL = await window.db.add("comercializacion_leche", reg);
+          const numeroDocInfolac = `INFOLAC-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${idL}`;
+          await window.db.add('documentos_legales', {
+            tipo: 'infolac_declaracion',
+            fincaId,
+            numero: numeroDocInfolac,
+            fecha_emision: dataLeche.fecha,
+            estado_tramite: reg.estado_tramite_infolac,
+            fecha_presentacion: reg.fecha_presentacion_infolac,
+            numero_registro_oficial: reg.numero_registro_infolac,
+            acuse_recibo: reg.acuse_infolac,
+            referencia_operacion_id: idL,
+            plataforma: window.ComunidadesService?.getConfiguracionCCAA?.(dataLeche.comunidad_autonoma || '')?.sistema_movimiento || '',
+            created_at: new Date().toISOString()
+          }).catch(() => {});
           const est = await window.Trazabilidad.generarEstructuraAlbaran(
             window.db,
             { ...reg, id: idL },
