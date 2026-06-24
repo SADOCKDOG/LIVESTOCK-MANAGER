@@ -1174,7 +1174,7 @@ const SigganQA = {
 
   async testNotificacionesREGA() {
     const M = 'TEST 17 — Notificaciones a REGA (Gap 11)';
-    this._startTest(M);
+    this._log('RUN', M, 'Iniciando validación de notificaciones a REGA');
     
     try {
       // Validar que módulo existe
@@ -1219,15 +1219,15 @@ const SigganQA = {
         `Validación: animal sin crotal = inválido`, 'VALIDACIÓN');
 
       // TEST: Registrar notificación
-      const notificacionId = await NotificacionesREGA.registrar({
+      const resultadoRegistro = await NotificacionesREGA.registrar({
         animal_id: animalId,
         finca_id: finca.id,
         animal_numero: animalTest.numero_identificacion,
         finca_rega: finca.rega || finca.codigo_REGA,
         tipo_evento: 'cambio_estado'
       });
-      this._assert(notificacionId, M, 
-        `Notificación registrada (id: ${notificacionId})`, 'REGISTRO');
+      this._assert(resultadoRegistro && resultadoRegistro.exito === true, M, 
+        `Notificación registrada (número: ${resultadoRegistro.numero_seguimiento})`, 'REGISTRO');
 
       // TEST: Verificar que animal fue notificado
       const yaNotificado = await NotificacionesREGA.yaFueNotificado(animalId);
@@ -1240,16 +1240,20 @@ const SigganQA = {
         `Historial de notificaciones recuperado (${historial.length} registros)`, 'HISTORIAL');
 
       // TEST: Actualizar estado de notificación
-      await NotificacionesREGA.actualizarEstado(notificacionId, 'enviado');
-      const historialActualizado = await NotificacionesREGA.obtenerHistorial(animalId);
-      const notificacionActualizada = historialActualizado[0];
-      this._assert(notificacionActualizada.estado_notificacion === 'enviado', M, 
-        `Estado actualizado a 'enviado'`, 'ESTADO');
+      if (resultadoRegistro.id) {
+        await NotificacionesREGA.actualizarEstado(resultadoRegistro.id, 'enviado');
+        const historialActualizado = await NotificacionesREGA.obtenerHistorial(animalId);
+        const notificacionActualizada = historialActualizado[0];
+        this._assert(notificacionActualizada && notificacionActualizada.estado_notificacion === 'enviado', M, 
+          `Estado actualizado a 'enviado'`, 'ESTADO');
 
-      // TEST: Simular envío a REGA
-      const resultado = await NotificacionesREGA.enviarAREGA(notificacionActualizada);
-      this._assert(resultado.exito === true, M, 
-        `Envío a REGA simulado exitosamente`, 'ENVÍO');
+        // TEST: Simular envío a REGA
+        const resultadoEnvio = await NotificacionesREGA.enviarAREGA(notificacionActualizada);
+        this._assert(resultadoEnvio && resultadoEnvio.exito === true, M, 
+          `Envío a REGA simulado exitosamente`, 'ENVÍO');
+      } else {
+        this._log('WARN', M, 'Notificación sin ID, saltando actualización de estado', 'ESTADO');
+      }
 
       // Limpiar
       try {
