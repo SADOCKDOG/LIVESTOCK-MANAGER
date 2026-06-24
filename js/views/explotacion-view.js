@@ -188,9 +188,9 @@ const ExplotacionView = {
       <!-- Selector de Modo ExPro Superior -->
       <div class="mb-14 text-center">
         <div style="display: inline-flex; background: #18181b; padding: 4px; border-radius: 24px; border: 1px solid #27272a; width: 100%; max-width: 480px; box-sizing: border-box;">
-          <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">🥩 Carne</button>
-          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">🥛 Leche</button>
-          <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">🔄 Híbrido</button>
+          <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
+          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
+          <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
         </div>
       </div>
       <div id="expro-mode-content"></div>
@@ -275,17 +275,17 @@ const ExplotacionView = {
         <div class="text-center mb-12">
           <div class="grid grid-cols-2 gap-10">
             <button class="btn btn-create btn-sm" style="background:${themeColor}; border-color:${themeColor};" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
-              ➕ Registrar Peso (kg)
+              ${Icons.agregar()} Registrar Peso (kg)
             </button>
             <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
-              💉 Registrar Tratamiento
+              ${Icons.sanidad()} Registrar Tratamiento
             </button>
           </div>
         </div>
 
         <!-- Líderes GMD -->
         <div class="mb-14 p-12 rounded bg-dark border border-222" style="border-top: 3px solid #fbbf24;">
-          <div class="text-xs text-amber font-black uppercase mb-6">🏆 LÍDERES DE GANANCIA DE PESO (GMD)</div>
+          <div class="text-xs text-amber font-black uppercase mb-6 flex items-center gap-6">${Icons.tendencia()} LÍDERES DE GANANCIA DE PESO (GMD)</div>
           <div class="grid gap-6">
             ${d.gmdList.slice(0, 4).map(g => `
               <div class="flex justify-between items-center text-xs text-white">
@@ -298,7 +298,7 @@ const ExplotacionView = {
         <!-- Historial Pesajes -->
         <div class="card p-16 mb-16 border-222">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-            📋 Últimos pesajes registrados
+            ${Icons.documento()} Últimos pesajes registrados
           </div>
           <div class="grid gap-8" style="max-height:350px; overflow-y:auto;">
             ${d.pesajes.length > 0
@@ -355,10 +355,10 @@ const ExplotacionView = {
         <div class="text-center mb-12">
           <div class="grid grid-cols-2 gap-10">
             <button class="btn btn-create btn-sm" style="background:${themeColor}; border-color:${themeColor};" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
-              ➕ Registrar Control Diario (L)
+              ${Icons.agregar()} Registrar Control Diario (L)
             </button>
             <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
-              💉 Registrar Tratamiento
+              ${Icons.sanidad()} Registrar Tratamiento
             </button>
           </div>
         </div>
@@ -366,7 +366,7 @@ const ExplotacionView = {
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
         <div class="card p-14 mb-16 border-222">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:8px; padding-bottom:5px;">
-            🔬 Calidad de Tanque (Últimas Analíticas de Laboratorio)
+            ${Icons.grafico()} Calidad de Tanque (Últimas Analíticas de Laboratorio)
           </div>
           
           <div class="scroll-shadow-container" style="overflow-x:auto;">
@@ -416,7 +416,7 @@ const ExplotacionView = {
         <!-- Controles Ordeño Recientes -->
         <div class="card p-14 mb-16 border-222">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-            📋 Ordeños y Controles Diarios Recientes
+            ${Icons.documento()} Ordeños y Controles Diarios Recientes
           </div>
           <div class="grid gap-8" style="max-height:220px; overflow-y:auto;">
             ${d.ordeños.length > 0
@@ -472,22 +472,22 @@ const ExplotacionView = {
 
         <div class="flex gap-10 mb-14">
           <button class="btn btn-create btn-sm flex-1" style="background:#ef4444; border-color:#ef4444;" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
-            ➕ Registrar Peso (kg)
+            ${Icons.agregar()} Registrar Peso (kg)
           </button>
           <button class="btn btn-secondary btn-sm flex-1" style="background:#3b82f6; border-color:#3b82f6;" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
-            ➕ Registrar Ordeño (L)
+            ${Icons.agregar()} Registrar Ordeño (L)
           </button>
         </div>
         <div class="text-center mb-14">
           <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
-            💉 Registrar Tratamiento (Mixto)
+            ${Icons.sanidad()} Registrar Tratamiento (Mixto)
           </button>
         </div>
 
         <!-- True Hub: Highlight Carne & Leche Side-by-Side -->
         <div class="grid grid-cols-2 gap-10 mb-14">
           <div class="p-10 rounded bg-dark border border-222" style="border-top:3px solid #ef4444;">
-            <div class="text-xs font-bold text-red uppercase mb-6">🥩 Carne: Líderes GMD</div>
+            <div class="text-xs font-bold text-red uppercase mb-6 flex items-center gap-6">${Icons.carne()} Carne: Líderes GMD</div>
             <div class="grid gap-4 text-xs" style="font-size:0.68rem;">
               ${d.gmdList.slice(0, 3).map(g => `
                 <div class="flex justify-between">
@@ -498,7 +498,7 @@ const ExplotacionView = {
           </div>
 
           <div class="p-10 rounded bg-dark border border-222" style="border-top:3px solid #3b82f6;">
-            <div class="text-xs font-bold text-blue uppercase mb-6">🔬 Leche: Última analítica</div>
+            <div class="text-xs font-bold text-blue uppercase mb-6 flex items-center gap-6">${Icons.grafico()} Leche: Última analítica</div>
             <div class="grid gap-4 text-xs" style="font-size:0.68rem;">
               ${d.entregasLeche.length > 0
                 ? (() => {
@@ -529,7 +529,7 @@ const ExplotacionView = {
         <!-- Historial Consolidado -->
         <div class="card p-14 mb-16 border-222">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-            📋 Historial Consolidado Reciente
+            ${Icons.documento()} Historial Consolidado Reciente
           </div>
           <div class="grid gap-8" style="max-height:220px; overflow-y:auto;">
             ${d.proConsolidada.length > 0
@@ -595,9 +595,9 @@ const ExplotacionView = {
     let html = `
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${borderStyleColor};">
         <div class="flex justify-between items-center mb-10">
-          <div class="text-xs text-white font-black uppercase">📦 ALMACÉN Y STOCK DE SILOS</div>
+          <div class="text-xs text-white font-black uppercase flex items-center gap-6">${Icons.paquete()} ALMACÉN Y STOCK DE SILOS</div>
           <button class="btn btn-secondary btn-xs" style="font-size:0.68rem; padding:3px 6px; background:${borderStyleColor}; border:none; margin:0; line-height:1;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-            ➕ Carga/Consumo
+            ${Icons.agregar()} Carga/Consumo
           </button>
         </div>
         <div class="grid gap-10">
@@ -641,7 +641,7 @@ const ExplotacionView = {
     return `
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${color};">
         <div class="flex justify-between items-center mb-10">
-          <div class="text-xs text-white font-black uppercase">💸 COSTES + CUMPLIMIENTO NORMATIVO</div>
+          <div class="text-xs text-white font-black uppercase flex items-center gap-6">${Icons.dinero()} COSTES + CUMPLIMIENTO NORMATIVO</div>
         </div>
         <div class="grid grid-cols-3 gap-10 mb-10">
           <div class="card p-10 text-center" style="border:1px solid #27272a;">
@@ -658,9 +658,9 @@ const ExplotacionView = {
           </div>
         </div>
         <div class="grid grid-cols-3 gap-10">
-          <button class="btn btn-secondary btn-sm" style="background:#d97706; border-color:#d97706;" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">➕ Gasto Alimentación</button>
-          <button class="btn btn-secondary btn-sm" style="background:#3b82f6; border-color:#3b82f6;" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">➕ Gasto Energía</button>
-          <button class="btn btn-secondary btn-sm" style="background:#16a34a; border-color:#16a34a;" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">➕ Gasto Fitosanitario</button>
+          <button class="btn btn-secondary btn-sm" style="background:#d97706; border-color:#d97706;" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">${Icons.agregar()} Gasto Alimentación</button>
+          <button class="btn btn-secondary btn-sm" style="background:#3b82f6; border-color:#3b82f6;" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">${Icons.agregar()} Gasto Energía</button>
+          <button class="btn btn-secondary btn-sm" style="background:#16a34a; border-color:#16a34a;" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">${Icons.agregar()} Gasto Fitosanitario</button>
         </div>
         <div class="mt-10 text-xs text-aaa">
           ✅ Registros fitosanitarios con control completo: <strong>${fitoConControl}</strong> · ⚠️ No aptos para comercialización: <strong style="color:${fitoPendientes > 0 ? '#ef4444' : '#10b981'}">${fitoPendientes}</strong>
@@ -674,13 +674,13 @@ const ExplotacionView = {
     const tab = modo === 'leche' ? 'leche' : 'carne';
     return `
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${color};">
-        <div class="text-xs text-white font-black uppercase mb-8">🔄 CIERRE OPERATIVO → COMERCIALIZACIÓN/VENTA</div>
+        <div class="text-xs text-white font-black uppercase mb-8 flex items-center gap-6">${Icons.rotacion()} CIERRE OPERATIVO → COMERCIALIZACIÓN/VENTA</div>
         <div class="text-xs text-aaa mb-10">
           Finaliza primero los registros de Explotación (producción, costes y cumplimiento). Después continúa el flujo comercial.
         </div>
         <div class="grid grid-cols-2 gap-10">
-          <button class="widget-link-btn" onclick="ExplotacionView._irAComercializacionDesdeExplotacion('${modo}')">🚚 Ir a Comercialización (${modo === 'leche' ? 'Leche' : 'Carne'})</button>
-          <a href="#/informes" class="widget-link-btn">📊 Ver informes de control</a>
+          <button class="widget-link-btn" onclick="ExplotacionView._irAComercializacionDesdeExplotacion('${modo}')">${Icons.transportistas()} Ir a Comercialización (${modo === 'leche' ? 'Leche' : 'Carne'})</button>
+          <a href="#/informes" class="widget-link-btn">${Icons.grafico()} Ver informes de control</a>
         </div>
       </div>
     `;
@@ -732,13 +732,13 @@ const ExplotacionView = {
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:380px; border-top:5px solid ${color}; width:100%; margin:16px;">
-        <h3 class="mt-0 text-white font-900">💉 Tratamiento ${modo.toUpperCase()}</h3>
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Tratamiento ${modo.toUpperCase()}</h3>
         <label class="wizard-label mb-10">Selecciona rebaño para tratamiento:</label>
         <select id="w-expro-trat-reb" class="wizard-input wizard-select mb-15">
           ${rebanos.map(r => `<option value="${r.id}">${r.nombre} (${r.tipo || r.especie || 'N/D'})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="w-expro-trat-next" style="background:${color}; border-color:${color};">Proceder ➔</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="w-expro-trat-next" style="background:${color}; border-color:${color};">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>
@@ -825,7 +825,7 @@ const ExplotacionView = {
     overlay.style.zIndex = "7000";
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:380px; border-top:5px solid ${themeColor}; width:100%; margin:16px;">
-        <h3 class="mt-0 text-white font-900">📦 Registro de Silo</h3>
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.paquete()} Registro de Silo</h3>
         
         <div class="wizard-input-group">
           <label class="wizard-label">Seleccionar Silo</label>
@@ -854,7 +854,7 @@ const ExplotacionView = {
         </div>
 
         <div class="flex gap-10 mt-20">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="ws-btn-save" style="background:${themeColor}; border-color:${themeColor};">Registrar ➔</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="ws-btn-save" style="background:${themeColor}; border-color:${themeColor};">Registrar ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>
@@ -938,8 +938,8 @@ const ExplotacionView = {
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="background:${themeColor}; border-color:${themeColor}; flex:2;">📝 Rectificar</button>
-                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🚫 Anular</button>
+                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="background:${themeColor}; border-color:${themeColor}; flex:2;">${Icons.editar()} Rectificar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Anular</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
           </div>`;
