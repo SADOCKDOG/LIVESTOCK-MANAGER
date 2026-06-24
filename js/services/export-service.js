@@ -483,11 +483,15 @@ const ExportService = {
   /**
    * Exportación completa REGA (CSV + XML) con descarga directa.
    * Bloquea si el código REGA no es válido.
+   * @param {object} [opts] - { skipPreflight } omite la validación interna
+   *   cuando la capa de UI ya la ha mostrado y confirmado.
    */
-  async exportarREGA(finca, animales, rebanos) {
-    const reporte = this.validarPreExportacion(finca, animales);
-    if (!this._reportarValidacion(reporte)) {
-      return { success: false, errores: reporte.errores, avisos: reporte.avisos };
+  async exportarREGA(finca, animales, rebanos, opts = {}) {
+    if (!opts.skipPreflight) {
+      const reporte = this.validarPreExportacion(finca, animales);
+      if (!this._reportarValidacion(reporte)) {
+        return { success: false, errores: reporte.errores, avisos: reporte.avisos };
+      }
     }
 
     const csv = this.generarCSV_CensoREGA(finca, animales, rebanos);
@@ -497,22 +501,25 @@ const ExportService = {
 
     await this.descargar(csv, `REGA_Censo_${rega}_${fecha}.csv`, 'text/csv;charset=utf-8');
     await this.descargar(xml, `REGA_Explotacion_${rega}_${fecha}.xml`, 'application/xml;charset=utf-8');
-    return { success: true, csv, xml, avisos: reporte.avisos };
+    return { success: true, csv, xml };
   },
 
   /**
    * Exportación movimientos SIA/PIGGAN. Bloquea si el código REGA no es válido.
+   * @param {object} [opts] - { skipPreflight } omite la validación interna.
    */
-  async exportarMovimientos(eventos, animales, finca) {
-    const reporte = this.validarPreExportacion(finca, animales, eventos);
-    if (!this._reportarValidacion(reporte)) {
-      return { success: false, errores: reporte.errores, avisos: reporte.avisos };
+  async exportarMovimientos(eventos, animales, finca, opts = {}) {
+    if (!opts.skipPreflight) {
+      const reporte = this.validarPreExportacion(finca, animales, eventos);
+      if (!this._reportarValidacion(reporte)) {
+        return { success: false, errores: reporte.errores, avisos: reporte.avisos };
+      }
     }
 
     const csv = this.generarCSV_Movimientos(eventos, animales, finca);
     const rega = finca?.codigo_REGA || finca?.rega || 'unknown';
     await this.descargar(csv, `Movimientos_SIA_${rega}_${formatFecha(new Date())}.csv`);
-    return { success: true, csv, avisos: reporte.avisos };
+    return { success: true, csv };
   },
 
   /**
@@ -526,11 +533,12 @@ const ExportService = {
 
   /**
    * Exportación completa (todo en uno)
+   * @param {object} [opts] - { skipPreflight } omite la validación interna.
    */
-  async exportarCompleto(finca, animales, rebanos, eventos, prodLeche, prodCarne) {
-    const rega = await this.exportarREGA(finca, animales, rebanos);
+  async exportarCompleto(finca, animales, rebanos, eventos, prodLeche, prodCarne, opts = {}) {
+    const rega = await this.exportarREGA(finca, animales, rebanos, opts);
     if (!rega.success) return rega; // REGA inválido: abortar todo
-    await this.exportarMovimientos(eventos, animales, finca);
+    await this.exportarMovimientos(eventos, animales, finca, { skipPreflight: true });
     await this.exportarProduccion(prodLeche, prodCarne);
     return { success: true };
   }
