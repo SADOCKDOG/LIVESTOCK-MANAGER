@@ -4,32 +4,69 @@
  */
 
 :root {
-    /* Paleta Deep Dark */
+    /* ── MARCA ── */
     --p-cork: #d4a373;        /* Oro Corcho */
     --p-cork-dark: #a0673a;
-    --accent: #7fb069;        /* Verde Alcornoque */
-    
+    --p-gold: #fbbf24;        /* Dorado de acento (títulos, badges) */
+    --p-gold-dark: #d97706;   /* Dorado oscuro (botón primario) */
+    --accent: #7fb069;        /* Verde Alcornoque (legacy) */
+
+    /* ── BASE OLED ── */
     --bg: #000000;            /* Negro Puro */
     --surface: #121212;       /* Gris Antracita */
     --surface-light: #1e1e1e; /* Elevación */
-    
+    --surface-input: #1a1a1a; /* Fondo de inputs/celdas */
+    --border: #2a2a2a;        /* Borde sutil */
+    --border-input: #333333;  /* Borde de inputs */
+
+    /* ── TEXTO ── */
     --text-p: #f8f9fa;        /* Blanco hueso */
     --text-s: #a0a0a0;        /* Gris suave */
-    --border: #2a2a2a;        /* Borde sutil */
-    
-    /* COLORES PARA DATOS */
-    --color-metric-primary: #10b981;
-    --color-metric-warning: #f59e0b;
-    --color-metric-danger: #ef4444;
-    --color-metric-info: #3b82f6;
-    
-    /* ESPACIADO */
+    --text-d: #666666;        /* Deshabilitado / placeholder */
+
+    /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
+    --c-success: #10b981;
+    --c-warning: #f59e0b;
+    --c-danger:  #ef4444;
+    --c-info:    #3b82f6;
+    --c-accent:  #8b5cf6;     /* Reproducción / violeta */
+
+    /* Alias legacy (mapeados a la semántica) */
+    --color-metric-primary: var(--c-success);
+    --color-metric-warning: var(--c-warning);
+    --color-metric-danger:  var(--c-danger);
+    --color-metric-info:    var(--c-info);
+
+    /* ── TIPOGRAFÍA (escala semántica única) ── */
+    --fs-display: 1.6rem;     /* KPI grande / cifra destacada */
+    --fs-h1:   1.25rem;       /* título de card */
+    --fs-h2:   1.05rem;       /* subtítulo de sección */
+    --fs-body: 0.95rem;       /* texto e inputs */
+    --fs-sm:   0.85rem;       /* secundario */
+    --fs-label:0.75rem;       /* labels (uppercase) */
+    --fs-tiny: 0.65rem;       /* metadatos */
+
+    /* ── ESPACIADO (escala base 4px) ── */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
     --touch-min: 50px;
     --tap-gap: 8px;
 
+    /* ── RADIOS ── */
+    --r-sm:   8px;            /* chips / inputs internos */
+    --r-md:   14px;           /* inputs / botones */
+    --r-lg:   16px;           /* cards */
+    --r-pill: 28px;           /* botón principal / FAB */
+    --radius: 16px;           /* alias legacy = --r-lg */
+
+    /* ── SOMBRAS ── */
     --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
-    --radius: 16px;
-    
+
+    /* ── SAFE AREAS (Android vertical) ── */
     --safe-top: env(safe-area-inset-top);
     --safe-bottom: env(safe-area-inset-bottom);
 }
@@ -290,22 +327,27 @@ nav.bottom-nav {
     filter: brightness(0.9);
 }
 
-.btn-primary { 
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%); 
-    color: #fff; 
-    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.3); 
+.btn-primary {
+    background: linear-gradient(135deg, var(--p-gold-dark) 0%, #b45309 100%);
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.3);
 }
 
-.btn-secondary { background: #1a1a1a; color: #fff; border: 1px solid #333; }
+.btn-secondary { background: var(--surface-input); color: #fff; border: 1px solid var(--border-input); }
 
 /* UTILS */
 .loader { text-align: center; padding: 50px; color: var(--p-cork); font-weight: 700; }
 .toast {
     position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-    background: #fbbf24; color: #000; padding: 15px 30px; border-radius: 30px;
+    background: var(--p-gold); color: #000; padding: 15px 30px; border-radius: var(--r-pill);
     font-weight: 800; z-index: 6000; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    max-width: calc(100% - 32px); text-align: center;
 }
-.toast.error { background: #ef4444; color: #fff; }
+/* Variantes semánticas (usar con Toast.success/warning/error/info) */
+.toast.success { background: var(--c-success); color: #fff; }
+.toast.warning { background: var(--c-warning); color: #000; }
+.toast.info    { background: var(--c-info);    color: #fff; }
+.toast.error   { background: var(--c-danger);  color: #fff; }
 
 /* Dashboard Grids */
 .summary-table-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
@@ -1153,8 +1195,8 @@ label {
     right: 20px;
     width: 56px;
     height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #d97706, #b45309);
+    border-radius: var(--r-pill);
+    background: linear-gradient(135deg, var(--p-gold-dark), #b45309);
     color: #fff;
     font-size: 1.6rem;
     display: flex;
@@ -2128,7 +2170,7 @@ label {
 .text-ccc { color: #ccc; }
 
 /* ── Navegación volver ── */
-.link-back { color: #fbbf24; text-decoration: none; font-size: 0.85rem; }
+.link-back { color: var(--p-gold); text-decoration: none; font-size: 0.85rem; }
 
 /* ── KPI mini card cells ── */
 .kpi-label  { font-size: 0.6rem; color: #888; font-weight: 800; text-transform: uppercase; }
@@ -2180,7 +2222,7 @@ label {
 .error-card { border-left: 4px solid #ef4444; }
 .report-section { padding: 16px; margin-bottom: 14px; }
 .leche-entrega-right-sm { text-align: right; }
-.wizard-checkbox-container { margin-bottom: 14px; 
+.wizard-checkbox-container { margin-bottom: 14px; }
 
 /* ── Utility classes añadidas en refactor JS ─────────────── */
 .py-4     { padding-top: 4px; padding-bottom: 4px; }
@@ -2196,7 +2238,6 @@ label {
 .td-lbl { padding:8px; border:1px solid #ddd; font-weight:bold; }
 .td-val { padding:8px; border:1px solid #ddd; }
 .section-underline { border-bottom:1px solid #333; padding-bottom:5px; }
-}
 
 
 /* ── Wizard scroll shadows (migrado de _injectGlobalStyles) ── */
@@ -2224,35 +2265,8 @@ label {
 .btn-naranja { background: #f97316; color: white; }
 .btn-verde { background: #059669; color: white; }
 
-/* ── Compact headers ──── */
-#app-content > div:first-child:has(> h2[style*="2.2rem"]) {
-  display: flex !important; flex-wrap: wrap !important;
-  align-items: center !important; justify-content: center !important;
-  gap: 8px !important; text-align: left !important;
-  margin-bottom: 16px !important; padding: 0 !important;
-}
-#app-content > div:first-child > h2[style*="2.2rem"] {
-  flex: 0 0 100% !important; font-size: 1rem !important;
-  letter-spacing: 0 !important; margin-bottom: 4px !important;
-  margin-right: 0 !important; color: #fbbf24 !important;
-  display: flex !important; align-items: center !important;
-  gap: 8px !important; text-transform: uppercase !important; font-weight: 900 !important;
-}
-#app-content > div:first-child > h2[style*="2.2rem"]::before {
-  content: ''; width: 5px; height: 24px;
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-  border-radius: 3px; flex-shrink: 0; display: inline-block;
-}
-#app-content > div:first-child:has(> h2[style*="2.2rem"])::before { display: none !important; }
-#app-content > div:first-child:has(> h2[style*="2.2rem"]) .btn,
-#app-content > div:first-child:has(> h2[style*="2.2rem"]) button:not(.sub-tabs button) {
-  height: 40px !important; font-size: 0.78rem !important;
-  padding: 0 18px !important; border-radius: 20px !important;
-  width: auto !important; margin: 0 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-  flex: 0 0 auto !important;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
+/* (Parche legacy "Compact headers" eliminado: apuntaba a h2[style*="2.2rem"],
+   patrón que ya no existe en el código. Usar .page-title-bar para cabeceras.) */
 
 /* ── Bigger fonts ──────── */
 #app-content .summary-cell .s-val { font-size: 1.2rem !important; }
@@ -2306,15 +2320,16 @@ label {
     border: 1px solid #991b1b !important;
 }
 
-/* Botón Flotante de Acción (FAB) táctil móvil */
+/* Botón Flotante de Acción (FAB) táctil — variante "añadir" (verde).
+   Comparte geometría con .fab; respeta safe-area (Android vertical). */
 .fab-btn {
     position: fixed;
-    bottom: 80px;
+    bottom: calc(85px + var(--safe-bottom));
     right: 20px;
     width: 56px;
     height: 56px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: var(--r-pill);
+    background: linear-gradient(135deg, var(--c-success) 0%, #059669 100%);
     color: #fff;
     border: none;
     font-size: 1.5rem;
@@ -2329,8 +2344,5 @@ label {
 }
 .fab-btn:active {
     transform: scale(0.92);
-}
-@media (min-width: 769px) {
-    .fab-btn { display: none !important; }
 }
 
