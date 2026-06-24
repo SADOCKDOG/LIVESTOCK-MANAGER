@@ -1,15 +1,171 @@
 /**
- * Livestock Manager - ExportService v1.0.0
+ * Livestock Manager - ExportService v1.1.0
  * Exportación oficial CSV/XML para REGA, SIA y PIGGAN.
- * Genera ficheros compatibles con las plataformas autonómicas.
+ * Genera ficheros compatibles con las plataformas autonómicas (SIGGAN/BADIGEX).
  *
  * Formatos:
  *   - REGA: CSV censo actual + XML explotación
  *   - SIA:  CSV movimientos (altas/bajas/expediciones)
  *   - PIGGAN: CSV producción y tratamiento
+ *
+ * v1.1.0 — Capa de validación semántica antes de exportar:
+ *   1. Formato estricto del código REGA (^ES\d{12}$)
+ *   2. Coherencia de fechas (no futuras; movimiento ≥ nacimiento)
+ *   3. Normalización a códigos oficiales (Sexo M/H, Especie canónica)
  */
 
+// ── Constantes oficiales ────────────────────────────────────────────────────
+const REGA_REGEX = /^ES\d{12}$/;
+
+// Sexo: código oficial del Ministerio (M = macho, H = hembra)
+const SEXO_MAP = {
+  'm': 'M', 'macho': 'M', 'male': 'M',
+  'h': 'H', 'hembra': 'H', 'female': 'H'
+};
+
+// Especies admitidas (nombre canónico en minúscula)
+const ESPECIES_VALIDAS = new Set([
+  'bovino', 'ovino', 'caprino', 'porcino', 'equino', 'avicola', 'cunicola', 'apicola'
+]);
+const ESPECIE_ALIAS = {
+  'vacuno': 'bovino', 'vaca': 'bovino', 'bovina': 'bovino',
+  'oveja': 'ovino', 'ovina': 'ovino',
+  'cabra': 'caprino', 'caprina': 'caprino',
+  'cerdo': 'porcino', 'porcina': 'porcino', 'cochino': 'porcino',
+  'caballo': 'equino', 'equina': 'equino',
+  'ave': 'avicola', 'aves': 'avicola', 'avícola': 'avicola',
+  'conejo': 'cunicola', 'cunícola': 'cunicola',
+  'abeja': 'apicola', 'apícola': 'apicola'
+};
+
+// ── Helpers de formato ───────────────────────────────────────────────────────
+
+/** Escapa un valor CSV: neutraliza saltos de línea y entrecomilla si lleva ';' o '"' */
+function escCsv(val) {
+  if (val === null || val === undefined) return '';
+  const str = String(val).replace(/\r?\n|\r/g, ' ');
+  return (str.includes(';') || str.includes('"')) ? `"${str.replace(/"/g, '""')}"` : str;
+}
+
+/** Normaliza una fecha a AAAA-MM-DD; devuelve '' si es inválida */
+function formatFecha(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+}
+
+/** Escapa caracteres especiales XML */
+function escXml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+// ── Helpers de normalización oficial ─────────────────────────────────────────
+
+/** Normaliza el sexo a código oficial M/H. Devuelve '' si no se reconoce. */
+function normalizarSexo(sexo) {
+  if (!sexo) return '';
+  return SEXO_MAP[String(sexo).trim().toLowerCase()] || '';
+}
+
+/** Normaliza el nombre de especie a su forma canónica. Devuelve '' si no es válida. */
+function normalizarEspecie(especie) {
+  if (!especie) return '';
+  let e = String(especie).trim().toLowerCase();
+  if (ESPECIE_ALIAS[e]) e = ESPECIE_ALIAS[e];
+  return ESPECIES_VALIDAS.has(e) ? e : '';
+}
+
 const ExportService = {
+
+  /**
+   * CAPA DE VALIDACIÓN — comprueba reglas semánticas antes de exportar.
+   * No depende de las claves de SIGGAN: aplica las reglas del sector.
+   *
+   * @param {object} finca
+   * @param {object[]} animales
+   * @param {object[]} [eventos] - movimientos opcionales para validar coherencia de fechas
+   * @returns {{valido:boolean, errores:string[], avisos:string[]}}
+   *   - errores: bloquean la exportación (REGA inválido)
+   *   - avisos: no bloquean, pero SIGGAN podría rechazar registros concretos
+   */
+  validarPreExportacion(finca, animales = [], eventos = []) {
+    const errores = [];
+    const avisos = [];
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999); // tolerancia hasta el final del día actual
+
+    // 1) Código REGA de la explotación
+    const rega = finca?.codigo_REGA || finca?.rega || '';
+    if (!rega) {
+      errores.push('La finca no tiene código REGA. Es obligatorio para exportar.');
+    } else if (!REGA_REGEX.test(rega)) {
+      errores.push(`Código REGA inválido: "${rega}". Debe cumplir el formato ES + 12 dígitos (ej. ES041234000001).`);
+    }
+
+    // Índice de animales por id para validar movimientos
+    const porId = new Map();
+    (animales || []).forEach(a => porId.set(String(a.id), a));
+
+    // 2) y 3) Validación por animal (fechas y códigos)
+    (animales || []).forEach(a => {
+      const ref = a.numero_identificacion || a.crotal || `#${a.id}`;
+      const activo = String(a.estado).toLowerCase() === 'activo';
+      if (!activo) return; // el censo solo exporta activos
+
+      if (!a.numero_identificacion && !a.crotal) {
+        avisos.push(`Animal ${ref}: sin crotal / número de identificación.`);
+      }
+
+      // 2) fecha de nacimiento no futura
+      if (a.fecha_nacimiento) {
+        const nac = new Date(a.fecha_nacimiento);
+        if (isNaN(nac.getTime())) {
+          avisos.push(`Animal ${ref}: fecha de nacimiento inválida ("${a.fecha_nacimiento}").`);
+        } else if (nac > hoy) {
+          avisos.push(`Animal ${ref}: fecha de nacimiento futura (${formatFecha(a.fecha_nacimiento)}).`);
+        }
+      } else {
+        avisos.push(`Animal ${ref}: sin fecha de nacimiento.`);
+      }
+
+      // 3) códigos oficiales
+      if (!normalizarSexo(a.sexo)) {
+        avisos.push(`Animal ${ref}: sexo no reconocido ("${a.sexo || ''}"); debe ser macho/hembra.`);
+      }
+      if (a.especie && !normalizarEspecie(a.especie)) {
+        avisos.push(`Animal ${ref}: especie no reconocida ("${a.especie}").`);
+      }
+    });
+
+    // 2) coherencia de fechas de movimiento
+    (eventos || []).forEach(e => {
+      if (!e.fecha) return;
+      const fmov = new Date(e.fecha);
+      if (isNaN(fmov.getTime())) {
+        avisos.push(`Movimiento (${e.id || '?'}): fecha inválida ("${e.fecha}").`);
+        return;
+      }
+      if (fmov > hoy) {
+        avisos.push(`Movimiento (${e.id || '?'}): fecha futura (${formatFecha(e.fecha)}).`);
+      }
+      const a = porId.get(String(e.animal_id || e.entidad_id || e.animalId));
+      if (a?.fecha_nacimiento) {
+        const nac = new Date(a.fecha_nacimiento);
+        if (!isNaN(nac.getTime()) && fmov < nac) {
+          const ref = a.numero_identificacion || a.crotal || `#${a.id}`;
+          avisos.push(`Movimiento de ${ref}: fecha (${formatFecha(e.fecha)}) anterior al nacimiento (${formatFecha(a.fecha_nacimiento)}).`);
+        }
+      }
+    });
+
+    return { valido: errores.length === 0, errores, avisos };
+  },
 
   /**
    * Genera un informe REGA (censo actual) en CSV
@@ -19,24 +175,22 @@ const ExportService = {
    * @returns {string} contenido CSV
    */
   generarCSV_CensoREGA(finca, animales, rebanos) {
-    const activos = animales.filter(a =>
-      a.estado === 'activo' || a.estado === 'Activo'
-    );
+    const activos = animales.filter(a => String(a.estado).toLowerCase() === 'activo');
 
     // Cabecera del fichero con datos de explotación
     const lines = [];
     lines.push(';;;EXPORTACION REGA - CENSO GANADERO;;;');
-    lines.push(`EXPLOTACION;;${finca?.nombre || ''};;`);
-    lines.push(`REGA;;${finca?.codigo_REGA || finca?.rega || ''};;`);
-    lines.push(`CEA;;${finca?.cea || ''};;`);
-    lines.push(`PROPIETARIO;;${finca?.propietario_nombre || finca?.nombre || ''};;`);
-    lines.push(`NIF;;${finca?.nif || ''};;`);
-    lines.push(`MUNICIPIO;;${finca?.municipio || ''};;`);
-    lines.push(`PROVINCIA;;${finca?.provincia || ''};;`);
-    lines.push(`COMUNIDAD;;${finca?.comunidad_autonoma || ''};;`);
-    lines.push(`ADSG;;${finca?.adsg_nombre || ''};;`);
-    lines.push(`VETERINARIO;;${finca?.adsg_veterinario || ''};;`);
-    lines.push(`FECHA_EXPORTACION;;${new Date().toISOString().split('T')[0]};;`);
+    lines.push(`EXPLOTACION;;${escCsv(finca?.nombre)};;`);
+    lines.push(`REGA;;${escCsv(finca?.codigo_REGA || finca?.rega)};;`);
+    lines.push(`CEA;;${escCsv(finca?.cea)};;`);
+    lines.push(`PROPIETARIO;;${escCsv(finca?.propietario_nombre || finca?.nombre)};;`);
+    lines.push(`NIF;;${escCsv(finca?.nif)};;`);
+    lines.push(`MUNICIPIO;;${escCsv(finca?.municipio)};;`);
+    lines.push(`PROVINCIA;;${escCsv(finca?.provincia)};;`);
+    lines.push(`COMUNIDAD;;${escCsv(finca?.comunidad_autonoma)};;`);
+    lines.push(`ADSG;;${escCsv(finca?.adsg_nombre)};;`);
+    lines.push(`VETERINARIO;;${escCsv(finca?.adsg_veterinario)};;`);
+    lines.push(`FECHA_EXPORTACION;;${formatFecha(new Date())};;`);
     lines.push('');
 
     // Resumen por especie
@@ -51,13 +205,17 @@ const ExportService = {
       const rebanosDeEsp = rebanos.filter(r => r.especie === esp || deEsp.some(a => a.rebanoId === r.id));
       (rebanosDeEsp.length ? rebanosDeEsp : [{ nombre: 'General' }]).forEach(rb => {
         const deRb = rb.id ? deEsp.filter(a => a.rebanoId === rb.id) : deEsp;
-        const hembras = deRb.filter(a => a.sexo === 'hembra' || a.sexo === 'Hembra').length;
-        const machos = deRb.filter(a => a.sexo === 'macho' || a.sexo === 'Macho').length;
+        const hembras = deRb.filter(a => normalizarSexo(a.sexo) === 'H').length;
+        const machos = deRb.filter(a => normalizarSexo(a.sexo) === 'M').length;
         const bajas = animales.filter(a =>
-          (a.estado === 'baja' || a.estado === 'Baja') &&
+          String(a.estado).toLowerCase() === 'baja' &&
           a.fecha_baja && new Date(a.fecha_baja) >= yearAgo
         ).length;
-        lines.push(`${esp};${rb.nombre};${deRb.length};${hembras};${machos};${bajas}`);
+        lines.push([
+          escCsv(normalizarEspecie(esp) || esp),
+          escCsv(rb.nombre),
+          deRb.length, hembras, machos, bajas
+        ].join(';'));
       });
     });
 
@@ -68,21 +226,21 @@ const ExportService = {
     lines.push('ID;CROTAL;ESPECIE;RAZA;SEXO;FECHA_NAC;EDAD_MESES;REBAÑO;CATEGORIA;PESO_ACTUAL;DIB;NOTIFICADO_REGA');
     activos.forEach(a => {
       const nac = a.fecha_nacimiento ? new Date(a.fecha_nacimiento) : null;
-      const edadMeses = nac ? Math.floor((now - nac) / (1000 * 60 * 60 * 24 * 30.44)) : 0;
+      const edadMeses = (nac && !isNaN(nac.getTime())) ? Math.max(0, Math.floor((now - nac) / (1000 * 60 * 60 * 24 * 30.44))) : 0;
       const rb = rebanos.find(r => r.id === a.rebanoId);
       lines.push([
-        a.id,
-        a.numero_identificacion || '',
-        a.especie || '',
-        a.raza || '',
-        a.sexo || '',
-        a.fecha_nacimiento || '',
+        escCsv(a.id),
+        escCsv(a.numero_identificacion),
+        escCsv(normalizarEspecie(a.especie) || a.especie || ''),
+        escCsv(a.raza),
+        normalizarSexo(a.sexo),
+        formatFecha(a.fecha_nacimiento),
         edadMeses,
-        rb?.nombre || '',
-        a.categoria || '',
-        a.peso_actual || '',
-        a.dib || '',
-        a.notificado_rega || ''
+        escCsv(rb?.nombre),
+        escCsv(a.categoria),
+        escCsv(a.peso_actual),
+        escCsv(a.dib),
+        a.notificado_rega ? 'SI' : 'NO'
       ].join(';'));
     });
 
@@ -97,17 +255,17 @@ const ExportService = {
    * @returns {string} XML
    */
   generarXML_REGA(finca, animales, rebanos) {
-    const activos = animales.filter(a => a.estado === 'activo' || a.estado === 'Activo');
-    const now = new Date().toISOString().split('T')[0];
+    const activos = animales.filter(a => String(a.estado).toLowerCase() === 'activo');
+    const now = formatFecha(new Date());
     const especiesAgrupadas = {};
     activos.forEach(a => {
-      const esp = a.especie || 'Sin especie';
+      const esp = normalizarEspecie(a.especie) || a.especie || 'Sin especie';
       if (!especiesAgrupadas[esp]) especiesAgrupadas[esp] = [];
       especiesAgrupadas[esp].push(a);
     });
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<REGA_Exportacion fecha="${now}" version="1.0">\n`;
+    xml += `<REGA_Exportacion fecha="${now}" version="1.1">\n`;
     xml += `  <Explotacion>\n`;
     xml += `    <Nombre>${escXml(finca?.nombre || '')}</Nombre>\n`;
     xml += `    <REGA>${escXml(finca?.codigo_REGA || finca?.rega || '')}</REGA>\n`;
@@ -125,7 +283,7 @@ const ExportService = {
       xml += `      <Codigo>${escXml(finca.adsg_codigo || '')}</Codigo>\n`;
       xml += `      <Veterinario>${escXml(finca.adsg_veterinario || '')}</Veterinario>\n`;
       xml += `      <VetColegiado>${escXml(finca.adsg_vet_colegiado || '')}</VetColegiado>\n`;
-      xml += `      <Vencimiento>${finca.adsg_fecha_vencimiento || ''}</Vencimiento>\n`;
+      xml += `      <Vencimiento>${formatFecha(finca.adsg_fecha_vencimiento)}</Vencimiento>\n`;
       xml += `    </ADSG>\n`;
     }
     xml += `  </Explotacion>\n`;
@@ -146,8 +304,8 @@ const ExportService = {
           xml += `          <ID>${escXml(a.numero_identificacion || '#' + a.id)}</ID>\n`;
           xml += `          <Crotal>${escXml(a.numero_identificacion || '')}</Crotal>\n`;
           xml += `          <Raza>${escXml(a.raza || '')}</Raza>\n`;
-          xml += `          <Sexo>${escXml(a.sexo || '')}</Sexo>\n`;
-          xml += `          <FechaNacimiento>${a.fecha_nacimiento || ''}</FechaNacimiento>\n`;
+          xml += `          <Sexo>${normalizarSexo(a.sexo)}</Sexo>\n`;
+          xml += `          <FechaNacimiento>${formatFecha(a.fecha_nacimiento)}</FechaNacimiento>\n`;
           xml += `          <DIB>${escXml(a.dib || '')}</DIB>\n`;
           xml += `          <NotificadoREGA>${a.notificado_rega ? 'SI' : 'NO'}</NotificadoREGA>\n`;
           xml += `          <Estado>activo</Estado>\n`;
@@ -176,8 +334,8 @@ const ExportService = {
   generarCSV_Movimientos(eventos, animales, finca) {
     const lines = [];
     lines.push(';;;EXPORTACION MOVIMIENTOS SIA/PIGGAN;;;');
-    lines.push(`EXPLOTACION;;${finca?.nombre || ''};;`);
-    lines.push(`REGA;;${finca?.codigo_REGA || finca?.rega || ''};;`);
+    lines.push(`EXPLOTACION;;${escCsv(finca?.nombre)};;`);
+    lines.push(`REGA;;${escCsv(finca?.codigo_REGA || finca?.rega)};;`);
     lines.push('');
 
     lines.push('FECHA;TIPO_MOVIMIENTO;ANIMAL_ID;CROTAL;ESPECIE;MOTIVO;DESTINO_ORIGEN;OBSERVACIONES');
@@ -189,14 +347,14 @@ const ExportService = {
       const a = animales.find(an => an.id === e.animal_id || an.id === e.entidad_id);
       const tipo = e.motivo_tarea || e.tipo || 'no especificado';
       lines.push([
-        e.fecha || '',
-        tipo,
-        e.animal_id || e.entidad_id || '',
-        a?.numero_identificacion || e.crotal || '',
-        a?.especie || '',
-        tipo,
-        e.destino || e.origen || '',
-        (e.descripcion || e.notas || '').replace(/;/g, ',')
+        formatFecha(e.fecha),
+        escCsv(tipo),
+        escCsv(e.animal_id || e.entidad_id),
+        escCsv(a?.numero_identificacion || e.crotal),
+        escCsv(normalizarEspecie(a?.especie) || a?.especie || ''),
+        escCsv(e.motivo || tipo),
+        escCsv(e.destino || e.origen),
+        escCsv(e.descripcion || e.notas)
       ].join(';'));
     });
 
@@ -219,13 +377,13 @@ const ExportService = {
       lines.push('FECHA;LITROS;GRASA%;PROTEINA%;CELULAS_SOMATICAS;EXTRACTO_SECO;DESTINO');
       produccionesLeche.forEach(p => {
         lines.push([
-          p.fechaRecogida || p.fecha || '',
-          p.litros || 0,
-          p.grasa || '',
-          p.proteina || '',
-          p.celulas_somaticas || '',
+          formatFecha(p.fechaRecogida || p.fecha),
+          escCsv(p.litros || 0),
+          escCsv(p.grasa),
+          escCsv(p.proteina),
+          escCsv(p.celulas_somaticas),
           (parseFloat(p.grasa || 0) + parseFloat(p.proteina || 0)).toFixed(2),
-          p.destino || p.comprador || ''
+          escCsv(p.destino || p.comprador)
         ].join(';'));
       });
       lines.push('');
@@ -236,13 +394,13 @@ const ExportService = {
       lines.push('FECHA;ANIMAL;PESO_CANAL(kg);CATEGORIA;PRECIO_UNITARIO;TOTAL;MATADERO');
       produccionesCarne.forEach(p => {
         lines.push([
-          p.fechaSacrificio || p.fecha || '',
-          p.animalId || '',
-          p.peso_canal || '',
-          p.categoria || p.seurop || '',
-          p.precio_unitario || '',
-          p.precio_total || '',
-          p.codigoMatadero || ''
+          formatFecha(p.fechaSacrificio || p.fecha),
+          escCsv(p.animalId),
+          escCsv(p.peso_canal),
+          escCsv(p.categoria || p.seurop),
+          escCsv(p.precio_unitario),
+          escCsv(p.precio_total),
+          escCsv(p.codigoMatadero)
         ].join(';'));
       });
     }
@@ -303,27 +461,58 @@ const ExportService = {
   },
 
   /**
-   * Exportación completa REGA (CSV + XML) con descarga directa
+   * Informa al usuario de errores/avisos de validación.
+   * @returns {boolean} true si se puede continuar exportando
    */
-  async exportarREGA(finca, animales, rebanos) {
-    const csv = this.generarCSV_CensoREGA(finca, animales, rebanos);
-    const xml = this.generarXML_REGA(finca, animales, rebanos);
-    const rega = finca?.codigo_REGA || finca?.rega || 'unknown';
-    const fecha = new Date().toISOString().split('T')[0];
-
-    await this.descargar(csv, `REGA_Censo_${rega}_${fecha}.csv`, 'text/csv;charset=utf-8');
-    await this.descargar(xml, `REGA_Explotacion_${rega}_${fecha}.xml`, 'application/xml;charset=utf-8');
-    return { csv, xml };
+  _reportarValidacion(reporte) {
+    if (reporte.avisos.length) {
+      console.warn(`[ExportService] ${reporte.avisos.length} aviso(s) de validación:`, reporte.avisos);
+    }
+    if (!reporte.valido) {
+      const msg = reporte.errores[0];
+      console.error('[ExportService] Exportación bloqueada:', reporte.errores);
+      if (window.App?.toast) App.toast(`❌ ${msg}`);
+      return false;
+    }
+    if (reporte.avisos.length && window.App?.toast) {
+      App.toast(`⚠️ Exportado con ${reporte.avisos.length} aviso(s). Revisa la consola.`);
+    }
+    return true;
   },
 
   /**
-   * Exportación movimientos SIA/PIGGAN
+   * Exportación completa REGA (CSV + XML) con descarga directa.
+   * Bloquea si el código REGA no es válido.
+   */
+  async exportarREGA(finca, animales, rebanos) {
+    const reporte = this.validarPreExportacion(finca, animales);
+    if (!this._reportarValidacion(reporte)) {
+      return { success: false, errores: reporte.errores, avisos: reporte.avisos };
+    }
+
+    const csv = this.generarCSV_CensoREGA(finca, animales, rebanos);
+    const xml = this.generarXML_REGA(finca, animales, rebanos);
+    const rega = finca?.codigo_REGA || finca?.rega || 'unknown';
+    const fecha = formatFecha(new Date());
+
+    await this.descargar(csv, `REGA_Censo_${rega}_${fecha}.csv`, 'text/csv;charset=utf-8');
+    await this.descargar(xml, `REGA_Explotacion_${rega}_${fecha}.xml`, 'application/xml;charset=utf-8');
+    return { success: true, csv, xml, avisos: reporte.avisos };
+  },
+
+  /**
+   * Exportación movimientos SIA/PIGGAN. Bloquea si el código REGA no es válido.
    */
   async exportarMovimientos(eventos, animales, finca) {
+    const reporte = this.validarPreExportacion(finca, animales, eventos);
+    if (!this._reportarValidacion(reporte)) {
+      return { success: false, errores: reporte.errores, avisos: reporte.avisos };
+    }
+
     const csv = this.generarCSV_Movimientos(eventos, animales, finca);
     const rega = finca?.codigo_REGA || finca?.rega || 'unknown';
-    await this.descargar(csv, `Movimientos_SIA_${rega}_${new Date().toISOString().split('T')[0]}.csv`);
-    return { csv };
+    await this.descargar(csv, `Movimientos_SIA_${rega}_${formatFecha(new Date())}.csv`);
+    return { success: true, csv, avisos: reporte.avisos };
   },
 
   /**
@@ -331,30 +520,20 @@ const ExportService = {
    */
   async exportarProduccion(produccionesLeche, produccionesCarne) {
     const csv = this.generarCSV_Produccion(produccionesLeche, produccionesCarne);
-    await this.descargar(csv, `Produccion_PIGGAN_${new Date().toISOString().split('T')[0]}.csv`);
-    return { csv };
+    await this.descargar(csv, `Produccion_PIGGAN_${formatFecha(new Date())}.csv`);
+    return { success: true, csv };
   },
 
   /**
    * Exportación completa (todo en uno)
    */
   async exportarCompleto(finca, animales, rebanos, eventos, prodLeche, prodCarne) {
-    await this.exportarREGA(finca, animales, rebanos);
+    const rega = await this.exportarREGA(finca, animales, rebanos);
+    if (!rega.success) return rega; // REGA inválido: abortar todo
     await this.exportarMovimientos(eventos, animales, finca);
     await this.exportarProduccion(prodLeche, prodCarne);
     return { success: true };
   }
 };
-
-// Helper XML escape
-function escXml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
 
 window.ExportService = ExportService;
