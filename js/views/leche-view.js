@@ -113,9 +113,9 @@ const LecheView = {
       <div class="mb-14">
         <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
           <div class="leche-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
-            <button class="leche-tab active" data-tab="patrimonio" onclick="LecheView._cambiarTab('patrimonio')">🏰 Patrimonio y Ganadería</button>
-            <button class="leche-tab" data-tab="comercializacion" onclick="LecheView._cambiarTab('comercializacion')">🚚 Logística y Transporte, Comercialización Ventas</button>
-            <button class="leche-tab" data-tab="legislacion" onclick="LecheView._cambiarTab('legislacion')">🛡️ Registros Legislación, Cumplimiento Sanitario</button>
+            <button class="leche-tab active" data-tab="patrimonio" onclick="LecheView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
+            <button class="leche-tab" data-tab="comercializacion" onclick="LecheView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
+            <button class="leche-tab" data-tab="legislacion" onclick="LecheView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
           </div>
         </div>
       </div>
@@ -242,7 +242,7 @@ const LecheView = {
     const html = `
       <div class="card report-section leche-report-card border-top-3px border-top-3px-orange">
         <div class="leche-report-title">
-          <span class="leche-report-icon">🏰</span>
+          <span class="leche-report-icon">${Icons.edificio()}</span>
           <div class="leche-report-title-text">
             <div class="leche-report-title-main">Patrimonio y Ganadería</div>
             <div class="leche-report-title-sub">Gestión de censo y rebaños lácteos</div>
@@ -252,13 +252,13 @@ const LecheView = {
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/animales" class="widget-link-btn">🐄 Animales</a>
-          <a href="#/rebanos" class="widget-link-btn">🐏 Rebaños</a>
-          <a href="#/zonas" class="widget-link-btn">📍 Zonas</a>
+          <a href="#/animales" class="widget-link-btn">${Icons.animales()} Animales</a>
+          <a href="#/rebanos" class="widget-link-btn">${Icons.rebanos()} Rebaños</a>
+          <a href="#/zonas" class="widget-link-btn">${Icons.zonas()} Zonas</a>
         </div>
 
         <div class="leche-list-header">
-          📋 Rebaños Lácteos Activos (${d.rebanosLeche.length})
+          ${Icons.documento()} Rebaños Lácteos Activos (${d.rebanosLeche.length})
         </div>
         <div class="grid gap-10">
           ${d.rebanosLeche.length > 0
@@ -297,7 +297,7 @@ const LecheView = {
     const html = `
       <div class="card report-section leche-report-card border-top-3px border-top-3px-green">
         <div class="leche-report-title">
-          <span class="leche-report-icon">🚚</span>
+          <span class="leche-report-icon">${Icons.transportistas()}</span>
           <div class="leche-report-title-text">
             <div class="leche-report-title-main">Logística y Transporte, Comercialización Ventas</div>
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
@@ -307,19 +307,19 @@ const LecheView = {
 
         <div class="text-center mb-12">
           <button class="btn btn-create btn-sm" onclick="App._abrirWizardAlbaranLeche()">
-            ➕ Nueva Entrega (Cisterna)
+            ${Icons.agregar()} Nueva Entrega (Cisterna)
           </button>
         </div>
 
         <!-- Accesos directos comerciales -->
         <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/compradores" class="widget-link-btn">👥 Compradores</a>
-          <a href="#/transportistas" class="widget-link-btn">🚛 Cisternas</a>
-          <a href="#/comercializacion" class="widget-link-btn">📄 Comercial</a>
+          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
+          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Cisternas</a>
+          <a href="#/comercializacion" class="widget-link-btn">${Icons.comercial()} Comercial</a>
         </div>
 
         <div class="leche-list-header">
-          📋 Historial de Entregas a Cisterna
+          ${Icons.documento()} Historial de Entregas a Cisterna
         </div>
         ${d.entregas.length > 0
           ? d.entregas.slice(0, 15).map(e => this._cardEntrega(e)).join('')
@@ -336,7 +336,7 @@ const LecheView = {
       ${this._inyectarAlertaSupresion(d)}
       <div class="card report-section leche-report-card border-top-3px" style="border-top-color:#8b5cf6;">
         <div class="leche-report-title">
-          <span class="leche-report-icon">🛡️</span>
+          <span class="leche-report-icon">${Icons.documento()}</span>
           <div class="leche-report-title-text">
             <div class="leche-report-title-main">Registros Legislación, Cumplimiento Sanitario</div>
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
@@ -346,18 +346,18 @@ const LecheView = {
 
         <div class="text-center mb-12">
           <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6; width:auto; display:inline-flex;" onclick="LecheView._abrirAsistenteTratamientoLeche()">
-            💉 Registrar Tratamiento
+            ${Icons.sanidad()} Registrar Tratamiento
           </button>
         </div>
 
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
-          <a href="#/documentos" class="widget-link-btn">📄 Documentos</a>
-          <a href="#/cuaderno" class="widget-link-btn">🛡️ Cuaderno Oficial</a>
+          <a href="#/documentos" class="widget-link-btn">${Icons.documento()} Documentos</a>
+          <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno Oficial</a>
         </div>
 
         <div class="leche-list-header">
-          📋 Historial Sanitario Lácteo (${d.sanitariosLeche.length})
+          ${Icons.documento()} Historial Sanitario Lácteo (${d.sanitariosLeche.length})
         </div>
         <div class="grid gap-10">
           ${d.sanitariosLeche.length > 0
@@ -442,8 +442,8 @@ const LecheView = {
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="flex:2;">💾 Guardar</button>
-                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🗑️ Borrar</button>
+                  <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="flex:2;">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
           </div>`;
@@ -498,13 +498,13 @@ const LecheView = {
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:380px; border-top:5px solid #fbbf24;">
-        <h3 class="mt-0 text-white font-900">💉 Aplicar Tratamiento Lácteo</h3>
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Lácteo</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño lechero a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ➔</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>
