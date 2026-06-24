@@ -29,11 +29,12 @@ const FormularioFinca = {
                 <div class="formulario-finca-cuerpo">
                     <form class="formulario-finca-formulario" id="formFinca">
                         <!-- Campo: Nombre -->
-                        <div class="formulario-finca-grupo">
-                            <label for="nombreFinca">
+                        <div class="form-group">
+                            <label class="form-label" for="nombreFinca">
                                 <span class="requerido">*</span> Nombre de Finca
                             </label>
                             <input
+                                class="form-input"
                                 type="text"
                                 id="nombreFinca"
                                 name="nombre"
@@ -45,11 +46,12 @@ const FormularioFinca = {
                         </div>
 
                         <!-- Campo: Propietario -->
-                        <div class="formulario-finca-grupo">
-                            <label for="propietarioFinca">
+                        <div class="form-group">
+                            <label class="form-label" for="propietarioFinca">
                                 <span class="requerido">*</span> Propietario
                             </label>
                             <input
+                                class="form-input"
                                 type="text"
                                 id="propietarioFinca"
                                 name="propietario"
@@ -61,11 +63,12 @@ const FormularioFinca = {
                         </div>
 
                         <!-- Campo: Dirección -->
-                        <div class="formulario-finca-grupo">
-                            <label for="direccionFinca">
+                        <div class="form-group">
+                            <label class="form-label" for="direccionFinca">
                                 <span class="requerido">*</span> Dirección
                             </label>
                             <input
+                                class="form-input"
                                 type="text"
                                 id="direccionFinca"
                                 name="direccion"
@@ -77,11 +80,12 @@ const FormularioFinca = {
                         </div>
 
                         <!-- Campo: Teléfono (opcional) -->
-                        <div class="formulario-finca-grupo">
-                            <label for="telefonoFinca">
+                        <div class="form-group">
+                            <label class="form-label" for="telefonoFinca">
                                 Teléfono (Opcional)
                             </label>
                             <input
+                                class="form-input"
                                 type="tel"
                                 id="telefonoFinca"
                                 name="telefonoContacto"
@@ -92,78 +96,78 @@ const FormularioFinca = {
                         </div>
 
                         <!-- NUEVOS CAMPOS: NIF, EMAIL, ADSG -->
-                        <div class="formulario-finca-grupo">
-                            <label for="nifFinca">NIF / CIF (Opcional)</label>
-                            <input type="text" id="nifFinca" name="nif_cif" placeholder="Ej: B12345678" maxlength="20" />
+                        <div class="form-group">
+                            <label class="form-label" for="nifFinca">NIF / CIF (Opcional)</label>
+                            <input class="form-input" type="text" id="nifFinca" name="nif_cif" placeholder="Ej: B12345678" maxlength="20" />
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="emailFinca">Correo Electrónico (Opcional)</label>
-                            <input type="email" id="emailFinca" name="email" placeholder="Ej: ganaderia@ejemplo.com" maxlength="100" />
+                        <div class="form-group">
+                            <label class="form-label" for="emailFinca">Correo Electrónico (Opcional)</label>
+                            <input class="form-input" type="email" id="emailFinca" name="email" placeholder="Ej: ganaderia@ejemplo.com" maxlength="100" />
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="adsgFinca">Agrupación ADSG (Opcional)</label>
-                            <input type="text" id="adsgFinca" name="adsg_nombre" placeholder="Ej: ADSG Ovino Sierra Norte" maxlength="100" />
+                        <div class="form-group">
+                            <label class="form-label" for="adsgFinca">Agrupación ADSG (Opcional)</label>
+                            <input class="form-input" type="text" id="adsgFinca" name="adsg_nombre" placeholder="Ej: ADSG Ovino Sierra Norte" maxlength="100" />
                         </div>
 
                         <!-- BLOQUE SIGGAN / REGA -->
-                        <div class="formulario-finca-grupo">
-                            <label for="ccaaFinca">Comunidad Autónoma</label>
-                            <select id="ccaaFinca" name="comunidad_autonoma">
+                        <div class="form-group">
+                            <label class="form-label" for="ccaaFinca">Comunidad Autónoma</label>
+                            <select class="form-select" id="ccaaFinca" name="comunidad_autonoma">
                                 <option value="">— Selecciona —</option>
                                 ${opcionesCCAA.map(o => `<option value="${o.value}">${o.label}</option>`).join("")}
                             </select>
                             <small class="formulario-finca-ayuda" id="ayudaSiggan"></small>
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="provinciaFinca">Provincia</label>
-                            <select id="provinciaFinca" name="provincia">
+                        <div class="form-group">
+                            <label class="form-label" for="provinciaFinca">Provincia</label>
+                            <select class="form-select" id="provinciaFinca" name="provincia">
                                 <option value="">— Selecciona comunidad primero —</option>
                             </select>
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="municipioFinca">Municipio</label>
-                            <input type="text" id="municipioFinca" name="municipio" placeholder="Ej: Aracena" maxlength="80" />
+                        <div class="form-group">
+                            <label class="form-label" for="municipioFinca">Municipio</label>
+                            <input class="form-input" type="text" id="municipioFinca" name="municipio" placeholder="Ej: Aracena" maxlength="80" />
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="regaFinca"><span class="requerido" id="regaReq" style="display:none;">*</span> Código REGA</label>
-                            <input type="text" id="regaFinca" name="rega" placeholder="Ej: ES041230000123" maxlength="25" />
+                        <div class="form-group">
+                            <label class="form-label" for="regaFinca"><span class="requerido" id="regaReq" style="display:none;">*</span> Código REGA</label>
+                            <input class="form-input" type="text" id="regaFinca" name="rega" placeholder="Ej: ES041230000123" maxlength="25" />
                             <span class="formulario-finca-error" data-campo="rega"></span>
                             <small class="formulario-finca-ayuda">ES + 2 díg. provincia + 3 díg. municipio + 7 díg. secuencial</small>
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="ceaFinca">Código CEA (Opcional)</label>
-                            <input type="text" id="ceaFinca" name="cea" placeholder="Ej: XX-XXXXX-XX" maxlength="20" />
+                        <div class="form-group">
+                            <label class="form-label" for="ceaFinca">Código CEA (Opcional)</label>
+                            <input class="form-input" type="text" id="ceaFinca" name="cea" placeholder="Ej: XX-XXXXX-XX" maxlength="20" />
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="tipoExpFinca">Tipo de Explotación (REGA)</label>
-                            <select id="tipoExpFinca" name="tipo_explotacion">
+                        <div class="form-group">
+                            <label class="form-label" for="tipoExpFinca">Tipo de Explotación (REGA)</label>
+                            <select class="form-select" id="tipoExpFinca" name="tipo_explotacion">
                                 <option value="">— Selecciona —</option>
                                 ${tiposExplotacion.map(t => `<option value="${t}">${t}</option>`).join("")}
                             </select>
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="claseZootFinca">Clasificación Zootécnica</label>
-                            <select id="claseZootFinca" name="clasificacion_zootecnica">
+                        <div class="form-group">
+                            <label class="form-label" for="claseZootFinca">Clasificación Zootécnica</label>
+                            <select class="form-select" id="claseZootFinca" name="clasificacion_zootecnica">
                                 <option value="">— Selecciona —</option>
                                 ${clasificacionZootecnica.map(c => `<option value="${c}">${c}</option>`).join("")}
                             </select>
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label for="capacidadFinca">Capacidad Máxima (nº cabezas)</label>
-                            <input type="number" id="capacidadFinca" name="capacidad_maxima" min="0" step="1" placeholder="Ej: 500" />
+                        <div class="form-group">
+                            <label class="form-label" for="capacidadFinca">Capacidad Máxima (nº cabezas)</label>
+                            <input class="form-input" type="number" id="capacidadFinca" name="capacidad_maxima" min="0" step="1" placeholder="Ej: 500" />
                         </div>
 
-                        <div class="formulario-finca-grupo">
-                            <label>Especies Autorizadas</label>
+                        <div class="form-group">
+                            <label class="form-label">Especies Autorizadas</label>
                             <div class="formulario-finca-especies" id="especiesAutorizadas">
                                 ${especiesAutorizables.map(e => `
                                 <label class="formulario-finca-chk">
@@ -179,11 +183,11 @@ const FormularioFinca = {
 
                 <!-- Botones SIEMPRE visibles abajo (fuera del scroll) -->
                 <div class="formulario-finca-botones">
-                    <button type="button" class="btn-primario" id="btn-guardar-finca">
-                        💾 Crear Finca
+                    <button type="button" class="btn btn--inline btn--primary" id="btn-guardar-finca">
+                        ${Icons.guardar()} Crear Finca
                     </button>
-                    <button type="button" class="btn-secundario formulario-finca-cancelar">
-                        ✕ Cancelar
+                    <button type="button" class="btn btn--inline btn--secondary formulario-finca-cancelar">
+                        ${Icons.cerrar()} Cancelar
                     </button>
                 </div>
             </div>

@@ -22,9 +22,9 @@ const WizardManager = {
             let contentHtml = typeof step.content === 'function' ? await step.content(wizardData) : step.content;
 
             overlay.innerHTML = `
-        <div class="wizard-header-fixed" style="border-top: 5px solid #d97706;">
-          <h2 style="margin: 0 0 4px 0; color: #ffffff; font-size: 1.3rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-weight: 900;">${title}</h2>
-          <div style="text-align: center; color: #d97706; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;">PASO ${currentStepIndex + 1} DE ${steps.length}</div>
+        <div class="wizard-header-fixed">
+          <h2>${title}</h2>
+          <div class="wizard-step-indicator">PASO ${currentStepIndex + 1} DE ${steps.length}</div>
         </div>
 
         <div id="wizard-content-area" class="wizard-content-scrollable animate-in">
@@ -32,11 +32,11 @@ const WizardManager = {
         </div>
 
         <div id="wizard-nav-area" class="wizard-footer-fixed">
-          ${currentStepIndex > 0 ? '<button id="wizard-btn-prev" class="wizard-btn-action wizard-btn-secondary">⬅ Volver</button>' : '<div></div>'}
-          <div style="display: flex; gap: 8px; flex: 1; justify-content: flex-end;">
+          ${currentStepIndex > 0 ? `<button id="wizard-btn-prev" class="wizard-btn-action wizard-btn-secondary">${Icons.atras()} Volver</button>` : '<div></div>'}
+          <div class="wizard-footer-buttons">
             <button id="wizard-btn-cancel" class="wizard-btn-action wizard-btn-secondary">Cancelar</button>
-            ${!isLastStep ? '<button id="wizard-btn-next" class="wizard-btn-action wizard-btn-primary">Siguiente ➔</button>' : ''}
-            ${isLastStep ? '<button id="wizard-btn-finish" class="wizard-btn-action wizard-btn-success">Finalizar ✔</button>' : ''}
+            ${!isLastStep ? `<button id="wizard-btn-next" class="wizard-btn-action wizard-btn-primary">Siguiente ${Icons.siguiente()}</button>` : ''}
+            ${isLastStep ? `<button id="wizard-btn-finish" class="wizard-btn-action wizard-btn-success">Finalizar ${Icons.check()}</button>` : ''}
           </div>
         </div>
       `;
