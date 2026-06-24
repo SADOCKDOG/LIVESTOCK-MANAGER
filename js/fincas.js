@@ -69,7 +69,38 @@ const Fincas = {
     async getActive() {
         const id = await this.getActiveId();
         if (!id) return null;
-        return this.get(id);
+        const finca = await this.get(id);
+        
+        // Migración Gap 9: Ensure zonas tienen codigo_pac y distancia_agua_m
+        if (finca && finca.zonas && Array.isArray(finca.zonas)) {
+            let needsUpdate = false;
+            finca.zonas.forEach((zona, idx) => {
+                if (zona) {
+                    if (!zona.hasOwnProperty('codigo_pac')) {
+                        // Auto-generar código PAC basado en índice: ES-BA-{fincaId}-{zonaIdx}
+                        // Formato: ES-BA-0001-001, ES-BA-0001-002, etc.
+                        const fincaNum = String(finca.id || 1).padStart(4, '0');
+                        const zonaNum = String(idx + 1).padStart(3, '0');
+                        finca.zonas[idx].codigo_pac = `ES-BA-${fincaNum}-${zonaNum}`;
+                        needsUpdate = true;
+                    }
+                    if (!zona.hasOwnProperty('distancia_agua_m')) {
+                        finca.zonas[idx].distancia_agua_m = 100; // Default 100m
+                        needsUpdate = true;
+                    }
+                }
+            });
+            if (needsUpdate) {
+                finca.actualizadoEn = new Date().toISOString();
+                try {
+                    await window.db.put('fincas', finca);
+                } catch (e) {
+                    console.warn('[Fincas] Error guardando migración de zonas:', e.message);
+                }
+            }
+        }
+        
+        return finca;
     },
 
     async setActiveId(id) {
@@ -83,6 +114,15 @@ const Fincas = {
     async save(data) {
         if (data) {
             const regaVal = this._normalizarREGA(data.rega || data.codigo_REGA);
+            if (regaVal && window.ComunidadesService?.validarFormatoREGA) {
+                const validacion = window.ComunidadesService.validarFormatoREGA(
+                    regaVal,
+                    data.comunidad_autonoma || null
+                );
+                if (!validacion?.valido) {
+                    throw new Error(validacion?.mensaje || 'Código REGA inválido');
+                }
+            }
             data.rega = regaVal;
             data.codigo_REGA = regaVal;
         }

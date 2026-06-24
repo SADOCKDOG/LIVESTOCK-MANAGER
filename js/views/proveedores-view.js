@@ -228,6 +228,30 @@ const ProveedoresView = {
               </div>
             </div>
 
+            <div class="grid grid-cols-3 gap-10 mb-12">
+              <div>
+                <label class="form-label">TIPO OPERADOR SIGGAN</label>
+                <select id="p-tipo-operador" class="premium-input">
+                  <option value="proveedor_servicios" ${!p.tipo_operador || p.tipo_operador === 'proveedor_servicios' ? 'selected' : ''}>Proveedor servicios</option>
+                  <option value="piensos" ${p.tipo_operador === 'piensos' ? 'selected' : ''}>Piensos</option>
+                  <option value="sanitario" ${p.tipo_operador === 'sanitario' ? 'selected' : ''}>Sanitario</option>
+                  <option value="maquinaria" ${p.tipo_operador === 'maquinaria' ? 'selected' : ''}>Maquinaria</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">REGA</label>
+                <input type="text" id="p-rega" value="${p.rega || ''}" class="premium-input" placeholder="ES041230000123">
+              </div>
+              <div>
+                <label class="form-label">CCAA</label>
+                <select id="p-ccaa" class="premium-input">
+                  <option value="">—</option>
+                  <option value="andalucia" ${p.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>Andalucía</option>
+                  <option value="extremadura" ${p.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>Extremadura</option>
+                </select>
+              </div>
+            </div>
+
             <label class="form-label">DIRECCIÓN</label>
             <input type="text" id="p-dir" value="${p.direccion}" class="premium-input mb-12">
 
@@ -299,6 +323,9 @@ const ProveedoresView = {
                 id: id || undefined,
                 nombre: document.getElementById('p-nombre').value.trim(),
                 nif_cif: document.getElementById('p-nif').value.trim(),
+                tipo_operador: document.getElementById('p-tipo-operador').value,
+                rega: document.getElementById('p-rega').value.trim(),
+                comunidad_autonoma: document.getElementById('p-ccaa').value,
                 direccion: document.getElementById('p-dir').value.trim(),
                 codigo_postal: document.getElementById('p-cp').value.trim(),
                 ciudad: document.getElementById('p-ciudad').value.trim(),

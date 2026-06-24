@@ -37,7 +37,7 @@ const Compradores = {
 
     async getByNif(nif) {
         try {
-            return await window.db.getFromIndex('compradores', 'nif_cif', nif.trim().toUpperCase());
+            return await window.db.getFromIndex('compradores', 'nif_cif', ErrorHandler.normalizeNifCif(nif));
         } catch (e) {
             return null;
         }
@@ -48,17 +48,25 @@ const Compradores = {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
             ErrorHandler.validateRequired('nombre', data.nombre, 'Nombre o razón social es obligatorio');
-            ErrorHandler.validateRequired('nif_cif', data.nif_cif, 'NIF/CIF es obligatorio');
+            const nifVal = ErrorHandler.validateNifCif(data.nif_cif, { required: true });
+            const tipoOperador = (data.tipo_operador || '').trim() || (
+                data.tipo_comprador === 'cárnico'
+                    ? 'matadero'
+                    : data.tipo_comprador === 'láctico'
+                        ? 'industria_lactea'
+                        : 'operador_comercial'
+            );
+            const regaVal = ErrorHandler.validateREGA(data.rega || '', data.comunidad_autonoma || null, { required: false });
 
             // Validar NIF único (excepto para el mismo registro en edición)
-            const existente = await this.getByNif(data.nif_cif);
+            const existente = await this.getByNif(nifVal);
             if (existente && (!esEdicion || existente.id !== Number(data.id))) {
-                throw new Error(`Ya existe un comprador con NIF/CIF "${data.nif_cif}"`);
+                throw new Error(`Ya existe un comprador con NIF/CIF "${nifVal}"`);
             }
 
             const compradorData = {
                 nombre: data.nombre.trim(),
-                nif_cif: data.nif_cif.trim().toUpperCase(),
+                nif_cif: nifVal,
                 direccion: (data.direccion || '').trim(),
                 codigo_postal: (data.codigo_postal || '').trim(),
                 ciudad: (data.ciudad || '').trim(),
@@ -66,6 +74,9 @@ const Compradores = {
                 telefono: (data.telefono || '').trim(),
                 email: (data.email || '').trim(),
                 tipo_comprador: data.tipo_comprador || 'híbrido',
+                tipo_operador: tipoOperador,
+                rega: regaVal,
+                comunidad_autonoma: (data.comunidad_autonoma || '').trim().toLowerCase(),
                 condiciones_pago: (data.condiciones_pago || '').trim(),
                 notas: (data.notas || '').trim(),
                 activo: data.activo !== undefined ? data.activo : true,

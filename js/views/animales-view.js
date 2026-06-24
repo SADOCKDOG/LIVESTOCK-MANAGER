@@ -192,14 +192,22 @@ const AnimalesView = {
     };
     if (!esNuevo) a = await Animales.get(id);
 
-    const [especies, rebanos] = await Promise.all([
+    const [especies, rebanos, todosAnimales] = await Promise.all([
       window.db.getAll("config_especies"),
       Rebanos.list(),
+      Animales.list().catch(() => []),
     ]);
+
+    const idActual = esNuevo ? null : Number(id);
+    const hembras = (todosAnimales || []).filter(
+      (x) => x.sexo === "H" && (x.estado || "activo") !== "baja" && x.id !== idActual
+    );
 
     const CS = window.ComunidadesService;
     const paisesNac = CS ? CS.getPaisesNacimiento() : [{ value: 'ES', label: 'España (ES)' }];
     const motivosBaja = CS ? CS.getMotivosBaja() : [];
+    const tiposAlta = CS && CS.getTiposAlta ? CS.getTiposAlta() : [{ value: 'Nacimiento', label: 'Nacimiento' }, { value: 'Compra', label: 'Compra' }];
+    const categoriasAnimal = CS && CS.getCategoriasAnimal ? CS.getCategoriasAnimal(a.especie) : [];
     const mostrarDIB = CS ? CS.especieRequiereDIB(a.especie) : false;
     const esCompra = a.tipoAlta === "Compra";
     const esBaja = a.estado === "baja" || a.estado === "Baja";
@@ -268,10 +276,16 @@ const AnimalesView = {
             <div>
               <label class="form-label">TIPO ALTA</label>
               <select id="a-tipoalta" class="form-input form-input-lg" onchange="AnimalesView._onTipoAltaChange(this)">
-                <option value="Nacimiento" ${a.tipoAlta === "Nacimiento" ? "selected" : ""}>Nacimiento</option>
-                <option value="Compra" ${a.tipoAlta === "Compra" ? "selected" : ""}>Compra</option>
+                ${tiposAlta.map((t) => `<option value="${t.value}" ${a.tipoAlta === t.value ? "selected" : ""}>${t.label}</option>`).join("")}
               </select>
             </div>
+          </div>
+          <div class="mb-12">
+            <label class="form-label">CATEGORÍA (libro de registro)</label>
+            <select id="a-categoria" class="form-input form-input-lg">
+              <option value="">— Sin clasificar —</option>
+              ${categoriasAnimal.map((c) => `<option value="${c}" ${a.categoria === c ? "selected" : ""}>${c}</option>`).join("")}
+            </select>
           </div>
           <div class="grid grid-cols-2 gap-12 mb-12">
             <div>
@@ -316,6 +330,13 @@ const AnimalesView = {
               <label class="form-label">REGA DE PROCEDENCIA (explotación origen)</label>
               <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="Ej: ES041230000123" class="form-input form-input-lg">
             </div>
+            <div class="mb-12">
+              <label class="form-label">MADRE (genealogía)</label>
+              <select id="a-madre" class="form-select-gold">
+                <option value="">Sin asignar</option>
+                ${hembras.map((h) => `<option value="${h.id}" ${a.madre_id == h.id ? "selected" : ""}>${h.numero_identificacion || ('#' + h.id)}${h.especie ? ' · ' + h.especie : ''}</option>`).join("")}
+              </select>
+            </div>
             <div id="a-dib-section" class="mb-12" style="display:${mostrarDIB ? 'block' : 'none'};">
               <label class="form-label">DIB / Nº PASAPORTE (bovino/equino)</label>
               <input type="text" id="a-dib" value="${a.dib || ""}" placeholder="Documento de Identificación Bovina" class="form-input form-input-lg">
@@ -335,6 +356,10 @@ const AnimalesView = {
                   <option value="">— Selecciona —</option>
                   ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label}</option>`).join("")}
                 </select>
+                <div id="a-sandach-wrap" style="display:none; margin-top:8px; padding:8px; background:#f0f9ff; border:1px solid #0ea5e9; border-radius:6px; font-size:12px;">
+                  <div style="color:#0369a1; font-weight:600; margin-bottom:4px;">ℹ️ CLASIFICACIÓN SANDACH (Reg. UE 1069/2009)</div>
+                  <div id="a-sandach-categoria" style="color:#475569; margin-top:4px;"></div>
+                </div>
               </div>
             </div>
             <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esSalida ? 'block' : 'none'}; margin-top:12px;">
@@ -374,6 +399,85 @@ const AnimalesView = {
       const ref = document.getElementById("tabla-referencia");
       if (ref) ref.innerHTML = '<em class="text-333">Sin rebaño asignado</em>';
     }
+
+    // Gap 7: Listener para actualizar categoría SANDACH al cambiar motivo_baja
+    const motivoBajaSelect = document.getElementById("a-motivo-baja");
+    if (motivoBajaSelect && window.ComunidadesService) {
+      const actualizarSANDACH = () => {
+        const motivo = motivoBajaSelect.value;
+        const sandachWrap = document.getElementById("a-sandach-wrap");
+        const sandachCatDiv = document.getElementById("a-sandach-categoria");
+        
+        if (motivo) {
+          const categoria = ComunidadesService.getSANDACHCategoria(motivo);
+          const descripcion = ComunidadesService.getSANDACHDescripcion(categoria);
+          
+          if (categoria) {
+            sandachWrap.style.display = 'block';
+            sandachCatDiv.innerHTML = `<strong>Categoría ${categoria}:</strong> ${descripcion || 'Subproductos ganaderos'}`;
+          } else {
+            sandachWrap.style.display = 'none';
+          }
+        } else {
+          sandachWrap.style.display = 'none';
+        }
+      };
+      
+      // Ejecutar al cargar
+      actualizarSANDACH();
+      
+      // Listener para cambios futuros
+      motivoBajaSelect.addEventListener('change', actualizarSANDACH);
+    }
+
+    // Gap 11: Listener para notificado_rega
+    const notificadoCheckbox = document.getElementById("a-notificado");
+    if (notificadoCheckbox && window.NotificacionesREGA) {
+      notificadoCheckbox.addEventListener('change', async (evt) => {
+        if (!evt.target.checked) return; // Solo procesar cuando se marca
+
+        // Validar datos mínimos antes de notificar
+        const crotal = document.getElementById("a-crotal")?.value?.trim().toUpperCase();
+        const finca = await window.Fincas?.getActive().catch(() => null);
+
+        const validacion = window.NotificacionesREGA.validarNotificacionPosible(
+          { numero_identificacion: crotal, estado: document.getElementById("a-estado")?.value },
+          finca
+        );
+
+        if (!validacion.valido) {
+          evt.target.checked = false;
+          return App.toastError(`Notificación REGA: ${validacion.mensaje}`);
+        }
+
+        try {
+          const notificacionId = await window.NotificacionesREGA.registrar({
+            animal_id: id || 'nuevo',
+            finca_id: finca?.id,
+            animal_numero: crotal,
+            finca_rega: finca?.rega || finca?.codigo_REGA,
+            tipo_evento: 'cambio_estado'
+          });
+
+          // Simular envío a REGA
+          const resultado = await window.NotificacionesREGA.enviarAREGA({
+            id: notificacionId,
+            animal_numero: crotal,
+            finca_rega: finca?.rega,
+            tipo_evento: 'cambio_estado'
+          });
+
+          if (resultado.exito) {
+            App.toast(`✅ ${resultado.mensaje}`);
+          } else {
+            App.toastError(`⚠️ ${resultado.mensaje}`);
+          }
+        } catch (err) {
+          App.toastError(`Error notificando REGA: ${err.message}`);
+          evt.target.checked = false;
+        }
+      });
+    }
   },
   async _guardarAnimalDetalle(id) {
     try {
@@ -409,6 +513,7 @@ const AnimalesView = {
         raza: document.getElementById("a-raza").value.trim(),
         rebanoId: rebanoIdFinal,
         tipoAlta: document.getElementById("a-tipoalta").value,
+        categoria: document.getElementById("a-categoria")?.value || "",
         fecha_nacimiento: document.getElementById("a-fecha").value,
         notas: document.getElementById("a-notas").value.trim(),
         rfid_codigo: document.getElementById("a-rfid").value.trim(),
@@ -417,6 +522,7 @@ const AnimalesView = {
         notificado_rega: document.getElementById("a-notificado").checked,
         // Libro de registro SIGGAN
         pais_nacimiento: document.getElementById("a-pais-nac")?.value || "ES",
+        madre_id: document.getElementById("a-madre")?.value ? Number(document.getElementById("a-madre").value) : null,
         fecha_alta: document.getElementById("a-fecha-alta")?.value || "",
         rega_origen: (document.getElementById("a-rega-origen")?.value || "").trim().toUpperCase(),
         dib: (document.getElementById("a-dib")?.value || "").trim().toUpperCase(),
@@ -448,6 +554,29 @@ const AnimalesView = {
       const nuevoId = await Animales.save(data);
       this._animalGuardado = true;
       App.toast("Animal guardado correctamente ✔");
+
+      // Gap 11: Si está marcado "Notificado a REGA", registrar notificación
+      if (data.notificado_rega && window.NotificacionesREGA) {
+        try {
+          const finca = await Fincas.getActive().catch(() => null);
+          if (finca) {
+            const resultado = await NotificacionesREGA.registrar({
+              animal_id: nuevoId,
+              finca_id: finca.id,
+              animal_numero: data.numero_identificacion,
+              finca_rega: finca.rega || '',
+              tipo_evento: 'alta',
+              observaciones: `Alta registrada ${id ? '(actualizada)' : '(nueva)'}`,
+            });
+            if (resultado.exito) {
+              await NotificacionesREGA.enviarAREGA(resultado.numero_seguimiento);
+              App.toast(`✅ Notificación REGA registrada: ${resultado.numero_seguimiento}`);
+            }
+          }
+        } catch (err) {
+          console.warn('Error registrando notificación REGA:', err);
+        }
+      }
 
       location.hash = "#/animales";
     } catch (e) {
@@ -507,12 +636,20 @@ const AnimalesView = {
   },
 
   _onEspecieChange(selectEl) {
+    const CS = window.ComunidadesService;
     const section = document.getElementById('a-dib-section');
-    if (!section) return;
-    const requiere = window.ComunidadesService
-      ? window.ComunidadesService.especieRequiereDIB(selectEl.value)
-      : false;
-    section.style.display = requiere ? 'block' : 'none';
+    if (section) {
+      const requiere = CS ? CS.especieRequiereDIB(selectEl.value) : false;
+      section.style.display = requiere ? 'block' : 'none';
+    }
+    // Refrescar el catálogo de categorías según la nueva especie
+    const catSel = document.getElementById('a-categoria');
+    if (catSel && CS && CS.getCategoriasAnimal) {
+      const prev = catSel.value;
+      const cats = CS.getCategoriasAnimal(selectEl.value);
+      catSel.innerHTML = '<option value="">— Sin clasificar —</option>' +
+        cats.map((c) => `<option value="${c}" ${prev === c ? 'selected' : ''}>${c}</option>`).join('');
+    }
   },
 
   _onEstadoChange(selectEl) {
@@ -532,10 +669,15 @@ const AnimalesView = {
   },
 
   async _eliminarAnimal(id) {
-    if (!confirm("¿Borrar animal de la base de datos?")) return;
+    const motivo = prompt("Motivo de anulación (obligatorio):", "rectificacion_censo");
+    if (!motivo || !motivo.trim()) {
+      App.toastError("Debes indicar un motivo de anulación.");
+      return;
+    }
+    if (!confirm("¿Anular ficha del animal? Se conservará histórico para auditoría.")) return;
     try {
-      await Animales.delete(id);
-      App.toast("Borrado");
+      await Animales.delete(id, motivo.trim());
+      App.toast("Animal anulado");
       location.hash = "#/animales";
     } catch (e) {
       App.toastError(e.message);

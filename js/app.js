@@ -323,7 +323,14 @@ const App = {
     try {
       const t = await Transportistas.get(val);
       if (!t) return;
-      App._showTransportistaInfo({ transportistaId: val, nombreTransportista: t.nombre, nifTransportista: t.nif_cif, matriculaTransportista: t.matricula });
+      App._showTransportistaInfo({
+        transportistaId: val,
+        nombreTransportista: t.nombre,
+        nifTransportista: t.nif_cif,
+        matriculaTransportista: t.matricula,
+        atgTransportista: t.autorizacion_transporte_ganado,
+        desinsectacionVencimiento: t.desinsectacion_vencimiento,
+      });
     } catch(e) {
       console.warn(e);
     }
@@ -343,6 +350,13 @@ const App = {
     if (nifEl) nifEl.textContent = 'NIF: ' + (data.nifTransportista || '');
     const matEl = document.getElementById('w-v-transportista-matricula');
     if (matEl) matEl.textContent = '🚚 ' + (data.matriculaTransportista || '');
+    const atgEl = document.getElementById('w-v-transportista-atg');
+    if (atgEl) atgEl.textContent = 'ATG: ' + (data.atgTransportista || 'pendiente');
+    const desEl = document.getElementById('w-v-transportista-desinsectacion');
+    if (desEl) {
+      const v = data.desinsectacionVencimiento || '';
+      desEl.textContent = 'Desinsectación: ' + (v ? ('vigente hasta ' + v) : 'sin vencimiento informado');
+    }
   },
 
   async updateNavigationMenu() {
@@ -1020,7 +1034,7 @@ const App = {
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
       overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
       overlay.innerHTML = `
-        <div class="card" style="max-width:450px;width:100%;border-top:4px solid #a78bfa;padding:24px;">
+        <div class="card" style="max-width:450px;width:100%;border-top:4px solid #a78bfa;padding:24px;max-height:90vh;overflow-y:auto;">
           <div class="flex justify-between items-center mb-14">
             <div class="font-900 text-white text-lg">🧬 Gestión Reproductiva</div>
             <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">✕</button>
@@ -1028,7 +1042,7 @@ const App = {
           <div class="mb-12 text-ccc text-sm">Animal: <strong class="text-white">${animal.numero_identificacion || '#'.concat(animal.id)}</strong></div>
           <div class="wizard-input-group">
             <label class="wizard-label">TIPO DE EVENTO</label>
-            <select id="wiz-repro-tipo" class="wizard-input wizard-select">
+            <select id="wiz-repro-tipo" class="wizard-input wizard-select" onchange="App._onReproTipoChange(this.value)">
               <option value="Celo">Celo</option>
               <option value="Inseminación Artificial" selected>Inseminación Artificial</option>
               <option value="Monta Natural">Monta Natural</option>
@@ -1043,12 +1057,27 @@ const App = {
             <label class="wizard-label">FECHA</label>
             <input type="date" id="wiz-repro-fecha" class="wizard-input" value="${new Date().toISOString().split('T')[0]}">
           </div>
+          <div id="wiz-repro-parto" style="display:none;">
+            <div class="grid grid-cols-2 gap-10">
+              <div class="wizard-input-group">
+                <label class="wizard-label">CRÍAS VIVAS</label>
+                <input type="number" id="wiz-repro-crias-vivas" class="wizard-input" min="0" max="10" value="1" oninput="App._renderCriasParto()">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">CRÍAS MUERTAS</label>
+                <input type="number" id="wiz-repro-crias-muertas" class="wizard-input" min="0" max="10" value="0">
+              </div>
+            </div>
+            <div class="text-2xs text-gray mb-8">Cada cría viva se dará de alta en el censo con su crotal y vínculo a la madre.</div>
+            <div id="wiz-repro-crias-list"></div>
+          </div>
           <div class="wizard-input-group">
             <label class="wizard-label">RESULTADO / NOTAS</label>
             <input type="text" id="wiz-repro-notas" class="wizard-input" placeholder="Ej: Positivo, Negativo, Crias: 2, ...">
           </div>
+          <div id="wiz-repro-msg" style="display:none; margin-top:6px; padding:8px 10px; border-radius:8px; font-size:13px; font-weight:700;"></div>
           <div class="mt-14 flex gap-10">
-            <button class="btn btn-primary flex-1" onclick="App._guardarEventoReproduccion('${animalId}')">✔ Guardar</button>
+            <button id="wiz-repro-guardar" class="btn btn-primary flex-1" onclick="App._guardarEventoReproduccion('${animalId}')">✔ Guardar</button>
             <button class="btn btn-secondary" onclick="this.closest('[style]').remove()">Cancelar</button>
           </div>
         </div>`;
@@ -1059,29 +1088,124 @@ const App = {
     }
   },
 
+  _onReproTipoChange(tipo) {
+    const sec = document.getElementById('wiz-repro-parto');
+    if (!sec) return;
+    if (tipo === 'Parto') {
+      sec.style.display = 'block';
+      this._renderCriasParto();
+    } else {
+      sec.style.display = 'none';
+    }
+  },
+
+  _renderCriasParto() {
+    const cont = document.getElementById('wiz-repro-crias-list');
+    if (!cont) return;
+    const n = Math.max(0, Math.min(10, parseInt(document.getElementById('wiz-repro-crias-vivas')?.value || '0', 10) || 0));
+    // Preservar lo que el usuario ya hubiera escrito
+    const prev = [];
+    cont.querySelectorAll('[data-cria-row]').forEach(row => {
+      prev.push({
+        crotal: row.querySelector('.cria-crotal')?.value || '',
+        sexo: row.querySelector('.cria-sexo')?.value || 'H'
+      });
+    });
+    let html = '';
+    for (let i = 0; i < n; i++) {
+      const p = prev[i] || { crotal: '', sexo: 'H' };
+      html += `<div data-cria-row class="grid grid-cols-2 gap-10 mb-8" style="border-top:1px solid #222; padding-top:8px;">
+          <div class="wizard-input-group" style="margin:0;">
+            <label class="wizard-label">CROTAL CRÍA ${i + 1}</label>
+            <input type="text" class="wizard-input cria-crotal" maxlength="14" placeholder="ES + 12 dígitos" value="${p.crotal}">
+          </div>
+          <div class="wizard-input-group" style="margin:0;">
+            <label class="wizard-label">SEXO</label>
+            <select class="wizard-input wizard-select cria-sexo">
+              <option value="H" ${p.sexo === 'H' ? 'selected' : ''}>Hembra</option>
+              <option value="M" ${p.sexo === 'M' ? 'selected' : ''}>Macho</option>
+            </select>
+          </div>
+        </div>`;
+    }
+    cont.innerHTML = html;
+  },
+
+  _reproMsg(msg, tipo) {
+    const el = document.getElementById('wiz-repro-msg');
+    if (!el) return;
+    if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+    const ok = tipo === 'ok';
+    el.style.background = ok ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+    el.style.color = ok ? '#10b981' : '#ef4444';
+    el.style.border = `1px solid ${ok ? '#10b981' : '#ef4444'}`;
+    el.textContent = (ok ? '✔ ' : '❌ ') + msg;
+    el.style.display = 'block';
+  },
+
   async _guardarEventoReproduccion(animalId) {
+    if (this._guardandoRepro) return;
     const overlay = document.querySelector('[style*="z-index:9999"]');
+    const btn = document.getElementById('wiz-repro-guardar');
     const tipo = document.getElementById('wiz-repro-tipo')?.value;
     const fecha = document.getElementById('wiz-repro-fecha')?.value;
     const notas = document.getElementById('wiz-repro-notas')?.value?.trim() || '';
-    if (!tipo || !fecha) { this.toastError('Completa todos los campos'); return; }
+    if (!tipo || !fecha) { this._reproMsg('Completa el tipo de evento y la fecha', 'error'); return; }
+    this._reproMsg('');
+    this._guardandoRepro = true;
+    if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; btn.style.opacity = '0.6'; }
     try {
       const fincaId = await Fincas.getActiveId();
-      await Reproduccion.saveEvento({
+      const payload = {
         animalId: Number(animalId),
         tipo_evento: tipo,
         fecha,
         notas,
         resultado: notas,
         fincaId
-      });
+      };
+
+      if (tipo === 'Parto') {
+        const muertas = parseInt(document.getElementById('wiz-repro-crias-muertas')?.value || '0', 10) || 0;
+        const filas = Array.from(document.querySelectorAll('#wiz-repro-crias-list [data-cria-row]'));
+        const crias = [];
+        for (const row of filas) {
+          const input = row.querySelector('.cria-crotal');
+          const crotal = (input?.value || '').trim().toUpperCase();
+          const sexo = row.querySelector('.cria-sexo')?.value || 'H';
+          if (input) input.style.border = '';
+          if (!crotal) {
+            if (input) { input.style.border = '2px solid #ef4444'; input.focus(); }
+            this._reproMsg('Indica el crotal de todas las crías vivas', 'error');
+            return;
+          }
+          if (window.ErrorHandler && !window.ErrorHandler.isCrotalValido(crotal)) {
+            if (input) { input.style.border = '2px solid #ef4444'; input.focus(); }
+            this._reproMsg(`Crotal inválido: ${crotal}. Formato: ES + 12 dígitos (ej: ES123456789012)`, 'error');
+            return;
+          }
+          crias.push({ crotal, sexo });
+        }
+        payload.crias = crias;
+        payload.crias_vivas = crias.length;
+        payload.crias_muertas = muertas;
+      }
+
+      await Reproduccion.saveEvento(payload);
       if (overlay) overlay.remove();
-      this.toast('Evento reproductivo guardado ✔');
+      const nCrias = (payload.crias || []).length;
+      this.toast(tipo === 'Parto' && nCrias
+        ? `Parto guardado · ${nCrias} cría(s) dada(s) de alta ✔`
+        : 'Evento reproductivo guardado ✔');
       // Recargar historial
       this._cargarHistorialReproduccion(animalId);
     } catch (e) {
       console.error('[App] Error guardando evento:', e);
-      this.toastError('Error al guardar: ' + e.message);
+      this._reproMsg('Error al guardar: ' + (e?.message || e), 'error');
+    } finally {
+      this._guardandoRepro = false;
+      const b = document.getElementById('wiz-repro-guardar');
+      if (b) { b.disabled = false; b.textContent = '✔ Guardar'; b.style.opacity = '1'; }
     }
   },
 
@@ -1196,6 +1320,9 @@ const App = {
           await Animales.save(a);
         }
       }
+      if (v?.movimientoId && window.Movimientos?.delete) {
+        await window.Movimientos.delete(v.movimientoId).catch(() => {});
+      }
       await window.db.delete("comercializacion_carne", id);
       this.toast("Registro de venta eliminado correctamente");
       location.hash = "/comercializacion?tab=carne";
@@ -1238,6 +1365,13 @@ const App = {
   async _guardarEdicionLeche(id) {
     try {
       const e = await window.db.get("comercializacion_leche", id);
+      const anterior = {
+        cantidad: e.cantidad,
+        precioBase: e.precioBase,
+        laboratorio: { ...(e.laboratorio || {}) },
+        antibioticos: e.antibioticos,
+        estadoAnalitica: e.estadoAnalitica,
+      };
       e.cantidad = parseFloat(document.getElementById("le-cant").value);
       e.precioBase = parseFloat(document.getElementById("le-pb").value);
       e.laboratorio = {
@@ -1249,6 +1383,21 @@ const App = {
       };
       e.antibioticos = e.laboratorio.antibioticos;
       e.estadoAnalitica = e.antibioticos ? "Alerta Crítica" : "Validado";
+      const cambios = {};
+      if (anterior.cantidad !== e.cantidad) cambios.cantidad = { antes: anterior.cantidad, despues: e.cantidad };
+      if (anterior.precioBase !== e.precioBase) cambios.precioBase = { antes: anterior.precioBase, despues: e.precioBase };
+      ["grasa", "proteina", "somaticas", "germenes", "antibioticos"].forEach((k) => {
+        const a = anterior.laboratorio?.[k];
+        const d = e.laboratorio?.[k];
+        if (a !== d) cambios[`laboratorio.${k}`] = { antes: a, despues: d };
+      });
+      if (Object.keys(cambios).length > 0) {
+        e.auditoria_analitica = Array.isArray(e.auditoria_analitica) ? e.auditoria_analitica : [];
+        e.auditoria_analitica.push({
+          fecha: new Date().toISOString(),
+          cambios,
+        });
+      }
       await window.db.put("comercializacion_leche", e);
       this.toast("Registro lácteo actualizado.");
       location.hash = "#/comercializacion?tab=leche";
@@ -1292,6 +1441,9 @@ const App = {
       if (a) {
         a.estado = "activo";
         await Animales.save(a);
+      }
+      if (v?.movimientoId && window.Movimientos?.delete) {
+        await window.Movimientos.delete(v.movimientoId).catch(() => {});
       }
       await window.db.delete("comercializacion_carne", id);
       this.toast("Venta eliminada.");

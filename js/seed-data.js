@@ -17,16 +17,16 @@
     telefonoContacto: '+34 654 123 456',
     nif_cif: 'B12345678',
     email: 'demo.chamorro@example.com',
-    rega: 'ES-10-123456-789',
+    rega: 'ES041230000123',  // Cádiz (04) + municipio (123) + secuencial (0000123) — formato REGA válido
     cea: 'BA-12345-67',
     adsg_nombre: 'ADSG Tierra de Barros',
-    comunidad_autonoma: 'Extremadura',
+    comunidad_autonoma: 'Andalucía',
     tipo_explotacion: 'Mixto',
     sistema_explotacion: 'Semiextensivo',
     zonas: [
-      { nombre: 'Parcela Norte 42ha', superficieGrafica: 42, superficie: 42, aforoMax: 200, aforo_maximo: 200, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pasto principal de vacuno', descripcion: 'Pasto principal de vacuno' },
-      { nombre: 'Parcela Sur 28ha', superficieGrafica: 28, superficie: 28, aforoMax: 150, aforo_maximo: 150, usoPrincipal: 'Barbecho', uso: 'Barbecho', localizacion: 'Rotación y barbecho', descripcion: 'Rotación y barbecho' },
-      { nombre: 'Pastos Este 15ha', superficieGrafica: 15, superficie: 15, aforoMax: 250, aforo_maximo: 250, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pastos de ovino', descripcion: 'Pastos de ovino' }
+      { nombre: 'Parcela Norte 42ha', superficieGrafica: 42, superficie: 42, aforoMax: 200, aforo_maximo: 200, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pasto principal de vacuno', descripcion: 'Pasto principal de vacuno', codigo_pac: 'ES-BA-0001-001', distancia_agua_m: 150 },
+      { nombre: 'Parcela Sur 28ha', superficieGrafica: 28, superficie: 28, aforoMax: 150, aforo_maximo: 150, usoPrincipal: 'Barbecho', uso: 'Barbecho', localizacion: 'Rotación y barbecho', descripcion: 'Rotación y barbecho', codigo_pac: 'ES-BA-0001-002', distancia_agua_m: 300 },
+      { nombre: 'Pastos Este 15ha', superficieGrafica: 15, superficie: 15, aforoMax: 250, aforo_maximo: 250, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pastos de ovino', descripcion: 'Pastos de ovino', codigo_pac: 'ES-BA-0001-003', distancia_agua_m: 80 }
     ]
   };
 
@@ -67,9 +67,9 @@
 
       // 2. Rebaños
       var rebDefs = [
-        { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId },
-        { nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId },
-        { nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId }
+        { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId, tipo_explotacion_rega: 'Producción y reproducción' },
+        { nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' },
+        { nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' }
       ];
       var rebs = [];
       for (var i = 0; i < rebDefs.length; i++) {
@@ -280,10 +280,10 @@
       // 11. Eventos reproductivos (vaca1, alineados con ejemplos de manual)
       if (vaca1) {
         var repDefs = [
-          { tipo_evento: 'Celo', fecha: '2026-06-01', animalId: vaca1.id },
-          { tipo_evento: 'Inseminación Artificial', fecha: '2026-06-02', animalId: vaca1.id, semenalId: 'Reproductor-5' },
-          { tipo_evento: 'Diagnóstico Gestación', fecha: '2026-06-30', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 28 },
-          { tipo_evento: 'Parto', fecha: '2027-03-09', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
+          { tipo_evento: 'Celo', fecha: '2025-08-20', animalId: vaca1.id },
+          { tipo_evento: 'Inseminación Artificial', fecha: '2025-08-21', animalId: vaca1.id, semenalId: 'Reproductor-5' },
+          { tipo_evento: 'Diagnóstico Gestación', fecha: '2025-09-20', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 30 },
+          { tipo_evento: 'Parto', fecha: '2026-05-30', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
         ];
         for (var r2 = 0; r2 < repDefs.length; r2++) {
           try { await Reproduccion.saveEvento(repDefs[r2]); } catch (e) { console.log('[SEED] Error reproducción:', e.message); }

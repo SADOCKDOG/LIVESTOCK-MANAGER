@@ -88,9 +88,10 @@ const RebanosView = {
     const rebano = await Rebanos.get(id);
     const animales = await Animales.list(id);
     const finca = await Fincas.getActive();
-    const zonas = finca ? finca.zonas || [] : [];
+    const zonas = finca ? (finca.zonas || []).filter(z => !z?.anulada) : [];
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
+    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const eventosReb = eventos.filter(e => e.entidad_id === Number(id) || (e.tipo_entidad === 'rebano' && e.snap_identificacion === rebano.nombre));
     const totalKg = eventosReb.filter(e => e.unidad === 'kg').reduce((s, e) => s + (e.valor_neto || 0), 0);
@@ -151,6 +152,11 @@ const RebanosView = {
               ${zonas.map((z) => `<option value="${z.nombre}" ${rebano.zonaActual === z.nombre ? "selected" : ""}>${z.nombre}</option>`).join("")}
             </select></div>
           </div>
+          <div><label class="form-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
+          <select id="r-edit-tipo-explotacion-rega" class="premium-input border-green">
+            <option value="">— Seleccionar —</option>
+            ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${rebano.tipo_explotacion_rega === t ? "selected" : ""}>${t}</option>`).join("")}
+          </select></div>
           <div><label class="form-label">Notas / Observaciones</label>
           <textarea id="r-edit-notas" class="premium-input" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
         </div>
@@ -226,7 +232,8 @@ const RebanosView = {
       r.capacidad_total = Number(document.getElementById("r-edit-capacidad").value) || 0;
       r.codigo_lote = document.getElementById("r-edit-lote").value.trim();
       r.fecha_constitucion = document.getElementById("r-edit-fecha").value;
-      r.notes = document.getElementById("r-edit-notas").value.trim();
+      r.tipo_explotacion_rega = document.getElementById("r-edit-tipo-explotacion-rega").value;
+      r.notas = document.getElementById("r-edit-notas").value.trim();
       if (!r.nombre) return App.toastError("Nombre requerido");
       await Rebanos.save(r);
       App.toast("Rebaño actualizado");
@@ -239,6 +246,7 @@ const RebanosView = {
   async _crearRebano() {
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
+    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const finca = await Fincas.getActive();
     const zonas = finca ? finca.zonas || [] : [];
 
@@ -302,6 +310,23 @@ const RebanosView = {
         content: (data) => `
           <div style="margin-top:10px;">
             <div class="wizard-input-group">
+              <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
+              <select id="w-reb-tipo-explotacion" class="wizard-input wizard-select" style="border-color: #10b981;">
+                <option value="">— Seleccionar —</option>
+                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_explotacion_rega === t ? "selected" : ""}>${t}</option>`).join("")}
+              </select>
+              <small class="text-gray">Requisito normativo SIGGAN/BADIGEX</small>
+            </div>
+          </div>
+        `,
+        onChange: async (data) => {
+          data.tipo_explotacion_rega = document.getElementById('w-reb-tipo-explotacion')?.value || data.tipo_explotacion_rega;
+        }
+      },
+      {
+        content: (data) => `
+          <div style="margin-top:10px;">
+            <div class="wizard-input-group">
               <label class="wizard-label">CAPACIDAD / AFORO MÁXIMO</label>
               <input type="number" id="w-reb-capacidad" value="${data.capacidad_total || ''}" placeholder="Ej: 100 (opcional)" class="wizard-input">
             </div>
@@ -325,13 +350,13 @@ const RebanosView = {
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">NOTAS / OBSERVACIONES</label>
-              <textarea id="w-reb-notas" placeholder="Ración, ADSG, detalles..." class="wizard-input" style="height:80px; resize:none;">${data.notes || ''}</textarea>
+              <textarea id="w-reb-notas" placeholder="Ración, ADSG, detalles..." class="wizard-input" style="height:80px; resize:none;">${data.notas || ''}</textarea>
             </div>
           </div>
         `,
         onChange: async (data) => {
           data.fecha_constitucion = document.getElementById('w-reb-fecha')?.value || data.fecha_constitucion;
-          data.notes = document.getElementById('w-reb-notas')?.value.trim() || '';
+          data.notas = document.getElementById('w-reb-notas')?.value.trim() || '';
         }
       }
     ];
@@ -344,10 +369,11 @@ const RebanosView = {
         especie: especies[0].nombre,
         tipo: tipos[0].nombre,
         zonaActual: "",
+        tipo_explotacion_rega: "",
         capacidad_total: "",
         codigo_lote: "",
         fecha_constitucion: new Date().toISOString().split("T")[0],
-        notes: ""
+        notas: ""
       },
       steps: wizardSteps,
       onComplete: async (finalData) => {
@@ -357,10 +383,11 @@ const RebanosView = {
             especie: finalData.especie,
             tipo: finalData.tipo,
             zonaActual: finalData.zonaActual,
+            tipo_explotacion_rega: finalData.tipo_explotacion_rega,
             capacidad_total: Number(finalData.capacidad_total) || 0,
             codigo_lote: finalData.codigo_lote,
             fecha_constitucion: finalData.fecha_constitucion,
-            notes: finalData.notes,
+            notas: finalData.notas,
             estado: "activo",
           });
           App.toast("Rebaño creado exitosamente");
@@ -374,12 +401,12 @@ const RebanosView = {
 
   async _eliminarRebano(id) {
     const ans = await Animales.list(id);
-    if (ans.length > 0)
+    if (ans.filter(a => (a.estado || 'activo') === 'activo').length > 0)
       return App.toastError("No se puede eliminar un rebaño con animales.");
-    if (!confirm("¿Eliminar este rebaño?")) return;
+    if (!confirm("¿Anular este rebaño? Se conservará histórico de auditoría.")) return;
     try {
       await Rebanos.delete(id);
-      App.toast("Eliminado");
+      App.toast("Rebaño anulado");
       location.hash = "#/rebanos";
     } catch (e) {
       App.toastError(e.message);
