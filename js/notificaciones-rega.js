@@ -46,77 +46,51 @@ window.NotificacionesREGA = (() => {
     return { valido: true, mensaje: 'Notificación permitida' };
   }
 
-  /**
-   * Registra una notificación a REGA para un animal
-   * @param {Object} data - {animal_id, finca_id, animal_numero, finca_rega, tipo_evento}
-   * @returns {Promise<{exito: boolean, numero_seguimiento: string, mensaje: string}>}
-   */
-  async function registrar(data) {
-    const fincaId = data.finca_id || (await window.Fincas?.getActiveId());
-    if (!fincaId) throw new Error('No hay finca activa');
+/**
+ * Registra una notificación a REGA para un animal
+ * @param {Object} data - {animal_id, finca_id, animal_numero, finca_rega, tipo_evento}
+ * @returns {Promise<{exito: boolean, numero_seguimiento: string, mensaje: string}>}
+ */
+async function registrar(data) {
+  const fincaId = data.finca_id || (await window.Fincas?.getActiveId());
+  if (!fincaId) throw new Error('No hay finca activa');
 
-    // Generar número de seguimiento único: YYYYMMDD-{fincaId}-{random}
-    const hoy = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const numeroSeguimiento = `${hoy}-${fincaId}-${random}`;
+  // Generar número de seguimiento único: YYYYMMDD-{fincaId}-{random}
+  const hoy = new Date().toISOString().split('T')[0].replace(/-/g, '');
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const numeroSeguimiento = `${hoy}-${fincaId}-${random}`;
 
-    const notificacionData = {
-      animal_id: data.animal_id,
-      finca_id: fincaId,
-      animal_numero: data.animal_numero, // Crotal/DIB
-      finca_rega: data.finca_rega,
-      tipo_evento: data.tipo_evento || 'cambio_estado', // alta, baja, cambio_estado, etc.
-      estado_notificacion: 'pendiente', // pendiente, enviado, confirmado, error
-      fecha_notificacion: new Date().toISOString(),
+  const notificacionData = {
+    id: Date.now(),
+    animal_id: data.animal_id,
+    finca_id: fincaId,
+    animal_numero: data.animal_numero, // Crotal/DIB
+    finca_rega: data.finca_rega,
+    tipo_evento: data.tipo_evento || 'cambio_estado', // alta, baja, cambio_estado, etc.
+    estado_notificacion: 'pendiente', // pendiente, enviado, confirmado, error
+    fecha_notificacion: new Date().toISOString(),
+    numero_seguimiento: numeroSeguimiento,
+    observaciones: data.observaciones || ''
+  };
+
+  try {
+    // Gap 11: Usar localStorage como almacenamiento principal (fallback robusto)
+    const notificaciones = JSON.parse(localStorage.getItem('notificaciones_rega') || '[]');
+    notificaciones.push(notificacionData);
+    localStorage.setItem('notificaciones_rega', JSON.stringify(notificaciones));
+    
+    console.log(`[NotificacionesREGA] Notificación registrada: animal=${data.animal_numero}, número=${numeroSeguimiento}`);
+    return {
+      exito: true,
       numero_seguimiento: numeroSeguimiento,
-      observaciones: data.observaciones || ''
+      mensaje: `Notificación registrada: ${numeroSeguimiento}`,
+      id: notificacionData.id
     };
-
-    try {
-      // Verificar si la tabla existe; si no, usar almacenamiento simple (fallback)
-      if (!window.db || !window.db.objectStoreNames) {
-        console.warn('[NotificacionesREGA] IndexedDB no disponible, usando localStorage fallback');
-        const fallback = JSON.parse(localStorage.getItem('notificaciones_rega_fallback') || '[]');
-        fallback.push(notificacionData);
-        localStorage.setItem('notificaciones_rega_fallback', JSON.stringify(fallback));
-        return {
-          exito: true,
-          numero_seguimiento: numeroSeguimiento,
-          mensaje: `Notificación registrada (fallback): ${numeroSeguimiento}`
-        };
-      }
-
-      if (!window.db.objectStoreNames.contains(STORE_NAME)) {
-        console.warn(`[NotificacionesREGA] Tabla ${STORE_NAME} no existe aún. Usando localStorage.`);
-        const fallback = JSON.parse(localStorage.getItem('notificaciones_rega_fallback') || '[]');
-        fallback.push(notificacionData);
-        localStorage.setItem('notificaciones_rega_fallback', JSON.stringify(fallback));
-        return {
-          exito: true,
-          numero_seguimiento: numeroSeguimiento,
-          mensaje: `Notificación registrada (fallback): ${numeroSeguimiento}`
-        };
-      }
-
-      const tx = window.db.transaction([STORE_NAME], 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const result = await new Promise((resolve, reject) => {
-        const req = store.add(notificacionData);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-      console.log(`[NotificacionesREGA] Notificación registrada: animal=${data.animal_numero}, número=${numeroSeguimiento}`);
-      return {
-        exito: true,
-        numero_seguimiento: numeroSeguimiento,
-        mensaje: `Notificación registrada: ${numeroSeguimiento}`,
-        id: result
-      };
-    } catch (e) {
-      console.error('[NotificacionesREGA] Error al registrar:', e.message);
-      throw e;
-    }
+  } catch (e) {
+    console.error('[NotificacionesREGA] Error al registrar:', e.message);
+    throw e;
   }
+}
 
   /**
    * Obtiene historial de notificaciones de un animal
@@ -125,20 +99,11 @@ window.NotificacionesREGA = (() => {
    */
   async function obtenerHistorial(animal_id) {
     try {
-      const tx = window.db.transaction([STORE_NAME], 'readonly');
-      const store = tx.objectStore(STORE_NAME);
-      const index = store.index('animal_id');
-
-      return await new Promise((resolve, reject) => {
-        const req = index.getAll(animal_id);
-        req.onsuccess = () => {
-          const notificaciones = req.result || [];
-          // Ordenar por fecha descendente
-          notificaciones.sort((a, b) => new Date(b.fecha_notificacion) - new Date(a.fecha_notificacion));
-          resolve(notificaciones);
-        };
-        req.onerror = () => reject(req.error);
-      });
+      const notificaciones = JSON.parse(localStorage.getItem('notificaciones_rega') || '[]');
+      const filtradas = notificaciones.filter(n => n.animal_id === animal_id);
+      // Ordenar por fecha descendente
+      filtradas.sort((a, b) => new Date(b.fecha_notificacion) - new Date(a.fecha_notificacion));
+      return filtradas;
     } catch (e) {
       console.error('[NotificacionesREGA] Error obteniendo historial:', e.message);
       return [];
@@ -164,31 +129,17 @@ window.NotificacionesREGA = (() => {
    */
   async function actualizarEstado(notificacion_id, nuevoEstado, error = '') {
     try {
-      const tx = window.db.transaction([STORE_NAME], 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const getReq = store.get(notificacion_id);
-
-      getReq.onsuccess = () => {
-        const notificacion = getReq.result;
-        if (!notificacion) {
-          console.error('[NotificacionesREGA] Notificación no encontrada:', notificacion_id);
-          return;
-        }
-        notificacion.estado_notificacion = nuevoEstado;
-        if (error) notificacion.error_mensaje = error;
-        notificacion.fecha_actualizacion = new Date().toISOString();
-
-        const putReq = store.put(notificacion);
-        putReq.onsuccess = () => {
-          console.log(`[NotificacionesREGA] Estado actualizado: ${notificacion_id} → ${nuevoEstado}`);
-        };
-        putReq.onerror = () => {
-          console.error('[NotificacionesREGA] Error actualizando notificación:', putReq.error);
-        };
-      };
-      getReq.onerror = () => {
-        console.error('[NotificacionesREGA] Error obteniendo notificación:', getReq.error);
-      };
+      const notificaciones = JSON.parse(localStorage.getItem('notificaciones_rega') || '[]');
+      const notificacion = notificaciones.find(n => n.id === notificacion_id);
+      if (!notificacion) {
+        console.error('[NotificacionesREGA] Notificación no encontrada:', notificacion_id);
+        return;
+      }
+      notificacion.estado_notificacion = nuevoEstado;
+      if (error) notificacion.error_mensaje = error;
+      notificacion.fecha_actualizacion = new Date().toISOString();
+      localStorage.setItem('notificaciones_rega', JSON.stringify(notificaciones));
+      console.log(`[NotificacionesREGA] Estado actualizado: ${notificacion_id} → ${nuevoEstado}`);
     } catch (e) {
       console.error('[NotificacionesREGA] Error actualizando estado:', e.message);
       throw e;
