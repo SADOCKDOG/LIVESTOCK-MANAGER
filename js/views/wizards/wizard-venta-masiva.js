@@ -553,6 +553,9 @@ window.VentaMasivaWizard = {
       onComplete: async (finalData) => {
         try {
           const fId = await window.Fincas.getActiveId();
+          const fincaActiva = await window.Fincas.getActive().catch(() => null);
+          const regaOrigenFinca = (fincaActiva?.rega || fincaActiva?.codigo_REGA || '').toString();
+          const ccaaFinca = (fincaActiva?.comunidad_autonoma || '').toString();
           let primerAlbaran = null;
           const N = finalData.seleccionados.length;
           const year = new Date().getFullYear();
@@ -618,6 +621,50 @@ window.VentaMasivaWizard = {
               } catch(e) { /* no hay contratos module */ }
             }
             const idV = await window.db.add("comercializacion_carne", reg);
+
+            // PRIORIDAD NORMATIVA 1: cada venta debe generar su movimiento oficial
+            // inter-explotación para trazabilidad legal (SIGGAN/BADIGEX).
+            if (!window.Movimientos || typeof window.Movimientos.save !== 'function') {
+              await window.db.delete("comercializacion_carne", idV).catch(() => {});
+              throw new Error("No se pudo registrar el movimiento oficial: módulo Movimientos no disponible.");
+            }
+            try {
+              const normalizarREGA = (v) => {
+                if (!v) return '';
+                if (window.ComunidadesService?.normalizarREGA) return window.ComunidadesService.normalizarREGA(v);
+                return v.toString().toUpperCase().replace(/[^A-Z0-9]/g, '');
+              };
+              const regaDestinoNorm = normalizarREGA(finalData.regaDestino || '');
+              const regaDestinoValido = /^[A-Z]{2}\d{12}$/.test(regaDestinoNorm) ? regaDestinoNorm : '';
+
+              const movimientoId = await window.Movimientos.save({
+                fincaId: fId,
+                tipo: 'salida',
+                numero_guia: finalData.numeroGuia || '',
+                rega_origen: normalizarREGA(regaOrigenFinca),
+                rega_destino: regaDestinoValido,
+                explotacion_contraparte: finalData.razonSocial || finalData.codigoMatadero || 'Destino matadero',
+                motivo: 'matadero',
+                especie: animal.especie || rebano.especie || '',
+                num_animales: 1,
+                animalId: [aId],
+                crotales: animal.numero_identificacion ? [animal.numero_identificacion] : [],
+                transportistaId: finalData.transportistaId || null,
+                transportista_nombre: finalData.nombreTransportista || '',
+                matricula: finalData.matriculaTransportista || '',
+                fecha: finalData.fechaSacrificio || new Date().toISOString().split('T')[0],
+                desinsectacion_certificada: true,
+                comunidad_autonoma: ccaaFinca,
+                notas: `Venta comercial ${numeroAlbaran} · DIMOE DIMOE-${numeroAlbaran}`
+              });
+
+              reg.movimientoId = movimientoId;
+              await window.db.put("comercializacion_carne", { ...reg, id: idV, actualizadoEn: new Date().toISOString() });
+            } catch (movErr) {
+              await window.db.delete("comercializacion_carne", idV).catch(() => {});
+              throw new Error("No se pudo registrar el movimiento oficial de salida: " + (movErr?.message || movErr));
+            }
+
             const est = await window.Trazabilidad.generarEstructuraAlbaran(
               window.db,
               { ...reg, id: idV },

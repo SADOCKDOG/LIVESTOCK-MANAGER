@@ -1306,6 +1306,9 @@ const App = {
           await Animales.save(a);
         }
       }
+      if (v?.movimientoId && window.Movimientos?.delete) {
+        await window.Movimientos.delete(v.movimientoId).catch(() => {});
+      }
       await window.db.delete("comercializacion_carne", id);
       this.toast("Registro de venta eliminado correctamente");
       location.hash = "/comercializacion?tab=carne";
@@ -1402,6 +1405,9 @@ const App = {
       if (a) {
         a.estado = "activo";
         await Animales.save(a);
+      }
+      if (v?.movimientoId && window.Movimientos?.delete) {
+        await window.Movimientos.delete(v.movimientoId).catch(() => {});
       }
       await window.db.delete("comercializacion_carne", id);
       this.toast("Venta eliminada.");
