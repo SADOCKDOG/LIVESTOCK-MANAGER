@@ -257,7 +257,7 @@ const HibridoView = {
               <div class="flex justify-between items-start">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-6">
-                    <span class="text-xl">🐏</span>
+                    <span class="text-xl">${Icons.rebanos()}</span>
                     <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                   </div>
                   <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
@@ -285,7 +285,7 @@ const HibridoView = {
       lList.push({
         id: v.id,
         tipo: 'carne',
-        titulo: `🥩 Carne: ${v.numero_albaran || 'Albarán'} - ${v.razonSocial || 'Matadero'}`,
+        titulo: `${Icons.carne()} Carne: ${v.numero_albaran || 'Albarán'} - ${v.razonSocial || 'Matadero'}`,
         fecha: v.fechaSacrificio || v.fecha,
         valor: v.importe_total || v.valor_neto || 0,
         detalle: `${v.pesoCanal || 0} kg canal`,
@@ -296,7 +296,7 @@ const HibridoView = {
       lList.push({
         id: e.id,
         tipo: 'leche',
-        titulo: `🥛 Leche: Entrega de ${(e.cantidad || 0).toLocaleString()} L`,
+        titulo: `${Icons.leche()} Leche: Entrega de ${(e.cantidad || 0).toLocaleString()} L`,
         fecha: e.fechaRecogida || e.fecha,
         valor: e.importe_total || e.cantidad * e.precioBase || 0,
         detalle: `Vehículo: ${e.matriculaCisterna || '—'}`,
@@ -345,11 +345,11 @@ const HibridoView = {
                 <div class="flex justify-between items-start">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-6">
-                      <span class="text-xl">${l.tipo === 'carne' ? '🥩' : '🥛'}</span>
+                      <span class="text-xl">${l.tipo === 'carne' ? Icons.carne() : Icons.leche()}</span>
                       <h3 class="section-h3 m-0 text-ellipsis">${l.titulo}</h3>
                     </div>
                     <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                      <span>📅 ${this._fmtFecha(l.fecha)}</span>
+                      <span>${Icons.calendar()} ${this._fmtFecha(l.fecha)}</span>
                       <span>·</span>
                       <span>${l.detalle}</span>
                     </div>
@@ -373,7 +373,7 @@ const HibridoView = {
     if (d.supresionesCarne.length > 0 || d.supresionesLeche.length > 0) {
       alertasHtml = `
         <div class="supresion-alerta-box">
-          <strong>⚠️ ALERTAS SANITARIAS ACTIVAS:</strong>
+          <strong>${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
           <ul style="margin:5px 0 0 15px; padding:0;">
             ${d.supresionesCarne.map(s => `
               <li><span class="sup-badge sup-badge-carne">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes}d</strong> para matadero.</li>
@@ -424,11 +424,11 @@ const HibridoView = {
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-6">
-                          <span class="text-xl">💉</span>
+                          <span class="text-xl">${Icons.sanidad()}</span>
                           <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
                         <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                          <span>📅 ${this._fmtFecha(s.fecha)}</span>
+                          <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
                           <span>Carne: <strong>${s.tiempo_espera_carne_dias || 0}d</strong> · Leche: <strong>${s.tiempo_espera_leche_dias || 0}d</strong></span>
                         </div>
