@@ -227,7 +227,7 @@ const LecheView = {
     if (d.tratamientosSupresionLeche.length === 0) return '';
     return `
       <div class="leche-alerta-box">
-        <strong>⚠️ CRÍTICO - SUPRESIÓN DE LECHE EN CURSO (ANTIBIÓTICOS/INHIBIDORES):</strong>
+        <strong>${Icons.alerta()} CRÍTICO - SUPRESIÓN DE LECHE EN CURSO (ANTIBIÓTICOS/INHIBIDORES):</strong>
         <ul style="margin:5px 0 0 15px; padding:0;">
           ${d.tratamientosSupresionLeche.map(s => `
             <li>Rebaño treated: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> de supresión para ordeño (Finaliza: ${s.fechaFin})</li>
@@ -267,7 +267,7 @@ const LecheView = {
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
-                        <span class="text-xl">🐏</span>
+                        <span class="text-xl">${Icons.rebanos()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                       </div>
                       <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
@@ -368,11 +368,11 @@ const LecheView = {
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-6">
-                          <span class="text-xl">💉</span>
+                          <span class="text-xl">${Icons.sanidad()}</span>
                           <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
                         <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                          <span>📅 ${this._fmtFecha(s.fecha)}</span>
+                          <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
                           <span>Espera Leche: <strong>${s.tiempo_espera_leche_dias || 0} días</strong></span>
                         </div>
@@ -399,7 +399,7 @@ const LecheView = {
       <div class="leche-entrega-card" style="--entrega-border-color:${esAlerta ? '#ef4444' : semaforo.color};" onclick="location.hash='/albaran-leche?id=${e.id}'">
         <div class="leche-entrega-content">
           <div class="leche-entrega-left">
-            <div>📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${(e.cantidad || 0).toLocaleString()} L</div>
+            <div>${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${(e.cantidad || 0).toLocaleString()} L</div>
             <div class="text-xs text-gray mt-2">Cisterna: ${e.matriculaCisterna || '—'}</div>
           </div>
           <div class="text-right">

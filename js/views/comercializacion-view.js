@@ -56,16 +56,16 @@ const ComercializacionView = {
 
       <!-- KPIs globales -->
       <div class="grid grid-cols-3 gap-6 mb-14">
-        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">🥩 CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
-        <div class="info-box-center" style="border-left:3px solid #fbbf24;"><small class="s-lbl">🥛 LECHE</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div><small class="text-gray text-xs">${entregas.length} entregas · MOFA ${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</small></div>
-        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">💸 GASTOS</small><div class="inf-val-lg text-red">${gastoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${gastosRecords.length} registros</small></div>
+        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">${Icons.carne()} CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
+        <div class="info-box-center" style="border-left:3px solid #fbbf24;"><small class="s-lbl">${Icons.leche()} LECHE</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div><small class="text-gray text-xs">${entregas.length} entregas · MOFA ${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</small></div>
+        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">${Icons.gastos()} GASTOS</small><div class="inf-val-lg text-red">${gastoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${gastosRecords.length} registros</small></div>
       </div>
 
       <div class="mb-14">
         <div class="tabs-scroll comer-tabs scroll-shadow-container">
-          <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">🥩 Carne</button>
-          <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">🥛 Leche</button>
-          <button class="comer-tab ${this._currentTab === 'gastos' ? 'active' : ''}" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">💸 Gastos</button>
+          <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+          <button class="comer-tab ${this._currentTab === 'gastos' ? 'active' : ''}" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
         </div>
       </div>
       <div id="comer-content"><div class="loader">Cargando...</div></div>`;
@@ -177,7 +177,7 @@ const ComercializacionView = {
             </div>
           </div>
           <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
-            ➕ Nuevo
+            ${Icons.agregar()} Nuevo
           </button>
         </div>
 
@@ -191,13 +191,13 @@ const ComercializacionView = {
         </div>` : ''}
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-          📋 ${listName}
+          ${Icons.documento()} ${listName}
         </div>
         <div class="grid gap-10">
           ${recordsHtml}
         </div>
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">➕</button>`;
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
   },
 
   // ===================== TAB CARNE =====================
@@ -209,7 +209,7 @@ const ComercializacionView = {
     };
 
     this._renderSeccion(content, {
-      icon: '🥩', title: 'Ventas de Carne', subtitle: 'Expediciones a matadero y venta directa',
+      icon: Icons.carne(), title: 'Ventas de Carne', subtitle: 'Expediciones a matadero y venta directa',
       color: '#ef4444', colorDark: '#b91c1c',
       threeColKpis: true,
       kpis: d.kpis.carne,
@@ -219,10 +219,10 @@ const ComercializacionView = {
       records: d.ventas.slice(0, 50).map(v => {
         const estadoTramite = (v.estado_tramite || '').toString().trim();
         const badgeTramite = estadoTramite
-          ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">🏛️ ${estadoTramite.toUpperCase()}</span>`
+          ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">${Icons.edificio()} ${estadoTramite.toUpperCase()}</span>`
           : '';
         return {
-          title: '🔖 ' + (v.razonSocial || 'Matadero Central'),
+          title: Icons.documento() + ' ' + (v.razonSocial || 'Matadero Central'),
           date: v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-',
           zone: v.snap_zona || '',
           value: (v.pesoCanal || 0) + ' kg',
@@ -239,7 +239,7 @@ const ComercializacionView = {
 
   _renderLeche(content, d) {
     this._renderSeccion(content, {
-      icon: '🥛', title: 'Entregas de Leche', subtitle: 'Retiradas de tanque y albaranes',
+      icon: Icons.leche(), title: 'Entregas de Leche', subtitle: 'Retiradas de tanque y albaranes',
       color: '#f59e0b', colorDark: '#b45309',
       threeColKpis: true,
       kpis: d.kpis.leche,
@@ -268,7 +268,7 @@ const ComercializacionView = {
         const allBadges = [badges, extraBadges].filter(Boolean).join(' ');
 
         return {
-          title: '🚛 Cisterna: ' + (e.matriculaCisterna || 'S/N'),
+          title: Icons.transportistas() + ' Cisterna: ' + (e.matriculaCisterna || 'S/N'),
           date: e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-',
           zone: '',
           value: (e.cantidad || 0).toLocaleString() + ' L',
@@ -285,7 +285,7 @@ const ComercializacionView = {
 
   _renderGastos(content, d) {
     this._renderSeccion(content, {
-      icon: '💸', title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
+      icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
       color: '#8b5cf6', colorDark: '#6d28d9',
       threeColKpis: false,
       kpis: d.kpis.gastos,
@@ -293,7 +293,7 @@ const ComercializacionView = {
       listName: 'Lista de Gastos',
       registrarHandler: "App._abrirFormularioGasto()",
       records: d.gastosRecords.slice(0, 50).map(g => ({
-        title: '🧾 ' + (g.concepto || g.categoria || 'Gasto'),
+        title: Icons.documento() + ' ' + (g.concepto || g.categoria || 'Gasto'),
         date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
         zone: g.snap_zona || '',
         meta: ' 🏷️ ' + (g.categoria || ''),
@@ -395,7 +395,7 @@ const ComercializacionView = {
     const id = params.get("id");
     const e = await window.db.get("comercializacion_leche", parseInt(id));
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/comercializacion?tab=leche" class="link-back">← Volver</a><h2>🥛 Analítica de Tanque</h2></div>
+      <div class="mb-20"><a href="#/comercializacion?tab=leche" class="link-back">← Volver</a><h2>${Icons.leche()} Analítica de Tanque</h2></div>
       <div class="card" style="border-top:5px solid #fbbf24;">
         <div class="grid grid-cols-2 gap-12">
           <div><label>Volumen (L)</label><input type="number" id="le-cant" value="${e.cantidad}" class="premium-input"></div>
@@ -411,8 +411,8 @@ const ComercializacionView = {
         </div>
         <div class="mt-20"><label>Control de Antibióticos</label><select id="le-ant" class="premium-input"><option value="false" ${!e.antibioticos ? "selected" : ""}>NEGATIVO (Apto)</option><option value="true" ${e.antibioticos ? "selected" : ""}>POSITIVO (Alerta Crítica)</option></select></div>
         <div class="flex justify-end gap-10 mt-20">
-          <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=leche'">✕ Cancelar</button>
-          <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionLeche(${id})">✔ Guardar</button>
+          <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=leche'">${Icons.cerrar()} Cancelar</button>
+          <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionLeche(${id})">${Icons.guardar()} Guardar</button>
         </div>
       </div>`;
   },
@@ -423,15 +423,15 @@ const ComercializacionView = {
     const id = params.get("id");
     const g = await window.db.get("gastos_ganaderia", parseInt(id));
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="link-back">← Volver</a><h2>💸 Ficha de Gasto</h2></div>
+      <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="link-back">← Volver</a><h2>${Icons.gastos()} Ficha de Gasto</h2></div>
       <div class="card" style="border-top:4px solid #3b82f6;">
         <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
         <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
         <div class="flex justify-between items-center mt-20">
-          <button class="btn btn-danger" onclick="ComercializacionView._eliminarGasto(${id})">🗑️ Eliminar</button>
+          <button class="btn btn-danger" onclick="ComercializacionView._eliminarGasto(${id})">${Icons.eliminar()} Eliminar</button>
           <div class="flex gap-10">
-            <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=gastos'">✕ Cancelar</button>
-            <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionGasto(${id})">✔ Guardar</button>
+            <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=gastos'">${Icons.cerrar()} Cancelar</button>
+            <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionGasto(${id})">${Icons.guardar()} Guardar</button>
           </div>
         </div>
       </div>`;
