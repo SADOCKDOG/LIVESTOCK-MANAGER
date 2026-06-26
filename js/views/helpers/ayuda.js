@@ -91,28 +91,27 @@ window.Ayuda = {
           <h3 class="text-green mt-0 mb-15">🧮 Calculadora de Dosificación</h3>
           <div class="grid grid-cols-2 gap-12 bg-darker" style="padding:18px; border-radius:12px;">
             <div>
-              <label class="text-gray text-75" style="margin-bottom:4px; display:block;">Peso Vivo (kg)</label>
+              <label class="text-gray text-75 mb-4 block">Peso Vivo (kg)</label>
               <input type="number" id="calc-peso" value="50" min="1" step="0.1" class="w-full p-10 rounded-sm bg-card border-muted text-white"
                 style="font-size:1rem; box-sizing:border-box;">
             </div>
             <div>
-              <label class="text-gray text-75" style="margin-bottom:4px; display:block;">Dosis (mg/kg)</label>
+              <label class="text-gray text-75 mb-4 block">Dosis (mg/kg)</label>
               <input type="number" id="calc-dosis" value="10" min="0.1" step="0.1" class="w-full p-10 rounded-sm bg-card border-muted text-white"
                 style="font-size:1rem; box-sizing:border-box;">
             </div>
             <div>
-              <label class="text-gray text-75" style="margin-bottom:4px; display:block;">Concentración (mg/ml)</label>
+              <label class="text-gray text-75 mb-4 block">Concentración (mg/ml)</label>
               <input type="number" id="calc-conc" value="100" min="0.1" step="1" class="w-full p-10 rounded-sm bg-card border-muted text-white"
                 style="font-size:1rem; box-sizing:border-box;">
             </div>
             <div style="display:flex; flex-direction:column; justify-content:flex-end;">
-              <button id="calc-btn" class="w-full p-12 rounded-sm font-bold"
-                class="text-white" style="background:#10b981; border:none; font-size:0.9rem; cursor:pointer;">Calcular Volumen</button>
+              <button id="calc-btn" class="w-full p-12 rounded-sm font-bold text-white" style="background:#10b981; border:none; font-size:0.9rem; cursor:pointer;">Calcular Volumen</button>
             </div>
           </div>
           <div id="calc-result" class="text-center" style="padding:15px 0;">
             <span class="text-green" style="font-size:1.8rem; font-weight:900;">5.00 ml</span>
-            <div class="text-75 text-gray" style="margin-top:4px;">Volumen a administrar</div>
+            <div class="text-75 text-gray mt-4">Volumen a administrar</div>
           </div>
         </div>
 
