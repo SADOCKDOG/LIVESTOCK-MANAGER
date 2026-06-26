@@ -506,24 +506,32 @@ label {
     background: var(--bg);
 }
 
-/* Botones de wizard — heredan de .btn pero adaptados */
-.wizard-btn-action {
+/* Botones compactos — geometría compartida btn-sm / wizard-btn-action */
+.btn-sm, .wizard-btn-action {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     min-height: 48px;
-    padding: 14px 20px;
+    height: auto;
+    width: auto;
+    padding: 0 20px;
     border-radius: 14px;
     border: none;
     font-size: 0.9rem;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+}
+/* Contexto wizard: más padding vertical + uppercase */
+.wizard-btn-action {
+    padding: 14px 20px;
+    text-transform: uppercase;
 }
 
 .btn-success, .btn--success, .wizard-btn-success {
@@ -532,25 +540,8 @@ label {
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
 }
 
-.wizard-btn-action:active {
+.btn-sm:active, .wizard-btn-action:active {
     transform: scale(0.96);
-}
-
-/* ============================================
-   BOTONES COMPACTOS (inline, min 48px táctil)
-   ============================================ */
-.btn-sm {
-    width: auto;
-    min-height: 48px;
-    height: auto;
-    padding: 0 20px;
-    border-radius: 14px;
-    font-size: 0.85rem;
-    font-weight: 800;
-    gap: 8px;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    flex-shrink: 0;
 }
 
 .btn-icon {
