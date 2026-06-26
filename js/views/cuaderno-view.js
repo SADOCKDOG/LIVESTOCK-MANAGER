@@ -140,14 +140,14 @@ const CuadernoDigitalView = {
     <div style="max-width:900px; margin:0 auto;">
       <!-- KPIs -->
       <div class="grid grid-cols-4 gap-6 mb-14">
-        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">${Icons.rebanos()} CENSO</small><div class="inf-val-lg text-green">${d.totalActivos}</div></div>
-        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">${Icons.reproduccion()} REPROD.</small><div class="inf-val-lg text-blue">${d.partos} partos</div></div>
-        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">${Icons.sanidad()} SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} activos</div></div>
-        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">${Icons.comercial()} VENTAS</small><div class="inf-val-lg text-amber">${d.ventasCarne.length + d.ventasLeche.length}</div></div>
+        <div class="info-box-center border-left-green"><small class="s-lbl">${Icons.rebanos()} CENSO</small><div class="inf-val-lg text-green">${d.totalActivos}</div></div>
+        <div class="info-box-center border-left-blue"><small class="s-lbl">${Icons.reproduccion()} REPROD.</small><div class="inf-val-lg text-blue">${d.partos} partos</div></div>
+        <div class="info-box-center border-left-red"><small class="s-lbl">${Icons.sanidad()} SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} activos</div></div>
+        <div class="info-box-center border-left-amber"><small class="s-lbl">${Icons.comercial()} VENTAS</small><div class="inf-val-lg text-amber">${d.ventasCarne.length + d.ventasLeche.length}</div></div>
       </div>
 
       <!-- Navegación rápida -->
-      <div class="flex flex-wrap gap-4 mb-14" style="overflow-x:auto;white-space:nowrap;">
+      <div class="flex flex-wrap gap-4 mb-14 hscroll-wrap">
         ${[['seccion-censo',`${Icons.rebanos()} Censo`],['seccion-movimientos',`${Icons.rotacion()} Movimientos`],['seccion-sanidad',`${Icons.sanidad()} Sanidad`],['seccion-repro',`${Icons.reproduccion()} Repro`],['seccion-produccion',`${Icons.grafico()} Producción`],['seccion-economico',`${Icons.dinero()} Económico`]].map(([id, label]) => {
           return `<a href="#${id}" class="btn btn-secondary btn-xs" style="padding:4px 10px;font-size:0.7rem;border-radius:10px;text-decoration:none;" onclick="document.getElementById('${id}')?.scrollIntoView({behavior:'smooth'});return false;">${label}</a>`;
         }).join('')}
@@ -200,7 +200,7 @@ const CuadernoDigitalView = {
           </div>
           <div class="mt-4 text-gray-500 text-75">
             ${Object.entries(info.categorias).map(([cat, cnt]) =>
-              `<span class="rounded-sm" style="background:#222; padding:2px 6px; margin-right:4px;">${cat}: ${cnt}</span>`
+              `<span class="rounded-sm tag-222">${cat}: ${cnt}</span>`
             ).join('')}
           </div>
         </div>
@@ -228,9 +228,9 @@ const CuadernoDigitalView = {
             <div class="text-gray text-2xs">Muertes</div>
           </div>
         </div>
-        <div class="text-sm" style="max-height:220px; overflow-y:auto;">
+        <div class="text-sm mh-220">
           ${d.movimientos.slice(0, 30).map(m =>
-            `<div class="flex justify-between" style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+            `<div class="flex justify-between cuaderno-row">
               <span class="text-gray">${m.fecha || '—'}</span>
               <span class="${m.tipo === 'entrada' ? 'text-green' : 'text-amber'}">${(m.tipo || '').toUpperCase()}</span>
               <span class="text-ccc">Guía: ${m.numero_guia || '—'}</span>
@@ -257,9 +257,9 @@ const CuadernoDigitalView = {
             <div class="text-gray text-2xs">Expediciones</div>
           </div>
         </div>
-        <div class="text-sm" style="max-height:200px; overflow-y:auto;">
+        <div class="text-sm mh-200">
           ${d.eventos.slice(0, 30).map(e =>
-            `<div class="flex justify-between" style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+            `<div class="flex justify-between cuaderno-row">
               <span class="text-gray">${e.fecha || '—'}</span>
               <span class="text-ccc">${e.motivo_tarea || e.tipo || 'Evento'}</span>
               <span class="text-gray-500">${e.descripcion || e.notas || ''}</span>
@@ -281,7 +281,7 @@ const CuadernoDigitalView = {
             <div class="text-gray text-2xs">En periodo supresión</div>
           </div>
         </div>
-        <div class="text-sm" style="max-height:200px; overflow-y:auto;">
+        <div class="text-sm mh-200">
           ${d.sanitarios.slice(0, 20).map(t => {
             const rb = d.rebanos.find(r => r.id === t.rebanoId);
             const CS = window.ComunidadesService;
@@ -289,11 +289,11 @@ const CuadernoDigitalView = {
             const via = t.via_administracion ? ` · ${CS ? CS.getViaAdministracionLabel(t.via_administracion) : t.via_administracion}` : '';
             const vet = t.veterinario_prescriptor ? ` · Vet: ${t.veterinario_prescriptor}${t.veterinario_colegiado ? ' (' + t.veterinario_colegiado + ')' : ''}` : '';
             const receta = t.numero_receta ? ` · Receta ${t.numero_receta}` : '';
-            return `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+            return `<div class="cuaderno-row">
               <span class="text-gray">${t.fecha || '—'}</span>
               <span class="text-gold font-semibold">${t.medicamento || t.producto || '—'}</span>
               <span class="text-gray"> · ${rb?.nombre || ''}${motivo}${via}${vet}${receta}</span>
-              <span class="text-gray-500" style="float:right;">Espera: ${t.tiempo_espera_carne_dias || '?'}d</span>
+              <span class="text-gray-500 float-right">Espera: ${t.tiempo_espera_carne_dias || '?'}d</span>
             </div>`;
           }).join('') || '<p class="empty-state-text mb-0">Sin tratamientos registrados.</p>'}
         </div>
@@ -302,13 +302,13 @@ const CuadernoDigitalView = {
       <!-- 4.b SANEAMIENTOS / CAMPAÑAS OFICIALES (SIGGAN) -->
       <div class="card card-left-red">
         <h3 class="section-h3 text-red" id="seccion-saneamientos">4.b ${Icons.veterinario()} Campañas de Saneamiento (ADSG)</h3>
-        <div class="text-sm" style="max-height:200px; overflow-y:auto;">
+        <div class="text-sm mh-200">
           ${d.saneamientos.slice(0, 20).map(s =>
-            `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
+            `<div class="cuaderno-row">
               <span class="text-gray">${s.fecha || '—'}</span>
               <span class="text-gold font-semibold"> · ${(window.ComunidadesService && ComunidadesService.getCampanasSaneamiento ? (ComunidadesService.getCampanasSaneamiento().find(c => c.value === s.campana)?.label) : null) || s.campana || '—'}</span>
               <span class="text-gray"> · Examinados: ${s.num_examinados ?? s.examinados ?? '—'} / Positivos: ${s.num_positivos ?? s.positivos ?? '—'}</span>
-              <span class="text-gray-500" style="float:right;">${s.calificacion || ''}</span>
+              <span class="text-gray-500 float-right">${s.calificacion || ''}</span>
             </div>`
           ).join('') || '<p class="empty-state-text mb-0">Sin campañas de saneamiento registradas.</p>'}
         </div>
@@ -331,9 +331,9 @@ const CuadernoDigitalView = {
             <div class="text-gray text-2xs">Partos</div>
           </div>
         </div>
-        <div class="text-sm" style="max-height:150px; overflow-y:auto;">
+        <div class="text-sm mh-150">
           ${d.reproduccion.slice(0, 15).map(e =>
-            `<div class="flex justify-between" style="padding:3px 0; border-bottom:1px solid #1a1a1a;">
+            `<div class="flex justify-between cuaderno-row">
               <span class="text-gray">${e.fecha || '—'}</span>
               <span class="text-ccc">${e.tipo || ''}</span>
               <span class="text-gray-500">${e.resultado || e.notas || ''}</span>
@@ -394,7 +394,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- Pie -->
-      <div class="text-center p-20 text-555 mt-25" style="font-size:0.72rem; border-top:1px solid #222;">
+      <div class="text-center p-20 text-555 mt-25 text-2xs" style="border-top:1px solid #222;">
         Documento generado el ${new Date().toLocaleString('es-ES')} · Cuaderno Digital RD 787/2023<br>
         Livestock Manager Premium — v4.3.0
       </div>

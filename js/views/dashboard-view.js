@@ -137,7 +137,7 @@ const DashboardView = {
             <div class="text-2xl font-black text-red">${(rent?.gastos || 0).toLocaleString()}€</div>
           </div>
         </div>
-        <div class="flex justify-between items-center p-14" style="background:rgba(16,185,129,0.08);border-radius:12px;">
+        <div class="flex justify-between items-center p-14 card-tint-green-lg">
           <div>
             <div class="text-xs text-gray uppercase font-bold">Beneficio Neto</div>
             <div class="text-xl font-black" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()} €</div>
@@ -155,7 +155,7 @@ const DashboardView = {
       ${this._renderIndicadoresLacteos(indicadoresLeche)}
 
       <!-- Calendario Preventivo -->
-      <div class="card card-accent card-accent-blue p-20" style="background:rgba(59,130,246,0.05);">
+      <div class="card card-accent card-accent-blue p-20 card-tint-blue">
         <h3 class="mt-0 text-blue flex items-center gap-8">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}️]+\s*/u, '')}</h3>
         ${alertaEpoca.sugerencias?.length > 0 ? `
         <ul class="text-85 text-gray m-0 leading-normal mt-10" style="padding-left:20px;">
@@ -170,8 +170,8 @@ const DashboardView = {
       <div class="card p-20">
         <h3 class="mt-0 text-white flex items-center gap-8">${Icons.rayo()} Accesos Rápidos</h3>
         <div class="grid grid-cols-2 gap-8 mt-10">
-          <a href="#/animales" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.animales()} Animales</a>
-          <a href="#/rebanos" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.rebanos()} Rebaños</a>
+          <a href="#/animales" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.animales()} Animales</a>
+          <a href="#/rebanos" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.rebanos()} Rebaños</a>
           ${(() => {
             let tieneCarne = false;
             let tieneLeche = false;
@@ -185,9 +185,9 @@ const DashboardView = {
             let modo = 'carne';
             if (tieneHibrido || (tieneCarne && tieneLeche)) modo = 'hibrido';
             else if (tieneLeche) modo = 'leche';
-            return `<a href="#/${modo}" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.grafico()} Módulo ${modo === 'hibrido' ? 'Híbrido' : modo === 'leche' ? 'Leche' : 'Carne'}</a>`;
+            return `<a href="#/${modo}" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.grafico()} Módulo ${modo === 'hibrido' ? 'Híbrido' : modo === 'leche' ? 'Leche' : 'Carne'}</a>`;
           })()}
-          <a href="#/informes" class="btn btn-primary btn-sm text-center" style="padding:12px;font-size:0.8rem;">${Icons.tendencia()} Informes</a>
+          <a href="#/informes" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.tendencia()} Informes</a>
         </div>
       </div>
     `;
@@ -196,7 +196,7 @@ const DashboardView = {
   _renderAlertasSanitarias(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card card-accent card-accent-red p-20" style="background:rgba(239,68,68,0.05);">
+      <div class="card card-accent card-accent-red p-20 card-tint-red">
         <h3 class="mt-0 text-red flex items-center gap-8">
           ${Icons.alerta()} Alertas Sanitarias <span class="badge rounded-xl text-white text-2xs" style="background:#ef4444; padding:2px 10px;">${alertas.length}</span>
         </h3>
@@ -247,7 +247,7 @@ const DashboardView = {
   _renderAlertasAdministrativas(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card card-accent card-accent-purple p-20" style="background:rgba(139,92,246,0.05);">
+      <div class="card card-accent card-accent-purple p-20 card-tint-violet">
         <h3 class="mt-0 text-purple flex items-center gap-8">
           ${Icons.documento()} Gestión / PAC <span class="badge rounded-xl text-white text-2xs" style="background:#8b5cf6; padding:2px 10px;">${alertas.length}</span>
         </h3>
@@ -307,22 +307,22 @@ const DashboardView = {
     if (!indicadores) return '';
     const { numEntregas, litrosTotal, precioFinalMedio, mofaTotal, mofaRatio, conLab, esMedia, meses } = indicadores;
     return `
-      <div class="card card-accent card-accent-amber p-20" style="background:rgba(245,158,11,0.05);">
+      <div class="card card-accent card-accent-amber p-20 card-tint-amber">
         <h3 class="mt-0 flex items-center gap-8 text-yellow">
           ${Icons.leche()} Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
         </h3>
-        <div style="display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; margin-top:15px;">
-          <div class="info-box border-left-amber" style="flex:0 0 140px; min-width:0;">
+        <div class="hscroll-cards">
+          <div class="info-box border-left-amber kpi-card-fixed">
             <div class="kpi-label">MOFA Mensual</div>
             <div class="text-2xl font-black" style="color:${mofaRatio >= 20 ? '#10b981' : '#f59e0b'};">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
             <div class="kpi-sub">${mofaRatio.toFixed(1)}% ingresos</div>
           </div>
-          <div class="info-box border-left-blue" style="flex:0 0 140px; min-width:0;">
+          <div class="info-box border-left-blue kpi-card-fixed">
             <div class="kpi-label">Precio Medio</div>
             <div class="text-white font-black text-2xl">${precioFinalMedio.toFixed(3)} €/L</div>
             <div class="kpi-sub">${(litrosTotal / Math.max(1, numEntregas)).toFixed(0)} L/entrega</div>
           </div>
-          <div class="info-box border-left-purple" style="flex:0 0 140px; min-width:0;">
+          <div class="info-box border-left-purple kpi-card-fixed">
             <div class="kpi-label">Extracto Seco</div>
             <div class="text-white font-black text-2xl">${esMedia.toFixed(2)}%</div>
             <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L</div>
@@ -443,9 +443,9 @@ const DashboardView = {
         <h3 class="mt-0 flex items-center gap-8 text-violet">
           ${Icons.grafico()} KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
         </h3>
-        <div style="display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; margin-top:15px;">
+        <div class="hscroll-cards">
 
-          <div class="info-box" style="border-left:3px solid ${kpiColor}; flex:0 0 140px; min-width:0;">
+          <div class="info-box kpi-card-fixed" style="border-left:3px solid ${kpiColor};">
             <div class="kpi-label flex items-center gap-4">${Icons.leche()} L/Oveja/Día</div>
             <div class="text-2xl font-black" style="color:${kpiColor};">
               ${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}
@@ -457,7 +457,7 @@ const DashboardView = {
             </div>
           </div>
 
-          <div class="info-box" style="border-left:3px solid ${piensoColor}; flex:0 0 140px; min-width:0;">
+          <div class="info-box kpi-card-fixed" style="border-left:3px solid ${piensoColor};">
             <div class="kpi-label flex items-center gap-4">${Icons.pac()} Ef. Pienso</div>
             <div class="text-2xl font-black" style="color:${piensoColor};">
               ${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}
@@ -467,7 +467,7 @@ const DashboardView = {
             </div>
           </div>
 
-          <div class="info-box" style="border-left:3px solid ${bajasColor}; flex:0 0 140px; min-width:0;">
+          <div class="info-box kpi-card-fixed" style="border-left:3px solid ${bajasColor};">
             <div class="kpi-label flex items-center gap-4">${Icons.sanidad()} % Bajas</div>
             <div class="text-2xl font-black" style="color:${bajasColor};">
               ${pctBajas != null ? pctBajas + '%' : '—'}

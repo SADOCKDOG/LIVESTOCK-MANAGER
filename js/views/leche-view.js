@@ -111,8 +111,8 @@ const LecheView = {
 
     main.innerHTML = `
       <div class="mb-14">
-        <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          <div class="leche-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
+        <div class="scroll-shadow-container scroll-tabs-row mb-10">
+          <div class="leche-tabs">
             <button class="leche-tab active" data-tab="patrimonio" onclick="LecheView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
             <button class="leche-tab" data-tab="comercializacion" onclick="LecheView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
             <button class="leche-tab" data-tab="legislacion" onclick="LecheView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
@@ -263,7 +263,7 @@ const LecheView = {
         <div class="grid gap-10">
           ${d.rebanosLeche.length > 0
             ? d.rebanosLeche.map(r => `
-                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid #d97706;">
+                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
@@ -277,7 +277,7 @@ const LecheView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold" style="display:block; margin-bottom:4px;">${r.cantidad_animales || 0} cabezas</span>
+                      <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
                       <span class="text-xs text-777">Ficha ➔</span>
                     </div>
                   </div>
@@ -334,7 +334,7 @@ const LecheView = {
   _renderLegislacion(content, d) {
     const html = `
       ${this._inyectarAlertaSupresion(d)}
-      <div class="card report-section leche-report-card border-top-3px" style="border-top-color:#8b5cf6;">
+      <div class="card report-section leche-report-card border-top-3px border-top-3px-purple">
         <div class="leche-report-title">
           <span class="leche-report-icon">${Icons.documento()}</span>
           <div class="leche-report-title-text">
@@ -345,7 +345,7 @@ const LecheView = {
         ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
 
         <div class="text-center mb-12">
-          <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6; width:auto; display:inline-flex;" onclick="LecheView._abrirAsistenteTratamientoLeche()">
+          <button class="btn btn-secondary btn-sm btn--purple w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
             ${Icons.sanidad()} Registrar Tratamiento
           </button>
         </div>
