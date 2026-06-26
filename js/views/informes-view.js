@@ -2667,12 +2667,12 @@ const InformesView = {
     if (!rent) return '';
     const balanceTotal = rent.balance || 0;
     return `
-      <h3 style="color:#d97706; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">💰 Resumen Económico</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:15px;">
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Ingresos Cárnicos</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${(rent.detalles?.carne || 0).toLocaleString()} €</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Ingresos Lácteos</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${(rent.detalles?.leche || 0).toLocaleString()} €</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Total Gastos</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:#cc0000;">${(rent.gastos || 0).toLocaleString()} €</td></tr>
-        <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">BALANCE NETO</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:1rem; color:${balanceTotal >= 0 ? '#10b981' : '#cc0000'};">${balanceTotal.toLocaleString()} €</td></tr>
+      <h3 class="pdf-sec" style="color:#d97706;">💰 Resumen Económico</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-15">
+        <tr><td class="pdf-kv6">Ingresos Cárnicos</td><td class="pdf-kv6 pdf-r pdf-b">${(rent.detalles?.carne || 0).toLocaleString()} €</td></tr>
+        <tr><td class="pdf-kv6">Ingresos Lácteos</td><td class="pdf-kv6 pdf-r pdf-b">${(rent.detalles?.leche || 0).toLocaleString()} €</td></tr>
+        <tr><td class="pdf-kv6">Total Gastos</td><td class="pdf-kv6 pdf-r pdf-b pdf-red">${(rent.gastos || 0).toLocaleString()} €</td></tr>
+        <tr class="pdf-bg1"><td class="pdf-big pdf-b">BALANCE NETO</td><td class="pdf-big pdf-r pdf-b" style="color:${balanceTotal >= 0 ? '#10b981' : '#cc0000'};">${balanceTotal.toLocaleString()} €</td></tr>
       </table>
     `;
   },
@@ -2682,17 +2682,17 @@ const InformesView = {
     const total = rent?.detalles?.carne || 0;
     const kgTotal = ventasHist.reduce((s, v) => s + (v.kg || 0), 0);
     return `
-      <h3 style="color:#f59e0b; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🥩 Informe Cárnico</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:12px;">
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Ingresos Totales Carne</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${total.toLocaleString()} €</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Ventas Registradas</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right;">${ventasHist.length}</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Kilos Totales</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${kgTotal.toFixed(1)} kg</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Precio Medio por Kg</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${kgTotal > 0 ? (total / kgTotal).toFixed(2) : '0.00'} €</td></tr>
+      <h3 class="pdf-sec" style="color:#f59e0b;">🥩 Informe Cárnico</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-12">
+        <tr><td class="pdf-kv6">Ingresos Totales Carne</td><td class="pdf-kv6 pdf-r pdf-b">${total.toLocaleString()} €</td></tr>
+        <tr><td class="pdf-kv6">Ventas Registradas</td><td class="pdf-kv6 pdf-r">${ventasHist.length}</td></tr>
+        <tr><td class="pdf-kv6">Kilos Totales</td><td class="pdf-kv6 pdf-r pdf-b">${kgTotal.toFixed(1)} kg</td></tr>
+        <tr><td class="pdf-kv6">Precio Medio por Kg</td><td class="pdf-kv6 pdf-r pdf-b">${kgTotal > 0 ? (total / kgTotal).toFixed(2) : '0.00'} €</td></tr>
       </table>
       ${ventasHist.length > 0 ? `
-      <table style="width:100%; border-collapse:collapse; font-size:0.7rem; margin-top:10px;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:6px; border-bottom:2px solid #ddd; text-align:left;">Fecha</th><th style="padding:6px; border-bottom:2px solid #ddd; text-align:center;">Kg</th><th style="padding:6px; border-bottom:2px solid #ddd; text-align:right;">Total</th></tr></thead>
-        <tbody>${ventasHist.slice(0, 20).map(v => `<tr><td style="padding:4px 6px; border-bottom:1px solid #eee;">${v.fecha}</td><td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:center;">${v.kg || '-'}</td><td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right;">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
+      <table class="pdf-tbl pdf-tbl-xs mt-10">
+        <thead><tr class="pdf-bg0"><th class="pdf-th" style="border-bottom-color:#ddd;">Fecha</th><th class="pdf-th pdf-c" style="border-bottom-color:#ddd;">Kg</th><th class="pdf-th pdf-r" style="border-bottom-color:#ddd;">Total</th></tr></thead>
+        <tbody>${ventasHist.slice(0, 20).map(v => `<tr><td class="pdf-td4">${v.fecha}</td><td class="pdf-td4 pdf-c">${v.kg || '-'}</td><td class="pdf-td4 pdf-r">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
       </table>` : ''}
     `;
   },
@@ -2701,12 +2701,12 @@ const InformesView = {
     const { lecheStats } = d;
     if (!lecheStats || lecheStats.totalLitros === 0) return '';
     return `
-      <h3 style="color:#fbbf24; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🥛 Informe Lácteo</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:12px;">
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Total Litros Producidos</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${lecheStats.totalLitros.toFixed(1)} L</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Promedio Diario</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right;">${lecheStats.promedioDiario.toFixed(1)} L/día</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Precio Medio</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${lecheStats.precioMedio.toFixed(3)} €/L</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Registros</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right;">${lecheStats.totalRegistros}</td></tr>
+      <h3 class="pdf-sec" style="color:#fbbf24;">🥛 Informe Lácteo</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-12">
+        <tr><td class="pdf-kv6">Total Litros Producidos</td><td class="pdf-kv6 pdf-r pdf-b">${lecheStats.totalLitros.toFixed(1)} L</td></tr>
+        <tr><td class="pdf-kv6">Promedio Diario</td><td class="pdf-kv6 pdf-r">${lecheStats.promedioDiario.toFixed(1)} L/día</td></tr>
+        <tr><td class="pdf-kv6">Precio Medio</td><td class="pdf-kv6 pdf-r pdf-b">${lecheStats.precioMedio.toFixed(3)} €/L</td></tr>
+        <tr><td class="pdf-kv6">Registros</td><td class="pdf-kv6 pdf-r">${lecheStats.totalRegistros}</td></tr>
       </table>
     `;
   },
@@ -2714,12 +2714,12 @@ const InformesView = {
   _pdfSeccionReproductivo(d) {
     const { kpisRepro } = d;
     return `
-      <h3 style="color:#8b5cf6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🧬 Informe Reproductivo</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Tasa de Fertilidad</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${kpisRepro.tasaFertilidadPct || 0}%</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Intervalo Entre Partos</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right;">${kpisRepro.intervaloEntrePartosDias || 0} días</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Índice de Prolificidad</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${kpisRepro.indiceProlificidad || 0}</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Partos Analizados</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right;">${kpisRepro.totalPartosAnalizados || 0}</td></tr>
+      <h3 class="pdf-sec" style="color:#8b5cf6;">🧬 Informe Reproductivo</h3>
+      <table class="pdf-tbl pdf-tbl-md">
+        <tr><td class="pdf-kv6">Tasa de Fertilidad</td><td class="pdf-kv6 pdf-r pdf-b">${kpisRepro.tasaFertilidadPct || 0}%</td></tr>
+        <tr><td class="pdf-kv6">Intervalo Entre Partos</td><td class="pdf-kv6 pdf-r">${kpisRepro.intervaloEntrePartosDias || 0} días</td></tr>
+        <tr><td class="pdf-kv6">Índice de Prolificidad</td><td class="pdf-kv6 pdf-r pdf-b">${kpisRepro.indiceProlificidad || 0}</td></tr>
+        <tr><td class="pdf-kv6">Partos Analizados</td><td class="pdf-kv6 pdf-r">${kpisRepro.totalPartosAnalizados || 0}</td></tr>
       </table>
     `;
   },
@@ -2727,15 +2727,15 @@ const InformesView = {
   _pdfSeccionSanidad(d) {
     const { estadisticasSanidad } = d;
     return `
-      <h3 style="color:#ef4444; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">⚕️ Informe Sanitario</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Total Tratamientos</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${estadisticasSanidad.totalTratamientos || 0}</td></tr>
-        <tr><td style="padding:6px 8px; border-bottom:1px solid #eee;">Supresiones Activas</td><td style="padding:6px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:#cc0000;">${estadisticasSanidad.retencionesActivas || 0}</td></tr>
+      <h3 class="pdf-sec" style="color:#ef4444;">⚕️ Informe Sanitario</h3>
+      <table class="pdf-tbl pdf-tbl-md">
+        <tr><td class="pdf-kv6">Total Tratamientos</td><td class="pdf-kv6 pdf-r pdf-b">${estadisticasSanidad.totalTratamientos || 0}</td></tr>
+        <tr><td class="pdf-kv6">Supresiones Activas</td><td class="pdf-kv6 pdf-r pdf-b pdf-red">${estadisticasSanidad.retencionesActivas || 0}</td></tr>
       </table>
       ${estadisticasSanidad.porCategoria?.length > 0 ? `
-      <table style="width:100%; border-collapse:collapse; font-size:0.7rem; margin-top:10px;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:6px; border-bottom:2px solid #ddd; text-align:left;">Categoría</th><th style="padding:6px; border-bottom:2px solid #ddd; text-align:right;">Cantidad</th></tr></thead>
-        <tbody>${estadisticasSanidad.porCategoria.map(c => `<tr><td style="padding:4px 6px; border-bottom:1px solid #eee;">${c.categoria}</td><td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right;">${c.cantidad}</td></tr>`).join('')}</tbody>
+      <table class="pdf-tbl pdf-tbl-xs mt-10">
+        <thead><tr class="pdf-bg0"><th class="pdf-th" style="border-bottom-color:#ddd;">Categoría</th><th class="pdf-th pdf-r" style="border-bottom-color:#ddd;">Cantidad</th></tr></thead>
+        <tbody>${estadisticasSanidad.porCategoria.map(c => `<tr><td class="pdf-td4">${c.categoria}</td><td class="pdf-td4 pdf-r">${c.cantidad}</td></tr>`).join('')}</tbody>
       </table>` : ''}
     `;
   },
@@ -2745,11 +2745,11 @@ const InformesView = {
     if (!censo?.length) return '';
     const totalAnimales = censo.reduce((s, r) => s + r.total, 0);
     return `
-      <h3 style="color:#000; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🐑 Censo de Animales</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:6px 8px; border-bottom:2px solid #d97706; text-align:left;">Rebaño</th><th style="padding:6px 8px; border-bottom:2px solid #d97706; text-align:center;">Total</th><th style="padding:6px 8px; border-bottom:2px solid #d97706; text-align:center;">Activos</th><th style="padding:6px 8px; border-bottom:2px solid #d97706; text-align:center;">Vendidos</th></tr></thead>
-        <tbody>${censo.map(r => `<tr><td style="padding:4px 6px; border-bottom:1px solid #eee;">${r.nombre}</td><td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:center; font-weight:bold;">${r.total}</td><td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:center;">${r.activos}</td><td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:center;">${r.vendidos}</td></tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px 8px; font-weight:bold;">TOTAL</td><td style="padding:6px 8px; text-align:center; font-weight:bold;">${totalAnimales}</td><td style="padding:6px 8px; text-align:center;">${censo.reduce((s, r) => s + r.activos, 0)}</td><td style="padding:6px 8px; text-align:center;">${censo.reduce((s, r) => s + r.vendidos, 0)}</td></tr></tfoot>
+      <h3 class="pdf-sec" style="color:#000;">🐑 Censo de Animales</h3>
+      <table class="pdf-tbl pdf-tbl-md">
+        <thead><tr class="pdf-bg0"><th class="pdf-th8" style="border-bottom-color:#d97706;">Rebaño</th><th class="pdf-th8 pdf-c" style="border-bottom-color:#d97706;">Total</th><th class="pdf-th8 pdf-c" style="border-bottom-color:#d97706;">Activos</th><th class="pdf-th8 pdf-c" style="border-bottom-color:#d97706;">Vendidos</th></tr></thead>
+        <tbody>${censo.map(r => `<tr><td class="pdf-td4">${r.nombre}</td><td class="pdf-td4 pdf-c pdf-b">${r.total}</td><td class="pdf-td4 pdf-c">${r.activos}</td><td class="pdf-td4 pdf-c">${r.vendidos}</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-kv6 pdf-b">TOTAL</td><td class="pdf-kv6 pdf-c pdf-b">${totalAnimales}</td><td class="pdf-kv6 pdf-c">${censo.reduce((s, r) => s + r.activos, 0)}</td><td class="pdf-kv6 pdf-c">${censo.reduce((s, r) => s + r.vendidos, 0)}</td></tr></tfoot>
       </table>
     `;
   },
@@ -2764,32 +2764,32 @@ const InformesView = {
     const totalImporte = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
     const totalIVA = ventas.reduce((s, v) => s + (v.importe_iva || 0), 0);
     return `
-      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📒 Libro de Ventas</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.7rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;">
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:left;">Fecha</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:left;">Albarán</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:left;">Comprador</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:right;">Kg</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:right;">Base</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:right;">IVA</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:right;">Total</th>
+      <h3 class="pdf-sec" style="color:#3b82f6;">📒 Libro de Ventas</h3>
+      <table class="pdf-tbl pdf-tbl-xs mb-10">
+        <thead><tr class="pdf-bg0">
+          <th class="pdf-th" style="border-bottom-color:#3b82f6;">Fecha</th>
+          <th class="pdf-th" style="border-bottom-color:#3b82f6;">Albarán</th>
+          <th class="pdf-th" style="border-bottom-color:#3b82f6;">Comprador</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Kg</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Base</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">IVA</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Total</th>
         </tr></thead>
         <tbody>${ventas.slice(0, 50).map(v => `
-          <tr><td style="padding:4px 6px; border-bottom:1px solid #eee;">${v.fechaSacrificio || v.fecha_emision || '-'}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee;">${v.numero_albaran || '-'}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee;">${v.razonSocial || v.nombreComprador || '-'}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right;">${(v.pesoCanal || v.pesoVivo || 0).toFixed(1)}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right;">${((v.precio_total || 0) - (v.importe_iva || 0)).toFixed(2)}€</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right;">${(v.importe_iva || 0).toFixed(2)}€</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${(v.precio_total || 0).toFixed(2)}€</td>
+          <tr><td class="pdf-td4">${v.fechaSacrificio || v.fecha_emision || '-'}</td>
+          <td class="pdf-td4">${v.numero_albaran || '-'}</td>
+          <td class="pdf-td4">${v.razonSocial || v.nombreComprador || '-'}</td>
+          <td class="pdf-td4 pdf-r">${(v.pesoCanal || v.pesoVivo || 0).toFixed(1)}</td>
+          <td class="pdf-td4 pdf-r">${((v.precio_total || 0) - (v.importe_iva || 0)).toFixed(2)}€</td>
+          <td class="pdf-td4 pdf-r">${(v.importe_iva || 0).toFixed(2)}€</td>
+          <td class="pdf-td4 pdf-r pdf-b">${(v.precio_total || 0).toFixed(2)}€</td>
         </tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f5f5f5;">
-          <td colspan="3" style="padding:8px; font-weight:bold; text-align:right;">TOTALES</td>
-          <td style="padding:8px; text-align:right; font-weight:bold;">${totalKg.toFixed(1)}</td>
-          <td style="padding:8px; text-align:right; font-weight:bold;">${(totalImporte - totalIVA).toFixed(2)}€</td>
-          <td style="padding:8px; text-align:right; font-weight:bold;">${totalIVA.toFixed(2)}€</td>
-          <td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem;">${totalImporte.toFixed(2)}€</td>
+        <tfoot><tr class="pdf-bg1">
+          <td colspan="3" class="pdf-big pdf-r pdf-b">TOTALES</td>
+          <td class="pdf-big pdf-r pdf-b">${totalKg.toFixed(1)}</td>
+          <td class="pdf-big pdf-r pdf-b">${(totalImporte - totalIVA).toFixed(2)}€</td>
+          <td class="pdf-big pdf-r pdf-b">${totalIVA.toFixed(2)}€</td>
+          <td class="pdf-big pdf-r pdf-b pdf-base">${totalImporte.toFixed(2)}€</td>
         </tr></tfoot>
       </table>
     `;
@@ -2807,56 +2807,56 @@ const InformesView = {
       porEspecie[esp] = (porEspecie[esp] || 0) + 1;
     });
     return `
-      <h3 style="color:#d97706; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📋 INFORME REGA</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Nombre Explotación</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.nombre || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">REGA</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">CEA</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.codigo_CEA || finca.cea || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Propietario</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.propietario || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">NIF/CIF</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.nif_cif || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Dirección</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.direccion || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Municipio / Provincia</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.municipio || ''} / ${finca.provincia || ''}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Comunidad Autónoma</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</td></tr>
+      <h3 class="pdf-sec" style="color:#d97706;">📋 INFORME REGA</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <tr><td class="pdf-kv pdf-b">Nombre Explotación</td><td class="pdf-kv">${finca.nombre || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">CEA</td><td class="pdf-kv">${finca.codigo_CEA || finca.cea || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Propietario</td><td class="pdf-kv">${finca.propietario || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">NIF/CIF</td><td class="pdf-kv">${finca.nif_cif || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Dirección</td><td class="pdf-kv">${finca.direccion || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Municipio / Provincia</td><td class="pdf-kv">${finca.municipio || ''} / ${finca.provincia || ''}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Comunidad Autónoma</td><td class="pdf-kv">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</td></tr>
       </table>
 
-      <h4 style="color:#10b981; border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:15px;">🐑 Resumen Censo</h4>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Total Animales</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${totalAnimales}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Animales Activos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#10b981;">${activos}</td></tr>
+      <h4 class="pdf-sec4" style="color:#10b981;">🐑 Resumen Censo</h4>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <tr><td class="pdf-kv pdf-b">Total Animales</td><td class="pdf-kv pdf-r">${totalAnimales}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Animales Activos</td><td class="pdf-kv pdf-r pdf-grn">${activos}</td></tr>
         ${Object.entries(porEspecie).map(([esp, cnt]) => `
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">&nbsp;&nbsp;— ${esp}</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${cnt}</td></tr>
+        <tr><td class="pdf-kv">&nbsp;&nbsp;— ${esp}</td><td class="pdf-kv pdf-r">${cnt}</td></tr>
         `).join('')}
       </table>
 
       ${rebanos?.length > 0 ? `
-      <h4 style="color:#f59e0b; border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:15px;">📦 Detalle por Rebaño</h4>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;">
-          <th style="padding:4px 6px; border-bottom:2px solid #f59e0b; text-align:left;">Rebaño</th>
-          <th style="padding:4px 6px; border-bottom:2px solid #f59e0b; text-align:center;">Total</th>
-          <th style="padding:4px 6px; border-bottom:2px solid #f59e0b; text-align:center;">Activos</th>
+      <h4 class="pdf-sec4" style="color:#f59e0b;">📦 Detalle por Rebaño</h4>
+      <table class="pdf-tbl pdf-tbl-sm mb-10">
+        <thead><tr class="pdf-bg0">
+          <th class="pdf-th-sm" style="border-bottom:2px solid #f59e0b;">Rebaño</th>
+          <th class="pdf-th-sm pdf-c" style="border-bottom:2px solid #f59e0b;">Total</th>
+          <th class="pdf-th-sm pdf-c" style="border-bottom:2px solid #f59e0b;">Activos</th>
         </tr></thead>
         <tbody>${rebanos.map(r => {
           const cnt = (animales || []).filter(a => Number(a.rebanoId) === Number(r.id)).length;
           const act = (animales || []).filter(a => Number(a.rebanoId) === Number(r.id) && (a.estado === 'activo' || a.estado === 'Activo')).length;
-          return `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;">${r.nombre}</td>
-            <td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center; font-weight:bold;">${cnt}</td>
-            <td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${act}</td></tr>`;
+          return `<tr><td class="pdf-td">${r.nombre}</td>
+            <td class="pdf-td pdf-c pdf-b">${cnt}</td>
+            <td class="pdf-td pdf-c">${act}</td></tr>`;
         }).join('')}</tbody>
       </table>` : ''}
 
       ${movimientos.length > 0 ? `
-      <h4 style="color:#8b5cf6; border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:15px;">📦 Últimos Movimientos</h4>
-      <table style="width:100%; border-collapse:collapse; font-size:0.7rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;">
-          <th style="padding:4px 6px; border-bottom:2px solid #8b5cf6; text-align:left;">Fecha</th>
-          <th style="padding:4px 6px; border-bottom:2px solid #8b5cf6; text-align:left;">Tipo</th>
-          <th style="padding:4px 6px; border-bottom:2px solid #8b5cf6; text-align:left;">Motivo</th>
+      <h4 class="pdf-sec4" style="color:#8b5cf6;">📦 Últimos Movimientos</h4>
+      <table class="pdf-tbl pdf-tbl-xs mb-10">
+        <thead><tr class="pdf-bg0">
+          <th class="pdf-th-sm" style="border-bottom:2px solid #8b5cf6;">Fecha</th>
+          <th class="pdf-th-sm" style="border-bottom:2px solid #8b5cf6;">Tipo</th>
+          <th class="pdf-th-sm" style="border-bottom:2px solid #8b5cf6;">Motivo</th>
         </tr></thead>
         <tbody>${movimientos.map(e => `
-          <tr><td style="padding:3px 6px; border-bottom:1px solid #eee;">${e.fecha || '-'}</td>
-          <td style="padding:3px 6px; border-bottom:1px solid #eee;">${e.motivo_tarea || '-'}</td>
-          <td style="padding:3px 6px; border-bottom:1px solid #eee;">${e.observaciones?.substring(0, 40) || '-'}</td></tr>
+          <tr><td class="pdf-td">${e.fecha || '-'}</td>
+          <td class="pdf-td">${e.motivo_tarea || '-'}</td>
+          <td class="pdf-td">${e.observaciones?.substring(0, 40) || '-'}</td></tr>
         `).join('')}</tbody>
       </table>` : ''}
     `;
@@ -2871,27 +2871,27 @@ const InformesView = {
     const totalIngresos = data.reduce((s, c) => s + c.total, 0);
     const totalKg = data.reduce((s, c) => s + c.kg, 0);
     return `
-      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🏢 Informe por Comprador</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;">
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:left;">Comprador</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:left;">NIF</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:center;">Ventas</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:right;">Kg</th>
-          <th style="padding:6px; border-bottom:2px solid #3b82f6; text-align:right;">Total</th>
+      <h3 class="pdf-sec" style="color:#3b82f6;">🏢 Informe por Comprador</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <thead><tr class="pdf-bg0">
+          <th class="pdf-th" style="border-bottom-color:#3b82f6;">Comprador</th>
+          <th class="pdf-th" style="border-bottom-color:#3b82f6;">NIF</th>
+          <th class="pdf-th pdf-c" style="border-bottom-color:#3b82f6;">Ventas</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Kg</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Total</th>
         </tr></thead>
         <tbody>${data.map(c => `
-          <tr><td style="padding:4px 6px; border-bottom:1px solid #eee;"><strong>${c.nombre}</strong></td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee;">${c.nif || '-'}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:center;">${c.numVentas}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right;">${c.kg.toFixed(1)}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${c.total.toLocaleString()}€</td>
+          <tr><td class="pdf-td4"><strong>${c.nombre}</strong></td>
+          <td class="pdf-td4">${c.nif || '-'}</td>
+          <td class="pdf-td4 pdf-c">${c.numVentas}</td>
+          <td class="pdf-td4 pdf-r">${c.kg.toFixed(1)}</td>
+          <td class="pdf-td4 pdf-r pdf-b">${c.total.toLocaleString()}€</td>
         </tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f5f5f5;">
-          <td colspan="2" style="padding:8px; font-weight:bold; text-align:right;">TOTALES</td>
-          <td style="padding:8px; text-align:center; font-weight:bold;">${data.reduce((s, c) => s + c.numVentas, 0)}</td>
-          <td style="padding:8px; text-align:right; font-weight:bold;">${totalKg.toFixed(1)}</td>
-          <td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem;">${totalIngresos.toLocaleString()}€</td>
+        <tfoot><tr class="pdf-bg1">
+          <td colspan="2" class="pdf-big pdf-r pdf-b">TOTALES</td>
+          <td class="pdf-big pdf-c pdf-b">${data.reduce((s, c) => s + c.numVentas, 0)}</td>
+          <td class="pdf-big pdf-r pdf-b">${totalKg.toFixed(1)}</td>
+          <td class="pdf-big pdf-r pdf-b pdf-base">${totalIngresos.toLocaleString()}€</td>
         </tr></tfoot>
       </table>
     `;
@@ -2903,22 +2903,22 @@ const InformesView = {
     if (!data.length) return '';
     const totalGasto = data.reduce((s, p) => s + p.total, 0);
     return `
-      <h3 style="color:#f59e0b; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📦 Informe por Proveedor</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;">
-          <th style="padding:6px; border-bottom:2px solid #f59e0b; text-align:left;">Proveedor</th>
-          <th style="padding:6px; border-bottom:2px solid #f59e0b; text-align:center;">Facturas</th>
-          <th style="padding:6px; border-bottom:2px solid #f59e0b; text-align:right;">Total</th>
+      <h3 class="pdf-sec" style="color:#f59e0b;">📦 Informe por Proveedor</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <thead><tr class="pdf-bg0">
+          <th class="pdf-th" style="border-bottom-color:#f59e0b;">Proveedor</th>
+          <th class="pdf-th pdf-c" style="border-bottom-color:#f59e0b;">Facturas</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#f59e0b;">Total</th>
         </tr></thead>
         <tbody>${data.map(p => `
-          <tr><td style="padding:4px 6px; border-bottom:1px solid #eee;"><strong>${p.nombre}</strong></td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:center;">${p.numFacturas}</td>
-          <td style="padding:4px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${p.total.toLocaleString()}€</td>
+          <tr><td class="pdf-td4"><strong>${p.nombre}</strong></td>
+          <td class="pdf-td4 pdf-c">${p.numFacturas}</td>
+          <td class="pdf-td4 pdf-r pdf-b">${p.total.toLocaleString()}€</td>
         </tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f5f5f5;">
-          <td style="padding:8px; font-weight:bold; text-align:right;">TOTALES</td>
-          <td style="padding:8px; text-align:center; font-weight:bold;">${data.reduce((s, p) => s + p.numFacturas, 0)}</td>
-          <td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem;">${totalGasto.toLocaleString()}€</td>
+        <tfoot><tr class="pdf-bg1">
+          <td class="pdf-big pdf-r pdf-b">TOTALES</td>
+          <td class="pdf-big pdf-c pdf-b">${data.reduce((s, p) => s + p.numFacturas, 0)}</td>
+          <td class="pdf-big pdf-r pdf-b pdf-base">${totalGasto.toLocaleString()}€</td>
         </tr></tfoot>
       </table>
     `;
@@ -2929,23 +2929,23 @@ const InformesView = {
     const data = fitosanitarioData || { registros: [], total: 0 };
     if (!data.registros.length) return '';
     return `
-      <h3 style="color:#10b981; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🧪 Informe Fitosanitario</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;">
-          <th style="padding:6px; border-bottom:2px solid #10b981; text-align:left;">Fecha</th>
-          <th style="padding:6px; border-bottom:2px solid #10b981; text-align:left;">Proveedor</th>
-          <th style="padding:6px; border-bottom:2px solid #10b981; text-align:left;">Producto</th>
-          <th style="padding:6px; border-bottom:2px solid #10b981; text-align:right;">Monto</th>
+      <h3 class="pdf-sec" style="color:#10b981;">🧪 Informe Fitosanitario</h3>
+      <table class="pdf-tbl pdf-tbl-sm mb-10">
+        <thead><tr class="pdf-bg0">
+          <th class="pdf-th" style="border-bottom-color:#10b981;">Fecha</th>
+          <th class="pdf-th" style="border-bottom-color:#10b981;">Proveedor</th>
+          <th class="pdf-th" style="border-bottom-color:#10b981;">Producto</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#10b981;">Monto</th>
         </tr></thead>
         <tbody>${data.registros.slice(0, 30).map(r => `
-          <tr><td style="padding:3px 6px; border-bottom:1px solid #eee;">${r.fecha || '-'}</td>
-          <td style="padding:3px 6px; border-bottom:1px solid #eee;">${r.proveedor || '-'}</td>
-          <td style="padding:3px 6px; border-bottom:1px solid #eee;">${r.descripcion || '-'}</td>
-          <td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${(r.monto || 0).toLocaleString()}€</td>
+          <tr><td class="pdf-td">${r.fecha || '-'}</td>
+          <td class="pdf-td">${r.proveedor || '-'}</td>
+          <td class="pdf-td">${r.descripcion || '-'}</td>
+          <td class="pdf-td pdf-r">${(r.monto || 0).toLocaleString()}€</td>
         </tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f5f5f5;">
-          <td colspan="3" style="padding:6px; font-weight:bold; text-align:right;">TOTAL</td>
-          <td style="padding:6px; text-align:right; font-weight:bold;">${data.total.toLocaleString()}€</td>
+        <tfoot><tr class="pdf-bg1">
+          <td colspan="3" class="pdf-tot pdf-r pdf-b">TOTAL</td>
+          <td class="pdf-tot pdf-r pdf-b">${data.total.toLocaleString()}€</td>
         </tr></tfoot>
       </table>
     `;
@@ -2960,26 +2960,26 @@ const InformesView = {
                   (alertas.trazabilidad?.filter(a => a.urgencia === 'rojo').length || 0) +
                   (alertas.administrativas?.filter(a => a.urgencia === 'rojo').length || 0);
     let html = `
-      <h3 style="color:#ef4444; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🚨 Informe de Alertas</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Total Alertas Activas</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#cc0000; font-weight:bold;">${totalAlertas}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Críticas (🔴)</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#cc0000;">${rojas}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Advertencias (🟡/🟢)</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${totalAlertas - rojas}</td></tr>
+      <h3 class="pdf-sec" style="color:#ef4444;">🚨 Informe de Alertas</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <tr><td class="pdf-kv pdf-b">Total Alertas Activas</td><td class="pdf-kv pdf-r pdf-b pdf-red">${totalAlertas}</td></tr>
+        <tr><td class="pdf-kv">Críticas (🔴)</td><td class="pdf-kv pdf-r pdf-red">${rojas}</td></tr>
+        <tr><td class="pdf-kv">Advertencias (🟡/🟢)</td><td class="pdf-kv pdf-r">${totalAlertas - rojas}</td></tr>
       </table>`;
     if (alertas.sanitarias?.length > 0) {
       html += `<h4 style="color:#ef4444;">🔴 Sanitarias</h4>
-      <table style="width:100%; border-collapse:collapse; font-size:0.7rem; margin-bottom:10px;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Medicamento</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Rebaño</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Días</th></tr></thead>
-        <tbody>${alertas.sanitarias.slice(0, 10).map(a => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;">${a.medicamento || '-'}</td><td style="padding:3px 6px; border-bottom:1px solid #eee;">${a.rebanoNombre || '-'}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${a.diasRestantes}</td></tr>`).join('')}</tbody>
+      <table class="pdf-tbl pdf-tbl-xs mb-10">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Medicamento</th><th class="pdf-th-sm">Rebaño</th><th class="pdf-th-sm pdf-r">Días</th></tr></thead>
+        <tbody>${alertas.sanitarias.slice(0, 10).map(a => `<tr><td class="pdf-td">${a.medicamento || '-'}</td><td class="pdf-td">${a.rebanoNombre || '-'}</td><td class="pdf-td pdf-r">${a.diasRestantes}</td></tr>`).join('')}</tbody>
       </table>`;
     }
     if (alertas.trazabilidad?.length > 0) {
       html += `<h4 style="color:#f59e0b;">🟠 Trazabilidad</h4>
-      <p style="font-size:0.7rem; color:#666;">${alertas.trazabilidad.length} alertas activas. Revisar identificaciones y documentación.</p>`;
+      <p class="pdf-tbl-xs pdf-muted">${alertas.trazabilidad.length} alertas activas. Revisar identificaciones y documentación.</p>`;
     }
     if (alertas.administrativas?.length > 0) {
       html += `<h4 style="color:#8b5cf6;">🟣 Administrativas</h4>
-      <p style="font-size:0.7rem; color:#666;">${alertas.administrativas.length} alertas activas. Revisar contratos, PAC y vencimientos.</p>`;
+      <p class="pdf-tbl-xs pdf-muted">${alertas.administrativas.length} alertas activas. Revisar contratos, PAC y vencimientos.</p>`;
     }
     return html;
   },
@@ -2991,23 +2991,23 @@ const InformesView = {
     const totalAnimales = (animales || []).length;
     const activos = (animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
     return `
-      <h3 style="color:#d97706; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🏠 Ficha de Explotación</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Nombre</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.nombre || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">REGA</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Propietario</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.propietario || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Municipio</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.municipio || ''}, ${finca.provincia || ''}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">CCAA</td><td style="padding:4px 8px; border-bottom:1px solid #eee;">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Censo Total</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${totalAnimales}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Animales Activos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#10b981;">${activos}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Rebaños</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${(rebanos || []).length}</td></tr>
+      <h3 class="pdf-sec" style="color:#d97706;">🏠 Ficha de Explotación</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <tr><td class="pdf-kv pdf-b">Nombre</td><td class="pdf-kv">${finca.nombre || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Propietario</td><td class="pdf-kv">${finca.propietario || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Municipio</td><td class="pdf-kv">${finca.municipio || ''}, ${finca.provincia || ''}</td></tr>
+        <tr><td class="pdf-kv pdf-b">CCAA</td><td class="pdf-kv">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Censo Total</td><td class="pdf-kv pdf-r pdf-b">${totalAnimales}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Animales Activos</td><td class="pdf-kv pdf-r pdf-grn">${activos}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Rebaños</td><td class="pdf-kv pdf-r">${(rebanos || []).length}</td></tr>
       </table>
       ${rent ? `
-      <h4 style="color:#10b981; border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:15px;">💰 Resumen Económico</h4>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Ingresos Totales</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${(rent.ingresos || 0).toLocaleString()}€</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Gastos Totales</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:#cc0000;">${(rent.gastos || 0).toLocaleString()}€</td></tr>
-        <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">BALANCE NETO</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem; color:${balanceTotal >= 0 ? '#10b981' : '#cc0000'};">${balanceTotal.toLocaleString()}€</td></tr>
+      <h4 class="pdf-sec4" style="color:#10b981;">💰 Resumen Económico</h4>
+      <table class="pdf-tbl pdf-tbl-md">
+        <tr><td class="pdf-kv">Ingresos Totales</td><td class="pdf-kv pdf-r pdf-b">${(rent.ingresos || 0).toLocaleString()}€</td></tr>
+        <tr><td class="pdf-kv">Gastos Totales</td><td class="pdf-kv pdf-r pdf-b pdf-red">${(rent.gastos || 0).toLocaleString()}€</td></tr>
+        <tr class="pdf-bg1"><td class="pdf-big pdf-b">BALANCE NETO</td><td class="pdf-big pdf-r pdf-b pdf-base" style="color:${balanceTotal >= 0 ? '#10b981' : '#cc0000'};">${balanceTotal.toLocaleString()}€</td></tr>
       </table>` : ''}
     `;
   },
@@ -3018,18 +3018,18 @@ const InformesView = {
     const { pygData } = d;
     if (!pygData || pygData.totalIngresos === 0) return '';
     return `
-      <h3 style="color:#10b981; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">💰 Cuenta de Resultados</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Total Ingresos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${pygData.totalIngresos.toLocaleString()}€</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Total Gastos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#cc0000;">${pygData.totalGastos.toLocaleString()}€</td></tr>
-        <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">BALANCE NETO</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem; color:${pygData.totalBalance >= 0 ? '#10b981' : '#cc0000'};">${pygData.totalBalance.toLocaleString()}€</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Rentabilidad</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${pygData.rentabilidad}%</td></tr>
+      <h3 class="pdf-sec" style="color:#10b981;">💰 Cuenta de Resultados</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <tr><td class="pdf-kv pdf-b">Total Ingresos</td><td class="pdf-kv pdf-r">${pygData.totalIngresos.toLocaleString()}€</td></tr>
+        <tr><td class="pdf-kv pdf-b">Total Gastos</td><td class="pdf-kv pdf-r pdf-red">${pygData.totalGastos.toLocaleString()}€</td></tr>
+        <tr class="pdf-bg1"><td class="pdf-big pdf-b">BALANCE NETO</td><td class="pdf-big pdf-r pdf-b pdf-base" style="color:${pygData.totalBalance >= 0 ? '#10b981' : '#cc0000'};">${pygData.totalBalance.toLocaleString()}€</td></tr>
+        <tr><td class="pdf-kv">Rentabilidad</td><td class="pdf-kv pdf-r">${pygData.rentabilidad}%</td></tr>
       </table>
       ${pygData.gastosPorCategoria?.length > 0 ? `
-      <h4 style="color:#ef4444; border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:12px;">Gastos por Categoría</h4>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Categoría</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Total</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">%</th></tr></thead>
-        <tbody>${pygData.gastosPorCategoria.map(g => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;">${g.categoria}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${g.total.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${pygData.totalGastos > 0 ? ((g.total / pygData.totalGastos) * 100).toFixed(1) : 0}%</td></tr>`).join('')}</tbody>
+      <h4 class="pdf-sec4" style="color:#ef4444;">Gastos por Categoría</h4>
+      <table class="pdf-tbl pdf-tbl-sm">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Categoría</th><th class="pdf-th-sm pdf-r">Total</th><th class="pdf-th-sm pdf-r">%</th></tr></thead>
+        <tbody>${pygData.gastosPorCategoria.map(g => `<tr><td class="pdf-td">${g.categoria}</td><td class="pdf-td pdf-r">${g.total.toLocaleString()}€</td><td class="pdf-td pdf-r">${pygData.totalGastos > 0 ? ((g.total / pygData.totalGastos) * 100).toFixed(1) : 0}%</td></tr>`).join('')}</tbody>
       </table>` : ''}
     `;
   },
@@ -3038,11 +3038,11 @@ const InformesView = {
     const { costeProdData } = d;
     if (!costeProdData?.porRebano?.length) return '';
     return `
-      <h3 style="color:#8b5cf6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🐄 Coste de Producción por Animal</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Rebaño</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Animales</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Gasto Total</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">€/Cabeza</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">€/Día</th></tr></thead>
-        <tbody>${costeProdData.porRebano.map(r => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${r.nombre}</strong> (${r.especie})</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${r.numAnimales}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${r.totalGasto.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${r.costePorCabeza.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${r.costePorDia}€</td></tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">MEDIA GLOBAL</td><td style="padding:6px; text-align:center; font-weight:bold;">${costeProdData.totalAnimales}</td><td style="padding:6px; text-align:right; font-weight:bold;">${costeProdData.totalGasto.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${costeProdData.costeMedioCabeza.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${costeProdData.costeMedioDia}€</td></tr></tfoot>
+      <h3 class="pdf-sec" style="color:#8b5cf6;">🐄 Coste de Producción por Animal</h3>
+      <table class="pdf-tbl pdf-tbl-sm">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Rebaño</th><th class="pdf-th-sm pdf-c">Animales</th><th class="pdf-th-sm pdf-r">Gasto Total</th><th class="pdf-th-sm pdf-r">€/Cabeza</th><th class="pdf-th-sm pdf-r">€/Día</th></tr></thead>
+        <tbody>${costeProdData.porRebano.map(r => `<tr><td class="pdf-td"><strong>${r.nombre}</strong> (${r.especie})</td><td class="pdf-td pdf-c">${r.numAnimales}</td><td class="pdf-td pdf-r">${r.totalGasto.toLocaleString()}€</td><td class="pdf-td pdf-r">${r.costePorCabeza.toLocaleString()}€</td><td class="pdf-td pdf-r">${r.costePorDia}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">MEDIA GLOBAL</td><td class="pdf-tot pdf-c pdf-b">${costeProdData.totalAnimales}</td><td class="pdf-tot pdf-r pdf-b">${costeProdData.totalGasto.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b">${costeProdData.costeMedioCabeza.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b">${costeProdData.costeMedioDia}€</td></tr></tfoot>
       </table>
     `;
   },
@@ -3052,11 +3052,11 @@ const InformesView = {
     if (!eficienciaData?.kpis?.length) return '';
     const semaforoPdf = (s) => s === 'verde' ? '#10b981' : s === 'amarillo' ? '#f59e0b' : '#cc0000';
     return `
-      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📊 Panel de Eficiencia Técnica</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        ${eficienciaData.kpis.map(k => `<tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">${k.label}</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:${semaforoPdf(k.status)};">${k.value}</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#888;">Obj: ${k.objetivo}${k.unidad}</td></tr>`).join('')}
+      <h3 class="pdf-sec" style="color:#3b82f6;">📊 Panel de Eficiencia Técnica</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        ${eficienciaData.kpis.map(k => `<tr><td class="pdf-kv pdf-b">${k.label}</td><td class="pdf-kv pdf-r pdf-b" style="color:${semaforoPdf(k.status)};">${k.value}</td><td class="pdf-kv pdf-r pdf-muted">Obj: ${k.objetivo}${k.unidad}</td></tr>`).join('')}
       </table>
-      <p style="font-size:0.65rem; color:#888;">🟢 Óptimo · 🟡 Alerta · 🔴 Crítico</p>
+      <p class="pdf-tbl-xs pdf-muted">🟢 Óptimo · 🟡 Alerta · 🔴 Crítico</p>
     `;
   },
 
@@ -3064,11 +3064,11 @@ const InformesView = {
     const { cargasData } = d;
     if (!cargasData?.porZona?.length) return '';
     return `
-      <h3 style="color:#f59e0b; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📐 Cargas y Aforos</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Zona</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Aforo</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Ocupación</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">%</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Estado</th></tr></thead>
-        <tbody>${cargasData.porZona.map(z => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${z.nombre}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.aforo}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.ocupacion}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.pctOcupacion}%</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${z.estado}</td></tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:center; font-weight:bold;">${cargasData.totalAforo}</td><td style="padding:6px; text-align:center; font-weight:bold;">${cargasData.totalOcupacion}</td><td style="padding:6px; text-align:center; font-weight:bold;">${cargasData.pctGlobal}%</td><td style="padding:6px; text-align:center;">${cargasData.numAlertas > 0 ? '⚠️ ' + cargasData.numAlertas + ' alertas' : '✅'}</td></tr></tfoot>
+      <h3 class="pdf-sec" style="color:#f59e0b;">📐 Cargas y Aforos</h3>
+      <table class="pdf-tbl pdf-tbl-sm">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Zona</th><th class="pdf-th-sm pdf-c">Aforo</th><th class="pdf-th-sm pdf-c">Ocupación</th><th class="pdf-th-sm pdf-c">%</th><th class="pdf-th-sm pdf-c">Estado</th></tr></thead>
+        <tbody>${cargasData.porZona.map(z => `<tr><td class="pdf-td"><strong>${z.nombre}</strong></td><td class="pdf-td pdf-c">${z.aforo}</td><td class="pdf-td pdf-c">${z.ocupacion}</td><td class="pdf-td pdf-c">${z.pctOcupacion}%</td><td class="pdf-td pdf-c">${z.estado}</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-c pdf-b">${cargasData.totalAforo}</td><td class="pdf-tot pdf-c pdf-b">${cargasData.totalOcupacion}</td><td class="pdf-tot pdf-c pdf-b">${cargasData.pctGlobal}%</td><td class="pdf-tot pdf-c">${cargasData.numAlertas > 0 ? '⚠️ ' + cargasData.numAlertas + ' alertas' : '✅'}</td></tr></tfoot>
       </table>
     `;
   },
@@ -3078,17 +3078,17 @@ const InformesView = {
     if (!rotacionData || rotacionData.totalAnimales === 0) return '';
     const u90 = rotacionData.ultimos90 || {};
     return `
-      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🔄 Rotación de Censo (${rotacionData.periodo})</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:8px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Censo Total</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${rotacionData.totalAnimales}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Animales Activos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${rotacionData.activos}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Nacimientos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#10b981;">${u90.nacimientos || 0}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Compras</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#3b82f6;">${u90.compras || 0}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Ventas</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#cc0000;">${u90.ventas || 0}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Bajas</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; color:#888;">${u90.bajas || 0}</td></tr>
-        <tr style="background:#f5f5f5;"><td style="padding:8px; font-weight:bold;">Entrada Neta</td><td style="padding:8px; text-align:right; font-weight:bold; font-size:0.9rem; color:${(u90.entradaNeta || 0) >= 0 ? '#10b981' : '#cc0000'};">${(u90.entradaNeta >= 0 ? '+' : '')}${u90.entradaNeta || 0}</td></tr>
+      <h3 class="pdf-sec" style="color:#3b82f6;">🔄 Rotación de Censo (${rotacionData.periodo})</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-8">
+        <tr><td class="pdf-kv pdf-b">Censo Total</td><td class="pdf-kv pdf-r">${rotacionData.totalAnimales}</td></tr>
+        <tr><td class="pdf-kv pdf-b">Animales Activos</td><td class="pdf-kv pdf-r">${rotacionData.activos}</td></tr>
+        <tr><td class="pdf-kv">Nacimientos</td><td class="pdf-kv pdf-r pdf-grn">${u90.nacimientos || 0}</td></tr>
+        <tr><td class="pdf-kv">Compras</td><td class="pdf-kv pdf-r" style="color:#3b82f6;">${u90.compras || 0}</td></tr>
+        <tr><td class="pdf-kv">Ventas</td><td class="pdf-kv pdf-r pdf-red">${u90.ventas || 0}</td></tr>
+        <tr><td class="pdf-kv">Bajas</td><td class="pdf-kv pdf-r pdf-muted">${u90.bajas || 0}</td></tr>
+        <tr class="pdf-bg1"><td class="pdf-big pdf-b">Entrada Neta</td><td class="pdf-big pdf-r pdf-b pdf-base" style="color:${(u90.entradaNeta || 0) >= 0 ? '#10b981' : '#cc0000'};">${(u90.entradaNeta >= 0 ? '+' : '')}${u90.entradaNeta || 0}</td></tr>
       </table>
-      <p style="font-size:0.65rem; color:#888;">Tasa reposición: ${rotacionData.tasaReposicion} · Tasa bajas: ${rotacionData.tasaBajas}</p>
+      <p class="pdf-tbl-xs pdf-muted">Tasa reposición: ${rotacionData.tasaReposicion} · Tasa bajas: ${rotacionData.tasaBajas}</p>
     `;
   },
 
@@ -3098,11 +3098,11 @@ const InformesView = {
     const meses = flujoCajaData.porMes.filter(m => m.entradas > 0 || m.salidas > 0);
     if (!meses.length) return '';
     return `
-      <h3 style="color:#14b8a6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📈 Flujo de Caja</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Mes</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Entradas</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Salidas</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Neto</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Acumulado</th></tr></thead>
-        <tbody>${meses.map(m => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${m.mes}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.entradas.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.salidas.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right; color:${m.neto >= 0 ? '#10b981' : '#cc0000'};">${m.neto.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${m.acumulado.toLocaleString()}€</td></tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:right; font-weight:bold;">${flujoCajaData.totalEntradas.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${flujoCajaData.totalSalidas.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold; color:${flujoCajaData.totalNeto >= 0 ? '#10b981' : '#cc0000'};">${flujoCajaData.totalNeto.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${flujoCajaData.saldoFinal.toLocaleString()}€</td></tr></tfoot>
+      <h3 class="pdf-sec" style="color:#14b8a6;">📈 Flujo de Caja</h3>
+      <table class="pdf-tbl pdf-tbl-sm">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Mes</th><th class="pdf-th-sm pdf-r">Entradas</th><th class="pdf-th-sm pdf-r">Salidas</th><th class="pdf-th-sm pdf-r">Neto</th><th class="pdf-th-sm pdf-r">Acumulado</th></tr></thead>
+        <tbody>${meses.map(m => `<tr><td class="pdf-td"><strong>${m.mes}</strong></td><td class="pdf-td pdf-r">${m.entradas.toLocaleString()}€</td><td class="pdf-td pdf-r">${m.salidas.toLocaleString()}€</td><td class="pdf-td pdf-r" style="color:${m.neto >= 0 ? '#10b981' : '#cc0000'};">${m.neto.toLocaleString()}€</td><td class="pdf-td pdf-r pdf-b">${m.acumulado.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-r pdf-b">${flujoCajaData.totalEntradas.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b">${flujoCajaData.totalSalidas.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b" style="color:${flujoCajaData.totalNeto >= 0 ? '#10b981' : '#cc0000'};">${flujoCajaData.totalNeto.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b">${flujoCajaData.saldoFinal.toLocaleString()}€</td></tr></tfoot>
       </table>
     `;
   },
@@ -3113,11 +3113,11 @@ const InformesView = {
     const { rentEspData } = d;
     if (!rentEspData?.porEspecie?.length) return '';
     return `
-      <h3 style="color:#8b5cf6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">🧬 Rentabilidad por Especie</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Especie</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:center;">Animales</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Ingresos</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Gastos</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Balance</th></tr></thead>
-        <tbody>${rentEspData.porEspecie.map(e => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${e.especie}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:center;">${e.numAnimales}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${e.ingresos.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${e.gastos.toLocaleString()}€</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right; font-weight:bold; color:${e.balance >= 0 ? '#10b981' : '#cc0000'};">${e.balance.toLocaleString()}€</td></tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:center; font-weight:bold;">${rentEspData.porEspecie.reduce((s, e) => s + e.numAnimales, 0)}</td><td style="padding:6px; text-align:right; font-weight:bold;">${rentEspData.totalIngresos.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold;">${rentEspData.totalGastos.toLocaleString()}€</td><td style="padding:6px; text-align:right; font-weight:bold; color:${rentEspData.totalBalance >= 0 ? '#10b981' : '#cc0000'};">${rentEspData.totalBalance.toLocaleString()}€</td></tr></tfoot>
+      <h3 class="pdf-sec" style="color:#8b5cf6;">🧬 Rentabilidad por Especie</h3>
+      <table class="pdf-tbl pdf-tbl-sm">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Especie</th><th class="pdf-th-sm pdf-c">Animales</th><th class="pdf-th-sm pdf-r">Ingresos</th><th class="pdf-th-sm pdf-r">Gastos</th><th class="pdf-th-sm pdf-r">Balance</th></tr></thead>
+        <tbody>${rentEspData.porEspecie.map(e => `<tr><td class="pdf-td"><strong>${e.especie}</strong></td><td class="pdf-td pdf-c">${e.numAnimales}</td><td class="pdf-td pdf-r">${e.ingresos.toLocaleString()}€</td><td class="pdf-td pdf-r">${e.gastos.toLocaleString()}€</td><td class="pdf-td pdf-r pdf-b" style="color:${e.balance >= 0 ? '#10b981' : '#cc0000'};">${e.balance.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-c pdf-b">${rentEspData.porEspecie.reduce((s, e) => s + e.numAnimales, 0)}</td><td class="pdf-tot pdf-r pdf-b">${rentEspData.totalIngresos.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b">${rentEspData.totalGastos.toLocaleString()}€</td><td class="pdf-tot pdf-r pdf-b" style="color:${rentEspData.totalBalance >= 0 ? '#10b981' : '#cc0000'};">${rentEspData.totalBalance.toLocaleString()}€</td></tr></tfoot>
       </table>
     `;
   },
@@ -3126,13 +3126,13 @@ const InformesView = {
     const { curvaProdData } = d;
     if (!curvaProdData?.porMes?.length) return '';
     return `
-      <h3 style="color:#3b82f6; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">📉 Curva de Producción</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.7rem;">
-        <thead><tr style="background:#f0f0f0;"><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:left;">Mes</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Kg</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Litros</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Kg Acum</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">L Acum</th><th style="padding:4px 6px; border-bottom:1px solid #ddd; text-align:right;">Ingresos</th></tr></thead>
-        <tbody>${curvaProdData.porMes.map(m => `<tr><td style="padding:3px 6px; border-bottom:1px solid #eee;"><strong>${m.mes}</strong></td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.kg.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.litros.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.kgAcum.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.litrosAcum.toFixed(1)}</td><td style="padding:3px 6px; border-bottom:1px solid #eee; text-align:right;">${m.ingresos.toLocaleString()}€</td></tr>`).join('')}</tbody>
-        <tfoot><tr style="background:#f9f9f9;"><td style="padding:6px; font-weight:bold;">TOTAL</td><td style="padding:6px; text-align:right; font-weight:bold;">${curvaProdData.totalKg.toFixed(1)}</td><td style="padding:6px; text-align:right; font-weight:bold;">${curvaProdData.totalLitros.toFixed(1)}</td><td style="padding:6px; text-align:right; font-weight:bold;">—</td><td style="padding:6px; text-align:right; font-weight:bold;">—</td><td style="padding:6px; text-align:right; font-weight:bold;">${curvaProdData.totalIngresos.toLocaleString()}€</td></tr></tfoot>
+      <h3 class="pdf-sec" style="color:#3b82f6;">📉 Curva de Producción</h3>
+      <table class="pdf-tbl pdf-tbl-xs">
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Mes</th><th class="pdf-th-sm pdf-r">Kg</th><th class="pdf-th-sm pdf-r">Litros</th><th class="pdf-th-sm pdf-r">Kg Acum</th><th class="pdf-th-sm pdf-r">L Acum</th><th class="pdf-th-sm pdf-r">Ingresos</th></tr></thead>
+        <tbody>${curvaProdData.porMes.map(m => `<tr><td class="pdf-td"><strong>${m.mes}</strong></td><td class="pdf-td pdf-r">${m.kg.toFixed(1)}</td><td class="pdf-td pdf-r">${m.litros.toFixed(1)}</td><td class="pdf-td pdf-r">${m.kgAcum.toFixed(1)}</td><td class="pdf-td pdf-r">${m.litrosAcum.toFixed(1)}</td><td class="pdf-td pdf-r">${m.ingresos.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalKg.toFixed(1)}</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalLitros.toFixed(1)}</td><td class="pdf-tot pdf-r pdf-b">—</td><td class="pdf-tot pdf-r pdf-b">—</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalIngresos.toLocaleString()}€</td></tr></tfoot>
       </table>
-      <p style="font-size:0.65rem; color:#888;">Meta kg: ${Math.round(curvaProdData.metaKg)} · Meta litros: ${Math.round(curvaProdData.metaLitros)} · Cumplimiento: ${curvaProdData.pctCumplimientoKg}% kg / ${curvaProdData.pctCumplimientoLitros}% L</p>
+      <p class="pdf-tbl-xs pdf-muted">Meta kg: ${Math.round(curvaProdData.metaKg)} · Meta litros: ${Math.round(curvaProdData.metaLitros)} · Cumplimiento: ${curvaProdData.pctCumplimientoKg}% kg / ${curvaProdData.pctCumplimientoLitros}% L</p>
     `;
   },
 
@@ -3140,14 +3140,14 @@ const InformesView = {
     const { breakEvenData } = d;
     if (!breakEvenData || breakEvenData.ingresosTotal === 0) return '';
     return `
-      <h3 style="color:#ef4444; border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">⚖️ Análisis de Punto Muerto (Break-Even)</h3>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:10px;">
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Costes Fijos</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.costesFijos.toLocaleString()}€</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Costes Variables</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.costesVariables.toLocaleString()}€</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Break-Even Carne</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${breakEvenData.breakEvenKg} kg <span style="color:${breakEvenData.cubiertoCarne ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoCarne ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee; font-weight:bold;">Break-Even Leche</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right; font-weight:bold;">${breakEvenData.breakEvenLitros} L <span style="color:${breakEvenData.cubiertoLeche ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoLeche ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Margen Seguridad Carne</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.margenSeguridadKg}</td></tr>
-        <tr><td style="padding:4px 8px; border-bottom:1px solid #eee;">Margen Seguridad Leche</td><td style="padding:4px 8px; border-bottom:1px solid #eee; text-align:right;">${breakEvenData.margenSeguridadLitros}</td></tr>
+      <h3 class="pdf-sec" style="color:#ef4444;">⚖️ Análisis de Punto Muerto (Break-Even)</h3>
+      <table class="pdf-tbl pdf-tbl-md mb-10">
+        <tr><td class="pdf-kv pdf-b">Costes Fijos</td><td class="pdf-kv pdf-r">${breakEvenData.costesFijos.toLocaleString()}€</td></tr>
+        <tr><td class="pdf-kv pdf-b">Costes Variables</td><td class="pdf-kv pdf-r">${breakEvenData.costesVariables.toLocaleString()}€</td></tr>
+        <tr><td class="pdf-kv pdf-b">Break-Even Carne</td><td class="pdf-kv pdf-r pdf-b">${breakEvenData.breakEvenKg} kg <span style="color:${breakEvenData.cubiertoCarne ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoCarne ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
+        <tr><td class="pdf-kv pdf-b">Break-Even Leche</td><td class="pdf-kv pdf-r pdf-b">${breakEvenData.breakEvenLitros} L <span style="color:${breakEvenData.cubiertoLeche ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoLeche ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
+        <tr><td class="pdf-kv">Margen Seguridad Carne</td><td class="pdf-kv pdf-r">${breakEvenData.margenSeguridadKg}</td></tr>
+        <tr><td class="pdf-kv">Margen Seguridad Leche</td><td class="pdf-kv pdf-r">${breakEvenData.margenSeguridadLitros}</td></tr>
       </table>
     `;
   },
