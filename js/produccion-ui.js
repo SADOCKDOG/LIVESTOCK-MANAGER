@@ -33,19 +33,19 @@ const ProduccionUI = {
       {
         content: (data) => `
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:5px;">
-            <button class="wizard-btn-action" style="padding: 15px 10px; flex-direction:column; border: 3px solid transparent; text-align:center;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'carne'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'carne'; this.style.borderColor = '#fbbf24';">
               <span style="font-size: 2rem; margin-bottom: 8px;">⚖️</span>
               <span style="font-size: 0.85rem; line-height: 1.2;">Producción<br>Cárnica (kg)</span>
             </button>
-            <button class="wizard-btn-action" style="padding: 15px 10px; flex-direction:column; border: 3px solid transparent; text-align:center;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'leche'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'leche'; this.style.borderColor = '#fbbf24';">
               <span style="font-size: 2rem; margin-bottom: 8px;">🥛</span>
               <span style="font-size: 0.85rem; line-height: 1.2;">Producción<br>Láctea (L)</span>
             </button>
-            <button class="wizard-btn-action wizard-btn-danger" style="padding: 15px 10px; flex-direction:column; border: 3px solid transparent; text-align:center;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-danger wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = '#fbbf24';">
               <span style="font-size: 2rem; margin-bottom: 8px;">🚚</span>
               <span style="font-size: 0.85rem; line-height: 1.2;">Venta Masiva<br>Matadero</span>
             </button>
-            <button class="wizard-btn-action" style="padding: 15px 10px; flex-direction:column; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: 3px solid transparent; text-align:center;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'gasto'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-option" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'gasto'; this.style.borderColor = '#fbbf24';">
               <span style="font-size: 2rem; margin-bottom: 8px;">🧾</span>
               <span style="font-size: 0.85rem; line-height: 1.2;">Gasto<br>Analítico</span>
             </button>

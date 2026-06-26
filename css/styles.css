@@ -505,6 +505,13 @@ label {
     padding: 14px 20px;
     text-transform: uppercase;
 }
+.wizard-btn-option {
+    flex-direction: column;
+    border: 3px solid transparent;
+    padding: 15px 10px;
+    text-align: center;
+    white-space: normal;
+}
 
 .btn-success, .btn--success, .wizard-btn-success {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
