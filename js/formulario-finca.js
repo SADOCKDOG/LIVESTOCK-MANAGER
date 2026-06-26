@@ -193,9 +193,6 @@ const FormularioFinca = {
             </div>
         `;
 
-    // Asignar estilos inline si no están en CSS
-    this._aplicarEstilos(formulario);
-
     // Asignar event listeners
     const formElement = formulario.querySelector("#formFinca");
     const btnCerrar = formulario.querySelector(".formulario-finca-cerrar");
@@ -395,38 +392,6 @@ const FormularioFinca = {
     return errores;
   },
 
-  /**
-   * Aplicar estilos CSS al formulario
-   */
-  _aplicarEstilos(contenedor) {
-    if (document.getElementById("formulario-finca-styles")) return;
-    const estilo = document.createElement("style");
-    estilo.id = "formulario-finca-styles";
-    estilo.textContent = `
-      .formulario-finca-cuerpo { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
-      .formulario-finca-botones {
-        display: flex; gap: 12px; padding: 16px 16px calc(16px + var(--safe-bottom, 20px));
-        border-top: 1px solid #222; flex-shrink: 0; background: #0a0a0a;
-        margin: 0 -16px -16px; /* Compensar padding del modal */
-      }
-      .formulario-finca-botones .btn-primario {
-        flex: 1; padding: 16px 14px; border-radius: 14px; font-weight: 700;
-        font-size: 16px; cursor: pointer; text-align: center;
-        border: none; background: linear-gradient(135deg, #d97706, #b45309);
-        color: #fff; box-shadow: 0 4px 14px rgba(217,119,6,0.35);
-      }
-      .formulario-finca-botones .btn-secundario {
-        flex: 1; padding: 16px 14px; border-radius: 14px; font-weight: 700;
-        font-size: 16px; cursor: pointer; text-align: center;
-        border: 1px solid #444; background: #1a1a1a; color: #eee;
-      }
-      .formulario-finca-ayuda { display:block; color:#888; font-size:11px; margin-top:4px; }
-      .formulario-finca-especies { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:4px; }
-      .formulario-finca-chk { display:flex; align-items:center; gap:6px; font-size:13px; color:#ddd; cursor:pointer; }
-      .formulario-finca-chk input { width:auto; }
-    `;
-    document.head.appendChild(estilo);
-  },
 };
 
 window.FormularioFinca = FormularioFinca;
