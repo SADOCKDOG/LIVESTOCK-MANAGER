@@ -13,9 +13,9 @@ const CompradoresView = {
           <div class="mb-16">
             <div class="flex gap-6 flex-wrap mb-10">
               ${['todos','cárnico','láctico','híbrido'].map(t => `
-                <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}" data-tab="${t}"
+                <button class="filter-pill filter-pill-gold font-800 uppercase ${this._currentTab === t ? 'active' : ''}" data-tab="${t}"
                   onclick="CompradoresView._cambiarFiltro('${t}')"
-                  style="text-transform:uppercase; letter-spacing:0.3px;">
+                  style="letter-spacing:0.3px;">
                   ${t === 'todos' ? `${Icons.documento()} Todos` : t === 'cárnico' ? `${Icons.carne()} Cárnico` : t === 'láctico' ? `${Icons.leche()} Láctico` : `${Icons.rotacion()} Híbrido`}
                 </button>
               `).join('')}

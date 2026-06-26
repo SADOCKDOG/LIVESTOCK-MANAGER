@@ -182,7 +182,7 @@ const ZonasView = {
     const wizardSteps = [
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">NOMBRE DE LA ZONA / PARCELA</label>
               <input type="text" id="w-zona-nombre" value="${data.nombre}" placeholder="Ej: Parcela Norte..." class="wizard-input">
@@ -217,7 +217,7 @@ const ZonasView = {
       },
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">CÓDIGO PAC (Parcela Agraria SIGGAN)</label>
               <input type="text" id="w-zona-pac" value="${data.codigo_pac}" placeholder="Ej: ES01A123456789" class="wizard-input">
