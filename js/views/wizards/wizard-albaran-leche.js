@@ -444,7 +444,7 @@ window.AlbaranLecheWizard = {
 
           return `
           <div class="mt-10">
-            <h4 class="text-amber text-base mt-0 mb-12">📊 MOFA — Margen sobre Coste de Alimentación</h4>
+            <h4 class="text-amber text-base mt-0 mb-12">${Icons.grafico()} MOFA — Margen sobre Coste de Alimentación</h4>
             <div class="wizard-input-group">
               <label class="wizard-label">COSTE ALIMENTACIÓN DIARIO (€/día)</label>
               <input type="number" id="w-l-cost-dia" value="${data.coste_alimentacion_diario || ''}" step="0.01" class="wizard-input">
@@ -456,7 +456,7 @@ window.AlbaranLecheWizard = {
             </div>
 
             <div class="p-16 bg-darker border-muted rounded" style="margin-top:14px;">
-              <h5 class="text-white text-sm" style="margin:0 0 12px;">📋 RESUMEN DE LA SALIDA LÁCTEA</h5>
+              <h5 class="text-white text-sm" style="margin:0 0 12px;">${Icons.documento()} RESUMEN DE LA SALIDA LÁCTEA</h5>
               <table class="text-sm w-full" style="border-collapse:collapse;">
                 <tr><td class="text-gray" class="py-4">Fecha</td><td class="text-right text-white" class="py-4">${data.fecha}</td></tr>
                 <tr><td class="text-gray" class="py-4">CCAA</td><td class="text-right text-white" class="py-4">${data.comunidad_autonoma ? opcionesCCAA.find(o=>o.value===data.comunidad_autonoma)?.label || data.comunidad_autonoma : '—'}</td></tr>

@@ -34,11 +34,11 @@ const TransportistasView = {
                     <button class="filter-pill ${this._currentFilter === 'inactivos' ? 'active' : ''}" onclick="TransportistasView._setFilter('inactivos')">INACTIVOS</button>
                 </div>
                 <div class="mb-14">
-                    <button class="btn btn-create btn-sm w-full" onclick="TransportistasView._abrirFormulario()">➕ Nuevo Transportista</button>
+                    <button class="btn btn-create btn-sm w-full" onclick="TransportistasView._abrirFormulario()">${Icons.agregar()} Nuevo Transportista</button>
                 </div>
                 <div id="trans-list"></div>
             </div>
-            <button class="fab-btn" onclick="TransportistasView._abrirFormulario()" aria-label="Nuevo Transportista">➕</button>
+            <button class="fab-btn" onclick="TransportistasView._abrirFormulario()" aria-label="Nuevo Transportista">${Icons.agregar()}</button>
         `;
         await this._renderLista();
     },
@@ -59,7 +59,7 @@ const TransportistasView = {
         const transportistas = await Transportistas.list(filtros);
 
         if (transportistas.length === 0) {
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><p class="empty-state-text">No hay transportistas registrados</p></div>`;
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.transportistas()}</div><p class="empty-state-text">No hay transportistas registrados</p></div>`;
             return;
         }
 
@@ -69,7 +69,7 @@ const TransportistasView = {
                 <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                         <div class="text-white font-800 truncate" style="font-size:0.9rem;">
-                            🚛 ${t.nombre}
+                            ${Icons.transportistas()} ${t.nombre}
                         </div>
                         <div class="text-gray text-xs mt-4">
                             ${t.nif_cif ? 'NIF: ' + t.nif_cif : ''}${t.matricula ? ' | 🚚 ' + t.matricula : ''}
@@ -100,7 +100,7 @@ const TransportistasView = {
                 <div class="flex items-center gap-8 mb-14">
                     <button onclick="TransportistasView.render()" class="link-back" style="background:none; border:none; cursor:pointer; padding:4px 8px;">← Volver</button>
                     <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,#3b82f6,#60a5fa);"></span>
-                    <h2 class="m-0 font-900 text-sm text-blue-400">🚛 ${t.nombre}</h2>
+                    <h2 class="m-0 font-900 text-sm text-blue-400">${Icons.transportistas()} ${t.nombre}</h2>
                 </div>
 
                 <div class="card p-16 mb-14">
@@ -132,8 +132,8 @@ const TransportistasView = {
                 </div>
 
                 <div class="flex justify-between items-center mt-20">
-                    <button onclick="TransportistasView._eliminar(${t.id})" class="btn btn-danger">🗑️ Eliminar</button>
-                    <button onclick="TransportistasView._abrirFormulario(${t.id})" class="btn btn-edit">✏️ Editar</button>
+                    <button onclick="TransportistasView._eliminar(${t.id})" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>
+                    <button onclick="TransportistasView._abrirFormulario(${t.id})" class="btn btn-edit">${Icons.editar()} Editar</button>
                 </div>
             </div>
         `;
@@ -152,7 +152,7 @@ const TransportistasView = {
 
         overlay.innerHTML = `
             <div class="card" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px; border-top:5px solid #3b82f6; margin:16px;">
-                <h3 class="mt-0 text-sm text-blue-400">${isEdit ? '✏️ EDITAR TRANSPORTISTA' : '➕ NUEVO TRANSPORTISTA'}</h3>
+                <h3 class="mt-0 text-sm text-blue-400">${isEdit ? `${Icons.editar()} EDITAR TRANSPORTISTA` : `${Icons.agregar()} NUEVO TRANSPORTISTA`}</h3>
 
                 <div class="wizard-input-group">
                     <label class="wizard-label">NOMBRE / RAZÓN SOCIAL <span class="text-red">*</span></label>
@@ -244,10 +244,10 @@ const TransportistasView = {
                 </div>
 
                 <div class="flex justify-between items-center mt-20">
-                    ${isEdit ? `<button onclick="TransportistasView._eliminar(${t.id}); this.closest('.wizard-full-screen').remove();" class="btn btn-danger">🗑️ Eliminar</button>` : '<div></div>'}
+                    ${isEdit ? `<button onclick="TransportistasView._eliminar(${t.id}); this.closest('.wizard-full-screen').remove();" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
                     <div class="flex gap-10">
-                        <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">✕ Cancelar</button>
-                        <button class="btn btn-success" id="btn-save-trans">✔ Guardar</button>
+                        <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} Cancelar</button>
+                        <button class="btn btn-success" id="btn-save-trans">${Icons.guardar()} Guardar</button>
                     </div>
                 </div>
                 <div id="trans-form-error" class="text-red text-xs mt-8" style="display:none;"></div>
