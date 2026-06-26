@@ -248,7 +248,7 @@ const TrazabilidadView = {
     const totalEventos = timeline.filter(t => t.tipo === 'evento').length;
 
     return `
-      <div style="max-width:100%; padding:12px; box-sizing:border-box;">
+      <div class="p-12" style="max-width:100%; box-sizing:border-box;">
         <!-- Cabecera con acciones -->
         <div class="flex items-center gap-8 mb-14 flex-wrap">
           <button onclick="App._navigateBack()" class="btn btn-secondary btn-sm" style="padding:8px 14px;">← Volver</button>
