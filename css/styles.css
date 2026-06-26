@@ -9,8 +9,6 @@
     --p-cork-dark: #a0673a;
     --p-gold: #fbbf24;        /* Dorado de acento (títulos, badges) */
     --p-gold-dark: #d97706;   /* Dorado oscuro (botón primario) */
-    --accent: #7fb069;        /* Verde Alcornoque (legacy) */
-
     /* ── BASE OLED ── */
     --bg: #000000;            /* Negro Puro */
     --surface: #121212;       /* Gris Antracita */
@@ -1247,7 +1245,7 @@ label {
 }
 
 /* ── Input de texto / número ── */
-.form-input {
+.form-input, .premium-input, .wizard-input, .wizard-select {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
@@ -1260,12 +1258,12 @@ label {
     transition: border-color 0.2s, background 0.2s;
     box-sizing: border-box;
 }
-.form-input:focus {
+.form-input:focus, .premium-input:focus, .wizard-input:focus {
     outline: none;
     border-color: var(--p-cork);
     background: #222;
 }
-.form-input::placeholder { color: #555; }
+.form-input::placeholder, .premium-input::placeholder, .wizard-input::placeholder { color: #555; }
 
 /* ── Form Input Large (animales wizard) ── */
 .form-input-lg { padding: 11px; font-size: 1rem; }
@@ -1440,24 +1438,8 @@ label {
     padding: 0 8px;
 }
 
-/* ── ALIASES — compatibilidad con código existente ── */
-.premium-input {
-    width: 100%; padding: 14px; border-radius: 12px; background: #1a1a1a;
-    border: 1px solid #333; color: #fff; font-size: 0.9rem; margin-top: 5px;
-    transition: border-color 0.2s;
-}
-.premium-input:focus { outline: none; border-color: var(--p-cork); background: #222; }
-.wizard-input {
-    width: 100%; padding: 14px; border-radius: 12px; background: #1a1a1a;
-    border: 1px solid #333; color: #fff; font-size: 0.95rem; margin-top: 5px;
-    min-height: 48px; transition: border-color 0.2s;
-}
-.wizard-input:focus { outline: none; border-color: var(--p-cork); background: #222; }
-.wizard-select {
-    width: 100%; padding: 14px; border-radius: 12px; background: #1a1a1a;
-    border: 1px solid #333; color: #fff; font-size: 0.95rem; margin-top: 5px;
-    min-height: 48px; appearance: auto;
-}
+/* .premium-input, .wizard-input, .wizard-select: aliases consolidados en .form-input */
+.wizard-select { appearance: auto; }
 .wizard-label {
     font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 800;
     letter-spacing: 0.5px; margin-left: 5px; margin-bottom: 2px; display: block;
