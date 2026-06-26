@@ -278,14 +278,14 @@ const ExplotacionView = {
             <button class="btn btn-create btn-sm" style="background:${themeColor}; border-color:${themeColor};" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
               ${Icons.agregar()} Registrar Peso (kg)
             </button>
-            <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
+            <button class="btn btn-secondary btn-sm btn--purple" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
               ${Icons.sanidad()} Registrar Tratamiento
             </button>
           </div>
         </div>
 
         <!-- Líderes GMD -->
-        <div class="mb-14 p-12 rounded bg-dark border border-222" style="border-top: 3px solid #fbbf24;">
+        <div class="mb-14 p-12 rounded bg-dark border border-222 border-top-3px border-top-3px-amber">
           <div class="text-xs text-amber font-black uppercase mb-6 flex items-center gap-6">${Icons.tendencia()} LÍDERES DE GANANCIA DE PESO (GMD)</div>
           <div class="grid gap-6">
             ${d.gmdList.slice(0, 4).map(g => `
@@ -298,10 +298,10 @@ const ExplotacionView = {
 
         <!-- Historial Pesajes -->
         <div class="card p-16 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
             ${Icons.documento()} Últimos pesajes registrados
           </div>
-          <div class="grid gap-8" style="max-height:350px; overflow-y:auto;">
+          <div class="grid gap-8 mh-350">
             ${d.pesajes.length > 0
               ? d.pesajes.slice(0, 15).map(e => `
                   <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="border-left:4px solid ${e.tipo_entidad === 'animal' ? '#ef4444' : '#f59e0b'}; padding:10px; margin:0;">
@@ -358,7 +358,7 @@ const ExplotacionView = {
             <button class="btn btn-create btn-sm" style="background:${themeColor}; border-color:${themeColor};" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
               ${Icons.agregar()} Registrar Control Diario (L)
             </button>
-            <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
+            <button class="btn btn-secondary btn-sm btn--purple" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
               ${Icons.sanidad()} Registrar Tratamiento
             </button>
           </div>
@@ -366,11 +366,11 @@ const ExplotacionView = {
 
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
         <div class="card p-14 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:8px; padding-bottom:5px;">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-8 pb-5">
             ${Icons.grafico()} Calidad de Tanque (Últimas Analíticas de Laboratorio)
           </div>
           
-          <div class="scroll-shadow-container" style="overflow-x:auto;">
+          <div class="scroll-shadow-container overflow-x-auto">
             <table class="premium-table">
               <thead>
                 <tr>
@@ -416,10 +416,10 @@ const ExplotacionView = {
 
         <!-- Controles Ordeño Recientes -->
         <div class="card p-14 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
             ${Icons.documento()} Ordeños y Controles Diarios Recientes
           </div>
-          <div class="grid gap-8" style="max-height:220px; overflow-y:auto;">
+          <div class="grid gap-8 mh-220">
             ${d.ordeños.length > 0
               ? d.ordeños.slice(0, 10).map(o => `
                   <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? '#3b82f6' : '#8b5cf6'}; padding:10px; margin:0;">
@@ -467,29 +467,29 @@ const ExplotacionView = {
           </div>
           <div class="explotacion-kpi-card">
             <div class="explotacion-kpi-label">Coste Aliment.</div>
-            <div class="explotacion-kpi-value" style="color:#ef4444">${d.totalGastosAlim.toLocaleString()} €</div>
+            <div class="explotacion-kpi-value text-red">${d.totalGastosAlim.toLocaleString()} €</div>
           </div>
         </div>
 
         <div class="flex gap-10 mb-14">
-          <button class="btn btn-create btn-sm flex-1" style="background:#ef4444; border-color:#ef4444;" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+          <button class="btn btn-create btn-sm flex-1 btn--red" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
             ${Icons.agregar()} Registrar Peso (kg)
           </button>
-          <button class="btn btn-secondary btn-sm flex-1" style="background:#3b82f6; border-color:#3b82f6;" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+          <button class="btn btn-secondary btn-sm flex-1 btn--blue" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
             ${Icons.agregar()} Registrar Ordeño (L)
           </button>
         </div>
         <div class="text-center mb-14">
-          <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
+          <button class="btn btn-secondary btn-sm btn--purple" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
             ${Icons.sanidad()} Registrar Tratamiento (Mixto)
           </button>
         </div>
 
         <!-- True Hub: Highlight Carne & Leche Side-by-Side -->
         <div class="grid grid-cols-2 gap-10 mb-14">
-          <div class="p-10 rounded bg-dark border border-222" style="border-top:3px solid #ef4444;">
+          <div class="p-10 rounded bg-dark border border-222 border-top-3px border-top-3px-red">
             <div class="text-xs font-bold text-red uppercase mb-6 flex items-center gap-6">${Icons.carne()} Carne: Líderes GMD</div>
-            <div class="grid gap-4 text-xs" style="font-size:0.68rem;">
+            <div class="grid gap-4 text-xs">
               ${d.gmdList.slice(0, 3).map(g => `
                 <div class="flex justify-between">
                   <span class="text-ccc">${g.crotal}</span>
@@ -498,9 +498,9 @@ const ExplotacionView = {
             </div>
           </div>
 
-          <div class="p-10 rounded bg-dark border border-222" style="border-top:3px solid #3b82f6;">
+          <div class="p-10 rounded bg-dark border border-222 border-top-3px border-top-3px-blue">
             <div class="text-xs font-bold text-blue uppercase mb-6 flex items-center gap-6">${Icons.grafico()} Leche: Última analítica</div>
-            <div class="grid gap-4 text-xs" style="font-size:0.68rem;">
+            <div class="grid gap-4 text-xs">
               ${d.entregasLeche.length > 0
                 ? (() => {
                     const e = d.entregasLeche[0];
@@ -529,10 +529,10 @@ const ExplotacionView = {
 
         <!-- Historial Consolidado -->
         <div class="card p-14 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
             ${Icons.documento()} Historial Consolidado Reciente
           </div>
-          <div class="grid gap-8" style="max-height:220px; overflow-y:auto;">
+          <div class="grid gap-8 mh-220">
             ${d.proConsolidada.length > 0
               ? d.proConsolidada.slice(0, 12).map(e => {
                   const esPeso = e.unidad === 'kg';
@@ -614,12 +614,12 @@ const ExplotacionView = {
       else if (pct < 50) colorBar = '#f59e0b'; // Naranja/Aviso
 
       html += `
-        <div style="font-size:0.75rem;">
+        <div class="text-75">
           <div class="flex justify-between font-bold mb-4">
             <span class="text-ccc">🌾 ${s.nombre}</span>
             <span class="text-white">${actual.toLocaleString()} / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
           </div>
-          <div style="background:#111; border-radius:4px; height:8px; width:100%; overflow:hidden;">
+          <div class="silo-bar">
             <div style="background:${colorBar}; width:${pct}%; height:100%; transition: width 0.3s;"></div>
           </div>
         </div>
@@ -645,23 +645,23 @@ const ExplotacionView = {
           <div class="text-xs text-white font-black uppercase flex items-center gap-6">${Icons.dinero()} COSTES + CUMPLIMIENTO NORMATIVO</div>
         </div>
         <div class="grid grid-cols-3 gap-10 mb-10">
-          <div class="card p-10 text-center" style="border:1px solid #27272a;">
+          <div class="card p-10 text-center border-272">
             <div class="text-xs text-888">Alimentación</div>
             <div class="font-900 text-white">${(d.totalGastosAlim || 0).toLocaleString()} €</div>
           </div>
-          <div class="card p-10 text-center" style="border:1px solid #27272a;">
+          <div class="card p-10 text-center border-272">
             <div class="text-xs text-888">Energía</div>
             <div class="font-900 text-white">${(d.totalGastosEnergia || 0).toLocaleString()} €</div>
           </div>
-          <div class="card p-10 text-center" style="border:1px solid #27272a;">
+          <div class="card p-10 text-center border-272">
             <div class="text-xs text-888">Fitosanitarios</div>
             <div class="font-900 text-white">${(d.totalGastosFito || 0).toLocaleString()} €</div>
           </div>
         </div>
         <div class="grid grid-cols-3 gap-10">
-          <button class="btn btn-secondary btn-sm" style="background:#d97706; border-color:#d97706;" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">${Icons.agregar()} Gasto Alimentación</button>
-          <button class="btn btn-secondary btn-sm" style="background:#3b82f6; border-color:#3b82f6;" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">${Icons.agregar()} Gasto Energía</button>
-          <button class="btn btn-secondary btn-sm" style="background:#16a34a; border-color:#16a34a;" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">${Icons.agregar()} Gasto Fitosanitario</button>
+          <button class="btn btn-secondary btn-sm btn--amber" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">${Icons.agregar()} Gasto Alimentación</button>
+          <button class="btn btn-secondary btn-sm btn--blue" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">${Icons.agregar()} Gasto Energía</button>
+          <button class="btn btn-secondary btn-sm btn--green-dk" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">${Icons.agregar()} Gasto Fitosanitario</button>
         </div>
         <div class="mt-10 text-xs text-aaa">
           ✅ Registros fitosanitarios con control completo: <strong>${fitoConControl}</strong> · ⚠️ No aptos para comercialización: <strong style="color:${fitoPendientes > 0 ? '#ef4444' : '#10b981'}">${fitoPendientes}</strong>

@@ -2359,3 +2359,17 @@ label {
 .pdf-bg1   { background:#f5f5f5; }
 .pdf-bg2   { background:#f9f9f9; }
 
+/* ===== BUTTON COLOR VARIANTS (Fase 4) ===== */
+.btn--purple   { background:#8b5cf6 !important; border-color:#8b5cf6 !important; color:#fff !important; }
+.btn--blue     { background:#3b82f6 !important; border-color:#3b82f6 !important; color:#fff !important; }
+.btn--red      { background:#ef4444 !important; border-color:#ef4444 !important; color:#fff !important; }
+.btn--amber    { background:#d97706 !important; border-color:#d97706 !important; color:#fff !important; }
+.btn--green-dk { background:#16a34a !important; border-color:#16a34a !important; color:#fff !important; }
+
+/* ===== SCROLL / LAYOUT UTILITIES (Fase 4) ===== */
+.mh-220     { max-height:220px; overflow-y:auto; }
+.mh-350     { max-height:350px; overflow-y:auto; }
+.pb-5       { padding-bottom:5px; }
+.border-272 { border:1px solid #27272a; }
+.silo-bar   { background:#111; border-radius:4px; height:8px; width:100%; overflow:hidden; }
+
