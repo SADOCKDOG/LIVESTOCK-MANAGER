@@ -81,6 +81,7 @@ body {
     padding: 0;
     line-height: 1.5;
     overflow-x: hidden;
+    min-height: 100dvh;
 }
 
 body.scanner-active {
