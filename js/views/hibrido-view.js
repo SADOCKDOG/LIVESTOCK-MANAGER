@@ -334,7 +334,7 @@ const HibridoView = {
           <a href="#/comercializacion" class="widget-link-btn">${Icons.comercial()} Comercial</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Historial de Ventas e Ingresos Mixtos (${lList.length})
         </div>
         <div class="grid gap-10">
@@ -410,7 +410,7 @@ const HibridoView = {
           <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno Oficial</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Historial Sanitario Consolidado (${d.sanitariosFinca.length})
         </div>
         <div class="grid gap-10">

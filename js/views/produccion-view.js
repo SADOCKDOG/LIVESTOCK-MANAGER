@@ -178,7 +178,7 @@ const ProduccionView = {
           }).join('')}
         </div>` : ''}
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           📋 ${listName}
         </div>
         <div class="grid gap-10">
