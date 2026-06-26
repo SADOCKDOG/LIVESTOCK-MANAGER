@@ -36,7 +36,7 @@ const DocumentosView = {
 
   _renderHTML(docs, ventaMap) {
     const tiposDoc = ['todos', 'dimoe', 'factura', 'certificado', 'dib'];
-    const labels = { todos: '📋 Todos', dimoe: '📄 DIMOE', factura: '🧾 Facturas', certificado: '📜 Certificados', dib: '🏛️ DIB' };
+    const labels = { todos: `${Icons.documento()} Todos`, dimoe: `${Icons.exportar()} DIMOE`, factura: `${Icons.libroVentas()} Facturas`, certificado: `${Icons.contratos()} Certificados`, dib: `${Icons.informeRega()} DIB` };
     const colors = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6' };
     const totalDocs = docs.length;
     const porTipo = {};
@@ -60,7 +60,7 @@ const DocumentosView = {
               </button>
             `).join('')}
           </div>
-          <button class="btn btn-primary btn-sm" onclick="DocumentosView._exportDocs()" style="white-space:nowrap;">📤 Exportar</button>
+          <button class="btn btn-primary btn-sm" onclick="DocumentosView._exportDocs()" style="white-space:nowrap;">${Icons.exportar()} Exportar</button>
         </div>
       </div>
       <div id="docs-lista">${this._renderLista(docs, ventaMap)}</div>
@@ -94,7 +94,7 @@ const DocumentosView = {
       : docs.filter(d => (d.tipo || '').toLowerCase() === this._currentTab);
 
     if (!filtrados.length) {
-      return `<div class="empty-state"><div class="empty-state-icon">📄</div><p class="empty-state-text">No hay documentos ${this._currentTab !== 'todos' ? 'de este tipo' : ''}.</p></div>`;
+      return `<div class="empty-state"><div class="empty-state-icon">${Icons.documento()}</div><p class="empty-state-text">No hay documentos ${this._currentTab !== 'todos' ? 'de este tipo' : ''}.</p></div>`;
     }
 
     const colors = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6' };
@@ -122,7 +122,7 @@ const DocumentosView = {
             </div>
             <div class="mt-8 flex gap-6">
               <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verVenta(${doc.ventaId || 0})">👁 Ver venta</button>
-              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verDetalle(${doc.id || 0})">📄 Detalle</button>
+              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verDetalle(${doc.id || 0})">${Icons.documento()} Detalle</button>
             </div>
           </div>
         `;
@@ -176,7 +176,7 @@ const DocumentosView = {
             <div class="font-800 text-sm" style="color:${color};">${label}</div>
             <div class="font-900 text-white text-lg">${doc.numero || 'S/N'}</div>
           </div>
-          <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">✕</button>
+          <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">${Icons.cerrar()}</button>
         </div>
         <div class="grid grid-cols-2 gap-8 text-sm mb-14">
           <div><span class="text-gray">Fecha:</span> <span class="text-white">${this._fmtFecha(doc.createdAt || doc.fecha)}</span></div>

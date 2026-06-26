@@ -194,15 +194,15 @@ const GastosView = {
         </div>` : ''}
         <div class="text-center mb-12">
           <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
-            ➕ ${registrarLabel}
+            ${Icons.agregar()} ${registrarLabel}
           </button>
         </div>
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
-          📋 ${listName}
+          ${Icons.documento()} ${listName}
         </div>
         ${recordsHtml}
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" aria-label="${registrarLabel}">➕</button>`;
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="${registrarLabel}">${Icons.agregar()}</button>`;
   },
 
   _fmt(n) {

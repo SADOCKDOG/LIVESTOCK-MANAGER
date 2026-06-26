@@ -168,7 +168,7 @@ window.WizardFinca = {
               </div>
 
               <hr class="border-333" class="my-16">
-              <h4 class="text-blue text-sm mt-0 mb-12">📊 INFOLAC — Declaraciones Mensuales</h4>
+              <h4 class="text-blue text-sm mt-0 mb-12">${Icons.grafico()} INFOLAC — Declaraciones Mensuales</h4>
               <div class="wizard-input-group"><label class="wizard-label">Nº INFOLAC (si aplica)</label><input type="text" id="w-f-infolac" value="${data.numero_infolac || ''}" placeholder="INFOLAC-AAAA-MM-NNN" class="wizard-input"></div>
 
               <hr class="border-333" class="my-16">

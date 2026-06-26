@@ -132,7 +132,7 @@ const ManualesView = {
     main.innerHTML = `
       <div class="page-container">
         <div class="page-header">
-          <h2 class="page-title">📚 Manuales</h2>
+          <h2 class="page-title">${Icons.libro()} Manuales</h2>
           <p class="page-subtitle">Guías de usuario y ejemplos prácticos</p>
         </div>
         <div id="manuales-list" style="display:flex; flex-direction:column; gap:14px; padding:0 0 20px;">
@@ -157,7 +157,7 @@ const ManualesView = {
           </div>
           <button class="btn btn-sm" style="flex-shrink:0; background:${m.color}; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:0.7rem; font-weight:700;"
                   onclick="event.stopPropagation(); ManualesView._exportarPDF('${m.archivo}', '${m.titulo}')">
-            📄 PDF
+            ${Icons.exportar()} PDF
           </button>
         </div>
       </div>
@@ -180,9 +180,9 @@ const ManualesView = {
                 style="background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:0.85rem;
                        padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:700;
                        display:flex; align-items:center; gap:6px;">
-          ✕ Volver
+          ${Icons.atras()} Volver
         </button>
-        <span style="color:#e0a83a; font-weight:800; font-size:0.85rem;">📚 Manual</span>
+        <span style="color:#e0a83a; font-weight:800; font-size:0.85rem;">${Icons.libro()} Manual</span>
 
       </div>
       <iframe id="manual-frame" src="${archivo}"

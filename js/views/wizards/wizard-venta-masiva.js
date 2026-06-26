@@ -308,7 +308,7 @@ window.VentaMasivaWizard = {
                       `<option value="${c.id}" ${data.compradorId === c.id ? 'selected' : ''}>${c.nombre} ${c.nif_cif ? '('+c.nif_cif+')' : ''} — ${c.tipo_comprador}</option>`
                     ).join('')}
                   </select>
-                  <button type="button" onclick="App._abrirAltaCompradorRapida()" class="text-xs text-green font-extrabold" style="padding:11px 14px; border-radius:12px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); cursor:pointer; white-space:nowrap;">➕ Nuevo</button>
+                  <button type="button" onclick="App._abrirAltaCompradorRapida()" class="text-xs text-green font-extrabold" style="padding:11px 14px; border-radius:12px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); cursor:pointer; white-space:nowrap;">${Icons.agregar()} Nuevo</button>
                 </div>
               </div>
               <div id="w-v-comprador-info" class="p-12 mb-12 bg-dark rounded-10" style="display:${data.compradorId ? 'block' : 'none'};">
@@ -471,7 +471,7 @@ window.VentaMasivaWizard = {
                       `<option value="${t.id}" ${data.transportistaId === t.id ? 'selected' : ''}>${t.nombre} ${t.nif_cif ? '('+t.nif_cif+')' : ''} — ${t.matricula || 'sin matrícula'}</option>`
                     ).join('')}
                   </select>
-                  <a href="#/transportistas" target="_blank" class="text-xs font-black text-blue flex items-center" style="padding:11px 14px; border-radius:12px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); text-decoration:none; white-space:nowrap;">➕ Nuevo</a>
+                  <a href="#/transportistas" target="_blank" class="text-xs font-black text-blue flex items-center" style="padding:11px 14px; border-radius:12px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); text-decoration:none; white-space:nowrap;">${Icons.agregar()} Nuevo</a>
                 </div>
               </div>
               <div id="w-v-transportista-info" class="p-12 mb-12 bg-dark rounded-10" style="display:${data.transportistaId ? 'block' : 'none'};">

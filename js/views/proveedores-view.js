@@ -15,11 +15,11 @@ const ProveedoresView = {
               <input type="search" id="search-proveedores" placeholder="🔍 Buscar por nombre, NIF o ciudad..."
                 oninput="ProveedoresView._filtrar(this.value)"
                 class="search-input">
-              <button class="btn btn-create btn-sm" onclick="ProveedoresView.renderFormulario()">➕ Nuevo</button>
+              <button class="btn btn-create btn-sm" onclick="ProveedoresView.renderFormulario()">${Icons.agregar()} Nuevo</button>
             </div>
           </div>
           <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
-          <button class="fab-btn" onclick="ProveedoresView.renderFormulario()" aria-label="Nuevo Proveedor">➕</button>`;
+          <button class="fab-btn" onclick="ProveedoresView.renderFormulario()" aria-label="Nuevo Proveedor">${Icons.agregar()}</button>`;
 
         await this._cargarDatos();
     },
@@ -62,10 +62,10 @@ const ProveedoresView = {
         if (lista.length === 0) {
             contenedor.innerHTML = `
               <div class="empty-state">
-                <div class="empty-state-icon">🏭</div>
+                <div class="empty-state-icon">${Icons.edificio()}</div>
                 <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
                 <button onclick="ProveedoresView.renderFormulario()"
-                  class="btn btn-create btn-sm mt-10">➕ Registrar primer proveedor</button>
+                  class="btn btn-create btn-sm mt-10">${Icons.agregar()} Registrar primer proveedor</button>
               </div>`;
             return;
         }
@@ -117,8 +117,8 @@ const ProveedoresView = {
                 </div>
               </div>
               <div class="flex gap-6">
-                <button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
-                <button onclick="ProveedoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">✏️ Editar</button>
+                <button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger btn-sm">${Icons.eliminar()} Eliminar</button>
+                <button onclick="ProveedoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">${Icons.editar()} Editar</button>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
@@ -151,7 +151,7 @@ const ProveedoresView = {
 
           <!-- Desglose por categoría -->
           <div class="card p-16">
-            <h3 class="section-h3">📊 Gastos por Categoría</h3>
+            <h3 class="section-h3">${Icons.grafico()} Gastos por Categoría</h3>
             ${Object.keys(resumen.por_categoria).length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin gastos registrados.</p></div>' :
               Object.entries(resumen.por_categoria).map(([cat, info]) => `
                 <div class="history-row">
@@ -166,12 +166,12 @@ const ProveedoresView = {
 
           <!-- Historial de Gastos -->
           <div class="card p-16">
-            <h3 class="section-h3">💰 Historial de Gastos</h3>
+            <h3 class="section-h3">${Icons.dinero()} Historial de Gastos</h3>
             ${gastos.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin gastos registrados.</p></div>' :
               gastos.slice(0, 30).map(g => `
                 <div class="history-row">
                   <div>
-                    <div class="history-title">📅 ${g.fecha ? new Date(g.fecha).toLocaleDateString() : '-'}</div>
+                    <div class="history-title">${Icons.calendar()} ${g.fecha ? new Date(g.fecha).toLocaleDateString() : '-'}</div>
                     <div class="history-sub">${g.categoria || 'Otros'}${g.descripcion ? ' · '+g.descripcion : ''}</div>
                   </div>
                   <div class="text-right">
@@ -185,7 +185,7 @@ const ProveedoresView = {
 
           ${proveedor.notas ? `
           <div class="card p-16">
-            <h3 class="section-h3">📝 Notas</h3>
+            <h3 class="section-h3">${Icons.documento()} Notas</h3>
             <p class="text-sm text-aaa m-0">${proveedor.notas}</p>
           </div>` : ''}
         `;
@@ -212,7 +212,7 @@ const ProveedoresView = {
             <a href="${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}" class="link-back">← Volver</a>
           </div>
           <div class="card p-20 border-top-3px border-top-3px-green">
-            <h2 class="text-green mt-0 mb-16 text-md" style="border:none; padding:0;">${esEdicion ? '✏️ Editar Proveedor' : '➕ Nuevo Proveedor'}</h2>
+            <h2 class="text-green mt-0 mb-16 text-md" style="border:none; padding:0;">${esEdicion ? `${Icons.editar()} Editar Proveedor` : `${Icons.agregar()} Nuevo Proveedor`}</h2>
 
             <label class="form-label">NOMBRE / RAZÓN SOCIAL *</label>
             <input type="text" id="p-nombre" value="${p.nombre}" class="premium-input mb-12" placeholder="Ej: Suministros Agrícolas S.L.">
@@ -303,10 +303,10 @@ const ProveedoresView = {
             </label>
 
             <div class="flex justify-between items-center mt-20">
-              ${esEdicion ? `<button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger">🗑️ Eliminar</button>` : '<div></div>'}
+              ${esEdicion ? `<button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
               <div class="flex gap-10">
-                <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="btn btn-secondary">✕ Cancelar</button>
-                <button onclick="ProveedoresView._guardar(${id || ''})" class="btn btn-success">✔ Guardar</button>
+                <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="btn btn-secondary">${Icons.cerrar()} Cancelar</button>
+                <button onclick="ProveedoresView._guardar(${id || ''})" class="btn btn-success">${Icons.guardar()} Guardar</button>
               </div>
             </div>
           </div>

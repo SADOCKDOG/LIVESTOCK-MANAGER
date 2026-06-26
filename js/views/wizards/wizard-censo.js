@@ -14,7 +14,7 @@ window.WizardCenso = {
       {
         content: (data) => `
           <div class="mt-10">
-            <h3 class="text-green mb-15">📅 Fecha de Referencia</h3>
+            <h3 class="text-green mb-15">${Icons.calendar()} Fecha de Referencia</h3>
             <div class="wizard-input-group">
               <label class="wizard-label">FECHA DEL CENSO</label>
               <input type="date" id="w-cs-fecha" value="${data.fecha}" class="wizard-input">
