@@ -185,7 +185,7 @@ const ProduccionView = {
           ${recordsHtml}
         </div>
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">➕</button>`;
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
   },
 
   _renderCarne(content, d) {
