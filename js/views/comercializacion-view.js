@@ -160,7 +160,7 @@ const ComercializacionView = {
             <div class="text-right flex-shrink-0 ml-8">
               <span class="badge badge-sm" style="background:${color}20;color:${color};border:1px solid ${color}40;display:block;margin-bottom:4px;">${r.value}</span>
               ${r.subvalue ? `<div class="kpi-sub" style="font-size:0.75rem; color:#888;">${r.subvalue}</div>` : ''}
-              <span class="text-xs text-777 mt-4" style="display:block;">Ver ➔</span>
+              <span class="text-xs text-777 mt-4 block">Ver ➔</span>
             </div>
           </div>
         </div>`).join('')
