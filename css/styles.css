@@ -2525,6 +2525,7 @@ label {
 .mh-350     { max-height:350px; overflow-y:auto; }
 .pb-5       { padding-bottom:5px; }
 .border-272 { border:1px solid #27272a; }
+.border-444 { border:1px solid #444; }
 .silo-bar   { background:#111; border-radius:4px; height:8px; width:100%; overflow:hidden; }
 
 /* ===== INFORMES UI COMPONENTS (Fase 4) ===== */
@@ -2553,4 +2554,20 @@ label {
 .card-tint-green  { background: rgba(16,185,129,0.05)  !important; }
 .card-tint-blue   { background: rgba(59,130,246,0.08)  !important; }
 .card-tint-orange { background: rgba(245,158,11,0.08)  !important; }
+
+/* ===== WIZARD SHARED COMPONENTS (Fase 5) ===== */
+.wizard-alert-error  { background:rgba(239,68,68,0.1); border-left:3px solid #ef4444; padding:10px; margin-bottom:15px; border-radius:4px; font-size:0.8rem; color:#fca5a5; }
+.wizard-alert-info   { background:rgba(16,185,129,0.08); border-left:3px solid #10b981; padding:10px; margin-bottom:15px; border-radius:4px; font-size:0.78rem; color:#a7f3d0; }
+.wizard-section-sep  { margin-top:20px; padding-top:15px; border-top:1px solid #333; }
+.wizard-section-sep-sm { margin-top:15px; padding-top:12px; border-top:1px solid #333; }
+.wizard-calc-panel   { margin-top:15px; padding:15px; border:1px solid #27272a; }
+.wizard-calc-btn     { background:#27272a !important; padding:10px !important; margin-top:5px; }
+.wizard-calc-result  { margin-top:15px; text-align:center; font-size:1.2rem; font-weight:bold; }
+.wizard-list-scroll  { max-height:55vh; overflow-y:auto; border:1px solid #444; }
+.wizard-list-scroll-sm { max-height:40vh; overflow-y:auto; border:1px solid #444; }
+.wizard-list-item    { border-bottom:1px solid #333; cursor:pointer; }
+.wizard-textarea     { min-height:70px; resize:none; }
+.wizard-panel-dark   { background:#18181b; padding:20px; border-radius:16px; border:2px solid #27272a; }
+.wizard-panel-darker { background:#111827; padding:14px; border-radius:12px; border:1px solid #1f2937; margin-top:10px; }
+.btn-ghost           { background:transparent !important; border:none !important; cursor:pointer; }
 

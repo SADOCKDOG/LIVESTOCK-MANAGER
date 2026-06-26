@@ -30,11 +30,11 @@ window.WizardTraslado = {
             <p class="text-sm text-gray m-0 mb-10">Destino: <span class="text-gold font-bold">${data.rebano.nombre}</span></p>
             <div class="wizard-input-group">
               <label class="wizard-label">SELECCIONA LOS ANIMALES A TRASLADAR</label>
-              <div id="w-tras-list" class="rounded-sm bg-card" style="max-height: 55vh; overflow-y:auto; border:1px solid #444;">
+              <div id="w-tras-list" class="rounded-sm bg-card wizard-list-scroll">
                 ${data.allAnimales.map((a) => {
                   const yaEnRebano = a.rebanoId == data.rebano.id;
                   const checked = yaEnRebano || data.selectedIds.includes(a.id);
-                  return `<label class="flex items-center gap-10 p-10" style="border-bottom: 1px solid #333; cursor:pointer;">
+                  return `<label class="flex items-center gap-10 p-10 wizard-list-item">
                     <input type="checkbox" value="${a.id}" ${checked ? "checked" : ""} ${yaEnRebano ? "disabled" : ""} class="w-tras-chk">
                     <span style="${yaEnRebano ? "color:#fbbf24" : ""}">${a.numero_identificacion} (${a.raza})${yaEnRebano ? " · ya en destino" : ""}</span>
                   </label>`;
@@ -63,7 +63,7 @@ window.WizardTraslado = {
             <div class="mt-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">RESUMEN DEL TRASLADO</label>
-                <div class="bg-card rounded-sm p-10" style="border:1px solid #444;">
+                <div class="bg-card rounded-sm p-10 border-444">
                   <p class="m-0 text-sm">Rebaño destino: <span class="text-gold font-bold">${data.rebano.nombre}</span></p>
                   <p class="m-0 text-sm">Zona destino: <span class="font-bold">${data.rebano.zonaActual || "—"}</span></p>
                   <p class="m-0 text-sm">Animales a trasladar: <span class="font-bold">${seleccionados.length}</span></p>
@@ -71,9 +71,9 @@ window.WizardTraslado = {
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">ANIMALES SELECCIONADOS</label>
-                <div class="rounded-sm bg-card" style="max-height: 40vh; overflow-y:auto; border:1px solid #444;">
+                <div class="rounded-sm bg-card wizard-list-scroll-sm">
                   ${seleccionados.map((a) =>
-                    `<div class="p-10 text-sm" style="border-bottom: 1px solid #333;">${a.numero_identificacion} (${a.raza})</div>`
+                    `<div class="p-10 text-sm wizard-list-item">${a.numero_identificacion} (${a.raza})</div>`
                   ).join("")}
                 </div>
               </div>
@@ -104,7 +104,7 @@ window.WizardTraslado = {
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">ACUSE RECIBO</label>
-              <textarea id="w-tras-acuse" class="wizard-input" style="min-height:70px;resize:none;">${data.acuse_recibo || ""}</textarea>
+              <textarea id="w-tras-acuse" class="wizard-input wizard-textarea">${data.acuse_recibo || ""}</textarea>
             </div>
           </div>
         `,
