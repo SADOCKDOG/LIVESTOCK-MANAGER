@@ -311,21 +311,21 @@ const DashboardView = {
         <h3 class="mt-0 flex items-center gap-8 text-yellow">
           ${Icons.leche()} Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
         </h3>
-        <div class="grid grid-cols-3 gap-10 mt-15">
-          <div class="info-box border-left-amber">
+        <div style="display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; margin-top:15px;">
+          <div class="info-box border-left-amber" style="flex:0 0 140px; min-width:0;">
             <div class="kpi-label">MOFA Mensual</div>
             <div class="text-2xl font-black" style="color:${mofaRatio >= 20 ? '#10b981' : '#f59e0b'};">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
-            <div class="kpi-sub">${mofaRatio.toFixed(1)}% sobre ingresos</div>
+            <div class="kpi-sub">${mofaRatio.toFixed(1)}% ingresos</div>
           </div>
-          <div class="info-box border-left-blue">
+          <div class="info-box border-left-blue" style="flex:0 0 140px; min-width:0;">
             <div class="kpi-label">Precio Medio</div>
             <div class="text-white font-black text-2xl">${precioFinalMedio.toFixed(3)} €/L</div>
             <div class="kpi-sub">${(litrosTotal / Math.max(1, numEntregas)).toFixed(0)} L/entrega</div>
           </div>
-          <div class="info-box border-left-purple">
-            <div class="kpi-label">Extracto Seco Medio</div>
+          <div class="info-box border-left-purple" style="flex:0 0 140px; min-width:0;">
+            <div class="kpi-label">Extracto Seco</div>
             <div class="text-white font-black text-2xl">${esMedia.toFixed(2)}%</div>
-            <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L total</div>
+            <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L</div>
           </div>
         </div>
         <div class="text-center mt-12">
@@ -443,32 +443,32 @@ const DashboardView = {
         <h3 class="mt-0 flex items-center gap-8 text-violet">
           ${Icons.grafico()} KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
         </h3>
-        <div class="grid grid-cols-3 gap-10 mt-15">
+        <div style="display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; margin-top:15px;">
 
-          <div class="info-box" style="border-left:3px solid ${kpiColor};">
-            <div class="kpi-label flex items-center gap-4">${Icons.leche()} Litros/Oveja/Día</div>
+          <div class="info-box" style="border-left:3px solid ${kpiColor}; flex:0 0 140px; min-width:0;">
+            <div class="kpi-label flex items-center gap-4">${Icons.leche()} L/Oveja/Día</div>
             <div class="text-2xl font-black" style="color:${kpiColor};">
               ${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}
             </div>
             <div class="kpi-sub">
-              ${totalHembras} ♀ activas · ${litros7d.toFixed(0)} L/7d
+              ${totalHembras} ♀ · ${litros7d.toFixed(0)} L/7d
               ${litrosPorOveja != null && litrosPorOveja < 1.0 ? '<span class="text-amber"> · bajo</span>' : ''}
               ${litrosPorOveja != null && litrosPorOveja >= 1.5 ? '<span class="text-green"> · óptimo ✓</span>' : ''}
             </div>
           </div>
 
-          <div class="info-box" style="border-left:3px solid ${piensoColor};">
-            <div class="kpi-label flex items-center gap-4">${Icons.pac()} Eficiencia Pienso</div>
+          <div class="info-box" style="border-left:3px solid ${piensoColor}; flex:0 0 140px; min-width:0;">
+            <div class="kpi-label flex items-center gap-4">${Icons.pac()} Ef. Pienso</div>
             <div class="text-2xl font-black" style="color:${piensoColor};">
-              ${eficienciaPienso != null ? eficienciaPienso.toLocaleString() + ' g/L' : '—'}
+              ${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}
             </div>
             <div class="kpi-sub">
-              ${eficienciaPienso != null ? (eficienciaPienso <= 600 ? 'Excelente ✓' : eficienciaPienso <= 900 ? 'Revisar ⚠️' : 'Alto 🔴') : 'Sin datos de alimentación'}
+              ${eficienciaPienso != null ? 'g/L · ' + (eficienciaPienso <= 600 ? 'Excelente ✓' : eficienciaPienso <= 900 ? 'Revisar' : 'Alto') : 'Sin datos pienso'}
             </div>
           </div>
 
-          <div class="info-box" style="border-left:3px solid ${bajasColor};">
-            <div class="kpi-label flex items-center gap-4">${Icons.sanidad()} % Bajas/Mamitis</div>
+          <div class="info-box" style="border-left:3px solid ${bajasColor}; flex:0 0 140px; min-width:0;">
+            <div class="kpi-label flex items-center gap-4">${Icons.sanidad()} % Bajas</div>
             <div class="text-2xl font-black" style="color:${bajasColor};">
               ${pctBajas != null ? pctBajas + '%' : '—'}
             </div>
