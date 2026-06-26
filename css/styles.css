@@ -379,7 +379,7 @@ nav.bottom-nav {
     touch-action: manipulation !important;
 }
 
-.btn--fab, .fab, .fab-btn {
+.fab-btn {
     position: fixed !important;
     bottom: calc(85px + var(--safe-bottom)) !important;
     right: 20px !important;
@@ -396,7 +396,7 @@ nav.bottom-nav {
     transition: transform 0.1s !important;
 }
 
-.btn--fab:active, .fab:active, .fab-btn:active {
+.fab-btn:active {
     transform: scale(0.92) !important;
 }
 
@@ -1207,11 +1207,6 @@ label {
     text-align: right;
 }
 
-/* ── Botón flotante (FAB) ── */
-.fab, .btn--fab-primary, .btn--fab--primary {
-    background: linear-gradient(135deg, var(--p-gold-dark), #b45309) !important;
-    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4) !important;
-}
 
 /* ── Sección colapsable ── */
 .section-header {
@@ -2479,7 +2474,7 @@ label {
 
 /* Botón Flotante de Acción (FAB) táctil — variante "añadir" (verde).
    Comparte geometría con .fab; respeta safe-area (Android vertical). */
-.fab-btn, .btn--fab-success, .btn--fab--success {
+.fab-btn {
     background: linear-gradient(135deg, var(--c-success) 0%, #059669 100%) !important;
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
 }
