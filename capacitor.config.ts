@@ -8,7 +8,13 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
   android: {
-    webContentsDebuggingEnabled: true
+    webContentsDebuggingEnabled: true,
+    backgroundColor: '#000000'
+  },
+  plugins: {
+    EdgeToEdge: {
+      backgroundColor: '#000000'
+    }
   }
 };
 
