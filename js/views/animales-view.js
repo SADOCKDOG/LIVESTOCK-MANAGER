@@ -669,8 +669,8 @@ const AnimalesView = {
   },
 
   async _eliminarAnimal(id) {
-    const motivo = prompt("Motivo de anulación (obligatorio):", "rectificacion_censo");
-    if (!motivo || !motivo.trim()) {
+    const motivo = await Confirm.prompt("Motivo de anulación", "Introduce el motivo (obligatorio):", "rectificacion_censo");
+    if (!motivo) {
       App.toastError("Debes indicar un motivo de anulación.");
       return;
     }

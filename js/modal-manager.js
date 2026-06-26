@@ -100,22 +100,26 @@ const Toast = {
         this._processQueue();
     },
 
+    _escapeHtml: function (str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    },
+
     _processQueue: function () {
         if (this._active || this._queue.length === 0) return;
 
         const { msg, type, ms } = this._queue.shift();
         const container = document.getElementById("toast-container") || document.body;
-        
+
         const t = document.createElement("div");
         t.className = "toast" + (type ? " " + type : "");
-        
-        let icon = "";
-        if (type === 'success') icon = "✅ ";
-        else if (type === 'warning') icon = "⚠️ ";
-        else if (type === 'error') icon = "❌ ";
-        else if (type === 'info') icon = "ℹ️ ";
-        
-        t.textContent = icon + msg;
+
+        let iconHtml = "";
+        if (type === 'success') iconHtml = typeof Icons !== 'undefined' ? Icons.check() : '';
+        else if (type === 'warning') iconHtml = typeof Icons !== 'undefined' ? Icons.alerta() : '';
+        else if (type === 'error') iconHtml = typeof Icons !== 'undefined' ? Icons.cerrar() : '';
+        else if (type === 'info') iconHtml = typeof Icons !== 'undefined' ? Icons.info() : '';
+
+        t.innerHTML = (iconHtml ? `<span class="icon icon-sm" style="vertical-align:middle;margin-right:6px;">${iconHtml}</span>` : '') + this._escapeHtml(msg);
         
         // Animación de entrada fluida
         t.style.opacity = '0';
@@ -187,15 +191,15 @@ const Confirm = {
 
         const id = 'confirm-dialog-' + Date.now();
         
-        const icon = danger ? '⚠️' : '❓';
+        const iconHtml = typeof Icons !== 'undefined' ? (danger ? Icons.alerta() : Icons.info()) : (danger ? '⚠️' : 'ℹ️');
         const titleColor = danger ? 'var(--c-danger)' : 'var(--p-gold)';
-        const btnPrimaryStyle = danger 
-            ? 'background: linear-gradient(135deg, var(--c-danger), #991b1b);' 
+        const btnPrimaryStyle = danger
+            ? 'background: linear-gradient(135deg, var(--c-danger), #991b1b);'
             : 'background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000;';
 
         const contentHtml = `
             <div class="error-dialog" style="border-color: ${danger ? 'var(--c-danger)' : 'var(--p-gold)'}; margin: 16px; box-sizing: border-box;">
-                <div class="error-dialog-icon">${icon}</div>
+                <div class="error-dialog-icon" style="color:${danger ? 'var(--c-danger)' : 'var(--p-gold)'};">${iconHtml}</div>
                 <div class="error-dialog-title" style="color: ${titleColor};">${title}</div>
                 <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
                 <div class="error-dialog-actions">
@@ -262,14 +266,66 @@ const Confirm = {
     },
 
     /**
+     * Helper Promise-based para inputs de texto (reemplaza prompt() nativo).
+     * Devuelve string con el valor introducido, o null si cancela.
+     */
+    prompt: function (title, msg, defaultValue = '', placeholder = '') {
+        return new Promise((resolve) => {
+            const id = 'prompt-dialog-' + Date.now();
+            const inputId = id + '-input';
+            const contentHtml = `
+                <div class="error-dialog" style="border-color: var(--p-gold); margin: 16px; box-sizing: border-box;">
+                    <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
+                    <div class="error-dialog-msg" style="color: var(--text-p, #fff); font-size: 0.95rem; margin-bottom: 16px;">${msg}</div>
+                    <input id="${inputId}" type="text" value="${defaultValue.replace(/"/g, '&quot;')}" placeholder="${placeholder}"
+                           class="wizard-input" style="margin-bottom:20px; width:100%; box-sizing:border-box;">
+                    <div class="error-dialog-actions">
+                        <button class="error-dialog-btn secondary" id="${id}-cancel">Cancelar</button>
+                        <button class="error-dialog-btn primary" id="${id}-ok" style="background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000;">Aceptar</button>
+                    </div>
+                </div>
+            `;
+            const overlay = ModalManager.show(id, contentHtml, { closeOnOverlayClick: false });
+            if (overlay) {
+                overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+                overlay.style.backdropFilter = 'blur(6px)';
+                overlay.style.webkitBackdropFilter = 'blur(6px)';
+            }
+
+            const input = document.getElementById(inputId);
+            if (input) { input.focus(); input.select(); }
+
+            let resolved = false;
+            const cleanUp = () => { if (resolved) return; resolved = true; ModalManager.close(id); };
+
+            const handleOk = () => {
+                const value = document.getElementById(inputId)?.value ?? '';
+                cleanUp();
+                resolve(value.trim() || null);
+            };
+            const handleCancel = () => { cleanUp(); resolve(null); };
+
+            document.getElementById(`${id}-ok`)?.addEventListener('click', handleOk);
+            document.getElementById(`${id}-cancel`)?.addEventListener('click', handleCancel);
+            if (input) {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') handleOk();
+                    else if (e.key === 'Escape') handleCancel();
+                });
+            }
+        });
+    },
+
+    /**
      * Helper Promise-based para alertas personalizadas sin usar alert() nativo
      */
     alert: function (title, msg) {
         return new Promise((resolve) => {
             const id = 'alert-dialog-' + Date.now();
+            const alertIconHtml = typeof Icons !== 'undefined' ? Icons.info() : 'ℹ️';
             const contentHtml = `
                 <div class="error-dialog" style="border-color: var(--p-gold); margin: 16px; box-sizing: border-box;">
-                    <div class="error-dialog-icon">ℹ️</div>
+                    <div class="error-dialog-icon" style="color:var(--p-gold);">${alertIconHtml}</div>
                     <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
                     <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
                     <div class="error-dialog-actions" style="justify-content: center;">

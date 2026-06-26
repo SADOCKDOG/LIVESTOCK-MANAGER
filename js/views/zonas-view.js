@@ -266,8 +266,8 @@ const ZonasView = {
   },
 
   async _eliminarZona(index) {
-    const motivo = prompt("Motivo de anulación (obligatorio):", "rectificacion_zonas");
-    if (!motivo || !motivo.trim()) {
+    const motivo = await Confirm.prompt("Motivo de anulación", "Introduce el motivo (obligatorio):", "rectificacion_zonas");
+    if (!motivo) {
       App.toastError("Debes indicar un motivo de anulación.");
       return;
     }

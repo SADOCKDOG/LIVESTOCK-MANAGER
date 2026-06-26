@@ -560,7 +560,7 @@ const AjustesView = {
     if (!finca) return;
     
     const zonas = finca.zonas || [];
-    const nombreZona = prompt('Nombre de la nueva zona:');
+    const nombreZona = await Confirm.prompt('Nueva Zona', 'Nombre de la nueva zona:', '', 'Ej: Parcela Norte...');
     if (!nombreZona) return;
 
     zonas.push({
