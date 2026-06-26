@@ -2373,3 +2373,30 @@ label {
 .border-272 { border:1px solid #27272a; }
 .silo-bar   { background:#111; border-radius:4px; height:8px; width:100%; overflow:hidden; }
 
+/* ===== INFORMES UI COMPONENTS (Fase 4) ===== */
+.scroll-tabs-row {
+    margin-left: -12px; margin-right: -12px;
+    padding: 0 12px;
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+}
+.informes-categories,
+.informes-tabs { display: inline-flex; gap: 6px; }
+
+.inf-actions-bar {
+    display: inline-flex; gap: 6px; align-items: center;
+    background: rgba(194,65,12,0.05);
+    border: 1px solid rgba(194,65,12,0.15);
+    border-radius: 14px; padding: 8px 16px;
+}
+.inf-actions-bar .btn { padding: 4px 10px !important; font-size: 0.7rem !important; }
+.inf-sep           { width:1px; height:18px; display:inline-block; }
+.inf-sep-pdf       { background: rgba(194,65,12,0.2); }
+.inf-sep-xls       { background: rgba(16,185,129,0.2); }
+
+.card-tint-amber  { background: rgba(251,191,36,0.05)  !important; }
+.card-tint-green  { background: rgba(16,185,129,0.05)  !important; }
+.card-tint-blue   { background: rgba(59,130,246,0.08)  !important; }
+.card-tint-orange { background: rgba(245,158,11,0.08)  !important; }
+

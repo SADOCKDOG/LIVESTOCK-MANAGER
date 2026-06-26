@@ -104,8 +104,8 @@ const InformesView = {
 
     // 1. Renderizar Nivel 1: Categorías
     let catsHtml = `
-      <div class="scroll-shadow-container" style="margin:0 -12px 6px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-        <div class="informes-categories" style="display:inline-flex; gap:6px; padding:4px 0;">
+      <div class="scroll-shadow-container scroll-tabs-row mb-6">
+        <div class="informes-categories py-4">
     `;
     for (const [catKey, cat] of Object.entries(this._categories)) {
       const activeClass = catKey === activeCatKey ? 'active' : '';
@@ -123,8 +123,8 @@ const InformesView = {
     // 2. Renderizar Nivel 2: Sub-tabs de la categoría activa
     const activeCat = this._categories[activeCatKey];
     let subTabsHtml = `
-      <div class="scroll-shadow-container" style="margin:0 -12px 12px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-        <div class="informes-tabs" style="display:inline-flex; gap:6px; padding:2px 0;">
+      <div class="scroll-shadow-container scroll-tabs-row mb-12">
+        <div class="informes-tabs py-2">
     `;
     for (const [tabKey, tabLabel] of Object.entries(activeCat.tabs)) {
       const activeClass = tabKey === this._currentTab ? 'active' : '';
@@ -337,13 +337,13 @@ const InformesView = {
 
   /** Genera barra de acciones PDF+Excel centrada con marco */
   _sectionActionsHTML(seccion, label) {
-    return `<div class="mb-12" style="display:flex; justify-content:center;">
-      <div style="display:inline-flex; gap:6px; align-items:center; background:rgba(194,65,12,0.05); border:1px solid rgba(194,65,12,0.15); border-radius:14px; padding:8px 16px;">
-        <button class="btn btn-primary btn-sm btn-pdf" onclick="InformesView._exportPDF()" style="padding:4px 10px; font-size:0.7rem;">📄 Completo</button>
-        <span style="width:1px; height:18px; background:rgba(194,65,12,0.2); display:inline-block;"></span>
-        <button class="btn btn-primary btn-sm btn-pdf-seccion" onclick="InformesView._exportPDFSeccion('${seccion}')" style="padding:4px 10px; font-size:0.7rem;">📄 ${label}</button>
-        <span style="width:1px; height:18px; background:rgba(16,185,129,0.2); display:inline-block;"></span>
-        <button class="btn btn-primary btn-sm btn-excel" onclick="InformesView._exportExcel()" style="padding:4px 10px; font-size:0.7rem;">📊 Excel</button>
+    return `<div class="mb-12 flex justify-center">
+      <div class="inf-actions-bar">
+        <button class="btn btn-primary btn-sm btn-pdf" onclick="InformesView._exportPDF()">📄 Completo</button>
+        <span class="inf-sep inf-sep-pdf"></span>
+        <button class="btn btn-primary btn-sm btn-pdf-seccion" onclick="InformesView._exportPDFSeccion('${seccion}')">📄 ${label}</button>
+        <span class="inf-sep inf-sep-xls"></span>
+        <button class="btn btn-primary btn-sm btn-excel" onclick="InformesView._exportExcel()">📊 Excel</button>
       </div>
     </div>`;
   },
@@ -607,7 +607,7 @@ const InformesView = {
         </div>
 
         ${conLab.length > 0 ? `
-        <div class="card" style="background:rgba(251,191,36,0.05);margin-bottom:14px;padding:12px;">
+        <div class="card mb-14 p-12 card-tint-amber">
           <div class="inf-section-title mb-8">🔬 Calidad de la Leche (${conLab.length} analíticas)</div>
           <div class="grid grid-cols-2 gap-6">
             <div class="info-box-sm" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
@@ -1017,7 +1017,7 @@ const InformesView = {
           </div>
         </div>
         ${topComprador ? `
-        <div class="card" style="background:rgba(59,130,246,0.08);margin-bottom:14px;">
+        <div class="card mb-14 card-tint-blue">
           <div class="flex justify-between items-center px-14 py-10">
             <div><span class="text-gray text-xs">COMPRADOR PRINCIPAL</span><div class="text-white font-800 text-md mt-4">${topComprador.nombre}</div></div>
             <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-amber font-900 text-md">${topComprador.total.toLocaleString()}€</div></div>
@@ -1120,7 +1120,7 @@ const InformesView = {
           </div>
         </div>
         ${topProv ? `
-        <div class="card" style="background:rgba(245,158,11,0.08);margin-bottom:14px;">
+        <div class="card mb-14 card-tint-orange">
           <div class="flex justify-between items-center px-14 py-10">
             <div><span class="text-gray text-xs">PRINCIPAL PROVEEDOR</span><div class="text-white font-800 text-md mt-4">${topProv.nombre}</div></div>
             <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-red font-900 text-md">${topProv.total.toLocaleString()}€</div></div>
@@ -1644,7 +1644,7 @@ const InformesView = {
         <div class="grid grid-cols-3 gap-8 mb-10">
           ${data.kpis.map(k => `
             <div class="info-box-sm" style="border-left:3px solid ${semaforo(k.status)};">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="flex justify-between items-center">
                 <small class="s-lbl">${k.label}</small>
                 <span style="width:10px;height:10px;border-radius:50%;background:${semaforo(k.status)};display:inline-block;"></span>
               </div>
@@ -1835,8 +1835,8 @@ const InformesView = {
           <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS TOTALES</small><div class="inf-val-lg text-green">${data.ingresosTotal.toLocaleString()}€</div></div>
         </div>
         <div class="grid grid-cols-2 gap-10 mb-14">
-          <div class="card" style="background:rgba(16,185,129,0.05);padding:14px;">
-            <div class="inf-card-title mb-6" style="font-size:0.9rem;">🥩 Carne</div>
+          <div class="card p-14 card-tint-green">
+            <div class="inf-card-title mb-6 text-base">🥩 Carne</div>
             <div class="grid grid-cols-2 gap-6">
               <div><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber">${data.precioMedioKg.toFixed(2)}€</div></div>
               <div><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red">${data.costeVarKg.toFixed(2)}€</div></div>
@@ -1844,8 +1844,8 @@ const InformesView = {
               <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadKg}</div></div>
             </div>
           </div>
-          <div class="card" style="background:rgba(251,191,36,0.05);padding:14px;">
-            <div class="inf-card-title mb-6" style="font-size:0.9rem;">🥛 Leche</div>
+          <div class="card p-14 card-tint-amber">
+            <div class="inf-card-title mb-6 text-base">🥛 Leche</div>
             <div class="grid grid-cols-2 gap-6">
               <div><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold">${data.precioMedioLitro.toFixed(3)}€</div></div>
               <div><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red">${data.costeVarLitro.toFixed(3)}€</div></div>
@@ -1869,7 +1869,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('subvenciones', 'PAC') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="flex justify-between items-center mb-14">
-          <div class="inf-card-title" style="margin:0;">🌾 Subvenciones PAC</div>
+          <div class="inf-card-title m-0">🌾 Subvenciones PAC</div>
           <button class="btn btn-primary btn-sm" onclick="InformesView._agregarPAC()" style="background:linear-gradient(135deg,#065f46,#059669);padding:6px 14px;font-size:0.75rem;">➕ Añadir</button>
         </div>
         <div class="grid grid-cols-4 gap-8 mb-14">
