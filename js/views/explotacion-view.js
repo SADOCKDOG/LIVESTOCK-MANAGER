@@ -221,13 +221,14 @@ const ExplotacionView = {
     const style = document.createElement('style');
     style.id = 'explotacion-styles';
     style.textContent = `
-      .explotacion-kpis { display: grid; grid-template-cols: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+      .explotacion-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
       .explotacion-kpi-card {
         background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 12px; padding: 12px 8px; text-align: center;
         border-top: 3px solid var(--theme-color);
+        min-width: 0;
       }
-      .explotacion-kpi-value { font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px; }
-      .explotacion-kpi-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
+      .explotacion-kpi-value { font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .explotacion-kpi-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       
       .premium-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       .premium-table th { background: #18181b; color: #a1a1aa; font-weight: 700; padding: 10px 8px; font-size: 0.68rem; text-transform: uppercase; border-bottom: 2px solid #27272a; }
