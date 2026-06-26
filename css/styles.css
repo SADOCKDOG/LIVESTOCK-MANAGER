@@ -2330,3 +2330,32 @@ label {
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
 }
 
+/* ===== PDF REPORT UTILITY CLASSES (Fase 4) =====
+   Usadas en html generado para exportación PDF (html2pdf + html2canvas).
+   Prefijo .pdf- evita conflictos con el resto del design system. */
+.pdf-tbl   { width:100%; border-collapse:collapse; }
+.pdf-tbl-xs{ font-size:0.65rem; }
+.pdf-tbl-sm{ font-size:0.75rem; }
+.pdf-tbl-md{ font-size:0.8rem; }
+.pdf-sec   { border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px; }
+.pdf-sec4  { border-bottom:1px solid #ddd; padding-bottom:3px; margin-top:15px; }
+.pdf-th    { padding:6px; text-align:left; border-bottom:2px solid; }
+.pdf-th8   { padding:6px 8px; text-align:left; border-bottom:2px solid; }
+.pdf-th-sm { padding:4px 6px; border-bottom:1px solid #ddd; text-align:left; }
+.pdf-kv    { padding:4px 8px; border-bottom:1px solid #eee; }
+.pdf-kv6   { padding:6px 8px; border-bottom:1px solid #eee; }
+.pdf-td    { padding:3px 6px; border-bottom:1px solid #eee; }
+.pdf-td4   { padding:4px 6px; border-bottom:1px solid #eee; }
+.pdf-tot   { padding:6px; }
+.pdf-big   { padding:8px; }
+.pdf-r     { text-align:right; }
+.pdf-c     { text-align:center; }
+.pdf-b     { font-weight:bold; }
+.pdf-base  { font-size:0.9rem; }
+.pdf-red   { color:#cc0000; }
+.pdf-grn   { color:#10b981; }
+.pdf-muted { color:#888; }
+.pdf-bg0   { background:#f0f0f0; }
+.pdf-bg1   { background:#f5f5f5; }
+.pdf-bg2   { background:#f9f9f9; }
+
