@@ -38,6 +38,21 @@ const GanaderiaView = {
     const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: '🥩', label: 'Cárnico', color: '#ef4444' };
 
     main.innerHTML = `
+      <div class="grid grid-cols-3 gap-10 mb-14 mt-4">
+        <a href="#/animales" class="widget-link-btn" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; gap: 4px; border-left: 3px solid #ef4444; border-right: 3px solid #ef4444; border-radius: 8px;">
+          ${Icons.animales()}
+          <span style="font-size: 0.85rem; font-weight: 600;">Animales</span>
+        </a>
+        <a href="#/rebanos" class="widget-link-btn" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; gap: 4px; border-left: 3px solid #3b82f6; border-right: 3px solid #3b82f6; border-radius: 8px;">
+          ${Icons.rebanos()}
+          <span style="font-size: 0.85rem; font-weight: 600;">Rebaños</span>
+        </a>
+        <a href="#/zonas" class="widget-link-btn" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; gap: 4px; border-left: 3px solid #10b981; border-right: 3px solid #10b981; border-radius: 8px;">
+          ${Icons.zonas()}
+          <span style="font-size: 0.85rem; font-weight: 600;">Zonas</span>
+        </a>
+      </div>
+
       <div class="mb-14 text-center">
         <div class="ganaderia-mode-switch">
           <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
@@ -67,11 +82,7 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-10 mb-14">
-        <a href="#/animales" class="widget-link-btn">${Icons.animales()} Animales</a>
-        <a href="#/rebanos" class="widget-link-btn">${Icons.rebanos()} Rebaños</a>
-        <a href="#/zonas" class="widget-link-btn">${Icons.zonas()} Zonas</a>
-      </div>
+
 
       <div class="card p-14 mb-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
