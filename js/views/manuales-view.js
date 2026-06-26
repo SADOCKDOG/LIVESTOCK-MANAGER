@@ -135,10 +135,10 @@ const ManualesView = {
           <h2 class="page-title">${Icons.libro()} Manuales</h2>
           <p class="page-subtitle">Guías de usuario y ejemplos prácticos</p>
         </div>
-        <div id="manuales-list" style="display:flex; flex-direction:column; gap:14px; padding:0 0 20px;">
+        <div id="manuales-list" class="flex flex-col gap-14 pb-20">
           ${this._renderLista()}
         </div>
-        <div class="text-center text-gray text-xs" style="margin-top:20px; padding-bottom:30px;">
+        <div class="text-center text-gray text-xs mt-20" style="padding-bottom:30px;">
           Pulsa sobre un manual para leerlo.<br>
           Usa el botón PDF para generar una copia imprimible.
         </div>
@@ -149,9 +149,9 @@ const ManualesView = {
     return this._MANUALES.map(m => `
       <div class="card manual-card" style="border-left:4px solid ${m.color}; padding:16px; cursor:pointer;"
            onclick="ManualesView._abrirManual('${m.archivo}')">
-        <div style="display:flex; align-items:center; gap:14px;">
-          <span style="font-size:2rem; flex-shrink:0;">${m.icono}</span>
-          <div style="flex:1; min-width:0;">
+        <div class="flex items-center gap-14">
+          <span class="flex-shrink-0" style="font-size:2rem;">${m.icono}</span>
+          <div class="flex-1" style="min-width:0;">
             <div style="font-weight:800; font-size:0.95rem; color:#fff; margin-bottom:4px;">${m.titulo}</div>
             <div style="font-size:0.78rem; color:#999; line-height:1.3;">${m.descripcion}</div>
           </div>
