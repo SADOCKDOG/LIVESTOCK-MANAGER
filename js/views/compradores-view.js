@@ -16,7 +16,7 @@ const CompradoresView = {
                 <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}" data-tab="${t}"
                   onclick="CompradoresView._cambiarFiltro('${t}')"
                   style="text-transform:uppercase; letter-spacing:0.3px;">
-                  ${t === 'todos' ? '📋 Todos' : t === 'cárnico' ? '🥩 Cárnico' : t === 'láctico' ? '🥛 Láctico' : '🔄 Híbrido'}
+                  ${t === 'todos' ? `${Icons.documento()} Todos` : t === 'cárnico' ? `${Icons.carne()} Cárnico` : t === 'láctico' ? `${Icons.leche()} Láctico` : `${Icons.rotacion()} Híbrido`}
                 </button>
               `).join('')}
             </div>
@@ -24,11 +24,11 @@ const CompradoresView = {
               <input type="search" id="search-compradores" placeholder="🔍 Buscar por nombre, NIF o ciudad..."
                 oninput="CompradoresView._filtrar(this.value)"
                 class="search-input">
-              <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">➕ Nuevo</button>
+              <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Nuevo</button>
             </div>
           </div>
           <div id="compr-lista"><div class="loader">Cargando compradores...</div></div>
-          <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">➕</button>`;
+          <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">${Icons.agregar()}</button>`;
 
         await this._cargarDatos();
     },
@@ -86,9 +86,9 @@ const CompradoresView = {
         if (lista.length === 0) {
             contenedor.innerHTML = `
               <div class="empty-state">
-                <div class="empty-state-icon">🏢</div>
+                <div class="empty-state-icon">${Icons.edificio()}</div>
                 <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
-                <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">➕ Registrar primer comprador</button>
+                <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Registrar primer comprador</button>
               </div>`;
             return;
         }
@@ -160,8 +160,8 @@ const CompradoresView = {
                 </div>
               </div>
               <div class="flex gap-6">
-                <button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
-                <button onclick="CompradoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">✏️ Editar</button>
+                <button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger btn-sm">${Icons.eliminar()} Eliminar</button>
+                <button onclick="CompradoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">${Icons.editar()} Editar</button>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
@@ -195,8 +195,8 @@ const CompradoresView = {
           <!-- Contratos activos -->
           <div class="card p-16">
             <h3 class="section-h3 flex justify-between items-center">
-              <span>📄 Contratos</span>
-              <button onclick="CompradoresView._nuevoContrato(${id})" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">➕ Añadir</button>
+              <span>${Icons.contratos()} Contratos</span>
+              <button onclick="CompradoresView._nuevoContrato(${id})" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">${Icons.agregar()} Añadir</button>
             </h3>
             ${contratos.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin contratos registrados.</p></div>' :
               contratos.map(c => `
@@ -215,12 +215,12 @@ const CompradoresView = {
 
           <!-- Historial de Ventas Carne -->
           <div class="card p-16">
-            <h3 class="section-h3">🥩 Historial de Ventas (Carne)</h3>
+            <h3 class="section-h3">${Icons.carne()} Historial de Ventas (Carne)</h3>
             ${ventasCarne.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin ventas registradas.</p></div>' :
               ventasCarne.slice(0, 30).map(v => `
                 <div class="history-row">
                   <div>
-                    <div class="history-title">📅 ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
+                    <div class="history-title">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
                     <div class="history-sub">${v.pesoCanal || 0} kg · Rend: ${v.rendimientoCanal || 0}%</div>
                   </div>
                   <div class="text-right">
@@ -234,12 +234,12 @@ const CompradoresView = {
 
           <!-- Historial de Leche -->
           <div class="card p-16">
-            <h3 class="section-h3">🥛 Historial de Entregas (Leche)</h3>
+            <h3 class="section-h3">${Icons.leche()} Historial de Entregas (Leche)</h3>
             ${entregasLeche.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin entregas registradas.</p></div>' :
               entregasLeche.slice(0, 20).map(e => `
                 <div class="history-row">
                   <div>
-                    <div class="history-title">📅 ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
+                    <div class="history-title">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
                     <div class="history-sub">${e.matriculaCisterna || 'S/N'}</div>
                   </div>
                   <div class="text-right">
@@ -253,7 +253,7 @@ const CompradoresView = {
 
           ${comprador.notas ? `
           <div class="card p-16">
-            <h3 class="section-h3">📝 Notas</h3>
+            <h3 class="section-h3">${Icons.documento()} Notas</h3>
             <p class="text-sm text-aaa m-0">${comprador.notas}</p>
           </div>` : ''}
         `;
@@ -277,7 +277,7 @@ const CompradoresView = {
             <a href="${esEdicion ? '#/comprador?id='+id : '#/compradores'}" class="link-back">← Volver</a>
           </div>
           <div class="card p-20 border-top-3px border-top-3px-gold">
-            <h2 class="text-amber mt-0 mb-16" style="font-size:1.1rem;">${esEdicion ? '✏️ Editar Comprador' : '➕ Nuevo Comprador'}</h2>
+            <h2 class="text-amber mt-0 mb-16" style="font-size:1.1rem;">${esEdicion ? `${Icons.editar()} Editar Comprador` : `${Icons.agregar()} Nuevo Comprador`}</h2>
 
             <label class="form-label">NOMBRE / RAZÓN SOCIAL *</label>
             <input type="text" id="c-nombre" value="${c.nombre}" class="premium-input mb-12" placeholder="Ej: Ganaderías del Sur S.L.">
@@ -362,10 +362,10 @@ const CompradoresView = {
             </label>
 
             <div class="flex justify-between items-center mt-20">
-              ${esEdicion ? `<button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger">🗑️ Eliminar</button>` : '<div></div>'}
+              ${esEdicion ? `<button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
               <div class="flex gap-10">
-                <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="btn btn-secondary">✕ Cancelar</button>
-                <button onclick="CompradoresView._guardar(${id || ''})" class="btn btn-success">✔ Guardar</button>
+                <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="btn btn-secondary">${Icons.cerrar()} Cancelar</button>
+                <button onclick="CompradoresView._guardar(${id || ''})" class="btn btn-success">${Icons.guardar()} Guardar</button>
               </div>
             </div>
           </div>

@@ -140,15 +140,15 @@ const CuadernoDigitalView = {
     <div style="max-width:900px; margin:0 auto;">
       <!-- KPIs -->
       <div class="grid grid-cols-4 gap-6 mb-14">
-        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">🐑 CENSO</small><div class="inf-val-lg text-green">${d.totalActivos}</div></div>
-        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">🧬 REPROD.</small><div class="inf-val-lg text-blue">${d.partos} partos</div></div>
-        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">💉 SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} activos</div></div>
-        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">🚚 VENTAS</small><div class="inf-val-lg text-amber">${d.ventasCarne.length + d.ventasLeche.length}</div></div>
+        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">${Icons.rebanos()} CENSO</small><div class="inf-val-lg text-green">${d.totalActivos}</div></div>
+        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">${Icons.reproduccion()} REPROD.</small><div class="inf-val-lg text-blue">${d.partos} partos</div></div>
+        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">${Icons.sanidad()} SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} activos</div></div>
+        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">${Icons.comercial()} VENTAS</small><div class="inf-val-lg text-amber">${d.ventasCarne.length + d.ventasLeche.length}</div></div>
       </div>
 
       <!-- Navegación rápida -->
       <div class="flex flex-wrap gap-4 mb-14" style="overflow-x:auto;white-space:nowrap;">
-        ${[['seccion-censo','🐑 Censo'],['seccion-movimientos','🔄 Movimientos'],['seccion-sanidad','💉 Sanidad'],['seccion-repro','🧬 Repro'],['seccion-produccion','📊 Producción'],['seccion-economico','💰 Económico']].map(([id, label]) => {
+        ${[['seccion-censo',`${Icons.rebanos()} Censo`],['seccion-movimientos',`${Icons.rotacion()} Movimientos`],['seccion-sanidad',`${Icons.sanidad()} Sanidad`],['seccion-repro',`${Icons.reproduccion()} Repro`],['seccion-produccion',`${Icons.grafico()} Producción`],['seccion-economico',`${Icons.dinero()} Económico`]].map(([id, label]) => {
           return `<a href="#${id}" class="btn btn-secondary btn-xs" style="padding:4px 10px;font-size:0.7rem;border-radius:10px;text-decoration:none;" onclick="document.getElementById('${id}')?.scrollIntoView({behavior:'smooth'});return false;">${label}</a>`;
         }).join('')}
       </div>
@@ -157,15 +157,15 @@ const CuadernoDigitalView = {
       <div class="text-center mb-25">
         <div class="text-gold text-82">RD 787/2023 — Explotación Ganadera</div>
         <div class="mt-8 flex justify-center gap-10 flex-wrap">
-          <button class="btn btn-primary" onclick="CuadernoDigitalView._exportarPDF()">📄 Exportar PDF Completo</button>
-          <button class="btn btn-secondary" onclick="CuadernoDigitalView._exportarCSV()">📊 Exportar CSV (SIGGAN)</button>
-          <button class="btn btn-secondary" onclick="CuadernoDigitalView._imprimir()">🖨 Imprimir</button>
+          <button class="btn btn-primary" onclick="CuadernoDigitalView._exportarPDF()">${Icons.exportar()} Exportar PDF Completo</button>
+          <button class="btn btn-secondary" onclick="CuadernoDigitalView._exportarCSV()">${Icons.grafico()} Exportar CSV (SIGGAN)</button>
+          <button class="btn btn-secondary" onclick="CuadernoDigitalView._imprimir()">${Icons.documento()} Imprimir</button>
         </div>
       </div>
 
       <!-- 1. EXPLOTACIÓN -->
       <div class="card card-left-amber">
-        <h3 class="section-h3 text-gold">1. 🏠 Datos de la Explotación</h3>
+        <h3 class="section-h3 text-gold">1. ${Icons.home()} Datos de la Explotación</h3>
         <div class="grid grid-cols-2 gap-6 text-85">
           <div><span class="text-gray">Nombre:</span> <strong class="text-white">${f.nombre || '—'}</strong></div>
           <div><span class="text-gray">Código REGA:</span> <strong class="text-white">${f.codigo_REGA || f.rega || '—'}</strong></div>
@@ -186,7 +186,7 @@ const CuadernoDigitalView = {
 
       <!-- 2. CENSO -->
       <div class="card card-left-blue">
-        <h3 class="section-h3 text-blue-400" id="seccion-censo">2. 🐑 Censo Actual <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
+        <h3 class="section-h3 text-blue-400" id="seccion-censo">2. ${Icons.rebanos()} Censo Actual <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
         <div class="text-3xl font-black text-white mb-10">${d.totalActivos} animales activos</div>
         ${Object.entries(d.censo).length === 0 ? '<p class="empty-state-text mb-0">Sin animales registrados.</p>' : ''}
         ${Object.entries(d.censo).map(([especie, info]) => `
@@ -209,7 +209,7 @@ const CuadernoDigitalView = {
 
       <!-- 3.b ENTRADAS / SALIDAS / NACIMIENTOS / MUERTES (SIGGAN) -->
       <div class="card card-left-purple">
-        <h3 class="section-h3 text-purple-400" id="seccion-siggan-movs">3.b 📋 Libro de Registro SIGGAN (${d.year})</h3>
+        <h3 class="section-h3 text-purple-400" id="seccion-siggan-movs">3.b ${Icons.documento()} Libro de Registro SIGGAN (${d.year})</h3>
         <div class="grid grid-cols-4 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
             <div class="text-green font-black text-2xl">${d.entradas.length}</div>
@@ -242,7 +242,7 @@ const CuadernoDigitalView = {
 
       <!-- 3. MOVIMIENTOS -->
       <div class="card card-left-purple">
-        <h3 class="section-h3 text-purple-400" id="seccion-movimientos">3. 🔄 Movimientos y Eventos</h3>
+        <h3 class="section-h3 text-purple-400" id="seccion-movimientos">3. ${Icons.rotacion()} Movimientos y Eventos</h3>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
             <div class="text-green font-black text-2xl">${d.eventos.length}</div>
@@ -270,7 +270,7 @@ const CuadernoDigitalView = {
 
       <!-- 4. SANIDAD -->
       <div class="card card-left-red">
-        <h3 class="section-h3 text-red" id="seccion-sanidad">4. 💉 Registro Sanitario</h3>
+        <h3 class="section-h3 text-red" id="seccion-sanidad">4. ${Icons.sanidad()} Registro Sanitario</h3>
         <div class="grid grid-cols-2 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
             <div class="text-white font-black text-2xl">${d.sanitarios.length}</div>
@@ -301,7 +301,7 @@ const CuadernoDigitalView = {
 
       <!-- 4.b SANEAMIENTOS / CAMPAÑAS OFICIALES (SIGGAN) -->
       <div class="card card-left-red">
-        <h3 class="section-h3 text-red" id="seccion-saneamientos">4.b 🩺 Campañas de Saneamiento (ADSG)</h3>
+        <h3 class="section-h3 text-red" id="seccion-saneamientos">4.b ${Icons.veterinario()} Campañas de Saneamiento (ADSG)</h3>
         <div class="text-sm" style="max-height:200px; overflow-y:auto;">
           ${d.saneamientos.slice(0, 20).map(s =>
             `<div style="padding:4px 0; border-bottom:1px solid #1a1a1a;">
@@ -316,7 +316,7 @@ const CuadernoDigitalView = {
 
       <!-- 5. REPRODUCCIÓN -->
       <div class="card card-left-pink">
-        <h3 class="section-h3 text-pink" id="seccion-repro">5. 🔬 Registro Reproductivo</h3>
+        <h3 class="section-h3 text-pink" id="seccion-repro">5. ${Icons.reproduccion()} Registro Reproductivo</h3>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
             <div class="text-violet font-black text-2xl">${d.cubriciones}</div>
@@ -344,17 +344,17 @@ const CuadernoDigitalView = {
 
       <!-- 6. PRODUCCIÓN -->
       <div class="card card-left-green">
-        <h3 class="section-h3 text-green" id="seccion-produccion">6. 📦 Producción</h3>
+        <h3 class="section-h3 text-green" id="seccion-produccion">6. ${Icons.paquete()} Producción</h3>
         <div class="grid grid-cols-2 gap-10">
           <div class="rounded-sm p-12 bg-dark">
-            <h4 class="text-gold mb-8 text-85 m-0">🥛 Leche</h4>
+            <h4 class="text-gold mb-8 text-85 m-0">${Icons.leche()} Leche</h4>
             ${d.ventasLeche.length > 0 ? `
               <div class="text-white font-black text-lg">${d.ventasLeche.reduce((s, v) => s + (v.litros || v.cantidad || 0), 0).toFixed(0)} L</div>
               <div class="text-gray text-2xs">${d.ventasLeche.length} entregas</div>
             ` : '<div class="empty-state mb-0"><p class="empty-state-text">Sin datos de producción láctea.</p></div>'}
           </div>
           <div class="rounded-sm p-12 bg-dark">
-            <h4 class="text-gold mb-8 text-85 m-0">🥩 Carne</h4>
+            <h4 class="text-gold mb-8 text-85 m-0">${Icons.carne()} Carne</h4>
             ${d.ventasCarne.length > 0 ? `
               <div class="text-white font-black text-lg">${d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0).toFixed(0)} kg</div>
               <div class="text-gray text-2xs">${d.ventasCarne.length} expediciones</div>
@@ -365,7 +365,7 @@ const CuadernoDigitalView = {
 
       <!-- 7. RESUMEN ECONÓMICO -->
       <div class="card card-left-amber">
-        <h3 class="section-h3 text-gold" id="seccion-economico">7. 💰 Resumen Económico</h3>
+        <h3 class="section-h3 text-gold" id="seccion-economico">7. ${Icons.dinero()} Resumen Económico</h3>
         <div class="grid grid-cols-2 gap-10">
           <div class="rounded-sm p-12 bg-dark">
             <div class="text-gray text-2xs">Ingresos Carne</div>
@@ -384,7 +384,7 @@ const CuadernoDigitalView = {
 
       <!-- 8. TRANSPORTISTAS -->
       <div class="card card-left-blue">
-        <h3 class="section-h3 text-blue-400">8. 🚛 Transportistas</h3>
+        <h3 class="section-h3 text-blue-400">8. ${Icons.transportistas()} Transportistas</h3>
         ${d.transportistas.length > 0 ? d.transportistas.map(t => `
         <div class="flex justify-between rounded-sm mb-6 bg-dark text-82 px-12 py-8">
           <span class="text-white">${t.nombre} (${t.nif_cif || t.nif || '—'})</span>
@@ -611,7 +611,7 @@ const CuadernoDigitalView = {
         <span style="font-weight:bold; font-size:14px; color:#333;">📋 Vista de Impresión — Cuaderno Digital</span>
         <div style="display:flex; gap:10px;">
           <button id="cuaderno-btn-print" style="padding:10px 24px; font-size:14px; cursor:pointer; background:#d97706; color:#fff; border:none; border-radius:6px; font-weight:bold;">📄 Compartir / Imprimir PDF</button>
-          <button id="cuaderno-btn-cerrar" style="padding:10px 20px; font-size:14px; cursor:pointer; background:#666; color:#fff; border:none; border-radius:6px;">✕ Cerrar</button>
+          <button id="cuaderno-btn-cerrar" style="padding:10px 20px; font-size:14px; cursor:pointer; background:#666; color:#fff; border:none; border-radius:6px;">${Icons.cerrar()} Cerrar</button>
         </div>
       </div>
       <div id="cuaderno-print-content" style="flex:1; padding:20px; font-family:'Courier New',monospace; color:#000; font-size:10px; line-height:1.4;"></div>
