@@ -27,13 +27,6 @@
     --c-warning: #f59e0b;
     --c-danger:  #ef4444;
     --c-info:    #3b82f6;
-    --c-accent:  #8b5cf6;     /* Reproducción / violeta */
-
-    /* Alias legacy (mapeados a la semántica) */
-    --color-metric-primary: var(--c-success);
-    --color-metric-warning: var(--c-warning);
-    --color-metric-danger:  var(--c-danger);
-    --color-metric-info:    var(--c-info);
 
     /* ── TIPOGRAFÍA (escala semántica única) ── */
     --fs-display: 1.6rem;     /* KPI grande / cifra destacada */
@@ -1863,11 +1856,6 @@ label {
     background: linear-gradient(135deg, #8b5cf6, #6d28d9);
     color: white;
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-}
-.wizard-btn-trazabilidad {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    color: #10b981;
 }
 
 /* ============================================
