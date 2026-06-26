@@ -32,7 +32,7 @@ window.GastoWizard = {
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">MONTO TOTAL (€)</label>
-              <input type="number" id="w-g-mon" value="${data.monto}" step="0.01" class="wizard-input" style="border-color: #3b82f6;">
+              <input type="number" id="w-g-mon" value="${data.monto}" step="0.01" class="wizard-input">
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">CATEGORÍA CONTABLE</label>
@@ -45,10 +45,10 @@ window.GastoWizard = {
                   <option value="Amortizacion" ${data.categoria === 'Amortizacion' ? 'selected' : ''}>🚜 Amortización</option>
               </select>
             </div>
-            <div id="w-g-imputacion-area" style="background: #18181b; padding: 20px; border-radius: 16px; border: 2px solid #27272a;">
+            <div id="w-g-imputacion-area" class="wizard-panel-dark">
                 <!-- Dinámico -->
             </div>
-            <div id="w-g-cumplimiento-area" style="background: #111827; padding: 14px; border-radius: 12px; border: 1px solid #1f2937; margin-top: 10px; display:none;">
+            <div id="w-g-cumplimiento-area" class="wizard-panel-darker" style="display:none;">
               <div class="wizard-label text-blue mb-8">CONTROL NORMATIVO FITOSANITARIO</div>
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">

@@ -45,7 +45,7 @@ window.WizardTratamiento = {
           <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">MEDICAMENTO</label>
-              <select id="w-san-med" class="wizard-input wizard-select" style="border-color: #10b981;">
+              <select id="w-san-med" class="wizard-input wizard-select">
                 ${optionsHtml}
               </select>
             </div>
@@ -63,7 +63,7 @@ window.WizardTratamiento = {
                 <input type="number" id="w-san-leche" class="wizard-input" value="${data.tiempo_espera_leche_dias || 0}">
               </div>
             </div>
-            <div id="w-san-alerta-leche" style="display:none; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 0.8rem; color: #fca5a5;">
+            <div id="w-san-alerta-leche" class="wizard-alert-error" style="display:none;">
                 ⚠️ <strong>PROHIBIDO EN LACTACIÓN:</strong> Este medicamento no debe usarse en animales cuya leche se destine a consumo humano.
             </div>
             <div class="wizard-input-group">
@@ -71,11 +71,11 @@ window.WizardTratamiento = {
               <input type="date" id="w-san-fecha" class="wizard-input" value="${data.fecha}">
             </div>
 
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
-                <button type="button" id="btn-toggle-calc" class="text-blue font-bold flex items-center gap-5 p-0" style="background:transparent; border:none; cursor:pointer;">
+            <div class="wizard-section-sep">
+                <button type="button" id="btn-toggle-calc" class="btn-ghost text-blue font-bold flex items-center gap-5 p-0">
                     <span>🧮</span> Abrir Calculadora de Dosis
                 </button>
-                <div id="calc-dosis-container" class="rounded-md bg-darker" style="display:none; margin-top:15px; padding:15px; border:1px solid #27272a;">
+                <div id="calc-dosis-container" class="rounded-md bg-darker wizard-calc-panel" style="display:none;">
                     <div class="grid grid-cols-2 gap-10">
                         <div class="wizard-input-group">
                             <label class="wizard-label">PESO ANIMAL (KG)</label>
@@ -90,8 +90,8 @@ window.WizardTratamiento = {
                         <label class="wizard-label">CONCENTRACIÓN FRASCO (MG/ML)</label>
                         <input type="number" id="calc-conc" class="wizard-input" placeholder="Ej: 200">
                     </div>
-                    <button type="button" id="btn-calcular" class="wizard-btn-action w-full" style="background:#27272a; padding:10px; margin-top:5px;">Calcular Volumen</button>
-                    <div id="calc-resultado" style="margin-top:15px; text-align:center; font-size:1.2rem; font-weight:bold; display:none;" class="text-green">
+                    <button type="button" id="btn-calcular" class="wizard-btn-action w-full wizard-calc-btn">Calcular Volumen</button>
+                    <div id="calc-resultado" class="wizard-calc-result text-green" style="display:none;">
                         Inyectar: <span id="calc-vol"></span> ml
                     </div>
                 </div>
@@ -176,7 +176,7 @@ window.WizardTratamiento = {
         // PASO 2: Libro de Tratamientos Veterinarios (SIGGAN)
         content: (data) => `
           <div class="mt-10">
-            <div style="background: rgba(16,185,129,0.08); border-left: 3px solid #10b981; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 0.78rem; color: #a7f3d0;">
+            <div class="wizard-alert-info">
               📒 <strong>LIBRO DE TRATAMIENTOS VETERINARIOS</strong> · Datos exigidos por el RD 1749/1998 y la tramitación SIGGAN.
             </div>
             <div class="wizard-input-group">
@@ -207,7 +207,7 @@ window.WizardTratamiento = {
                 <input type="date" id="w-san-caducidad" class="wizard-input" value="${data.caducidad_medicamento || ''}">
               </div>
             </div>
-            <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid #333;">
+            <div class="wizard-section-sep-sm">
               <label class="wizard-label text-green mb-8">VETERINARIO PRESCRIPTOR</label>
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">
