@@ -54,7 +54,7 @@ const AnimalesView = {
         <div class="flex gap-8 items-center">
           <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
-                 class="search-input" style="flex:1;min-width:0;">
+                 class="search-input flex-1" style="min-width:0;">
           <select id="animales-filtro-especie" class="form-select-gold"
                   onchange="AnimalesView._setFiltro('especie', this.value)"
                   style="width:130px;min-width:120px;">
@@ -312,9 +312,9 @@ const AnimalesView = {
           </div>
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
-          <div class="badge-crotal" style="margin-bottom:12px;">
+          <div class="badge-crotal mb-12">
             <div class="badge-crotal-header flex items-center gap-6">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
-            <div class="grid grid-cols-2 gap-12 mb-12" style="margin-top:10px;">
+            <div class="grid grid-cols-2 gap-12 mb-12 mt-10">
               <div>
                 <label class="form-label">PAÍS DE NACIMIENTO</label>
                 <select id="a-pais-nac" class="form-input form-input-lg">
