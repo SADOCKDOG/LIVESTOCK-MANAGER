@@ -48,7 +48,7 @@ const AjustesView = {
           return `<div class="flex justify-between items-center rounded-sm" style="background:#222; padding:12px; border:1px solid ${f.id === activeId ? "var(--p-cork)" : "#333"};">
           <div>
             <div class="font-bold" style="color:${f.id === activeId ? "var(--p-cork)" : "#fff"};">${f.nombre}</div>
-            <div class="text-gray" style="font-size:0.75rem;">REGA: ${f.codigo_REGA || f.rega || "N/D"} · 🐑 ${anims.length} animales</div>
+            <div class="text-gray text-xs">REGA: ${f.codigo_REGA || f.rega || "N/D"} · 🐑 ${anims.length} animales</div>
           </div>
           <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Activar</button>` : `<span class="badge badge-gold text-xs" style="padding:4px 10px;">Activa</span>`}</div>
         </div>`;
@@ -83,7 +83,7 @@ const AjustesView = {
             <div><span class="text-gray">INFOLAC:</span> <strong class="text-white">${activeFinca.numero_infolac || '—'}</strong></div>
           </div>
         </div>
-        <div class="text-gray-500 mt-8 rounded-sm" style="font-size:0.72rem; padding:8px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.15);">
+        <div class="text-gray-500 mt-8 rounded-sm note-amber">
           📌 El contrato lácteo debe tener una duración mínima de 1 año. Las declaraciones INFOLAC son mensuales y obligatorias.
         </div>` : '<p class="text-555">Activa una finca para ver los datos de contratación láctea.</p>'}
         <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar Contrato Lácteo</button>
@@ -127,7 +127,7 @@ const AjustesView = {
               <div><span class="text-gray">Umbral PAC:</span> <strong class="text-white">${umbral || '—'} UGM/año</strong></div>
               <div><span class="text-gray">Explotación:</span> <strong class="text-white">${activeFinca.tipo_explotacion || '—'} / ${activeFinca.sistema_explotacion || '—'}</strong></div>
             </div>
-            <div class="text-gray-500 mt-8 rounded-sm" style="font-size:0.72rem; padding:6px; background:rgba(139,92,246,0.08);">
+            <div class="text-gray-500 mt-8 rounded-sm note-purple">
               📌 ${ccaa === 'andalucia' ? 'Guías sanitarias automáticas (365d). Plataforma PIMA. Subvención ADSG directa.' : 'Guías requieren confirmación. Plataforma Arado/Laboreo. Control ADSG estricto.'}
             </div>
             <div class="flex gap-6 mt-10">
@@ -143,12 +143,12 @@ const AjustesView = {
         <h3 class="flex items-center gap-8">${Icons.objetivo()} Objetivos de Explotación</h3>
         <p class="text-gray mt-5 text-85">Define las metas productivas para el Panel de Eficiencia Técnica (semáforos 🟢🟡🔴).</p>
         <div class="grid grid-cols-2 gap-6 mt-10">
-          <div><label class="text-xs text-gray">GMD Objetivo (kg/día)</label><input type="number" id="obj-gmd" value="${config.objGmd || 0.8}" step="0.1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
-          <div><label class="text-xs text-gray">Litros/Vaca/Día Objetivo</label><input type="number" id="obj-litros" value="${config.objLitros || 25}" step="1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objLitros', this.value)"></div>
-          <div><label class="text-xs text-gray">Fertilidad Objetivo (%)</label><input type="number" id="obj-fert" value="${config.objFert || 85}" step="1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objFert', this.value)"></div>
-          <div><label class="text-xs text-gray">Ocupación Aforo Objetivo (%)</label><input type="number" id="obj-ocup" value="${config.objOcup || 85}" step="1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objOcup', this.value)"></div>
-          <div><label class="text-xs text-gray">Rentabilidad Objetivo (%)</label><input type="number" id="obj-rent" value="${config.objRent || 20}" step="1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objRent', this.value)"></div>
-          <div><label class="text-xs text-gray">% Bajas Máximo</label><input type="number" id="obj-bajas" value="${config.objBajas || 5}" step="1" class="premium-input" style="height:36px;" onchange="AjustesView._guardarObjetivo('objBajas', this.value)"></div>
+          <div><label class="text-xs text-gray">GMD Objetivo (kg/día)</label><input type="number" id="obj-gmd" value="${config.objGmd || 0.8}" step="0.1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
+          <div><label class="text-xs text-gray">Litros/Vaca/Día Objetivo</label><input type="number" id="obj-litros" value="${config.objLitros || 25}" step="1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objLitros', this.value)"></div>
+          <div><label class="text-xs text-gray">Fertilidad Objetivo (%)</label><input type="number" id="obj-fert" value="${config.objFert || 85}" step="1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objFert', this.value)"></div>
+          <div><label class="text-xs text-gray">Ocupación Aforo Objetivo (%)</label><input type="number" id="obj-ocup" value="${config.objOcup || 85}" step="1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objOcup', this.value)"></div>
+          <div><label class="text-xs text-gray">Rentabilidad Objetivo (%)</label><input type="number" id="obj-rent" value="${config.objRent || 20}" step="1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objRent', this.value)"></div>
+          <div><label class="text-xs text-gray">% Bajas Máximo</label><input type="number" id="obj-bajas" value="${config.objBajas || 5}" step="1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objBajas', this.value)"></div>
         </div>
       </div>
 
@@ -173,7 +173,7 @@ const AjustesView = {
             { id: 'alertINCOLAC', label: 'Alertas INFOLAC (declaraciones mensuales)', def: true },
             { id: 'alertContratos', label: 'Alertas de Contratos (vencimientos)', def: false },
           ].map(a => `
-            <label class="flex items-center gap-8 text-sm text-gray cursor-pointer" style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
+            <label class="flex items-center gap-8 text-sm text-gray cursor-pointer checkbox-row">
               <input type="checkbox" ${config[a.id] !== false ? 'checked' : ''} style="accent-color:#ef4444;" onchange="AjustesView._toggleAlerta('${a.id}', this.checked)"> ${a.label}
             </label>`).join('')}
         </div>
@@ -184,17 +184,17 @@ const AjustesView = {
         <h3 class="flex items-center gap-8">${Icons.ajustes()} Preferencias</h3>
         <p class="text-gray mt-5 text-85">Configura el comportamiento general de la aplicación.</p>
         <div class="grid gap-6 mt-10">
-          <label class="flex items-center gap-8 text-sm text-gray cursor-pointer" style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
+          <label class="flex items-center gap-8 text-sm text-gray cursor-pointer checkbox-row">
             <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> 🌙 Modo Oscuro
           </label>
-          <label class="flex items-center gap-8 text-sm text-gray" style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
+          <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>📅 Formato Fecha:</span>
             <select class="premium-input" style="height:32px;font-size:0.8rem;flex:1;" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
               <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (España)</option>
               <option value="en-US" ${config.formatoFecha === 'en-US' ? 'selected' : ''}>MM/DD/AAAA (EE.UU.)</option>
             </select>
           </label>
-          <label class="flex items-center gap-8 text-sm text-gray" style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
+          <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>💰 Moneda:</span>
             <select class="premium-input" style="height:32px;font-size:0.8rem;flex:1;" onchange="AjustesView._guardarPreferencia('moneda', this.value)">
               <option value="€" ${config.moneda !== '$' ? 'selected' : ''}>Euro (€)</option>
@@ -351,7 +351,7 @@ const AjustesView = {
     const especies = config.especies || [];
     if (!especies.length) return '<div class="text-gray text-sm">Sin especies configuradas. Añade tu primera especie.</div>';
     return especies.map((e, i) => `
-      <div class="flex items-center gap-6 mb-4" style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
+      <div class="flex items-center gap-6 mb-4 checkbox-row">
         <span class="text-white font-bold text-sm flex-1">${e.nombre}</span>
         <span class="text-gray text-xs">${e.consumoAgua || '—'} L/día</span>
         <span class="text-gray text-xs">Precio: ${e.precioRef || '—'}€</span>

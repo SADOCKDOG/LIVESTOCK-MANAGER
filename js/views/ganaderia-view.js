@@ -81,7 +81,7 @@ const GanaderiaView = {
       </div>
 
       <div class="card p-14 mb-14 border-222">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Rebaños del modo ${meta.label}
         </div>
         <div class="grid gap-8">
@@ -103,7 +103,7 @@ const GanaderiaView = {
       </div>
 
       <div class="card p-14 border-222">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Censo reciente (${especies.size} especie(s))
         </div>
         <div class="grid gap-8">

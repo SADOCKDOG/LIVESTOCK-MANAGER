@@ -151,8 +151,8 @@ const CarneView = {
     main.innerHTML = `
       <!-- Tabs -->
       <div class="mb-14">
-        <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          <div class="carne-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
+        <div class="scroll-shadow-container scroll-tabs-row mb-10">
+          <div class="carne-tabs">
             <button class="carne-tab active" data-tab="patrimonio" onclick="CarneView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
             <button class="carne-tab" data-tab="comercializacion" onclick="CarneView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
             <button class="carne-tab" data-tab="legislacion" onclick="CarneView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
@@ -270,10 +270,10 @@ const CarneView = {
       <div class="card report-section p-16 border-top-3px border-top-3px-orange">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${Icons.edificio()}</span>
+            <span class="text-3xl">${Icons.edificio()}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">Patrimonio y Ganadería</div>
-              <div class="text-gray" style="font-size:0.68rem;">Gestión de censo y lotes de carne</div>
+              <div class="text-white font-900 text-lg">Patrimonio y Ganadería</div>
+              <div class="text-gray text-2xs">Gestión de censo y lotes de carne</div>
             </div>
           </div>
         </div>
@@ -287,13 +287,13 @@ const CarneView = {
           <a href="#/zonas" class="widget-link-btn">${Icons.zonas()} Zonas</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Lotes de Carne Activos (${d.rebanosCarne.length})
         </div>
         <div class="grid gap-10">
           ${d.rebanosCarne.length > 0
             ? d.rebanosCarne.map(r => `
-                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid #d97706;">
+                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
@@ -307,7 +307,7 @@ const CarneView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold" style="display:block; margin-bottom:4px;">${r.cantidad_animales || 0} cabezas</span>
+                      <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
                       <span class="text-xs text-777">Ver ficha ➔</span>
                     </div>
                   </div>
@@ -323,13 +323,13 @@ const CarneView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card report-section p-16 border-top-3px" style="border-top-color:#10b981;">
+      <div class="card report-section p-16 border-top-3px border-top-3px-green">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${Icons.transportistas()}</span>
+            <span class="text-3xl">${Icons.transportistas()}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">Logística y Transporte, Comercialización Ventas</div>
-              <div class="text-gray" style="font-size:0.68rem;">Logística, vehículos, compradores, contratos y ventas</div>
+              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
+              <div class="text-gray text-2xs">Logística, vehículos, compradores, contratos y ventas</div>
             </div>
           </div>
           <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
@@ -346,13 +346,13 @@ const CarneView = {
           <a href="#/comercializacion" class="widget-link-btn">${Icons.comercial()} Comercial</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Historial de Facturas/Matadero
         </div>
         <div class="grid gap-10">
           ${d.ventasCarne.length > 0
             ? d.ventasCarne.slice(0, 15).map(v => `
-                <div class="card card-animal" onclick="App._abrirDetalleVentaCarne(${v.id})" style="border-left:4px solid #10b981;">
+                <div class="card card-animal border-4-left-green" onclick="App._abrirDetalleVentaCarne(${v.id})">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
@@ -366,7 +366,7 @@ const CarneView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm text-green font-bold text-lg" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); display:block;">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
+                      <span class="badge badge-sm text-green font-bold text-lg badge-green-outline block">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
                     </div>
                   </div>
                 </div>`).join('')
@@ -397,17 +397,17 @@ const CarneView = {
 
     const html = `
       ${supresionesHtml}
-      <div class="card report-section p-16 border-top-3px" style="border-top-color:#8b5cf6;">
+      <div class="card report-section p-16 border-top-3px border-top-3px-purple">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${Icons.documento()}</span>
+            <span class="text-3xl">${Icons.documento()}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">Registros Legislación, Cumplimiento Sanitario</div>
-              <div class="text-gray" style="font-size:0.68rem;">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
+              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
+              <div class="text-gray text-2xs">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
             </div>
           </div>
           <div class="flex gap-4">
-            <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="CarneView._abrirAsistenteTratamientoCarne()">
+            <button class="btn btn-secondary btn-sm btn--purple" onclick="CarneView._abrirAsistenteTratamientoCarne()">
               ${Icons.agregar()} Registrar Tratamiento
             </button>
           </div>
@@ -421,7 +421,7 @@ const CarneView = {
           <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno de Explotación</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222" style="margin-bottom:6px; padding-bottom:5px;">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Historial Sanitario Cárnico (${d.sanitariosCarne.length})
         </div>
         <div class="grid gap-10">
