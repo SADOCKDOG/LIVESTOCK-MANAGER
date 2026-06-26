@@ -34,7 +34,7 @@ const DashboardView = {
 
   _buildSkeleton() {
     return `
-      <div style="padding:10px 0;">
+      <div class="py-10">
         <div class="skeleton-card mb-25">
           <div class="skeleton-title" style="width:50%; margin:0 auto 20px;"></div>
           <div class="grid grid-cols-3 gap-12">
@@ -158,7 +158,7 @@ const DashboardView = {
       <div class="card card-accent card-accent-blue p-20 card-tint-blue">
         <h3 class="mt-0 text-blue flex items-center gap-8">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}️]+\s*/u, '')}</h3>
         ${alertaEpoca.sugerencias?.length > 0 ? `
-        <ul class="text-85 text-gray m-0 leading-normal mt-10" style="padding-left:20px;">
+        <ul class="text-85 text-gray m-0 leading-normal mt-10 pl-20">
           ${alertaEpoca.sugerencias.map(s => `<li class="mb-4">${s}</li>`).join('')}
         </ul>` : '<div class="text-gray text-sm mt-10">Sin sugerencias para esta temporada.</div>'}
         <div class="text-center mt-12">
@@ -223,7 +223,7 @@ const DashboardView = {
   _renderAlertasTrazabilidad(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card card-accent p-20" style="background:rgba(249,115,22,0.05); border-top-color:#f97316;">
+      <div class="card card-accent card-accent-orange p-20 card-tint-orange">
         <h3 class="mt-0 flex items-center gap-8 text-orange">
           ${Icons.alerta()} Alertas Trazabilidad (SIA) <span class="badge rounded-xl text-white text-2xs" style="background:#f97316; padding:2px 10px;">${alertas.length}</span>
         </h3>
@@ -413,7 +413,7 @@ const DashboardView = {
   _renderKPIsDiariosCard(kpis) {
     if (!kpis || (!kpis.litrosPorOveja && !kpis.eficienciaPienso && !kpis.pctBajas)) {
       return `
-        <div class="card card-accent card-accent-purple p-20" style="background:rgba(168,85,247,0.05);">
+        <div class="card card-accent card-accent-purple p-20 card-tint-violet">
           <h3 class="mt-0 flex items-center gap-8 text-violet">
             ${Icons.grafico()} KPIs Diarios
           </h3>
@@ -439,7 +439,7 @@ const DashboardView = {
       : '#888';
 
     return `
-      <div class="card card-accent card-accent-purple p-20" style="background:rgba(168,85,247,0.05);">
+      <div class="card card-accent card-accent-purple p-20 card-tint-violet">
         <h3 class="mt-0 flex items-center gap-8 text-violet">
           ${Icons.grafico()} KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
         </h3>
