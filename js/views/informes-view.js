@@ -172,9 +172,6 @@ const InformesView = {
       </div>
       <div id="informes-content"><div class="loader">Cargando indicadores...</div></div>`;
 
-    // Inyectar estilos para los tabs
-    this._inyectarEstilosTabs();
-
     // Cargar datos
     const fId = await Fincas.getActiveId();
     try {
@@ -246,51 +243,6 @@ const InformesView = {
     }
   },
 
-  _inyectarEstilosTabs() {
-    if (document.getElementById('inf-tab-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'inf-tab-styles';
-    style.textContent = `
-      .informes-categories { scrollbar-width: none; }
-      .informes-categories::-webkit-scrollbar { display: none; }
-      .inf-cat-tab {
-        flex: 0 0 auto; padding: 6px 12px; border-radius: 12px; border: 1px solid #2a2a2a;
-        background: #0f0f11; color: #aaa; font-size: 0.72rem; font-weight: 800;
-        cursor: pointer; white-space: nowrap; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
-        display: inline-flex; align-items: center; gap: 4px;
-      }
-      .inf-cat-tab.active { background: #1e3a8a; color: #fff; border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
-      .inf-cat-tab:active { transform: scale(0.95); }
-
-      .informes-tabs { scrollbar-width: none; }
-      .informes-tabs::-webkit-scrollbar { display: none; }
-      .inf-tab {
-        flex: 0 0 auto; padding: 7px 12px; border-radius: 16px; border: 1px solid #333;
-        background: #1a1a1a; color: #888; font-size: 0.75rem; font-weight: 800;
-        cursor: pointer; white-space: nowrap; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
-        display: inline-flex; align-items: center; gap: 4px;
-      }
-      .inf-tab.active { background: #d97706; color: #fff; border-color: #d97706; box-shadow: 0 0 12px rgba(217,119,6,0.3); }
-      .inf-tab:active { transform: scale(0.95); }
-      .chart-wrap { position:relative; width:100%; max-width:100%; overflow:hidden; }
-      .chart-wrap canvas { max-width:100% !important; height:auto !important; }
-      .table-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-      .table-scroll table { min-width:450px; }
-      .reporte-table td, .reporte-table th { white-space:nowrap; padding:10px 12px; }
-      .report-section { max-width:100%; overflow:hidden; }
-
-      /* 🌟 BIGGER FONTS — override inline styles for better readability */
-      .inf-report h3 { font-size: 1.15rem !important; }
-      .inf-report .s-lbl { font-size: 0.7rem !important; letter-spacing: 0.5px; color: #888; }
-      .inf-report .inf-val-lg { font-size: 1.35rem !important; font-weight: 900; }
-      .inf-report .inf-val-md { font-size: 1.1rem !important; font-weight: 800; }
-      .inf-report .inf-table { font-size: 0.85rem !important; }
-      .inf-report .inf-small { font-size: 0.75rem !important; }
-      .inf-report .inf-card-title { font-size: 1.1rem !important; font-weight: 800; margin: 0 0 10px 0; }
-    `;
-    document.head.appendChild(style);
-  },
-
   _renderTabActual() {
     const d = this._cachedData;
     if (!d) return;
@@ -327,7 +279,7 @@ const InformesView = {
       }
     } catch (e) {
       console.error('[InformesView] Error en render:', e);
-      content.innerHTML = `<div class="card empty-state"><p class="text-red" style="font-size:1rem;">❌ Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
+      content.innerHTML = `<div class="card empty-state"><p class="text-red text-base">❌ Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
     }
     // Scroll up after tab switch
     window.scrollTo(0, 0);
@@ -361,16 +313,16 @@ const InformesView = {
       <div class="grid grid-cols-3 gap-8 mb-15">
         <div class="summary-cell summary-cell-kpi"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()}€</div></div>
         <div class="summary-cell summary-cell-kpi"><div class="s-lbl">RENTAB.</div><div class="s-val inf-val-lg" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'};">${pctRent}%</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CENSO</div><div class="s-val inf-val-lg" style="color:#3b82f6;">${totalAnimales}</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg" style="color:#f59e0b;">${(rent?.detalles?.carne || 0).toLocaleString()}€</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg" style="color:#fbbf24;">${(rent?.detalles?.leche || 0).toLocaleString()}€</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg" style="color:#ef4444;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
+        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CENSO</div><div class="s-val inf-val-lg text-blue">${totalAnimales}</div></div>
+        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg text-amber">${(rent?.detalles?.carne || 0).toLocaleString()}€</div></div>
+        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg text-gold">${(rent?.detalles?.leche || 0).toLocaleString()}€</div></div>
+        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg text-red">${(rent?.gastos || 0).toLocaleString()}€</div></div>
       </div>
 
       ${alertas ? `<div class="card inf-alert-red">
           <div class="flex items-center gap-10">
-            <span style="font-size:1.8rem;">🚨</span>
-            <div><strong class="text-red text-md">${estadisticasSanidad.retencionesActivas} lotes</strong><span class="text-aaa text-sm" style="display:block;">con supresión de venta activa</span></div>
+            <span class="text-3xl">🚨</span>
+            <div><strong class="text-red text-md">${estadisticasSanidad.retencionesActivas} lotes</strong><span class="text-aaa text-sm block">con supresión de venta activa</span></div>
           </div>
         </div>` : ''}
 
@@ -1218,7 +1170,7 @@ const InformesView = {
 
         ${data.zonas.length > 0 ? `
         <div class="flex flex-wrap gap-6 mb-14">
-          ${data.zonas.map(z => `<span class="badge badge-green" style="font-size:0.7rem;">🌱 ${z}</span>`).join('')}
+          ${data.zonas.map(z => `<span class="badge badge-green text-2xs">🌱 ${z}</span>`).join('')}
         </div>` : ''}
 
         ${data.registros.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🧪</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>' : `
@@ -1270,7 +1222,7 @@ const InformesView = {
             </div>
             <div class="info-box-center border-left-red">
               <small class="s-lbl">🔴 CRÍTICAS</small>
-              <div class="inf-val-lg" style="color:#dc2626;">${rojas}</div>
+              <div class="inf-val-lg text-red">${rojas}</div>
             </div>
             <div class="info-box-center border-left-amber">
               <small class="s-lbl">🟡 ADVERTENCIAS</small>
@@ -1279,7 +1231,7 @@ const InformesView = {
           </div>
 
           ${alertas.sanitarias?.length > 0 ? `
-          <div class="inf-section-title" style="color:#ef4444;">🔴 Alertas Sanitarias (${alertas.sanitarias.length})</div>
+          <div class="inf-section-title text-red">🔴 Alertas Sanitarias (${alertas.sanitarias.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
             <table class="inf-table inf-table-sm" style="--tbl-accent:#ef4444;">
               <thead><tr><th>Medicamento</th><th>Rebaño</th><th>Fecha</th><th class="text-right">Días rest.</th><th class="text-center">Urgencia</th></tr></thead>
@@ -1295,7 +1247,7 @@ const InformesView = {
           </div>` : ''}
 
           ${alertas.trazabilidad?.length > 0 ? `
-          <div class="inf-section-title" style="color:#f59e0b;">🟠 Alertas de Trazabilidad (${alertas.trazabilidad.length})</div>
+          <div class="inf-section-title text-amber">🟠 Alertas de Trazabilidad (${alertas.trazabilidad.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
             <table class="inf-table inf-table-sm" style="--tbl-accent:#f59e0b;">
               <thead><tr><th>Animal/Venta</th><th>Mensaje</th><th>Urgencia</th></tr></thead>
@@ -1309,7 +1261,7 @@ const InformesView = {
           </div>` : ''}
 
           ${alertas.administrativas?.length > 0 ? `
-          <div class="inf-section-title" style="color:#8b5cf6;">🟣 Alertas Administrativas (${alertas.administrativas.length})</div>
+          <div class="inf-section-title text-violet">🟣 Alertas Administrativas (${alertas.administrativas.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
             <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
               <thead><tr><th>Sección</th><th>Mensaje</th><th>Urgencia</th></tr></thead>
@@ -1450,10 +1402,10 @@ const InformesView = {
       <div class="inf-report mb-14">
         <!-- KPIs -->
         <div class="grid grid-cols-4 gap-6 mb-14">
-          <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">CENSO TOTAL</small><div class="inf-val-lg text-green">${totalAnimales}</div></div>
-          <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-blue">${activos}</div></div>
-          <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">REBAÑOS</small><div class="inf-val-lg text-amber">${numRebanos}</div></div>
-          <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">ESPECIES</small><div class="inf-val-lg text-purple">${especies.length}</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">CENSO TOTAL</small><div class="inf-val-lg text-green">${totalAnimales}</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-blue">${activos}</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">REBAÑOS</small><div class="inf-val-lg text-amber">${numRebanos}</div></div>
+          <div class="info-box-center border-left-purple"><small class="s-lbl">ESPECIES</small><div class="inf-val-lg text-purple">${especies.length}</div></div>
         </div>
         <!-- Datos Explotación -->
         <div class="card report-section border-top-3px border-top-3px-gold report-card">
@@ -1646,7 +1598,7 @@ const InformesView = {
             <div class="info-box-sm" style="border-left:3px solid ${semaforo(k.status)};">
               <div class="flex justify-between items-center">
                 <small class="s-lbl">${k.label}</small>
-                <span style="width:10px;height:10px;border-radius:50%;background:${semaforo(k.status)};display:inline-block;"></span>
+                <span class="inf-led" style="background:${semaforo(k.status)};"></span>
               </div>
               <div class="inf-val-md text-white">${k.value}</div>
               <small class="text-gray text-xs">Objetivo: ${k.objetivo}${k.unidad}</small>
@@ -1669,8 +1621,8 @@ const InformesView = {
           <div class="info-box-center border-left-amber"><small class="s-lbl">OCUPACIÓN</small><div class="inf-val-lg text-amber">${data.totalOcupacion}</div></div>
           <div class="info-box-center" style="border-left:3px solid ${colorPct(parseFloat(data.pctGlobal))};"><small class="s-lbl">% GLOBAL</small><div class="inf-val-lg" style="color:${colorPct(parseFloat(data.pctGlobal))}">${data.pctGlobal}%</div></div>
         </div>
-        ${data.numAlertas > 0 ? `<div class="card" style="background:rgba(239,68,68,0.1);margin-bottom:14px;padding:12px;">
-          <div class="flex items-center gap-8"><span style="font-size:1.4rem;">🚨</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm" style="display:block;">Zonas con sobrecarga o infrautilización</span></div></div>
+        ${data.numAlertas > 0 ? `<div class="card card-tint-red mb-14 p-12">
+          <div class="flex items-center gap-8"><span class="text-xl">🚨</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
         </div>` : ''}
         ${data.porZona.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
@@ -1870,7 +1822,7 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="flex justify-between items-center mb-14">
           <div class="inf-card-title m-0">🌾 Subvenciones PAC</div>
-          <button class="btn btn-primary btn-sm" onclick="InformesView._agregarPAC()" style="background:linear-gradient(135deg,#065f46,#059669);padding:6px 14px;font-size:0.75rem;">➕ Añadir</button>
+          <button class="btn btn-primary btn-sm btn--green-dk" onclick="InformesView._agregarPAC()">➕ Añadir</button>
         </div>
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">SOLICITADO</small><div class="inf-val-lg text-green">${data.totalSolicitado.toLocaleString()}€</div></div>
@@ -2472,20 +2424,16 @@ const InformesView = {
       // Crear overlay de carga con barra de proceso
       loader = document.createElement('div');
       loader.id = 'pdf-loader-overlay';
-      loader.style.cssText = `
-        position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
-        background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
-        align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
-      `;
+      loader.className = 'pdf-loader-overlay';
       loader.innerHTML = `
-        <div style="width:280px; text-align:center;">
-          <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
-          <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
-          <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Informe: ${seccion || 'Completo'}</div>
-          <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
-            <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+        <div class="pdf-gen-modal">
+          <div class="text-4xl mb-20" style="animation:bounce 2s infinite;">📄</div>
+          <div class="pdf-gen-title">Generando PDF</div>
+          <div class="pdf-gen-sub">Informe: ${seccion || 'Completo'}</div>
+          <div class="pdf-gen-bar-wrap">
+            <div id="pdf-progress-bar" class="pdf-gen-bar"></div>
           </div>
-          <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+          <div id="pdf-progress-text" class="pdf-gen-label">PROCESANDO...</div>
         </div>
         <style>
           @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
@@ -3327,7 +3275,7 @@ const InformesView = {
             <h4 class="text-white mb-4">📋 REGA — Censo y Explotación</h4>
             <p class="text-gray text-xs m-0">CSV del censo actual + XML estructurado con datos de la explotación. Compatible con SIGGAN/BADIGEX.</p>
           </div>
-          <button class="btn btn-primary btn-download" onclick="InformesView._exportREGA()" style="background:#f59e0b;">⬇ Descargar</button>
+          <button class="btn btn-primary btn-download btn--amber" onclick="InformesView._exportREGA()">⬇ Descargar</button>
         </div>
       </div>
       <div class="card card-left-blue">
@@ -3336,7 +3284,7 @@ const InformesView = {
             <h4 class="text-white mb-4">🔄 SIA/PIGGAN — Movimientos</h4>
             <p class="text-gray text-xs m-0">CSV de altas, bajas y expediciones. Incluye crotal, especie, motivo y destino/origen.</p>
           </div>
-          <button class="btn btn-primary btn-download" onclick="InformesView._exportMovimientos()" style="background:#3b82f6;">⬇ Descargar</button>
+          <button class="btn btn-primary btn-download btn--blue" onclick="InformesView._exportMovimientos()">⬇ Descargar</button>
         </div>
       </div>
       <div class="card card-left-green">
@@ -3345,16 +3293,16 @@ const InformesView = {
             <h4 class="text-white mb-4">📊 PIGGAN — Producción</h4>
             <p class="text-gray text-xs m-0">CSV de producción láctea (litros, calidad) y cárnica (peso canal, precio).</p>
           </div>
-          <button class="btn btn-primary btn-download" onclick="InformesView._exportProduccion()" style="background:#10b981;">⬇ Descargar</button>
+          <button class="btn btn-primary btn-download btn--green-dk" onclick="InformesView._exportProduccion()">⬇ Descargar</button>
         </div>
       </div>
-      <div class="card card-left-purple" style="background:rgba(139,92,246,0.05);">
+      <div class="card card-left-purple card-tint-violet">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">📦 Exportación Completa</h4>
             <p class="text-gray text-xs m-0">Descarga todos los ficheros: REGA (CSV+XML), movimientos SIA y producción PIGGAN.</p>
           </div>
-          <button class="btn btn-primary btn-download" onclick="InformesView._exportCompleto()" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">⬇ Todo</button>
+          <button class="btn btn-primary btn-download btn--purple" onclick="InformesView._exportCompleto()">⬇ Todo</button>
         </div>
       </div>
     </div>
