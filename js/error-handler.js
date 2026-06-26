@@ -278,7 +278,7 @@ const ErrorHandler = {
         { field: "numero_identificacion", required: true }
       );
     }
-    
+
     const CROTAL_REGEX = /^[A-Z]{2}\d{12}$/;
     const valorLimpio = String(numero_identificacion)
       .trim()

@@ -51,14 +51,15 @@ const GastosView = {
     const mesesHtml = Object.values(porMes).reverse().map(m => {
       const pct = Math.min(100, m.total / (Math.max(1, Object.values(porMes).reduce((s,x) => Math.max(s, x.total), 0)) / 100));
       const color = pct > 70 ? '#ef4444' : pct > 40 ? '#f59e0b' : '#10b981';
-      return `<div style="flex:1;text-align:center;">
-        <div class="text-xs text-gray mb-2">${m.label}</div>
+      return `<div style="flex:1;text-align:center;min-width:0;">
+        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
         <div style="height:40px;background:#1a1a1a;border-radius:6px;overflow:hidden;position:relative;">
           <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
         </div>
-        <div class="text-xs font-bold mt-2" style="color:${color}">${(m.total/1000).toFixed(1)}k€</div>
+        <div class="text-xs font-bold mt-2" style="color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(m.total/1000).toFixed(1)}k€</div>
       </div>`;
     }).join('');
+
 
     // Calcular KPIs por categoría
     const kpis = {};
