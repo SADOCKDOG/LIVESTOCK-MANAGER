@@ -1400,31 +1400,6 @@ label {
 .formulario-finca-formulario {
     display: block;
 }
-.formulario-finca-grupo {
-    margin-bottom: 15px;
-}
-.formulario-finca-grupo label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #ccc;
-    font-size: 14px;
-}
-.formulario-finca-grupo input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #444;
-    background: #222;
-    color: white;
-    border-radius: 12px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-.formulario-finca-grupo input:focus {
-    outline: none;
-    border-color: #d97706;
-    box-shadow: 0 0 5px rgba(217, 119, 6, 0.3);
-}
 .formulario-finca-error {
     display: block;
     color: #ef4444;
