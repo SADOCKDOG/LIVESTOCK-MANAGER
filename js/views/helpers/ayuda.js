@@ -232,7 +232,7 @@ window.Ayuda = {
         <div class="rounded-sm border-muted text-center mb-25" style="background:#000; padding:15px; font-family:monospace; font-size:1.5rem; letter-spacing:2px;">
             <span class="text-red">ES</span> <span class="text-green">01</span> <span class="text-white">1234567890</span>
         </div>
-        <ul class="text-sm mb-25" style="padding-left: 20px; color: #ccc;">
+        <ul class="text-sm mb-25 pl-20 text-ccc">
             <li><strong class="text-red">ES:</strong> Código de país (España).</li>
             <li><strong class="text-green">01/10:</strong> Código de Comunidad Autónoma (01 = Andalucía, 10 = Extremadura).</li>
             <li><strong class="text-white">1234567890:</strong> Numeración individual correlativa (10 dígitos).</li>
@@ -326,7 +326,7 @@ window.Ayuda = {
         </div>
 
         <h3 class="text-green mb-10" class="section-underline">Impacto en la Gestión Diaria</h3>
-        <ul class="mb-20 text-sm text-ccc" style="padding-left:20px;">
+        <ul class="mb-20 text-sm text-ccc pl-20">
           <li class="mb-8"><strong>🚚 Guías de Movimiento:</strong> En Andalucía se emiten automáticamente si el animal está saneado. En Extremadura requieren confirmación del veterinario ADSG.</li>
           <li class="mb-8"><strong>🐑 PAC 2026:</strong> Andalucía exige 0.6 corderos/oveja/año para cobrar el eco-régimen; Extremadura 0.4. Ajusta tus declaraciones.</li>
           <li class="mb-8"><strong>💉 Vacunación:</strong> Andalucía subvenciona directamente las vacunas (paga la Junta). Extremadura las incluye como cláusula de fuerza mayor en PAC.</li>

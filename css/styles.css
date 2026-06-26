@@ -784,6 +784,7 @@ label {
 .py-12  { padding-top: 12px; padding-bottom: 12px; }
 .pt-16  { padding-top: 16px; }
 .pb-4   { padding-bottom: 4px; }
+.pl-20  { padding-left: 20px; }
 
 /* ── Texto ── */
 .text-center    { text-align: center; }
