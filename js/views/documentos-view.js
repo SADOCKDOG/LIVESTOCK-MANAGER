@@ -51,11 +51,11 @@ const DocumentosView = {
       </div>
       <div class="mb-16">
         <div class="flex gap-6 mb-10">
-          <div class="tabs-scroll scroll-shadow-container" style="overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap;flex:1;">
+          <div class="tabs-scroll scroll-shadow-container flex-1" style="white-space:nowrap;">
             ${tiposDoc.map(t => `
-              <button class="filter-pill filter-pill-gold font-800 ${this._currentTab === t ? 'active' : ''}"
+              <button class="filter-pill filter-pill-gold font-800 uppercase inline-flex gap-4 ${this._currentTab === t ? 'active' : ''}"
                 onclick="DocumentosView._cambiarTab('${t}')"
-                style="text-transform:uppercase; letter-spacing:0.3px; display:inline-flex; gap:4px;">
+                style="letter-spacing:0.3px;">
                 ${labels[t] || t}
               </button>
             `).join('')}
