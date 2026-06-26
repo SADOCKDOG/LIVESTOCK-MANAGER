@@ -189,14 +189,14 @@ const AjustesView = {
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>📅 Formato Fecha:</span>
-            <select class="premium-input" style="height:32px;font-size:0.8rem;flex:1;" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
+            <select class="premium-input flex-1" style="height:32px;font-size:0.8rem;" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
               <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (España)</option>
               <option value="en-US" ${config.formatoFecha === 'en-US' ? 'selected' : ''}>MM/DD/AAAA (EE.UU.)</option>
             </select>
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>💰 Moneda:</span>
-            <select class="premium-input" style="height:32px;font-size:0.8rem;flex:1;" onchange="AjustesView._guardarPreferencia('moneda', this.value)">
+            <select class="premium-input flex-1" style="height:32px;font-size:0.8rem;" onchange="AjustesView._guardarPreferencia('moneda', this.value)">
               <option value="€" ${config.moneda !== '$' ? 'selected' : ''}>Euro (€)</option>
               <option value="$" ${config.moneda === '$' ? 'selected' : ''}>Dólar ($)</option>
             </select>
@@ -208,7 +208,7 @@ const AjustesView = {
       <div class="card card-left-gold mb-20">
         <h3 class="flex items-center gap-8">${Icons.info()} Información del Sistema</h3>
         <p class="text-gray mt-5 text-85">Estado de la base de datos local y versión de la aplicación.</p>
-        <div class="grid grid-cols-2 gap-6 mt-10" style="font-size:0.8rem;">
+        <div class="grid grid-cols-2 gap-6 mt-10 text-sm">
           <div><span class="text-gray">Versión App:</span> <strong class="text-white">v4.5.0</strong></div>
           <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IndexedDB v10</strong></div>
           <div><span class="text-gray">Fincas:</span> <strong class="text-white">${fincas.length}</strong></div>
@@ -293,7 +293,7 @@ const AjustesView = {
         <div class="text-white font-bold text-xl">David Asuar Arteaga</div>
         <div style="max-width:320px; margin:20px auto; font-size:0.9rem; line-height:1.6;" class="text-777">Plataforma profesional de gestión ganadera inteligente y trazabilidad industrial.</div>
         <div class="mt-15"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-bold no-underline text-md">📩 soporte.sdogfarm@gmail.com</a></div>
-        <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-bold no-underline text-md" style="display:inline-flex; align-items:center; gap:6px;">🐙 GitHub</a></div>
+        <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-bold no-underline text-md inline-flex items-center gap-6">🐙 GitHub</a></div>
         <div class="mt-40 text-75 text-444" style="border-top:1px solid #111; padding-top:25px;">
           © 2026 Livestock Manager Premium · v4.5.0<br>
           Todos los derechos reservados.
@@ -520,7 +520,7 @@ const AjustesView = {
     
     let zonasHtml = '';
     if (zonas.length === 0) {
-      zonasHtml = '<p class="text-gray" style="text-align:center; padding:20px;">Sin zonas definidas</p>';
+      zonasHtml = '<p class="text-gray text-center p-20">Sin zonas definidas</p>';
     } else {
       zonasHtml = `<div class="grid gap-10">
         ${zonas.map((z, idx) => `
