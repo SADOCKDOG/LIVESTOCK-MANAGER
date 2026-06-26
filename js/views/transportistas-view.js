@@ -68,7 +68,7 @@ const TransportistasView = {
                  style="border-left:4px solid ${t.activo ? '#10b981' : '#6b7280'};">
                 <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
-                        <div class="text-white font-800 truncate" style="font-size:0.9rem;">
+                        <div class="text-white font-800 truncate text-base">
                             ${Icons.transportistas()} ${t.nombre}
                         </div>
                         <div class="text-gray text-xs mt-4">
