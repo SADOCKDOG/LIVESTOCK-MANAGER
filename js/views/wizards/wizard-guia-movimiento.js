@@ -165,7 +165,7 @@ window.WizardGuiaMovimiento = {
                 <input type="text" id="w-mv-matricula" value="${data.matricula}" class="wizard-input">
               </div>
             </div>
-            <label class="wizard-checkbox-container" style="margin-top:8px;">
+            <label class="wizard-checkbox-container mt-8">
               <input type="checkbox" id="w-mv-desins" ${data.desinsectacion_certificada ? 'checked' : ''}>
               <span>Desinsectación/desinfección certificada (48h previas)</span>
             </label>
@@ -173,7 +173,7 @@ window.WizardGuiaMovimiento = {
             <div class="rounded-sm" style="background:rgba(245,158,11,0.1); padding:10px; margin-top:10px; border-left:3px solid #f59e0b;">
               <div class="text-xs text-aaa">⚠️ ${conf.label} exige certificar la desinsectación previa al movimiento.</div>
             </div>` : ''}
-            <div class="wizard-input-group" style="margin-top:10px;">
+            <div class="wizard-input-group mt-10">
               <label class="wizard-label">OBSERVACIONES</label>
               <textarea id="w-mv-notas" class="wizard-input" rows="2">${data.notas}</textarea>
             </div>

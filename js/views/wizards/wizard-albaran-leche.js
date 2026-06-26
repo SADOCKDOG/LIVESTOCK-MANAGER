@@ -262,11 +262,11 @@ window.AlbaranLecheWizard = {
               ❄️ <strong>Cadena de frío legal:</strong> La leche debe enfriarse de 37°C a &lt;4°C en menos de 2 horas.
               ${data.temp <= 4 ? `<span class="text-green">✅ Actual: ${data.temp}°C — CUMPLE</span>` : `<span class="text-red">⚠️ Actual: ${data.temp}°C — REVISAR</span>`}
             </div>
-            <label class="wizard-checkbox-container" style="margin-top:6px;">
+            <label class="wizard-checkbox-container mt-6">
               <input type="checkbox" id="w-l-frio" ${data.cadena_frio_cumplida ? 'checked' : ''}>
               <span>Certifico cadena de frío cumplida (&lt;4°C en &lt;2h)</span>
             </label>
-            <label class="wizard-checkbox-container" style="margin-top:6px;">
+            <label class="wizard-checkbox-container mt-6">
               <input type="checkbox" id="w-l-inh" ${data.inh ? 'checked' : ''}>
               <span>Certifico ausencia absoluta de inhibidores / biocidas</span>
             </label>
@@ -404,7 +404,7 @@ window.AlbaranLecheWizard = {
               <input type="number" id="w-l-prim" value="${data.primas_penalizaciones || 0}" step="0.01" class="wizard-input"
                 onchange="App._recalcularPrecioLeche()" oninput="App._recalcularPrecioLeche()">
             </div>
-            <div class="bg-darker border-muted rounded-10" style="padding:14px; margin-top:12px;">
+            <div class="bg-darker border-muted rounded-10 p-14 mt-12">
               <div class="grid grid-cols-2 gap-8 text-sm">
                 <div>Extracto seco: <strong class="text-gold" id="w-l-es-display">${es}</strong>%</div>
                 <div>Tasa INLAC: <strong class="text-gray">${tasa} €</strong></div>

@@ -328,7 +328,7 @@ const Confirm = {
                     <div class="error-dialog-icon" style="color:var(--p-gold);">${alertIconHtml}</div>
                     <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
                     <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
-                    <div class="error-dialog-actions" style="justify-content: center;">
+                    <div class="error-dialog-actions justify-center">
                         <button class="error-dialog-btn primary" id="${id}-ok" style="background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000; max-width: 150px;">Aceptar</button>
                     </div>
                 </div>
