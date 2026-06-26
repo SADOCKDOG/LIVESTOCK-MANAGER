@@ -238,13 +238,17 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <div class="text-center mb-12">
+        <!-- PANEL DE ACCIONES -->
+        <div class="card p-12 mb-14 border-222" style="background: linear-gradient(145deg, #111 0%, #0a0a0a 100%); border-top: 3px solid ${themeColor}; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 text-center" style="letter-spacing: 1px;">⚡ Acciones de Registro</div>
           <div class="grid grid-cols-2 gap-10">
-            <button class="btn btn-create btn-sm" style="background:${themeColor}; border-color:${themeColor};" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
-              ${Icons.agregar()} Registrar Peso (kg)
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid ${themeColor}; border-right: 3px solid ${themeColor}; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px ${themeColor}40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
+              ${Icons.agregar()}
+              <span style="font-size: 0.85rem; font-weight: 600; text-align: center;">Registrar Peso (kg)</span>
             </button>
-            <button class="btn btn-secondary btn-sm btn--purple" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
-              ${Icons.sanidad()} Registrar Tratamiento
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #a855f7; border-right: 3px solid #a855f7; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #a855f740; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
+              ${Icons.sanidad()}
+              <span style="font-size: 0.85rem; font-weight: 600; text-align: center;">Registrar Tratamiento</span>
             </button>
           </div>
         </div>
@@ -318,13 +322,17 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <div class="text-center mb-12">
+        <!-- PANEL DE ACCIONES -->
+        <div class="card p-12 mb-14 border-222" style="background: linear-gradient(145deg, #111 0%, #0a0a0a 100%); border-top: 3px solid ${themeColor}; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 text-center" style="letter-spacing: 1px;">⚡ Acciones de Registro</div>
           <div class="grid grid-cols-2 gap-10">
-            <button class="btn btn-create btn-sm" style="background:${themeColor}; border-color:${themeColor};" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
-              ${Icons.agregar()} Registrar Control Diario (L)
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid ${themeColor}; border-right: 3px solid ${themeColor}; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px ${themeColor}40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
+              ${Icons.agregar()}
+              <span style="font-size: 0.85rem; font-weight: 600; text-align: center;">Registrar Control (L)</span>
             </button>
-            <button class="btn btn-secondary btn-sm btn--purple" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
-              ${Icons.sanidad()} Registrar Tratamiento
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #a855f7; border-right: 3px solid #a855f7; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #a855f740; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
+              ${Icons.sanidad()}
+              <span style="font-size: 0.85rem; font-weight: 600; text-align: center;">Registrar Tratamiento</span>
             </button>
           </div>
         </div>
@@ -436,18 +444,23 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <div class="flex gap-10 mb-14">
-          <button class="btn btn-create btn-sm flex-1 btn--red" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
-            ${Icons.agregar()} Registrar Peso (kg)
-          </button>
-          <button class="btn btn-secondary btn-sm flex-1 btn--blue" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
-            ${Icons.agregar()} Registrar Ordeño (L)
-          </button>
-        </div>
-        <div class="text-center mb-14">
-          <button class="btn btn-secondary btn-sm btn--purple" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
-            ${Icons.sanidad()} Registrar Tratamiento (Mixto)
-          </button>
+        <!-- PANEL DE ACCIONES -->
+        <div class="card p-12 mb-14 border-222" style="background: linear-gradient(145deg, #111 0%, #0a0a0a 100%); border-top: 3px solid ${themeColor}; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 text-center" style="letter-spacing: 1px;">⚡ Acciones de Registro (Híbrido)</div>
+          <div class="grid grid-cols-3 gap-10">
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #ef4444; border-right: 3px solid #ef4444; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #ef444440; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+              ${Icons.agregar()}
+              <span style="font-size: 0.8rem; font-weight: 600; text-align: center; line-height: 1.1;">Registrar<br>Peso (kg)</span>
+            </button>
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #3b82f6; border-right: 3px solid #3b82f6; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #3b82f640; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+              ${Icons.agregar()}
+              <span style="font-size: 0.8rem; font-weight: 600; text-align: center; line-height: 1.1;">Registrar<br>Ordeño (L)</span>
+            </button>
+            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #a855f7; border-right: 3px solid #a855f7; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #a855f740; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
+              ${Icons.sanidad()}
+              <span style="font-size: 0.8rem; font-weight: 600; text-align: center; line-height: 1.1;">Tratamiento<br>(Mixto)</span>
+            </button>
+          </div>
         </div>
 
         <!-- True Hub: Highlight Carne & Leche Side-by-Side -->
