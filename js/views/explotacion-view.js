@@ -310,7 +310,7 @@ const ExplotacionView = {
                         <div class="font-bold text-white">${e.snap_identificacion || 'Animal/Lote'}</div>
                         <div class="text-gray mt-2">📅 ${this._fmtFecha(e.fecha)}</div>
                       </div>
-                      <span class="badge badge-sm font-bold text-red" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);">${e.valor_neto} kg</span>
+                      <span class="badge badge-sm font-bold text-red badge-red-outline">${e.valor_neto} kg</span>
                     </div>
                   </div>`).join('')
               : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">📭 Sin pesajes registrados.</span></div>`
@@ -428,7 +428,7 @@ const ExplotacionView = {
                         <div class="font-bold text-white">${o.snap_identificacion || 'Control Lote/Animal'}</div>
                         <div class="text-gray mt-2">📅 ${this._fmtFecha(o.fecha)}</div>
                       </div>
-                      <span class="badge badge-sm font-bold text-blue" style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3);">${o.valor_neto} L</span>
+                      <span class="badge badge-sm font-bold text-blue badge-blue-outline">${o.valor_neto} L</span>
                     </div>
                   </div>`).join('')
               : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">📭 Sin registros de ordeño recientes.</span></div>`

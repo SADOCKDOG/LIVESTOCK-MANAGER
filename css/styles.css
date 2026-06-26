@@ -2643,8 +2643,10 @@ label {
 .border-4-left-green  { border-left: 4px solid #10b981; }
 .border-4-left-purple { border-left: 4px solid #8b5cf6; }
 
-/* badge variante outline verde */
+/* badge variante outline verde/rojo/azul */
 .badge-green-outline  { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); }
+.badge-red-outline    { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3); }
+.badge-blue-outline   { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); }
 
 /* cuaderno list rows */
 .cuaderno-row    { padding: 4px 0; border-bottom: 1px solid #1a1a1a; }

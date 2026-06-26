@@ -250,15 +250,15 @@ const TrazabilidadView = {
     return `
       <div style="max-width:100%; padding:12px; box-sizing:border-box;">
         <!-- Cabecera con acciones -->
-        <div class="flex items-center gap-8 mb-14" style="flex-wrap:wrap;">
+        <div class="flex items-center gap-8 mb-14 flex-wrap">
           <button onclick="App._navigateBack()" class="btn btn-secondary btn-sm" style="padding:8px 14px;">← Volver</button>
-          <div style="flex:1;"></div>
+          <div class="flex-1"></div>
           <button onclick="TrazabilidadView._exportarPDF()" class="btn btn-primary btn-sm" style="padding:8px 14px;background:#b45309;">${Icons.exportar()} Exportar PDF</button>
         </div>
 
         <!-- Datos Básicos del Animal -->
         <div class="card p-16 mb-16">
-          <div class="flex justify-between items-center mb-10" style="flex-wrap:wrap;gap:8px;">
+          <div class="flex justify-between items-center mb-10 flex-wrap gap-8">
             <strong class="text-amber" style="font-size:1.1rem;">${animal.numero_identificacion}</strong>
             <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado}</span>
           </div>
@@ -276,17 +276,17 @@ const TrazabilidadView = {
 
         <!-- KPIs rápidos -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:8px; margin-bottom:16px;">
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-green" style="font-size:1.2rem;">${totalPesajes}</div><div class="kpi-label" style="font-size:0.6rem;">PESAJES</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-blue" style="font-size:1.2rem;">${totalSanitarios}</div><div class="kpi-label" style="font-size:0.6rem;">TRATAMIENTOS</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-violet" style="font-size:1.2rem;">${totalReproduccion}</div><div class="kpi-label" style="font-size:0.6rem;">REPRODUCCIÓN</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-amber" style="font-size:1.2rem;">${totalEventos}</div><div class="kpi-label" style="font-size:0.6rem;">EVENTOS</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-green text-xl">${totalPesajes}</div><div class="kpi-label" style="font-size:0.6rem;">PESAJES</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-blue text-xl">${totalSanitarios}</div><div class="kpi-label" style="font-size:0.6rem;">TRATAMIENTOS</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-violet text-xl">${totalReproduccion}</div><div class="kpi-label" style="font-size:0.6rem;">REPRODUCCIÓN</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-amber text-xl">${totalEventos}</div><div class="kpi-label" style="font-size:0.6rem;">EVENTOS</div></div>
         </div>
 
         <!-- Timeline -->
         <div class="mt-16">
           <h3 class="text-white" style="font-size:1rem; margin-bottom:15px;">${Icons.calendar()} Línea de Vida</h3>
           ${timeline.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.buscar()}</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>` : ''}
-          <div id="trazabilidad-timeline" style="position:relative;">
+          <div id="trazabilidad-timeline" class="relative">
             <div style="position:absolute; left:18px; top:0; bottom:0; width:2px; background:#333;"></div>
             ${timeline.map(t => this._renderTimelineItem(t)).join('')}
           </div>

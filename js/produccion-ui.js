@@ -135,7 +135,7 @@ const ProduccionUI = {
           <div style="display:flex; flex-direction:column; height: 100%; gap: 15px; margin-top:10px;">
               <input type="text" id="search-entity" placeholder="🔍 Buscar por nombre, raza o crotal..." class="wizard-input">
               <div id="entity-list" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; min-height: 40vh; padding-right: 5px;">
-                  <div class="text-gray" style="text-align:center; padding:20px;">Cargando registros...</div>
+                  <div class="text-gray text-center p-20">Cargando registros...</div>
               </div>
           </div>
         `,
@@ -168,7 +168,7 @@ const ProduccionUI = {
             });
 
             if (filtered.length === 0) {
-              listEl.innerHTML = `<div class="text-gray" style="text-align:center; padding:20px;">No se encontraron resultados</div>`;
+              listEl.innerHTML = `<div class="text-gray text-center p-20">No se encontraron resultados</div>`;
               return;
             }
 

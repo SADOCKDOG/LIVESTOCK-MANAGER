@@ -125,11 +125,11 @@ const PesajesUI = {
             <div class="wizard-header-fixed" style="border-top: 5px solid ${unidadColor}; position:relative; text-align:center;">
                 <button onclick="window._pesajesWizardActivo=false;document.getElementById('wizard-pesaje-overlay').remove();window.App.route()" class="text-zinc-200" style="background:#27272a; border:none; width:32px; height:32px; border-radius:50%; position:absolute; top:50%; transform:translateY(-50%); right:15px; z-index:5001; cursor:pointer; font-weight:bold;">✕</button>
                 <h2 style="margin:0 0 4px 0; color:${unidadColor}; font-size:1.3rem; text-transform:uppercase; font-weight:900; letter-spacing:1px;">${titulo}</h2>
-                <p class="text-gray-400" style="font-size:0.8rem; margin:0; font-weight:600;">${subtitulo}</p>
+                <p class="text-gray-400 text-sm m-0 font-semibold">${subtitulo}</p>
             </div>
 
             <div class="wizard-content-scrollable">
-                <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="flex flex-col gap-15">
                     ${necesitaAsignacion ? `
                     <div style="background:rgba(251,191,36,0.05); padding:12px; border-radius:10px; border:1px solid #fbbf24; flex-shrink: 0;" id="box-assign-rebano">
                         <label class="text-75 text-gold" style="font-weight:bold; display:block; margin-bottom:5px;">ASOCIAR A REBAÑO (OBLIGATORIO)</label>
@@ -140,8 +140,8 @@ const PesajesUI = {
                     </div>
                     ` : `
                     <div class="bg-card" style="padding:10px; border-radius:8px; border:1px solid #222; display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.7rem; flex-shrink: 0;">
-                        <div><span class="text-gray-500">📍 ZONA ACTUAL:</span><br><span class="text-ccc font-bold" style="font-size:0.8rem;">${rebano ? (rebano.zonaActual || 'Finca') : 'Finca'}</span></div>
-                        <div><span class="text-gray-500">🧬 TIPO EXP.:</span><br><span class="text-ccc font-bold" style="font-size:0.8rem;">${rebano ? rebano.tipo : 'Sin clasificar'}</span></div>
+                        <div><span class="text-gray-500">📍 ZONA ACTUAL:</span><br><span class="text-ccc font-bold text-sm">${rebano ? (rebano.zonaActual || 'Finca') : 'Finca'}</span></div>
+                        <div><span class="text-gray-500">🧬 TIPO EXP.:</span><br><span class="text-ccc font-bold text-sm">${rebano ? rebano.tipo : 'Sin clasificar'}</span></div>
                     </div>
                     `}
 
@@ -160,16 +160,16 @@ const PesajesUI = {
                          <div style="margin-top: 10px; display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                              <div>
                                  <label class="text-gray" style="font-size:0.6rem;">GRASA (%)</label>
-                                 <input type="number" id="w-leche-grasa" step="0.01" placeholder="3.5" class="premium-input" style="height:36px; font-size:0.9rem;">
+                                 <input type="number" id="w-leche-grasa" step="0.01" placeholder="3.5" class="premium-input input-sm">
                              </div>
                              <div>
                                  <label class="text-gray" style="font-size:0.6rem;">PROTEÍNA (%)</label>
-                                 <input type="number" id="w-leche-proteina" step="0.01" placeholder="3.2" class="premium-input" style="height:36px; font-size:0.9rem;">
+                                 <input type="number" id="w-leche-proteina" step="0.01" placeholder="3.2" class="premium-input input-sm">
                              </div>
                          </div>
                          ` : ''}
 
-                         <div style="margin-top: 20px;">
+                         <div class="mt-20">
                              <button id="btn-guardar-peso" class="wizard-btn-action" style="width: 100%; max-width: 280px; margin: 0 auto; font-size: 1.1rem; padding: 15px; background: ${unidadColor}; color: #000; font-weight: 900; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">💾 ${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</button>
                          </div>
                     </div>
@@ -197,10 +197,10 @@ const PesajesUI = {
                     <div class="rounded-10" style="background:#000; border:1px solid #222; overflow: hidden; display: flex; flex-direction: column; flex-shrink: 0; max-height: 250px;">
                         <div class="bg-card text-tiny text-555" style="padding:8px 12px; text-transform:uppercase; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px;">
                             <span>${esModoLeche ? 'Vaca' : 'Animal'}</span>
-                            <span style="text-align:right;">Anterior</span>
-                            <span style="text-align:right;">Actual</span>
+                            <span class="text-right">Anterior</span>
+                            <span class="text-right">Actual</span>
                         </div>
-                        <div id="w-table-body" style="overflow-y: auto; flex: 1;">
+                        <div id="w-table-body" class="flex-1" style="overflow-y: auto;">
                         </div>
                     </div>
 
@@ -218,8 +218,8 @@ const PesajesUI = {
                 </div>
             </div>
 
-            <div class="wizard-footer-fixed" style="display:flex; gap:10px;">
-                <button class="wizard-btn-action wizard-btn-success" id="btn-wizard-finish" style="flex:1;">${esModoLeche ? 'FINALIZAR CONTROL ✔' : 'FINALIZAR PESADAS ✔'}</button>
+            <div class="wizard-footer-fixed flex gap-10">
+                <button class="wizard-btn-action wizard-btn-success flex-1" id="btn-wizard-finish">${esModoLeche ? 'FINALIZAR CONTROL ✔' : 'FINALIZAR PESADAS ✔'}</button>
             </div>
             `;
 
