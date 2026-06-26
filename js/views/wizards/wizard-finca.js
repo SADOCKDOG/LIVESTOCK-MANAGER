@@ -3,7 +3,7 @@
  * Extraído de app.js para modularización
  */
 window.WizardFinca = {
-  showForm() {
+  showForm(options = {}) {
     const opcionesCCAA = window.ComunidadesService
       ? window.ComunidadesService.getOpcionesComunidad()
       : [{ value: 'andalucia', label: 'Andalucía' }, { value: 'extremadura', label: 'Extremadura' }];
@@ -48,12 +48,13 @@ window.WizardFinca = {
       }
     ];
 
+    const { onComplete, onCancel } = options;
     window.WizardManager.create({
       id: 'wizard-nueva-finca',
       title: 'NUEVA FINCA',
       initialData: { nombre: '', codigo_REGA: '', comunidad_autonoma: '' },
       steps: wizardSteps,
-      onComplete: async (finalData) => {
+      onComplete: onComplete || (async (finalData) => {
         try {
           await Fincas.save(finalData);
           App.toast("Finca creada");
@@ -61,7 +62,8 @@ window.WizardFinca = {
         } catch (e) {
           App.toastError(e.message);
         }
-      }
+      }),
+      onCancel
     });
   },
 
@@ -88,7 +90,7 @@ window.WizardFinca = {
               <div class="wizard-input-group"><label class="wizard-label">NIF / CIF</label><input type="text" id="w-f-nif" value="${data.nif_cif || ''}" class="wizard-input"></div>
               <div class="wizard-input-group"><label class="wizard-label">DIRECCIÓN POSTAL</label><input type="text" id="w-f-dir" value="${data.direccion || ''}" class="wizard-input"></div>
 
-              <hr class="border-333" class="my-16">
+              <hr class="border-333 my-16">
               <h4 class="text-gold text-sm mt-0 mb-12">📍 Configuración Autonómica</h4>
 
               <div class="wizard-input-group"><label class="wizard-label">COMUNIDAD AUTÓNOMA</label>
@@ -116,7 +118,7 @@ window.WizardFinca = {
                 </div>
               </div>
 
-              <hr class="border-333" class="my-16">
+              <hr class="border-333 my-16">
               <h4 class="text-red text-sm mt-0 mb-12">🏥 ADSG (Agrupación Defensa Sanitaria)</h4>
 
               <div class="wizard-input-group"><label class="wizard-label">NOMBRE ADSG</label><input type="text" id="w-f-adsg" value="${data.adsg_nombre || ''}" placeholder="Agrupación Defensa..." class="wizard-input"></div>
@@ -167,12 +169,12 @@ window.WizardFinca = {
                 <div class="wizard-input-group"><label class="wizard-label">COMPRADOR</label><input type="text" id="w-f-cl-comp" value="${data.contrato_lacteo_comprador || ''}" placeholder="Industria/Cooperativa" class="wizard-input"></div>
               </div>
 
-              <hr class="border-333" class="my-16">
+              <hr class="border-333 my-16">
               <h4 class="text-blue text-sm mt-0 mb-12">${Icons.grafico()} INFOLAC — Declaraciones Mensuales</h4>
               <div class="wizard-input-group"><label class="wizard-label">Nº INFOLAC (si aplica)</label><input type="text" id="w-f-infolac" value="${data.numero_infolac || ''}" placeholder="INFOLAC-AAAA-MM-NNN" class="wizard-input"></div>
 
-              <hr class="border-333" class="my-16">
-              <div class="bg-darker border-muted rounded" style="padding:14px;">
+              <hr class="border-333 my-16">
+              <div class="bg-darker border-muted rounded p-14">
                 <p class="text-2xs text-gray-500" class="m-0">
                   💡 <strong>¿No tienes contrato lácteo?</strong> Si produces leche pero no has formalizado contrato,
                   el Paquete Lácteo te obliga a hacerlo. Consulta la guía en Ajustes &gt; Paquete Lácteo.
