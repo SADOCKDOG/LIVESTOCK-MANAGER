@@ -109,7 +109,7 @@ const HibridoView = {
     main.innerHTML = `
       <div class="mb-14">
         <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          <div class="hibrido-tabs" style="display:inline-flex; gap:4px; padding:4px 0;">
+          <div class="hibrido-tabs">
             <button class="hibrido-tab active" data-tab="patrimonio" onclick="HibridoView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
             <button class="hibrido-tab" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
             <button class="hibrido-tab" data-tab="legislacion" onclick="HibridoView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
@@ -235,7 +235,7 @@ const HibridoView = {
           <span style="font-size:1.6rem;">${Icons.edificio()}</span>
           <div>
             <div class="text-white font-900" style="font-size:1.05rem;">Patrimonio y Censo Consolidado</div>
-            <div class="text-gray" style="font-size:0.68rem;">Organización ganadera de doble aptitud</div>
+            <div class="text-gray text-xs">Organización ganadera de doble aptitud</div>
           </div>
         </div>
 
@@ -312,14 +312,14 @@ const HibridoView = {
             <span style="font-size:1.6rem;">${Icons.transportistas()}</span>
             <div>
               <div class="text-white font-900" style="font-size:1.05rem;">Logística y Transporte, Comercialización Ventas</div>
-              <div class="text-gray" style="font-size:0.68rem;">Logística, transporte, compradores, contratos y ventas consolidado</div>
+              <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
             </div>
           </div>
           <div class="flex gap-4">
             <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
               ${Icons.agregar()} Venta Carne
             </button>
-            <button class="btn btn-secondary btn-sm" style="background:#10b981; border-color:#10b981;" onclick="App._abrirWizardAlbaranLeche()">
+            <button class="btn btn-success btn-sm" onclick="App._abrirWizardAlbaranLeche()">
               ${Icons.agregar()} Albarán Leche
             </button>
           </div>
@@ -394,7 +394,7 @@ const HibridoView = {
             <span style="font-size:1.6rem;">${Icons.documento()}</span>
             <div>
               <div class="text-white font-900" style="font-size:1.05rem;">Registros Legislación, Cumplimiento Sanitario</div>
-              <div class="text-gray" style="font-size:0.68rem;">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
+              <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
             </div>
           </div>
           <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="HibridoView._abrirAsistenteTratamientoMix()">

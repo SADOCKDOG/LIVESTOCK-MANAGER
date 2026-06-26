@@ -2431,8 +2431,9 @@ label {
 /* scroll containers */
 .hscroll-wrap    { overflow-x: auto; white-space: nowrap; }
 .hscroll-cards   { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; margin-top: 15px; }
-.leche-tabs      { display: inline-flex; gap: 4px; padding: 4px 0; }
-.carne-tabs      { display: inline-flex; gap: 4px; padding: 4px 0; }
+.leche-tabs,
+.carne-tabs,
+.hibrido-tabs    { display: inline-flex; gap: 4px; padding: 4px 0; }
 
 /* kpi cards en fila horizontal */
 .kpi-card-fixed  { flex: 0 0 140px; min-width: 0; }
