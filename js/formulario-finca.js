@@ -183,10 +183,10 @@ const FormularioFinca = {
 
                 <!-- Botones SIEMPRE visibles abajo (fuera del scroll) -->
                 <div class="formulario-finca-botones">
-                    <button type="button" class="btn btn--inline btn--primary" id="btn-guardar-finca">
+                    <button type="button" class="btn btn-sm btn-primary" id="btn-guardar-finca">
                         ${Icons.guardar()} Crear Finca
                     </button>
-                    <button type="button" class="btn btn--inline btn--secondary formulario-finca-cancelar">
+                    <button type="button" class="btn btn-sm btn-secondary formulario-finca-cancelar">
                         ${Icons.cerrar()} Cancelar
                     </button>
                 </div>
