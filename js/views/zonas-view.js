@@ -14,10 +14,10 @@ const ZonasView = {
       .filter(({ zona }) => !zona?.anulada);
     let html = `
       <div class="text-center mb-25">
-        <button class="btn btn-create btn-sm" onclick="ZonasView._crearZona()">➕ Nueva Zona</button>
+        <button class="btn btn-create btn-sm" onclick="ZonasView._crearZona()">${Icons.agregar()} Nueva Zona</button>
       </div>`;
     if (zonasConIndice.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">🗺️</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
     else {
       let totalAforo = 0, totalOcupacion = 0;
       html += `<div class="grid gap-15">`;
@@ -102,7 +102,7 @@ const ZonasView = {
           </div>
         </div>`;
     }
-    main.innerHTML = html + `<button class="fab-btn" onclick="ZonasView._crearZona()" aria-label="Nueva Zona">➕</button>`;
+    main.innerHTML = html + `<button class="fab-btn" onclick="ZonasView._crearZona()" aria-label="Nueva Zona">${Icons.agregar()}</button>`;
   },
 
   async renderDetalle(params) {
@@ -128,7 +128,7 @@ const ZonasView = {
     const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
     
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">📍 Detalle Zona</h2></div>
+      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
       <div class="card border-top-3px border-top-3px-orange">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
@@ -144,17 +144,17 @@ const ZonasView = {
           <div><label class="form-label">Distancia a Fuente de Agua (m)</label>
           <input type="number" id="z-edit-agua" value="${zona.distancia_agua_m || ""}" placeholder="Metros" class="premium-input"></div>
           <div class="text-gray text-xs mt-8">
-            <strong>📊 Métricas SIGGAN (solo lectura):</strong><br/>
+            <strong>${Icons.grafico()} Métricas SIGGAN (solo lectura):</strong><br/>
             UGM Total: <strong>${ugmTotal.toFixed(1)}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
           </div>
           <div><label class="form-label">Localización</label>
           <textarea id="z-edit-localizacion" class="premium-input" style="min-height:60px; resize:none;">${zona.localizacion || ""}</textarea></div>
         </div>
         <div class="flex justify-between items-center mt-20">
-          <button class="btn btn-danger" onclick="ZonasView._eliminarZona(${index})">🗑️ Eliminar</button>
+          <button class="btn btn-danger" onclick="ZonasView._eliminarZona(${index})">${Icons.eliminar()} Eliminar</button>
           <div class="flex gap-10">
-            <button class="btn btn-secondary" onclick="location.hash='/zonas'">✕ Cancelar</button>
-            <button class="btn btn-success" onclick="ZonasView._guardarZona(${index})">✔ Guardar</button>
+            <button class="btn btn-secondary" onclick="location.hash='/zonas'">${Icons.cerrar()} Cancelar</button>
+            <button class="btn btn-success" onclick="ZonasView._guardarZona(${index})">${Icons.guardar()} Guardar</button>
           </div>
         </div>
       </div>`;

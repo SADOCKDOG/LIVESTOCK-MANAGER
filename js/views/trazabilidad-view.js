@@ -253,7 +253,7 @@ const TrazabilidadView = {
         <div class="flex items-center gap-8 mb-14" style="flex-wrap:wrap;">
           <button onclick="App._navigateBack()" class="btn btn-secondary btn-sm" style="padding:8px 14px;">← Volver</button>
           <div style="flex:1;"></div>
-          <button onclick="TrazabilidadView._exportarPDF()" class="btn btn-primary btn-sm" style="padding:8px 14px;background:#b45309;">📄 Exportar PDF</button>
+          <button onclick="TrazabilidadView._exportarPDF()" class="btn btn-primary btn-sm" style="padding:8px 14px;background:#b45309;">${Icons.exportar()} Exportar PDF</button>
         </div>
 
         <!-- Datos Básicos del Animal -->
@@ -284,8 +284,8 @@ const TrazabilidadView = {
 
         <!-- Timeline -->
         <div class="mt-16">
-          <h3 class="text-white" style="font-size:1rem; margin-bottom:15px;">📅 Línea de Vida</h3>
-          ${timeline.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🔍</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>' : ''}
+          <h3 class="text-white" style="font-size:1rem; margin-bottom:15px;">${Icons.calendar()} Línea de Vida</h3>
+          ${timeline.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.buscar()}</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>` : ''}
           <div id="trazabilidad-timeline" style="position:relative;">
             <div style="position:absolute; left:18px; top:0; bottom:0; width:2px; background:#333;"></div>
             ${timeline.map(t => this._renderTimelineItem(t)).join('')}
