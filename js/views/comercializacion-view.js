@@ -13,15 +13,6 @@ const ComercializacionView = {
     const tab = (params && params.get ? params.get("tab") : null) || this._currentTab;
     this._currentTab = tab;
 
-    const main = document.getElementById("app-content");
-    main.style.overflowX = 'hidden';
-    main.style.maxWidth = '100%';
-    main.style.boxSizing = 'border-box';
-    main.style.paddingLeft = '12px';
-    main.style.paddingRight = '12px';
-
-    this._inyectarEstilos();
-
     const fincaId = await Fincas.getActiveId();
     const [ventas, entregas, gastosRecords] = await Promise.all([
       window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
@@ -94,25 +85,6 @@ const ComercializacionView = {
     };
 
     this._renderTabActual();
-  },
-
-  _inyectarEstilos() {
-    if (document.getElementById('comer-tab-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'comer-tab-styles';
-    style.textContent = `
-      .comer-tabs::-webkit-scrollbar { display: none; }
-      .comer-tab {
-        flex: 0 0 auto; padding: 9px 18px; border-radius: 18px; border: 1px solid #333;
-        background: #1a1a1a; color: #888; font-size: 0.78rem; font-weight: 800;
-        cursor: pointer; white-space: nowrap; transition: all 0.2s;
-        text-transform: uppercase; letter-spacing: 0.4px;
-      }
-      .comer-tab.active { background: #d97706; color: #fff; border-color: #d97706; box-shadow: 0 0 14px rgba(217,119,6,0.35); }
-      .comer-tab:active { transform: scale(0.95); }
-      #comer-content .report-section { max-width:100%; overflow:hidden; }
-    `;
-    document.head.appendChild(style);
   },
 
   _cambiarTab(tab) {

@@ -213,10 +213,10 @@ header {
 main#app-content {
     margin-top: calc(56px + var(--safe-top) + 4px);
     margin-bottom: calc(90px + var(--safe-bottom));
-    padding: 16px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* CARTAS */
@@ -2343,6 +2343,87 @@ label {
 .leche-tabs,
 .carne-tabs,
 .hibrido-tabs    { display: inline-flex; gap: 4px; padding: 4px 0; }
+.gasto-tabs, .comer-tabs, .prod-tabs { display: inline-flex; gap: 4px; padding: 4px 0; }
+.gasto-tabs::-webkit-scrollbar, .comer-tabs::-webkit-scrollbar, .prod-tabs::-webkit-scrollbar { display: none; }
+
+/* ===== VIEW TAB BUTTONS — migrado desde _inyectarEstilos() ===== */
+.carne-tab, .comer-tab, .gasto-tab, .hibrido-tab, .leche-tab, .prod-tab {
+  flex: 0 0 auto; padding: 9px 18px; border-radius: 18px; border: 1px solid #333;
+  background: #1a1a1a; color: #888; font-size: 0.78rem; font-weight: 800;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.carne-tab.active {
+  background: #ef4444; color: #fff; border-color: #ef4444;
+  box-shadow: 0 0 14px rgba(239,68,68,0.35);
+}
+.comer-tab.active, .gasto-tab.active, .hibrido-tab.active, .leche-tab.active, .prod-tab.active {
+  background: #d97706; color: #fff; border-color: #d97706;
+  box-shadow: 0 0 14px rgba(217,119,6,0.35);
+}
+.carne-tab:active, .comer-tab:active, .gasto-tab:active,
+.hibrido-tab:active, .leche-tab:active, .prod-tab:active { transform: scale(0.95); }
+#carne-content .report-section, #comer-content .report-section, #gasto-content .report-section,
+#hibrido-content .report-section, #leche-content .report-section, #prod-content .report-section {
+  max-width: 100%; overflow: hidden;
+}
+
+/* Botón enlace-widget (navegación entre módulos desde vistas) */
+.widget-link-btn {
+  background: #27272a; color: #fff; border: 1px solid #3f3f46;
+  padding: 10px 14px; border-radius: 8px; text-align: center;
+  font-size: 0.78rem; font-weight: bold; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all 0.2s; text-decoration: none;
+}
+.widget-link-btn:active { transform: scale(0.95); background: #3f3f46; }
+
+/* Alerta de supresión / lechera */
+.supresion-alerta-box, .leche-alerta-box {
+  background: rgba(239,68,68,0.15); border-left: 4px solid #ef4444;
+  padding: 12px; border-radius: 6px; margin-bottom: 15px;
+  color: #fca5a5; font-size: 0.8rem; line-height: 1.4;
+}
+.sup-badge { font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 5px; margin-right: 5px; }
+.sup-badge-carne { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.sup-badge-leche { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+
+/* Vista Explotación — KPI grid, tabla premium, modo-btn */
+.explotacion-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+.explotacion-kpi-card {
+  background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 12px;
+  padding: 12px 8px; text-align: center; border-top: 3px solid var(--theme-color); min-width: 0;
+}
+.explotacion-kpi-value {
+  font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.explotacion-kpi-label {
+  font-size: 0.65rem; color: #888; text-transform: uppercase;
+  letter-spacing: 0.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.premium-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.premium-table th {
+  background: #18181b; color: #a1a1aa; font-weight: 700; padding: 10px 8px;
+  font-size: 0.68rem; text-transform: uppercase; border-bottom: 2px solid #27272a;
+}
+.premium-table td { padding: 10px 8px; font-size: 0.72rem; color: #e4e4e7; border-bottom: 1px solid #27272a; }
+.premium-table tr:hover { background: rgba(255,255,255,0.02); }
+.expro-mode-btn {
+  flex: 1; padding: 9px 16px; border: none; border-radius: 20px;
+  background: transparent; color: #888; font-size: 0.8rem; font-weight: 800;
+  cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.expro-mode-btn.active { background: var(--mode-color); color: #fff; box-shadow: 0 0 12px var(--mode-color); }
+.expro-mode-btn:active { transform: scale(0.95); }
+.ganaderia-mode-switch { display: inline-flex; background: #18181b; padding: 4px; border-radius: 24px; border: 1px solid #27272a; width: 100%; max-width: 520px; box-sizing: border-box; }
+.ganaderia-mode-btn { flex: 1; padding: 9px 16px; border: none; border-radius: 20px; background: transparent; color: #888; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+.ganaderia-mode-btn.active { background: var(--mode-color); color: #fff; box-shadow: 0 0 12px var(--mode-color); }
+.ganaderia-mode-btn:active { transform: scale(0.95); }
+.ganaderia-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.ganaderia-kpi { background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 12px; text-align: center; padding: 12px 8px; border-top: 3px solid var(--kpi-color); }
+.ganaderia-kpi small { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
+.ganaderia-kpi strong { font-size: 1.1rem; color: #fff; margin-top: 4px; display: block; }
 
 /* kpi cards en fila horizontal */
 .kpi-card-fixed  { flex: 0 0 140px; min-width: 0; }
