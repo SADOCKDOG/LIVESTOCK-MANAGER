@@ -16,14 +16,6 @@ const HibridoView = {
   },
 
   async render() {
-    const main = document.getElementById('app-content');
-    main.style.maxWidth = '100%';
-    main.style.boxSizing = 'border-box';
-    main.style.paddingLeft = '12px';
-    main.style.paddingRight = '12px';
-
-    this._inyectarEstilos();
-
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
 
@@ -154,43 +146,6 @@ const HibridoView = {
     };
 
     this._renderTabActual();
-  },
-
-  _inyectarEstilos() {
-    if (document.getElementById('hibrido-tab-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'hibrido-tab-styles';
-    style.textContent = `
-      .hibrido-tabs::-webkit-scrollbar { display: none; }
-      .hibrido-tab {
-        flex: 0 0 auto; padding: 9px 18px; border-radius: 18px; border: 1px solid #333;
-        background: #1a1a1a; color: #888; font-size: 0.78rem; font-weight: 800;
-        cursor: pointer; white-space: nowrap; transition: all 0.2s;
-        text-transform: uppercase; letter-spacing: 0.4px;
-      }
-      .hibrido-tab.active { background: #d97706; color: #fff; border-color: #d97706; box-shadow: 0 0 14px rgba(217,119,6,0.35); }
-      .hibrido-tab:active { transform: scale(0.95); }
-      #hibrido-content .report-section { max-width:100%; overflow:hidden; }
-      .widget-link-btn {
-        background: #27272a; color: #fff; border: 1px solid #3f3f46;
-        padding: 10px 14px; border-radius: 8px; text-align: center;
-        font-size: 0.78rem; font-weight: bold; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-        transition: all 0.2s; text-decoration: none;
-      }
-      .widget-link-btn:active { transform: scale(0.95); background: #3f3f46; }
-      .supresion-alerta-box {
-        background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444;
-        padding: 12px; border-radius: 6px; margin-bottom: 15px; color: #fca5a5;
-        font-size: 0.8rem; line-height: 1.4;
-      }
-      .sup-badge {
-        font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 5px; margin-right: 5px;
-      }
-      .sup-badge-carne { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-      .sup-badge-leche { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
-    `;
-    document.head.appendChild(style);
   },
 
   _cambiarTab(tab) {

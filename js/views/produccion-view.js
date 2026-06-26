@@ -11,14 +11,6 @@ const ProduccionView = {
 
   async render() {
     const main = document.getElementById("app-content");
-    main.style.overflowX = 'hidden';
-    main.style.maxWidth = '100%';
-    main.style.boxSizing = 'border-box';
-    main.style.paddingLeft = '12px';
-    main.style.paddingRight = '12px';
-
-    this._inyectarEstilos();
-
     // Cabecera compacta + tabs
     main.innerHTML = `
       <div class="mb-14">
@@ -82,25 +74,6 @@ const ProduccionView = {
     this._renderTabActual();
 
       },
-
-  _inyectarEstilos() {
-    if (document.getElementById('prod-tab-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'prod-tab-styles';
-    style.textContent = `
-      .prod-tabs::-webkit-scrollbar { display: none; }
-      .prod-tab {
-        flex: 0 0 auto; padding: 9px 18px; border-radius: 18px; border: 1px solid #333;
-        background: #1a1a1a; color: #888; font-size: 0.78rem; font-weight: 800;
-        cursor: pointer; white-space: nowrap; transition: all 0.2s;
-        text-transform: uppercase; letter-spacing: 0.4px;
-      }
-      .prod-tab.active { background: #d97706; color: #fff; border-color: #d97706; box-shadow: 0 0 14px rgba(217,119,6,0.35); }
-      .prod-tab:active { transform: scale(0.95); }
-      #prod-content .report-section { max-width:100%; overflow:hidden; }
-    `;
-    document.head.appendChild(style);
-  },
 
   _cambiarTab(tab) {
     this._currentTab = tab;

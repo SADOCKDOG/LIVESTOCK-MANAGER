@@ -8,13 +8,6 @@ const GanaderiaView = {
 
   async render() {
     const main = document.getElementById('app-content');
-    main.style.maxWidth = '100%';
-    main.style.boxSizing = 'border-box';
-    main.style.paddingLeft = '12px';
-    main.style.paddingRight = '12px';
-
-    this._injectStyles();
-
     const fincaId = await Fincas.getActiveId();
     if (!fincaId) {
       main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">No hay ninguna finca seleccionada.</p></div>`;
@@ -132,39 +125,6 @@ const GanaderiaView = {
     this.render();
   },
 
-  _injectStyles() {
-    if (document.getElementById('ganaderia-view-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'ganaderia-view-styles';
-    style.textContent = `
-      .ganaderia-mode-switch {
-        display:inline-flex; background:#18181b; padding:4px; border-radius:24px;
-        border:1px solid #27272a; width:100%; max-width:520px; box-sizing:border-box;
-      }
-      .ganaderia-mode-btn {
-        flex:1; padding:9px 16px; border:none; border-radius:20px; background:transparent;
-        color:#888; font-size:0.8rem; font-weight:800; cursor:pointer; transition:all 0.2s;
-        text-transform:uppercase; letter-spacing:0.5px;
-      }
-      .ganaderia-mode-btn.active {
-        background:var(--mode-color); color:#fff; box-shadow:0 0 12px var(--mode-color);
-      }
-      .ganaderia-kpis {
-        display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:14px;
-      }
-      .ganaderia-kpi {
-        background:#1e1e1e; border:1px solid #2e2e2e; border-radius:12px; text-align:center;
-        padding:12px 8px; border-top:3px solid var(--kpi-color);
-      }
-      .ganaderia-kpi small {
-        display:block; font-size:0.65rem; color:#888; text-transform:uppercase;
-        letter-spacing:0.3px;
-      }
-      .ganaderia-kpi strong { font-size:1.1rem; color:#fff; margin-top:4px; display:block; }
-      .no-underline { text-decoration:none; }
-    `;
-    document.head.appendChild(style);
-  }
 };
 
 window.GanaderiaView = GanaderiaView;
