@@ -78,10 +78,10 @@ const AsistenteConfiguracion = {
                     </div>
                     <div id="asistente-resultado" class="asistente-resultado" style="display: none;"></div>
                     <div class="asistente-botones">
-                        <button class="btn btn--inline btn--primary" id="btn-importar-confirmar" disabled>
+                        <button class="btn btn-sm btn-primary" id="btn-importar-confirmar" disabled>
                             Importar Fincas
                         </button>
-                        <button class="btn btn--inline btn--secondary" id="btn-volver-importar">
+                        <button class="btn btn-sm btn-secondary" id="btn-volver-importar">
                             Volver
                         </button>
                     </div>
@@ -92,7 +92,7 @@ const AsistenteConfiguracion = {
                     <div class="asistente-titulo-seccion">Seleccionar Finca Existente</div>
                     <div id="lista-fincas-existentes" class="asistente-lista-fincas"></div>
                     <div class="asistente-botones">
-                        <button class="btn btn--inline btn--secondary" id="btn-volver-seleccionar">
+                        <button class="btn btn-sm btn-secondary" id="btn-volver-seleccionar">
                             Volver
                         </button>
                     </div>
