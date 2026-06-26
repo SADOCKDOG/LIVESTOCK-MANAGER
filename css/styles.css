@@ -335,26 +335,6 @@ nav.bottom-nav {
 }
 
 
-.btn--icon {
-    width: 48px !important;
-    min-width: 48px !important;
-    height: 48px !important;
-    padding: 0 !important;
-    border-radius: 14px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 1.2rem !important;
-    cursor: pointer !important;
-    border: none !important;
-    transition: all 0.2s ease !important;
-    background: #1a1a1a !important;
-    color: #fff !important;
-    border: 1px solid #333 !important;
-    -webkit-tap-highlight-color: transparent !important;
-    touch-action: manipulation !important;
-}
-
 .fab-btn {
     position: fixed !important;
     bottom: calc(85px + var(--safe-bottom)) !important;
@@ -377,7 +357,6 @@ nav.bottom-nav {
 }
 
 .btn:active,
-.btn--icon:active,
 .wizard-btn-action:active,
 .sub-tabs button:active,
 .list-card:active,
@@ -544,29 +523,6 @@ label {
     transform: scale(0.96);
 }
 
-.btn-icon {
-    width: 48px;
-    min-width: 48px;
-    height: 48px;
-    padding: 0;
-    border-radius: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-    background: #1a1a1a;
-    color: #fff;
-    border: 1px solid #333;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-}
-
-.btn-icon:active {
-    transform: scale(0.92);
-}
 
 /* ============================================
    TABLAS RESPONSIVE
@@ -2281,9 +2237,6 @@ label {
 /* ── Badge tipo comprador/proveedor ── */
 .badge-tipo { font-size: 0.62rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; }
 
-/* ── Botones acción en detalle ── */
-.btn-action-blue { padding: 8px 14px; border-radius: 12px; background: #3b82f6; color: white; border: none; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-.btn-action-red  { padding: 8px 14px; border-radius: 12px; background: #450a0a; color: #ef4444; border: none; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
 
 /* ── Ítem lista con cursor pointer ── */
 .card-list-item { cursor: pointer; padding: 14px 16px; margin-bottom: 0; }
@@ -2343,10 +2296,6 @@ label {
 .wizard-content-scrollable[data-ss-start]::before { opacity: 1; }
 .wizard-content-scrollable[data-ss-end]::after { opacity: 1; }
 
-/* ── Botones industriales ── */
-.btn-industrial { border: none; border-radius: 15px; font-weight: 900; font-size: 1.2rem; padding: 20px; cursor: pointer; width: 100%; }
-.btn-naranja { background: #f97316; color: white; }
-.btn-verde { background: #059669; color: white; }
 
 /* (Parche legacy "Compact headers" eliminado: apuntaba a h2[style*="2.2rem"],
    patrón que ya no existe en el código. Usar .page-title-bar para cabeceras.) */
