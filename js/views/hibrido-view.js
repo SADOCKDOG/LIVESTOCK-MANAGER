@@ -362,7 +362,7 @@ const HibridoView = {
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
           <a href="#/documentos" class="widget-link-btn">${Icons.documento()} Documentos</a>
-          <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno Oficial</a>
+          <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno de Explotación</a>
         </div>
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">

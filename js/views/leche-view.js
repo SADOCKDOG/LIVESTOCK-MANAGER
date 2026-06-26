@@ -313,7 +313,7 @@ const LecheView = {
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
           <a href="#/documentos" class="widget-link-btn">${Icons.documento()} Documentos</a>
-          <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno Oficial</a>
+          <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno de Explotación</a>
         </div>
 
         <div class="leche-list-header">
