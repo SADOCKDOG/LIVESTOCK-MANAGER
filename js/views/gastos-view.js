@@ -51,7 +51,7 @@ const GastosView = {
     const mesesHtml = Object.values(porMes).reverse().map(m => {
       const pct = Math.min(100, m.total / (Math.max(1, Object.values(porMes).reduce((s,x) => Math.max(s, x.total), 0)) / 100));
       const color = pct > 70 ? '#ef4444' : pct > 40 ? '#f59e0b' : '#10b981';
-      return `<div style="flex:1;text-align:center;min-width:0;">
+      return `<div class="flex-1 text-center" style="min-width:0;">
         <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
         <div style="height:40px;background:#1a1a1a;border-radius:6px;overflow:hidden;position:relative;">
           <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
@@ -73,7 +73,7 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card mb-14" style="padding:12px;background:rgba(239,68,68,0.03);">
+      <div class="card mb-14 p-12" style="background:rgba(239,68,68,0.03);">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
           <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>

@@ -116,7 +116,7 @@ const RebanosView = {
 
       <!-- Categorías -->
       ${Object.keys(porCategoria).length > 0 ? `
-      <div class="card mb-20 border-top-3px border-top-3px-purple" style="padding:12px;">
+      <div class="card mb-20 border-top-3px border-top-3px-purple p-12">
         <div class="inf-section-title mb-6 flex items-center gap-8">${Icons.documento()} Por categoría</div>
         <div class="flex flex-wrap gap-4">${Object.entries(porCategoria).map(([c, n]) => `<span class="badge badge-sm badge-purple">${c}: ${n}</span>`).join('')}</div>
       </div>` : ''}
@@ -167,7 +167,7 @@ const RebanosView = {
       </div>
       
       <!-- Sanidad -->
-      <div class="card mb-20 border-top-3px border-top-3px-green" style="background:rgba(16,185,129,0.05);">
+      <div class="card mb-20 border-top-3px border-top-3px-green card-tint-green">
         <div class="flex justify-between items-center">
           <div class="inf-card-title m-0 flex items-center gap-8">${Icons.sanidad()} Sanidad</div>
           <button class="btn btn-primary btn-add" onclick="App._registrarTratamiento(${id})" style="padding:5px 12px; font-size:0.8rem;">${Icons.agregar()} Añadir</button>
@@ -258,7 +258,7 @@ const RebanosView = {
     const wizardSteps = [
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">NOMBRE DEL REBAÑO</label>
               <input type="text" id="w-reb-nombre" value="${data.nombre}" placeholder="Ej: Lote Engorde A..." class="wizard-input">
@@ -285,7 +285,7 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">TIPO DE PRODUCCIÓN</label>
               <select id="w-reb-tipo" class="wizard-input wizard-select">
@@ -308,7 +308,7 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
               <select id="w-reb-tipo-explotacion" class="wizard-input wizard-select" style="border-color: #10b981;">
@@ -325,7 +325,7 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">CAPACIDAD / AFORO MÁXIMO</label>
               <input type="number" id="w-reb-capacidad" value="${data.capacidad_total || ''}" placeholder="Ej: 100 (opcional)" class="wizard-input">
@@ -343,7 +343,7 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div style="margin-top:10px;">
+          <div class="mt-10">
             <div class="wizard-input-group">
               <label class="wizard-label">FECHA DE CONSTITUCIÓN</label>
               <input type="date" id="w-reb-fecha" value="${data.fecha_constitucion}" class="wizard-input">
