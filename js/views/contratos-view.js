@@ -37,7 +37,7 @@ const ContratosView = {
           </div>
           <div class="card" style="border-top:4px solid #8b5cf6; padding:20px;">
             <h2 class="text-gold m-0 mb-16" style="font-size:1.1rem; border:none; padding:0;">
-              ${esEdicion ? '✏️ Contrato: ' + contrato.numero_contrato : '➕ Nuevo Contrato'}
+              ${esEdicion ? `${Icons.editar()} Contrato: ` + contrato.numero_contrato : `${Icons.agregar()} Nuevo Contrato`}
             </h2>
 
             ${comprador ? `
@@ -98,8 +98,8 @@ const ContratosView = {
             <!-- TABLA DE PRECIOS -->
             <div class="mt-16 mb-12">
               <div class="flex justify-between items-center mb-8">
-                <h3 class="text-gold m-0 text-85">💰 Tabla de Precios</h3>
-                <button onclick="ContratosView._addPrecioRow()" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">➕ Añadir precio</button>
+                <h3 class="text-gold m-0 text-85">${Icons.dinero()} Tabla de Precios</h3>
+                <button onclick="ContratosView._addPrecioRow()" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">${Icons.agregar()} Añadir precio</button>
               </div>
               <div id="ct-precios-container">
                 ${contrato.precios && contrato.precios.length > 0 ?
@@ -115,10 +115,10 @@ const ContratosView = {
             </label>
 
             <div class="flex justify-between items-center mt-20">
-              ${esEdicion ? `<button onclick="App.toastError('Para eliminar el contrato, desactívelo.')" class="btn btn-danger" style="opacity: 0.5;">🗑️ Eliminar</button>` : '<div></div>'}
+              ${esEdicion ? `<button onclick="App.toastError('Para eliminar el contrato, desactívelo.')" class="btn btn-danger" style="opacity: 0.5;">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
               <div class="flex gap-10">
-                <button onclick="location.hash='${comprador ? '#/comprador?id='+contrato.compradorId : '#/compradores'}'" class="btn btn-secondary">✕ Cancelar</button>
-                <button onclick="ContratosView._guardar('${id || ''}')" class="btn btn-success">✔ Guardar</button>
+                <button onclick="location.hash='${comprador ? '#/comprador?id='+contrato.compradorId : '#/compradores'}'" class="btn btn-secondary">${Icons.cerrar()} Cancelar</button>
+                <button onclick="ContratosView._guardar('${id || ''}')" class="btn btn-success">${Icons.guardar()} Guardar</button>
               </div>
             </div>
           </div>
@@ -148,7 +148,7 @@ const ContratosView = {
             </div>
             <div>
               <label class="kpi-label">&nbsp;</label>
-              <button onclick="this.closest('.precio-row').remove()" class="btn btn-danger" style="display:block; width:100%; padding:8px; border-radius:8px; font-size:0.7rem; font-weight:800;">✕</button>
+              <button onclick="this.closest('.precio-row').remove()" class="btn btn-danger" style="display:block; width:100%; padding:8px; border-radius:8px; font-size:0.7rem; font-weight:800;">${Icons.cerrar()}</button>
             </div>
           </div>`;
     },

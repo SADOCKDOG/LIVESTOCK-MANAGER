@@ -243,7 +243,7 @@ window.WizardCrotales = {
               </div>
           </div>
           <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-              <button class="btn btn-primary" id="btn-descargar-adsg" style="width:auto; padding:0 30px; background:#10b981;">📄 DESCARGAR O ENVIAR</button>
+              <button class="btn btn-primary" id="btn-descargar-adsg" style="width:auto; padding:0 30px; background:#10b981;">${Icons.exportar()} DESCARGAR O ENVIAR</button>
               <button class="btn btn-secondary" onclick="document.getElementById('pedido-pdf-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
           </div>
       `;
