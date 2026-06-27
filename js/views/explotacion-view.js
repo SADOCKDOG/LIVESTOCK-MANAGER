@@ -666,6 +666,10 @@ const ExplotacionView = {
   _renderPipelineComercialHtml(modo) {
     const color = modo === 'leche' ? '#3b82f6' : (modo === 'hibrido' ? '#10b981' : '#ef4444');
     const tab = modo === 'leche' ? 'leche' : 'carne';
+    const labelBoton = modo === 'hibrido'
+      ? 'Ir a Comercialización Leche, carne e híbrido'
+      : `Ir a Comercialización (${modo === 'leche' ? 'Leche' : 'Carne'})`;
+
     return `
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${color};">
         <div class="text-xs text-white font-black uppercase mb-8 flex items-center gap-6">${Icons.rotacion()} CIERRE OPERATIVO → COMERCIALIZACIÓN/VENTA</div>
@@ -673,7 +677,7 @@ const ExplotacionView = {
           Finaliza primero los registros de Explotación (producción, costes y cumplimiento). Después continúa el flujo comercial.
         </div>
         <div class="grid grid-cols-2 gap-10">
-          <button class="widget-link-btn" onclick="ExplotacionView._irAComercializacionDesdeExplotacion('${modo}')">${Icons.transportistas()} Ir a Comercialización (${modo === 'leche' ? 'Leche' : 'Carne'})</button>
+          <button class="widget-link-btn" onclick="ExplotacionView._irAComercializacionDesdeExplotacion('${modo}')">${Icons.transportistas()} ${labelBoton}</button>
           <a href="#/informes" class="widget-link-btn">${Icons.grafico()} Ver informes de control</a>
         </div>
       </div>
