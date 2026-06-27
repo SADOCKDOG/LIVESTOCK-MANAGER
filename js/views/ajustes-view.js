@@ -188,14 +188,14 @@ const AjustesView = {
             <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> 🌙 Modo Oscuro
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
-            <span>📅 Formato Fecha:</span>
+            <span>${Icons.calendar()} Formato Fecha:</span>
             <select class="premium-input flex-1 select-sm" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
               <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (España)</option>
               <option value="en-US" ${config.formatoFecha === 'en-US' ? 'selected' : ''}>MM/DD/AAAA (EE.UU.)</option>
             </select>
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
-            <span>💰 Moneda:</span>
+            <span>${Icons.dinero()} Moneda:</span>
             <select class="premium-input flex-1 select-sm" onchange="AjustesView._guardarPreferencia('moneda', this.value)">
               <option value="€" ${config.moneda !== '$' ? 'selected' : ''}>Euro (€)</option>
               <option value="$" ${config.moneda === '$' ? 'selected' : ''}>Dólar ($)</option>

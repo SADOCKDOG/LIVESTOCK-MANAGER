@@ -59,19 +59,19 @@ window.CalidadLecheHelper = (() => {
     const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toFixed(1) : null);
     if (es != null) {
       const ok = es >= 11.0;
-      parts.push(badgeParametro('📊 ES', es + '%', ok));
+      parts.push(badgeParametro(`${Icons.grafico()} ES`, es + '%', ok));
     }
 
     // Células somáticas
     if (lab.somaticas != null) {
       const ok = lab.somaticas <= 400000;
-      parts.push(badgeParametro('🔬 CS', (lab.somaticas / 1000).toFixed(0) + 'k', ok));
+      parts.push(badgeParametro(`${Icons.fitosanitario()} CS`, (lab.somaticas / 1000).toFixed(0) + 'k', ok));
     }
 
     // Inhibidores
     if (e.certificadoInhibidores != null) {
       const ok = e.certificadoInhibidores;
-      parts.push(badgeParametro('💊 Inhib', ok ? 'OK' : 'PENDIENTE', ok));
+      parts.push(badgeParametro(`${Icons.veterinario()} Inhib`, ok ? 'OK' : 'PENDIENTE', ok));
     }
 
     return parts.join(' ');

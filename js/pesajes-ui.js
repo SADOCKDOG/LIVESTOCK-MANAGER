@@ -43,18 +43,18 @@ const PesajesUI = {
             if (esModoLeche) {
                 entidades = await Animales.list(rebanoId);
                 entidades = entidades.filter(a => ['h','hembra'].includes((a.sexo||'').toLowerCase()) && ['Vacas','Ovejas','Cabras'].includes(a.especie));
-                titulo = "🥛 Control Lechero de Lote";
+                titulo = `${Icons.leche()} Control Lechero de Lote`;
                 subtitulo = `${rebano.nombre} | ${rebano.especie} (${rebano.tipo})`;
             } else {
                 entidades = await Animales.list(rebanoId);
-                titulo = motivo === 'expedicion' ? "📦 Expedición de Lote" : "⚖️ Pesaje de Lote";
+                titulo = motivo === 'expedicion' ? `${Icons.paquete()} Expedición de Lote` : "⚖️ Pesaje de Lote";
                 subtitulo = `${rebano.nombre} | ${rebano.especie} (${rebano.tipo})`;
             }
         } else if (animalId) {
             const animal = await Animales.get(animalId);
             entidades = [animal];
             if (esModoLeche) {
-                titulo = "🥛 Control Lechero Individual";
+                titulo = `${Icons.leche()} Control Lechero Individual`;
                 subtitulo = animal.numero_identificacion;
                 // Para leche individual, filtrar si no es hembra lechera
                 if (!['h','hembra'].includes((animal.sexo||'').toLowerCase()) || !['Vacas','Ovejas','Cabras'].includes(animal.especie)) {
@@ -170,7 +170,7 @@ const PesajesUI = {
                          ` : ''}
 
                          <div class="mt-20">
-                             <button id="btn-guardar-peso" class="wizard-btn-action" style="width: 100%; max-width: 280px; margin: 0 auto; font-size: 1.1rem; padding: 15px; background: ${unidadColor}; color: #000; font-weight: 900; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">💾 ${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</button>
+                             <button id="btn-guardar-peso" class="wizard-btn-action" style="width: 100%; max-width: 280px; margin: 0 auto; font-size: 1.1rem; padding: 15px; background: ${unidadColor}; color: #000; font-weight: 900; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">${Icons.guardar()} ${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</button>
                          </div>
                     </div>
 
