@@ -184,6 +184,7 @@ const ExplotacionView = {
     main.innerHTML = `
       <!-- Selector de Modo ExPro Superior -->
       <div class="mb-14 text-center">
+        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center mx-auto" style="letter-spacing: 1.5px; color: ${this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444')}; text-shadow: 0 0 12px ${this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444')}80; border-top: 2px solid ${this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444')}; border-top-left-radius: 8px; border-top-right-radius: 8px; max-width: 480px;">⚡ TIPO EXPLOTACIÓN</div>
         <div style="display: inline-flex; background: #18181b; padding: 4px; border-radius: 24px; border: 1px solid #27272a; width: 100%; max-width: 480px; box-sizing: border-box;">
           <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
           <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
