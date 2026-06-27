@@ -122,80 +122,80 @@ const PesajesUI = {
             const unidadLabelLower = esModoLeche ? 'litros' : 'kg';
 
             let html = `
-            <div class="wizard-header-fixed" style="border-top: 5px solid ${unidadColor}; position:relative; text-align:center;">
-                <button onclick="window._pesajesWizardActivo=false;document.getElementById('wizard-pesaje-overlay').remove();window.App.route()" class="text-zinc-200" style="background:#27272a; border:none; width:32px; height:32px; border-radius:50%; position:absolute; top:50%; transform:translateY(-50%); right:15px; z-index:5001; cursor:pointer; font-weight:bold;">✕</button>
-                <h2 style="margin:0 0 4px 0; color:${unidadColor}; font-size:1.3rem; text-transform:uppercase; font-weight:900; letter-spacing:1px;">${titulo}</h2>
+            <div class="wizard-header-fixed text-center" style="border-top: 5px solid ${unidadColor}; position:relative;">
+                <button onclick="window._pesajesWizardActivo=false;document.getElementById('wizard-pesaje-overlay').remove();window.App.route()" class="text-zinc-200 btn-pesaje-close">✕</button>
+                <h2 class="pesaje-titulo-h2" style="color:${unidadColor};">${titulo}</h2>
                 <p class="text-gray-400 text-sm m-0 font-semibold">${subtitulo}</p>
             </div>
 
             <div class="wizard-content-scrollable">
                 <div class="flex flex-col gap-15">
                     ${necesitaAsignacion ? `
-                    <div style="background:rgba(251,191,36,0.05); padding:12px; border-radius:10px; border:1px solid #fbbf24; flex-shrink: 0;" id="box-assign-rebano">
-                        <label class="text-75 text-gold" style="font-weight:bold; display:block; margin-bottom:5px;">ASOCIAR A REBAÑO (OBLIGATORIO)</label>
-                        <select id="w-assign-rebano" class="premium-input bg-card border-gold" style="height: 45px; width: 100%;">
+                    <div class="pesaje-rebano-box" id="box-assign-rebano">
+                        <label class="text-75 text-gold font-bold d-block mb-5">ASOCIAR A REBAÑO (OBLIGATORIO)</label>
+                        <select id="w-assign-rebano" class="premium-input bg-card border-gold h-45 w-full">
                             <option value="">-- Seleccionar Destino --</option>
                             ${rebanosCompatibles.map(r => `<option value="${r.id}">${r.nombre} | 📍 ${r.zonaActual || 'S/N'}</option>`).join('')}
                         </select>
                     </div>
                     ` : `
-                    <div class="bg-card" style="padding:10px; border-radius:8px; border:1px solid #222; display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.7rem; flex-shrink: 0;">
+                    <div class="bg-card pesaje-info-grid">
                         <div><span class="text-gray-500">📍 ZONA ACTUAL:</span><br><span class="text-ccc font-bold text-sm">${rebano ? (rebano.zonaActual || 'Finca') : 'Finca'}</span></div>
                         <div><span class="text-gray-500">🧬 TIPO EXP.:</span><br><span class="text-ccc font-bold text-sm">${rebano ? rebano.tipo : 'Sin clasificar'}</span></div>
                     </div>
                     `}
 
-                    <div style="text-align:center; padding: 20px 15px; background: #0a0a0a; border: 2px solid #333; border-radius: 12px; position:relative;">
-                         <div class="text-75 text-gray" style="text-transform:uppercase; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">${esModoLeche ? 'Vaca a Registrar' : 'Animal a Pesar'}</div>
-                         <div id="w-current-crotal" style="font-size:2.8rem; font-weight:900; color:${unidadColor}; line-height:1; text-transform:uppercase;">--</div>
-                         <div id="w-current-desc" class="text-gray-400" style="font-size:0.9rem; margin-top:5px;">--</div>
+                    <div class="pesaje-animal-box">
+                         <div class="text-75 text-gray pesaje-animal-label">${esModoLeche ? 'Vaca a Registrar' : 'Animal a Pesar'}</div>
+                         <div id="w-current-crotal" class="pesaje-crotal" style="color:${unidadColor};">--</div>
+                         <div id="w-current-desc" class="text-gray-400 text-base mt-5">--</div>
 
-                         <div style="margin-top: 15px;">
+                         <div class="mt-15">
                              <input type="number" id="w-peso-gigante" step="0.1" inputmode="decimal" placeholder="0.0"
-                                    style="width: 100%; max-width: 200px; font-size: 3.5rem; font-weight: 900; text-align: center; background: #1a1a1a; border: 3px solid ${unidadColor}; color: white; border-radius: 16px; padding: 10px;">
-                             <div style="color:${unidadColor}; font-weight:800; font-size:0.9rem; text-transform:uppercase; margin-top:5px;">${unidadLabel}</div>
+                                    class="pesaje-peso-input" style="border: 3px solid ${unidadColor};">
+                             <div class="pesaje-unidad-label" style="color:${unidadColor};">${unidadLabel}</div>
                          </div>
 
                          ${esModoLeche ? `
-                         <div style="margin-top: 10px; display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                         <div class="pesaje-leche-grid">
                              <div>
-                                 <label class="text-gray" style="font-size:0.6rem;">GRASA (%)</label>
+                                 <label class="text-gray text-60">GRASA (%)</label>
                                  <input type="number" id="w-leche-grasa" step="0.01" placeholder="3.5" class="premium-input input-sm">
                              </div>
                              <div>
-                                 <label class="text-gray" style="font-size:0.6rem;">PROTEÍNA (%)</label>
+                                 <label class="text-gray text-60">PROTEÍNA (%)</label>
                                  <input type="number" id="w-leche-proteina" step="0.01" placeholder="3.2" class="premium-input input-sm">
                              </div>
                          </div>
                          ` : ''}
 
                          <div class="mt-20">
-                             <button id="btn-guardar-peso" class="wizard-btn-action" style="width: 100%; max-width: 280px; margin: 0 auto; font-size: 1.1rem; padding: 15px; background: ${unidadColor}; color: #000; font-weight: 900; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">${Icons.guardar()} ${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</button>
+                             <button id="btn-guardar-peso" class="wizard-btn-action pesaje-guardar-btn" style="background: ${unidadColor}; color: #000; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">${Icons.guardar()} ${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</button>
                          </div>
                     </div>
 
                     ${isLogistico ? `
-                    <div class="card bg-dark border-muted" style="padding:12px; flex-shrink: 0;">
-                        <h3 class="text-85 text-gold" style="margin:0 0 10px 0;">🚛 Datos de Báscula (Logística)</h3>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="card bg-dark border-muted p-12 flex-shrink-0">
+                        <h3 class="text-85 text-gold mb-10">🚛 Datos de Báscula (Logística)</h3>
+                        <div class="pesaje-logis-grid">
                             <div><label class="text-tiny text-gray">BRUTO (kg)</label>
-                            <input type="number" id="w-bruto" class="premium-input" style="height:40px; font-size:1rem;"></div>
+                            <input type="number" id="w-bruto" class="premium-input h-40 text-base"></div>
                             <div><label class="text-tiny text-gray">TARA (kg)</label>
-                            <input type="number" id="w-tara" class="premium-input" style="height:40px; font-size:1rem;"></div>
+                            <input type="number" id="w-tara" class="premium-input h-40 text-base"></div>
                         </div>
-                        <div style="margin-top:8px; display:grid; grid-template-columns: 1fr 1.5fr; gap:10px;">
+                        <div class="pesaje-logis-grid-2">
                             <div><label class="text-tiny text-gray">MATRÍCULA</label>
-                            <input type="text" id="w-matricula" class="premium-input" style="height:40px; text-transform:uppercase;"></div>
-                            <div style="display:flex; flex-direction:column; justify-content:center; align-items:flex-end; background:#000; padding: 5px 10px; border-radius: 8px;">
-                                <span class="text-gray-500" style="font-size:0.6rem;">NETO REAL:</span>
-                                <span id="w-neto-display" class="text-green" style="font-size:1.1rem; font-weight:bold;">0 kg</span>
+                            <input type="text" id="w-matricula" class="premium-input h-40 uppercase"></div>
+                            <div class="pesaje-neto-box">
+                                <span class="text-gray-500 text-60">NETO REAL:</span>
+                                <span id="w-neto-display" class="text-green text-lg font-bold">0 kg</span>
                             </div>
                         </div>
                     </div>
                     ` : ''}
 
-                    <div class="rounded-10" style="background:#000; border:1px solid #222; overflow: hidden; display: flex; flex-direction: column; flex-shrink: 0; max-height: 250px;">
-                        <div class="bg-card text-tiny text-555" style="padding:8px 12px; text-transform:uppercase; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px;">
+                    <div class="rounded-10 pesaje-lista-box">
+                        <div class="bg-card text-tiny text-555 pesaje-lista-header">
                             <span>${esModoLeche ? 'Vaca' : 'Animal'}</span>
                             <span class="text-right">Anterior</span>
                             <span class="text-right">Actual</span>
