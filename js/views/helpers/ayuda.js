@@ -159,7 +159,7 @@ window.Ayuda = {
       const tbody = overlay.querySelector('#med-tbody');
       tbody.innerHTML = rows.map(m => `
         <tr>
-          <td class="p-10 text-gray" style="white-space:nowrap;">${m.cat}</td>
+          <td class="p-10 text-gray nowrap">${m.cat}</td>
           <td class="p-10 font-bold">${m.principio}</td>
           <td class="p-10 text-amber">${m.carne}</td>
           <td class="p-10" style="color:${lecheClsColor[m.lecheCls] || '#ccc'}; ${m.lecheCls === 'danger' ? 'font-weight:bold; background:rgba(239,68,68,0.15);' : ''}">${m.leche}</td>

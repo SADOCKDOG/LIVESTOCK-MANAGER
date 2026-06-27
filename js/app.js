@@ -915,8 +915,8 @@ const App = {
     overlay.id = 'scanner-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;';
     overlay.innerHTML = `
-      <div id="scanner-container" style="flex:1;width:100%;overflow:hidden;"></div>
-      <div style="padding:14px;text-align:center;background:#1a1a1a;">
+      <div id="scanner-container" class="flex-1 w-full overflow-hidden"></div>
+      <div class="p-14 text-center bg-dark">
         <div class="text-white text-sm mb-8">🔍 Enfoca el código de barras o QR del crotal</div>
         <button class="btn btn-primary btn-sm" onclick="App._cancelarScanWeb()" style="background:#ef4444;">✕ Cancelar</button>
       </div>`;
@@ -1419,7 +1419,7 @@ const App = {
                 <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
                 <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
                 <div class="flex gap-10" style="margin-top:25px;">
-                    <button class="btn btn-primary" onclick="App._guardarEdicionGasto(${id})" style="flex:2; background:#3b82f6;">💾 GUARDAR</button>
+                    <button class="btn btn-primary flex-2" onclick="App._guardarEdicionGasto(${id})" style="background:#3b82f6;">💾 GUARDAR</button>
                     <button class="btn btn-secondary flex-1" onclick="App._eliminarGasto(${id})" style="background:#450a0a; color:white;">🗑️ BORRAR</button>
                 </div>
             </div>`;

@@ -146,7 +146,7 @@ window.VentaMasivaWizard = {
             } else {
               tablaFilasHtml += `
               <tr style="border-bottom: 1px solid #222; color: #fff;">
-                  <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg" style="cursor: pointer;"></td>
+                  <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg cursor-pointer"></td>
                   <td class="text-gold font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
                   <td class="p-14">${gateKeep.edadTexto}</td>
