@@ -1,0 +1,6 @@
+- [x] Definir `main` en `comercializacion-view.js`
+- [x] Definir `main` en `carne-view.js`
+- [x] Definir `main` en `leche-view.js`
+- [x] Definir `main` en `hibrido-view.js`
+- [x] Definir `main` en `gastos-view.js`
+- [x] Actualizar texto del botón en `explotacion-view.js`
