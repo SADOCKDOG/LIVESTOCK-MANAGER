@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - AjustesView v1.2.0
  * Vista de Ajustes/Configuración extraída de App.js para modularización.
  * Copia espejo de js/views/ajustes-view.js
@@ -50,7 +50,7 @@ const AjustesView = {
             <div class="font-bold" style="color:${f.id === activeId ? "var(--p-cork)" : "#fff"};">${f.nombre}</div>
             <div class="text-gray text-xs">REGA: ${f.codigo_REGA || f.rega || "N/D"} · 🐑 ${anims.length} animales</div>
           </div>
-          <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Activar</button>` : `<span class="badge badge-gold text-xs" style="padding:4px 10px;">Activa</span>`}</div>
+          <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Activar</button>` : `<span class="badge badge-gold text-xs">Activa</span>`}</div>
         </div>`;
         }).join("")}</div>
       </div>
@@ -64,7 +64,7 @@ const AjustesView = {
           <button class="btn btn-success flex-1" onclick="App.exportBackup()">${Icons.exportar()} Exportar</button>
           <button class="btn btn-secondary flex-1" onclick="document.getElementById('import-backup-file').click()">${Icons.importar()} Importar</button>
         </div>
-        <input type="file" id="import-backup-file" style="display:none" onchange="App.importBackup(event)">
+        <input type="file" id="import-backup-file" class="d-none" onchange="App.importBackup(event)">
         <label class="flex items-center gap-6 mt-10 text-xs text-gray cursor-pointer" onclick="const c=document.getElementById('auto-backup'); if(c){c.checked=!c.checked;AjustesView._toggleAutoBackup(c.checked)}">
           <input type="checkbox" id="auto-backup" ${config.autoBackup ? 'checked' : ''} style="accent-color:#3b82f6;"> Backup automático al salir
         </label>
@@ -78,7 +78,7 @@ const AjustesView = {
         <div class="info-box mt-10">
           <div class="grid grid-cols-2 gap-6 text-82">
             <div><span class="text-gray">Nº Contrato:</span> <strong class="text-white">${activeFinca.contrato_lacteo_numero || '—'}</strong></div>
-            <div><span class="text-gray">Vencimiento:</span> <strong style="color:${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? '#ef4444' : '#fff'};">${activeFinca.contrato_lacteo_fecha_fin || '—'}${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? ' ⚠️ Vencido' : ''}</strong></div>
+            <div><span class="text-gray">Vencimiento:</span> <strong class="${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? 'text-red' : 'text-white'}">${activeFinca.contrato_lacteo_fecha_fin || '—'}${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? ' ⚠️ Vencido' : ''}</strong></div>
             <div><span class="text-gray">Comprador:</span> <strong class="text-white">${activeFinca.contrato_lacteo_comprador || '—'}</strong></div>
             <div><span class="text-gray">INFOLAC:</span> <strong class="text-white">${activeFinca.numero_infolac || '—'}</strong></div>
           </div>
@@ -101,7 +101,7 @@ const AjustesView = {
             <div><span class="text-gray">Veterinario:</span> <strong class="text-white">${activeFinca.adsg_veterinario || '—'}</strong></div>
             <div><span class="text-gray">Colegiado:</span> <strong class="text-white">${activeFinca.adsg_vet_colegiado || '—'}</strong></div>
             <div><span class="text-gray">Teléfono Vet.:</span> <strong class="text-white">${activeFinca.adsg_vet_telefono || '—'}</strong></div>
-            <div><span class="text-gray">Vencimiento:</span> <strong style="color:${activeFinca.adsg_fecha_vencimiento ? '#f59e0b' : '#888'};">${activeFinca.adsg_fecha_vencimiento || '—'}${activeFinca.adsg_fecha_vencimiento ? AjustesView._diasRestantes(activeFinca.adsg_fecha_vencimiento) : ''}</strong></div>
+            <div><span class="text-gray">Vencimiento:</span> <strong class="${activeFinca.adsg_fecha_vencimiento ? 'text-amber' : 'text-gray'}">${activeFinca.adsg_fecha_vencimiento || '—'}${activeFinca.adsg_fecha_vencimiento ? AjustesView._diasRestantes(activeFinca.adsg_fecha_vencimiento) : ''}</strong></div>
           </div>
         </div>` : '<p class="text-555">Activa una finca para gestionar los datos ADSG.</p>'}
         <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar ADSG</button>
@@ -189,14 +189,14 @@ const AjustesView = {
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>📅 Formato Fecha:</span>
-            <select class="premium-input flex-1" style="height:32px;font-size:0.8rem;" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
+            <select class="premium-input flex-1 select-sm" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
               <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (España)</option>
               <option value="en-US" ${config.formatoFecha === 'en-US' ? 'selected' : ''}>MM/DD/AAAA (EE.UU.)</option>
             </select>
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>💰 Moneda:</span>
-            <select class="premium-input flex-1" style="height:32px;font-size:0.8rem;" onchange="AjustesView._guardarPreferencia('moneda', this.value)">
+            <select class="premium-input flex-1 select-sm" onchange="AjustesView._guardarPreferencia('moneda', this.value)">
               <option value="€" ${config.moneda !== '$' ? 'selected' : ''}>Euro (€)</option>
               <option value="$" ${config.moneda === '$' ? 'selected' : ''}>Dólar ($)</option>
             </select>
@@ -258,7 +258,7 @@ const AjustesView = {
         </div>
         <div class="mt-10">
           ${tramitesFinca.slice(-5).reverse().map(d => `
-            <div style="padding:8px; border:1px solid #333; border-radius:8px; margin-bottom:6px;">
+            <div class="p-8 border-muted rounded-sm mb-6">
               <div class="text-white text-xs"><strong>${d.tipo || 'documento'}</strong> · ${d.numero || 'sin número'}</div>
               <div class="text-gray text-2xs">${d.fecha_emision || d.created_at || ''}</div>
               ${(d.estado_tramite || d.numero_registro_oficial || d.acuse_recibo) ? `
@@ -427,12 +427,12 @@ const AjustesView = {
     const overlay = document.createElement('div');
     overlay.className = 'wizard-overlay';
     overlay.innerHTML = `
-      <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
+      <div class="wizard-card modal-scroll">
         <div class="wizard-header">
           <h2 class="flex items-center gap-8">${Icons.editar()} Editar Datos de Finca</h2>
           <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">${Icons.cerrar()} Cerrar</button>
         </div>
-        <div class="wizard-body" style="padding:20px;">
+        <div class="wizard-body p-20">
           <div class="grid gap-12">
             <div>
               <label class="text-xs text-gold font-bold">NOMBRE DE FINCA *</label>
@@ -541,12 +541,12 @@ const AjustesView = {
     }
 
     overlay.innerHTML = `
-      <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
+      <div class="wizard-card modal-scroll">
         <div class="wizard-header">
           <h2 class="flex items-center gap-8">${Icons.zonas()} Gestionar Zonas</h2>
           <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">${Icons.cerrar()} Cerrar</button>
         </div>
-        <div class="wizard-body" style="padding:20px;">
+        <div class="wizard-body p-20">
           ${zonasHtml}
           <button class="btn btn-create btn-full mt-15" onclick="AjustesView._crearNuevaZona()">${Icons.agregar()} Nueva Zona</button>
         </div>
@@ -593,12 +593,12 @@ const AjustesView = {
     const overlay = document.createElement('div');
     overlay.className = 'wizard-overlay';
     overlay.innerHTML = `
-      <div class="wizard-card" style="max-height:90vh; overflow-y:auto;">
+      <div class="wizard-card modal-scroll">
         <div class="wizard-header">
           <h2 class="flex items-center gap-8">${Icons.editar()} Editar Zona: ${z.nombre}</h2>
           <button onclick="this.closest('.wizard-overlay').remove()" class="btn btn-secondary" style="padding:8px 16px;">${Icons.cerrar()} Cerrar</button>
         </div>
-        <div class="wizard-body" style="padding:20px;">
+        <div class="wizard-body p-20">
           <div class="grid gap-12">
             <div>
               <label class="text-xs text-gold font-bold">NOMBRE</label>
