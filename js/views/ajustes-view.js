@@ -287,14 +287,14 @@ const AjustesView = {
       </div>
 
       <!-- ===================== FOOTER ===================== -->
-      <div class="text-center p-40" style="background:#050505; border-radius:32px; border:1px solid #111; margin-top:30px;">
-        <img src="icons/Logo aplicación.png" alt="Livestock Manager Premium" style="max-width:220px; height:auto; margin:0 auto 20px; display:block;">
+      <div class="text-center p-40 about-card">
+        <img src="icons/Logo aplicación.png" alt="Livestock Manager Premium" class="about-logo">
         <div class="text-gold font-800 text-85">Desarrollado por</div>
         <div class="text-white font-bold text-xl">David Asuar Arteaga</div>
-        <div style="max-width:320px; margin:20px auto; font-size:0.9rem; line-height:1.6;" class="text-777">Plataforma profesional de gestión ganadera inteligente y trazabilidad industrial.</div>
+        <div class="text-777 about-desc">Plataforma profesional de gestión ganadera inteligente y trazabilidad industrial.</div>
         <div class="mt-15"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-bold no-underline text-md">📩 soporte.sdogfarm@gmail.com</a></div>
         <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-bold no-underline text-md inline-flex items-center gap-6">🐙 GitHub</a></div>
-        <div class="mt-40 text-75 text-444" style="border-top:1px solid #111; padding-top:25px;">
+        <div class="mt-40 text-75 text-444 about-footer">
           © 2026 Livestock Manager Premium · v4.7.0<br>
           Todos los derechos reservados.
         </div>
@@ -364,7 +364,7 @@ const AjustesView = {
     overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;';
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:340px;border-top:5px solid #f59e0b;">
+      <div class="card p-25 max-w-340 border-top-5-amber">
         <h3 class="mt-0 text-gold flex items-center gap-8">${Icons.reproduccion()} Nueva Especie</h3>
         <div class="wizard-input-group"><label class="wizard-label">Nombre</label><input type="text" id="esp-nombre" placeholder="Vacas, Ovejas, Cabras..." class="wizard-input"></div>
         <div class="grid grid-cols-2 gap-10">
@@ -728,11 +728,11 @@ const AjustesView = {
     overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:#fff; display:flex; flex-direction:column;';
     overlay.innerHTML = `
-      <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#1a1a1a; color:#fff;">
+      <div class="manual-header">
         <strong style="color:#e0a83a;" class="inline-flex items-center gap-6">${Icons.libro()} Manual de Usuario</strong>
         <button onclick="this.closest('.wizard-full-screen').remove()" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">${Icons.cerrar()} Cerrar</button>
       </div>
-      <iframe src="manual/index.html" style="flex:1; width:100%; border:none; background:#fff;"></iframe>`;
+      <iframe src="manual/index.html" class="manual-iframe"></iframe>`;
     document.body.appendChild(overlay);
   }
 };

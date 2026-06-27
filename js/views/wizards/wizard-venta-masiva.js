@@ -133,8 +133,8 @@ window.VentaMasivaWizard = {
               if (!gateKeep.gateDib) motivos.push('📋 SIN DIB');
               if (!gateKeep.gateGestacion) motivos.push('🤰 GEST.');
               tablaFilasHtml += `
-              <tr style="background: rgba(220, 38, 38, 0.1); color: #f87171; border-bottom: 1px solid #450a0a;">
-                  <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg" style="opacity: 0.3;"></td>
+              <tr class="tr-blocked">
+                  <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg opacity-30"></td>
                   <td class="font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
                   <td class="p-14">${gateKeep.edadTexto}</td>
@@ -145,7 +145,7 @@ window.VentaMasivaWizard = {
               </tr>`;
             } else {
               tablaFilasHtml += `
-              <tr style="border-bottom: 1px solid #222; color: #fff;">
+              <tr class="tr-active">
                   <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg cursor-pointer"></td>
                   <td class="text-gold font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
@@ -160,8 +160,8 @@ window.VentaMasivaWizard = {
 
           return `
               <div class="flex gap-15 mb-20">
-                  <div class="text-center bg-darker" style="flex:1; border: 2px solid #27272a; padding:15px; border-radius:16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);"><small class="wizard-label">APTOS</small><div class="text-green font-black" style="font-size:2.2rem; margin-top:5px;">${animalesActivos.length - totalBloqueados}</div></div>
-                  <div class="text-center" style="flex:1; background:#2a0808; border: 2px solid #450a0a; padding:15px; border-radius:16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);"><small class="wizard-label text-red">BLOQUEADOS</small><div class="text-red font-black" style="font-size:2.2rem; margin-top:5px;">${totalBloqueados}</div></div>
+                  <div class="text-center bg-darker stat-box-aptos"><small class="wizard-label">APTOS</small><div class="text-green font-black text-2rem mt-5">${animalesActivos.length - totalBloqueados}</div></div>
+                  <div class="text-center stat-box-bloq"><small class="wizard-label text-red">BLOQUEADOS</small><div class="text-red font-black text-2rem mt-5">${totalBloqueados}</div></div>
               </div>
               <div class="text-center text-xs text-gray mb-10">
                 <span class="mr-12">👶 Edad mínima</span>
@@ -169,9 +169,9 @@ window.VentaMasivaWizard = {
                 <span class="mr-12">🤰 Gestación &gt;3 meses</span>
                 <span>💉 Supresión sanitaria</span>
               </div>
-              <div style="flex:1; overflow-y: auto; border: 2px solid #27272a; border-radius: 16px; background: #0a0a0a; min-height:300px;">
-                  <table class="w-full text-base" style="border-collapse: collapse;">
-                      <thead style="background: #111; position: sticky; top: 0; z-index: 10;">
+              <div class="venta-tabla-wrapper">
+                  <table class="w-full text-base table-collapse">
+                      <thead class="thead-sticky">
                           <tr>
                               <th class="text-center p-12"><input type="checkbox" id="select-all-lote" class="checkbox-lg"></th>
                               <th class="text-gray p-12">ID OFICIAL</th>
@@ -297,7 +297,7 @@ window.VentaMasivaWizard = {
               <div class="wizard-input-group mb-12">
                 <label class="wizard-label">COMPRADOR</label>
                 ${compradores.length === 0 ? `
-                <div class="text-sm text-gold mb-8" style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.2); border-radius:10px; padding:10px 12px;">
+                <div class="text-sm text-gold mb-8 hint-box-gold">
                   ⚠️ No hay compradores activos registrados. Crea uno rápidamente con el botón "➕ Nuevo".
                 </div>` : ''}
                 <div class="flex gap-8">
@@ -308,7 +308,7 @@ window.VentaMasivaWizard = {
                       `<option value="${c.id}" ${data.compradorId === c.id ? 'selected' : ''}>${c.nombre} ${c.nif_cif ? '('+c.nif_cif+')' : ''} — ${c.tipo_comprador}</option>`
                     ).join('')}
                   </select>
-                  <button type="button" onclick="App._abrirAltaCompradorRapida()" class="text-xs text-green font-extrabold" style="padding:11px 14px; border-radius:12px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); cursor:pointer; white-space:nowrap;">${Icons.agregar()} Nuevo</button>
+                  <button type="button" onclick="App._abrirAltaCompradorRapida()" class="text-xs text-green font-extrabold btn-inline-green">${Icons.agregar()} Nuevo</button>
                 </div>
               </div>
               <div id="w-v-comprador-info" class="p-12 mb-12 bg-dark rounded-10" style="display:${data.compradorId ? 'block' : 'none'};">
@@ -471,7 +471,7 @@ window.VentaMasivaWizard = {
                       `<option value="${t.id}" ${data.transportistaId === t.id ? 'selected' : ''}>${t.nombre} ${t.nif_cif ? '('+t.nif_cif+')' : ''} — ${t.matricula || 'sin matrícula'}</option>`
                     ).join('')}
                   </select>
-                  <a href="#/transportistas" target="_blank" class="text-xs font-black text-blue flex items-center" style="padding:11px 14px; border-radius:12px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); text-decoration:none; white-space:nowrap;">${Icons.agregar()} Nuevo</a>
+                  <a href="#/transportistas" target="_blank" class="text-xs font-black text-blue flex items-center btn-inline-blue">${Icons.agregar()} Nuevo</a>
                 </div>
               </div>
               <div id="w-v-transportista-info" class="p-12 mb-12 bg-dark rounded-10" style="display:${data.transportistaId ? 'block' : 'none'};">
@@ -482,7 +482,7 @@ window.VentaMasivaWizard = {
                 <div class="text-gray text-xs" id="w-v-transportista-desinsectacion">Desinsectación: ${data.desinsectacionVencimiento ? ('vigente hasta ' + data.desinsectacionVencimiento) : 'sin vencimiento informado'}</div>
               </div>
 
-              <h4 class="text-purple text-sm" style="margin:16px 0 12px;">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</h4>
+              <h4 class="text-purple text-sm mt-16 mb-12">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</h4>
               <div class="grid grid-cols-2 gap-12 mb-12">
                 <div class="wizard-input-group">
                   <label class="wizard-label">VETERINARIO RESPONSABLE</label>
@@ -497,7 +497,7 @@ window.VentaMasivaWizard = {
                 <label class="wizard-label">FECHA AUTORIZACIÓN</label>
                 <input type="date" id="w-v-vet-fecha" value="${data.vet_fecha_autorizacion}" class="wizard-input">
               </div>
-              <div class="text-xs text-purple-400" style="background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.15); border-radius:10px; padding:10px 12px; margin-top:8px;">
+              <div class="text-xs text-purple-400 hint-box-violet">
                 ℹ️ La autorización veterinaria es obligatoria para la expedición de animales vivos al matadero.
               </div>
           </div>
