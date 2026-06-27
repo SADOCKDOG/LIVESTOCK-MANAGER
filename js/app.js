@@ -1,6 +1,6 @@
 /**
- * Livestock Manager - Application Controller v4.0.0
- * UI validada v3.3.9 + flujo Industrial Animals v4.0.0 integrado correctamente
+ * Livestock Manager - Application Controller v4.6.0
+ * UI validada v3.3.9 + flujo Industrial Animals v4.6.0 integrado correctamente
  * Fix: rebanoId preservado en _guardarAnimalDetalle (bug invisible en lista)
  */
 
@@ -41,7 +41,7 @@ const App = {
 
   async init() {
     try {
-      console.log("App Livestock: Iniciando v4.0.0...");
+      console.log("App Livestock: Iniciando v4.6.0...");
       this._injectGlobalStyles();
       window.addEventListener("hashchange", () => App.route());
       await window.dbPromise;
@@ -1721,7 +1721,7 @@ const App = {
 
           await sharePlugin.share({
             title: "Backup Livestock Manager",
-            text: `Copia de seguridad v4.5.0 — ${totalRegistros} registros`,
+            text: `Copia de seguridad v4.6.0 — ${totalRegistros} registros`,
             url: result.uri,
             files: [result.uri],
             dialogTitle: "Compartir copia de seguridad con…",
