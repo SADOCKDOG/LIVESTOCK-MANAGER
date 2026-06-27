@@ -51,7 +51,7 @@ const AsistenteConfiguracion = {
                     </button>
 
                     <!-- Opción 3: Ver Fincas Existentes -->
-                    <button class="asistente-opcion" id="btn-seleccionar" style="display: none;">
+                    <button class="asistente-opcion d-none" id="btn-seleccionar">
                         <div class="asistente-icono">📋</div>
                         <div class="asistente-info-opcion">
                             <div class="asistente-titulo">Seleccionar Finca</div>
@@ -61,22 +61,22 @@ const AsistenteConfiguracion = {
                 </div>
 
                 <!-- Sección de Carga de Archivo -->
-                <div id="asistente-carga-archivo" class="asistente-seccion" style="display: none;">
+                <div id="asistente-carga-archivo" class="asistente-seccion d-none">
                     <div class="asistente-titulo-seccion">Cargar Backup JSON</div>
-                    <input type="file" id="entrada-archivo" accept=".json" style="display: none;">
+                    <input type="file" id="entrada-archivo" accept=".json" class="d-none">
                     <div class="asistente-carga-zona">
                         <button class="btn-carga" id="btn-seleccionar-archivo">
                             Seleccionar archivo
                         </button>
                         <p id="nombre-archivo-seleccionado" class="asistente-archivo-nombre"></p>
                     </div>
-                    <div id="asistente-progreso" class="asistente-progreso" style="display: none;">
+                    <div id="asistente-progreso" class="asistente-progreso d-none">
                         <div class="asistente-barra-progreso">
                             <div class="asistente-barra-lleno"></div>
                         </div>
                         <p id="texto-progreso">Importando...</p>
                     </div>
-                    <div id="asistente-resultado" class="asistente-resultado" style="display: none;"></div>
+                    <div id="asistente-resultado" class="asistente-resultado d-none"></div>
                     <div class="asistente-botones">
                         <button class="btn btn-sm btn-primary" id="btn-importar-confirmar" disabled>
                             Importar Fincas
@@ -88,7 +88,7 @@ const AsistenteConfiguracion = {
                 </div>
 
                 <!-- Sección de Selección de Fincas Existentes -->
-                <div id="asistente-seleccionar-finca" class="asistente-seccion" style="display: none;">
+                <div id="asistente-seleccionar-finca" class="asistente-seccion d-none">
                     <div class="asistente-titulo-seccion">Seleccionar Finca Existente</div>
                     <div id="lista-fincas-existentes" class="asistente-lista-fincas"></div>
                     <div class="asistente-botones">
@@ -99,7 +99,7 @@ const AsistenteConfiguracion = {
                 </div>
 
                 <!-- Mensajes -->
-                <div id="asistente-mensaje" class="asistente-mensaje" style="display: none;"></div>
+                <div id="asistente-mensaje" class="asistente-mensaje d-none"></div>
             </div>
         `;
 
@@ -421,7 +421,7 @@ const AsistenteConfiguracion = {
                         ${pasos.map((_, i) => `<span class="tour-dot ${i === 0 ? 'activo' : ''}" data-index="${i}"></span>`).join('')}
                     </div>
                     <button class="tour-btn tour-btn-next" id="tour-next">Siguiente →</button>
-                    <button class="tour-btn tour-btn-fin" id="tour-fin" style="display:none;">✓ ¡Comenzar!</button>
+                    <button class="tour-btn tour-btn-fin d-none" id="tour-fin">✓ ¡Comenzar!</button>
                 </div>
             </div>
         `;
