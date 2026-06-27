@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wizard Albarán de Leche (Salida Láctea)
  * Extraído de app.js para modularización (Fase 3)
  */
@@ -258,7 +258,7 @@ window.AlbaranLecheWizard = {
               <label class="wizard-label">TEMPERATURA DE CARGA (ºC)</label>
               <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input">
             </div>
-            <div class="text-xs text-aaa rounded-sm p-10 bg-darker" style="margin:8px 0; border-left:3px solid #3b82f6;">
+            <div class="text-xs text-aaa rounded-sm p-10 bg-darker" class="border-left-blue" style="margin:8px 0;">
               ❄️ <strong>Cadena de frío legal:</strong> La leche debe enfriarse de 37°C a &lt;4°C en menos de 2 horas.
               ${data.temp <= 4 ? `<span class="text-green">✅ Actual: ${data.temp}°C — CUMPLE</span>` : `<span class="text-red">⚠️ Actual: ${data.temp}°C — REVISAR</span>`}
             </div>
@@ -329,7 +329,7 @@ window.AlbaranLecheWizard = {
             <div class="flex items-center gap-12 mt-12 rounded-sm p-10 bg-darker">
               <label class="flex items-center gap-6 text-sm" class="cursor-pointer">
                 <input type="checkbox" id="w-l-ant" ${data.antibioticos ? 'checked' : ''}>
-                <span style="color:${data.antibioticos ? '#ef4444' : '#888'};">🔬 Antibióticos detectados</span>
+                <span class="${data.antibioticos ? 'text-red' : 'text-gray'}">🔬 Antibióticos detectados</span>
               </label>
             </div>
             <div class="grid grid-cols-2 gap-8 mt-12">

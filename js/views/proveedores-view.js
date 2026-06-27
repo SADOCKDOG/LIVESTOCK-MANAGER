@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProveedoresView - Livestock Manager Premium v4.0
  * Vista de proveedores: lista, detalle con trazabilidad de gastos, formulario.
  */
@@ -35,8 +35,8 @@ const ProveedoresView = {
             kpisEl.innerHTML = `
               <div class="grid grid-cols-3 gap-6 mb-14">
                 <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">PROVEEDORES</small><div class="inf-val-lg text-purple">${proveedores.length}</div></div>
-                <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">GASTO ASIGNADO</small><div class="inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
-                <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
+                <div class="info-box-center border-left-amber"><small class="s-lbl">GASTO ASIGNADO</small><div class="inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
+                <div class="info-box-center border-left-blue"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
               </div>`;
         }
         this._cachedData = proveedores;
@@ -135,7 +135,7 @@ const ProveedoresView = {
           <div class="grid grid-cols-3 gap-8 mb-14">
             <div class="card p-12 text-center mb-0">
               <div class="kpi-label">Total Gastado</div>
-              <div class="kpi-value text-green" style="font-size:1.2rem;">${resumen.total_gastado.toFixed(2)} €</div>
+              <div class="kpi-value text-green text-xl">${resumen.total_gastado.toFixed(2)} €</div>
             </div>
             <div class="card p-12 text-center mb-0">
               <div class="kpi-label">Registros</div>
@@ -144,7 +144,7 @@ const ProveedoresView = {
             </div>
             <div class="card p-12 text-center mb-0">
               <div class="kpi-label">Gasto Anual</div>
-              <div class="kpi-value text-red" style="font-size:1.2rem;">${resumen.gasto_anual.toFixed(2)} €</div>
+              <div class="kpi-value text-red text-xl">${resumen.gasto_anual.toFixed(2)} €</div>
               <div class="kpi-sub">últimos 12 meses</div>
             </div>
           </div>

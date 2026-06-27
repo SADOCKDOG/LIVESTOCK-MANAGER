@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - ProduccionView v3.1.0
  * Vista de Producción con tabs — Cárnica y Láctea.
  * NOTA: Ventas y Gastos se gestionan desde Comercial (antes "Ventas Carne").
@@ -131,9 +131,9 @@ const ProduccionView = {
       <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${icon}</span>
+            <span class="text-3xl">${icon}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">${title}</div>
+              <div class="text-white font-900 text-lg">${title}</div>
               ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
             </div>
           </div>

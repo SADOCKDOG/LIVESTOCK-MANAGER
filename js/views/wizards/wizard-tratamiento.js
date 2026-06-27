@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wizard Tratamiento Sanitario
  * Extraído de app.js para modularización
  */
@@ -49,7 +49,7 @@ window.WizardTratamiento = {
                 ${optionsHtml}
               </select>
             </div>
-            <div class="wizard-input-group" id="w-san-custom-container" style="display:none;">
+            <div class="wizard-input-group" id="w-san-custom-container" class="d-none">
               <label class="wizard-label">NOMBRE MEDICAMENTO / PRINCIPIO ACTIVO</label>
               <input type="text" id="w-san-custom" class="wizard-input" value="${data.medicamento || ''}">
             </div>
@@ -63,7 +63,7 @@ window.WizardTratamiento = {
                 <input type="number" id="w-san-leche" class="wizard-input" value="${data.tiempo_espera_leche_dias || 0}">
               </div>
             </div>
-            <div id="w-san-alerta-leche" class="wizard-alert-error" style="display:none;">
+            <div id="w-san-alerta-leche" class="wizard-alert-error d-none">
                 ⚠️ <strong>PROHIBIDO EN LACTACIÓN:</strong> Este medicamento no debe usarse en animales cuya leche se destine a consumo humano.
             </div>
             <div class="wizard-input-group">
@@ -75,7 +75,7 @@ window.WizardTratamiento = {
                 <button type="button" id="btn-toggle-calc" class="btn-ghost text-blue font-bold flex items-center gap-5 p-0">
                     <span>🧮</span> Abrir Calculadora de Dosis
                 </button>
-                <div id="calc-dosis-container" class="rounded-md bg-darker wizard-calc-panel" style="display:none;">
+                <div id="calc-dosis-container" class="rounded-md bg-darker wizard-calc-panel d-none">
                     <div class="grid grid-cols-2 gap-10">
                         <div class="wizard-input-group">
                             <label class="wizard-label">PESO ANIMAL (KG)</label>
@@ -91,7 +91,7 @@ window.WizardTratamiento = {
                         <input type="number" id="calc-conc" class="wizard-input" placeholder="Ej: 200">
                     </div>
                     <button type="button" id="btn-calcular" class="wizard-btn-action w-full wizard-calc-btn">Calcular Volumen</button>
-                    <div id="calc-resultado" class="wizard-calc-result text-green" style="display:none;">
+                    <div id="calc-resultado" class="wizard-calc-result text-green d-none">
                         Inyectar: <span id="calc-vol"></span> ml
                     </div>
                 </div>
