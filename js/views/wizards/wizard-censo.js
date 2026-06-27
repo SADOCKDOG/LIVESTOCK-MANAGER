@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wizard Censo Anual SIGGAN — Livestock Manager Premium
  * Consolida el censo de la explotación a una fecha de referencia (por defecto
  * 1 de enero) por especie y categoría, y genera el documento de declaración
@@ -19,7 +19,7 @@ window.WizardCenso = {
               <label class="wizard-label">FECHA DEL CENSO</label>
               <input type="date" id="w-cs-fecha" value="${data.fecha}" class="wizard-input">
             </div>
-            <div class="rounded-sm" style="background:rgba(16,185,129,0.1);padding:12px;margin-top:10px;border-left:3px solid #10b981;">
+            <div class="rounded-sm nota-box nota-box-green mt-10">
               <div class="text-xs text-aaa">
                 📌 La declaración censal obligatoria se refiere normalmente al <strong>censo a 1 de enero</strong>.
                 Se contabilizan los animales activos a la fecha indicada.
