@@ -576,12 +576,6 @@ const ExplotacionView = {
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${borderStyleColor};">
         <div class="mb-10">
           <div class="text-xs text-white font-black uppercase flex items-center gap-6 mb-8">${Icons.paquete()} ALMACÉN Y STOCK DE SILOS</div>
-          <div class="flex flex-col items-center gap-3">
-            <div class="text-[0.65rem] uppercase font-extrabold tracking-wider pt-2 text-center" style="letter-spacing: 1px; color: ${borderStyleColor}; text-shadow: 0 0 10px ${borderStyleColor}80; border-top: 3px solid ${borderStyleColor}; width: 100%; border-top-left-radius: 8px; border-top-right-radius: 8px;">⚡ ACCIÓN DE CARGA</div>
-            <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid ${borderStyleColor}; border-right: 3px solid ${borderStyleColor}; border-radius: 8px; color: #ffffff; box-shadow: 0 0 20px ${borderStyleColor}B0, inset 0 0 12px ${borderStyleColor}40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 0; width: 100%; max-width: 120px;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-              ${Icons.agregar()} <span style="font-size:0.75rem; font-weight:600; text-align: center;">Carga/Consumo</span>
-            </button>
-          </div>
         </div>
         <div class="grid gap-10">
     `;
@@ -609,6 +603,12 @@ const ExplotacionView = {
     });
 
     html += `
+        </div>
+        <div class="mt-10 flex flex-col items-center gap-3">
+          <div class="text-[0.65rem] uppercase font-extrabold tracking-wider pt-2 text-center" style="letter-spacing: 1px; color: ${borderStyleColor}; text-shadow: 0 0 10px ${borderStyleColor}80; border-top: 3px solid ${borderStyleColor}; width: 100%; border-top-left-radius: 8px; border-top-right-radius: 8px;">⚡ ACCIÓN DE CARGA</div>
+          <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid ${borderStyleColor}; border-right: 3px solid ${borderStyleColor}; border-radius: 8px; color: #ffffff; box-shadow: 0 0 20px ${borderStyleColor}B0, inset 0 0 12px ${borderStyleColor}40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 0; width: 100%; max-width: 120px;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+            ${Icons.agregar()} <span style="font-size:0.75rem; font-weight:600; text-align: center;">Carga/Consumo</span>
+          </button>
         </div>
       </div>
     `;
