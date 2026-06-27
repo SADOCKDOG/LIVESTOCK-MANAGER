@@ -356,7 +356,7 @@ const AnimalesView = {
                   <option value="">— Selecciona —</option>
                   ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label}</option>`).join("")}
                 </select>
-                <div id="a-sandach-wrap" style="display:none; margin-top:8px; padding:8px; background:#f0f9ff; border:1px solid #0ea5e9; border-radius:6px; font-size:12px;">
+                <div id="a-sandach-wrap" class="d-none" style="margin-top:8px; padding:8px; background:#f0f9ff; border:1px solid #0ea5e9; border-radius:6px; font-size:12px;">
                   <div style="color:#0369a1; font-weight:600; margin-bottom:4px;">ℹ️ CLASIFICACIÓN SANDACH (Reg. UE 1069/2009)</div>
                   <div id="a-sandach-categoria" style="color:#475569; margin-top:4px;"></div>
                 </div>

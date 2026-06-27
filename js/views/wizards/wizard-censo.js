@@ -203,7 +203,7 @@ window.WizardCenso = {
           <h1 style="margin:0;font-size:1.4rem;text-transform:uppercase;">Declaración Censal de Explotación Ganadera</h1>
           <h3 style="margin:5px 0 0;color:#555;font-weight:normal;">Censo a fecha ${fecha}</h3>
         </div>
-        <div style="font-size:0.9rem;margin-bottom:20px;">
+        <div class="text-base mb-20">
           <p style="margin:0;"><strong>Explotación:</strong> ${finca.nombre || '—'} &nbsp;·&nbsp;
           <strong>REGA:</strong> ${regaPropia}<br>
           <strong>Titular:</strong> ${finca.propietario || '—'} &nbsp;·&nbsp;
