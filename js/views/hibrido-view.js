@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - HibridoView v2.0.0
  * Vista de Consola Híbrida/Mixta con las 4 pestañas modulares de gestión unificada
  */
@@ -187,9 +187,9 @@ const HibridoView = {
     const html = `
       <div class="card report-section p-16 border-top-3px border-top-3px-orange">
         <div class="flex items-center gap-12 mb-16">
-          <span style="font-size:1.6rem;">${Icons.edificio()}</span>
+          <span class="text-3xl">${Icons.edificio()}</span>
           <div>
-            <div class="text-white font-900" style="font-size:1.05rem;">Patrimonio y Censo Consolidado</div>
+            <div class="text-white font-900 text-lg">Patrimonio y Censo Consolidado</div>
             <div class="text-gray text-xs">Organización ganadera de doble aptitud</div>
           </div>
         </div>
@@ -220,7 +220,7 @@ const HibridoView = {
                   </div>
                 </div>
                 <div class="text-right flex-shrink-0 ml-8">
-                  <span class="badge badge-sm badge-gold" style="display:block; margin-bottom:4px;">${r.cantidad_animales || 0} cabezas</span>
+                  <span class="badge badge-sm badge-gold" class="block mb-4">${r.cantidad_animales || 0} cabezas</span>
                 </div>
               </div>
             </div>`).join('')}
@@ -264,9 +264,9 @@ const HibridoView = {
       <div class="card report-section p-16 border-top-3px border-top-3px-green">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${Icons.transportistas()}</span>
+            <span class="text-3xl">${Icons.transportistas()}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">Logística y Transporte, Comercialización Ventas</div>
+              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
               <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
             </div>
           </div>
@@ -329,7 +329,7 @@ const HibridoView = {
       alertasHtml = `
         <div class="supresion-alerta-box">
           <strong>${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
-          <ul style="margin:5px 0 0 15px; padding:0;">
+          <ul class="mt-4 pl-20 m-0">
             ${d.supresionesCarne.map(s => `
               <li><span class="sup-badge sup-badge-carne">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes}d</strong> para matadero.</li>
             `).join('')}
@@ -346,9 +346,9 @@ const HibridoView = {
       <div class="card report-section p-16 border-top-3px" style="border-top-color:#8b5cf6;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${Icons.documento()}</span>
+            <span class="text-3xl">${Icons.documento()}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">Registros Legislación, Cumplimiento Sanitario</div>
+              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
               <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
             </div>
           </div>

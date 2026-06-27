@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - ComercializacionView v2.0.0
  * Vista de Comercialización unificada con tabs tipo ProduccionView/GastosView.
  * Carne / Leche / Gastos con KPIs, botón registrar, listados filtrados.
@@ -42,14 +42,14 @@ const ComercializacionView = {
       <div class="card p-12 mb-12 border-222" style="border-left:4px solid #10b981;">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider">Origen de flujo</div>
         <div class="text-sm text-white mt-4">Registro finalizado en <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
-        <div class="text-xs text-aaa mt-4">Fitosanitarios con pendiente/no aptos: <strong style="color:${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? '#ef4444' : '#10b981'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong> / ${pipelineInfo.cumplimiento?.totalFitosanitarios || 0}</div>
+        <div class="text-xs text-aaa mt-4">Fitosanitarios con pendiente/no aptos: <strong class="${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? 'text-red' : 'text-green'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong> / ${pipelineInfo.cumplimiento?.totalFitosanitarios || 0}</div>
       </div>` : ''}
 
       <!-- KPIs globales -->
       <div class="grid grid-cols-3 gap-6 mb-14">
-        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">${Icons.carne()} CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
-        <div class="info-box-center" style="border-left:3px solid #fbbf24;"><small class="s-lbl">${Icons.leche()} LECHE</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div><small class="text-gray text-xs">${entregas.length} entregas · MOFA ${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</small></div>
-        <div class="info-box-center" style="border-left:3px solid #ef4444;"><small class="s-lbl">${Icons.gastos()} GASTOS</small><div class="inf-val-lg text-red">${gastoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${gastosRecords.length} registros</small></div>
+        <div class="info-box-center border-left-amber"><small class="s-lbl">${Icons.carne()} CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
+        <div class="info-box-center border-left-gold"><small class="s-lbl">${Icons.leche()} LECHE</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div><small class="text-gray text-xs">${entregas.length} entregas · MOFA ${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</small></div>
+        <div class="info-box-center border-left-red"><small class="s-lbl">${Icons.gastos()} GASTOS</small><div class="inf-val-lg text-red">${gastoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${gastosRecords.length} registros</small></div>
       </div>
 
       <div class="mb-14">
@@ -131,7 +131,7 @@ const ComercializacionView = {
             </div>
             <div class="text-right flex-shrink-0 ml-8">
               <span class="badge badge-sm" style="background:${color}20;color:${color};border:1px solid ${color}40;display:block;margin-bottom:4px;">${r.value}</span>
-              ${r.subvalue ? `<div class="kpi-sub" style="font-size:0.75rem; color:#888;">${r.subvalue}</div>` : ''}
+              ${r.subvalue ? `<div class="kpi-sub text-75 text-gray">${r.subvalue}</div>` : ''}
               <span class="text-xs text-777 mt-4 block">Ver ➔</span>
             </div>
           </div>
@@ -142,9 +142,9 @@ const ComercializacionView = {
       <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span style="font-size:1.6rem;">${icon}</span>
+            <span class="text-3xl">${icon}</span>
             <div>
-              <div class="text-white font-900" style="font-size:1.05rem;">${title}</div>
+              <div class="text-white font-900 text-lg">${title}</div>
               ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
             </div>
           </div>

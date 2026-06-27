@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - LecheView v3.0.0
  * Vista del Módulo de Leche con las 4 pestañas modulares de gestión unificada
  */
@@ -188,7 +188,7 @@ const LecheView = {
     return `
       <div class="leche-alerta-box">
         <strong>${Icons.alerta()} CRÍTICO - SUPRESIÓN DE LECHE EN CURSO (ANTIBIÓTICOS/INHIBIDORES):</strong>
-        <ul style="margin:5px 0 0 15px; padding:0;">
+        <ul class="mt-4 pl-20 m-0">
           ${d.tratamientosSupresionLeche.map(s => `
             <li>Rebaño treated: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> de supresión para ordeño (Finaliza: ${s.fechaFin})</li>
           `).join('')}
