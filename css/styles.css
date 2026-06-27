@@ -2458,3 +2458,53 @@ label {
 /* dashboard: tarjeta verde con radio */
 .card-tint-green-lg { background: rgba(16,185,129,0.08); border-radius: 12px; }
 
+/* === Neon UI patterns (ganaderia / explotacion) === */
+.card-dark-gradient { background: linear-gradient(145deg, #111 0%, #0a0a0a 100%); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.border-top-theme   { border-top: 3px solid var(--theme-color, var(--p-gold)); }
+
+/* section header neon — usa --neon-color inline para color dinámico */
+.section-header-neon {
+  letter-spacing: 1.5px;
+  color: var(--neon-color, var(--p-gold));
+  text-shadow: 0 0 12px var(--neon-color, var(--p-gold));
+  border-top: 3px solid var(--neon-color, var(--p-gold));
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+/* section header usando --theme-color del contenedor padre */
+.section-header-theme {
+  letter-spacing: 1.5px;
+  color: var(--theme-color, var(--p-gold));
+  text-shadow: 0 0 12px var(--theme-color, var(--p-gold));
+}
+
+/* mode switch container para ExplotacionView */
+.expro-mode-switch { display: inline-flex; background: #18181b; padding: 4px; border-radius: 24px; border: 1px solid #27272a; width: 100%; max-width: 480px; box-sizing: border-box; }
+
+/* botón widget-link con efecto neon — color via CSS vars */
+.widget-link-btn--neon {
+  background: #000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 10px 4px; gap: 6px;
+  border-left: 3px solid var(--neon-color, #888);
+  border-right: 3px solid var(--neon-color, #888);
+  border-radius: 8px; color: #fff;
+  box-shadow: 0 0 20px var(--neon-glow, rgba(136,136,136,0.69)), inset 0 0 12px var(--neon-inner, rgba(136,136,136,0.25));
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.widget-link-btn--neon:active { transform: scale(0.95); }
+
+/* variantes de color neon */
+.neon-danger  { --neon-color: var(--c-danger);  --neon-glow: rgba(239,68,68,0.69);  --neon-inner: rgba(239,68,68,0.25); }
+.neon-info    { --neon-color: var(--c-info);    --neon-glow: rgba(59,130,246,0.69); --neon-inner: rgba(59,130,246,0.25); }
+.neon-success { --neon-color: var(--c-success); --neon-glow: rgba(16,185,129,0.69); --neon-inner: rgba(16,185,129,0.25); }
+.neon-warning { --neon-color: var(--c-warning); --neon-glow: rgba(245,158,11,0.69);  --neon-inner: rgba(245,158,11,0.25); }
+.neon-accent  { --neon-color: #a855f7; --neon-glow: rgba(168,85,247,0.69); --neon-inner: rgba(168,85,247,0.25); }
+.neon-theme   { --neon-color: var(--theme-color); }
+
+/* etiqueta de texto dentro de widget-link-btn--neon */
+.widget-link-label    { font-size: 0.85rem; font-weight: 600; text-align: center; }
+.widget-link-label-sm { font-size: 0.8rem;  font-weight: 600; text-align: center; line-height: 1.1; }
+.widget-link-label-xs { font-size: 0.75rem; font-weight: 600; text-align: center; }
+
