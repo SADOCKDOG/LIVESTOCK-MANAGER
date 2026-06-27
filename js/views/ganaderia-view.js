@@ -39,7 +39,7 @@ const GanaderiaView = {
 
     main.innerHTML = `
       <div class="mb-14 mt-4 card p-10 border-222" style="background: linear-gradient(145deg, #111 0%, #0a0a0a 100%);">
-        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center" style="letter-spacing: 1.5px; color: #facc15; text-shadow: 0 0 12px #facc1580; border-top: 2px solid #facc15;">⚡ ACCESO A OTROS MÓDULOS</div>
+        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center" style="letter-spacing: 1.5px; color: #facc15; text-shadow: 0 0 12px #facc1580; border-top: 2px solid #facc15; border-top-left-radius: 8px; border-top-right-radius: 8px;">⚡ ACCESO A OTROS MÓDULOS</div>
         <div class="grid grid-cols-3 gap-10">
           <a href="#/animales" class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #ef4444; border-right: 3px solid #ef4444; border-radius: 8px; color: #ffffff; box-shadow: 0 0 20px #ef4444B0, inset 0 0 12px #ef444440; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
             ${Icons.animales()}
