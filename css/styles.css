@@ -2516,6 +2516,11 @@ label {
 .widget-link-label-sm { font-size: 0.8rem;  font-weight: 600; text-align: center; line-height: 1.1; }
 .widget-link-label-xs { font-size: 0.75rem; font-weight: 600; text-align: center; }
 
+/* === layout utilities === */
+.d-none       { display: none; }
+.modal-scroll { max-height: 90vh; overflow-y: auto; }
+.select-sm    { height: 32px; font-size: 0.8rem; }
+
 /* === ayuda overlay components === */
 .btn-overlay-close  { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; line-height: 1; }
 .wizard-body-text   { color: #e4e4e7; line-height: 1.6; font-size: 0.95rem; }
