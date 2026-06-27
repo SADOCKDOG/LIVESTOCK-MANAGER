@@ -2516,6 +2516,15 @@ label {
 .widget-link-label-sm { font-size: 0.8rem;  font-weight: 600; text-align: center; line-height: 1.1; }
 .widget-link-label-xs { font-size: 0.75rem; font-weight: 600; text-align: center; }
 
+/* === PDF loader overlay widget === */
+.pdf-loader         { width: 280px; text-align: center; }
+.pdf-loader-emoji   { font-size: 3rem; margin-bottom: 20px; animation: bounce 2s infinite; }
+.pdf-loader-title   { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+.pdf-loader-desc    { font-size: 0.85rem; color: #aaa; margin-bottom: 20px; }
+.pdf-loader-bar     { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; }
+.pdf-loader-fill    { position: absolute; left: 0; top: 0; height: 100%; width: 10%; background: #c9851f; transition: width 0.4s ease; border-radius: 10px; }
+.pdf-loader-status  { font-size: 0.7rem; color: #888; margin-top: 8px; font-weight: 700; }
+
 /* === layout utilities === */
 .d-none       { display: none; }
 .modal-scroll { max-height: 90vh; overflow-y: auto; }

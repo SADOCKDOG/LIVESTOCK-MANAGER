@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - CuadernoDigitalView v1.0.0
  * Cuaderno Digital de Explotación Ganadera (RD 787/2023)
  *
@@ -423,14 +423,14 @@ const CuadernoDigitalView = {
         align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
       `;
       loader.innerHTML = `
-        <div style="width:280px; text-align:center;">
-          <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
-          <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
-          <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Cuaderno Digital</div>
-          <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
-            <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+        <div class="pdf-loader">
+          <div class="pdf-loader-emoji">📄</div>
+          <div class="pdf-loader-title">Generando PDF</div>
+          <div class="pdf-loader-desc">Cuaderno Digital</div>
+          <div class="pdf-loader-bar">
+            <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
           </div>
-          <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+          <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
         </div>
         <style>
           @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
@@ -649,14 +649,14 @@ const CuadernoDigitalView = {
           align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
         `;
         loader.innerHTML = `
-          <div style="width:280px; text-align:center;">
-            <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
-            <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
-            <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">Cuaderno Digital</div>
-            <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
-              <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
+          <div class="pdf-loader">
+            <div class="pdf-loader-emoji">📄</div>
+            <div class="pdf-loader-title">Generando PDF</div>
+            <div class="pdf-loader-desc">Cuaderno Digital</div>
+            <div class="pdf-loader-bar">
+              <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
             </div>
-            <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
+            <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
           </div>
           <style>
             @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
