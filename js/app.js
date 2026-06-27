@@ -716,7 +716,7 @@ const App = {
         return;
       }
       container.innerHTML = eventos.slice(0, 10).map(e =>
-        `<div class="flex justify-between text-xs" style="padding:3px 0; border-bottom:1px solid #1a1a1a;">
+        `<div class="flex justify-between text-xs py-3 row-border-dark">
           <span class="text-gold">${e.fecha || '—'}</span>
           <span class="text-ccc">${e.tipo_evento || e.tipo || 'Evento'}</span>
           <span class="text-gray-500">${e.resultado || e.notas || ''}</span>
@@ -743,7 +743,7 @@ const App = {
         return;
       }
       container.innerHTML = companeros.map(a =>
-        `<div class="flex justify-between text-xs" style="padding:2px 0;">
+        `<div class="flex justify-between text-xs py-2">
           <span class="text-ccc">${a.numero_identificacion || '#'.concat(a.id)}</span>
           <span class="text-gray-500">${a.especie || ''} · ${a.peso_actual || '—'} kg</span>
         </div>`
@@ -918,7 +918,7 @@ const App = {
       <div id="scanner-container" class="flex-1 w-full overflow-hidden"></div>
       <div class="p-14 text-center bg-dark">
         <div class="text-white text-sm mb-8">🔍 Enfoca el código de barras o QR del crotal</div>
-        <button class="btn btn-primary btn-sm" onclick="App._cancelarScanWeb()" style="background:#ef4444;">✕ Cancelar</button>
+        <button class="btn btn-primary btn-sm btn--red" onclick="App._cancelarScanWeb()">✕ Cancelar</button>
       </div>`;
     document.body.appendChild(overlay);
     window._scanOverlay = overlay;
@@ -1038,10 +1038,10 @@ const App = {
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
       overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
       overlay.innerHTML = `
-        <div class="card" style="max-width:450px;width:100%;border-top:4px solid #a78bfa;padding:24px;max-height:90vh;overflow-y:auto;">
+        <div class="card w-full max-w-450 border-top-4-violet p-24 modal-scroll">
           <div class="flex justify-between items-center mb-14">
             <div class="font-900 text-white text-lg">🧬 Gestión Reproductiva</div>
-            <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">✕</button>
+            <button onclick="this.closest('.card').parentElement.remove()" class="btn-overlay-close text-gray">✕</button>
           </div>
           <div class="mb-12 text-ccc text-sm">Animal: <strong class="text-white">${animal.numero_identificacion || '#'.concat(animal.id)}</strong></div>
           <div class="wizard-input-group">
@@ -1079,7 +1079,7 @@ const App = {
             <label class="wizard-label">RESULTADO / NOTAS</label>
             <input type="text" id="wiz-repro-notas" class="wizard-input" placeholder="Ej: Positivo, Negativo, Crias: 2, ...">
           </div>
-          <div id="wiz-repro-msg" class="d-none" style="margin-top:6px; padding:8px 10px; border-radius:8px; font-size:13px; font-weight:700;"></div>
+          <div id="wiz-repro-msg" class="d-none msg-feedback"></div>
           <div class="mt-14 flex gap-10">
             <button id="wiz-repro-guardar" class="btn btn-primary flex-1" onclick="App._guardarEventoReproduccion('${animalId}')">✔ Guardar</button>
             <button class="btn btn-secondary" onclick="this.closest('[style]').remove()">Cancelar</button>
@@ -1118,7 +1118,7 @@ const App = {
     let html = '';
     for (let i = 0; i < n; i++) {
       const p = prev[i] || { crotal: '', sexo: 'H' };
-      html += `<div data-cria-row class="grid grid-cols-2 gap-10 mb-8" style="border-top:1px solid #222; padding-top:8px;">
+      html += `<div data-cria-row class="grid grid-cols-2 gap-10 mb-8 row-sep-222">
           <div class="wizard-input-group m-0">
             <label class="wizard-label">CROTAL CRÍA ${i + 1}</label>
             <input type="text" class="wizard-input cria-crotal" maxlength="14" placeholder="ES + 12 dígitos" value="${p.crotal}">
@@ -1235,7 +1235,7 @@ const App = {
           <h2 class="text-white mt-10">🥩 Detalle de Venta</h2>
         </div>
 
-        <div class="card mb-20" style="border-top: 5px solid #ef4444;">
+        <div class="card mb-20 border-top-5-danger">
           <div class="flex justify-between items-center border-bottom-222 pb-10 mb-15">
             <div>
               <div class="text-gray text-tiny uppercase font-bold">Albarán Nº</div>
@@ -1278,10 +1278,10 @@ const App = {
           </div>
 
           <div class="flex gap-10 mt-30">
-            <button class="btn btn-primary flex-1" onclick="App._reimprimirAlbaranCarne(${v.id})" style="background:#ef4444; border:none;">
+            <button class="btn btn-primary flex-1 btn--red" onclick="App._reimprimirAlbaranCarne(${v.id})">
               ${Icons.documento()} REIMPRIMIR ALBARÁN
             </button>
-            <button class="btn btn-secondary" onclick="App._eliminarVentaCarneDetalle(${v.id})" style="background:#450a0a; color:white; border:none; padding: 0 15px;">
+            <button class="btn btn-secondary btn--dark-red" onclick="App._eliminarVentaCarneDetalle(${v.id})">
               ${Icons.eliminar()}
             </button>
           </div>
