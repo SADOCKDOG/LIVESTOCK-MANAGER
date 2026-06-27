@@ -41,14 +41,17 @@ const GanaderiaView = {
       <div class="mb-14 mt-4 card p-10 border-222 card-dark-gradient">
         <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center section-header-neon" style="--neon-color: #facc15;">⚡ ACCESO A OTROS MÓDULOS</div>
         <div class="grid grid-cols-3 gap-10">
-          <a href="#/animales" class="widget-link-btn">
-            ${Icons.animales()} Animales
+          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
+            ${Icons.animales()}
+            <span class="widget-link-label">Animales</span>
           </a>
-          <a href="#/rebanos" class="widget-link-btn">
-            ${Icons.rebanos()} Rebaños
+          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
+            ${Icons.rebanos()}
+            <span class="widget-link-label">Rebaños</span>
           </a>
-          <a href="#/zonas" class="widget-link-btn">
-            ${Icons.zonas()} Zonas
+          <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">
+            ${Icons.zonas()}
+            <span class="widget-link-label">Zonas</span>
           </a>
         </div>
       </div>
