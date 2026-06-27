@@ -284,7 +284,7 @@ const TrazabilidadView = {
 
         <!-- Timeline -->
         <div class="mt-16">
-          <h3 class="text-white" style="font-size:1rem; margin-bottom:15px;">${Icons.calendar()} Línea de Vida</h3>
+          <h3 class="text-white mb-15">${Icons.calendar()} Línea de Vida</h3>
           ${timeline.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.buscar()}</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>` : ''}
           <div id="trazabilidad-timeline" class="relative">
             <div style="position:absolute; left:18px; top:0; bottom:0; width:2px; background:#333;"></div>
