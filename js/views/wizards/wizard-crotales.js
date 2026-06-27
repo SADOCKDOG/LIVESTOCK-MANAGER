@@ -28,7 +28,7 @@ window.WizardCrotales = {
       {
         content: (data) => `
           <div class="mt-10">
-            <h3 class="text-green mb-15">📦 Material Solicitado</h3>
+            <h3 class="text-green mb-15">${Icons.paquete()} Material Solicitado</h3>
             <div class="wizard-input-group">
               <label class="wizard-label">ESPECIE</label>
               <select id="w-pd-especie" class="wizard-input wizard-select">
