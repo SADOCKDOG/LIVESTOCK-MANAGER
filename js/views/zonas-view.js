@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - ZonasView v1.0.0
  * Vista de Zonas/Parcelas extraída de App.js para modularización.
  * Copia espejo de js/views/zonas-view.js
@@ -41,7 +41,7 @@ const ZonasView = {
                   <div style="font-size:0.8rem; font-weight:700; color:${colorEspecie};">${r.nombre}</div>
                   <div class="text-gray text-2xs">${r.tipo}</div>
                 </div>
-                <div class="text-white font-800" style="font-size:0.85rem;">${n}</div>
+                <div class="text-white font-800 text-85">${n}</div>
               </div>`;
           }
         }
