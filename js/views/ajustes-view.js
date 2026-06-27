@@ -524,7 +524,7 @@ const AjustesView = {
     } else {
       zonasHtml = `<div class="grid gap-10">
         ${zonas.map((z, idx) => `
-          <div class="flex justify-between items-center rounded-sm border-left-dark-gold" style="background:#222; padding:12px;">
+          <div class="flex justify-between items-center rounded-sm border-left-dark-gold bg-222 p-12">
             <div>
               <div class="font-bold text-white">${z.nombre}</div>
               <div class="text-gray text-2xs">Superficie: ${z.superficie || 0} ha · Aforo: ${z.aforoMax || z.aforo_maximo || 50}</div>

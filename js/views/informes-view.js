@@ -1874,7 +1874,7 @@ const InformesView = {
     overlay.style.alignItems = 'center';
     overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px;border-top:5px solid #10b981;">
+      <div class="card p-25 max-w-380 border-top-5-success">
         <h3 class="mt-0 text-green">${Icons.pac()} Nueva Subvención PAC</h3>
         <div class="wizard-input-group">
           <label class="wizard-label">Año</label>

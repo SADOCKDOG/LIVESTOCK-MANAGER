@@ -22,7 +22,7 @@ const TransportistasView = {
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
-            <div style="max-width:600px; margin:0 auto;">
+            <div class="max-w-600 mx-auto">
                 <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
                     <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
@@ -96,7 +96,7 @@ const TransportistasView = {
         const main = document.getElementById("app-content");
 
         main.innerHTML = `
-            <div class="p-16" style="max-width:800px; margin:0 auto;">
+            <div class="p-16 max-w-800 mx-auto">
                 <div class="flex items-center gap-8 mb-14">
                     <button onclick="TransportistasView.render()" class="link-back" style="background:none; border:none; cursor:pointer; padding:4px 8px;">← Volver</button>
                     <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,#3b82f6,#60a5fa);"></span>
