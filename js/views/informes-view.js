@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - InformesView v2.3.0
  * Panel de Inteligencia Analítica — cabecera compacta, fuentes grandes,
  * exportación PDF/Excel con compartición nativa, botón flotante, indicadores.
@@ -311,8 +311,8 @@ const InformesView = {
       <!-- KPIs compactos -->
       <div class="inf-report">
       <div class="grid grid-cols-3 gap-8 mb-15">
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()}€</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">RENTAB.</div><div class="s-val inf-val-lg" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'};">${pctRent}%</div></div>
+        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>
+        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">RENTAB.</div><div class="s-val inf-val-lg ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
         <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CENSO</div><div class="s-val inf-val-lg text-blue">${totalAnimales}</div></div>
         <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg text-amber">${(rent?.detalles?.carne || 0).toLocaleString()}€</div></div>
         <div class="summary-cell summary-cell-kpi"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg text-gold">${(rent?.detalles?.leche || 0).toLocaleString()}€</div></div>
@@ -341,8 +341,8 @@ const InformesView = {
         </div>
         <div class="info-box border-left-green">
           <div class="flex justify-between">
-            <div><small class="s-lbl">BALANCE NETO</small><div class="inf-val-lg" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()}€</div></div>
-            <div class="text-right"><small class="s-lbl">RENTABILIDAD</small><div class="inf-val-lg" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'};">${pctRent}%</div></div>
+            <div><small class="s-lbl">BALANCE NETO</small><div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>
+            <div class="text-right"><small class="s-lbl">RENTABILIDAD</small><div class="inf-val-lg ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
           </div>
         </div>
       </div>
@@ -391,13 +391,13 @@ const InformesView = {
               <div class="inf-val-md text-white">${actual.mes}</div>
               <div class="text-sm mt-4">Ingresos: <strong class="text-green">${actual.ingresos.toLocaleString()}€</strong></div>
               <div class="text-sm">Gastos: <strong class="text-red">${actual.gastos.toLocaleString()}€</strong></div>
-              <div class="text-sm">Balance: <strong style="color:${actual.balance >= 0 ? '#10b981' : '#ef4444'}">${actual.balance.toLocaleString()}€</strong></div>
+              <div class="text-sm">Balance: <strong class="${actual.balance >= 0 ? 'text-green' : 'text-red'}">${actual.balance.toLocaleString()}€</strong></div>
             </div>
             <div class="info-box border-left-amber">
               <small class="s-lbl">VS MES ANTERIOR</small>
               <div class="inf-val-md text-white">${anterior?.mes || '—'}</div>
-              <div class="text-sm mt-4">Ingresos: <strong style="color:${diffIngresos >= 0 ? '#10b981' : '#ef4444'}">${diffIngresos >= 0 ? '+' : ''}${diffIngresos.toLocaleString()}€</strong></div>
-              <div class="text-sm">Balance: <strong style="color:${diffBalance >= 0 ? '#10b981' : '#ef4444'}">${diffBalance >= 0 ? '+' : ''}${diffBalance.toLocaleString()}€</strong></div>
+              <div class="text-sm mt-4">Ingresos: <strong class="${diffIngresos >= 0 ? 'text-green' : 'text-red'}">${diffIngresos >= 0 ? '+' : ''}${diffIngresos.toLocaleString()}€</strong></div>
+              <div class="text-sm">Balance: <strong class="${diffBalance >= 0 ? 'text-green' : 'text-red'}">${diffBalance >= 0 ? '+' : ''}${diffBalance.toLocaleString()}€</strong></div>
             </div>
           </div>
         </div>`;
@@ -453,9 +453,9 @@ const InformesView = {
             <small class="s-lbl">PRECIO MEDIO KG</small>
             <div class="inf-val-lg text-violet">${precioMedioKg.toFixed(2)}€</div>
           </div>
-          <div class="info-box" style="border-left:3px solid ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? '#10b981' : '#6b7280'};">
+          <div class="info-box border-left-${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'green' : 'neutral'}">
             <small class="s-lbl">GMD MEDIA GLOBAL</small>
-            <div class="inf-val-lg" style="color:${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? '#10b981' : '#6b7280'}">${gmdMedia !== null ? gmdMedia + ' kg' : '—'}</div>
+            <div class="inf-val-lg ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'text-green' : 'text-neutral'}">${gmdMedia !== null ? gmdMedia + ' kg' : '—'}</div>
             ${gmdMedia !== null ? '<small class="text-gray text-xs">Ganancia Media Diaria</small>' : '<small class="text-gray text-xs">Se necesitan 2+ pesajes</small>'}
           </div>
         </div>
@@ -471,7 +471,7 @@ const InformesView = {
         ${ventasHist.length > 0 ? `
         <div class="inf-section-title">Últimas ventas</div>
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table" style="--tbl-accent:#f59e0b;">
+          <table class="inf-table tbl-accent-amber">
             <thead><tr><th>Fecha</th><th>Animales</th><th>Kg</th><th>Total</th></tr></thead>
             <tbody>${ventasHist.slice(0, 10).map(v => `
               <tr><td>${v.fecha || '-'}</td><td>${v.animales || 1}</td><td>${v.kg || '-'}</td><td class="text-green">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
@@ -551,9 +551,9 @@ const InformesView = {
             <small class="s-lbl">REGISTROS</small>
             <div class="inf-val-md text-white">${lecheStats.totalRegistros}</div>
           </div>
-          <div class="info-box" style="border-left:3px solid ${mofaTotal >= 0 ? '#10b981' : '#ef4444'};">
+          <div class="info-box border-left-${mofaTotal >= 0 ? 'green' : 'red'}">
             <small class="s-lbl">MOFA TOTAL</small>
-            <div class="inf-val-md" style="color:${mofaTotal >= 0 ? '#10b981' : '#ef4444'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div>
+            <div class="inf-val-md ${mofaTotal >= 0 ? 'text-green' : 'text-red'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div>
             <small class="text-gray text-xs">Ratio: ${mofaRatio}% sobre ingresos</small>
           </div>
         </div>
@@ -647,9 +647,9 @@ const InformesView = {
           </div>
         </div>
         <div class="grid grid-cols-2 gap-10 mb-12">
-          <div class="info-box" style="border-left:3px solid ${parseFloat(tasaAbortos) > 10 ? '#ef4444' : '#10b981'};">
+          <div class="info-box border-left-${parseFloat(tasaAbortos) > 10 ? 'red' : 'green'}">
             <small class="s-lbl">RATIO DE ABORTOS</small>
-            <div class="inf-val-lg" style="color:${parseFloat(tasaAbortos) > 10 ? '#ef4444' : '#10b981'}">${tasaAbortos}%</div>
+            <div class="inf-val-lg ${parseFloat(tasaAbortos) > 10 ? 'text-red' : 'text-green'}">${tasaAbortos}%</div>
             <small class="text-gray text-xs">${abortos} abortos de ${totalEventos} gestaciones</small>
           </div>
           <div class="info-box border-left-blue">
@@ -814,7 +814,7 @@ const InformesView = {
 
         <div class="inf-section-title">Detalle por rebaño</div>
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table" style="--tbl-accent:#10b981;">
+          <table class="inf-table tbl-accent-green">
             <thead><tr><th>Rebaño</th><th>Tipo</th><th>Total</th><th>Activos</th><th class="text-red">Vendidos</th></tr></thead>
             <tbody>${censo.map(r => `
               <tr><td><strong>${r.nombre}</strong></td><td class="text-gray">${r.tipo}</td><td class="font-800">${r.total}</td><td class="text-green">${r.activos}</td><td class="text-red">${r.vendidos}</td></tr>`).join('')}</tbody>
@@ -857,7 +857,7 @@ const InformesView = {
 
         ${ventas.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📭</div><p class="empty-state-text">No hay ventas registradas</p></div>' : `
         <div class="table-scroll scroll-shadow-container mt-10">
-          <table class="inf-table" style="--tbl-accent:#3b82f6;">
+          <table class="inf-table tbl-accent-blue">
             <thead>
               <tr>
                 <th>FECHA</th>
@@ -918,7 +918,7 @@ const InformesView = {
         <div class="card report-section border-top-3px border-top-3px-green report-card mt-14">
           <div class="inf-card-title">📊 Precio Medio por Comprador</div>
           <div class="table-scroll scroll-shadow-container">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#10b981;">
+            <table class="inf-table inf-table-sm tbl-accent-green">
               <thead><tr><th>Comprador</th><th class="text-center">Ventas</th><th class="text-right">Kg</th><th class="text-right">Total</th><th class="text-right">€/Kg</th></tr></thead>
               <tbody>${comps.map(c => `
                 <tr>
@@ -978,7 +978,7 @@ const InformesView = {
 
         ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🏢</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>' : `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table" style="--tbl-accent:#3b82f6;">
+          <table class="inf-table tbl-accent-blue">
             <thead><tr>
               <th>Comprador</th>
               <th>NIF</th>
@@ -1081,7 +1081,7 @@ const InformesView = {
 
         ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📦</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>' : `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table" style="--tbl-accent:#f59e0b;">
+          <table class="inf-table tbl-accent-amber">
             <thead><tr>
               <th>Proveedor</th>
               <th>NIF</th>
@@ -1175,7 +1175,7 @@ const InformesView = {
 
         ${data.registros.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🧪</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>' : `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table" style="--tbl-accent:#10b981;">
+          <table class="inf-table tbl-accent-green">
             <thead><tr>
               <th>Fecha</th>
               <th>Proveedor</th>
@@ -1233,7 +1233,7 @@ const InformesView = {
           ${alertas.sanitarias?.length > 0 ? `
           <div class="inf-section-title text-red">🔴 Alertas Sanitarias (${alertas.sanitarias.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#ef4444;">
+            <table class="inf-table inf-table-sm tbl-accent-red">
               <thead><tr><th>Medicamento</th><th>Rebaño</th><th>Fecha</th><th class="text-right">Días rest.</th><th class="text-center">Urgencia</th></tr></thead>
               <tbody>${alertas.sanitarias.map(a => `
                 <tr>
@@ -1249,7 +1249,7 @@ const InformesView = {
           ${alertas.trazabilidad?.length > 0 ? `
           <div class="inf-section-title text-amber">🟠 Alertas de Trazabilidad (${alertas.trazabilidad.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#f59e0b;">
+            <table class="inf-table inf-table-sm tbl-accent-amber">
               <thead><tr><th>Animal/Venta</th><th>Mensaje</th><th>Urgencia</th></tr></thead>
               <tbody>${alertas.trazabilidad.map(a => `
                 <tr>
@@ -1263,7 +1263,7 @@ const InformesView = {
           ${alertas.administrativas?.length > 0 ? `
           <div class="inf-section-title text-violet">🟣 Alertas Administrativas (${alertas.administrativas.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
+            <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr><th>Sección</th><th>Mensaje</th><th>Urgencia</th></tr></thead>
               <tbody>${alertas.administrativas.map(a => `
                 <tr>
@@ -1277,7 +1277,7 @@ const InformesView = {
           ${alertas.calendario?.sugerencias?.length > 0 ? `
           <div class="card border-top-3px border-top-3px-blue p-14">
             <div class="inf-card-title mb-8">📅 ${alertas.calendario.titulo || 'Calendario Preventivo'}</div>
-            <ul style="margin:0;padding-left:18px;">
+            <ul class="m-0 pl-18">
               ${alertas.calendario.sugerencias.map(s => `<li class="text-sm text-gray mb-4">${s}</li>`).join('')}
             </ul>
           </div>` : ''}
@@ -1349,7 +1349,7 @@ const InformesView = {
             </div>
             <div class="info-box border-left-green">
               <small class="s-lbl">BALANCE</small>
-              <div class="inf-val-lg" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()}€</div>
+              <div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div>
             </div>
           </div>
         </div>` : ''}
@@ -1359,7 +1359,7 @@ const InformesView = {
         <div class="card report-section border-top-3px border-top-3px-purple report-card">
           <div class="inf-card-title flex items-center gap-6">${Icons.rebanos()} Rebaños</div>
           <div class="table-scroll scroll-shadow-container">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
+            <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr><th>Rebaño</th><th>Tipo</th><th class="text-center">Animales</th><th class="text-center">Activos</th></tr></thead>
               <tbody>${rebanos.map(r => {
                 const cnt = (animales || []).filter(a => Number(a.rebanoId) === Number(r.id)).length;
@@ -1457,7 +1457,7 @@ const InformesView = {
           ${rebanos?.length > 0 ? `
           <div class="inf-section-title mt-10 mb-6">Por rebaño</div>
           <div class="table-scroll scroll-shadow-container">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#10b981;">
+            <table class="inf-table inf-table-sm tbl-accent-green">
               <thead><tr>
                 <th>REBAÑO</th>
                 <th class="text-center">TOTAL</th>
@@ -1481,7 +1481,7 @@ const InformesView = {
           <div class="inf-card-title">📦 Últimos Movimientos</div>
           ${eventosRecientes.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📦</div><p class="empty-state-text">Sin movimientos registrados</p></div>' : `
           <div class="table-scroll scroll-shadow-container">
-            <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
+            <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr>
                 <th>FECHA</th>
                 <th>TIPO</th>
@@ -1516,19 +1516,19 @@ const InformesView = {
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${data.totalIngresos.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${data.totalGastos.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg" style="color:${data.totalBalance >= 0 ? '#10b981' : '#ef4444'}">${data.totalBalance.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg ${data.totalBalance >= 0 ? 'text-green' : 'text-red'}">${data.totalBalance.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-blue"><small class="s-lbl">RENTABILIDAD</small><div class="inf-val-lg text-blue">${data.rentabilidad}%</div></div>
         </div>
         ${data.porMes.length > 0 ? `
         <div class="table-scroll scroll-shadow-container mb-14">
-          <table class="inf-table" style="--tbl-accent:#10b981;">
+          <table class="inf-table tbl-accent-green">
             <thead><tr><th>Mes</th><th class="text-right text-green">Ingresos</th><th class="text-right text-red">Gastos</th><th class="text-right">Balance</th><th class="text-right">Acumulado</th></tr></thead>
             <tbody>${data.porMes.filter(m => m.ingresos > 0 || m.gastos > 0).map(m => `
               <tr>
                 <td><strong>${m.mes}</strong></td>
                 <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
                 <td class="text-right text-red">${m.gastos.toLocaleString()}€</td>
-                <td class="text-right font-bold" style="color:${m.balance >= 0 ? '#10b981' : '#ef4444'}">${m.balance.toLocaleString()}€</td>
+                <td class="text-right font-bold ${m.balance >= 0 ? 'text-green' : 'text-red'}">${m.balance.toLocaleString()}€</td>
                 <td class="text-right text-gray">—</td>
               </tr>`).join('')}
             </tbody>
@@ -1561,7 +1561,7 @@ const InformesView = {
         ${data.totalGasto > 0 ? `<div class="info-box mb-14"><small class="s-lbl">GASTO TOTAL</small><div class="inf-val-md text-red">${data.totalGasto.toLocaleString()}€</div></div>` : ''}
         ${data.porRebano.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table inf-table-sm" style="--tbl-accent:#8b5cf6;">
+          <table class="inf-table inf-table-sm tbl-accent-purple">
             <thead><tr><th>Rebaño</th><th class="text-center">Animales</th><th class="text-right">Gasto Total</th><th class="text-right">€/Cabeza</th><th class="text-right">€/Día</th><th class="text-right">%Alim</th><th class="text-right">%Sanidad</th></tr></thead>
             <tbody>${data.porRebano.map(r => `
               <tr>
@@ -1626,7 +1626,7 @@ const InformesView = {
         </div>` : ''}
         ${data.porZona.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table inf-table-sm" style="--tbl-accent:#f59e0b;">
+          <table class="inf-table inf-table-sm tbl-accent-amber">
             <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo</th><th class="text-center">Ocupación</th><th class="text-center">%</th><th>Estado</th></tr></thead>
             <tbody>${data.porZona.map(z => `
               <tr>
@@ -1654,7 +1654,7 @@ const InformesView = {
         <div class="grid grid-cols-3 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">CENSO TOTAL</small><div class="inf-val-lg text-green">${data.totalAnimales}</div></div>
           <div class="info-box-center border-left-blue"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-blue">${data.activos}</div></div>
-          <div class="info-box-center border-left-amber"><small class="s-lbl">ENTRADA NETA</small><div class="inf-val-lg" style="color:${(u90.entradaNeta || 0) >= 0 ? '#10b981' : '#ef4444'}">${(u90.entradaNeta || 0) >= 0 ? '+' : ''}${u90.entradaNeta || 0}</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">ENTRADA NETA</small><div class="inf-val-lg ${(u90.entradaNeta || 0) >= 0 ? 'text-green' : 'text-red'}">${(u90.entradaNeta || 0) >= 0 ? '+' : ''}${u90.entradaNeta || 0}</div></div>
         </div>
         <div class="grid grid-cols-2 gap-8 mb-14">
           <div class="info-box border-left-green"><small class="s-lbl">TASA REPOSICIÓN</small><div class="inf-val-lg text-green">${data.tasaReposicion}</div></div>
@@ -1680,19 +1680,19 @@ const InformesView = {
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">ENTRADAS</small><div class="inf-val-lg text-green">${data.totalEntradas.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-red"><small class="s-lbl">SALIDAS</small><div class="inf-val-lg text-red">${data.totalSalidas.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-${data.totalNeto >= 0 ? 'green' : 'red'}"><small class="s-lbl">NETO</small><div class="inf-val-lg" style="color:${data.totalNeto >= 0 ? '#10b981' : '#ef4444'}">${data.totalNeto.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalNeto >= 0 ? 'green' : 'red'}"><small class="s-lbl">NETO</small><div class="inf-val-lg ${data.totalNeto >= 0 ? 'text-green' : 'text-red'}">${data.totalNeto.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-blue"><small class="s-lbl">SALDO FINAL</small><div class="inf-val-lg text-blue">${data.saldoFinal.toLocaleString()}€</div></div>
         </div>
         ${data.porMes.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table inf-table-sm" style="--tbl-accent:#14b8a6;">
+          <table class="inf-table inf-table-sm tbl-accent-teal">
             <thead><tr><th>Mes</th><th class="text-right text-green">Entradas</th><th class="text-right text-red">Salidas</th><th class="text-right">Neto</th><th class="text-right">Acumulado</th></tr></thead>
             <tbody>${data.porMes.filter(m => m.entradas > 0 || m.salidas > 0).map(m => `
               <tr>
                 <td><strong>${m.mes}</strong></td>
                 <td class="text-right text-green">${m.entradas.toLocaleString()}€</td>
                 <td class="text-right text-red">${m.salidas.toLocaleString()}€</td>
-                <td class="text-right font-bold" style="color:${m.neto >= 0 ? '#10b981' : '#ef4444'}">${m.neto.toLocaleString()}€</td>
+                <td class="text-right font-bold ${m.neto >= 0 ? 'text-green' : 'text-red'}">${m.neto.toLocaleString()}€</td>
                 <td class="text-right text-blue font-bold">${m.acumulado.toLocaleString()}€</td>
               </tr>`).join('')}</tbody>
           </table>
@@ -1710,11 +1710,11 @@ const InformesView = {
         <div class="grid grid-cols-3 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${data.totalIngresos.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${data.totalGastos.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg" style="color:${data.totalBalance >= 0 ? '#10b981' : '#ef4444'}">${data.totalBalance.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg ${data.totalBalance >= 0 ? 'text-green' : 'text-red'}">${data.totalBalance.toLocaleString()}€</div></div>
         </div>
         ${data.porEspecie.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table" style="--tbl-accent:#8b5cf6;">
+          <table class="inf-table tbl-accent-purple">
             <thead><tr><th>Especie</th><th class="text-center">Rebaños</th><th class="text-center">Animales</th><th class="text-right text-green">Ingresos</th><th class="text-right text-red">Gastos</th><th class="text-right">Balance</th><th class="text-center">Vtas Carne</th><th class="text-center">Vtas Leche</th></tr></thead>
             <tbody>${data.porEspecie.map(e => `
               <tr>
@@ -1723,7 +1723,7 @@ const InformesView = {
                 <td class="text-center font-bold">${e.numAnimales}</td>
                 <td class="text-right text-green font-bold">${e.ingresos.toLocaleString()}€</td>
                 <td class="text-right text-red">${e.gastos.toLocaleString()}€</td>
-                <td class="text-right font-bold" style="color:${e.balance >= 0 ? '#10b981' : '#ef4444'}">${e.balance.toLocaleString()}€</td>
+                <td class="text-right font-bold ${e.balance >= 0 ? 'text-green' : 'text-red'}">${e.balance.toLocaleString()}€</td>
                 <td class="text-center">${e.numVentasCarne}</td>
                 <td class="text-center">${e.numVentasLeche}</td>
               </tr>`).join('')}
@@ -1747,18 +1747,18 @@ const InformesView = {
           <div class="info-box-center border-left-blue"><small class="s-lbl">META L</small><div class="inf-val-lg text-blue">${Math.round(data.metaLitros)}</div></div>
         </div>
         <div class="grid grid-cols-2 gap-8 mb-14">
-          <div class="info-box" style="border-left:3px solid ${parseFloat(data.pctCumplimientoKg) >= 100 ? '#10b981' : '#f59e0b'};">
+          <div class="info-box border-left-${parseFloat(data.pctCumplimientoKg) >= 100 ? 'green' : 'amber'}">
             <small class="s-lbl">CUMPLIMIENTO CARNE</small>
-            <div class="inf-val-lg" style="color:${parseFloat(data.pctCumplimientoKg) >= 100 ? '#10b981' : '#f59e0b'}">${data.pctCumplimientoKg}%</div>
+            <div class="inf-val-lg ${parseFloat(data.pctCumplimientoKg) >= 100 ? 'text-green' : 'text-amber'}">${data.pctCumplimientoKg}%</div>
           </div>
-          <div class="info-box" style="border-left:3px solid ${parseFloat(data.pctCumplimientoLitros) >= 100 ? '#10b981' : '#f59e0b'};">
+          <div class="info-box border-left-${parseFloat(data.pctCumplimientoLitros) >= 100 ? 'green' : 'amber'}">
             <small class="s-lbl">CUMPLIMIENTO LECHE</small>
-            <div class="inf-val-lg" style="color:${parseFloat(data.pctCumplimientoLitros) >= 100 ? '#10b981' : '#f59e0b'}">${data.pctCumplimientoLitros}%</div>
+            <div class="inf-val-lg ${parseFloat(data.pctCumplimientoLitros) >= 100 ? 'text-green' : 'text-amber'}">${data.pctCumplimientoLitros}%</div>
           </div>
         </div>
         ${data.porMes.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table inf-table-sm" style="--tbl-accent:#3b82f6;">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
             <thead><tr><th>Mes</th><th class="text-right text-amber">Kg</th><th class="text-right text-gold">Litros</th><th class="text-right text-amber">Kg Acum</th><th class="text-right text-gold">L Acum</th><th class="text-right text-green">Ingresos</th></tr></thead>
             <tbody>${data.porMes.map(m => `
               <tr>
@@ -1792,7 +1792,7 @@ const InformesView = {
             <div class="grid grid-cols-2 gap-6">
               <div><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber">${data.precioMedioKg.toFixed(2)}€</div></div>
               <div><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red">${data.costeVarKg.toFixed(2)}€</div></div>
-              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md" style="color:${data.cubiertoCarne ? '#10b981' : '#ef4444'}">${data.breakEvenKg} kg</div></div>
+              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoCarne ? 'text-green' : 'text-red'}">${data.breakEvenKg} kg</div></div>
               <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadKg}</div></div>
             </div>
           </div>
@@ -1801,7 +1801,7 @@ const InformesView = {
             <div class="grid grid-cols-2 gap-6">
               <div><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold">${data.precioMedioLitro.toFixed(3)}€</div></div>
               <div><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red">${data.costeVarLitro.toFixed(3)}€</div></div>
-              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md" style="color:${data.cubiertoLeche ? '#10b981' : '#ef4444'}">${data.breakEvenLitros} L</div></div>
+              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoLeche ? 'text-green' : 'text-red'}">${data.breakEvenLitros} L</div></div>
               <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadLitros}</div></div>
             </div>
           </div>
@@ -1827,7 +1827,7 @@ const InformesView = {
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">SOLICITADO</small><div class="inf-val-lg text-green">${data.totalSolicitado.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-blue"><small class="s-lbl">COBRADO</small><div class="inf-val-lg text-blue">${data.totalCobrado.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-${data.totalPendiente > 0 ? 'amber' : 'green'}"><small class="s-lbl">PENDIENTE</small><div class="inf-val-lg" style="color:${data.totalPendiente > 0 ? '#f59e0b' : '#10b981'}">${data.totalPendiente.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${data.totalPendiente > 0 ? 'amber' : 'green'}"><small class="s-lbl">PENDIENTE</small><div class="inf-val-lg ${data.totalPendiente > 0 ? 'text-amber' : 'text-green'}">${data.totalPendiente.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-purple"><small class="s-lbl">REGISTROS</small><div class="inf-val-lg text-purple">${data.numRegistros}</div></div>
         </div>
         ${data.porAnio.length > 0 ? `
@@ -1846,7 +1846,7 @@ const InformesView = {
         </div>` : ''}
         ${data.registros.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
-          <table class="inf-table inf-table-sm" style="--tbl-accent:#10b981;">
+          <table class="inf-table inf-table-sm tbl-accent-green">
             <thead><tr><th>Año</th><th>Concepto</th><th>Régimen</th><th class="text-right">Solicitado</th><th class="text-right">Cobrado</th><th class="text-center">Estado</th></tr></thead>
             <tbody>${data.registros.map(r => {
               const pct = r.importe_solicitado > 0 ? ((r.importe_cobrado || 0) / r.importe_solicitado * 100).toFixed(0) : 0;

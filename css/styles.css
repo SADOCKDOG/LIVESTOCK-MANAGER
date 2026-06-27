@@ -713,6 +713,7 @@ label {
 .text-444       { color: #444; }
 .text-999       { color: #999; }
 .text-gray-400  { color: #9ca3af; }
+.text-neutral   { color: #6b7280; }
 .text-blue-400  { color: #60a5fa; }
 .text-purple-400{ color: #a78bfa; }
 .text-zinc-200  { color: #e4e4e7; }
@@ -793,6 +794,7 @@ label {
 .py-12  { padding-top: 12px; padding-bottom: 12px; }
 .pt-16  { padding-top: 16px; }
 .pb-4   { padding-bottom: 4px; }
+.pl-18  { padding-left: 18px; }
 .pl-20  { padding-left: 20px; }
 
 /* ── Texto ── */
@@ -1998,7 +2000,8 @@ label {
 .border-left-amber  { border-left: 3px solid #f59e0b; }
 .border-left-blue   { border-left: 3px solid #3b82f6; }
 .border-left-purple { border-left: 3px solid #a855f7; }
-.border-left-violet { border-left: 3px solid #8b5cf6; }
+.border-left-violet   { border-left: 3px solid #8b5cf6; }
+.border-left-neutral  { border-left: 3px solid #6b7280; }
 .border-left-dark-gold { border-left: 3px solid #d97706; }
 
 /* ── Badge-crotal section header ── */
@@ -2507,4 +2510,12 @@ label {
 .widget-link-label    { font-size: 0.85rem; font-weight: 600; text-align: center; }
 .widget-link-label-sm { font-size: 0.8rem;  font-weight: 600; text-align: center; line-height: 1.1; }
 .widget-link-label-xs { font-size: 0.75rem; font-weight: 600; text-align: center; }
+
+/* === inf-table accent color presets === */
+.tbl-accent-green  { --tbl-accent: var(--c-success); }
+.tbl-accent-blue   { --tbl-accent: var(--c-info); }
+.tbl-accent-amber  { --tbl-accent: var(--c-warning); }
+.tbl-accent-red    { --tbl-accent: var(--c-danger); }
+.tbl-accent-purple { --tbl-accent: #8b5cf6; }
+.tbl-accent-teal   { --tbl-accent: #14b8a6; }
 
