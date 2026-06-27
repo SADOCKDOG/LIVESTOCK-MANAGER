@@ -151,7 +151,7 @@ const ManualesView = {
            onclick="ManualesView._abrirManual('${m.archivo}')">
         <div class="flex items-center gap-14">
           <span class="flex-shrink-0" style="font-size:2rem;">${m.icono}</span>
-          <div class="flex-1" style="min-width:0;">
+          <div class="flex-1 min-w-0">
             <div style="font-weight:800; font-size:0.95rem; color:#fff; margin-bottom:4px;">${m.titulo}</div>
             <div style="font-size:0.78rem; color:#999; line-height:1.3;">${m.descripcion}</div>
           </div>

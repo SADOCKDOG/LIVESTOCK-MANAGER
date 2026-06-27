@@ -47,11 +47,11 @@ const DocumentosView = {
         <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${totalDocs}</div></div>
         <div class="info-box-center border-left-green"><small class="s-lbl">DIMOE</small><div class="inf-val-lg text-green">${porTipo.dimoe || 0}</div></div>
         <div class="info-box-center border-left-amber"><small class="s-lbl">FACTURAS</small><div class="inf-val-lg text-amber">${porTipo.factura || 0}</div></div>
-        <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">DIB</small><div class="inf-val-lg text-purple">${porTipo.dib || 0}</div></div>
+        <div class="info-box-center border-left-violet"><small class="s-lbl">DIB</small><div class="inf-val-lg text-purple">${porTipo.dib || 0}</div></div>
       </div>
       <div class="mb-16">
         <div class="flex gap-6 mb-10">
-          <div class="tabs-scroll scroll-shadow-container flex-1" style="white-space:nowrap;">
+          <div class="tabs-scroll scroll-shadow-container flex-1 nowrap">
             ${tiposDoc.map(t => `
               <button class="filter-pill filter-pill-gold font-800 uppercase inline-flex gap-4 ${this._currentTab === t ? 'active' : ''}"
                 onclick="DocumentosView._cambiarTab('${t}')"
@@ -60,7 +60,7 @@ const DocumentosView = {
               </button>
             `).join('')}
           </div>
-          <button class="btn btn-primary btn-sm" onclick="DocumentosView._exportDocs()" style="white-space:nowrap;">${Icons.exportar()} Exportar</button>
+          <button class="btn btn-primary btn-sm nowrap" onclick="DocumentosView._exportDocs()">${Icons.exportar()} Exportar</button>
         </div>
       </div>
       <div id="docs-lista">${this._renderLista(docs, ventaMap)}</div>

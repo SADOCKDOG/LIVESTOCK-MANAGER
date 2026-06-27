@@ -36,7 +36,7 @@ window.WizardTraslado = {
                   const checked = yaEnRebano || data.selectedIds.includes(a.id);
                   return `<label class="flex items-center gap-10 p-10 wizard-list-item">
                     <input type="checkbox" value="${a.id}" ${checked ? "checked" : ""} ${yaEnRebano ? "disabled" : ""} class="w-tras-chk">
-                    <span style="${yaEnRebano ? "color:#fbbf24" : ""}">${a.numero_identificacion} (${a.raza})${yaEnRebano ? " · ya en destino" : ""}</span>
+                    <span class="${yaEnRebano ? 'text-gold' : ''}">${a.numero_identificacion} (${a.raza})${yaEnRebano ? " · ya en destino" : ""}</span>
                   </label>`;
                 }).join("")}
               </div>

@@ -34,7 +34,7 @@ const ProveedoresView = {
         if (kpisEl) {
             kpisEl.innerHTML = `
               <div class="grid grid-cols-3 gap-6 mb-14">
-                <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">PROVEEDORES</small><div class="inf-val-lg text-purple">${proveedores.length}</div></div>
+                <div class="info-box-center border-left-violet"><small class="s-lbl">PROVEEDORES</small><div class="inf-val-lg text-purple">${proveedores.length}</div></div>
                 <div class="info-box-center border-left-amber"><small class="s-lbl">GASTO ASIGNADO</small><div class="inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
                 <div class="info-box-center border-left-blue"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
               </div>`;
