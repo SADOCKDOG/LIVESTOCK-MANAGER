@@ -573,11 +573,14 @@ const ExplotacionView = {
 
     let html = `
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${borderStyleColor};">
-        <div class="flex justify-between items-center mb-10">
-          <div class="text-xs text-white font-black uppercase flex items-center gap-6">${Icons.paquete()} ALMACÉN Y STOCK DE SILOS</div>
-          <button class="widget-link-btn" style="background: #000000; display: flex; align-items: center; justify-content: center; padding: 4px 12px; gap: 6px; border-left: 2px solid ${borderStyleColor}; border-right: 2px solid ${borderStyleColor}; border-radius: 6px; color: #ffffff; box-shadow: 0 0 18px ${borderStyleColor}A0, inset 0 0 10px ${borderStyleColor}30; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 0; width: auto;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-            ${Icons.agregar()} <span style="font-size:0.75rem; font-weight:600;">Carga/Consumo</span>
-          </button>
+        <div class="mb-10">
+          <div class="text-xs text-white font-black uppercase flex items-center gap-6 mb-8">${Icons.paquete()} ALMACÉN Y STOCK DE SILOS</div>
+          <div class="flex flex-col items-center gap-3">
+            <div class="text-[0.65rem] uppercase font-extrabold tracking-wider" style="letter-spacing: 1px; color: ${borderStyleColor}; text-shadow: 0 0 10px ${borderStyleColor}80;">⚡ ACCIÓN DE CARGA</div>
+            <button class="widget-link-btn" style="background: #000000; display: flex; align-items: center; justify-content: center; padding: 10px 16px; gap: 6px; border-left: 2px solid ${borderStyleColor}; border-right: 2px solid ${borderStyleColor}; border-radius: 6px; color: #ffffff; box-shadow: 0 0 18px ${borderStyleColor}A0, inset 0 0 10px ${borderStyleColor}30; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 0; width: 100%; max-width: 300px;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+              ${Icons.agregar()} <span style="font-size:0.75rem; font-weight:600;">Carga/Consumo</span>
+            </button>
+          </div>
         </div>
         <div class="grid gap-10">
     `;
@@ -636,6 +639,7 @@ const ExplotacionView = {
             <div class="font-900 text-white">${(d.totalGastosFito || 0).toLocaleString()} €</div>
           </div>
         </div>
+        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 text-center" style="letter-spacing: 1.5px; color: ${color}; text-shadow: 0 0 12px ${color}80;">⚡ ACCIONES DE GASTOS</div>
         <div class="grid grid-cols-3 gap-10">
           <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #f59e0b; border-right: 3px solid #f59e0b; border-radius: 8px; color: #ffffff; box-shadow: 0 0 20px #f59e0bB0, inset 0 0 12px #f59e0b40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">
             ${Icons.agregar()}
