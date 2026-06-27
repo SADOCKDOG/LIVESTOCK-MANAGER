@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - AnimalesView v1.0.0
  * Vista de Animales extraída de App.js para modularización.
  * Copia espejo de js/views/animales-view.js
@@ -73,7 +73,7 @@ const AnimalesView = {
     html += `</div>
       <!-- Botón Flotante de Acción para móviles -->
       <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
-      <div id="animales-empty-search" class="empty-state-search" style="display:none;">
+      <div id="animales-empty-search" class="empty-state-search d-none">
         <div class="text-2xl mb-8">🔍</div>
         <p class="text-gray-500">No se encontraron animales con ese criterio.</p>
       </div>`;

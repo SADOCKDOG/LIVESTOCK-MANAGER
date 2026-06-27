@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - GastosView v2.0.0
  * Vista de Gastos con tabs por Categoría Contable.
  * Sigue el mismo patrón que ProduccionView: tabs, KPIs, botón registrar, listado.
@@ -151,9 +151,9 @@ const GastosView = {
     content.innerHTML = `
       <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
         <div class="flex items-center gap-12 mb-12">
-          <span style="font-size:1.6rem;">${icon}</span>
+          <span class="text-3xl">${icon}</span>
           <div>
-            <div class="text-white font-900" style="font-size:1.05rem;">${title}</div>
+            <div class="text-white font-900 text-lg">${title}</div>
             ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
           </div>
         </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - ExplotacionView v1.2.0
  * Vista unificada del Módulo ExPro (Explotación y Producción)
  * Contiene tres modos seleccionables en la parte superior: Carne (Rojo), Leche (Azul), Híbrido (Verde)
@@ -371,9 +371,9 @@ const ExplotacionView = {
                           <td><strong>${(e.cantidad || 0).toLocaleString()} L</strong></td>
                           <td>${lab.grasa != null ? lab.grasa.toFixed(2) + '%' : '—'}</td>
                           <td>${lab.proteina != null ? lab.proteina.toFixed(2) + '%' : '—'}</td>
-                          <td style="color:${(lab.somaticas || 0) > 400000 ? '#ef4444' : '#10b981'}">${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '—'}</td>
-                          <td style="color:${(lab.germenes || 0) > 1500000 ? '#ef4444' : '#10b981'}">${lab.germenes ? (lab.germenes / 1000).toFixed(0) + 'k' : '—'}</td>
-                          <td style="color:${e.certificadoInhibidores === false || e.antibioticos ? '#ef4444' : '#10b981'}">${e.certificadoInhibidores ? 'OK' : (e.certificadoInhibidores === false ? 'ALERT' : 'PEND')}</td>
+                          <td class="${(lab.somaticas || 0) > 400000 ? 'text-red' : 'text-green'}">${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '—'}</td>
+                          <td class="${(lab.germenes || 0) > 1500000 ? 'text-red' : 'text-green'}">${lab.germenes ? (lab.germenes / 1000).toFixed(0) + 'k' : '—'}</td>
+                          <td class="${e.certificadoInhibidores === false || e.antibioticos ? 'text-red' : 'text-green'}">${e.certificadoInhibidores ? 'OK' : (e.certificadoInhibidores === false ? 'ALERT' : 'PEND')}</td>
                           <td>
                             <span class="badge" style="background:${semaforo.color}15; color:${semaforo.color}; border:1px solid ${semaforo.color}30; font-size:0.58rem; padding:2px 6px;">
                               ${semaforo.label}
