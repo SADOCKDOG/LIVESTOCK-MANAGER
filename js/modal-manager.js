@@ -274,11 +274,11 @@ const Confirm = {
             const id = 'prompt-dialog-' + Date.now();
             const inputId = id + '-input';
             const contentHtml = `
-                <div class="error-dialog" style="border-color: var(--p-gold); margin: 16px; box-sizing: border-box;">
+                <div class="error-dialog error-dialog--gold">
                     <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
                     <div class="error-dialog-msg" style="color: var(--text-p, #fff); font-size: 0.95rem; margin-bottom: 16px;">${msg}</div>
                     <input id="${inputId}" type="text" value="${defaultValue.replace(/"/g, '&quot;')}" placeholder="${placeholder}"
-                           class="wizard-input" style="margin-bottom:20px; width:100%; box-sizing:border-box;">
+                           class="wizard-input mb-20 w-full">
                     <div class="error-dialog-actions">
                         <button class="error-dialog-btn secondary" id="${id}-cancel">Cancelar</button>
                         <button class="error-dialog-btn primary" id="${id}-ok" style="background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000;">Aceptar</button>
@@ -324,7 +324,7 @@ const Confirm = {
             const id = 'alert-dialog-' + Date.now();
             const alertIconHtml = typeof Icons !== 'undefined' ? Icons.info() : 'ℹ️';
             const contentHtml = `
-                <div class="error-dialog" style="border-color: var(--p-gold); margin: 16px; box-sizing: border-box;">
+                <div class="error-dialog error-dialog--gold">
                     <div class="error-dialog-icon" style="color:var(--p-gold);">${alertIconHtml}</div>
                     <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
                     <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>

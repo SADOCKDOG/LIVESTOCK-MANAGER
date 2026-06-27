@@ -86,27 +86,27 @@ const ProduccionUI = {
           if (data.operacion === 'carne') {
             html += `
                 <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
-                  <span style="font-size: 1.8rem; margin-right: 15px;">👤</span>
-                  <span style="font-size: 0.95rem;">Pesada Individual (Animal)</span>
+                  <span class="wizard-sel-icon">👤</span>
+                  <span class="text-md">Pesada Individual (Animal)</span>
                 </button>
                 <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
-                  <span style="font-size: 1.8rem; margin-right: 15px;">🐄</span>
-                  <span style="font-size: 0.95rem;">Pesaje por Lote (Rebaño)</span>
+                  <span class="wizard-sel-icon">🐄</span>
+                  <span class="text-md">Pesaje por Lote (Rebaño)</span>
                 </button>
              `;
           } else if (data.operacion === 'leche') {
             html += `
                 <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
-                  <span style="font-size: 1.5rem; margin-right: 12px;">👤</span>
-                  <span style="font-size: 0.9rem;">Control Lechero Individual</span>
+                  <span class="wizard-sel-icon--sm">👤</span>
+                  <span class="text-md">Control Lechero Individual</span>
                 </button>
                 <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
-                  <span style="font-size: 1.5rem; margin-right: 12px;">🐄</span>
-                  <span style="font-size: 0.9rem;">Control Lechero de Lote</span>
+                  <span class="wizard-sel-icon--sm">🐄</span>
+                  <span class="text-md">Control Lechero de Lote</span>
                 </button>
                 <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'tanque'; this.style.borderColor = '#fbbf24';">
-                  <span style="font-size: 1.5rem; margin-right: 12px;">🚛</span>
-                  <span style="font-size: 0.9rem;">Expedición de Tanque</span>
+                  <span class="wizard-sel-icon--sm">🚛</span>
+                  <span class="text-md">Expedición de Tanque</span>
                 </button>
              `;
           }
