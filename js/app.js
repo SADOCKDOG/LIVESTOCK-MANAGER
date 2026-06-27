@@ -1287,7 +1287,7 @@ const App = {
           </div>
         </div>
 
-        <div class="card bg-darker" style="border-left: 3px solid #333;">
+        <div class="card bg-darker border-left-333">
           <h4 class="text-gray text-xs uppercase font-bold mb-8">Información de Trazabilidad</h4>
           <div class="grid grid-cols-2 gap-8 text-xs text-aaa">
             <div>Guía Sanitaria:</div><div class="text-white text-right">${v.numero_Guia_Sanitaria || '-'}</div>
@@ -1340,7 +1340,7 @@ const App = {
     const e = await window.db.get("comercializacion_leche", parseInt(id));
     document.getElementById("app-content").innerHTML = `
             <div class="mb-20"><a href="#/comercializacion?tab=leche" class="text-gold" class="no-underline">← Volver</a><h2>${Icons.leche()} Analítica de Tanque</h2></div>
-            <div class="card" style="border-top: 5px solid #fbbf24;">
+            <div class="card border-top-5-gold">
                 <div class="grid grid-cols-2 gap-12">
                     <div><label>Volumen (L)</label><input type="number" id="le-cant" value="${e.cantidad
       }" class="premium-input"></div>
@@ -1362,7 +1362,7 @@ const App = {
                 <div class="mt-20"><label>Control de Antibióticos</label><select id="le-ant" class="premium-input"><option value="false" ${!e.antibioticos ? "selected" : ""
       }>NEGATIVO (Apto)</option><option value="true" ${e.antibioticos ? "selected" : ""
       }>POSITIVO (Alerta Crítica)</option></select></div>
-                <button class="btn btn-primary" onclick="App._guardarEdicionLeche(${id})" style="margin-top:25px; background:#fbbf24; color:#000;">ACTUALIZAR RESULTADOS</button>
+                <button class="btn btn-primary mt-25 btn--gold" onclick="App._guardarEdicionLeche(${id})">ACTUALIZAR RESULTADOS</button>
             </div>`;
   },
 
@@ -1415,12 +1415,12 @@ const App = {
     const g = await window.db.get("gastos_ganaderia", parseInt(id));
     document.getElementById("app-content").innerHTML = `
             <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="text-gold" class="no-underline">← Volver</a><h2>💸 Ficha de Gasto</h2></div>
-            <div class="card" style="border-top: 4px solid #3b82f6;">
+            <div class="card border-top-4-blue">
                 <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
                 <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
-                <div class="flex gap-10" style="margin-top:25px;">
-                    <button class="btn btn-primary flex-2" onclick="App._guardarEdicionGasto(${id})" style="background:#3b82f6;">${Icons.guardar()} GUARDAR</button>
-                    <button class="btn btn-secondary flex-1" onclick="App._eliminarGasto(${id})" style="background:#450a0a; color:white;">${Icons.eliminar()} BORRAR</button>
+                <div class="flex gap-10 mt-25">
+                    <button class="btn btn-primary flex-2 btn--blue" onclick="App._guardarEdicionGasto(${id})">${Icons.guardar()} GUARDAR</button>
+                    <button class="btn btn-secondary flex-1 btn--dark-red" onclick="App._eliminarGasto(${id})">${Icons.eliminar()} BORRAR</button>
                 </div>
             </div>`;
   },

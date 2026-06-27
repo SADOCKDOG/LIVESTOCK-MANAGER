@@ -80,7 +80,7 @@ const ZonasView = {
                 <span class="text-gray">OCUPACIÓN</span>
                 <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
               </div>
-              <div style="width:100%;height:8px;background:#222;border-radius:4px;overflow:hidden;">
+              <div class="progress-track">
                 <div style="width:${Math.min(pct, 100)}%;height:100%;background:${colorCenso};border-radius:4px;box-shadow:0 0 8px ${colorCenso}44;transition:width 0.3s;"></div>
               </div>
             </div>
@@ -97,7 +97,7 @@ const ZonasView = {
             <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
             <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
           </div>
-          <div style="width:100%;height:10px;background:#222;border-radius:5px;overflow:hidden;">
+          <div class="progress-track progress-track--lg">
             <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
           </div>
         </div>`;
@@ -148,7 +148,7 @@ const ZonasView = {
             UGM Total: <strong>${ugmTotal.toFixed(1)}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
           </div>
           <div><label class="form-label">Localización</label>
-          <textarea id="z-edit-localizacion" class="premium-input" style="min-height:60px; resize:none;">${zona.localizacion || ""}</textarea></div>
+          <textarea id="z-edit-localizacion" class="premium-input min-h-60 resize-none">${zona.localizacion || ""}</textarea></div>
         </div>
         <div class="flex justify-between items-center mt-20">
           <button class="btn btn-danger" onclick="ZonasView._eliminarZona(${index})">${Icons.eliminar()} Eliminar</button>

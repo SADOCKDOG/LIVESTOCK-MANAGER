@@ -45,7 +45,7 @@ const GastosView = {
       const color = pct > 70 ? '#ef4444' : pct > 40 ? '#f59e0b' : '#10b981';
       return `<div class="flex-1 text-center min-w-0">
         <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
-        <div style="height:40px;background:#1a1a1a;border-radius:6px;overflow:hidden;position:relative;">
+        <div class="gasto-bar-wrap">
           <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
         </div>
         <div class="text-xs font-bold mt-2" style="color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(m.total/1000).toFixed(1)}k€</div>

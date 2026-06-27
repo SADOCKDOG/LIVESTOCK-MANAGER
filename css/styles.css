@@ -2703,3 +2703,23 @@ label {
 /* === Cuaderno === */
 .border-top-222 { border-top: 1px solid #222; }
 
+/* === Batch 4 — border-top utilities === */
+.border-top-5-gold    { border-top: 5px solid var(--p-gold); }
+.border-top-4-blue    { border-top: 4px solid var(--c-info); }
+.border-top-5-success { border-top: 5px solid var(--c-success); }
+.border-top-5-violet  { border-top: 5px solid #8b5cf6; }
+.border-left-333      { border-left: 3px solid #333; }
+
+/* === Batch 4 — btn semantic variants === */
+.btn--gold { background: var(--p-gold); color: #000; }
+.btn--blue { background: var(--c-info);  color: #fff; }
+
+/* === Batch 4 — progress bars === */
+.progress-track       { width: 100%; height: 8px;  background: #222; border-radius: 4px; overflow: hidden; }
+.progress-track--lg   { height: 10px; border-radius: 5px; }
+
+/* === Batch 4 — misc === */
+.resize-none     { resize: none; }
+.gasto-bar-wrap  { height: 40px; background: #1a1a1a; border-radius: 6px; overflow: hidden; position: relative; }
+.hint-box-green  { background: rgba(16,185,129,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--c-success); flex-shrink: 0; }
+
