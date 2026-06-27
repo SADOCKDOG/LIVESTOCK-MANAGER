@@ -611,7 +611,7 @@ const App = {
           <div class="pdf-loader">
             <div class="pdf-loader-emoji">📄</div>
             <div class="pdf-loader-title">Generando PDF</div>
-            <div style="font-size:0.85rem; class="pdf-loader-desc">Albarán ${albaran.cabecera.numero_albaran}</div>
+            <div class="pdf-loader-desc">Albarán ${albaran.cabecera.numero_albaran}</div>
             <div class="pdf-loader-bar">
               <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
             </div>
@@ -1061,7 +1061,7 @@ const App = {
             <label class="wizard-label">FECHA</label>
             <input type="date" id="wiz-repro-fecha" class="wizard-input" value="${new Date().toISOString().split('T')[0]}">
           </div>
-          <div id="wiz-repro-parto" style="display:none;">
+          <div id="wiz-repro-parto" class="d-none">
             <div class="grid grid-cols-2 gap-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">CRÍAS VIVAS</label>
@@ -1079,7 +1079,7 @@ const App = {
             <label class="wizard-label">RESULTADO / NOTAS</label>
             <input type="text" id="wiz-repro-notas" class="wizard-input" placeholder="Ej: Positivo, Negativo, Crias: 2, ...">
           </div>
-          <div id="wiz-repro-msg" style="display:none; margin-top:6px; padding:8px 10px; border-radius:8px; font-size:13px; font-weight:700;"></div>
+          <div id="wiz-repro-msg" class="d-none" style="margin-top:6px; padding:8px 10px; border-radius:8px; font-size:13px; font-weight:700;"></div>
           <div class="mt-14 flex gap-10">
             <button id="wiz-repro-guardar" class="btn btn-primary flex-1" onclick="App._guardarEventoReproduccion('${animalId}')">✔ Guardar</button>
             <button class="btn btn-secondary" onclick="this.closest('[style]').remove()">Cancelar</button>
@@ -1119,11 +1119,11 @@ const App = {
     for (let i = 0; i < n; i++) {
       const p = prev[i] || { crotal: '', sexo: 'H' };
       html += `<div data-cria-row class="grid grid-cols-2 gap-10 mb-8" style="border-top:1px solid #222; padding-top:8px;">
-          <div class="wizard-input-group" style="margin:0;">
+          <div class="wizard-input-group m-0">
             <label class="wizard-label">CROTAL CRÍA ${i + 1}</label>
             <input type="text" class="wizard-input cria-crotal" maxlength="14" placeholder="ES + 12 dígitos" value="${p.crotal}">
           </div>
-          <div class="wizard-input-group" style="margin:0;">
+          <div class="wizard-input-group m-0">
             <label class="wizard-label">SEXO</label>
             <select class="wizard-input wizard-select cria-sexo">
               <option value="H" ${p.sexo === 'H' ? 'selected' : ''}>Hembra</option>
@@ -1359,7 +1359,7 @@ const App = {
                     <div><label>Gérmenes (UFC/mL)</label><input type="number" id="le-ger" value="${e.laboratorio?.germenes || 0
       }" class="premium-input"></div>
                 </div>
-                <div style="margin-top:20px;"><label>Control de Antibióticos</label><select id="le-ant" class="premium-input"><option value="false" ${!e.antibioticos ? "selected" : ""
+                <div class="mt-20"><label>Control de Antibióticos</label><select id="le-ant" class="premium-input"><option value="false" ${!e.antibioticos ? "selected" : ""
       }>NEGATIVO (Apto)</option><option value="true" ${e.antibioticos ? "selected" : ""
       }>POSITIVO (Alerta Crítica)</option></select></div>
                 <button class="btn btn-primary" onclick="App._guardarEdicionLeche(${id})" style="margin-top:25px; background:#fbbf24; color:#000;">ACTUALIZAR RESULTADOS</button>
@@ -1416,7 +1416,7 @@ const App = {
     document.getElementById("app-content").innerHTML = `
             <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="text-gold" class="no-underline">← Volver</a><h2>💸 Ficha de Gasto</h2></div>
             <div class="card" style="border-top: 4px solid #3b82f6;">
-                <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input" style="margin-bottom:10px;">
+                <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
                 <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
                 <div class="flex gap-10" style="margin-top:25px;">
                     <button class="btn btn-primary" onclick="App._guardarEdicionGasto(${id})" style="flex:2; background:#3b82f6;">💾 GUARDAR</button>

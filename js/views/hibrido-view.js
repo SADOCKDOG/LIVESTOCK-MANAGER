@@ -441,7 +441,7 @@ const HibridoView = {
                 </div>
 
                 <div class="flex gap-10 mt-20">
-                    <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-reg" style="flex:2;">${Icons.guardar()} Guardar</button>
+                    <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                     <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
                 </div>
                 <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
