@@ -80,7 +80,7 @@ window.AlbaranLecheWizard = {
                 ).join('')}
               </select>
             </div>
-            <div id="w-l-ccaa-info" class="text-xs text-aaa rounded-sm p-10 bg-darker" style="display:none; margin:8px 0; border-left:3px solid #3b82f6;"></div>
+            <div id="w-l-ccaa-info" class="text-xs text-aaa rounded-sm p-10 bg-darker d-none border-left-blue" style="margin:8px 0;"></div>
             <div class="wizard-input-group">
               <label class="wizard-label">Nº CONTRATO LÁCTEO</label>
               <input type="text" id="w-l-ctr" value="${data.contrato_numero || finca.contrato_lacteo_numero || ''}" placeholder="Ej: CT-2026-001" class="wizard-input">
