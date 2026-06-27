@@ -850,6 +850,7 @@ label {
 .text-sm        { font-size: 0.78rem; }
 .text-82        { font-size: 0.82rem; }
 .text-85        { font-size: 0.85rem; }
+.text-2rem      { font-size: 2rem; }
 .text-base      { font-size: 0.9rem; }
 .text-md        { font-size: 0.95rem; }
 .text-lg        { font-size: 1.05rem; }
@@ -1480,6 +1481,8 @@ label {
     border-radius: 8px; cursor: pointer; transition: border-color 0.2s;
 }
 .asistente-sel-btn:hover { border-color: #d97706; }
+.asistente-logo     { height: 50px; margin-bottom: 25px; object-fit: contain; }
+.asistente-msg-body { padding: 30px 10px; }
 .asistente-loading-overlay {
     position: fixed; inset: 0; z-index: 9999; background: #000;
     display: flex; align-items: center; justify-content: center;
@@ -1535,7 +1538,7 @@ label {
     padding: 10px 18px; border-radius: 12px; font-size: 0.82rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s; min-width: 90px;
 }
-.tour-btn:disabled { cursor: default; }
+.tour-btn:disabled { cursor: default; opacity: 0.4; }
 .tour-btn:not(:disabled):hover { background: rgba(255,255,255,0.12); border-color: #d97706; color: #fff; }
 .tour-btn-fin {
     background: linear-gradient(135deg, #059669, #047857); border: none;
