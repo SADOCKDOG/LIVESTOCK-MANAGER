@@ -14,7 +14,7 @@ const AsistenteConfiguracion = {
         contenedor.innerHTML = `
             <div class="asistente-configuracion">
                 <div class="asistente-cabecera">
-                    <img src="icons/Logo aplicación.png" alt="Livestock Manager" style="height: 50px; margin-bottom: 25px; object-fit: contain;">
+                    <img src="icons/Logo aplicación.png" alt="Livestock Manager" class="asistente-logo">
                     <h1>Bienvenido</h1>
                     <p>Gestión ganadera profesional v4.5.0 Premium</p>
                     <button class="btn-tour" id="btn-iniciar-tour">
@@ -111,7 +111,7 @@ const AsistenteConfiguracion = {
         // Verificar si hay fincas existentes
         const fincas = await Fincas.list();
         if (fincas.length > 0) {
-            document.querySelector('#btn-seleccionar').style.display = 'flex';
+            document.querySelector('#btn-seleccionar').classList.remove('d-none');
         }
     },
 
@@ -138,8 +138,8 @@ const AsistenteConfiguracion = {
 
         // Opción: Importar desde Backup
         btnImportar.addEventListener('click', () => {
-            contenedor.querySelector('.asistente-opciones').style.display = 'none';
-            contenedor.querySelector('#asistente-carga-archivo').style.display = 'block';
+            contenedor.querySelector('.asistente-opciones').classList.add('d-none');
+            contenedor.querySelector('#asistente-carga-archivo').classList.remove('d-none');
         });
 
         // Opción: Crear Nueva Finca
@@ -156,9 +156,9 @@ const AsistenteConfiguracion = {
 
                 const opciones = contenedor.querySelector('.asistente-opciones');
                 const mensaje = contenedor.querySelector('#asistente-mensaje');
-                opciones.style.display = 'none';
-                mensaje.style.display = 'block';
-                mensaje.innerHTML = '<div class="text-gold text-center font-bold" style="padding:30px 10px;">⏳ Cargando datos de la demo...<br><span class="text-gray" style="font-size:0.8rem; font-weight:400;">Esto puede tardar unos segundos.</span></div>';
+                opciones.classList.add('d-none');
+                mensaje.classList.remove('d-none');
+                mensaje.innerHTML = '<div class="text-gold text-center font-bold asistente-msg-body">⏳ Cargando datos de la demo...<br><span class="text-gray text-sm font-normal">Esto puede tardar unos segundos.</span></div>';
 
                 try {
                     if (window.SeedData && typeof window.SeedData.run === 'function') {
@@ -168,8 +168,8 @@ const AsistenteConfiguracion = {
                         throw new Error('Módulo de datos demo no disponible.');
                     }
                 } catch (err) {
-                    mensaje.innerHTML = '<div class="text-red text-center font-bold" style="padding:30px 10px;">❌ Error cargando la demo:<br><span class="text-gray" style="font-size:0.8rem; font-weight:400;">' + (err.message || err) + '</span></div>';
-                    opciones.style.display = 'flex';
+                    mensaje.innerHTML = '<div class="text-red text-center font-bold asistente-msg-body">❌ Error cargando la demo:<br><span class="text-gray text-sm font-normal">' + (err.message || err) + '</span></div>';
+                    opciones.classList.remove('d-none');
                 }
             });
         }
@@ -177,8 +177,8 @@ const AsistenteConfiguracion = {
         // Opción: Seleccionar Finca Existente
         if (btnSeleccionar) {
             btnSeleccionar.addEventListener('click', () => {
-                contenedor.querySelector('.asistente-opciones').style.display = 'none';
-                contenedor.querySelector('#asistente-seleccionar-finca').style.display = 'block';
+                contenedor.querySelector('.asistente-opciones').classList.add('d-none');
+                contenedor.querySelector('#asistente-seleccionar-finca').classList.remove('d-none');
                 this._cargarFincasExistentes(contenedor);
             });
         }
@@ -207,15 +207,15 @@ const AsistenteConfiguracion = {
 
         // Botones Volver
         btnVolverImportar.addEventListener('click', () => {
-            contenedor.querySelector('.asistente-opciones').style.display = 'flex';
-            contenedor.querySelector('#asistente-carga-archivo').style.display = 'none';
+            contenedor.querySelector('.asistente-opciones').classList.remove('d-none');
+            contenedor.querySelector('#asistente-carga-archivo').classList.add('d-none');
             entradaArchivo.value = '';
             btnImportarConfirmar.disabled = true;
         });
 
         btnVolverSeleccionar.addEventListener('click', () => {
-            contenedor.querySelector('.asistente-opciones').style.display = 'flex';
-            contenedor.querySelector('#asistente-seleccionar-finca').style.display = 'none';
+            contenedor.querySelector('.asistente-opciones').classList.remove('d-none');
+            contenedor.querySelector('#asistente-seleccionar-finca').classList.add('d-none');
         });
     },
 
@@ -236,7 +236,7 @@ const AsistenteConfiguracion = {
                 "Mezclar"
             );
 
-            progreso.style.display = 'block';
+            progreso.classList.remove('d-none');
             btnConfirmar.disabled = true;
             textProgreso.textContent = 'Restaurando base de datos...';
 
@@ -275,9 +275,9 @@ const AsistenteConfiguracion = {
         const cargaArea = contenedor.querySelector('#asistente-carga-archivo');
         const progreso = contenedor.querySelector('#asistente-progreso');
 
-        progreso.style.display = 'none';
-        cargaArea.style.display = 'none';
-        opciones.style.display = 'flex';
+        progreso.classList.add('d-none');
+        cargaArea.classList.add('d-none');
+        opciones.classList.remove('d-none');
         opciones.innerHTML = `
             <div class="asistente-sel-overlay">
                 <h3 class="text-gold mt-0">Selecciona Finca Activa</h3>
@@ -451,13 +451,12 @@ const AsistenteConfiguracion = {
             }
 
             prevBtn.disabled = idx === 0;
-            prevBtn.style.opacity = idx === 0 ? '0.4' : '1';
             if (idx < pasos.length - 1) {
-                nextBtn.style.display = 'inline-block';
-                finBtn.style.display = 'none';
+                nextBtn.classList.remove('d-none');
+                finBtn.classList.add('d-none');
             } else {
-                nextBtn.style.display = 'none';
-                finBtn.style.display = 'inline-block';
+                nextBtn.classList.add('d-none');
+                finBtn.classList.remove('d-none');
             }
 
             dots.forEach((dot, i) => {
@@ -490,7 +489,7 @@ const AsistenteConfiguracion = {
                     if (!await Confirm.confirm("Cargar Demo", '¿Cargar la explotación de ejemplo "DEMO CHAMORRO"? Se añadirán datos de ejemplo en todos los módulos.', false)) return;
                     const msgDiv = document.createElement('div');
                     msgDiv.className = 'asistente-loading-overlay';
-                    msgDiv.innerHTML = '<div style="font-size:2rem;">⏳</div><div class="text-gold font-bold">Cargando datos demo...</div><div class="text-gray text-xs">Esto puede tardar unos segundos.</div>';
+                    msgDiv.innerHTML = '<div class="text-2rem">⏳</div><div class="text-gold font-bold">Cargando datos demo...</div><div class="text-gray text-xs">Esto puede tardar unos segundos.</div>';
                     document.body.appendChild(msgDiv);
                     setTimeout(async () => {
                         try {
