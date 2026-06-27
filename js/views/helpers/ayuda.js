@@ -48,13 +48,13 @@ window.Ayuda = {
     overlay.className = "wizard-full-screen";
     overlay.style.zIndex = "6000";
     overlay.innerHTML = `
-      <div class="wizard-header-fixed flex justify-between items-center" style="border-top: 5px solid #ef4444; flex-shrink:0;">
-        <h2 style="margin: 0; color: #ffffff; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px;" class="font-black">📚 Guía Farmacológica</h2>
-        <button id="med-close-btn" class="font-bold text-red" style="background:transparent; border:none; font-size:1.5rem; cursor:pointer;">✖</button>
+      <div class="wizard-header-fixed flex justify-between items-center" style="border-top: 5px solid #ef4444;">
+        <h2 class="m-0 font-black text-white uppercase tracking-wide" style="font-size: 1.3rem;">📚 Guía Farmacológica</h2>
+        <button id="med-close-btn" class="btn-overlay-close font-bold text-red">✖</button>
       </div>
-      <div class="wizard-content-scrollable flex flex-col" style="color: #e4e4e7; line-height: 1.6; font-size: 0.95rem;">
+      <div class="wizard-content-scrollable flex flex-col wizard-body-text">
 
-        <div class="rounded-sm" style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 12px; margin-bottom: 18px; font-size: 0.85rem;">
+        <div class="rounded-sm nota-box nota-box-red mb-20">
           <strong>Nota importante:</strong> Los tiempos de retiro varían según vía de administración, dosis y marca comercial.
           Usa siempre estos valores como referencia general y <strong class="text-white">verifica la etiqueta del fabricante</strong>.
         </div>
@@ -62,7 +62,7 @@ window.Ayuda = {
         <!-- Buscador -->
         <div class="mb-12">
           <input type="text" id="med-search-input" placeholder="🔍 Buscar por principio activo o categoría…"
-            class="w-full bg-darker border-muted rounded-10 text-white" style="padding:12px 16px; font-size:0.9rem; outline:none; box-sizing:border-box;">
+            class="w-full bg-darker border-muted rounded-10 text-white p-12" style="font-size:0.9rem; outline:none; box-sizing:border-box;">
         </div>
 
         <!-- Filtros rápidos -->
@@ -73,7 +73,7 @@ window.Ayuda = {
 
         <h3 class="text-red mt-0 mb-10">Tiempos de Retiro Promedio <span id="med-count" class="font-normal text-xs text-gray">— ${MEDICAMENTOS.length} fármacos</span></h3>
         <div class="mb-25 scroll-shadow-container" style="overflow-x: auto; flex-shrink:0;">
-          <table style="width: 100%; min-width: 500px; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+          <table class="ayuda-table" style="min-width: 500px;">
             <thead>
               <tr style="background: #18181b; border-bottom: 2px solid #ef4444; position:sticky; top:0;">
                 <th class="p-10">Categoría</th>
@@ -87,9 +87,9 @@ window.Ayuda = {
         </div>
 
         <!-- Calculadora dosificación -->
-        <div style="border-top:2px solid #333; padding-top:20px;" class="mb-25">
+        <div class="sec-divider-top mb-25">
           <h3 class="text-green mt-0 mb-15">🧮 Calculadora de Dosificación</h3>
-          <div class="grid grid-cols-2 gap-12 bg-darker" style="padding:18px; border-radius:12px;">
+          <div class="grid grid-cols-2 gap-12 bg-darker p-12 rounded-10">
             <div>
               <label class="text-gray text-75 mb-4 block">Peso Vivo (kg)</label>
               <input type="number" id="calc-peso" value="50" min="1" step="0.1" class="w-full p-10 rounded-sm bg-card border-muted text-white"
@@ -105,8 +105,8 @@ window.Ayuda = {
               <input type="number" id="calc-conc" value="100" min="0.1" step="1" class="w-full p-10 rounded-sm bg-card border-muted text-white"
                 style="font-size:1rem; box-sizing:border-box;">
             </div>
-            <div style="display:flex; flex-direction:column; justify-content:flex-end;">
-              <button id="calc-btn" class="w-full p-12 rounded-sm font-bold text-white" style="background:#10b981; border:none; font-size:0.9rem; cursor:pointer;">Calcular Volumen</button>
+            <div class="flex-col-end">
+              <button id="calc-btn" class="btn btn-success w-full p-12 rounded-sm font-bold text-white">Calcular Volumen</button>
             </div>
           </div>
           <div id="calc-result" class="text-center" style="padding:15px 0;">
@@ -117,18 +117,18 @@ window.Ayuda = {
 
         <!-- Consejos -->
         <div class="grid grid-cols-2 gap-15 mb-20">
-          <div class="bg-darker rounded-10" style="padding:15px;">
+          <div class="bg-darker rounded-10 p-15">
             <h4 class="text-amber mt-0 mb-8 text-85">⚡ Consejos</h4>
-            <ul class="text-aaa text-82" style="margin:0; padding-left:16px; line-height:1.7;">
+            <ul class="text-aaa text-82 ul-list">
               <li><strong>Dosifica por el más pesado</strong> — evita subdosificar calculando promedios.</li>
               <li><strong>% → mg/ml:</strong> multiplica el % por 10 (ej: 5% = 50 mg/ml).</li>
               <li><strong>Efecto acumulativo:</strong> repetir dosis extiende el retiro.</li>
               <li><strong>Uso extra-etiqueta:</strong> medicamento de bovino en ovino → retiro carne mínimo 28 días.</li>
             </ul>
           </div>
-          <div class="bg-darker rounded-10" style="padding:15px;">
+          <div class="bg-darker rounded-10 p-15">
             <h4 class="text-blue mt-0 mb-8 text-85">🎯 Buenas Prácticas</h4>
-            <ul class="text-aaa text-82" style="margin:0; padding-left:16px; line-height:1.7;">
+            <ul class="text-aaa text-82 ul-list">
               <li><strong>Registra cada tratamiento</strong> — fecha, producto, lote y tiempo de espera.</li>
               <li><strong>Identifica los animales</strong> tratados con crotal o marca visible.</li>
               <li><strong>No mezcles</strong> leche de animales en retiro con la leche apta.</li>
@@ -137,7 +137,7 @@ window.Ayuda = {
           </div>
         </div>
 
-        <div class="text-center mb-10" style="background: rgba(59,130,246,0.08); border:1px solid #3b82f6; border-radius:10px; padding:12px; font-size:0.8rem; color:#93c5fd;">
+        <div class="text-center mb-10 nota-box nota-box-blue" style="font-size:0.8rem; color:#93c5fd;">
           🐑 <strong>Ovino:</strong> los tiempos de retiro pueden diferir de bovino o caprino.
           Verifica siempre con tu veterinario ADSG y la etiqueta del laboratorio.
         </div>
@@ -158,7 +158,7 @@ window.Ayuda = {
       const rows = MEDICAMENTOS.filter(m => !q || m.principio.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q));
       const tbody = overlay.querySelector('#med-tbody');
       tbody.innerHTML = rows.map(m => `
-        <tr style="border-bottom: 1px solid #27272a;">
+        <tr>
           <td class="p-10 text-gray" style="white-space:nowrap;">${m.cat}</td>
           <td class="p-10 font-bold">${m.principio}</td>
           <td class="p-10 text-amber">${m.carne}</td>
@@ -190,7 +190,7 @@ window.Ayuda = {
       const c = parseFloat(calcConc.value) || 1;
       const v = ((p * d) / c).toFixed(2);
       calcResult.innerHTML = v > 0
-        ? `<span class="text-green" style="font-size:1.8rem; font-weight:900;">${v} ml</span><div class="text-75 text-gray" style="margin-top:4px;">Volumen a administrar</div>`
+        ? `<span class="text-green" style="font-size:1.8rem; font-weight:900;">${v} ml</span><div class="text-75 text-gray mt-4">Volumen a administrar</div>`
         : '<span class="text-red">Introduce valores válidos</span>';
     };
     overlay.querySelector('#calc-btn').addEventListener('click', calcular);
@@ -208,27 +208,27 @@ window.Ayuda = {
     overlay.innerHTML = `
       <div class="wizard-header-fixed flex justify-between items-center" style="border-top: 5px solid #10b981;">
         <h2 class="mt-0 uppercase font-black text-white" style="font-size: 1.3rem; letter-spacing: 1px;">📖 Normativa Crotales</h2>
-        <button onclick="this.closest('.wizard-full-screen').remove()" class="font-bold text-green" style="background:transparent; border:none; font-size:1.5rem; cursor:pointer;">✖</button>
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-overlay-close font-bold text-green">✖</button>
       </div>
-      <div class="wizard-content-scrollable" style="color: #e4e4e7; line-height: 1.6; font-size: 0.95rem;">
+      <div class="wizard-content-scrollable wizard-body-text">
 
-        <div class="rounded-sm mb-20" style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; padding: 12px; font-size: 0.85rem;">
+        <div class="rounded-sm mb-20 nota-box nota-box-green">
             <strong>Marco Legal:</strong> El sistema de identificación para ganado ovino y caprino se rige por el Real Decreto 787/2023 y modificaciones, estableciendo trazabilidad individual obligatoria.
         </div>
 
         <h3 class="text-green mb-10" class="section-underline">Doble Identificación Obligatoria</h3>
         <div class="grid grid-cols-2 gap-10 mb-20">
-            <div class="rounded-sm" style="background: #111; padding: 15px; border: 1px solid #222;">
+            <div class="rounded-sm bg-card p-15 border-muted">
                 <h4 class="mt-0 mb-10 text-gold">📍 Oreja Derecha</h4>
                 <p class="mt-0 text-sm text-ccc"><strong>Crotal Visual:</strong> De tipo bandera o botón, en color amarillo (RAL 1016). Muestra el código de identificación visible a distancia.</p>
             </div>
-            <div class="rounded-sm" style="background: #111; padding: 15px; border: 1px solid #222;">
+            <div class="rounded-sm bg-card p-15 border-muted">
                 <h4 class="mt-0 mb-10 text-blue">🛜 Oreja Izquierda</h4>
                 <p class="mt-0 text-sm text-ccc"><strong>Crotal Electrónico:</strong> Dispositivo RFID (botón) que contiene el código único del animal, permitiendo lecturas automatizadas (SIA/PIGGAN).</p>
         </div>
 
         <h3 class="text-gold mb-10" class="section-underline">Estructura del Código Oficial</h3>
-        <div class="rounded-sm border-muted text-center mb-25" style="background:#000; padding:15px; font-family:monospace; font-size:1.5rem; letter-spacing:2px;">
+        <div class="rounded-sm border-muted text-center mb-25 bg-card p-15" style="font-family:monospace; font-size:1.5rem; letter-spacing:2px;">
             <span class="text-red">ES</span> <span class="text-green">01</span> <span class="text-white">1234567890</span>
         </div>
         <ul class="text-sm mb-25 pl-20 text-ccc">
@@ -238,7 +238,7 @@ window.Ayuda = {
         </ul>
 
         <h3 class="text-blue mb-10" class="section-underline">Plazos de Identificación</h3>
-        <table class="mb-25 w-full text-sm" style="border-collapse: collapse; text-align: left;">
+        <table class="ayuda-table mb-25">
             <thead>
                 <tr style="background: #18181b; border-bottom: 2px solid #3b82f6;">
                     <th class="p-10">Sistema de Cría</th>
@@ -246,24 +246,24 @@ window.Ayuda = {
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid #27272a;">
+                <tr>
                     <td class="p-10 text-ccc">Intensivo / Semi-extensivo</td>
                     <td class="p-10 font-bold text-amber">6 meses de vida</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #27272a;">
+                <tr>
                     <td class="p-10 text-ccc">Extensivo (Pasto libre)</td>
                     <td class="p-10 font-bold text-green">9 meses de vida</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #27272a;">
+                <tr>
                     <td class="p-10 text-ccc">Venta / Traslado</td>
                     <td class="p-10 font-bold text-red">Antes de abandonar la explotación</td>
                 </tr>
             </tbody>
         </table>
 
-        <div class="rounded-sm" style="background: #1a1a1a; padding: 15px; border-left: 4px solid #8b5cf6;">
-            <h4 class="text-purple" style="margin:0 0 5px 0;">Excepción: Destino Directo a Matadero</h4>
-            <p class="text-85 text-aaa" class="m-0">Los animales destinados a sacrificio antes de los 12 meses pueden identificarse con un único <strong>crotal visual en la oreja derecha</strong> que contenga el Código REGA de la explotación de nacimiento.</p>
+        <div class="rounded-sm p-15 border-left-violet">
+            <h4 class="text-purple m-0 mb-4">Excepción: Destino Directo a Matadero</h4>
+            <p class="text-85 text-aaa m-0">Los animales destinados a sacrificio antes de los 12 meses pueden identificarse con un único <strong>crotal visual en la oreja derecha</strong> que contenga el Código REGA de la explotación de nacimiento.</p>
         </div>
 
       </div>
@@ -287,11 +287,11 @@ window.Ayuda = {
     overlay.innerHTML = `
       <div class="wizard-header-fixed flex justify-between items-center" style="border-top:5px solid #8b5cf6;">
         <h2 class="text-white font-black uppercase mt-0" style="font-size:1.3rem; letter-spacing:1px;">📖 Comparativa Normativa CCAA</h2>
-        <button onclick="this.closest('.wizard-full-screen').remove()" class="text-purple font-bold" style="background:transparent; border:none; font-size:1.5rem; cursor:pointer;">✖</button>
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-overlay-close text-purple font-bold">✖</button>
       </div>
-      <div class="wizard-content-scrollable text-base text-zinc-200" style="line-height:1.6;">
+      <div class="wizard-content-scrollable text-base text-zinc-200 wizard-body-text">
 
-        <div class="rounded-sm mb-20 text-sm" style="background:rgba(139,92,246,0.1); border-left:3px solid #8b5cf6; padding:12px;">
+        <div class="rounded-sm mb-20 text-sm nota-box nota-box-purple">
           <strong>Marco Legal:</strong> Cada Comunidad Autónoma tiene competencias en sanidad animal, movimiento pecuario y ayudas PAC. Conoce las diferencias clave entre tus zonas de operación.
         </div>
 
@@ -299,7 +299,7 @@ window.Ayuda = {
 
         <div class="grid grid-cols-2 gap-15 mb-20">
           <!-- Andalucía -->
-          <div class="rounded-md bg-card" style="padding:15px; border:1px solid #fbbf24;">
+          <div class="rounded-md bg-card p-15 border-muted border-gold">
             <h4 class="text-gold mt-0 mb-12 text-lg">🌿 Andalucía</h4>
             <div class="grid gap-8 text-82">
               <div><span class="text-gray">Sistema Mov.:</span> <strong class="text-white">${and?.sistema_movimiento || 'SIGGAN'}</strong></div>
@@ -311,7 +311,7 @@ window.Ayuda = {
             </div>
           </div>
           <!-- Extremadura -->
-          <div class="rounded-md bg-card" style="padding:15px; border:1px solid #3b82f6;">
+          <div class="rounded-md bg-card p-15 border-muted border-blue">
             <h4 class="text-blue mt-0 mb-12 text-lg">🌿 Extremadura</h4>
             <div class="grid gap-8 text-82">
               <div><span class="text-gray">Sistema Mov.:</span> <strong class="text-white">${ext?.sistema_movimiento || 'BADIGEX'}</strong></div>

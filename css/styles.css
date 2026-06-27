@@ -840,6 +840,8 @@ label {
 .border-muted   { border: 1px solid #333; }
 .border-green   { border-color: #10b981; }
 .border-gold    { border-color: #fbbf24; }
+.border-blue    { border-color: #3b82f6; }
+.border-purple  { border-color: #8b5cf6; }
 .border-333     { border-color: #333; }
 .border-orange  { border-color: #f97316; }
 
@@ -2510,6 +2512,21 @@ label {
 .widget-link-label    { font-size: 0.85rem; font-weight: 600; text-align: center; }
 .widget-link-label-sm { font-size: 0.8rem;  font-weight: 600; text-align: center; line-height: 1.1; }
 .widget-link-label-xs { font-size: 0.75rem; font-weight: 600; text-align: center; }
+
+/* === ayuda overlay components === */
+.btn-overlay-close  { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.wizard-body-text   { color: #e4e4e7; line-height: 1.6; font-size: 0.95rem; }
+.nota-box           { padding: 12px; font-size: 0.85rem; }
+.nota-box-red       { background: rgba(239,68,68,0.1);   border-left: 3px solid #ef4444; }
+.nota-box-green     { background: rgba(16,185,129,0.1);  border-left: 3px solid #10b981; }
+.nota-box-purple    { background: rgba(139,92,246,0.1);  border-left: 3px solid #8b5cf6; }
+.nota-box-blue      { background: rgba(59,130,246,0.08); border: 1px solid #3b82f6; border-radius: 10px; }
+.ayuda-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+.ayuda-table tbody tr { border-bottom: 1px solid #27272a; }
+.ul-list            { margin: 0; padding-left: 16px; line-height: 1.7; }
+.sec-divider-top    { border-top: 2px solid #333; padding-top: 20px; }
+.flex-col-end       { display: flex; flex-direction: column; justify-content: flex-end; }
+.p-15               { padding: 15px; }
 
 /* === inf-table accent color presets === */
 .tbl-accent-green  { --tbl-accent: var(--c-success); }
