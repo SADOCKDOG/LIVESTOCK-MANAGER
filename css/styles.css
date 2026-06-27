@@ -2538,6 +2538,7 @@ label {
 .nota-box-green     { background: rgba(16,185,129,0.1);  border-left: 3px solid #10b981; }
 .nota-box-purple    { background: rgba(139,92,246,0.1);  border-left: 3px solid #8b5cf6; }
 .nota-box-blue      { background: rgba(59,130,246,0.08); border: 1px solid #3b82f6; border-radius: 10px; }
+.nota-box-amber     { background: rgba(245,158,11,0.1);  border-left: 3px solid #f59e0b; }
 .ayuda-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
 .ayuda-table tbody tr { border-bottom: 1px solid #27272a; }
 .ul-list            { margin: 0; padding-left: 16px; line-height: 1.7; }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - CarneView v2.0.0
  * Vista del Módulo de Carne con los 4 bloques unificados de gestión
  */
@@ -346,7 +346,7 @@ const CarneView = {
       supresionesHtml = `
         <div class="supresion-alerta-box">
           <strong>⚠️ ALERTA: SUPRESIÓN DE CARNE ACTIVA:</strong>
-          <ul style="margin:5px 0 0 15px; padding:0;">
+          <ul class="mt-4 pl-20 m-0">
             ${d.tratamientosSupresion.map(s => `
               <li>Rebaño: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> (Finaliza: ${s.fechaFin})</li>
             `).join('')}

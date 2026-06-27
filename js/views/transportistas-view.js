@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TransportistasView - Livestock Manager Premium v4.0
  * Vista de gestión de transportistas con listado, detalle y formulario.
  */
@@ -24,9 +24,9 @@ const TransportistasView = {
         main.innerHTML = `
             <div style="max-width:600px; margin:0 auto;">
                 <div class="grid grid-cols-3 gap-6 mb-14">
-                    <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
-                    <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
-                    <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
+                    <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
+                    <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
+                    <div class="info-box-center border-left-amber"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
                 </div>
                 <div class="tabs-scroll scroll-shadow-container mb-12 gap-6">
                     <button class="filter-pill ${this._currentFilter === 'todos' ? 'active' : ''}" onclick="TransportistasView._setFilter('todos')">TODOS</button>
@@ -250,7 +250,7 @@ const TransportistasView = {
                         <button class="btn btn-success" id="btn-save-trans">${Icons.guardar()} Guardar</button>
                     </div>
                 </div>
-                <div id="trans-form-error" class="text-red text-xs mt-8" style="display:none;"></div>
+                <div id="trans-form-error" class="text-red text-xs mt-8 d-none"></div>
             </div>
         `;
         document.body.appendChild(overlay);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wizard Guía de Movimiento SIGGAN — Livestock Manager Premium
  * Genera la guía de origen y sanidad pecuaria para movimientos
  * inter-explotación (entrada/salida) y la registra como movimiento oficial,
@@ -170,7 +170,7 @@ window.WizardGuiaMovimiento = {
               <span>Desinsectación/desinfección certificada (48h previas)</span>
             </label>
             ${conf && conf.requiere_desinsectacion_movimiento ? `
-            <div class="rounded-sm" style="background:rgba(245,158,11,0.1); padding:10px; margin-top:10px; border-left:3px solid #f59e0b;">
+            <div class="nota-box nota-box-amber rounded-sm mt-10">
               <div class="text-xs text-aaa">⚠️ ${conf.label} exige certificar la desinsectación previa al movimiento.</div>
             </div>` : ''}
             <div class="wizard-input-group mt-10">
