@@ -88,11 +88,11 @@ const CompradoresView = {
 
         let headerHtml = '';
         if (this._currentTab === 'cárnico') {
-            headerHtml = `<div style="border-top: 4px solid #ef4444; background: rgba(239,68,68,0.1); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; color: #ef4444; font-weight: bold; font-size: 0.95rem;">${Icons.carne()} Mostrando Mataderos y Tratantes Cárnicos</div>`;
+            headerHtml = `<div class="comprador-mode-header comprador-mode-header--carne">${Icons.carne()} Mostrando Mataderos y Tratantes Cárnicos</div>`;
         } else if (this._currentTab === 'láctico') {
-            headerHtml = `<div style="border-top: 4px solid #3b82f6; background: rgba(59,130,246,0.1); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; color: #3b82f6; font-weight: bold; font-size: 0.95rem;">${Icons.leche()} Mostrando Industrias Lácteas y Queserías</div>`;
+            headerHtml = `<div class="comprador-mode-header comprador-mode-header--leche">${Icons.leche()} Mostrando Industrias Lácteas y Queserías</div>`;
         } else if (this._currentTab === 'híbrido') {
-            headerHtml = `<div style="border-top: 4px solid #10b981; background: rgba(16,185,129,0.1); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; color: #10b981; font-weight: bold; font-size: 0.95rem;">${Icons.rotacion()} Mostrando Operadores Híbridos (Carne y Leche)</div>`;
+            headerHtml = `<div class="comprador-mode-header comprador-mode-header--hibrido">${Icons.rotacion()} Mostrando Operadores Híbridos (Carne y Leche)</div>`;
         }
 
         if (lista.length === 0) {
@@ -110,8 +110,8 @@ const CompradoresView = {
             style="border-left:4px solid ${this._colorTipo(c.tipo_comprador)};">
             <div class="flex justify-between items-start">
               <div class="flex-1 min-w-0">
-                <div class="text-white font-800" style="font-size:0.95rem;">${c.nombre}</div>
-                <div class="text-gray mt-4" style="font-size:0.72rem;">
+                <div class="text-white font-800 text-md">${c.nombre}</div>
+                <div class="text-gray mt-4 text-75">
                   ${c.nif_cif ? '🔑 '+c.nif_cif : ''}${c.ciudad ? ' · 📍 '+c.ciudad : ''}
                 </div>
               </div>
@@ -119,7 +119,7 @@ const CompradoresView = {
                 <span class="badge-tipo" style="background:${this._colorTipo(c.tipo_comprador, true)}; color:${this._colorTipo(c.tipo_comprador)}; border:1px solid ${this._colorTipo(c.tipo_comprador, false, true)};">
                   ${c.tipo_comprador || 'híbrido'}
                 </span>
-                ${c.activo === false ? '<span class="text-red" style="display:block; margin-top:4px; font-size:0.6rem;">INACTIVO</span>' : ''}
+                ${c.activo === false ? '<span class="text-red text-60 d-block mt-4">INACTIVO</span>' : ''}
               </div>
             </div>
           </div>
@@ -181,7 +181,7 @@ const CompradoresView = {
               ${comprador.telefono ? '<div>📞 <strong>Tel:</strong> '+comprador.telefono+'</div>' : ''}
               ${comprador.email ? '<div>📧 <strong>Email:</strong> '+comprador.email+'</div>' : ''}
               ${comprador.ciudad ? '<div>📍 <strong>Ciudad:</strong> '+comprador.ciudad+(comprador.provincia ? ' ('+comprador.provincia+')' : '')+'</div>' : ''}
-              ${comprador.condiciones_pago ? '<div style="grid-column:span 2;">💳 <strong>Condiciones pago:</strong> '+comprador.condiciones_pago+'</div>' : ''}
+              ${comprador.condiciones_pago ? '<div class="col-span-2">💳 <strong>Condiciones pago:</strong> '+comprador.condiciones_pago+'</div>' : ''}
             </div>
           </div>
 
@@ -289,7 +289,7 @@ const CompradoresView = {
             <a href="${esEdicion ? '#/comprador?id='+id : '#/compradores'}" class="link-back">← Volver</a>
           </div>
           <div class="card p-20 border-top-3px border-top-3px-gold">
-            <h2 class="text-amber mt-0 mb-16" style="font-size:1.1rem;">${esEdicion ? `${Icons.editar()} Editar Comprador` : `${Icons.agregar()} Nuevo Comprador`}</h2>
+            <h2 class="text-amber mt-0 mb-16 text-lg">${esEdicion ? `${Icons.editar()} Editar Comprador` : `${Icons.agregar()} Nuevo Comprador`}</h2>
 
             <label class="form-label">NOMBRE / RAZÓN SOCIAL *</label>
             <input type="text" id="c-nombre" value="${c.nombre}" class="premium-input mb-12" placeholder="Ej: Ganaderías del Sur S.L.">
@@ -366,7 +366,7 @@ const CompradoresView = {
             <input type="text" id="c-pago" value="${c.condiciones_pago}" class="premium-input mb-12" placeholder="Ej: 30 días fecha factura">
 
             <label class="form-label">NOTAS</label>
-            <textarea id="c-notas" class="premium-input mb-12" style="min-height:60px;">${c.notas}</textarea>
+            <textarea id="c-notas" class="premium-input mb-12 min-h-60">${c.notas}</textarea>
 
             <label class="wizard-checkbox-container mb-16">
               <input type="checkbox" id="c-activo" ${c.activo !== false ? 'checked' : ''}>
