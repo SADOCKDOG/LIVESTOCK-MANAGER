@@ -16,7 +16,7 @@ const ProduccionView = {
       <div class="mb-14">
         <div class="tabs-scroll prod-tabs scroll-shadow-container">
           <button class="prod-tab active" data-tab="carne" onclick="ProduccionView._cambiarTab('carne')">⚖️ Cárnica</button>
-          <button class="prod-tab" data-tab="leche" onclick="ProduccionView._cambiarTab('leche')">🥛 Láctea</button>
+          <button class="prod-tab" data-tab="leche" onclick="ProduccionView._cambiarTab('leche')">${Icons.leche()} Láctea</button>
         </div>
       </div>
       <div id="prod-content"><div class="loader">Cargando registros...</div></div>`;
@@ -138,7 +138,7 @@ const ProduccionView = {
             </div>
           </div>
           <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
-            ➕ Nuevo
+            ${Icons.agregar()} Nuevo
           </button>
         </div>
 
@@ -152,7 +152,7 @@ const ProduccionView = {
         </div>` : ''}
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          📋 ${listName}
+          ${Icons.registros()} ${listName}
         </div>
         <div class="grid gap-10">
           ${recordsHtml}
@@ -326,8 +326,8 @@ const ProduccionView = {
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">💾 Guardar</button>
-                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">🗑️ Borrar</button>
+                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
           </div>`;
@@ -422,8 +422,8 @@ const ProduccionView = {
           </div>
 
           <div class="flex gap-10 mt-20">
-            <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-gasto">💾 Guardar</button>
-            <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-gasto">🗑️ Borrar</button>
+            <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-gasto">${Icons.guardar()} Guardar</button>
+            <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-gasto">${Icons.eliminar()} Borrar</button>
           </div>
           <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cerrar</button>
         </div>`;

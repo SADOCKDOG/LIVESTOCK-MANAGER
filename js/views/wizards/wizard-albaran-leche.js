@@ -313,7 +313,7 @@ window.AlbaranLecheWizard = {
               </div>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">📊 EXTRACTO SECO CALCULADO (%)</label>
+              <label class="wizard-label">${Icons.grafico()} EXTRACTO SECO CALCULADO (%)</label>
               <input type="text" id="w-l-es-calc" value="${esCalc}" class="wizard-input text-green font-bold border-green" readonly style="background:#222;">
             </div>
             <div class="grid grid-cols-2 gap-8 mt-12">
@@ -329,7 +329,7 @@ window.AlbaranLecheWizard = {
             <div class="flex items-center gap-12 mt-12 rounded-sm p-10 bg-darker">
               <label class="flex items-center gap-6 text-sm" class="cursor-pointer">
                 <input type="checkbox" id="w-l-ant" ${data.antibioticos ? 'checked' : ''}>
-                <span class="${data.antibioticos ? 'text-red' : 'text-gray'}">🔬 Antibióticos detectados</span>
+                <span class="${data.antibioticos ? 'text-red' : 'text-gray'}">${Icons.fitosanitario()} Antibióticos detectados</span>
               </label>
             </div>
             <div class="grid grid-cols-2 gap-8 mt-12">

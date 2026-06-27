@@ -165,7 +165,7 @@ window.VentaMasivaWizard = {
               </div>
               <div class="text-center text-xs text-gray mb-10">
                 <span class="mr-12">👶 Edad mínima</span>
-                <span class="mr-12">📋 DIB (bovinos)</span>
+                <span class="mr-12">${Icons.documento()} DIB (bovinos)</span>
                 <span class="mr-12">🤰 Gestación &gt;3 meses</span>
                 <span>💉 Supresión sanitaria</span>
               </div>
@@ -482,7 +482,7 @@ window.VentaMasivaWizard = {
                 <div class="text-gray text-xs" id="w-v-transportista-desinsectacion">Desinsectación: ${data.desinsectacionVencimiento ? ('vigente hasta ' + data.desinsectacionVencimiento) : 'sin vencimiento informado'}</div>
               </div>
 
-              <h4 class="text-purple text-sm" style="margin:16px 0 12px;">🩺 AUTORIZACIÓN VETERINARIA</h4>
+              <h4 class="text-purple text-sm" style="margin:16px 0 12px;">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</h4>
               <div class="grid grid-cols-2 gap-12 mb-12">
                 <div class="wizard-input-group">
                   <label class="wizard-label">VETERINARIO RESPONSABLE</label>

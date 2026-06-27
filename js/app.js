@@ -1279,10 +1279,10 @@ const App = {
 
           <div class="flex gap-10 mt-30">
             <button class="btn btn-primary flex-1" onclick="App._reimprimirAlbaranCarne(${v.id})" style="background:#ef4444; border:none;">
-              📄 REIMPRIMIR ALBARÁN
+              ${Icons.documento()} REIMPRIMIR ALBARÁN
             </button>
             <button class="btn btn-secondary" onclick="App._eliminarVentaCarneDetalle(${v.id})" style="background:#450a0a; color:white; border:none; padding: 0 15px;">
-              🗑️
+              ${Icons.eliminar()}
             </button>
           </div>
         </div>
@@ -1339,7 +1339,7 @@ const App = {
     const id = params.get("id");
     const e = await window.db.get("comercializacion_leche", parseInt(id));
     document.getElementById("app-content").innerHTML = `
-            <div class="mb-20"><a href="#/comercializacion?tab=leche" class="text-gold" class="no-underline">← Volver</a><h2>🥛 Analítica de Tanque</h2></div>
+            <div class="mb-20"><a href="#/comercializacion?tab=leche" class="text-gold" class="no-underline">← Volver</a><h2>${Icons.leche()} Analítica de Tanque</h2></div>
             <div class="card" style="border-top: 5px solid #fbbf24;">
                 <div class="grid grid-cols-2 gap-12">
                     <div><label>Volumen (L)</label><input type="number" id="le-cant" value="${e.cantidad
@@ -1419,8 +1419,8 @@ const App = {
                 <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
                 <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
                 <div class="flex gap-10" style="margin-top:25px;">
-                    <button class="btn btn-primary flex-2" onclick="App._guardarEdicionGasto(${id})" style="background:#3b82f6;">💾 GUARDAR</button>
-                    <button class="btn btn-secondary flex-1" onclick="App._eliminarGasto(${id})" style="background:#450a0a; color:white;">🗑️ BORRAR</button>
+                    <button class="btn btn-primary flex-2" onclick="App._guardarEdicionGasto(${id})" style="background:#3b82f6;">${Icons.guardar()} GUARDAR</button>
+                    <button class="btn btn-secondary flex-1" onclick="App._eliminarGasto(${id})" style="background:#450a0a; color:white;">${Icons.eliminar()} BORRAR</button>
                 </div>
             </div>`;
   },
