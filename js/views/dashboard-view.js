@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - DashboardView v1.0.0
  * Vista principal del Dashboard extraída de App.js para modularización.
  * Utiliza EventBus, CacheService y AlertasService.
@@ -111,7 +111,7 @@ const DashboardView = {
           <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.animales()} CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
           <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.check()} ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
           <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.paquete()} VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.grafico()} RENTAB.</div><div class="s-val" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'}">${pctRent}%</div></div>
+          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.grafico()} RENTAB.</div><div class="s-val ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
         </div>
       </div>
 
@@ -140,11 +140,11 @@ const DashboardView = {
         <div class="flex justify-between items-center p-14 card-tint-green-lg">
           <div>
             <div class="text-xs text-gray uppercase font-bold">Beneficio Neto</div>
-            <div class="text-xl font-black" style="color:${balanceTotal >= 0 ? '#10b981' : '#ef4444'};">${balanceTotal.toLocaleString()} €</div>
+            <div class="text-xl font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €</div>
           </div>
           <div class="text-right">
             <div class="text-xs text-gray uppercase font-bold">Rentabilidad</div>
-            <div class="text-xl font-black" style="color:${parseFloat(pctRent) > 0 ? '#10b981' : '#ef4444'};">${pctRent}%</div>
+            <div class="text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
           </div>
         </div>
         <div class="text-center mt-12">
@@ -198,11 +198,11 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-red p-20 card-tint-red">
         <h3 class="mt-0 text-red flex items-center gap-8">
-          ${Icons.alerta()} Alertas Sanitarias <span class="badge rounded-xl text-white text-2xs" style="background:#ef4444; padding:2px 10px;">${alertas.length}</span>
+          ${Icons.alerta()} Alertas Sanitarias <span class="badge rounded-xl badge-solid-danger">${alertas.length}</span>
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 3).map(a => `
-            <div class="info-box" style="border-left:3px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+            <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : 'amber'}">
               <div class="flex justify-between items-start">
                 <div>
                   <div class="text-white font-bold text-base">${a.medicamento}</div>
@@ -225,11 +225,11 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-orange p-20 card-tint-orange">
         <h3 class="mt-0 flex items-center gap-8 text-orange">
-          ${Icons.alerta()} Alertas Trazabilidad (SIA) <span class="badge rounded-xl text-white text-2xs" style="background:#f97316; padding:2px 10px;">${alertas.length}</span>
+          ${Icons.alerta()} Alertas Trazabilidad (SIA) <span class="badge rounded-xl badge-solid-orange">${alertas.length}</span>
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 3).map(a => `
-            <div class="info-box" style="border-left:3px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+            <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : 'amber'}">
               <div class="flex justify-between items-center">
                 <div>
                   <div class="text-white font-bold text-base">${a.crotal}</div>
@@ -249,13 +249,13 @@ const DashboardView = {
     return `
       <div class="card card-accent card-accent-purple p-20 card-tint-violet">
         <h3 class="mt-0 text-purple flex items-center gap-8">
-          ${Icons.documento()} Gestión / PAC <span class="badge rounded-xl text-white text-2xs" style="background:#8b5cf6; padding:2px 10px;">${alertas.length}</span>
+          ${Icons.documento()} Gestión / PAC <span class="badge rounded-xl badge-solid-purple">${alertas.length}</span>
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 4).map(a => {
             const icono = a.seccion === 'contrato_lacteo' ? '📄' : a.seccion === 'infolac' ? '📊' : a.seccion === 'pac' ? '🌾' : a.seccion === 'adsg' ? '🛡️' : '📌';
             return `
-            <div class="info-box" style="border-left:3px solid ${a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#22c55e'};">
+            <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : a.urgencia === 'amarillo' ? 'amber' : 'green'}">
               <div class="flex justify-between items-start">
                 <div>
                   <div class="text-white font-bold text-base">${icono} ${a.mensaje}</div>
@@ -314,7 +314,7 @@ const DashboardView = {
         <div class="hscroll-cards">
           <div class="info-box border-left-amber kpi-card-fixed">
             <div class="kpi-label">MOFA Mensual</div>
-            <div class="text-2xl font-black" style="color:${mofaRatio >= 20 ? '#10b981' : '#f59e0b'};">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
+            <div class="text-2xl font-black ${mofaRatio >= 20 ? 'text-green' : 'text-amber'}">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
             <div class="kpi-sub">${mofaRatio.toFixed(1)}% ingresos</div>
           </div>
           <div class="info-box border-left-blue kpi-card-fixed">
@@ -417,7 +417,7 @@ const DashboardView = {
           <h3 class="mt-0 flex items-center gap-8 text-violet">
             ${Icons.grafico()} KPIs Diarios
           </h3>
-          <div class="empty-state" style="padding:15px;">
+          <div class="empty-state p-15">
             <p class="empty-state-text">No hay suficientes datos para calcular KPIs diarios.</p>
             <p class="text-xs text-gray">Registra entregas de leche y animales para ver métricas.</p>
           </div>

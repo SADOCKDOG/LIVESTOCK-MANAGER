@@ -991,6 +991,9 @@ label {
 .badge-green { background: rgba(16,185,129,0.1); color: #10b981; }
 .badge-red   { background: rgba(239,68,68,0.1); color: #ef4444; }
 .badge-blue  { background: rgba(59,130,246,0.1); color: #3b82f6; }
+.badge-solid-danger  { background: #ef4444; color: #fff; }
+.badge-solid-orange  { background: #f97316; color: #fff; }
+.badge-solid-purple  { background: #8b5cf6; color: #fff; }
 
 /* ── Search input ── */
 .search-input {
