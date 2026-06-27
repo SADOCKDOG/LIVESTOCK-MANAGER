@@ -57,6 +57,7 @@ const GanaderiaView = {
       </div>
 
       <div class="mb-14 text-center">
+        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center mx-auto" style="letter-spacing: 1.5px; color: ${meta.color}; text-shadow: 0 0 12px ${meta.color}80; border-top: 2px solid ${meta.color}; border-top-left-radius: 8px; border-top-right-radius: 8px; max-width: 360px;">⚡ TIPO EXPLOTACIÓN</div>
         <div class="ganaderia-mode-switch">
           <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
           <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
