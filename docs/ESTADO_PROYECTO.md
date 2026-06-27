@@ -1,7 +1,7 @@
 # Estado del Proyecto — Livestock Manager (SIGGAN)
-> Fotografía técnica regenerada el **2026-06-24** · Versión de app: **v4.5.0** · Base de datos: **IndexedDB DB v10** · Service Worker: **`corcho-v6.5.63`**
-
-> Este documento sustituye a la fotografía anterior (v3.7.1 / DB v5), que había quedado obsoleta. Reconstruido a partir del código real y del historial de commits (84 commits, 6 PRs de adaptación SIGGAN).
+> Fotografía técnica regenerada el **2026-06-28** · Versión de app: **v4.7.0** · Base de datos: **IndexedDB DB v11** · Service Worker: **`corcho-v6.7.19`**
+>
+> Documento anterior: v4.5.0 / DB v10 / SW corcho-v6.5.63 (2026-06-24) — **obsoleto**.
 
 ---
 
@@ -9,14 +9,12 @@
 
 | Artefacto | Valor |
 |---|---|
-| `package.json` | `4.5.0` |
-| `index.html` (cache-bust) | `?v=20260624031800` (JS QA) · `?v=5.2.0` (CSS) |
-| `app.js` (cabecera interna) | `v4.0.0` (Application Controller) |
-| `trazabilidad.js` | `v3.3.5 Premium` |
-| `analitica.js` | `v3.2.1 Premium` |
-| `pesajes.js` | `v4.0.0` |
-| **Base de datos IndexedDB** | **DB v10** |
-| **Service Worker** `CACHE_NAME` | **`corcho-v6.5.63`** |
+| `package.json` | `4.7.0` |
+| `index.html` CSS cache-bust | `?v=5.3.0` |
+| **Base de datos IndexedDB** | **DB v11** |
+| **Service Worker** `CACHE_NAME` | **`corcho-v6.7.19`** |
+| `app.js` (ExPro about) | `v4.5.0` (string interno pendiente de actualizar) |
+| Git commits desde v4.5.0 | ~159 commits |
 
 > **Disciplina de caché:** al modificar cualquier JS/CSS/HTML hay que subir `CACHE_NAME` en `sw.js` para forzar recarga en Android/PWA.
 
@@ -27,71 +25,81 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     index.html (SPA Shell)                   │
-│  Header · Nav · #app-content · Toast · ~80 <script> cargados │
+│  Header · Nav · #app-content · Toast · ~85 <script> cargados │
 ├─────────────────────────────────────────────────────────────┤
 │                    CAPA DE ARRANQUE                           │
-│  idb-local.js (wrapper idb)  →  db.js (DB v10 + migraciones)  │
-│  error-handler.js (validación NIF/CIF/REGA)  ·  crypto.js     │
+│  idb-local.js (wrapper idb)  →  db.js (DB v11 + migraciones) │
+│  error-handler.js (validación NIF/CIF/REGA) · crypto.js       │
 ├─────────────────────────────────────────────────────────────┤
 │                    CAPA DE SERVICIOS                          │
 │  event-bus · cache-service · alertas-service · balance-service│
 │  comunidades-service (catálogos SIGGAN/BADIGEX) · pdf-service │
-│  export-service                                               │
+│  export-service v1.2.0                                        │
 ├─────────────────────────────────────────────────────────────┤
 │                CAPA DE REGLAS Y MOTOR                         │
-│  trazabilidad.js (MotorTrazabilidad) · analitica.js          │
+│  trazabilidad.js (MotorTrazabilidad) · analitica.js           │
+│  liquidacion.js (IVA/REAGP) · snapshot-service.js            │
 ├─────────────────────────────────────────────────────────────┤
 │              CAPA DE MODELOS / DOMINIO                        │
-│  fincas · rebanos · animales · pesajes · produccion · gastos │
-│  sanitarios · saneamientos · movimientos · reproduccion      │
-│  compradores · proveedores · transportistas · contratos      │
-│  pedidos-crotales · notificaciones-rega                      │
+│  fincas · rebanos · animales · pesajes · produccion · gastos  │
+│  sanitarios · saneamientos · movimientos · reproduccion       │
+│  compradores · proveedores · transportistas · contratos       │
+│  pedidos-crotales · notificaciones-rega · liquidacion         │
+├─────────────────────────────────────────────────────────────┤
+│                 CAPA DE UI / FRAMEWORK                        │
+│  modal-manager.js (Toast + Confirm + prompt)                  │
+│  wizard-manager.js · produccion-ui.js · pesajes-ui.js         │
+│  icons.js (SVG, ~50 glifos)                                   │
 ├─────────────────────────────────────────────────────────────┤
 │                 CAPA DE VISTAS (js/views/)                    │
-│  ~22 vistas + 9 wizards (js/views/wizards/)                  │
+│  21 vistas + 9 wizards (js/views/wizards/)                    │
 ├─────────────────────────────────────────────────────────────┤
 │                  ORQUESTADOR CENTRAL                          │
-│  app.js — App (router de 30 rutas, todas activas)            │
+│  app.js — App (router hash-based, ~28 rutas)                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Base de Datos IndexedDB — DB v10
+## 3. Base de Datos IndexedDB — DB v11
 
 ### Almacenes y versión de introducción
 
-| Almacén | Desde | KeyPath | Índices | Cifrado |
-|---|:---:|---|---|:---:|
-| `fincas` | v1 | `id` | `rega` (único, v9) | No |
-| `rebanos` | v1 | `id` | `fincaId` | No |
-| `animales` | v1 | `id` | `rebanoId`, `caravana`(único), `dib`(único,v9), `categoria`(v9), `madre_id`(v9) | No |
-| `produccion_carne` | v1 | `id` | `animalId` | No |
-| `produccion_leche` | v1 | `id` | — | **Sí (AES-GCM)** |
-| `ventas_ganado` | v1 | `id` | `fincaId` | **Sí (AES-GCM)** |
-| `sanitarios_ganado` | v1 | `id` | `rebanoId` | No |
-| `gastos_ganaderia` | v1 | `id` | `fincaId`, `proveedorId`(v8) | No |
-| `config_especies` | v2 | `id` | — | No |
-| `config_tipos_produccion` | v2 | `id` | — | No |
-| `comercializacion_carne` | v3 | `id` | `fincaId`, `animalId`, `compradorId`(v8), `contratoId`(v8), `numero_albaran`(único,v9), `dimoe`(v9), `transportistaId`(v9), `autorizacion_veterinaria`(v9) | No |
-| `comercializacion_leche` | v3 | `id` | `fincaId`, `comunidad_autonoma`(v7), `fechaRecogida`(v7), `contrato_numero`(v7), `compradorId`(v8), `contratoId`(v8) | No |
-| `meta` | v4 | `key` | — | No (control de migraciones v8/v9) |
-| `registro_eventos` | v5 | `id` | `fincaId`, `entidad_id`, `tipo_entidad`, `snap_zona`, `snap_tipo`, `motivo_tarea`, `fecha` | No |
-| `reproduccion_eventos` | v6 | `id` | `fincaId`, `animalId`, `tipo_evento`, `fecha` | No |
-| `compradores` | v8 | `id` | `nif_cif`(único), `tipo_comprador`, `activo` | No |
-| `proveedores` | v8 | `id` | `nif_cif`(único), `activo` | No |
-| `contratos_compra` | v8 | `id` | `compradorId`, `activo`, `tipo` | No |
-| `transportistas` | v9 | `id` | `nif_cif`(único), `activo`, `matricula` | No |
-| `documentos_legales` | v9 | `id` | `tipo`, `fincaId`, `animalId`, `numero`(único), `fecha_emision` | No |
-| `movimientos_ganado` | **v10** | `id` | `fincaId`, `tipo`, `numero_guia`, `rega_origen`, `rega_destino`, `fecha`, `animalId`(multiEntry) | No |
-| `saneamientos` | **v10** | `id` | `fincaId`, `campana`, `fecha`, `calificacion` | No |
+| Almacén | Desde | Cifrado | Notas |
+|---|:---:|:---:|---|
+| `fincas` | v1 | No | REGA único (v9); zonas embebidas como array |
+| `rebanos` | v1 | No | índice `fincaId` |
+| `animales` | v1 | No | índices: `rebanoId`, `caravana`(único), `dib`(único,v9), `categoria`(v9), `madre_id`(v9) |
+| `produccion_carne` | v1 | No | índice `animalId` |
+| `produccion_leche` | v1 | **Sí (AES-GCM)** | — |
+| `ventas_ganado` | v1 | **Sí (AES-GCM)** | índice `fincaId` |
+| `sanitarios_ganado` | v1 | No | índice `rebanoId` |
+| `gastos_ganaderia` | v1 | No | índices `fincaId`, `proveedorId`(v8) |
+| `config_especies` | v2 | No | 4 especies semilla |
+| `config_tipos_produccion` | v2 | No | 4 tipos semilla |
+| `comercializacion_carne` | v3 | No | índices: `fincaId`, `animalId`, `compradorId`(v8), `contratoId`(v8), `numero_albaran`(único,v9), `dimoe`(v9), `transportistaId`(v9), `autorizacion_veterinaria`(v9) |
+| `comercializacion_leche` | v3 | No | índices: `fincaId`, `comunidad_autonoma`(v7), `fechaRecogida`(v7), `contrato_numero`(v7), `compradorId`(v8), `contratoId`(v8) |
+| `meta` | v4 | No | Control de idempotencia de migraciones |
+| `registro_eventos` | v5 | No | 8 índices; fuente del Cuaderno Digital |
+| `reproduccion_eventos` | v6 | No | índices: `fincaId`, `animalId`, `tipo_evento`, `fecha` |
+| `compradores` | v8 | No | NIF/CIF único; migración auto desde ventas legadas |
+| `proveedores` | v8 | No | NIF/CIF único |
+| `contratos_compra` | v8 | No | índices: `compradorId`, `activo`, `tipo` |
+| `transportistas` | v9 | No | índices: `nif_cif`(único), `activo`, `matricula` |
+| `documentos_legales` | v9 | No | índices: `tipo`, `fincaId`, `animalId`, `numero`(único), `fecha_emision` |
+| `movimientos_ganado` | v10 | No | índices: `fincaId`, `tipo`, `numero_guia`, `rega_origen/destino`, `fecha`, `animalId`(multi) |
+| `saneamientos` | v10 | No | índices: `fincaId`, `campana`, `fecha`, `calificacion` |
+| `notificaciones_rega` | **v11** | No | Migrado desde `localStorage`; auditable |
 
-> **Nota:** las **zonas no son un object store propio**; viven embebidas en `fincas.zonas` (array). Cualquier lectura de zonas debe hacerse desde la finca, no vía `db.getAll('zonas')`.
+> **Regla crítica:** las **zonas no son un store propio**; viven embebidas en `fincas.zonas` (array). Siempre leer desde `Fincas.getActive()`, nunca `db.getAllFromIndex('zonas', …)`.
 
 ### Migraciones automáticas en arranque
-- **`migrarV8`**: extrae compradores/proveedores únicos de ventas/gastos legados y crea entidades, enlazando `compradorId`/`proveedorId`.
-- **`migrarV9`**: asigna `numero_albaran` secuencial (`AAAA-NNNN`) y genera `documentos_legales` tipo DIMOE para ventas sin documento.
-- Control de idempotencia vía store `meta` (`migracion_v8`, `migracion_v9`).
+
+| Versión | Migración | Idempotencia |
+|---|---|---|
+| v8 | `migrarV8`: extrae compradores/proveedores únicos de ventas/gastos legados; crea entidades y enlaza IDs | `meta.migracion_v8` |
+| v9 | `migrarV9`: asigna `numero_albaran` secuencial (`AAAA-NNNN`) y genera DIMOE en `documentos_legales` para ventas sin documento | `meta.migracion_v9` |
+| v11 | Auto-migración de notificaciones REGA desde `localStorage` a `notificaciones_rega` | idempotente por diseño |
 
 ### Datos semilla (`populateDefaults`)
 - **config_especies**: Vacas (60 L), Ovejas (8 L), Cabras (8 L), Cerdos (12 L).
@@ -102,113 +110,137 @@
 
 ---
 
-## 4. Router (app.js) — 30 rutas, todas activas
+## 4. Router (app.js) — ~28 rutas
 
-| Hash | Método | Hash | Método |
+| Hash | Vista / método | Hash | Vista / método |
 |---|---|---|---|
-| `#/` | renderDashboard | `#/explotacion` | renderExplotacion |
-| `#/ganaderia` | renderGanaderia | `#/gastos` / `#/gasto` | renderGastos / detalle |
-| `#/rebanos` / `#/rebano` | renderRebanos / detalle | `#/comercializacion` | renderComercializacion |
-| `#/carne` / `#/hibrido` | renderCarne / renderHibrido | `#/informes` | renderInformes |
-| `#/zonas` / `#/zona` | renderZonas / detalle | `#/ajustes` | renderAjustes |
-| `#/animales` / `#/animal` | renderAnimales / detalle | `#/compradores` / `#/comprador` | render… |
-| `#/leche` / `#/albaran-leche` | renderLeche / detalle | `#/proveedores` / `#/proveedor` | render… |
-| `#/venta-carne` | renderDetalleVentaCarne | `#/transportistas` | renderTransportistas |
-| `#/contrato` | renderContrato | `#/trazabilidad` | renderTrazabilidad |
-| `#/cuaderno` | renderCuadernoDigital | `#/documentos` | renderDocumentos |
-| `#/manuales` | renderManuales | | |
-
-> Las rutas `comercializacion`, `informes`, `ajustes` y `zonas` —que en v3.7.1 eran stubs— están **implementadas**.
-
----
-
-## 5. Adaptación SIGGAN — Gaps cerrados
-
-| Gap | Contenido | Norma | Commit |
-|---|---|---|---|
-| 1 | Genealogía (`madre_id` en formulario y modelo) | RD 787/2023 | `f9acea6` |
-| 2 | Parto → alta automática de cría (evento `alta_nacimiento`) | RD 787/2023 | `f9acea6` |
-| 3 | Eventos alta/baja en `registro_eventos` (`Animales.save`) | RD 787/2023 | `f9acea6` |
-| 4 | Traslado interno → evento `traslado_interno` | RD 787/2023 | `f9acea6` |
-| 5 | Bloqueo de venta de leche con `prohibidoLeche` | RD 787/2023 | `47ea1e3` |
-| 6 | Catálogos cerrados (`tipoAlta`, categoría animal) | — | `f9acea6` |
-| 7 | Clasificación **SANDACH** por motivo de baja | Reg. UE 1069/2009 | `f087996`, `bf3c591` |
-| 8 | Rebaños con `tipo_explotacion_rega` del catálogo REGA | — | `bb77d13` |
-| 9 | Zonas con UGM, carga ganadera, distancias y PAC | — | `3d91022` |
-| 10 | Persistencia de pedidos de crotales en BD | — | `859156a` |
-| 11 | Notificaciones a REGA al dar de alta animal | — | `6d85c5b` |
-
-### Bloques transversales (ExPro + Ganadería)
-- **Auditoría legal inmutable:** `Animales.delete`, `Rebanos.delete` y anulación de zonas hacen **anulación trazable** (`anulado:true` + asiento en `registro_eventos`); las `list()` excluyen anulados. Sin borrado físico en entidades críticas.
-- **Workflow administrativo:** estados de trámite `borrador → presentado → aceptado → rechazado` + fecha de presentación + nº de registro oficial + acuse de recibo, persistidos en `documentos_legales`. Implementado en guías de movimiento, albarán de leche (INFOLAC), censo y traslado.
-- **Validaciones cruzadas:** coherencia `num_animales`↔`crotales`, crotal normativo (ES + 12 dígitos / país + dígitos), operador y REGA destino válidos en salidas.
-- **Cableado comercial → oficial:** la venta masiva genera `Movimientos.save('salida')` por animal (con rollback) y persiste `movimientoId` en `comercializacion_carne`.
-- **Maestros comerciales SIGGAN:** comprador/proveedor con `nif_cif` validado + `tipo_operador` + `rega` + `comunidad_autonoma`; transportista con ATG obligatorio + control de desinsectación (fechas/vigencia).
-- **Trazabilidad económica:** los gastos escriben en `registro_eventos` (aparecen en el cuaderno) y los gastos de sanidad intentan enlazarse con `sanitarios_ganado`.
-- **Validación REGA por CCAA** en `Fincas.save` vía `ComunidadesService.validarFormatoREGA`.
-- **Cierre mensual** exportable a SIGGAN/BADIGEX (`AjustesView._exportarCierreMensual`).
+| `#/` | DashboardView | `#/explotacion` | ExplotacionView |
+| `#/ganaderia` | GanaderiaView | `#/gastos` | GastosView |
+| `#/rebanos` | RebanosView | `#/gasto?id` | App.renderDetalleGasto |
+| `#/rebano?id` | App.renderRebano | `#/comercializacion` | ComercializacionView |
+| `#/carne` | CarneView | `#/venta-carne?id` | App.renderDetalleVentaCarne |
+| `#/hibrido` | HibridoView | `#/albaran-leche?id` | App.renderDetalleLeche |
+| `#/zonas` | ZonasView | `#/informes` | InformesView |
+| `#/zona?index` | ZonasView.renderDetalle | `#/ajustes` | AjustesView |
+| `#/animales` | AnimalesView | `#/compradores` | CompradorView |
+| `#/animal?id` | AnimalesView.renderDetalle | `#/comprador?id` | CompradorView.renderDetalle |
+| `#/leche` | LecheView | `#/proveedores` | ProveedoresView |
+| `#/trazabilidad` | TrazabilidadView | `#/proveedor?id` | ProveedoresView.renderDetalle |
+| `#/cuaderno` | CuadernoView | `#/transportistas` | TransportistasView |
+| `#/documentos` | DocumentosView | `#/contrato?id` | App.renderContrato |
+| `#/manuales` | ManualesView | | |
 
 ---
 
-## 6. Libros y documentos oficiales (Cuaderno Digital)
-- Libro de Registro de Explotación (altas/bajas/genealogía/movimientos).
-- Libro de Movimientos (guía de origen y sanidad).
-- Libro de Saneamientos (campañas ADSG: TBC, brucelosis…).
-- Libro de Tratamientos Veterinarios (con tiempos de espera y etiquetado legible).
-- Documentos legales: DIMOE, albaranes, INFOLAC, certificados.
-- Exportación CSV/XML oficial (REGA, SIA).
+## 5. Módulos JS principales
+
+### Dominio / Modelos
+`fincas` · `rebanos` · `animales` · `pesajes` · `produccion` · `gastos` · `sanitarios` · `saneamientos` · `movimientos` · `reproduccion` · `compradores` · `proveedores` · `transportistas` · `contratos` · `pedidos-crotales` · `notificaciones-rega` · `liquidacion`
+
+### Servicios
+`alertas-service` · `balance-service` · `cache-service` · `comunidades-service` · `event-bus` · `export-service` · `pdf-service`
+
+### UI / Framework
+`modal-manager` (Toast + Confirm + prompt) · `wizard-manager` (9 wizards) · `produccion-ui` · `pesajes-ui` · `icons` (~50 SVG glifos) · `snapshot-service`
+
+### Wizards (js/views/wizards/)
+`wizard-albaran-leche` · `wizard-censo` · `wizard-crotales` · `wizard-finca` · `wizard-gasto` · `wizard-guia-movimiento` · `wizard-traslado` · `wizard-tratamiento` · `wizard-venta-masiva`
+
+### QA / Testing
+`qa-siggan` (18 tests SIGGAN) · `qa-diagnostico` · `qa-test-runner` · `e2e-test-suite` · `tests` · `seed-data`
 
 ---
 
-## 7. QA / Testing
+## 6. Sistema de UI/UX — Fase 6 completa
+
+Toda la auditoría UI/UX (`docs/AUDITORIA-UI-UX.md`) está ✅ terminada:
+
+| Fase | Contenido | Estado |
+|---|---|:---:|
+| 0 | Tokens CSS (`--p-gold`, `--p-cork`, `--c-success/danger/warning/info`) + bug `--p-gold` | ✅ |
+| 1 | Consolidación CSS: inputs unificados, FAB único, parche `:has()` eliminado | ✅ |
+| 2 | Iconos: librería `Icons.*` SVG conectada; ~35 emojis funcionales → SVG | ✅ |
+| 3 | Mensajes: `Toast.success/warning/error/info()` + `Confirm.confirm()/alert()` — cero `alert()`/`confirm()` nativos | ✅ |
+| 4 | Estilos inline: 1.361 → **625** (100% residuales justificados: PDF templates, custom props dinámicos, colores computados) | ✅ |
+| 5 | Formularios/wizards: `wizard-manager` unificado, `wizard-finca` reemplaza `formulario-finca` | ✅ |
+| 6 | Pantallas densas: `informes-view` con nav 2 niveles (5 cat × 22 sub-tabs); modal validación exportación | ✅ |
+
+---
+
+## 7. Adaptación SIGGAN — Estado
+
+Ver `docs/CUMPLIMIENTO_SIGGAN.md` para la matriz completa. Resumen:
+
+| Bloque | Estado |
+|---|:---:|
+| Explotación / REGA | ✅ |
+| Identificación animal (crotal/DIB/genealogía) | ✅ |
+| Censo y libro de registro | ✅ |
+| Movimientos / guías oficiales | ✅ |
+| Sanidad (tratamientos / saneamientos / bloqueo leche) | ✅ |
+| Comercialización (carne / leche / SANDACH) | ✅ |
+| Maestros comerciales (compradores/proveedores/transportistas) | ✅ |
+| Trazabilidad / auditoría inmutable | ✅ |
+| Workflow administrativo (borrador→presentado→aceptado/rechazado) | ✅ |
+| Notificaciones REGA en BD (v11) | ✅ |
+| Exportación CSV/XML (validación local) | ✅ |
+| Exportación validada contra importador real SIGGAN/BADIGEX | 🟡 requiere credenciales Junta |
+| Validación en dispositivo Android real | 🟡 `SigganQA.runAll()` pendiente ejecución manual |
+| Manuales de usuario alineados a SIGGAN | ✅ |
+
+---
+
+## 8. QA / Testing
 
 - **Suite SIGGAN** (`window.SigganQA`, `js/qa-siggan.js`): **18 tests** automatizados.
-  - TEST 1 REGA · 2 Catálogos · 3 Movimientos · 4 Saneamientos · 5 Tratamientos · 6 Export CSV/XML · 7 Cuaderno · 8 Rendimiento DB v10 · 9 Crotal normativo · 10 Traslado/aforo · 11 Parto/genealogía · 12 Censo alta/baja · 13 Zonas UGM/PAC · 14 Tipo explotación REGA · 15 prohibidoLeche · 16 SANDACH · 17 Notificaciones REGA · 18 Cobertura demo CHAMORRO.
-  - Ejecución: `await SigganQA.runAll()` · `SigganQA.run("coverage")` · `SigganQA.cleanup()`.
+  - TEST 1 REGA · 2 Catálogos · 3 Movimientos · 4 Saneamientos · 5 Tratamientos · 6 Export CSV/XML · 7 Cuaderno · 8 Rendimiento DB · 9 Crotal · 10 Traslado/aforo · 11 Parto/genealogía · 12 Censo alta/baja · 13 Zonas UGM/PAC · 14 Tipo explotación REGA · 15 prohibidoLeche · 16 SANDACH · 17 Notificaciones REGA · 18 Cobertura demo CHAMORRO
+  - Ejecución: `await SigganQA.runAll()` · `SigganQA.run("coverage")` · `SigganQA.cleanup()`
 - **E2E Test Suite** (`js/e2e-test-suite.js`): 13 tests de flujo.
 - **QA Test Runner** (`window.QATestRunner.runLevel(1-7)`) y **QA Diagnóstico** (`window.QADiagnostico.run()`).
-- **Cobertura demo CHAMORRO: 17/17 módulos (100%)** — ver `files/demo-coverage-checklist` / TEST 18.
+- **Cobertura demo CHAMORRO: 17/17 módulos (100%)**.
 
 ---
 
-## 8. Infraestructura Android
+## 9. Infraestructura Android
 
 | Fichero | Configuración |
 |---|---|
 | `capacitor.config.ts` | `appId: com.livestockmanager.app`, `androidScheme: https` |
 | `package.json` scripts | `build` (copia a `www/`), `cap:sync`, `cap:open` |
 | `sync-mirrors.ps1` | Sincroniza raíz ↔ `www/` ↔ Android src ↔ Android build |
+| `android/` | Gitignored; build sale del repo principal |
 
-**Flujo de trabajo (norma):** todo cambio que se pase a Android **debe quedar commiteado en GitHub** (`origin/master` es la fuente de verdad). Tras editar JS/CSS/HTML: subir `CACHE_NAME`, `npm run build`, `sync-mirrors.ps1`, commit + push.
+**Flujo de trabajo:** todo cambio JS/CSS/HTML → subir `CACHE_NAME` → `npm run build` → `sync-mirrors.ps1` → commit + push.
 
 ---
 
-## 9. Deuda técnica / pendientes
+## 10. Deuda técnica abierta
 
 | # | Severidad | Descripción | Estado |
 |---|:---:|---|---|
-| 1 | 🔴 | `GanaderiaView` (≈línea 27) lee `db.getAllFromIndex('zonas', …)` pero **no existe el store `zonas`** (viven en `fincas.zonas`). Envuelto en `.catch(()=>[])` → los KPIs de zonas del hub salen siempre vacíos. | Abierto |
-| 2 | 🟡 | `notificaciones-rega.js` persiste en `localStorage`, no en store versionado / `documentos_legales`. | Abierto |
-| 3 | 🟢 | `js/qa-siggan-test17.js` era un duplicado huérfano (no referenciado) de la suite QA → **eliminado** en esta limpieza. | Resuelto |
-| 4 | 🟡 | **Manuales** (`docs/GUIA_*.html`) no actualizados a SIGGAN (sin Cuaderno Digital ni libros de registro). | Abierto |
-| 5 | 🟡 | **Validación end-to-end en Android** (`cap:sync` + `SigganQA.runAll()` en dispositivo) repetidamente diferida. | Abierto |
-| 6 | 🟢 | Divergencia histórica `notes`/`notas` en rebaños (rebanos-view usa `notas` de forma consistente). | A vigilar |
+| 1 | 🟡 | **Exportación SIGGAN/BADIGEX** — validación local ✅; falta contrastar contra importador real (requiere XSD/credenciales Junta). | Abierto — externo |
+| 2 | 🟡 | **Test Android real** — código listo (`cap:sync` ejecutado); falta `SigganQA.runAll()` en dispositivo físico. | Abierto — manual |
+| 3 | 🟢 | String de versión interno en `app.js` línea 1699 (`version: "4.5.0"`) sin actualizar a 4.7.0. | Menor |
+| 4 | 🟠 | **7 vulnerabilidades Dependabot** en GitHub (6 high, 1 moderate) en dependencias de `package.json`. | Revisar |
 
 ---
 
-## 10. Reglas de negocio implementadas
+## 11. Reglas de negocio implementadas
 
-| Regla | Módulo | Descripción |
-|---|---|---|
-| Supresión farmacológica | `trazabilidad.js` | Bloquea comercialización dentro del periodo de espera |
-| Aforo de zona | `trazabilidad.js` | Impide traslados que superen `aforoMax` |
-| Merma canal | `trazabilidad.js` | Valida `pesoCanal < pesoVivo` en expediciones |
-| Clasificación SEUROP | `trazabilidad.js` | Clasificación de canal por % de magro |
-| Laboratorio lácteo | `trazabilidad.js` | Evalúa inhibidores/antibióticos |
-| Crotal único | `animales.js` | Índice único `caravana` + validación formato (ES+12) |
-| Anulación trazable | `animales.js`, `rebanos.js`, zonas | Sin borrado físico; histórico conservado |
-| Integridad referencial | `animales/rebanos/fincas` | Bloquea anulación con dependientes activos |
-| Snapshot de contexto | `pesajes/produccion/gastos` | Captura zona/tipo/especie inalterable |
-| Seguridad de datos | `crypto.js` | Ventas y producción láctea cifradas (AES-GCM) |
-| Validación NIF/CIF/REGA | `error-handler.js` | DNI/NIE/CIF con dígito de control + REGA por CCAA |
-| Venta ↔ movimiento oficial | `wizard-venta-masiva.js` | Genera y enlaza movimiento SIGGAN, con rollback |
+| Regla | Módulo |
+|---|---|
+| Supresión farmacológica | `trazabilidad.js` — bloquea comercialización en periodo de espera |
+| Aforo de zona | `trazabilidad.js` — impide traslados que superen `aforoMax` |
+| Merma canal | `trazabilidad.js` — valida `pesoCanal < pesoVivo` |
+| Clasificación SEUROP | `trazabilidad.js` — % magro en canal |
+| Laboratorio lácteo | `trazabilidad.js` — inhibidores/antibióticos |
+| Crotal único + formato | `animales.js` — índice único `caravana` + `ES+12dígitos` |
+| Anulación trazable | `animales.js`, `rebanos.js`, zonas — sin borrado físico |
+| Integridad referencial | `animales/rebanos/fincas` — bloquea anulación con dependientes activos |
+| Snapshot de contexto | `pesajes/produccion/gastos` — captura zona/tipo/especie inalterable |
+| Seguridad de datos | `crypto.js` — ventas y producción láctea cifradas AES-GCM |
+| Validación NIF/CIF/REGA | `error-handler.js` — DNI/NIE/CIF con dígito de control + REGA por CCAA |
+| Venta ↔ movimiento oficial | `wizard-venta-masiva.js` — genera movimiento SIGGAN con rollback |
+| Bloqueo venta leche | `sanitarios.js` / wizards — `prohibidoLeche` en periodo de espera |
+| SANDACH | `animales.js` — clasificación por motivo de baja (Reg. UE 1069/2009) |
+| Workflow trámite | `documentos_legales` — estados borrador→presentado→aceptado/rechazado |
