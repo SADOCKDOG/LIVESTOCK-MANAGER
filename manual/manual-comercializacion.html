@@ -39,6 +39,7 @@
   .fase-tag{display:inline-block; background:var(--comer); color:#fff; font-size:.7rem; font-weight:700;
     padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
   .fase-tag.carne{background:var(--carne);}
+  .fase-tag.normativa{background:#dc2626;}
   .fase-tag.leche{background:var(--leche);}
   .fase-tag.wizard{background:var(--oro);}
   .intro-mod{color:var(--gris); margin:8px 0 16px;}
@@ -621,8 +622,42 @@
     </div>
   </section>
 
+  <!-- ============================================================= -->
+  <!-- SIGGAN -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="siggan">
+    <span class="fase-tag normativa">SIGGAN · Andalucía</span>
+    <h2 class="modulo">Comercialización y el Libro de Registro SIGGAN</h2>
+    <p class="intro-mod">
+      Cada venta de animales genera automáticamente un registro en el
+      <strong>Libro de Salidas</strong> del Cuaderno de Campo Digital, que SIGGAN requiere
+      para la trazabilidad de movimientos entre explotaciones y hacia matadero.
+    </p>
+
+    <h4>Qué genera una venta en SIGGAN</h4>
+    <table class="parametros">
+      <tr><th>Operación</th><th>Registro SIGGAN generado</th></tr>
+      <tr><td>Venta Masiva (carne)</td><td>Baja por venta con REGA destino (matadero), nº guía DIMOE, peso y fecha</td></tr>
+      <tr><td>Albarán de Leche</td><td>Expedición de tanque con INFOLAC, transportista, volumen y analítica</td></tr>
+    </table>
+
+    <h4>Exportar al CSV SIGGAN</h4>
+    <ol class="pasos">
+      <li>Ve a <span class="ruta">Más → Cuaderno Digital</span>.</li>
+      <li>Pulsa <kbd>Exportar CSV (SIGGAN)</kbd>. El fichero incluye la sección <strong>Salidas</strong>
+          con todas las ventas del período: crotales individuales, REGA destino, fecha y transportista.</li>
+      <li>Adjunta el CSV al trámite de declaración de movimientos en el portal SIGGAN de la Junta de Andalucía.</li>
+    </ol>
+
+    <div class="nota">
+      <strong>Compatibilidad:</strong> El CSV exportado sigue el esquema de columnas definido por SIGGAN
+      para la importación de movimientos de salida. Verifica la compatibilidad con el importador real
+      antes de presentarlo oficialmente.
+    </div>
+  </section>
+
   <div class="text-center text-gray text-xs" style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v6.4 · Manual de Comercialización · Venta Masiva y Albarán de Leche
+    Livestock Manager v4.7.0 · Manual de Comercialización · Venta Masiva y Albarán de Leche
   </div>
 
 </div>

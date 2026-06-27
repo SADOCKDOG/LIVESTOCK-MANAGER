@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'corcho-v6.7.19';
+﻿const CACHE_NAME = 'corcho-v6.7.20';
 const ASSETS = [
   './',
   './index.html',
@@ -43,6 +43,13 @@ const ASSETS = [
   './manual/manual-pesadas.html',
   './manual/manual-control-lechero.html',
   './manual/manual-gastos.html',
+  './manual/manual-animales-rebanos.html',
+  './manual/manual-compradores.html',
+  './manual/manual-contratos.html',
+  './manual/manual-proveedores.html',
+  './manual/manual-reproduccion.html',
+  './manual/manual-sanitarios.html',
+  './manual/manual-transportistas.html',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-placeholder.svg',

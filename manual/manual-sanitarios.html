@@ -36,6 +36,7 @@
 
   .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
     padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+  .fase-tag.normativa{background:#dc2626;}
   .intro-mod{color:var(--gris); margin:8px 0 16px;}
 
   ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
@@ -459,6 +460,42 @@
     </div>
   </section>
 
+  <!-- ============================================================= -->
+  <!-- SIGGAN -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="siggan">
+    <span class="fase-tag normativa">SIGGAN · Andalucía</span>
+    <h2 class="modulo">12. Tratamientos en el Libro de Registro SIGGAN</h2>
+    <p class="intro-mod">
+      El <strong>Reglamento (UE) 2019/6</strong> y la normativa autonómica andaluza exigen que todos los
+      tratamientos con medicamentos de uso veterinario queden registrados en el
+      <strong>Libro de Registro de Medicamentos</strong>, que forma parte del Cuaderno de Campo
+      que SIGGAN puede requerir en cualquier inspección.
+    </p>
+
+    <h4>Qué exporta el Cuaderno Digital SIGGAN</h4>
+    <table class="parametros">
+      <tr><th>Sección CSV</th><th>Datos de Sanitarios incluidos</th></tr>
+      <tr><td>Tratamientos</td><td>Fecha, animal/rebaño, medicamento, dosis, veterinario, tiempos de espera</td></tr>
+      <tr><td>Saneamientos (ADSG)</td><td>Campañas de brucelosis, tuberculosis y otras zoonosis</td></tr>
+    </table>
+
+    <h4>Buenas prácticas para cumplimiento SIGGAN</h4>
+    <ol class="pasos">
+      <li>Registra <strong>cada tratamiento el mismo día</strong> que se administra.</li>
+      <li>Completa siempre el campo <strong>Veterinario</strong> para los antibióticos (obligatorio por Reglamento UE).</li>
+      <li>Revisa mensualmente el listado de animales con <strong>restricción sanitaria activa</strong>
+          antes de incluirlos en cualquier venta o movimiento.</li>
+      <li>Exporta el CSV SIGGAN desde <span class="ruta">Más → Cuaderno Digital → Exportar CSV (SIGGAN)</span>
+          y archívalo como respaldo documental.</li>
+    </ol>
+
+    <div class="tip">
+      El informe PDF «Libro Sanitario» (desde <span class="ruta">Más → Informes → Libro Sanitario</span>)
+      incluye todos los tratamientos con tiempos de espera en formato imprimible para inspecciones.
+    </div>
+  </section>
+
   <section class="seccion" id="capturas">
     <span class="fase-tag">Capturas</span>
     <h2 class="modulo">11. Capturas reales en app (demo CHAMORRO)</h2>
@@ -474,7 +511,7 @@
   </section>
 
   <div class="text-center text-gray text-xs" style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v6.5 · Manual de Sanitarios · Control de Tratamientos
+    Livestock Manager v4.7.0 · Manual de Sanitarios · Control de Tratamientos
   </div>
 
 </div>

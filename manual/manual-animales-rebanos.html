@@ -428,7 +428,54 @@
   </section>
 
   <!-- ============================================================= -->
-  <!-- 8. EJEMPLO -->
+  <!-- 8. SIGGAN -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="siggan">
+    <span class="fase-tag normativa">SIGGAN · Andalucía</span>
+    <h2 class="modulo">8. Obligaciones SIGGAN para Animales y Rebaños</h2>
+    <p class="intro-mod">
+      En Andalucía, el <strong>Sistema Integrado de Gestión Ganadera (SIGGAN)</strong> exige que la información
+      del censo esté siempre sincronizada con el <strong>Registro General de Explotaciones Ganaderas (REGA)</strong>.
+      Livestock Manager facilita el cumplimiento desde varios puntos.
+    </p>
+
+    <h4>Código REGA de la explotación</h4>
+    <p>
+      Antes de dar de alta animales, asegúrate de tener completado el <strong>código REGA</strong> en
+      <span class="ruta">Ajustes → Datos de la finca</span>. El formato oficial es:
+      <strong>ES + 2 dígitos provincia + 3 dígitos municipio + 5 dígitos secuencial</strong>
+      (ej: ES110010001). Sin REGA, los exports SIGGAN no incluirán la identificación de origen.
+    </p>
+
+    <h4>Identificación de animales (crotales)</h4>
+    <table class="parametros">
+      <tr><th>Especie</th><th>Formato crotal</th><th>Plazo notificación nacimiento</th></tr>
+      <tr><td>Bovino</td><td>ES + 10 dígitos (auricular doble)</td><td>7 días desde nacimiento</td></tr>
+      <tr><td>Ovino / Caprino</td><td>ES + 9 dígitos (+ electrónico para subv.)</td><td>6 meses (o antes del primer movimiento)</td></tr>
+      <tr><td>Porcino</td><td>Tatuaje o auricular con código REGA</td><td>Antes de primer movimiento</td></tr>
+    </table>
+    <p>
+      El campo <strong>Número de identificación</strong> en la ficha del animal se valida en color
+      dorado cuando el crotal empieza por <kbd>ES</kbd>, indicando formato correcto.
+    </p>
+
+    <h4>Declaración Censal anual</h4>
+    <p>
+      Cada año (antes del 1 de marzo), debes declarar el censo a 1 de enero ante la
+      autoridad competente. Livestock Manager genera la <strong>Declaración Censal SIGGAN</strong>
+      desde <span class="ruta">Ajustes → Trámites SIGGAN → Declaración Censal</span>,
+      con el recuento por especie y categoría listo para presentar.
+    </p>
+
+    <div class="aviso">
+      <strong>Atención:</strong> Cada nacimiento, compra, venta o baja debe reflejarse en el
+      Cuaderno de Campo Digital y, cuando aplique, comunicarse a SIGGAN dentro del plazo legal.
+      Exporta regularmente desde <span class="ruta">Más → Cuaderno Digital → Exportar CSV (SIGGAN)</span>.
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- 9. EJEMPLO (renumerado) -->
   <!-- ============================================================= -->
   <section class="seccion" id="ejemplo">
     <span class="fase-tag">Ejemplo</span>
@@ -500,7 +547,7 @@
   </section>
 
   <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v6.5 · Manual de Animales y Rebaños · Gestión del Censo
+    Livestock Manager v4.7.0 · Manual de Animales y Rebaños · Gestión del Censo
   </div>
 
 </div>

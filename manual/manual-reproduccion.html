@@ -36,6 +36,7 @@
 
   .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
     padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+  .fase-tag.normativa{background:#dc2626;}
   .intro-mod{color:var(--gris); margin:8px 0 16px;}
 
   ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
@@ -429,7 +430,43 @@
   </section>
 
   <!-- ============================================================= -->
-  <!-- 10. EJEMPLOS -->
+  <!-- SIGGAN -->
+  <!-- ============================================================= -->
+  <section class="seccion" id="siggan">
+    <span class="fase-tag normativa">SIGGAN · Andalucía</span>
+    <h2 class="modulo">10. Nacimientos y Reproducción en SIGGAN</h2>
+    <p class="intro-mod">
+      En Andalucía, cada nacimiento debe notificarse a SIGGAN dentro del plazo legal.
+      Livestock Manager registra los datos necesarios para que esa notificación sea sencilla.
+    </p>
+
+    <h4>Plazos de notificación por especie</h4>
+    <table class="parametros">
+      <tr><th>Especie</th><th>Plazo notificación nacimiento</th><th>Acción en la app</th></tr>
+      <tr><td>Bovino</td><td>7 días desde nacimiento</td><td>Alta del animal con tipo «Nacimiento» y asignación de crotal</td></tr>
+      <tr><td>Ovino / Caprino</td><td>Antes del primer movimiento (máx. 6 meses)</td><td>Alta del animal con crotal ES</td></tr>
+      <tr><td>Porcino</td><td>Antes del primer movimiento</td><td>Alta con código REGA de la madre</td></tr>
+    </table>
+
+    <h4>Flujo recomendado para nacimientos</h4>
+    <ol class="pasos">
+      <li>Registra el parto en <span class="ruta">Más → Reproducción → Nuevo parto</span> con fecha y número de crías.</li>
+      <li>Desde la ficha del parto, accede a <kbd>Dar de alta crías</kbd> para crear el animal con tipo
+          «Nacimiento», asignar crotal y vincularlo a la madre (genealogía automática).</li>
+      <li>El nacimiento queda en el Cuaderno Digital en la sección <strong>Nacimientos</strong> del CSV SIGGAN.</li>
+      <li>Exporta el CSV desde <span class="ruta">Más → Cuaderno Digital → Exportar CSV (SIGGAN)</span>
+          y notifica a SIGGAN dentro del plazo correspondiente.</li>
+    </ol>
+
+    <div class="tip">
+      El informe de <strong>Declaración Censal</strong> (sección de Animales en el Cuaderno Digital)
+      incluye automáticamente las crías nacidas en el período, facilitando la declaración anual
+      ante la Junta de Andalucía.
+    </div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- 11. EJEMPLOS (renumerado) -->
   <!-- ============================================================= -->
   <section class="seccion" id="ejemplos">
     <span class="fase-tag">Ejemplos</span>
@@ -487,7 +524,7 @@
   </section>
 
   <div class="text-center text-gray text-xs" style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v6.5 · Manual de Reproducción · Ciclo Reproductivo y Genealogía
+    Livestock Manager v4.7.0 · Manual de Reproducción · Ciclo Reproductivo y Genealogía
   </div>
 
 </div>
