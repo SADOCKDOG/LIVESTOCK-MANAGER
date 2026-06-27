@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wizard Venta Masiva de Animales
  * Extraído de app.js para modularización (Fase 3)
  */
@@ -135,7 +135,7 @@ window.VentaMasivaWizard = {
               tablaFilasHtml += `
               <tr style="background: rgba(220, 38, 38, 0.1); color: #f87171; border-bottom: 1px solid #450a0a;">
                   <td class="text-center p-14"><input type="checkbox" disabled style="transform: scale(1.5); opacity: 0.3;"></td>
-                  <td class="font-bold p-14" style="font-size:1.0rem;">${animal.numero_identificacion}</td>
+                  <td class="font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
                   <td class="p-14">${gateKeep.edadTexto}</td>
                   <td class="p-14">${gateKeep.requiereDib ? (gateKeep.gateDib ? '✅' : '❌') : '—'}</td>
@@ -147,7 +147,7 @@ window.VentaMasivaWizard = {
               tablaFilasHtml += `
               <tr style="border-bottom: 1px solid #222; color: #fff;">
                   <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} style="transform: scale(1.5); cursor: pointer;" class="batch-animal-chk"></td>
-                  <td class="text-gold font-bold p-14" style="font-size:1.0rem;">${animal.numero_identificacion}</td>
+                  <td class="text-gold font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
                   <td class="p-14">${gateKeep.edadTexto}</td>
                   <td class="p-14">${gateKeep.requiereDib ? '✅' : '—'}</td>
