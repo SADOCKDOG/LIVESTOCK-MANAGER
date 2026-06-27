@@ -258,7 +258,7 @@ window.AlbaranLecheWizard = {
               <label class="wizard-label">TEMPERATURA DE CARGA (ºC)</label>
               <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input">
             </div>
-            <div class="text-xs text-aaa rounded-sm p-10 bg-darker" class="border-left-blue" style="margin:8px 0;">
+            <div class="text-xs text-aaa rounded-sm p-10 bg-darker border-left-blue" style="margin:8px 0;">
               ❄️ <strong>Cadena de frío legal:</strong> La leche debe enfriarse de 37°C a &lt;4°C en menos de 2 horas.
               ${data.temp <= 4 ? `<span class="text-green">✅ Actual: ${data.temp}°C — CUMPLE</span>` : `<span class="text-red">⚠️ Actual: ${data.temp}°C — REVISAR</span>`}
             </div>

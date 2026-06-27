@@ -54,7 +54,7 @@ const AnimalesView = {
         <div class="flex gap-8 items-center">
           <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
-                 class="search-input flex-1" style="min-width:0;">
+                 class="search-input flex-1 min-w-0">
           <select id="animales-filtro-especie" class="form-select-gold"
                   onchange="AnimalesView._setFiltro('especie', this.value)"
                   style="width:130px;min-width:120px;">
