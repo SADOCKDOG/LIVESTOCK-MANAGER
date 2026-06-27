@@ -50,9 +50,12 @@ const CompradoresView = {
 
     _cambiarFiltro(tab) {
         this._currentTab = tab;
-        document.querySelectorAll('.compr-tab').forEach(b => {
-            b.style.background = b.dataset.tab === tab ? '#d97706' : '#1a1a1a';
-            b.style.color = b.dataset.tab === tab ? '#fff' : '#888';
+        document.querySelectorAll('button[data-tab]').forEach(b => {
+            if (b.dataset.tab === tab) {
+                b.classList.add('active');
+            } else {
+                b.classList.remove('active');
+            }
         });
         const busqueda = document.getElementById('search-compradores')?.value || '';
         this._aplicarFiltros(busqueda);
@@ -83,8 +86,17 @@ const CompradoresView = {
         const contenedor = document.getElementById('compr-lista');
         if (!contenedor) return;
 
+        let headerHtml = '';
+        if (this._currentTab === 'cárnico') {
+            headerHtml = `<div style="border-top: 4px solid #ef4444; background: rgba(239,68,68,0.1); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; color: #ef4444; font-weight: bold; font-size: 0.95rem;">${Icons.carne()} Mostrando Mataderos y Tratantes Cárnicos</div>`;
+        } else if (this._currentTab === 'láctico') {
+            headerHtml = `<div style="border-top: 4px solid #3b82f6; background: rgba(59,130,246,0.1); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; color: #3b82f6; font-weight: bold; font-size: 0.95rem;">${Icons.leche()} Mostrando Industrias Lácteas y Queserías</div>`;
+        } else if (this._currentTab === 'híbrido') {
+            headerHtml = `<div style="border-top: 4px solid #10b981; background: rgba(16,185,129,0.1); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; color: #10b981; font-weight: bold; font-size: 0.95rem;">${Icons.rotacion()} Mostrando Operadores Híbridos (Carne y Leche)</div>`;
+        }
+
         if (lista.length === 0) {
-            contenedor.innerHTML = `
+            contenedor.innerHTML = headerHtml + `
               <div class="empty-state">
                 <div class="empty-state-icon">${Icons.edificio()}</div>
                 <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
@@ -93,7 +105,7 @@ const CompradoresView = {
             return;
         }
 
-        contenedor.innerHTML = `<div class="grid gap-10">${lista.map(c => `
+        contenedor.innerHTML = headerHtml + `<div class="grid gap-10">${lista.map(c => `
           <div class="card card-list-item" onclick="CompradoresView.renderDetalle(${c.id})"
             style="border-left:4px solid ${this._colorTipo(c.tipo_comprador)};">
             <div class="flex justify-between items-start">
@@ -118,7 +130,7 @@ const CompradoresView = {
         const colores = {
             'cárnico': { text: '#ef4444', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' },
             'láctico': { text: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
-            'híbrido': { text: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.3)' }
+            'híbrido': { text: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' }
         };
         const c = colores[tipo] || colores['híbrido'];
         if (bg) return c.bg;

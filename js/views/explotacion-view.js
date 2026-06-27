@@ -575,8 +575,8 @@ const ExplotacionView = {
       <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${borderStyleColor};">
         <div class="flex justify-between items-center mb-10">
           <div class="text-xs text-white font-black uppercase flex items-center gap-6">${Icons.paquete()} ALMACÉN Y STOCK DE SILOS</div>
-          <button class="btn btn-secondary btn-xs" style="font-size:0.68rem; padding:3px 6px; background:${borderStyleColor}; border:none; margin:0; line-height:1;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-            ${Icons.agregar()} Carga/Consumo
+          <button class="widget-link-btn" style="background: #000000; display: flex; align-items: center; justify-content: center; padding: 4px 12px; gap: 6px; border-left: 2px solid ${borderStyleColor}; border-right: 2px solid ${borderStyleColor}; border-radius: 6px; color: #ffffff; box-shadow: 0 2px 8px ${borderStyleColor}40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 0; width: auto;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+            ${Icons.agregar()} <span style="font-size:0.75rem; font-weight:600;">Carga/Consumo</span>
           </button>
         </div>
         <div class="grid gap-10">
@@ -637,9 +637,18 @@ const ExplotacionView = {
           </div>
         </div>
         <div class="grid grid-cols-3 gap-10">
-          <button class="btn btn-secondary btn-sm btn--amber" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">${Icons.agregar()} Gasto Alimentación</button>
-          <button class="btn btn-secondary btn-sm btn--blue" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">${Icons.agregar()} Gasto Energía</button>
-          <button class="btn btn-secondary btn-sm btn--green-dk" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">${Icons.agregar()} Gasto Fitosanitario</button>
+          <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #f59e0b; border-right: 3px solid #f59e0b; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #f59e0b40; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">
+            ${Icons.agregar()}
+            <span style="font-size: 0.75rem; font-weight: 600; text-align: center;">Gasto Aliment.</span>
+          </button>
+          <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #3b82f6; border-right: 3px solid #3b82f6; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #3b82f640; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">
+            ${Icons.agregar()}
+            <span style="font-size: 0.75rem; font-weight: 600; text-align: center;">Gasto Energía</span>
+          </button>
+          <button class="widget-link-btn" style="background: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; gap: 6px; border-left: 3px solid #10b981; border-right: 3px solid #10b981; border-radius: 8px; color: #ffffff; box-shadow: 0 4px 12px #10b98140; transform: scale(1); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">
+            ${Icons.agregar()}
+            <span style="font-size: 0.75rem; font-weight: 600; text-align: center;">Gasto Fito.</span>
+          </button>
         </div>
         <div class="mt-10 text-xs text-aaa">
           ✅ Registros fitosanitarios con control completo: <strong>${fitoConControl}</strong> · ⚠️ No aptos para comercialización: <strong style="color:${fitoPendientes > 0 ? '#ef4444' : '#10b981'}">${fitoPendientes}</strong>
