@@ -2667,3 +2667,39 @@ label {
 .pesaje-lista-box    { background: #000; border: 1px solid #222; overflow: hidden; display: flex; flex-direction: column; flex-shrink: 0; max-height: 250px; }
 .pesaje-lista-header { padding: 8px 12px; text-transform: uppercase; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; }
 
+/* === Produccion UI — selector wizard === */
+.prod-options-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 5px; }
+.prod-opt-icon      { font-size: 2rem; margin-bottom: 8px; display: block; }
+.prod-opt-label     { font-size: 0.85rem; line-height: 1.2; }
+.wizard-sel-btn     { padding: 20px; border: 3px solid transparent; }
+.wizard-sel-btn--sm { padding: 15px; border: 3px solid transparent; }
+.h-full             { height: 100%; }
+.gap-20             { gap: 20px; }
+.prod-entity-list   { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 40vh; padding-right: 5px; }
+
+/* === Ajustes — sección About y manual === */
+.about-card   { background: #050505; border-radius: 32px; border: 1px solid #111; margin-top: 30px; }
+.about-logo   { max-width: 220px; height: auto; margin: 0 auto 20px; display: block; }
+.about-desc   { max-width: 320px; margin: 20px auto; font-size: 0.9rem; line-height: 1.6; }
+.about-footer { border-top: 1px solid #111; padding-top: 25px; }
+.max-w-340    { max-width: 340px; }
+.border-top-5-amber { border-top: 5px solid var(--c-warning); }
+.manual-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #1a1a1a; color: #fff; }
+.manual-iframe { flex: 1; width: 100%; border: none; background: #fff; }
+
+/* === Venta Masiva — tabla === */
+.tr-blocked          { background: rgba(220,38,38,0.1); color: #f87171; border-bottom: 1px solid #450a0a; }
+.tr-active           { border-bottom: 1px solid #222; color: #fff; }
+.stat-box-aptos      { flex: 1; border: 2px solid #27272a; padding: 15px; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+.stat-box-bloq       { flex: 1; background: #2a0808; border: 2px solid #450a0a; padding: 15px; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+.venta-tabla-wrapper { flex: 1; overflow-y: auto; border: 2px solid #27272a; border-radius: 16px; background: #0a0a0a; min-height: 300px; }
+.table-collapse      { border-collapse: collapse; }
+.thead-sticky        { background: #111; position: sticky; top: 0; z-index: 10; }
+.hint-box-gold       { background: rgba(251,191,36,0.08);  border: 1px solid rgba(251,191,36,0.2);  border-radius: 10px; padding: 10px 12px; }
+.hint-box-violet     { background: rgba(139,92,246,0.06);  border: 1px solid rgba(139,92,246,0.15); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+.btn-inline-green    { padding: 11px 14px; border-radius: 12px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); cursor: pointer; white-space: nowrap; }
+.btn-inline-blue     { padding: 11px 14px; border-radius: 12px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); text-decoration: none; white-space: nowrap; }
+
+/* === Cuaderno === */
+.border-top-222 { border-top: 1px solid #222; }
+

@@ -32,22 +32,22 @@ const ProduccionUI = {
       // Paso 1: Seleccionar Área
       {
         content: (data) => `
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:5px;">
+          <div class="prod-options-grid">
             <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'carne'; this.style.borderColor = '#fbbf24';">
-              <span style="font-size: 2rem; margin-bottom: 8px;">⚖️</span>
-              <span style="font-size: 0.85rem; line-height: 1.2;">Producción<br>Cárnica (kg)</span>
+              <span class="prod-opt-icon">⚖️</span>
+              <span class="prod-opt-label">Producción<br>Cárnica (kg)</span>
             </button>
             <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'leche'; this.style.borderColor = '#fbbf24';">
-              <span style="font-size: 2rem; margin-bottom: 8px;">🥛</span>
-              <span style="font-size: 0.85rem; line-height: 1.2;">Producción<br>Láctea (L)</span>
+              <span class="prod-opt-icon">🥛</span>
+              <span class="prod-opt-label">Producción<br>Láctea (L)</span>
             </button>
             <button class="wizard-btn-action wizard-btn-danger wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = '#fbbf24';">
-              <span style="font-size: 2rem; margin-bottom: 8px;">🚚</span>
-              <span style="font-size: 0.85rem; line-height: 1.2;">Venta Masiva<br>Matadero</span>
+              <span class="prod-opt-icon">🚚</span>
+              <span class="prod-opt-label">Venta Masiva<br>Matadero</span>
             </button>
             <button class="wizard-btn-action wizard-btn-option" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'gasto'; this.style.borderColor = '#fbbf24';">
-              <span style="font-size: 2rem; margin-bottom: 8px;">🧾</span>
-              <span style="font-size: 0.85rem; line-height: 1.2;">Gasto<br>Analítico</span>
+              <span class="prod-opt-icon">🧾</span>
+              <span class="prod-opt-label">Gasto<br>Analítico</span>
             </button>
           </div>
         `,
@@ -79,32 +79,32 @@ const ProduccionUI = {
       },
       // Paso 2: Seleccionar Modalidad (Individual / Lote / Tanque)
       {
-        content: (data) => `<div id="opciones-modalidad" style="display:flex; flex-direction:column; gap:20px; margin-top:15px; text-align:center;"></div>`,
+        content: (data) => `<div id="opciones-modalidad" class="flex flex-col gap-20 mt-15 text-center"></div>`,
         onRender: (data, stepEl) => {
           const container = stepEl.querySelector('#opciones-modalidad');
           let html = '';
           if (data.operacion === 'carne') {
             html += `
-                <button class="wizard-btn-action" style="padding: 20px; border: 3px solid transparent;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
                   <span style="font-size: 1.8rem; margin-right: 15px;">👤</span>
                   <span style="font-size: 0.95rem;">Pesada Individual (Animal)</span>
                 </button>
-                <button class="wizard-btn-action" style="padding: 20px; border: 3px solid transparent;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
                   <span style="font-size: 1.8rem; margin-right: 15px;">🐄</span>
                   <span style="font-size: 0.95rem;">Pesaje por Lote (Rebaño)</span>
                 </button>
              `;
           } else if (data.operacion === 'leche') {
             html += `
-                <button class="wizard-btn-action" style="padding: 15px; border: 3px solid transparent;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
                   <span style="font-size: 1.5rem; margin-right: 12px;">👤</span>
                   <span style="font-size: 0.9rem;">Control Lechero Individual</span>
                 </button>
-                <button class="wizard-btn-action" style="padding: 15px; border: 3px solid transparent;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
                   <span style="font-size: 1.5rem; margin-right: 12px;">🐄</span>
                   <span style="font-size: 0.9rem;">Control Lechero de Lote</span>
                 </button>
-                <button class="wizard-btn-action" style="padding: 15px; border: 3px solid transparent;" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'tanque'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'tanque'; this.style.borderColor = '#fbbf24';">
                   <span style="font-size: 1.5rem; margin-right: 12px;">🚛</span>
                   <span style="font-size: 0.9rem;">Expedición de Tanque</span>
                 </button>
@@ -132,9 +132,9 @@ const ProduccionUI = {
       // Paso 3: Buscar y Seleccionar Entidad (Buscador Integrado)
       {
         content: (data) => `
-          <div style="display:flex; flex-direction:column; height: 100%; gap: 15px; margin-top:10px;">
+          <div class="flex flex-col h-full gap-15 mt-10">
               <input type="text" id="search-entity" placeholder="🔍 Buscar por nombre, raza o crotal..." class="wizard-input">
-              <div id="entity-list" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; min-height: 40vh; padding-right: 5px;">
+              <div id="entity-list" class="prod-entity-list">
                   <div class="text-gray text-center p-20">Cargando registros...</div>
               </div>
           </div>
@@ -182,8 +182,8 @@ const ProduccionUI = {
               return `
                       <div class="entity-item card" data-id="${id}" style="padding:15px; border: 2px solid; ${selectedStyle} cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition: all 0.2s;">
                           <div>
-                              <div style="font-weight:900; font-size:1.1rem;" class="text-white">${title}</div>
-                              <div class="text-gray" style="font-size:0.8rem; margin-top: 4px;">${subtitle}</div>
+                              <div class="text-white font-black text-lg">${title}</div>
+                              <div class="text-gray text-sm mt-4">${subtitle}</div>
                           </div>
                           <div class="entity-check" style="width:26px; height:26px; border-radius:50%; border:2px solid; ${checkStyle} display:flex; align-items:center; justify-content:center; font-weight:bold;">
                               ${data.selectedEntityId === id ? '✓' : ''}

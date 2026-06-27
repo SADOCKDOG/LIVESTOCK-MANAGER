@@ -394,7 +394,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- Pie -->
-      <div class="text-center p-20 text-555 mt-25 text-2xs" style="border-top:1px solid #222;">
+      <div class="text-center p-20 text-555 mt-25 text-2xs border-top-222">
         Documento generado el ${new Date().toLocaleString('es-ES')} · Cuaderno Digital RD 787/2023<br>
         Livestock Manager Premium — v4.3.0
       </div>
