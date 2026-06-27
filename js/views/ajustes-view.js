@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - AjustesView v1.2.0
  * Vista de Ajustes/Configuración extraída de App.js para modularización.
  * Copia espejo de js/views/ajustes-view.js
@@ -209,7 +209,7 @@ const AjustesView = {
         <h3 class="flex items-center gap-8">${Icons.info()} Información del Sistema</h3>
         <p class="text-gray mt-5 text-85">Estado de la base de datos local y versión de la aplicación.</p>
         <div class="grid grid-cols-2 gap-6 mt-10 text-sm">
-          <div><span class="text-gray">Versión App:</span> <strong class="text-white">v4.6.0</strong></div>
+          <div><span class="text-gray">Versión App:</span> <strong class="text-white">v4.7.0</strong></div>
           <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IndexedDB v10</strong></div>
           <div><span class="text-gray">Fincas:</span> <strong class="text-white">${fincas.length}</strong></div>
           <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
@@ -295,7 +295,7 @@ const AjustesView = {
         <div class="mt-15"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-bold no-underline text-md">📩 soporte.sdogfarm@gmail.com</a></div>
         <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-bold no-underline text-md inline-flex items-center gap-6">🐙 GitHub</a></div>
         <div class="mt-40 text-75 text-444" style="border-top:1px solid #111; padding-top:25px;">
-          © 2026 Livestock Manager Premium · v4.6.0<br>
+          © 2026 Livestock Manager Premium · v4.7.0<br>
           Todos los derechos reservados.
         </div>
       </div>`;
