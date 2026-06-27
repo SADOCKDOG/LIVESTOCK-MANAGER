@@ -205,15 +205,15 @@ const PesajesUI = {
                     </div>
 
                     ${motivo === 'expedicion' && !esModoLeche ? `
-                    <div style="background:rgba(16,185,129,0.1); padding:10px; border-radius:8px; border:1px solid #10b981; flex-shrink: 0;">
-                        <label class="text-75 text-green" style="font-weight:bold;">PRECIO LIQUIDACIÓN (€/kg Canal)</label>
-                        <input type="number" id="w-precio" value="5.50" step="0.01" class="premium-input border-green" style="height:40px; font-size:1.1rem;">
+                    <div class="hint-box-green">
+                        <label class="text-75 text-green font-bold">PRECIO LIQUIDACIÓN (€/kg Canal)</label>
+                        <input type="number" id="w-precio" value="5.50" step="0.01" class="premium-input border-green h-40 text-lg">
                     </div>
                     ` : ''}
 
                     <div style="display:grid; grid-template-columns: 1fr; gap:10px; flex-shrink: 0;">
                         <div><label class="text-tiny text-gray-500">${esModoLeche ? 'FECHA DEL CONTROL' : 'FECHA DE LA PESADA'}</label>
-                        <input type="date" id="w-fecha" value="${new Date().toISOString().split('T')[0]}" class="premium-input" style="height:40px;"></div>
+                        <input type="date" id="w-fecha" value="${new Date().toISOString().split('T')[0]}" class="premium-input h-40"></div>
                     </div>
                 </div>
             </div>

@@ -48,7 +48,7 @@ window.Ayuda = {
     overlay.className = "wizard-full-screen";
     overlay.style.zIndex = "6000";
     overlay.innerHTML = `
-      <div class="wizard-header-fixed flex justify-between items-center" style="border-top: 5px solid #ef4444;">
+      <div class="wizard-header-fixed flex justify-between items-center border-top-5-danger">
         <h2 class="m-0 font-black text-white uppercase tracking-wide" style="font-size: 1.3rem;">📚 Guía Farmacológica</h2>
         <button id="med-close-btn" class="btn-overlay-close font-bold text-red">✖</button>
       </div>
@@ -206,7 +206,7 @@ window.Ayuda = {
     overlay.className = "wizard-full-screen";
     overlay.style.zIndex = "6000";
     overlay.innerHTML = `
-      <div class="wizard-header-fixed flex justify-between items-center" style="border-top: 5px solid #10b981;">
+      <div class="wizard-header-fixed flex justify-between items-center border-top-5-success">
         <h2 class="mt-0 uppercase font-black text-white" style="font-size: 1.3rem; letter-spacing: 1px;">${Icons.libro()} Normativa Crotales</h2>
         <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-overlay-close font-bold text-green">✖</button>
       </div>
@@ -285,7 +285,7 @@ window.Ayuda = {
     overlay.className = "wizard-full-screen";
     overlay.style.zIndex = "6000";
     overlay.innerHTML = `
-      <div class="wizard-header-fixed flex justify-between items-center" style="border-top:5px solid #8b5cf6;">
+      <div class="wizard-header-fixed flex justify-between items-center border-top-5-violet">
         <h2 class="text-white font-black uppercase mt-0" style="font-size:1.3rem; letter-spacing:1px;">${Icons.libro()} Comparativa Normativa CCAA</h2>
         <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-overlay-close text-purple font-bold">✖</button>
       </div>

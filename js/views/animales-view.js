@@ -305,7 +305,7 @@ const AnimalesView = {
             </select>
           </div>
           <div class="mb-12">
-            <label class="wizard-checkbox-container" style="margin-top:5px;">
+            <label class="wizard-checkbox-container mt-5">
               <input type="checkbox" id="a-notificado" ${a.notificado_rega ? 'checked' : ''}>
               <span>Alta comunicada oficialmente a PIGGAN/SIA</span>
             </label>
@@ -375,7 +375,7 @@ const AnimalesView = {
               <div class="badge-crotal-header">COMPAÑEROS DE REBAÑO &mdash; Últ. pesaje</div>
               <div id="tabla-referencia" class="badge-crotal-loading">Cargando...</div>
             </div>
-            <div class="badge-crotal" style="margin-top:15px;">
+            <div class="badge-crotal mt-15">
               <div class="badge-crotal-header">HISTORIAL REPRODUCTIVO</div>
               <div id="tabla-reproduccion" class="badge-crotal-loading">Cargando...</div>
             </div>
