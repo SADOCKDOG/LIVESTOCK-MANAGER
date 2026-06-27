@@ -134,7 +134,7 @@ window.VentaMasivaWizard = {
               if (!gateKeep.gateGestacion) motivos.push('🤰 GEST.');
               tablaFilasHtml += `
               <tr style="background: rgba(220, 38, 38, 0.1); color: #f87171; border-bottom: 1px solid #450a0a;">
-                  <td class="text-center p-14"><input type="checkbox" disabled style="transform: scale(1.5); opacity: 0.3;"></td>
+                  <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg" style="opacity: 0.3;"></td>
                   <td class="font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
                   <td class="p-14">${gateKeep.edadTexto}</td>
@@ -146,7 +146,7 @@ window.VentaMasivaWizard = {
             } else {
               tablaFilasHtml += `
               <tr style="border-bottom: 1px solid #222; color: #fff;">
-                  <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} style="transform: scale(1.5); cursor: pointer;" class="batch-animal-chk"></td>
+                  <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg" style="cursor: pointer;"></td>
                   <td class="text-gold font-bold p-14">${animal.numero_identificacion}</td>
                   <td class="p-14">${animal.raza}</td>
                   <td class="p-14">${gateKeep.edadTexto}</td>
@@ -164,16 +164,16 @@ window.VentaMasivaWizard = {
                   <div class="text-center" style="flex:1; background:#2a0808; border: 2px solid #450a0a; padding:15px; border-radius:16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);"><small class="wizard-label text-red">BLOQUEADOS</small><div class="text-red font-black" style="font-size:2.2rem; margin-top:5px;">${totalBloqueados}</div></div>
               </div>
               <div class="text-center text-xs text-gray mb-10">
-                <span style="margin-right:12px;">👶 Edad mínima</span>
-                <span style="margin-right:12px;">📋 DIB (bovinos)</span>
-                <span style="margin-right:12px;">🤰 Gestación &gt;3 meses</span>
+                <span class="mr-12">👶 Edad mínima</span>
+                <span class="mr-12">📋 DIB (bovinos)</span>
+                <span class="mr-12">🤰 Gestación &gt;3 meses</span>
                 <span>💉 Supresión sanitaria</span>
               </div>
               <div style="flex:1; overflow-y: auto; border: 2px solid #27272a; border-radius: 16px; background: #0a0a0a; min-height:300px;">
                   <table class="w-full text-base" style="border-collapse: collapse;">
                       <thead style="background: #111; position: sticky; top: 0; z-index: 10;">
                           <tr>
-                              <th class="text-center p-12"><input type="checkbox" id="select-all-lote" style="transform: scale(1.5);"></th>
+                              <th class="text-center p-12"><input type="checkbox" id="select-all-lote" class="checkbox-lg"></th>
                               <th class="text-gray p-12">ID OFICIAL</th>
                               <th class="text-gray p-12">RAZA</th>
                               <th class="text-gray p-12">EDAD</th>

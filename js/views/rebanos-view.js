@@ -161,8 +161,8 @@ const RebanosView = {
           <textarea id="r-edit-notas" class="premium-input" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
         </div>
         <div class="flex gap-10 mt-20">
-          <button class="btn btn-secondary btn-danger" onclick="RebanosView._eliminarRebano(${id})" style="flex:1;">${Icons.eliminar()} Eliminar</button>
-          <button class="btn btn-primary btn-success" onclick="RebanosView._guardarRebano(${id})" style="flex:2;">${Icons.guardar()} Guardar</button>
+          <button class="btn btn-secondary btn-danger flex-1" onclick="RebanosView._eliminarRebano(${id})">${Icons.eliminar()} Eliminar</button>
+          <button class="btn btn-primary btn-success flex-2" onclick="RebanosView._guardarRebano(${id})">${Icons.guardar()} Guardar</button>
         </div>
       </div>
       
