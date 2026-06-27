@@ -16,6 +16,7 @@ const LecheView = {
   },
 
   async render() {
+    const main = document.getElementById('app-content');
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
 

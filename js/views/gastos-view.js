@@ -21,6 +21,7 @@ const GastosView = {
   ],
 
   async render() {
+    const main = document.getElementById('app-content');
     // Cargar datos primero
     const gastosRecords = await Gastos.list(await Fincas.getActiveId());
 
