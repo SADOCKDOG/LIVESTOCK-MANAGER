@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Wizard Gasto Analítico
  * Extraído de app.js para modularización (Fase 3)
  */
@@ -48,7 +48,7 @@ window.GastoWizard = {
             <div id="w-g-imputacion-area" class="wizard-panel-dark">
                 <!-- Dinámico -->
             </div>
-            <div id="w-g-cumplimiento-area" class="wizard-panel-darker" style="display:none;">
+            <div id="w-g-cumplimiento-area" class="wizard-panel-darker d-none">
               <div class="wizard-label text-blue mb-8">CONTROL NORMATIVO FITOSANITARIO</div>
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">

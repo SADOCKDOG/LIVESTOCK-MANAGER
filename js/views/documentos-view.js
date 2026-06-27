@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Livestock Manager - DocumentosView v1.0.0
  * Vista de documentos legales: DIMOE, facturas, certificados, DIB.
  */
@@ -44,9 +44,9 @@ const DocumentosView = {
 
     return `
       <div class="grid grid-cols-4 gap-6 mb-14">
-        <div class="info-box-center" style="border-left:3px solid #3b82f6;"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${totalDocs}</div></div>
-        <div class="info-box-center" style="border-left:3px solid #10b981;"><small class="s-lbl">DIMOE</small><div class="inf-val-lg text-green">${porTipo.dimoe || 0}</div></div>
-        <div class="info-box-center" style="border-left:3px solid #f59e0b;"><small class="s-lbl">FACTURAS</small><div class="inf-val-lg text-amber">${porTipo.factura || 0}</div></div>
+        <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${totalDocs}</div></div>
+        <div class="info-box-center border-left-green"><small class="s-lbl">DIMOE</small><div class="inf-val-lg text-green">${porTipo.dimoe || 0}</div></div>
+        <div class="info-box-center border-left-amber"><small class="s-lbl">FACTURAS</small><div class="inf-val-lg text-amber">${porTipo.factura || 0}</div></div>
         <div class="info-box-center" style="border-left:3px solid #8b5cf6;"><small class="s-lbl">DIB</small><div class="inf-val-lg text-purple">${porTipo.dib || 0}</div></div>
       </div>
       <div class="mb-16">
