@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - ComercializacionView v2.0.0
  * Vista de Comercialización unificada con tabs tipo ProduccionView/GastosView.
  * Carne / Leche / Gastos con KPIs, botón registrar, listados filtrados.
@@ -10,6 +10,7 @@ const ComercializacionView = {
   _cachedData: null,
 
   async render(params) {
+    const main = document.getElementById('app-content');
     const tab = (params && params.get ? params.get("tab") : null) || this._currentTab;
     this._currentTab = tab;
 
