@@ -248,7 +248,7 @@ const TrazabilidadView = {
     const totalEventos = timeline.filter(t => t.tipo === 'evento').length;
 
     return `
-      <div class="p-12" style="max-width:100%; box-sizing:border-box;">
+      <div class="p-12 w-full">
         <!-- Cabecera con acciones -->
         <div class="flex items-center gap-8 mb-14 flex-wrap">
           <button onclick="App._navigateBack()" class="btn btn-secondary btn-sm" style="padding:8px 14px;">← Volver</button>
@@ -259,10 +259,10 @@ const TrazabilidadView = {
         <!-- Datos Básicos del Animal -->
         <div class="card p-16 mb-16">
           <div class="flex justify-between items-center mb-10 flex-wrap gap-8">
-            <strong class="text-amber" style="font-size:1.1rem;">${animal.numero_identificacion}</strong>
+            <strong class="text-amber text-lg">${animal.numero_identificacion}</strong>
             <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado}</span>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; font-size:0.85rem;">
+          <div class="traz-meta-grid">
             <div><span class="text-gray">Especie:</span> ${animal.especie || 'N/D'}</div>
             <div><span class="text-gray">Raza:</span> ${animal.raza || 'N/D'}</div>
             <div><span class="text-gray">Sexo:</span> ${animal.sexo || 'N/D'}</div>
@@ -275,11 +275,11 @@ const TrazabilidadView = {
         </div>
 
         <!-- KPIs rápidos -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:8px; margin-bottom:16px;">
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-green text-xl">${totalPesajes}</div><div class="kpi-label" style="font-size:0.6rem;">PESAJES</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-blue text-xl">${totalSanitarios}</div><div class="kpi-label" style="font-size:0.6rem;">TRATAMIENTOS</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-violet text-xl">${totalReproduccion}</div><div class="kpi-label" style="font-size:0.6rem;">REPRODUCCIÓN</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-amber text-xl">${totalEventos}</div><div class="kpi-label" style="font-size:0.6rem;">EVENTOS</div></div>
+        <div class="traz-stats-grid">
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-green text-xl">${totalPesajes}</div><div class="kpi-label text-60">PESAJES</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-blue text-xl">${totalSanitarios}</div><div class="kpi-label text-60">TRATAMIENTOS</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-violet text-xl">${totalReproduccion}</div><div class="kpi-label text-60">REPRODUCCIÓN</div></div>
+          <div class="card p-10 text-center mb-0"><div class="kpi-value text-amber text-xl">${totalEventos}</div><div class="kpi-label text-60">EVENTOS</div></div>
         </div>
 
         <!-- Timeline -->
@@ -287,12 +287,12 @@ const TrazabilidadView = {
           <h3 class="text-white mb-15">${Icons.calendar()} Línea de Vida</h3>
           ${timeline.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.buscar()}</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>` : ''}
           <div id="trazabilidad-timeline" class="relative">
-            <div style="position:absolute; left:18px; top:0; bottom:0; width:2px; background:#333;"></div>
+            <div class="traz-timeline-line"></div>
             ${timeline.map(t => this._renderTimelineItem(t)).join('')}
           </div>
         </div>
 
-        <div class="text-center mt-20" style="padding-bottom:40px;">
+        <div class="text-center mt-20 pb-40">
           <button onclick="App._navigateBack()" class="btn btn-secondary">← Volver al animal</button>
         </div>
       </div>
