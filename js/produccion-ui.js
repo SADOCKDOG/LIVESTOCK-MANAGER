@@ -34,19 +34,19 @@ const ProduccionUI = {
         content: (data) => `
           <div class="prod-options-grid">
             <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'carne'; this.style.borderColor = '#fbbf24';">
-              <span class="prod-opt-icon">⚖️</span>
-              <span class="prod-opt-label">Producción<br>Cárnica (kg)</span>
+              <span class="prod-opt-icon">${Icons.balanza()}</span>
+              <span class="prod-opt-label">Producción<br>Cárnica (KG)</span>
             </button>
             <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'leche'; this.style.borderColor = '#fbbf24';">
-              <span class="prod-opt-icon">🥛</span>
+              <span class="prod-opt-icon">${Icons.leche()}</span>
               <span class="prod-opt-label">Producción<br>Láctea (L)</span>
             </button>
             <button class="wizard-btn-action wizard-btn-danger wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = '#fbbf24';">
-              <span class="prod-opt-icon">🚚</span>
+              <span class="prod-opt-icon">${Icons.transportistas()}</span>
               <span class="prod-opt-label">Venta Masiva<br>Matadero</span>
             </button>
             <button class="wizard-btn-action wizard-btn-option" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'gasto'; this.style.borderColor = '#fbbf24';">
-              <span class="prod-opt-icon">🧾</span>
+              <span class="prod-opt-icon">${Icons.documento()}</span>
               <span class="prod-opt-label">Gasto<br>Analítico</span>
             </button>
           </div>
@@ -86,27 +86,27 @@ const ProduccionUI = {
           if (data.operacion === 'carne') {
             html += `
                 <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
-                  <span class="wizard-sel-icon">👤</span>
-                  <span class="text-md">Pesada Individual (Animal)</span>
+                  <span class="wizard-sel-icon">${Icons.animales()}</span>
+                  <span class="text-md uppercase font-900">Pesada Individual</span>
                 </button>
                 <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
-                  <span class="wizard-sel-icon">🐄</span>
-                  <span class="text-md">Pesaje por Lote (Rebaño)</span>
+                  <span class="wizard-sel-icon">${Icons.rebanos()}</span>
+                  <span class="text-md uppercase font-900">Pesaje por Lote</span>
                 </button>
              `;
           } else if (data.operacion === 'leche') {
             html += `
                 <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
-                  <span class="wizard-sel-icon--sm">👤</span>
-                  <span class="text-md">Control Lechero Individual</span>
+                  <span class="wizard-sel-icon--sm">${Icons.animales()}</span>
+                  <span class="text-md uppercase font-900">Control Individual</span>
                 </button>
                 <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
-                  <span class="wizard-sel-icon--sm">🐄</span>
-                  <span class="text-md">Control Lechero de Lote</span>
+                  <span class="wizard-sel-icon--sm">${Icons.rebanos()}</span>
+                  <span class="text-md uppercase font-900">Control de Lote</span>
                 </button>
                 <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'tanque'; this.style.borderColor = '#fbbf24';">
-                  <span class="wizard-sel-icon--sm">🚛</span>
-                  <span class="text-md">Expedición de Tanque</span>
+                  <span class="wizard-sel-icon--sm">${Icons.transportistas()}</span>
+                  <span class="text-md uppercase font-900">Expedición Tanque</span>
                 </button>
              `;
           }
@@ -133,7 +133,7 @@ const ProduccionUI = {
       {
         content: (data) => `
           <div class="flex flex-col h-full gap-15 mt-10">
-              <input type="text" id="search-entity" placeholder="🔍 Buscar por nombre, raza o crotal..." class="wizard-input">
+              <input type="text" id="search-entity" placeholder="BUSCAR POR NOMBRE, RAZA O CROTAL..." class="wizard-input uppercase font-800">
               <div id="entity-list" class="prod-entity-list">
                   <div class="text-gray text-center p-20">Cargando registros...</div>
               </div>
@@ -168,7 +168,7 @@ const ProduccionUI = {
             });
 
             if (filtered.length === 0) {
-              listEl.innerHTML = `<div class="text-gray text-center p-20">No se encontraron resultados</div>`;
+              listEl.innerHTML = `<div class="text-gray text-center p-20 uppercase font-900 text-xs">No se encontraron resultados</div>`;
               return;
             }
 
@@ -176,17 +176,17 @@ const ProduccionUI = {
               const id = i.id;
               const title = data.tipo_objetivo === 'individual' ? i.numero_identificacion : i.nombre;
               const subtitle = data.tipo_objetivo === 'individual' ? `${i.especie} - ${i.raza}` : `${i.especie} - ${i.tipo}`;
-              const selectedStyle = data.selectedEntityId === id ? 'border-color: #fbbf24;' : 'border-color: #27272a;';
-              const checkStyle = data.selectedEntityId === id ? 'border-color: #fbbf24; background: #d97706; color: white;' : 'border-color: #555; background: transparent; color: transparent;';
+              const selectedStyle = data.selectedEntityId === id ? 'border-color: var(--p-gold); background: rgba(250, 204, 21, 0.05);' : 'border-color: #222;';
+              const checkStyle = data.selectedEntityId === id ? 'border-color: var(--p-gold); background: var(--p-gold); color: #000;' : 'border-color: #444; background: transparent; color: transparent;';
 
               return `
-                      <div class="entity-item card" data-id="${id}" style="padding:15px; border: 2px solid; ${selectedStyle} cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition: all 0.2s;">
+                      <div class="entity-item card" data-id="${id}" style="padding:16px; border: 2px solid; ${selectedStyle} cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition: all 0.2s; margin-bottom:8px;">
                           <div>
-                              <div class="text-white font-black text-lg">${title}</div>
-                              <div class="text-gray text-sm mt-4">${subtitle}</div>
+                              <div class="text-white font-900 text-lg uppercase tracking-tight">${title}</div>
+                              <div class="text-gray text-xs mt-4 uppercase font-800">${subtitle}</div>
                           </div>
-                          <div class="entity-check" style="width:26px; height:26px; border-radius:50%; border:2px solid; ${checkStyle} display:flex; align-items:center; justify-content:center; font-weight:bold;">
-                              ${data.selectedEntityId === id ? '✓' : ''}
+                          <div class="entity-check" style="width:28px; height:26px; border-radius:50%; border:2px solid; ${checkStyle} display:flex; align-items:center; justify-content:center; font-weight:900;">
+                              ${data.selectedEntityId === id ? Icons.check() : ''}
                           </div>
                       </div>
                   `;

@@ -43,18 +43,18 @@ const PesajesUI = {
             if (esModoLeche) {
                 entidades = await Animales.list(rebanoId);
                 entidades = entidades.filter(a => ['h','hembra'].includes((a.sexo||'').toLowerCase()) && ['Vacas','Ovejas','Cabras'].includes(a.especie));
-                titulo = `${Icons.leche()} Control Lechero de Lote`;
+                titulo = `${Icons.leche()} CONTROL LECHERO LOTE`;
                 subtitulo = `${rebano.nombre} | ${rebano.especie} (${rebano.tipo})`;
             } else {
                 entidades = await Animales.list(rebanoId);
-                titulo = motivo === 'expedicion' ? `${Icons.paquete()} Expedición de Lote` : "⚖️ Pesaje de Lote";
+                titulo = motivo === 'expedicion' ? `${Icons.paquete()} EXPEDICIÓN LOTE` : `${Icons.balanza()} PESAJE DE LOTE`;
                 subtitulo = `${rebano.nombre} | ${rebano.especie} (${rebano.tipo})`;
             }
         } else if (animalId) {
             const animal = await Animales.get(animalId);
             entidades = [animal];
             if (esModoLeche) {
-                titulo = `${Icons.leche()} Control Lechero Individual`;
+                titulo = `${Icons.leche()} CONTROL LECHERO INDIVIDUAL`;
                 subtitulo = animal.numero_identificacion;
                 // Para leche individual, filtrar si no es hembra lechera
                 if (!['h','hembra'].includes((animal.sexo||'').toLowerCase()) || !['Vacas','Ovejas','Cabras'].includes(animal.especie)) {
@@ -62,7 +62,7 @@ const PesajesUI = {
                     return;
                 }
             } else {
-                titulo = esAltaNueva ? "⚖️ Pesaje Inicial (Alta)" : "⚖️ Pesaje Individual";
+                titulo = esAltaNueva ? `${Icons.balanza()} PESAJE INICIAL (ALTA)` : `${Icons.balanza()} PESAJE INDIVIDUAL`;
                 subtitulo = animal.numero_identificacion;
             }
 
@@ -131,89 +131,92 @@ const PesajesUI = {
             <div class="wizard-content-scrollable">
                 <div class="flex flex-col gap-15">
                     ${necesitaAsignacion ? `
-                    <div class="pesaje-rebano-box" id="box-assign-rebano">
-                        <label class="text-75 text-gold font-bold d-block mb-5">ASOCIAR A REBAÑO (OBLIGATORIO)</label>
-                        <select id="w-assign-rebano" class="premium-input bg-card border-gold h-45 w-full">
-                            <option value="">-- Seleccionar Destino --</option>
-                            ${rebanosCompatibles.map(r => `<option value="${r.id}">${r.nombre} | 📍 ${r.zonaActual || 'S/N'}</option>`).join('')}
+                    <div class="pesaje-rebano-box p-16" id="box-assign-rebano">
+                        <label class="text-[0.65rem] text-gold font-900 uppercase tracking-widest d-block mb-10">${Icons.rebanos()} ASIGNAR REBAÑO (REQUERIDO)</label>
+                        <select id="w-assign-rebano" class="wizard-input text-lg font-800">
+                            <option value="">-- SELECCIONAR LOTE DESTINO --</option>
+                            ${rebanosCompatibles.map(r => `<option value="${r.id}">${r.nombre} | ${r.zonaActual || 'GENERAL'}</option>`).join('')}
                         </select>
                     </div>
                     ` : `
-                    <div class="bg-card pesaje-info-grid">
-                        <div><span class="text-gray-500">📍 ZONA ACTUAL:</span><br><span class="text-ccc font-bold text-sm">${rebano ? (rebano.zonaActual || 'Finca') : 'Finca'}</span></div>
-                        <div><span class="text-gray-500">🧬 TIPO EXP.:</span><br><span class="text-ccc font-bold text-sm">${rebano ? rebano.tipo : 'Sin clasificar'}</span></div>
+                    <div class="bg-black border border-222 p-12 rounded-sm grid grid-cols-2 gap-10">
+                        <div><span class="text-gray uppercase font-800 text-[0.6rem]">${Icons.zonas()} ZONA ACTUAL:</span><br><span class="text-white font-900 text-sm uppercase">${rebano ? (rebano.zonaActual || 'FINCA GENERAL') : 'FINCA GENERAL'}</span></div>
+                        <div><span class="text-gray uppercase font-800 text-[0.6rem]">${Icons.info()} TIPO LOTE:</span><br><span class="text-white font-900 text-sm uppercase">${rebano ? rebano.tipo : 'SIN CLASIFICAR'}</span></div>
                     </div>
                     `}
 
                     <div class="pesaje-animal-box">
-                         <div class="text-75 text-gray pesaje-animal-label">${esModoLeche ? 'Vaca a Registrar' : 'Animal a Pesar'}</div>
-                         <div id="w-current-crotal" class="pesaje-crotal" style="color:${unidadColor};">--</div>
-                         <div id="w-current-desc" class="text-gray-400 text-base mt-5">--</div>
+                         <div class="text-75 text-gray pesaje-animal-label uppercase font-900 tracking-widest opacity-70">${esModoLeche ? 'Vaca a Registrar' : 'Animal a Pesar'}</div>
+                         <div id="w-current-crotal" class="pesaje-crotal" style="color:var(--p-gold); text-shadow: 0 0 10px rgba(250, 204, 21, 0.2);">--</div>
+                         <div id="w-current-desc" class="text-aaa text-lg font-800 uppercase tracking-tight mt-5">--</div>
 
-                         <div class="mt-15">
+                         <div class="mt-20">
                              <input type="number" id="w-peso-gigante" step="0.1" inputmode="decimal" placeholder="0.0"
-                                    class="pesaje-peso-input" style="border: 3px solid ${unidadColor};">
-                             <div class="pesaje-unidad-label" style="color:${unidadColor};">${unidadLabel}</div>
+                                    class="pesaje-peso-input" style="border: 3px solid ${unidadColor}; box-shadow: inset 0 0 15px ${unidadColor}20;">
+                             <div class="pesaje-unidad-label font-900" style="color:${unidadColor}; letter-spacing: 2px;">${unidadLabel}</div>
                          </div>
 
                          ${esModoLeche ? `
                          <div class="pesaje-leche-grid">
                              <div>
-                                 <label class="text-gray text-60">GRASA (%)</label>
-                                 <input type="number" id="w-leche-grasa" step="0.01" placeholder="3.5" class="premium-input input-sm">
+                                 <label class="text-gray text-[0.6rem] font-900 uppercase">GRASA (%)</label>
+                                 <input type="number" id="w-leche-grasa" step="0.01" placeholder="3.5" class="premium-input text-lg font-800">
                              </div>
                              <div>
-                                 <label class="text-gray text-60">PROTEÍNA (%)</label>
-                                 <input type="number" id="w-leche-proteina" step="0.01" placeholder="3.2" class="premium-input input-sm">
+                                 <label class="text-gray text-[0.6rem] font-900 uppercase">PROTEÍNA (%)</label>
+                                 <input type="number" id="w-leche-proteina" step="0.01" placeholder="3.2" class="premium-input text-lg font-800">
                              </div>
                          </div>
                          ` : ''}
 
-                         <div class="mt-20">
-                             <button id="btn-guardar-peso" class="wizard-btn-action pesaje-guardar-btn" style="background: ${unidadColor}; color: #000; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">${Icons.guardar()} ${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</button>
+                         <div class="mt-25">
+                             <button id="btn-guardar-peso" class="widget-link-btn widget-link-btn--neon ${esModoLeche ? 'neon-warning' : 'neon-success'} w-full max-w-300 mx-auto">
+                                ${Icons.guardar()}
+                                <span class="widget-link-label">${esModoLeche ? 'GUARDAR REGISTRO' : 'GUARDAR PESADA'}</span>
+                             </button>
                          </div>
                     </div>
 
                     ${isLogistico ? `
-                    <div class="card bg-dark border-muted p-12 flex-shrink-0">
-                        <h3 class="text-85 text-gold mb-10">🚛 Datos de Báscula (Logística)</h3>
-                        <div class="pesaje-logis-grid">
-                            <div><label class="text-tiny text-gray">BRUTO (kg)</label>
-                            <input type="number" id="w-bruto" class="premium-input h-40 text-base"></div>
-                            <div><label class="text-tiny text-gray">TARA (kg)</label>
-                            <input type="number" id="w-tara" class="premium-input h-40 text-base"></div>
+                    <div class="card bg-black border-222 p-16 flex-shrink-0">
+                        <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.transportistas()} LOGÍSTICA / BÁSCULA</div>
+                        <div class="grid grid-cols-2 gap-12">
+                            <div><label class="text-[0.65rem] text-gray uppercase font-800">BRUTO (KG)</label>
+                            <input type="number" id="w-bruto" class="premium-input h-50 text-xl font-900"></div>
+                            <div><label class="text-[0.65rem] text-gray uppercase font-800">TARA (KG)</label>
+                            <input type="number" id="w-tara" class="premium-input h-50 text-xl font-900"></div>
                         </div>
-                        <div class="pesaje-logis-grid-2">
-                            <div><label class="text-tiny text-gray">MATRÍCULA</label>
-                            <input type="text" id="w-matricula" class="premium-input h-40 uppercase"></div>
-                            <div class="pesaje-neto-box">
-                                <span class="text-gray-500 text-60">NETO REAL:</span>
-                                <span id="w-neto-display" class="text-green text-lg font-bold">0 kg</span>
+                        <div class="grid grid-cols-2 gap-12 mt-12 items-end">
+                            <div><label class="text-[0.65rem] text-gray uppercase font-800">MATRÍCULA</label>
+                            <input type="text" id="w-matricula" class="premium-input h-45 uppercase font-900"></div>
+                            <div class="bg-black border border-222 p-8 rounded-sm text-right">
+                                <span class="text-gray uppercase font-900 text-[0.55rem] block mb-2">NETO REAL:</span>
+                                <span id="w-neto-display" class="text-green text-2xl font-900 tracking-tighter">0 KG</span>
                             </div>
                         </div>
                     </div>
                     ` : ''}
 
-                    <div class="rounded-10 pesaje-lista-box">
-                        <div class="bg-card text-tiny text-555 pesaje-lista-header">
-                            <span>${esModoLeche ? 'Vaca' : 'Animal'}</span>
-                            <span class="text-right">Anterior</span>
-                            <span class="text-right">Actual</span>
+                    <div class="rounded-10 pesaje-lista-box border-222">
+                        <div class="bg-black text-[0.65rem] text-gray font-900 uppercase tracking-widest p-10 grid grid-cols-[2fr_1fr_1fr] gap-5 border-bottom-222">
+                            <span>ANIMAL / LOTE</span>
+                            <span class="text-right">HISTÓRICO</span>
+                            <span class="text-right">ACTUAL</span>
                         </div>
                         <div id="w-table-body" class="flex-1" style="overflow-y: auto;">
                         </div>
                     </div>
 
                     ${motivo === 'expedicion' && !esModoLeche ? `
-                    <div class="hint-box-green">
-                        <label class="text-75 text-green font-bold">PRECIO LIQUIDACIÓN (€/kg Canal)</label>
-                        <input type="number" id="w-precio" value="5.50" step="0.01" class="premium-input border-green h-40 text-lg">
+                    <div class="card p-16 border-222 bg-black">
+                        <label class="text-[0.65rem] text-green font-900 uppercase tracking-widest d-block mb-10">${Icons.dinero()} PRECIO LIQUIDACIÓN (€/KG CANAL)</label>
+                        <input type="number" id="w-precio" value="5.50" step="0.01" class="premium-input h-50 text-2xl font-900 text-green">
                     </div>
                     ` : ''}
 
-                    <div style="display:grid; grid-template-columns: 1fr; gap:10px; flex-shrink: 0;">
-                        <div><label class="text-tiny text-gray-500">${esModoLeche ? 'FECHA DEL CONTROL' : 'FECHA DE LA PESADA'}</label>
-                        <input type="date" id="w-fecha" value="${new Date().toISOString().split('T')[0]}" class="premium-input h-40"></div>
+                    <div class="grid grid-cols-1 gap-10">
+                        <div><label class="text-[0.65rem] text-gray uppercase font-900 tracking-widest ml-4">${esModoLeche ? 'FECHA DEL CONTROL' : 'FECHA DE LA PESADA'}</label>
+                        <input type="date" id="w-fecha" value="${new Date().toISOString().split('T')[0]}" class="premium-input h-45 font-800"></div>
                     </div>
                 </div>
             </div>
@@ -229,13 +232,13 @@ const PesajesUI = {
                 const tbody = overlay.querySelector('#w-table-body');
                 if (!tbody) return;
                 tbody.innerHTML = entidades.map((a, idx) => `
-                    <div class="batch-item" data-index="${idx}" style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; padding:10px 12px; border-bottom:1px solid #111; background: ${idx === currentAnimalIndex ? '#1a1a1a' : 'transparent'}; border-left: 3px solid ${idx === currentAnimalIndex ? unidadColor : 'transparent'}; cursor:pointer;">
+                    <div class="batch-item" data-index="${idx}" style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; padding:14px 16px; border-bottom:1px solid #111; background: ${idx === currentAnimalIndex ? 'rgba(250, 204, 21, 0.05)' : 'transparent'}; border-left: 4px solid ${idx === currentAnimalIndex ? 'var(--p-gold)' : 'transparent'}; cursor:pointer;">
                         <div>
-                            <div style="font-weight:bold; color:${idx === currentAnimalIndex ? unidadColor : '#ccc'}; font-size:0.85rem;">${a.numero_identificacion}</div>
-                            <div class="text-gray-500" style="font-size:0.6rem;">${a.raza || a.especie}</div>
+                            <div style="font-weight:900; color:${idx === currentAnimalIndex ? 'var(--p-gold)' : '#fff'}; font-size:0.95rem; text-transform:uppercase;">${a.numero_identificacion}</div>
+                            <div class="text-gray uppercase font-800" style="font-size:0.6rem; letter-spacing:0.5px;">${a.raza || a.especie}</div>
                         </div>
-                        <div class="text-gray" style="text-align:right; font-size:0.9rem; align-self: center;">${a.pesoAnterior}</div>
-                        <div style="text-align:right; font-weight:bold; color:${a.pesoActual ? unidadColor : '#444'}; font-size:0.9rem; align-self: center;">${a.pesoActual || '--'}</div>
+                        <div class="text-gray uppercase font-900" style="text-align:right; font-size:0.8rem; align-self: center;">${a.pesoAnterior}</div>
+                        <div style="text-align:right; font-weight:900; color:${a.pesoActual ? unidadColor : '#333'}; font-size:1rem; align-self: center;">${a.pesoActual ? a.pesoActual + unidadAbreviada : '--'}</div>
                     </div>
                 `).join('');
 
@@ -326,7 +329,7 @@ const PesajesUI = {
                         });
 
                         a.pesoActual = val;
-                        window.App.toast(`✅ ${a.numero_identificacion || 'Registro'}  ${val} L`);
+                        window.App.toast(`REGISTRADO: ${a.numero_identificacion || 'Animal'}  ${val} L`);
                     } else {
                         // MODO CARNE
                         const payload = {
@@ -356,7 +359,7 @@ const PesajesUI = {
                         }
 
                         a.pesoActual = val;
-                        window.App.toast(`✅ ${a.numero_identificacion}  ${val} kg`);
+                        window.App.toast(`REGISTRADO: ${a.numero_identificacion}  ${val} kg`);
                     }
 
                     // Avanzar al siguiente si es lote
@@ -369,7 +372,7 @@ const PesajesUI = {
                             if (esModoLote && !esModoLeche) {
                                 window.App.toast(`📦 Lote: ${_pesajesLote.length} animales pesados. Pulsa FINALIZAR para registrar.`);
                             } else {
-                                window.App.toast("Lote completado ✓");
+                                window.App.toast("Lote completado OK");
                             }
                         }
                     } else {
