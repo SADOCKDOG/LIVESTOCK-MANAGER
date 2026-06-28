@@ -646,7 +646,7 @@ const ExplotacionView = {
         <div class="grid grid-cols-3 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">
             ${Icons.agregar()}
-            <span class="widget-link-label">Alimentación</span>
+            <span class="widget-link-label">Aliment.</span>
           </button>
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">
             ${Icons.agregar()}
