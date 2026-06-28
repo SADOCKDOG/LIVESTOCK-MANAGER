@@ -49,6 +49,7 @@ const AjustesView = {
       <!-- ===================== MIS FINCAS ===================== -->
       <div class="card card-left-gold mb-25 p-12">
         <div class="section-header-theme" style="--theme-color: var(--p-gold)">MIS FINCAS</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Gestiona tus explotaciones ganaderas y cambia la finca activa</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="App._showFincaForm()">
             ${Icons.agregar()}
@@ -70,7 +71,7 @@ const AjustesView = {
       <!-- ===================== COPIA DE SEGURIDAD ===================== -->
       <div class="card card-left-blue mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #3b82f6">SEGURIDAD</div>
-        <p class="text-gray mt-5 text-85 text-center">Exporta o importa todos los datos de la aplicación en formato JSON.</p>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Exporta o importa todos los datos de la aplicación en formato JSON</p>
         <div class="grid grid-cols-2 gap-10 mt-10">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App.exportBackup()">
             ${Icons.exportar()}
@@ -90,7 +91,7 @@ const AjustesView = {
       <!-- ===================== PAQUETE LÁCTEO ===================== -->
       <div class="card card-left-amber mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #f59e0b">PAQUETE LÁCTEO</div>
-        <p class="text-gray mt-5 text-85 text-center">Gestión de contratos lácteos obligatorios (RD 752/2016) e INFOLAC.</p>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Gestión de contratos obligatorios (RD 752/2016) e INFOLAC</p>
         ${activeFinca ? `
         <div class="info-box mt-10">
           <div class="grid grid-cols-2 gap-6 text-82">
@@ -111,7 +112,7 @@ const AjustesView = {
       <!-- ===================== ADSG ===================== -->
       <div class="card card-left-blue mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #3b82f6">ADSG</div>
-        <p class="text-gray mt-5 text-85 text-center">Sanidad Ganadera y datos del veterinario de explotación.</p>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Sanidad Ganadera y datos del veterinario de explotación</p>
         ${activeFinca ? `
         <div class="info-box mt-10">
           <div class="grid grid-cols-2 gap-6 text-82">
@@ -134,6 +135,7 @@ const AjustesView = {
       <!-- ===================== CONFIGURACIÓN AUTONÓMICA ===================== -->
       <div class="card card-left-purple mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #8b5cf6">NORMATIVA CCAA</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Normativa activa, plataforma de movimiento y umbrales PAC</p>
         ${activeFinca ? (() => {
           const ccaa = activeFinca.comunidad_autonoma;
           const plataforma = ccaa && window.ComunidadesService ? window.ComunidadesService.getPlataformaMovimiento(ccaa) : null;
@@ -163,9 +165,9 @@ const AjustesView = {
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
-      <div class="card card-left-green mb-20">
-        <h3 class="flex items-center gap-8">${Icons.objetivo()} Objetivos de Explotación</h3>
-        <p class="text-gray mt-5 text-85">Define las metas productivas para el Panel de Eficiencia Técnica (semáforos 🟢🟡🔴).</p>
+      <div class="card card-left-green mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #10b981">OBJETIVOS</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Metas productivas para el Panel de Eficiencia Técnica</p>
         <div class="grid grid-cols-2 gap-6 mt-10">
           <div><label class="text-xs text-gray">GMD Objetivo (kg/día)</label><input type="number" id="obj-gmd" value="${config.objGmd || 0.8}" step="0.1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
           <div><label class="text-xs text-gray">Litros/Vaca/Día Objetivo</label><input type="number" id="obj-litros" value="${config.objLitros || 25}" step="1" class="premium-input input-sm" onchange="AjustesView._guardarObjetivo('objLitros', this.value)"></div>
@@ -179,7 +181,7 @@ const AjustesView = {
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
       <div class="card card-left-amber mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #f59e0b">ESPECIES</div>
-        <p class="text-gray mt-5 text-85 text-center">Gestiona las especies activas en tu explotación.</p>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Gestiona las especies activas y sus parámetros de referencia</p>
         <div id="especies-container" class="mt-10">${this._renderEspecies(config)}</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._agregarEspecie()">
@@ -190,9 +192,9 @@ const AjustesView = {
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
-      <div class="card card-left-red mb-20">
-        <h3 class="flex items-center gap-8">${Icons.campana()} Gestión de Alertas</h3>
-        <p class="text-gray mt-5 text-85">Activa o desactiva los tipos de alerta que quieres recibir en el Dashboard.</p>
+      <div class="card card-left-red mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #ef4444">ALERTAS</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Configuración de notificaciones críticas en el Dashboard</p>
         <div class="grid gap-6 mt-10">
           ${[
             { id: 'alertSanidad', label: 'Alertas Sanitarias (supresión venta)', def: true },
@@ -211,7 +213,7 @@ const AjustesView = {
       <!-- ===================== PREFERENCIAS ===================== -->
       <div class="card card-left-purple mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #8b5cf6">PREFERENCIAS</div>
-        <p class="text-gray mt-5 text-85 text-center">Configura el comportamiento general de la aplicación.</p>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Configura el comportamiento general de la aplicación</p>
         <div class="grid gap-6 mt-10">
           <label class="flex items-center gap-8 text-sm text-gray cursor-pointer checkbox-row">
             <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> Modo Oscuro
@@ -236,6 +238,7 @@ const AjustesView = {
       <!-- ===================== INFORMACIÓN DEL SISTEMA ===================== -->
       <div class="card card-left-gold mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: var(--p-gold)">SISTEMA</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Estado de la base de datos local y versión técnica</p>
         <div class="grid grid-cols-2 gap-6 mt-16 text-sm">
           <div><span class="text-gray uppercase font-800 text-[0.62rem]">Versión:</span> <strong class="text-white">v4.8.5</strong></div>
           <div><span class="text-gray uppercase font-800 text-[0.62rem]">Base Datos:</span> <strong class="text-white">IDB v10</strong></div>
@@ -251,6 +254,7 @@ const AjustesView = {
       <!-- ===================== GESTIÓN DE TRAZABILIDAD ===================== -->
       <div class="card card-left-green mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #10b981">TRAZABILIDAD</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Solicitudes oficiales de remesas de crotales para ADSG</p>
         <div class="grid grid-cols-2 gap-10 mt-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._abrirWizardPedidoCrotales()">
             ${Icons.documento()}
@@ -266,6 +270,7 @@ const AjustesView = {
       <!-- ===================== TRÁMITES SIGGAN ===================== -->
       <div class="card card-left-purple mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #8b5cf6">TRÁMITES OFICIALES</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Guía de movimiento y declaración censal oficial SIGGAN</p>
         <div class="grid grid-cols-3 gap-10 mt-16">
           <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="App._abrirWizardGuiaMovimiento()">
             ${Icons.rotacion()}
@@ -283,9 +288,9 @@ const AjustesView = {
       </div>
 
       <!-- ===================== CATÁLOGOS REGA ===================== -->
-      <div class="card card-left-blue mb-20">
-        <h3 class="flex items-center gap-8">${Icons.libroVentas()} Catálogos REGA</h3>
-        <p class="text-gray mt-5 text-85">Consulta rápida de catálogos normativos expuestos para configuración de explotación y especies.</p>
+      <div class="card card-left-blue mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #3b82f6">CATÁLOGOS REGA</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Catálogos normativos para explotación y especies</p>
         <div class="info-box mt-10">
           <div class="text-xs text-gray mb-6">Tipos explotación (top 5):</div>
           <div class="text-white text-xs">${catalogoTiposREGA.length ? catalogoTiposREGA.join(' · ') : 'No disponible'}</div>
@@ -295,9 +300,9 @@ const AjustesView = {
       </div>
 
       <!-- ===================== HISTORIAL TRÁMITES ===================== -->
-      <div class="card card-left-gold mb-20">
-        <h3 class="flex items-center gap-8">${Icons.documento()} Historial de Trámites</h3>
-        <p class="text-gray mt-5 text-85">Últimos documentos y eventos de tramitación oficial vinculados a la finca activa.</p>
+      <div class="card card-left-gold mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">HISTORIAL</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Últimos documentos y eventos de tramitación oficial</p>
         <div class="info-box mt-10 text-xs">
           <div><span class="text-gray">Documentos legales:</span> <strong class="text-white">${tramitesFinca.length}</strong></div>
           <div><span class="text-gray">Eventos de registro:</span> <strong class="text-white">${eventos.length}</strong></div>
@@ -321,6 +326,7 @@ const AjustesView = {
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
       <div class="card card-left-red mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: #ef4444">FARMACOLOGÍA</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Tiempos de retiro, supresión y dosificación de residuos</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
           <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._mostrarAyudaMedicamentos()">
             ${Icons.sanidad()}
@@ -332,6 +338,7 @@ const AjustesView = {
       <!-- ===================== MANUAL DE USUARIO ===================== -->
       <div class="card card-left-gold mb-20 p-12">
         <div class="section-header-theme" style="--theme-color: var(--p-gold)">AYUDA</div>
+        <p class="text-aaa mt-8 mb-12 text-center uppercase font-900 text-[0.62rem] tracking-widest opacity-80">Guía paso a paso del uso integral de la aplicación</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._abrirManual()">
             ${Icons.libro()}
