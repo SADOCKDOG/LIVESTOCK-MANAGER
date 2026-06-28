@@ -3,420 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compradores · Gestión de Clientes y Contratos · Livestock Manager</title>
+<title>Compradores · Maestros Comerciales · Livestock Manager Premium v4.8.0</title>
 <style>
   :root{
-    --acento:#ef4444; --acento-claro:#f87171; --acento2:#f59e0b;
-    --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
-    --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
+    --acento:#ef4444; --tinta:#1a1a1a; --gris:#555; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
   }
   *{box-sizing:border-box;}
   body{
     font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
   .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
-
   .portada{
     text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#1a1a2e,#2d2d44);
-    color:#fff; border-bottom:6px solid var(--acento-claro);
+    background:linear-gradient(160deg,#1a0a0a,#2d1a1a);
+    color:#fff; border-bottom:6px solid var(--acento);
   }
-  .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a;
-    border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
-  .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
-
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
-    border-left:5px solid var(--acento); padding-left:14px;
-  }
-  h2.lactico{border-left-color:var(--acento2);}
-
-  .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
-    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
-  .fase-tag.lactico{background:var(--acento2);}
-  .fase-tag.wizard{background:#c9851f;}
-  .fase-tag.maestro{background:#6366f1;}
-  .intro-mod{color:var(--gris); margin:8px 0 16px;}
-
+  .portada h1{font-size:2.3rem; margin:18px 0 6px; color:#fca5a5;}
+  h2.modulo{font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px; border-left:5px solid var(--acento); padding-left:14px;}
   ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
   ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
+    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
     background:var(--suave); border-radius:10px; border:1px solid var(--linea);
   }
   ol.pasos > li::before{
     counter-increment:paso; content:counter(paso);
     position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center;
+    background:var(--acento); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
   }
-
-  ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
-  ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
-  ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--acento); font-weight:700;}
-
-  .nota{background:#fff8e8; border-left:4px solid #c9851f; padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#6b5418;}
-  .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#7a241b;}
-  .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#14512f;}
-  .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem;}
-
-  figure{margin:18px 0; text-align:center;}
-  figure img{
-    max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.12);
-  }
-  figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
-
-  .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
-  .seccion:last-child{border-bottom:none;}
-
-  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
-  .indice h3{margin:0 0 14px; color:var(--tinta);}
-  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
-  .indice li{margin-bottom:7px;}
-  .indice a{color:var(--tinta); text-decoration:none;}
-  .indice a:hover{color:var(--acento); text-decoration:underline;}
-
-  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
-  .ruta{color:var(--acento); font-weight:600;}
-  .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
-
-  .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
-    padding:20px 24px; margin:20px 0;}
-  .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
-  .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
-  .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
-  .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
-
-  table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
-  table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
-  table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
-  table.parametros .ok{color:var(--verde); font-weight:700;}
-  table.parametros .alert{color:var(--rojo); font-weight:700;}
-
-  .tabs-ej{display:flex; gap:10px; margin:16px 0; flex-wrap:wrap;}
-  .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
-    border:1px solid var(--linea); cursor:default; white-space:nowrap;}
-  .tab-ej.carnico{background:#fef2f2; color:#b91c1c; border-color:#ef4444;}
-  .tab-ej.lactico{background:#fef9e7; color:#b45309; border-color:#f59e0b;}
-  .tab-ej.hibrido{background:#f0fdf4; color:#166534; border-color:#22c55e;}
-
-  @media print{
-    body{font-size:12px;}
-    .portada{padding:40px 24px;}
-    .seccion{page-break-inside:avoid; padding:18px 0;}
-    figure img{max-width:230px; box-shadow:none;}
-    a{color:var(--tinta) !important; text-decoration:none;}
-    .indice ol{columns:2;}
-  }
+  figure{margin:24px 0; text-align:center;}
+  figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
+  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
+  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
+  .ruta{color:var(--acento); font-weight:700;}
 </style>
 </head>
 <body>
 
 <header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" class="logo-img">
-  <h1>🏢 Compradores</h1>
-  <p class="sub">Gestión de Clientes y Contratos — Guía completa paso a paso</p>
-  <div class="badge">MANUAL PRÁCTICO · Trazabilidad de ventas por comprador</div>
+  <img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;">
+  <h1>🏢 Gestión de Compradores</h1>
+  <p class="sub">Cartera de Clientes y Destinos de Matadero · Guía v4.8.0</p>
+  <div class="badge">MAESTROS COMERCIALES PREMIUM</div>
 </header>
 
 <div class="wrap">
 
   <section class="seccion">
-    <h2 class="modulo">📖 Sobre este manual</h2>
-    <p class="intro-mod">
-      Este manual documenta el <strong>módulo de Compradores</strong> de Livestock Manager.
-      Un comprador es la empresa o persona física a quien se venden los animales (canal) o
-      se entregan producciones de leche. Registrar los compradores es imprescindible para
-      generar albaranes, contratos y para la trazabilidad completa de todas las ventas.
-    </p>
-    <p class="intro-mod">
-      Cada comprador tiene un <strong>tipo</strong> (cárnico, láctico o híbrido) que determina
-      en qué flujos de comercialización aparece, y una ficha con historial de ventas, entregas
-      y contratos vigentes.
-    </p>
-
-    <div class="indice">
-      <h3>📋 Índice</h3>
-      <ol>
-        <li><a href="#acceso">Acceso a Compradores</a></li>
-        <li><a href="#formulario">Formulario de alta</a></li>
-        <li><a href="#tipos">Tipos de comprador</a></li>
-        <li><a href="#venta-masiva">Uso en Venta Masiva</a></li>
-        <li><a href="#albaran-leche">Uso en Albarán de Leche</a></li>
-        <li><a href="#ficha">Ficha de comprador</a></li>
-        <li><a href="#contratos">Contratos</a></li>
-        <li><a href="#ejemplo">Ejemplo con datos demo</a></li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 1. ACCESO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="acceso">
-    <span class="fase-tag">Inicio</span>
-    <h2 class="modulo">1. Acceso a Compradores</h2>
-    <p class="intro-mod">
-      Accede al módulo de compradores desde <span class="ruta">Más → Compradores</span> en la
-      barra de navegación inferior.
-    </p>
-
-    <p>Desde la pantalla principal puedes:</p>
-    <ul>
-      <li>Ver los <strong>KPIs</strong> de compradores activos, ventas de carne y entregas de leche totales</li>
-      <li>Filtrar por tipo de comprador (<strong>Todos / Cárnico / Láctico / Híbrido</strong>)</li>
-      <li>Buscar por nombre, NIF/CIF o ciudad</li>
-      <li><strong>Registrar un nuevo comprador</strong> pulsando <kbd>➕ Nuevo</kbd></li>
-      <li>Pulsar sobre cualquier comprador para ver su ficha detallada</li>
-    </ul>
-
-    <div class="tabs-ej">
-      <span class="tab-ej carnico">🥩 Cárnico</span>
-      <span class="tab-ej lactico">🥛 Láctico</span>
-      <span class="tab-ej hibrido">🔄 Híbrido</span>
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 2. FORMULARIO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="formulario">
-    <span class="fase-tag wizard">Formulario</span>
-    <h2 class="modulo">2. Formulario de alta de comprador</h2>
-    <p class="intro-mod">
-      Se abre pulsando <kbd>➕ Nuevo</kbd> desde la pantalla principal o <kbd>✏️ Editar</kbd>
-      desde la ficha del comprador.
-    </p>
-
-    <h4>Campos del formulario</h4>
-    <table class="parametros">
-      <tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
-      <tr><td><span class="campo">Nombre / Razón Social</span></td><td class="ok">Sí</td><td>Nombre completo de la empresa o autónomo</td></tr>
-      <tr><td><span class="campo">NIF/CIF</span></td><td class="ok">Sí</td><td>Identificación fiscal. Debe ser único en el sistema.</td></tr>
-      <tr><td><span class="campo">Tipo Comprador</span></td><td class="ok">Sí</td><td>Cárnico, Láctico o Híbrido (ver sección 3)</td></tr>
-      <tr><td><span class="campo">Dirección</span></td><td>No</td><td>Dirección postal completa</td></tr>
-      <tr><td><span class="campo">Código Postal</span></td><td>No</td><td>CP de la localidad del comprador</td></tr>
-      <tr><td><span class="campo">Ciudad</span></td><td>No</td><td>Localidad del comprador</td></tr>
-      <tr><td><span class="campo">Provincia</span></td><td>No</td><td>Provincia del comprador</td></tr>
-      <tr><td><span class="campo">Teléfono</span></td><td>No</td><td>Teléfono de contacto</td></tr>
-      <tr><td><span class="campo">Email</span></td><td>No</td><td>Correo electrónico de contacto</td></tr>
-      <tr><td><span class="campo">Condiciones de Pago</span></td><td>No</td><td>Ej: "Pago 30 días", "Pago al contado"</td></tr>
-      <tr><td><span class="campo">Notas</span></td><td>No</td><td>Observaciones adicionales</td></tr>
-      <tr><td><span class="campo">Activo</span></td><td>No</td><td>Checkbox para activar/desactivar el comprador (por defecto: activado)</td></tr>
-    </table>
-
-    <div class="aviso">
-      <strong>El NIF/CIF es único:</strong> no se pueden registrar dos compradores con el mismo
-      NIF/CIF. El sistema lanzará un error si intentas duplicarlo.
-    </div>
-
+    <h2 class="modulo">1. Acceso desde el Menú Más</h2>
+    <p class="intro-mod">Los maestros comerciales se gestionan desde el panel de navegación secundaria.</p>
+    <figure><img src="img/11-menu-mas.png" alt="Menú Más Navegación">
+      <figcaption>Pulsa "Más" en la barra inferior y selecciona el botón "Compradores".</figcaption></figure>
     <ol class="pasos">
-      <li><strong>Pulsa</strong> <kbd>➕ Nuevo</kbd> en la pantalla de Compradores</li>
-      <li><strong>Introduce</strong> el nombre y NIF/CIF (obligatorios)</li>
-      <li><strong>Selecciona</strong> el tipo de comprador en el selector desplegable</li>
-      <li><strong>Rellena</strong> los datos opcionales de contacto y ubicación</li>
-      <li><strong>Pulsa</strong> <kbd>💾 GUARDAR</kbd> para registrar el comprador</li>
+      <li><strong>Navegación</strong>: El acceso a compradores ahora está centralizado junto a proveedores y transportistas.</li>
     </ol>
   </section>
 
-  <!-- ============================================================= -->
-  <!-- 3. TIPOS -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="tipos">
-    <span class="fase-tag">Tipos</span>
-    <h2 class="modulo">3. Tipos de comprador</h2>
-    <p class="intro-mod">
-      El tipo de comprador determina en qué módulos de comercialización aparece disponible
-      para selección. Es importante asignarlo correctamente desde el alta.
-    </p>
-
-    <table class="parametros">
-      <tr><th>Tipo</th><th>Valor interno</th><th>Icono</th><th>Cuándo usarlo</th></tr>
-      <tr>
-        <td><span class="campo">Cárnico</span></td>
-        <td><code>cárnico</code></td>
-        <td>🥩</td>
-        <td>Mataderos, carnicerías mayoristas, cooperativas de carne. El comprador solo adquiere animales para sacrificio.</td>
-      </tr>
-      <tr>
-        <td><span class="campo">Láctico</span></td>
-        <td><code>láctico</code></td>
-        <td>🥛</td>
-        <td>Industrias lácteas, queserías, centrales lecheras. El comprador solo recoge leche.</td>
-      </tr>
-      <tr>
-        <td><span class="campo">Híbrido</span></td>
-        <td><code>híbrido</code></td>
-        <td>🔄</td>
-        <td>Compradores que adquieren tanto animales como leche, o cuando no está claro el tipo. Es el valor por defecto.</td>
-      </tr>
-    </table>
-
-    <div class="tip">
-      <strong>Tip:</strong> Un comprador de tipo <strong>Híbrido</strong> aparece disponible en todos
-      los flujos de comercialización (venta de carne y albarán de leche). Úsalo si el comprador
-      compra en ambos mercados o si aún no lo tienes claro.
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 4. VENTA MASIVA -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="venta-masiva">
-    <span class="fase-tag">Comercialización</span>
-    <h2 class="modulo">4. El comprador en la Venta Masiva (carne)</h2>
-    <p class="intro-mod">
-      En la <strong>Venta Masiva</strong> de animales (<span class="ruta">Registros → Comercialización → Venta Masiva</span>),
-      uno de los pasos del wizard es la selección del <strong>comprador cárnico</strong>.
-    </p>
-
-    <ul>
-      <li>Solo aparecen compradores de tipo <strong>cárnico</strong> o <strong>híbrido</strong></li>
-      <li>El sistema recupera automáticamente el NIF/CIF y la razón social del comprador para incluirlos en el DIMOE</li>
-      <li>Si hay un <strong>contrato de carne</strong> activo con ese comprador, el sistema puede preseleccionar el precio por kg</li>
-      <li>La venta queda registrada en el historial del comprador</li>
-    </ul>
-
-    <div class="nota">
-      <strong>Nota:</strong> Si el comprador que buscas no aparece en el listado de la Venta Masiva,
-      verifica que su tipo sea <strong>cárnico</strong> o <strong>híbrido</strong> y que esté marcado
-      como <strong>activo</strong>.
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 5. ALBARÁN DE LECHE -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="albaran-leche">
-    <span class="fase-tag lactico">Comercialización</span>
-    <h2 class="modulo lactico">5. El comprador en el Albarán de Leche</h2>
-    <p class="intro-mod">
-      En el <strong>Albarán de Leche</strong> (<span class="ruta">Registros → Comercialización → Albarán de Leche</span>),
-      el wizard solicita el comprador láctico al que se entrega la producción.
-    </p>
-
-    <ul>
-      <li>Solo aparecen compradores de tipo <strong>láctico</strong> o <strong>híbrido</strong></li>
-      <li>La matrícula de la cisterna del albarán se puede vincular al transportista registrado</li>
-      <li>Si hay un <strong>contrato de leche</strong> activo, el sistema precarga el precio base por litro</li>
-      <li>Cada entrega queda en el historial del comprador con los datos de laboratorio (grasa, proteína, células somáticas)</li>
-    </ul>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 6. FICHA -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="ficha">
-    <span class="fase-tag maestro">Ficha</span>
-    <h2 class="modulo">6. Ficha de comprador</h2>
-    <p class="intro-mod">
-      Pulsa sobre cualquier comprador en el listado para abrir su ficha detallada.
-    </p>
-
-    <h4>La ficha muestra:</h4>
-    <table class="parametros">
-      <tr><th>Sección</th><th>Contenido</th></tr>
-      <tr><td><span class="campo">KPIs</span></td><td>Ventas de carne (nº y kg canal), entregas de leche (nº y litros), contratos activos</td></tr>
-      <tr><td><span class="campo">Datos de contacto</span></td><td>NIF, dirección, teléfono, email, condiciones de pago</td></tr>
-      <tr><td><span class="campo">Historial ventas carne</span></td><td>Lista de todas las ventas de carne realizadas a este comprador, con fecha, animal, peso y precio</td></tr>
-      <tr><td><span class="campo">Historial entregas leche</span></td><td>Lista de todas las entregas de leche, con fecha, litros, analítica y precio final</td></tr>
-      <tr><td><span class="campo">Contratos</span></td><td>Contratos activos e históricos con precios y condiciones</td></tr>
-    </table>
-
-    <div class="tip">
-      <strong>Tip:</strong> Los KPIs de la ficha se calculan en tiempo real a partir de todos los
-      registros de comercialización. Son útiles para negociar condiciones con el comprador o para
-      justificar precios ante la administración.
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 7. CONTRATOS -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="contratos">
-    <span class="fase-tag">Contratos</span>
-    <h2 class="modulo">7. Contratos con compradores</h2>
-    <p class="intro-mod">
-      Los contratos permiten fijar condiciones de precio y pago con un comprador para un
-      período determinado. Se gestionan desde la ficha del comprador.
-    </p>
-
-    <h4>Campos de un contrato</h4>
-    <table class="parametros">
-      <tr><th>Campo</th><th>Descripción</th></tr>
-      <tr><td><span class="campo">Número de contrato</span></td><td>Referencia interna del contrato (ej: CT-2026-001)</td></tr>
-      <tr><td><span class="campo">Tipo</span></td><td><code>carne</code> o <code>leche</code></td></tr>
-      <tr><td><span class="campo">Fecha inicio / fin</span></td><td>Período de vigencia del contrato</td></tr>
-      <tr><td><span class="campo">IVA (%)</span></td><td>Tipo de IVA aplicable (habitualmente 10%)</td></tr>
-      <tr><td><span class="campo">Retención REAGP (%)</span></td><td>Retención del Régimen Especial Agrario</td></tr>
-      <tr><td><span class="campo">Condiciones</span></td><td>Texto libre de condiciones de pago</td></tr>
-      <tr><td><span class="campo">Precios</span></td><td>Lista de precios por producto y unidad (ej: cordero cebo a 6,50 €/kg)</td></tr>
-    </table>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 8. EJEMPLO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="ejemplo">
-    <span class="fase-tag">Ejemplo</span>
-    <h2 class="modulo">8. Ejemplo con la demo CHAMORRO</h2>
-    <p class="intro-mod">
-      La demo <strong>CHAMORRO</strong> incluye 3 compradores precargados que ilustran los
-      tres tipos disponibles:
-    </p>
-
-    <div class="panel-ejemplo">
-      <h4>📐 Compradores de la demo CHAMORRO</h4>
-      <table>
-        <tr><th>Nombre</th><th>NIF/CIF</th><th>Tipo</th><th>Ciudad</th><th>Provincia</th></tr>
-        <tr><td>Cárnicas Extremeñas SL</td><td>B98765432</td><td>🥩 cárnico</td><td>Mérida</td><td>Badajoz</td></tr>
-        <tr><td>Lácteos La Serena SA</td><td>A87654321</td><td>🥛 láctico</td><td>Don Benito</td><td>Badajoz</td></tr>
-        <tr><td>Ganados del Oeste SL</td><td>B76543210</td><td>🔄 híbrido</td><td>Cáceres</td><td>Cáceres</td></tr>
-      </table>
-    </div>
-
-    <p>En la demo:</p>
-    <ul>
-      <li><strong>Cárnicas Extremeñas SL</strong> aparece en la Venta Masiva del ternero vendido (DIMOE ALB-2025-0007)</li>
-      <li><strong>Lácteos La Serena SA</strong> aparece en las 3 entregas de leche registradas (cisterna matrícula 5678EFG)</li>
-      <li>Ambos tienen contratos activos (CT-XXXX-001 de carne y CT-XXXX-002 de leche)</li>
-      <li><strong>Ganados del Oeste SL</strong> es un ejemplo de comprador híbrido sin transacciones aún</li>
-    </ul>
-
-    <div class="nota">
-      <strong>Nota sobre teléfonos:</strong> Los teléfonos de la demo (+34 924 111 222, +34 924 333 444,
-      +34 927 555 666) son ficticios. Sustitúyelos por los reales al crear tu propia explotación.
-    </div>
-  </section>
-
-  <section class="seccion" id="capturas">
-    <span class="fase-tag">Capturas</span>
-    <h2 class="modulo">9. Capturas reales en app (demo CHAMORRO)</h2>
-    <p class="intro-mod">
-      Secuencia visual completa del flujo de compradores con datos reales de la demo.
-    </p>
-
-    <figure><img src="img/compr/compr-01.png" alt="Listado de compradores"><figcaption>Compr-01 · Listado de compradores</figcaption></figure>
-    <figure><img src="img/compr/compr-02.png" alt="Alta de comprador"><figcaption>Compr-02 · Apertura de formulario de alta</figcaption></figure>
-    <figure><img src="img/compr/compr-03.png" alt="Formulario comprador"><figcaption>Compr-03 · Formulario de comprador</figcaption></figure>
-    <figure><img src="img/compr/compr-04.png" alt="Ficha comprador carnico"><figcaption>Compr-04 · Ficha de Cárnicas Extremeñas</figcaption></figure>
-    <figure><img src="img/compr/compr-05.png" alt="Historial de ventas comprador"><figcaption>Compr-05 · Historial de ventas por comprador</figcaption></figure>
-    <figure><img src="img/compr/compr-06.png" alt="Ficha comprador lacteo"><figcaption>Compr-06 · Ficha de Lácteos La Serena</figcaption></figure>
-    <figure><img src="img/compr/compr-07.png" alt="Contratos del comprador"><figcaption>Compr-07 · Contratos asociados</figcaption></figure>
-    <figure><img src="img/compr/compr-08.png" alt="Kpis de compradores"><figcaption>Compr-08 · KPIs y resumen de compradores</figcaption></figure>
+  <section class="seccion">
+    <h2 class="modulo">2. Listado de Clientes</h2>
+    <p class="intro-mod">Administra tus contactos comerciales y visualiza su historial.</p>
+    <figure><img src="img/18-compradores-lista.png" alt="Lista Compradores">
+      <figcaption>Listado de compradores con tarjetas de contacto rápido.</figcaption></figure>
+    <ol class="pasos">
+      <li><strong>Alta de Comprador</strong>: Pulsa <kbd>➕ Nuevo</kbd> para registrar un cliente (NIF, Razón Social, Teléfono).</li>
+      <li><strong>Tipo de Cliente</strong>: Clasifícalos como Cárnico, Lácteo o Híbrido para que aparezcan en los wizards de venta correspondientes.</li>
+      <li><strong>Historial de Ventas</strong>: Pulsa sobre un comprador para ver cuántos animales le has vendido y el importe total facturado.</li>
+    </ol>
   </section>
 
   <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v4.7.0 · Manual de Compradores · Gestión de Clientes y Contratos
+    Livestock Manager Premium · v4.8.0 · Guía de Compradores
   </div>
 
 </div>
