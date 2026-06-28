@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.8.1] - 2026-06-29
+### Fixed
+- **Crash al compartir en Android 13/14:** corregido cierre inesperado de la aplicación al intentar compartir exportaciones (PDF, Excel, Informe general) en dispositivos con Android 13 (API 33) y Android 14 (API 34).
+  - `SecurityException`: se especifica ahora `RECEIVER_EXPORTED` al registrar el `BroadcastReceiver` del plugin de compartir, requerido por Android 13+.
+  - `IllegalArgumentException`: se usa un `Intent` explícito con `setPackage()` en el `PendingIntent` del chooser de compartir, evitando el conflicto entre `FLAG_MUTABLE` y `FLAG_IMMUTABLE` en Android 14+.
+
 ## [v4.5.3] - 2026-06-23
 ### Added
 - **Trazabilidad individual:** la línea de tiempo del animal muestra ahora todos los datos del libro de tratamientos veterinarios (motivo, vía de administración, nº de animales tratados, lote, caducidad, veterinario prescriptor con nº colegiado y nº de receta).
