@@ -452,15 +452,15 @@ const ExplotacionView = {
           <div class="grid grid-cols-3 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
               ${Icons.agregar()}
-              <span class="widget-link-label-sm">Registrar<br>Peso (kg)</span>
+              <span class="widget-link-label">Peso (kg)</span>
             </button>
             <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
               ${Icons.agregar()}
-              <span class="widget-link-label-sm">Registrar<br>Ordeño (L)</span>
+              <span class="widget-link-label">Ordeño (L)</span>
             </button>
             <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
               ${Icons.sanidad()}
-              <span class="widget-link-label-sm">Tratamiento<br>(Mixto)</span>
+              <span class="widget-link-label">Tratamiento</span>
             </button>
           </div>
         </div>
@@ -608,7 +608,8 @@ const ExplotacionView = {
         <div class="mt-10 flex flex-col items-center gap-3">
           <div class="text-[0.65rem] uppercase font-extrabold tracking-wider pt-2 text-center section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%;">⚡ ACCIÓN DE CARGA</div>
           <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${borderStyleColor}; --neon-glow: ${borderStyleColor}B0; --neon-inner: ${borderStyleColor}40; width: 100%; max-width: 120px;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-            ${Icons.agregar()} <span class="widget-link-label-xs">Carga/Consumo</span>
+            ${Icons.agregar()}
+            <span class="widget-link-label">Carga/Consumo</span>
           </button>
         </div>
       </div>
@@ -645,15 +646,15 @@ const ExplotacionView = {
         <div class="grid grid-cols-3 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">
             ${Icons.agregar()}
-            <span class="widget-link-label-xs">Gasto Aliment.</span>
+            <span class="widget-link-label">Alimentación</span>
           </button>
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">
             ${Icons.agregar()}
-            <span class="widget-link-label-xs">Gasto Energía</span>
+            <span class="widget-link-label">Energía</span>
           </button>
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')">
             ${Icons.agregar()}
-            <span class="widget-link-label-xs">Gasto Fito.</span>
+            <span class="widget-link-label">Fitosanitario</span>
           </button>
         </div>
         <div class="mt-10 text-xs text-aaa">
