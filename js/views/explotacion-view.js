@@ -44,7 +44,9 @@ const ExplotacionView = {
 
     this._activeMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('explotacion', rebanos)
-      : (this._activeMode || 'carne');
+      : (this._activeMode || 'leche');
+
+    if (this._activeMode === 'hibrido') this._activeMode = 'leche';
 
     const rebanosIds = rebanos.map(r => r.id);
     const rebanosCarne = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'carne') : rebanos;
@@ -245,7 +247,7 @@ const ExplotacionView = {
 
         <!-- PANEL DE ACCIONES -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme">ACCIONES</div>
+          <div class="section-header-theme">ACCIONES DE REGISTRO</div>
           <div class="grid grid-cols-2 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
               ${Icons.agregar()}
@@ -328,8 +330,8 @@ const ExplotacionView = {
         </div>
 
         <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-16">
-          <div class="text-xs uppercase font-extrabold tracking-wider mb-8 text-center section-header-theme">ACCIONES DE REGISTRO</div>
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+          <div class="section-header-theme">ACCIONES DE REGISTRO</div>
           <div class="grid grid-cols-2 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
               ${Icons.agregar()}
@@ -451,7 +453,7 @@ const ExplotacionView = {
 
         <!-- PANEL DE ACCIONES -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme">ACCIONES</div>
+          <div class="section-header-theme">ACCIONES DE REGISTRO</div>
           <div class="grid grid-cols-3 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
               ${Icons.agregar()}
