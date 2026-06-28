@@ -3,7 +3,7 @@
  * Bloque consolidado de Ganadería con modo independiente (carne/leche/híbrido).
  */
 const GanaderiaView = {
-  _activeMode: 'carne',
+  _activeMode: 'leche',
   _cache: null,
 
   async render() {
@@ -35,11 +35,14 @@ const GanaderiaView = {
     const especies = new Set(animalesModo.map(a => (a.especie || '').toLowerCase()).filter(Boolean));
 
     this._cache = { rebanos, animales, zonas, rebanosModo, animalesModo };
-    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: '🥩', label: 'Cárnico', color: '#ef4444' };
+    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: '#ef4444' };
+
+    // Sincronizar color de cabecera con el modo activo
+    if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
     main.innerHTML = `
-      <div class="mb-14 mt-4 card p-10 border-222 card-dark-gradient">
-        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center section-header-neon" style="--neon-color: #facc15;">⚡ ACCESO A OTROS MÓDULOS</div>
+      <div class="mb-16 mt-4 card p-12 border-222 card-dark-gradient pb-24">
+        <div class="section-header-neon" style="--neon-color: #facc15;">MÓDULOS</div>
         <div class="grid grid-cols-3 gap-10">
           <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
             ${Icons.animales()}
@@ -56,8 +59,8 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="mb-14 text-center">
-        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center mx-auto section-header-neon" style="--neon-color: ${meta.color}; max-width: 360px;">⚡ TIPO EXPLOTACIÓN</div>
+      <div class="mb-16 text-center">
+        <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 360px; margin: 0 auto;">EXPLOTACIÓN</div>
         <div class="ganaderia-mode-switch">
           <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
           <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>

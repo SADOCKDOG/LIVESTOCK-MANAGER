@@ -5,7 +5,7 @@
  */
 
 const ExplotacionView = {
-  _activeMode: null, // 'carne' | 'leche' | 'hibrido'
+  _activeMode: 'leche', // default
   _cachedData: null,
 
   _fmtFecha(dateStr) {
@@ -180,12 +180,15 @@ const ExplotacionView = {
       proConsolidada
     };
 
+    // Sincronizar color de cabecera con el modo activo
+    if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
+
     // Renderizar cabecera con TRES BOTONES ARRIBA
     const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444');
     main.innerHTML = `
       <!-- Selector de Modo ExPro Superior -->
-      <div class="mb-14 text-center">
-        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center mx-auto section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px;">⚡ TIPO EXPLOTACIÓN</div>
+      <div class="mb-16 text-center">
+        <div class="section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
         <div class="expro-mode-switch">
           <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
           <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
@@ -241,8 +244,8 @@ const ExplotacionView = {
         </div>
 
         <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-14 border-222 card-dark-gradient border-top-theme">
-          <div class="text-xs uppercase font-extrabold tracking-wider mb-6 text-center section-header-theme">⚡ ACCIONES DE REGISTRO</div>
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+          <div class="section-header-theme">ACCIONES</div>
           <div class="grid grid-cols-2 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
               ${Icons.agregar()}
@@ -325,12 +328,12 @@ const ExplotacionView = {
         </div>
 
         <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-14 border-222 card-dark-gradient border-top-theme">
-          <div class="text-xs uppercase font-extrabold tracking-wider mb-6 text-center section-header-theme">⚡ ACCIONES DE REGISTRO</div>
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-16">
+          <div class="text-xs uppercase font-extrabold tracking-wider mb-8 text-center section-header-theme">ACCIONES DE REGISTRO</div>
           <div class="grid grid-cols-2 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
               ${Icons.agregar()}
-              <span class="widget-link-label">Ordeño (L)</span>
+              <span class="widget-link-label">Control (L)</span>
             </button>
             <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
               ${Icons.sanidad()}
@@ -447,8 +450,8 @@ const ExplotacionView = {
         </div>
 
         <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-14 border-222 card-dark-gradient border-top-theme">
-          <div class="text-xs uppercase font-extrabold tracking-wider mb-6 text-center section-header-theme">⚡ ACCIONES DE REGISTRO (HÍBRIDO)</div>
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+          <div class="section-header-theme">ACCIONES</div>
           <div class="grid grid-cols-3 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
               ${Icons.agregar()}
@@ -593,7 +596,7 @@ const ExplotacionView = {
       html += `
         <div class="text-75">
           <div class="flex justify-between font-bold mb-4">
-            <span class="text-ccc">🌾 ${s.nombre}</span>
+            <span class="text-ccc">${s.nombre}</span>
             <span class="text-white">${actual.toLocaleString()} / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
           </div>
           <div class="silo-bar">
@@ -606,10 +609,9 @@ const ExplotacionView = {
     html += `
         </div>
         <div class="mt-10 flex flex-col items-center gap-3">
-          <div class="text-[0.65rem] uppercase font-extrabold tracking-wider pt-2 text-center section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%;">⚡ ACCIÓN DE CARGA</div>
-          <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-            ${Icons.agregar()}
-            <span class="widget-link-label">Carga/Consumo</span>
+          <div class="section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%;">ALMACÉN</div>
+          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${borderStyleColor}; --neon-glow: ${borderStyleColor}B0; --neon-inner: ${borderStyleColor}40; width: 100%; max-width: 140px;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+            ${Icons.agregar()} <span class="widget-link-label">Carga/Consumo</span>
           </button>
         </div>
       </div>
@@ -642,7 +644,7 @@ const ExplotacionView = {
             <div class="font-900 text-white">${(d.totalGastosFito || 0).toLocaleString()} €</div>
           </div>
         </div>
-        <div class="text-xs uppercase font-extrabold tracking-wider mb-6 pt-2 text-center section-header-neon" style="--neon-color: ${color};">⚡ ACCIONES DE GASTOS</div>
+        <div class="section-header-neon" style="--neon-color: ${color};">GASTOS</div>
         <div class="grid grid-cols-3 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">
             ${Icons.agregar()}

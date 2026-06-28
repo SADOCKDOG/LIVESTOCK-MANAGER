@@ -106,8 +106,8 @@ const DashboardView = {
       <div class="card card-accent mt-10">
         <h3 class="text-center text-white text-2xl mb-20">${finca.nombre || 'Resumen Ganadero'}</h3>
         <div class="summary-table-grid">
-          <div class="summary-cell c-bo"><div class="s-lbl">ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl">REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
+          <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.zonas()} ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
+          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.rebanos()} REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
           <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.animales()} CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
           <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.check()} ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
           <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.paquete()} VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
@@ -253,13 +253,21 @@ const DashboardView = {
         </h3>
         <div class="flex flex-column gap-10 mt-15">
           ${alertas.slice(0, 4).map(a => {
-            const icono = a.seccion === 'contrato_lacteo' ? '📄' : a.seccion === 'infolac' ? '📊' : a.seccion === 'pac' ? '🌾' : a.seccion === 'adsg' ? '🛡️' : '📌';
+            let iconoSVG = Icons.info();
+            if (a.seccion === 'contrato_lacteo') iconoSVG = Icons.contratos();
+            else if (a.seccion === 'infolac') iconoSVG = Icons.grafico();
+            else if (a.seccion === 'pac') iconoSVG = Icons.pac();
+            else if (a.seccion === 'adsg') iconoSVG = Icons.veterinario();
+
             return `
             <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : a.urgencia === 'amarillo' ? 'amber' : 'green'}">
               <div class="flex justify-between items-start">
-                <div>
-                  <div class="text-white font-bold text-base">${icono} ${a.mensaje}</div>
-                  ${a.accion ? `<div class="text-violet text-xs mt-4">💡 ${a.accion}</div>` : ''}
+                <div class="flex items-center gap-8">
+                  <span class="text-purple">${iconoSVG}</span>
+                  <div>
+                    <div class="text-white font-bold text-base">${a.mensaje}</div>
+                    ${a.accion ? `<div class="text-violet text-xs mt-4">💡 ${a.accion}</div>` : ''}
+                  </div>
                 </div>
                 ${a.diasRestantes != null ? `<div class="text-right">
                   <div class="text-red font-black text-lg">${a.diasRestantes}d</div>

@@ -7,11 +7,11 @@ const ModoContextoHelper = {
 
   getModeMeta(mode) {
     const map = {
-      carne: { icon: '🥩', label: 'Cárnico', color: '#ef4444' },
-      leche: { icon: '🥛', label: 'Lácteo', color: '#3b82f6' },
-      hibrido: { icon: '🔄', label: 'Híbrido', color: '#10b981' }
+      carne: { icon: Icons.carne(), label: 'Cárnico', color: '#ef4444' },
+      leche: { icon: Icons.leche(), label: 'Lácteo', color: '#3b82f6' },
+      hibrido: { icon: Icons.rotacion(), label: 'Híbrido', color: '#10b981' }
     };
-    return map[mode] || map.carne;
+    return map[mode] || map.leche;
   },
 
   detectModeFromRebanos(rebanos) {
@@ -26,9 +26,10 @@ const ModoContextoHelper = {
       else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
     });
 
-    if (tieneHibrido || (tieneCarne && tieneLeche)) return 'hibrido';
-    if (tieneLeche) return 'leche';
-    return 'carne';
+    // Prioridad Lácteo sobre Híbrido por defecto
+    if (tieneLeche || tieneHibrido || (tieneCarne && tieneLeche)) return 'leche';
+    if (tieneCarne) return 'carne';
+    return 'leche';
   },
 
   _matchTipoByMode(tipo, mode) {

@@ -146,7 +146,7 @@ const App = {
    * Header contextual: título de vista + botón de volver según la ruta actual.
    */
   _headerTitles: {
-    '/': '',
+    '/': 'Inicio',
     '/ganaderia': 'Ganadería',
     '/rebanos': 'Rebaños',
     '/rebano': 'Ficha Rebaño',
@@ -157,9 +157,9 @@ const App = {
     '/zona': 'Ficha Zona',
     '/animales': 'Animales',
     '/animal': 'Ficha Animal',
-    '/leche': 'Control Lechero',
+    '/leche': 'Leche',
     '/gastos': 'Gastos',
-    '/comercializacion': 'Comercialización',
+    '/comercializacion': 'Comercial',
     '/albaran-leche': 'Albarán Lácteo',
     '/gasto': 'Detalle Gasto',
     '/informes': 'Informes',
@@ -172,7 +172,7 @@ const App = {
     '/transportistas': 'Transportistas',
     '/trazabilidad': 'Trazabilidad 360°',
     '/cuaderno': 'Cuaderno Digital',
-    '/documentos': 'Documentos Legales',
+    '/documentos': 'Documentos DIMOE',
     '/manuales': 'Manuales',
   },
 
@@ -236,10 +236,54 @@ const App = {
   },
 
   _updateHeaderContext(path) {
-    const title = this._headerTitles[path] ?? '';
     const titleEl = document.getElementById('header-view-title');
     const backBtn = document.getElementById('header-back-btn');
-    if (titleEl) titleEl.textContent = title;
+
+    // Mapeo de rutas a iconos SVG (Normalización Visual)
+    const headerIcons = {
+      '/': Icons.home(),
+      '/ganaderia': Icons.rebanos(),
+      '/rebanos': Icons.rebanos(),
+      '/rebano': Icons.rebanos(),
+      '/carne': Icons.carne(),
+      '/hibrido': Icons.rotacion(),
+      '/explotacion': Icons.dashboard(),
+      '/zonas': Icons.zonas(),
+      '/zona': Icons.zonas(),
+      '/animales': Icons.animales(),
+      '/animal': Icons.animales(),
+      '/leche': Icons.leche(),
+      '/gastos': Icons.gastos(),
+      '/comercializacion': Icons.comercial(),
+      '/albaran-leche': Icons.leche(),
+      '/gasto': Icons.gastos(),
+      '/informes': Icons.informes(),
+      '/ajustes': Icons.ajustes(),
+      '/compradores': Icons.compradores(),
+      '/comprador': Icons.compradores(),
+      '/proveedores': Icons.proveedores(),
+      '/proveedor': Icons.proveedores(),
+      '/contrato': Icons.contratos(),
+      '/transportistas': Icons.transportistas(),
+      '/trazabilidad': Icons.trazabilidad(),
+      '/cuaderno': Icons.cuaderno(),
+      '/documentos': Icons.documento(),
+      '/manuales': Icons.libro(),
+    };
+
+    if (titleEl) {
+      // Normalizamos: se muestra el icono SVG y el nombre exacto contenido en un marco
+      const icon = headerIcons[path] || Icons.home();
+      const titleText = this._headerTitles[path] || 'Livestock';
+
+      titleEl.innerHTML = `
+        <div class="header-banner-frame">
+          <div class="header-banner-icon">${icon}</div>
+          <div class="header-banner-text">${titleText}</div>
+        </div>
+      `;
+    }
+
     if (backBtn) {
       if (this._routesConVolver.has(path)) {
         backBtn.classList.add('visible');
@@ -247,6 +291,20 @@ const App = {
         backBtn.classList.remove('visible');
       }
     }
+
+    // Resetear color de cabecera al navegar (por defecto oro)
+    this.updateHeaderColor(null);
+  },
+
+  /** Actualiza el color neon de la cabecera según el modo de explotación */
+  updateHeaderColor(mode) {
+    const colorMap = {
+      carne: '#ef4444',
+      leche: '#3b82f6',
+      hibrido: '#10b981'
+    };
+    const color = colorMap[mode] || '#f3c14b'; // Oro por defecto
+    document.documentElement.style.setProperty('--header-neon-color', color);
   },
 
   /**

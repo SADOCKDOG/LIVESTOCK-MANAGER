@@ -170,20 +170,55 @@ header {
     align-items: center;
     gap: 6px;
     transition: opacity 0.2s ease;
+    height: 100%;
 }
 #header-view-title {
-    font-size: 1.02rem;
-    font-weight: 900;
-    color: #f3c14b;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-    flex: 1;
-    text-shadow: 0 0 10px rgba(243,193,75,0.55), 0 0 2px rgba(243,193,75,0.8), 0 1px 2px rgba(0,0,0,0.7);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
 }
+.header-banner-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 12px 4px;
+    border-bottom: 2px solid var(--header-neon-color, #f3c14b);
+    box-shadow: 0 5px 15px -3px var(--header-neon-color, rgba(243,193,75,0.6));
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+.header-banner-icon .icon {
+    width: 18px;
+    height: 18px;
+    margin-bottom: 2px;
+    filter: drop-shadow(0 0 5px var(--header-neon-color, #f3c14b));
+}
+.header-banner-text {
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(0,0,0,0.8);
+}
+#header-back-btn {
+    background: none;
+    border: none;
+    color: #f3c14b;
+    font-size: 1.4rem;
+    padding: 8px 4px;
+    cursor: pointer;
+    display: none;
+    z-index: 20;
+}
+#header-back-btn.visible { display: block; }
 #header-back-btn {
     background: none;
     border: 1px solid #333;
@@ -387,7 +422,7 @@ nav.bottom-nav {
 
 /* Dashboard Grids */
 .summary-table-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
-.summary-cell { background: #1a1a1a; padding: 15px 10px; border-radius: 16px; border: 1px solid #333; }
+.summary-cell { background: #1a1a1a; padding: 15px 10px; border-radius: 16px; border: 1px solid #333; text-align: center; }
 .summary-cell-kpi { padding: 10px 6px; text-align: center; }
 .s-lbl { font-size: 0.7rem; color: #888; margin-bottom: 5px; font-weight: 800; }
 .s-val { font-size: 1.5rem; font-weight: 900; color: #fff; }
@@ -2527,18 +2562,24 @@ label {
 
 /* section header neon — usa --neon-color inline para color dinámico */
 .section-header-neon {
+  font-size: 0.85rem; font-weight: 900;
+  padding: 12px 10px;
   letter-spacing: 1.5px;
   color: var(--neon-color, var(--p-gold));
   text-shadow: 0 0 12px var(--neon-color, var(--p-gold));
   border-top: 3px solid var(--neon-color, var(--p-gold));
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  text-transform: uppercase;
 }
 /* section header usando --theme-color del contenedor padre */
 .section-header-theme {
+  font-size: 0.85rem; font-weight: 900;
+  padding-bottom: 12px;
   letter-spacing: 1.5px;
   color: var(--theme-color, var(--p-gold));
   text-shadow: 0 0 12px var(--theme-color, var(--p-gold));
+  text-transform: uppercase;
 }
 
 /* mode switch container para ExplotacionView */
@@ -2573,11 +2614,17 @@ label {
 .widget-link-label,
 .widget-link-label-sm,
 .widget-link-label-xs {
-  font-size: 0.82rem; font-weight: 700;
-  color: var(--text-p);
-  text-align: center; line-height: 1.2;
+  font-size: 0.8rem; font-weight: 800;
+  color: #ffffff !important;
+  text-align: center !important;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
   overflow-wrap: break-word;
   word-break: break-word;
+  margin-top: 4px;
+  display: block;
+  width: 100%;
 }
 
 /* === PDF loader overlay widget === */
