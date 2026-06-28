@@ -22,11 +22,13 @@ const GanaderiaView = {
     // Se excluyen las zonas anuladas, igual que en ZonasView.
     const zonas = (fincaActiva?.zonas || []).filter(z => z && !z.anulada);
 
-    this._activeMode = window.ModoContextoHelper
+    const savedMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('ganaderia', rebanos)
       : 'leche';
 
-    if (this._activeMode === 'hibrido') this._activeMode = 'leche';
+    // Si ya tenemos un modo activo (por click manual), lo mantenemos.
+    // Si no (primera carga), usamos el guardado/detectado.
+    this._activeMode = this._activeMode || savedMode;
 
     const rebanosModo = window.ModoContextoHelper
       ? ModoContextoHelper.filterRebanosByMode(rebanos, this._activeMode)
@@ -121,17 +123,29 @@ const GanaderiaView = {
         </div>
         <div class="grid gap-8">
           ${animalesModo.length > 0
-            ? animalesModo.slice(0, 10).map(a => `
-              <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:10px; margin:0;">
-                <div class="flex justify-between items-center">
-                  <div class="text-xs">
-                    <div class="font-bold text-white">${a.crotal || a.nombre || `Animal #${a.id}`}</div>
-                    <div class="text-gray mt-2">${a.especie || 'N/D'} · ${a.raza || 'N/D'}</div>
-                  </div>
-                  <span class="badge badge-sm" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
-                </div>
-              </a>
-            `).join('')
+            ? animalesModo.slice(0, 10).map(a => {
+                const reb = rebanos.find(r => r.id === a.rebanoId);
+                const sexoIcon = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '');
+                const ageText = a.fechaNacimiento ? ` · ${Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365))} años` : '';
+                return `
+                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:10px; margin:0;">
+                    <div class="flex justify-between items-center">
+                      <div class="flex items-center gap-10">
+                        <div class="text-xl" style="color:${meta.color}">${Icons.animales()}</div>
+                        <div class="text-xs">
+                          <div class="font-bold text-white uppercase">${a.crotal || a.nombre || `Animal #${a.id}`} <span class="text-gray-400 ml-4">${sexoIcon}</span></div>
+                          <div class="text-gray mt-2 font-700">${(a.especie || 'N/D').toUpperCase()} · ${(a.raza || 'N/D').toUpperCase()}${ageText}</div>
+                          <div class="text-[0.62rem] text-aaa mt-2">${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}</div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <span class="badge badge-sm uppercase" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
+                        <div class="text-[0.6rem] text-777 mt-4">VER FICHA ➔</div>
+                      </div>
+                    </div>
+                  </a>
+                `;
+              }).join('')
             : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">Sin animales para este modo.</span></div>`
           }
         </div>
