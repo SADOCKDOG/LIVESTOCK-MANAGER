@@ -170,18 +170,22 @@ const ComercializacionView = {
               </div>
             </div>
 
-            <div class="flex justify-between items-end w-full">
-              <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap gap-x-12 gap-y-4 text-[0.68rem] text-gray font-700 uppercase">
-                  <span class="flex items-center gap-4">${Icons.calendar()} ${r.date}</span>
-                  ${r.zone ? `<span class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</span>` : ''}
-                  ${r.meta ? `<span class="flex items-center gap-4 text-aaa">${Icons.documento()} ${r.meta.replace(/🏷️|📄/g, '')}</span>` : ''}
-                </div>
-                ${r.badges ? `<div class="flex flex-wrap gap-4 mt-8">${r.badges}</div>` : ''}
+            <div class="flex flex-col w-full mt-10">
+              <!-- Metadatos y Referencias -->
+              <div class="flex flex-wrap gap-x-12 gap-y-3 mb-10 text-[0.68rem] text-gray font-800 uppercase">
+                  <div class="flex items-center gap-4">${Icons.calendar()} ${r.date}</div>
+                  ${r.zone ? `<div class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</div>` : ''}
+                  ${r.subvalue ? `<div class="flex items-center gap-4 text-aaa">${Icons.info()} ${r.subvalue}</div>` : ''}
+                  ${r.meta ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${r.meta.replace(/🏷️|📄/g, '')}</div>` : ''}
               </div>
-              <div class="text-right flex flex-col items-end">
-                ${r.subvalue ? `<div class="text-[0.6rem] text-aaa uppercase font-800 tracking-wider mb-4">${r.subvalue}</div>` : ''}
-                <div class="text-[0.5rem] text-gray-700 font-900 uppercase">VER ➔</div>
+
+              <!-- Grid de Badges (2 columnas para ocupar ancho) -->
+              <div class="grid grid-cols-2 gap-x-8 gap-y-4 w-full">
+                ${r.badges}
+              </div>
+
+              <div class="text-right w-full mt-12">
+                <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLE ➔</div>
               </div>
             </div>
           </div>
@@ -260,19 +264,21 @@ const ComercializacionView = {
         const badges = window.CalidadLecheHelper ? window.CalidadLecheHelper.badgesCompletos(e) : '';
 
         // Añadir precio final y MOFA como badges si existen
-        let extraBadges = '';
-        if (e.precio_final_unitario) extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.3);">${Icons.dinero()} ${e.precio_final_unitario.toFixed(3)} €/L</span>`;
+        const extraBadges = [];
+        if (e.precio_final_unitario) {
+          extraBadges.push(window.CalidadLecheHelper.badgeParametro('Precio', e.precio_final_unitario.toFixed(3) + ' €/L', true, Icons.dinero()));
+        }
         if (e.mofa != null) {
-          const color = e.mofa >= 0 ? '#10b981' : '#ef4444';
-          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(${e.mofa >= 0 ? '16,185,129' : '239,68,68'},0.1); color:${color}; border:1px solid rgba(${e.mofa >= 0 ? '16,185,129' : '239,68,68'},0.3);">${Icons.grafico()} MOFA: ${Math.round(e.mofa)} €</span>`;
+          extraBadges.push(window.CalidadLecheHelper.badgeParametro('MOFA', Math.round(e.mofa) + ' €', e.mofa >= 0, Icons.grafico()));
         }
         if (e.comunidad_autonoma) {
-          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3);">${e.comunidad_autonoma === 'andalucia' ? Icons.zonas() + ' AND' : Icons.zonas() + ' EXT'}</span>`;
+          const label = e.comunidad_autonoma === 'andalucia' ? 'AND' : 'EXT';
+          extraBadges.push(window.CalidadLecheHelper.badgeParametro('CCAA', label, true, Icons.zonas()));
         }
         if (e.estado_tramite_infolac) {
-          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.35);">${Icons.edificio()} INFOLAC: ${String(e.estado_tramite_infolac).toUpperCase()}</span>`;
+          extraBadges.push(window.CalidadLecheHelper.badgeParametro('INFOLAC', String(e.estado_tramite_infolac).toUpperCase(), true, Icons.edificio()));
         }
-        const allBadges = [badges, extraBadges].filter(Boolean).join(' ');
+        const allBadges = [badges, ...extraBadges].filter(Boolean).join('');
 
         return {
           title: 'Cisterna: ' + (e.matriculaCisterna || 'S/N'),
@@ -280,7 +286,7 @@ const ComercializacionView = {
           zone: '',
           value: (e.cantidad || 0).toLocaleString() + ' L',
           subvalue: (e.temperatura || '--') + 'ºC' + (es !== '--' ? ' · ES: ' + es + '%' : ''),
-          badges: allBadges || `<span style="font-size:0.62rem; font-weight:700; padding:2px 8px; border-radius:4px; background:${esAlerta ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}; color:${esAlerta ? '#ef4444' : '#10b981'}; border:1px solid ${esAlerta ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'};">${e.estadoAnalitica || 'PENDIENTE'}</span>`,
+          badges: allBadges,
           onclick: "location.hash='/albaran-leche?id=" + e.id + "'"
         };
       }),

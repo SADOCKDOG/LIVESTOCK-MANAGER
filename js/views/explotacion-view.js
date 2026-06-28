@@ -283,13 +283,13 @@ const ExplotacionView = {
                   <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="border-left:4px solid ${e.tipo_entidad === 'animal' ? '#ef4444' : '#f59e0b'}; padding:10px; margin:0;">
                     <div class="flex justify-between items-center">
                       <div class="text-xs">
-                        <div class="font-bold text-white">${e.snap_identificacion || 'Animal/Lote'}</div>
-                        <div class="text-gray mt-2">📅 ${this._fmtFecha(e.fecha)}</div>
+                        <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Animal/Lote'}</div>
+                        <div class="text-gray mt-4 flex items-center gap-4 font-700">${Icons.calendar()} ${this._fmtFecha(e.fecha)}</div>
                       </div>
                       <span class="badge badge-sm font-bold text-red badge-red-outline">${e.valor_neto} kg</span>
                     </div>
                   </div>`).join('')
-              : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">📭 Sin pesajes registrados.</span></div>`
+              : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin pesajes registrados</span></div>`
             }
           </div>
         </div>
@@ -372,7 +372,7 @@ const ExplotacionView = {
                       
                       return `
                         <tr>
-                          <td>📅 ${this._fmtFecha(e.fechaRecogida || e.fecha)}</td>
+                          <td><span class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)}</span></td>
                           <td><strong>${(e.cantidad || 0).toLocaleString()} L</strong></td>
                           <td>${lab.grasa != null ? lab.grasa.toFixed(2) + '%' : '—'}</td>
                           <td>${lab.proteina != null ? lab.proteina.toFixed(2) + '%' : '—'}</td>
@@ -405,13 +405,13 @@ const ExplotacionView = {
                   <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? '#3b82f6' : '#8b5cf6'}; padding:10px; margin:0;">
                     <div class="flex justify-between items-center">
                       <div class="text-xs">
-                        <div class="font-bold text-white">${o.snap_identificacion || 'Control Lote/Animal'}</div>
-                        <div class="text-gray mt-2">📅 ${this._fmtFecha(o.fecha)}</div>
+                        <div class="font-bold text-white uppercase">${o.snap_identificacion || 'Control Lote/Animal'}</div>
+                        <div class="text-gray mt-4 flex items-center gap-4 font-700">${Icons.calendar()} ${this._fmtFecha(o.fecha)}</div>
                       </div>
                       <span class="badge badge-sm font-bold text-blue badge-blue-outline">${o.valor_neto} L</span>
                     </div>
                   </div>`).join('')
-              : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">📭 Sin registros de ordeño recientes.</span></div>`
+              : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin registros de ordeño</span></div>`
             }
           </div>
         </div>
@@ -525,15 +525,15 @@ const ExplotacionView = {
                   return `
                     <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${esPeso ? 'carne' : 'leche'}')" style="border-left:4px solid ${color}; padding:10px; margin:0;">
                       <div class="flex justify-between items-center">
-                        <div class="text-xs">
-                          <div class="font-bold text-white">${e.snap_identificacion || 'Registro Mixto'}</div>
-                          <div class="text-gray mt-2">📅 ${this._fmtFecha(e.fecha)}</div>
-                        </div>
+                      <div class="text-xs">
+                        <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Registro Mixto'}</div>
+                        <div class="text-gray mt-4 flex items-center gap-4 font-700">${Icons.calendar()} ${this._fmtFecha(e.fecha)}</div>
+                      </div>
                         <span class="badge badge-sm font-bold" style="background:${color}10; color:${color}; border:1px solid ${color}30;">${e.valor_neto} ${e.unidad}</span>
                       </div>
                     </div>`;
                 }).join('')
-              : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">📭 Sin registros de producción.</span></div>`
+              : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin registros de producción</span></div>`
             }
           </div>
         </div>

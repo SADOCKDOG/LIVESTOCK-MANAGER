@@ -12,15 +12,16 @@ window.CalidadLecheHelper = (() => {
    * @param {string} label — nombre del parámetro
    * @param {number|string} value — valor medido
    * @param {boolean} ok — true si cumple umbral
+   * @param {string} [iconSVG] — icono SVG opcional
    * @returns {string}
    */
-  function badgeParametro(label, value, ok) {
+  function badgeParametro(label, value, ok, iconSVG) {
     const color = ok ? '#10b981' : '#ef4444';
-    const icon = ok ? '✅' : '⚠️';
-    return `<span style="display:inline-flex; align-items:center; gap:3px; font-size:0.62rem; font-weight:700;
-             padding:2px 8px; border-radius:4px; background:${color}16; color:${color};
-             border:1px solid ${color}40; margin:2px;">
-             ${icon} ${label}: ${value}</span>`;
+    const stateIcon = ok ? Icons.check() : Icons.alerta();
+    return `<span style="display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:0.68rem; font-weight:800;
+             padding:4px 10px; border-radius:6px; background:${color}20; color:#ffffff !important;
+             border:1px solid ${color}60; text-transform:uppercase; letter-spacing:0.4px; width: 100%; box-sizing: border-box; text-align:center;">
+             <span style="color:${color}; display:flex;">${iconSVG || stateIcon}</span> ${label ? label + ': ' : ''}${value}</span>`;
   }
 
   /**
@@ -40,41 +41,41 @@ window.CalidadLecheHelper = (() => {
     // Temperatura
     if (e.temperatura != null) {
       const ok = e.temperatura <= 4;
-      parts.push(badgeParametro('🌡️', e.temperatura + '°C', ok));
+      parts.push(badgeParametro('Temp', e.temperatura + '°C', ok, Icons.termometro()));
     }
 
     // Grasa
     if (lab.grasa != null) {
       const ok = lab.grasa >= 6.0;
-      parts.push(badgeParametro('🧈 Grasa', lab.grasa + '%', ok));
+      parts.push(badgeParametro('Grasa', lab.grasa + '%', ok, Icons.carne()));
     }
 
     // Proteína
     if (lab.proteina != null) {
       const ok = lab.proteina >= 5.0;
-      parts.push(badgeParametro('🥩 Prot', lab.proteina + '%', ok));
+      parts.push(badgeParametro('Prot', lab.proteina + '%', ok, Icons.animales()));
     }
 
     // Extracto seco
     const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toFixed(1) : null);
     if (es != null) {
       const ok = es >= 11.0;
-      parts.push(badgeParametro(`${Icons.grafico()} ES`, es + '%', ok));
+      parts.push(badgeParametro('ES', es + '%', ok, Icons.grafico()));
     }
 
     // Células somáticas
     if (lab.somaticas != null) {
       const ok = lab.somaticas <= 400000;
-      parts.push(badgeParametro(`${Icons.fitosanitario()} CS`, (lab.somaticas / 1000).toFixed(0) + 'k', ok));
+      parts.push(badgeParametro('CS', (lab.somaticas / 1000).toFixed(0) + 'k', ok, Icons.fitosanitario()));
     }
 
     // Inhibidores
     if (e.certificadoInhibidores != null) {
       const ok = e.certificadoInhibidores;
-      parts.push(badgeParametro(`${Icons.veterinario()} Inhib`, ok ? 'OK' : 'PENDIENTE', ok));
+      parts.push(badgeParametro('Inhib', ok ? 'OK' : 'PENDIENTE', ok, Icons.veterinario()));
     }
 
-    return parts.join(' ');
+    return parts.join('');
   }
 
   /**
@@ -93,12 +94,12 @@ window.CalidadLecheHelper = (() => {
     if (e.certificadoInhibidores === false) problemas.push('inhibidores');
 
     if (problemas.length === 0) {
-      return { color: '#10b981', label: 'Calidad Óptima', icon: '✅' };
+      return { color: '#10b981', label: 'Calidad Óptima', icon: Icons.check() };
     }
     if (problemas.length <= 2) {
-      return { color: '#f59e0b', label: 'Atención: ' + problemas.join(', '), icon: '⚠️' };
+      return { color: '#f59e0b', label: 'Atención: ' + problemas.join(', '), icon: Icons.alerta() };
     }
-    return { color: '#ef4444', label: 'Alerta: ' + problemas.join(', '), icon: '🚨' };
+    return { color: '#ef4444', label: 'Alerta: ' + problemas.join(', '), icon: Icons.alerta() };
   }
 
   /**
