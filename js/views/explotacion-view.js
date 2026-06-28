@@ -246,11 +246,11 @@ const ExplotacionView = {
           <div class="grid grid-cols-2 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
               ${Icons.agregar()}
-              <span class="widget-link-label">Registrar Peso (kg)</span>
+              <span class="widget-link-label">Peso (kg)</span>
             </button>
             <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
               ${Icons.sanidad()}
-              <span class="widget-link-label">Registrar Tratamiento</span>
+              <span class="widget-link-label">Tratamiento</span>
             </button>
           </div>
         </div>
@@ -330,11 +330,11 @@ const ExplotacionView = {
           <div class="grid grid-cols-2 gap-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
               ${Icons.agregar()}
-              <span class="widget-link-label">Registrar Control (L)</span>
+              <span class="widget-link-label">Ordeño (L)</span>
             </button>
             <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
               ${Icons.sanidad()}
-              <span class="widget-link-label">Registrar Tratamiento</span>
+              <span class="widget-link-label">Tratamiento</span>
             </button>
           </div>
         </div>
@@ -607,7 +607,7 @@ const ExplotacionView = {
         </div>
         <div class="mt-10 flex flex-col items-center gap-3">
           <div class="text-[0.65rem] uppercase font-extrabold tracking-wider pt-2 text-center section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%;">⚡ ACCIÓN DE CARGA</div>
-          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${borderStyleColor}; --neon-glow: ${borderStyleColor}B0; --neon-inner: ${borderStyleColor}40; width: 100%; max-width: 120px;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+          <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
             ${Icons.agregar()}
             <span class="widget-link-label">Carga/Consumo</span>
           </button>
@@ -646,7 +646,7 @@ const ExplotacionView = {
         <div class="grid grid-cols-3 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')">
             ${Icons.agregar()}
-            <span class="widget-link-label">Aliment.</span>
+            <span class="widget-link-label">Alimentación</span>
           </button>
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')">
             ${Icons.agregar()}

@@ -2558,6 +2558,8 @@ label {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .widget-link-btn--neon:active { transform: scale(0.95); }
+/* icono SVG dentro del botón neon: tamaño fijo 24×24, no se encoge */
+.widget-link-btn--neon svg { width: 24px; height: 24px; flex-shrink: 0; }
 
 /* variantes de color neon */
 .neon-danger  { --neon-color: var(--c-danger);  --neon-glow: rgba(239,68,68,0.69);  --neon-inner: rgba(239,68,68,0.25); }
