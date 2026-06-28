@@ -159,7 +159,7 @@ const App = {
     '/animal': 'Ficha Animal',
     '/leche': 'Leche',
     '/gastos': 'Gastos',
-    '/comercializacion': 'Comercial',
+    '/comercializacion': 'Comercialización',
     '/albaran-leche': 'Albarán Lácteo',
     '/gasto': 'Detalle Gasto',
     '/informes': 'Informes',
@@ -430,10 +430,8 @@ const App = {
         else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
       });
 
-      let modo = 'carne'; // Default
-      if (tieneHibrido || (tieneCarne && tieneLeche)) {
-        modo = 'hibrido';
-      } else if (tieneLeche) {
+      let modo = 'leche'; // Prioridad Lácteo por defecto
+      if (tieneLeche || tieneHibrido || (tieneCarne && tieneLeche)) {
         modo = 'leche';
       } else if (tieneCarne) {
         modo = 'carne';
@@ -444,6 +442,13 @@ const App = {
       if (navAnimales) navAnimales.style.display = 'none';
       const navRebanos = document.getElementById('nav-rebanos');
       if (navRebanos) navRebanos.style.display = 'none';
+
+      const navComer = document.getElementById('nav-comercializacion');
+      if (navComer) {
+        navComer.style.display = 'flex';
+        const tab = modo === 'leche' ? 'leche' : 'carne';
+        navComer.setAttribute('href', `#/comercializacion?tab=${tab}`);
+      }
 
       const navProduccion = document.getElementById('nav-produccion');
       if (navProduccion) {

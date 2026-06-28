@@ -24,7 +24,9 @@ const GanaderiaView = {
 
     this._activeMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('ganaderia', rebanos)
-      : 'carne';
+      : 'leche';
+
+    if (this._activeMode === 'hibrido') this._activeMode = 'leche';
 
     const rebanosModo = window.ModoContextoHelper
       ? ModoContextoHelper.filterRebanosByMode(rebanos, this._activeMode)

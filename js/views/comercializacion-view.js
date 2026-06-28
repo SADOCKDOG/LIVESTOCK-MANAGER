@@ -6,7 +6,7 @@
  */
 
 const ComercializacionView = {
-  _currentTab: 'carne',
+  _currentTab: 'leche',
   _cachedData: null,
 
   async render(params) {
@@ -85,6 +85,12 @@ const ComercializacionView = {
       }
     };
 
+    // Sincronizar color de cabecera con el tab activo
+    if (window.App && App.updateHeaderColor) {
+      const mode = (this._currentTab === 'leche') ? 'leche' : (this._currentTab === 'carne' ? 'carne' : null);
+      App.updateHeaderColor(mode);
+    }
+
     this._renderTabActual();
   },
 
@@ -93,6 +99,13 @@ const ComercializacionView = {
     document.querySelectorAll('.comer-tab').forEach(b => {
       b.classList.toggle('active', b.dataset.tab === tab);
     });
+
+    // Sincronizar color de cabecera
+    if (window.App && App.updateHeaderColor) {
+      const mode = (tab === 'leche') ? 'leche' : (tab === 'carne' ? 'carne' : null);
+      App.updateHeaderColor(mode);
+    }
+
     this._renderTabActual();
     window.scrollTo(0, 0);
   },
