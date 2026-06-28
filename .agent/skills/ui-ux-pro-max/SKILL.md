@@ -1,30 +1,20 @@
 ---
 name: ui-ux-pro-max
-description: UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks.
+description: Inteligencia de diseño UI/UX. 50 estilos, 21 paletas, 50 combinaciones de fuentes, 20 gráficos, 9 stacks.
 ---
 # ui-ux-pro-max
 
-Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
+Guía de diseño integral para aplicaciones web y móviles. Contiene 67 estilos, 96 paletas de colores, 57 combinaciones de fuentes, 99 directrices de UX y 25 tipos de gráficos a través de 13 stacks tecnológicos. Base de datos consultable con recomendaciones basadas en prioridades.
 
-## Prerequisites
+## Requisitos Previos
 
-Check if Python is installed:
+Comprobar si Python está instalado:
 
 ```bash
 python3 --version || python --version
 ```
 
-If Python is not installed, install it based on user's OS:
-
-**macOS:**
-```bash
-brew install python3
-```
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update && sudo apt install python3
-```
+Si Python no está instalado, instalarlo según el SO del usuario:
 
 **Windows:**
 ```powershell
@@ -33,288 +23,103 @@ winget install Python.Python.3.12
 
 ---
 
-## How to Use This Skill
+## Cómo usar esta Skill
 
-When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
+Cuando el usuario solicite trabajo de UI/UX (diseñar, construir, crear, implementar, revisar, arreglar, mejorar), sigue este flujo de trabajo:
 
-### Step 1: Analyze User Requirements
+### Paso 1: Analizar los requisitos del usuario
 
-Extract key information from user request:
-- **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
-- **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
-- **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: React, Vue, Next.js, or default to `html-tailwind`
+Extraer información clave de la solicitud del usuario:
+- **Tipo de producto**: SaaS, e-commerce, portafolio, dashboard, landing page, etc.
+- **Palabras clave de estilo**: minimalista, divertido, profesional, elegante, modo oscuro, etc.
+- **Industria**: salud, fintech, gaming, educación, etc.
+- **Stack**: React, Vue, Next.js, o por defecto `html-tailwind`.
 
-### Step 2: Generate Design System (REQUIRED)
+### Paso 2: Generar el Sistema de Diseño (OBLIGATORIO)
 
-**Always start with `--design-system`** to get comprehensive recommendations with reasoning:
-
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
-```
-
-This command:
-1. Searches 5 domains in parallel (product, style, color, landing, typography)
-2. Applies reasoning rules from `ui-reasoning.csv` to select best matches
-3. Returns complete design system: pattern, style, colors, typography, effects
-4. Includes anti-patterns to avoid
-
-**Example:**
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
-```
-
-### Step 2b: Persist Design System (Master + Overrides Pattern)
-
-To save the design system for hierarchical retrieval across sessions, add `--persist`:
+**Comienza siempre con `--design-system`** para obtener recomendaciones completas con razonamiento:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name"
+python3 skills/ui-ux-pro-max/scripts/search.py "<tipo_producto> <industria> <palabras_clave>" --design-system [-p "Nombre del Proyecto"]
 ```
 
-This creates:
-- `design-system/MASTER.md` — Global Source of Truth with all design rules
-- `design-system/pages/` — Folder for page-specific overrides
+Este comando:
+1. Busca en 5 dominios en paralelo (producto, estilo, color, landing, tipografía).
+2. Aplica reglas de razonamiento de `ui-reasoning.csv` para seleccionar las mejores coincidencias.
+3. Devuelve el sistema de diseño completo: patrón, estilo, colores, tipografía, efectos.
+4. Incluye anti-patrones a evitar.
 
-**With page-specific override:**
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
-```
+### Paso 2b: Persistir el Sistema de Diseño (Patrón Maestro + Overrides)
 
-This also creates:
-- `design-system/pages/dashboard.md` — Page-specific deviations from Master
-
-**How hierarchical retrieval works:**
-1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
-2. If the page file exists, its rules **override** the Master file
-3. If not, use `design-system/MASTER.md` exclusively
-
-### Step 3: Supplement with Detailed Searches (as needed)
-
-After getting the design system, use domain searches to get additional details:
+Para guardar el sistema de diseño para su recuperación jerárquica entre sesiones, añade `--persist`:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
+python3 skills/ui-ux-pro-max/scripts/search.py "<consulta>" --design-system --persist -p "Nombre del Proyecto"
 ```
 
-**When to use detailed searches:**
+Esto crea:
+- `design-system/MASTER.md` — Fuente Global de Verdad con todas las reglas de diseño.
+- `design-system/pages/` — Carpeta para excepciones específicas por página.
 
-| Need | Domain | Example |
+### Paso 3: Complementar con búsquedas detalladas (según sea necesario)
+
+Después de obtener el sistema de diseño, usa búsquedas de dominio para obtener detalles adicionales:
+
+```bash
+python3 skills/ui-ux-pro-max/scripts/search.py "<palabra_clave>" --domain <dominio> [-n <max_resultados>]
+```
+
+| Necesidad | Dominio | Ejemplo |
 |------|--------|---------|
-| More style options | `style` | `--domain style "glassmorphism dark"` |
-| Chart recommendations | `chart` | `--domain chart "real-time dashboard"` |
-| UX best practices | `ux` | `--domain ux "animation accessibility"` |
-| Alternative fonts | `typography` | `--domain typography "elegant luxury"` |
-| Landing structure | `landing` | `--domain landing "hero social-proof"` |
-
-### Step 4: Stack Guidelines (Default: html-tailwind)
-
-Get implementation-specific best practices. If user doesn't specify a stack, **default to `html-tailwind`**.
-
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
-```
-
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
+| Más opciones de estilo | `style` | `--domain style "glassmorphism dark"` |
+| Recomendaciones de gráficos | `chart` | `--domain chart "real-time dashboard"` |
+| Mejores prácticas de UX | `ux` | `--domain ux "animation accessibility"` |
 
 ---
 
-## Search Reference
+## Reglas Comunes para una UI Profesional
 
-### Available Domains
+Estos son problemas que se pasan por alto con frecuencia y que hacen que la UI parezca poco profesional:
 
-| Domain | Use For | Example Keywords |
-|--------|---------|------------------|
-| `product` | Product type recommendations | SaaS, e-commerce, portfolio, healthcare, beauty, service |
-| `style` | UI styles, colors, effects | glassmorphism, minimalism, dark mode, brutalism |
-| `typography` | Font pairings, Google Fonts | elegant, playful, professional, modern |
-| `color` | Color palettes by product type | saas, ecommerce, healthcare, beauty, fintech, service |
-| `landing` | Page structure, CTA strategies | hero, hero-centric, testimonial, pricing, social-proof |
-| `chart` | Chart types, library recommendations | trend, comparison, timeline, funnel, pie |
-| `ux` | Best practices, anti-patterns | animation, accessibility, z-index, loading |
-| `react` | React/Next.js performance | waterfall, bundle, suspense, memo, rerender, cache |
-| `web` | Web interface guidelines | aria, focus, keyboard, semantic, virtualize |
-| `prompt` | AI prompts, CSS keywords | (style name) |
+### Iconos y Elementos Visuales
 
-### Available Stacks
-
-| Stack | Focus |
-|-------|-------|
-| `html-tailwind` | Tailwind utilities, responsive, a11y (DEFAULT) |
-| `react` | State, hooks, performance, patterns |
-| `nextjs` | SSR, routing, images, API routes |
-| `vue` | Composition API, Pinia, Vue Router |
-| `svelte` | Runes, stores, SvelteKit |
-| `swiftui` | Views, State, Navigation, Animation |
-| `react-native` | Components, Navigation, Lists |
-| `flutter` | Widgets, State, Layout, Theming |
-| `shadcn` | shadcn/ui components, theming, forms, patterns |
-| `jetpack-compose` | Composables, Modifiers, State Hoisting, Recomposition |
-
----
-
-## Example Workflow
-
-**User request:** "Làm landing page cho dịch vụ chăm sóc da chuyên nghiệp"
-
-### Step 1: Analyze Requirements
-- Product type: Beauty/Spa service
-- Style keywords: elegant, professional, soft
-- Industry: Beauty/Wellness
-- Stack: html-tailwind (default)
-
-### Step 2: Generate Design System (REQUIRED)
-
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service elegant" --design-system -p "Serenity Spa"
-```
-
-**Output:** Complete design system with pattern, style, colors, typography, effects, and anti-patterns.
-
-### Step 3: Supplement with Detailed Searches (as needed)
-
-```bash
-# Get UX guidelines for animation and accessibility
-python3 skills/ui-ux-pro-max/scripts/search.py "animation accessibility" --domain ux
-
-# Get alternative typography options if needed
-python3 skills/ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain typography
-```
-
-### Step 4: Stack Guidelines
-
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
-```
-
-**Then:** Synthesize design system + detailed searches and implement the design.
-
----
-
-## Output Formats
-
-The `--design-system` flag supports two output formats:
-
-```bash
-# ASCII box (default) - best for terminal display
-python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
-
-# Markdown - best for documentation
-python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
-```
-
----
-
-## Tips for Better Results
-
-1. **Be specific with keywords** - "healthcare SaaS dashboard" > "app"
-2. **Search multiple times** - Different keywords reveal different insights
-3. **Combine domains** - Style + Typography + Color = Complete design system
-4. **Always check UX** - Search "animation", "z-index", "accessibility" for common issues
-5. **Use stack flag** - Get implementation-specific best practices
-6. **Iterate** - If first search doesn't match, try different keywords
-
----
-
-## Common Rules for Professional UI
-
-These are frequently overlooked issues that make UI look unprofessional:
-
-### Icons & Visual Elements
-
-| Rule | Do | Don't |
+| Regla | Hacer | No Hacer |
 |------|----|----- |
-| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emojis like 🎨 🚀 ⚙️ as UI icons |
-| **Stable hover states** | Use color/opacity transitions on hover | Use scale transforms that shift layout |
-| **Correct brand logos** | Research official SVG from Simple Icons | Guess or use incorrect logo paths |
-| **Consistent icon sizing** | Use fixed viewBox (24x24) with w-6 h-6 | Mix different icon sizes randomly |
+| **Sin iconos emoji** | Usar iconos SVG (Heroicons, Lucide, Icons.js) | Usar emojis como 🎨 🚀 ⚙️ como iconos de UI |
+| **Logos de marca correctos** | Investigar el SVG oficial en Simple Icons | Adivinar o usar rutas de logo incorrectas |
+| **Tamaño de icono consistente** | Usar un viewBox fijo (24x24) con w-6 h-6 | Mezclar diferentes tamaños de iconos al azar |
 
-### Interaction & Cursor
+### Interacción y Cursor
 
-| Rule | Do | Don't |
+| Regla | Hacer | No Hacer |
 |------|----|----- |
-| **Cursor pointer** | Add `cursor-pointer` to all clickable/hoverable cards | Leave default cursor on interactive elements |
-| **Hover feedback** | Provide visual feedback (color, shadow, border) | No indication element is interactive |
-| **Smooth transitions** | Use `transition-colors duration-200` | Instant state changes or too slow (>500ms) |
-
-### Light/Dark Mode Contrast
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Glass card light mode** | Use `bg-white/80` or higher opacity | Use `bg-white/10` (too transparent) |
-| **Text contrast light** | Use `#0F172A` (slate-900) for text | Use `#94A3B8` (slate-400) for body text |
-| **Muted text light** | Use `#475569` (slate-600) minimum | Use gray-400 or lighter |
-| **Border visibility** | Use `border-gray-200` in light mode | Use `border-white/10` (invisible) |
-
-### Layout & Spacing
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Floating navbar** | Add `top-4 left-4 right-4` spacing | Stick navbar to `top-0 left-0 right-0` |
-| **Content padding** | Account for fixed navbar height | Let content hide behind fixed elements |
-| **Consistent max-width** | Use same `max-w-6xl` or `max-w-7xl` | Mix different container widths |
+| **Cursor pointer** | Añadir `cursor-pointer` a todos los elementos clicables | Dejar el cursor por defecto en elementos interactivos |
+| **Feedback de hover** | Proporcionar feedback visual (color, sombra, borde) | Sin indicación de que el elemento es interactivo |
 
 ---
 
-## Pre-Delivery Checklist
+## Estándares Premium OLED de Livestock Manager (v4.8.5)
 
-Before delivering UI code, verify these items:
+Reglas de referencia para mantener la consistencia visual en este proyecto específico.
 
-### Visual Quality
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] Brand logos are correct (verified from Simple Icons)
-- [ ] Hover states don't cause layout shift
-- [ ] Use theme colors directly (bg-primary) not var() wrapper
+### 1. Cabecera y Navegación
+- **Banner Hub Centrado**: Usar `.header-banner-frame` para el título de la vista. El icono debe ser un SVG de 17px con resplandor dorado `#facc15`.
+- **Línea Neón Dinámica**: La parte inferior de la cabecera debe usar `var(--header-neon-color)` para coincidir con el modo activo.
+- **Hub CoMer**: Usar la etiqueta "CoMer" para Comercialización en la navegación inferior. Enlazar dinámicamente a `#/comercializacion?tab=leche` por defecto.
 
-### Interaction
-- [ ] All clickable elements have `cursor-pointer`
-- [ ] Hover states provide clear visual feedback
-- [ ] Transitions are smooth (150-300ms)
-- [ ] Focus states visible for keyboard navigation
+### 2. Layouts de Hub (Ganadería, ExPro, CoMer)
+- **Selector de Modo Superior**: Usar `.comer-mode-switch` o equivalente en la parte superior. Prioridad por defecto a **Lácteo** (#3b82f6).
+- **Alineación de KPIs**: Todas las tarjetas de KPI deben tener una altura fija de **90px**.
+- **Regla 2+1**: Al mostrar 3 tarjetas de KPI, usar `flex-wrap` y `justify-content: center` para que la 3ª tarjeta quede centrada debajo de las dos primeras.
+- **Encabezados de Sección**: Usar `.section-header-neon` o `.section-header-theme` **sin borde superior**. Las etiquetas deben ser blancas, peso 800 y centradas.
 
-### Light/Dark Mode
-- [ ] Light mode text has sufficient contrast (4.5:1 minimum)
-- [ ] Glass/transparent elements visible in light mode
-- [ ] Borders visible in both modes
-- [ ] Test both modes before delivery
+### 3. Botones de Acción
+- **Botones Neón**: Usar siempre `.widget-link-btn--neon`.
+- **Etiquetas**: Deben ser blancas (`#ffffff !important`), en mayúsculas (uppercase), peso 800, tamaño 0.8rem y perfectamente centradas.
+- **Sin Redundancia**: Evitar el prefijo "Registrar". Usar sustantivos cortos y claros: `Peso (kg)`, `Control (L)`, `Tratamiento`.
 
-### Layout
-- [ ] Floating elements have proper spacing from edges
-- [ ] No content hidden behind fixed navbars
-- [ ] Responsive at 375px, 768px, 1024px, 1440px
-- [ ] No horizontal scroll on mobile
-
-### Accessibility
-- [ ] All images have alt text
-- [ ] Form inputs have labels
-- [ ] Color is not the only indicator
-- [ ] `prefers-reduced-motion` respected
-
----
-
-## Livestock Manager - Premium OLED Standards (v4.8.5)
-
-Reference rules for maintaining visual consistency in this project.
-
-### 1. Header & Navigation
-- **Hub Centric Banner**: Use `.header-banner-frame` for the view title. Icon must be 17px SVG with `#facc15` gold glow.
-- **Dynamic Neon Line**: The bottom of the header must use `var(--header-neon-color)` to match the active mode.
-- **CoMer Hub**: Use the "CoMer" label for Comercialización in bottom navigation. Link dynamically to `#/comercializacion?tab=leche` by default.
-
-### 2. Hub Layouts (Ganadería, ExPro, CoMer)
-- **Top Mode Switch**: Use `.comer-mode-switch` or equivalent at the very top. Default to **Lácteo** (#3b82f6) for mixed farms.
-- **KPI Alignment**: All KPI cards must have a fixed height of `90px`.
-- **The 2+1 Rule**: When showing 3 KPI cards, use `flex-wrap` and `justify-content: center` so the 3rd card sits centered below the first two.
-- **Section Headers**: Use `.section-header-neon` or `.section-header-theme` without a top border. Labels must be white, 800 weight, and centered.
-
-### 3. Action Buttons
-- **Neon Buttons**: Always use `.widget-link-btn--neon`.
-- **Labels**: Must be white (`#ffffff !important`), uppercase, weight 800, size 0.8rem, and perfectly centered.
-- **No Redundancy**: Avoid "Registrar" prefix. Use clear, short nouns: `Peso (kg)`, `Control (L)`, `Tratamiento`.
-
-### 4. Data Cards (Records)
-- **Full Width**: Cards must occupy 100% of the available width.
-- **SVG Only**: No functional emojis. Use `Icons.*` with resplandor.
-- **Visual Hierarchy**: Main info at top (title left, value right); metadata at bottom (SVG + text left, "VER" indicator right).
-- **Animal Info**: Show gender icon (♀/♂) and calculated age. Include Lote/Rebaño link with its SVG icon.
+### 4. Tarjetas de Datos (Registros)
+- **Ancho Completo**: Las tarjetas deben ocupar el 100% del ancho disponible.
+- **Solo SVG**: Nada de emojis funcionales. Usar `Icons.*` con resplandor.
+- **Jerarquía Visual**: Información principal arriba (título izquierda, valor derecha); metadatos abajo (SVG + texto izquierda, indicador "VER" derecha).
+- **Info de Animales**: Mostrar icono de género (♀/♂) y edad calculada. Incluir enlace al Lote/Rebaño con su icono SVG.

@@ -45,6 +45,29 @@ const ComercializacionView = {
       App.updateHeaderColor(this._currentTab === 'gastos' ? null : this._currentTab);
     }
 
+    this._cachedData = {
+      ventas, entregas, gastosRecords,
+      kpis: {
+        carne: [
+          { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
+          { label: 'Animales', value: ventas.length },
+          { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' },
+          { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
+        ],
+        leche: [
+          { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
+          { label: 'Entregas', value: entregas.length },
+          { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
+          { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
+        ],
+        gastos: [
+          { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
+          { label: 'Registros', value: gastosRecords.length },
+          { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
+        ]
+      }
+    };
+
     main.innerHTML = `
       <!-- Selector de Modo Comercial Superior -->
       <div class="mb-16 text-center">
@@ -69,29 +92,6 @@ const ComercializacionView = {
       </div>
 
       <div id="comer-content"><div class="loader">Cargando...</div></div>`;
-
-    this._cachedData = {
-      ventas, entregas, gastosRecords,
-      kpis: {
-        carne: [
-          { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
-          { label: 'Animales', value: ventas.length },
-          { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' },
-          { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
-        ],
-        leche: [
-          { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
-          { label: 'Entregas', value: entregas.length },
-          { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
-          { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
-        ],
-        gastos: [
-          { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
-          { label: 'Registros', value: gastosRecords.length },
-          { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
-        ]
-      }
-    };
 
     this._renderTabActual();
   },
