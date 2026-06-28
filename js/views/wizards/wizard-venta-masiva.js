@@ -124,69 +124,58 @@ window.VentaMasivaWizard = {
 
           const results = await Promise.all(checkPromises);
 
-          for (let { animal, rebano, controlSanitario, gateKeep, bloqueado } of results) {
-            if (bloqueado) {
+          if (bloqueado) {
               totalBloqueados++;
               const motivos = [];
-              if (!controlSanitario.apto) motivos.push(`⚠️ ${controlSanitario?.diasRestantes ?? "X"}d`);
-              if (!gateKeep.gateEdad) motivos.push('👶 JOVEN');
-              if (!gateKeep.gateDib) motivos.push('📋 SIN DIB');
-              if (!gateKeep.gateGestacion) motivos.push('🤰 GEST.');
+              if (!controlSanitario.apto) motivos.push(`${controlSanitario?.diasRestantes ?? "X"}D`);
+              if (!gateKeep.gateEdad) motivos.push('JOVEN');
+              if (!gateKeep.gateDib) motivos.push('SIN DIB');
+              if (!gateKeep.gateGestacion) motivos.push('GEST.');
               tablaFilasHtml += `
-              <tr class="tr-blocked">
-                  <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg opacity-30"></td>
-                  <td class="font-bold p-14">${animal.numero_identificacion}</td>
-                  <td class="p-14">${animal.raza}</td>
-                  <td class="p-14">${gateKeep.edadTexto}</td>
-                  <td class="p-14">${gateKeep.requiereDib ? (gateKeep.gateDib ? '✅' : '❌') : '—'}</td>
-                  <td class="p-14">${gateKeep.gestacionTexto ? (gateKeep.gateGestacion ? `🤰${gateKeep.gestacionTexto}` : `❌ ${gateKeep.gestacionTexto}`) : '—'}</td>
-                  <td class="p-14">${rebano.nombre}</td>
-                  <td class="text-red font-bold p-14">${motivos.join(' | ')}</td>
+              <tr class="tr-blocked border-bottom-222">
+                  <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg opacity-20"></td>
+                  <td class="font-900 p-14 uppercase text-white">${animal.numero_identificacion}</td>
+                  <td class="p-14 text-aaa uppercase font-800">${animal.raza}</td>
+                  <td class="text-red font-950 p-14 uppercase text-[0.6rem] tracking-tight">${motivos.join(' | ')}</td>
               </tr>`;
             } else {
               tablaFilasHtml += `
-              <tr class="tr-active">
+              <tr class="tr-active border-bottom-222">
                   <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg cursor-pointer"></td>
-                  <td class="text-gold font-bold p-14">${animal.numero_identificacion}</td>
-                  <td class="p-14">${animal.raza}</td>
-                  <td class="p-14">${gateKeep.edadTexto}</td>
-                  <td class="p-14">${gateKeep.requiereDib ? '✅' : '—'}</td>
-                  <td class="p-14">${gateKeep.gestacionTexto ? `🤰${gateKeep.gestacionTexto}` : '—'}</td>
-                  <td class="p-14">${rebano.nombre}</td>
-                  <td class="text-green font-bold p-14">✓ APTO</td>
+                  <td class="text-gold font-950 p-14 uppercase">${animal.numero_identificacion}</td>
+                  <td class="p-14 text-white uppercase font-800">${animal.raza}</td>
+                  <td class="text-green font-950 p-14 uppercase text-[0.6rem] tracking-tight">APTO</td>
               </tr>`;
             }
-          }
 
           return `
-              <div class="flex gap-15 mb-20">
-                  <div class="text-center bg-darker stat-box-aptos"><small class="wizard-label">APTOS</small><div class="text-green font-black text-2rem mt-5">${animalesActivos.length - totalBloqueados}</div></div>
-                  <div class="text-center stat-box-bloq"><small class="wizard-label text-red">BLOQUEADOS</small><div class="text-red font-black text-2rem mt-5">${totalBloqueados}</div></div>
-              </div>
-              <div class="text-center text-xs text-gray mb-10">
-                <span class="mr-12">👶 Edad mínima</span>
-                <span class="mr-12">${Icons.documento()} DIB (bovinos)</span>
-                <span class="mr-12">🤰 Gestación &gt;3 meses</span>
-                <span>💉 Supresión sanitaria</span>
-              </div>
-              <div class="venta-tabla-wrapper">
-                  <table class="w-full text-base table-collapse">
-                      <thead class="thead-sticky">
-                          <tr>
-                              <th class="text-center p-12"><input type="checkbox" id="select-all-lote" class="checkbox-lg"></th>
-                              <th class="text-gray p-12">ID OFICIAL</th>
-                              <th class="text-gray p-12">RAZA</th>
-                              <th class="text-gray p-12">EDAD</th>
-                              <th class="text-gray p-12">DIB</th>
-                              <th class="text-gray p-12">GEST.</th>
-                              <th class="text-gray p-12">REBAÑO</th>
-                              <th class="text-gray p-12">ESTADO</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          ${tablaFilasHtml || '<tr><td colspan="8" class="text-center text-gray-500" style="padding:30px; font-size:1.2rem;">Sin animales activos.</td></tr>'}
-                      </tbody>
-                  </table>
+              <div class="card card-accent card-accent-green p-16 mt-10">
+                <div class="section-header-theme mb-12" style="--theme-color: #10b981">ANÁLISIS DE APTITUD</div>
+                <div class="flex gap-15 mb-15">
+                    <div class="text-center bg-black border border-222 p-12 rounded-sm flex-1"><small class="text-gray uppercase font-900 text-[0.6rem]">APTOS</small><div class="text-green font-950 text-2xl mt-4">${animalesActivos.length - totalBloqueados}</div></div>
+                    <div class="text-center bg-black border border-222 p-12 rounded-sm flex-1"><small class="text-red uppercase font-900 text-[0.6rem]">BLOQUEADOS</small><div class="text-red font-950 text-2xl mt-4">${totalBloqueados}</div></div>
+                </div>
+                <div class="text-center text-[0.6rem] text-aaa uppercase font-800 tracking-widest mb-10 opacity-70">
+                  <span class="mr-10">JOVEN</span>
+                  <span class="mr-10">DIB (BOVINOS)</span>
+                  <span class="mr-10">GESTACIÓN</span>
+                  <span>SUPRESIÓN</span>
+                </div>
+                <div class="venta-tabla-wrapper border border-222 rounded-sm">
+                    <table class="w-full text-xs table-collapse">
+                        <thead class="thead-sticky bg-black border-bottom-222">
+                            <tr>
+                                <th class="text-center p-12"><input type="checkbox" id="select-all-lote" class="checkbox-lg"></th>
+                                <th class="text-gray p-12 uppercase font-900">ID OFICIAL</th>
+                                <th class="text-gray p-12 uppercase font-900">RAZA</th>
+                                <th class="text-gray p-12 uppercase font-900">ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tablaFilasHtml || '<tr><td colspan="4" class="text-center text-gray-500 uppercase font-900 p-20">Sin animales activos</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
               </div>
           `;
         },
@@ -212,26 +201,27 @@ window.VentaMasivaWizard = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-              <div class="wizard-input-group">
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+              <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">TRAZABILIDAD LOGÍSTICA</div>
+              <div class="wizard-input-group mb-12">
                 <label class="wizard-label">FECHA SACRIFICIO</label>
-                <input type="date" id="w-v-fecha" value="${data.fechaSacrificio}" class="wizard-input">
+                <input type="date" id="w-v-fecha" value="${data.fechaSacrificio}" class="wizard-input font-800">
               </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label">CÓDIGO MATADERO</label>
-                <input type="text" id="w-v-mata" value="${data.codigoMatadero}" class="wizard-input">
+              <div class="wizard-input-group mb-12">
+                <label class="wizard-label">MATADERO DESTINO</label>
+                <input type="text" id="w-v-mata" value="${data.codigoMatadero}" class="wizard-input uppercase font-800" placeholder="NOMBRE DEL MATADERO">
               </div>
-              <div class="wizard-input-group">
+              <div class="wizard-input-group mb-12">
                 <label class="wizard-label">DOCUMENTO ICA</label>
-                <input type="text" id="w-v-ica" value="${data.codigoICA}" placeholder="Código ICA..." class="wizard-input">
+                <input type="text" id="w-v-ica" value="${data.codigoICA}" placeholder="CÓDIGO ICA..." class="wizard-input uppercase font-800">
               </div>
-              <div class="wizard-input-group">
+              <div class="wizard-input-group mb-16">
                 <label class="wizard-label">GUÍA SANITARIA</label>
-                <input type="text" id="w-v-guia" value="${data.numeroGuia}" placeholder="Número de guía oficial..." class="wizard-input">
+                <input type="text" id="w-v-guia" value="${data.numeroGuia}" placeholder="Nº GUÍA OFICIAL..." class="wizard-input uppercase font-800">
               </div>
-              <label class="wizard-checkbox-container">
-                  <input type="checkbox" id="w-v-fitos" ${data.confirmacionFitosanitarios ? 'checked' : ''}>
-                  <span>Declaración jurada fitosanitaria colectiva (Ausencia de residuos 180 días).</span>
+              <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
+                  <input type="checkbox" id="w-v-fitos" ${data.confirmacionFitosanitarios ? 'checked' : ''} style="accent-color:var(--p-gold);">
+                  <span class="uppercase font-900 text-[0.6rem] tracking-tight leading-tight">DECLARACIÓN FITOSANITARIA COLECTIVA (AUSENCIA RESIDUOS 180 DÍAS)</span>
               </label>
           </div>
         `,
@@ -252,25 +242,26 @@ window.VentaMasivaWizard = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-              <div class="grid grid-cols-2 gap-15">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+              <div class="section-header-theme mb-12" style="--theme-color: #10b981">DATOS ECONÓMICOS</div>
+              <div class="grid grid-cols-2 gap-15 mb-12">
                   <div class="wizard-input-group">
-                    <label class="wizard-label">PESO VIVO TOTAL (KG)</label>
-                    <input type="number" id="w-v-pv" value="${data.pVivo}" class="wizard-input">
+                    <label class="wizard-label">PESO VIVO (KG)</label>
+                    <input type="number" id="w-v-pv" value="${data.pVivo}" class="wizard-input font-900 text-lg">
                   </div>
                   <div class="wizard-input-group">
-                    <label class="wizard-label">PESO CANAL TOTAL (KG)</label>
-                    <input type="number" id="w-v-pc" value="${data.pCanal}" class="wizard-input">
+                    <label class="wizard-label">PESO CANAL (KG)</label>
+                    <input type="number" id="w-v-pc" value="${data.pCanal}" class="wizard-input font-900 text-lg text-green">
                   </div>
               </div>
               <div class="grid grid-cols-2 gap-15">
                   <div class="wizard-input-group">
-                    <label class="wizard-label">TRANSPORTE TOTAL (€)</label>
-                    <input type="number" id="w-v-gt" value="${data.gTrans}" class="wizard-input">
+                    <label class="wizard-label">TRANSPORTE (€)</label>
+                    <input type="number" id="w-v-gt" value="${data.gTrans}" class="wizard-input font-800">
                   </div>
                   <div class="wizard-input-group">
-                    <label class="wizard-label">MATANZA TOTAL (€)</label>
-                    <input type="number" id="w-v-gm" value="${data.gMata}" class="wizard-input">
+                    <label class="wizard-label">MATANZA (€)</label>
+                    <input type="number" id="w-v-gm" value="${data.gMata}" class="wizard-input font-800">
                   </div>
               </div>
           </div>
@@ -293,50 +284,41 @@ window.VentaMasivaWizard = {
         content: (data) => {
           const compradores = data._compradores || [];
           return `
-          <div class="mt-10">
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+              <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">LIQUIDACIÓN Y CLIENTE</div>
               <div class="wizard-input-group mb-12">
-                <label class="wizard-label">COMPRADOR</label>
-                ${compradores.length === 0 ? `
-                <div class="text-sm text-gold mb-8 hint-box-gold">
-                  ⚠️ No hay compradores activos registrados. Crea uno rápidamente con el botón "➕ Nuevo".
-                </div>` : ''}
-                <div class="flex gap-8">
-                  <select id="w-v-comprador" class="flex-1 bg-card rounded border-muted" style="font-size:0.95rem; color:white; padding:11px;"
+                <label class="wizard-label">COMPRADOR REGISTRADO</label>
+                <div class="flex gap-8 items-center">
+                  <select id="w-v-comprador" class="flex-1 wizard-input font-800" style="padding:11px;"
                     onchange="App._onCompradorChangeWizard(this)">
-                    <option value="">${compradores.length === 0 ? 'No hay compradores disponibles...' : 'Seleccionar comprador...'}</option>
+                    <option value="">${compradores.length === 0 ? 'SIN COMPRADORES ACTIVOS' : 'SELECCIONAR CLIENTE...'}</option>
                     ${compradores.map(c =>
-                      `<option value="${c.id}" ${data.compradorId === c.id ? 'selected' : ''}>${c.nombre} ${c.nif_cif ? '('+c.nif_cif+')' : ''} — ${c.tipo_comprador}</option>`
+                      `<option value="${c.id}" ${data.compradorId === c.id ? 'selected' : ''}>${c.nombre.toUpperCase()}</option>`
                     ).join('')}
                   </select>
-                  <button type="button" onclick="App._abrirAltaCompradorRapida()" class="text-xs text-green font-extrabold btn-inline-green">${Icons.agregar()} Nuevo</button>
+                  <button type="button" onclick="App._abrirAltaCompradorRapida()" class="widget-link-btn widget-link-btn--neon neon-success px-12 py-6 min-h-0 h-auto">
+                    <span class="text-[0.6rem] font-950 uppercase">NUEVO</span>
+                  </button>
                 </div>
               </div>
-              <div id="w-v-comprador-info" class="p-12 mb-12 bg-dark rounded-10" style="display:${data.compradorId ? 'block' : 'none'};">
-                <div class="text-white text-sm" id="w-v-comprador-nombre"><strong>${data.razonSocial || ''}</strong></div>
-                <div class="text-gray text-xs mt-4" id="w-v-comprador-nif">NIF: ${data.nifComprador || ''}</div>
-                <div class="text-gray text-xs" id="w-v-comprador-contrato"></div>
+              <div id="w-v-comprador-info" class="p-12 mb-12 bg-black border border-222 rounded-sm" style="display:${data.compradorId ? 'block' : 'none'};">
+                <div class="text-white text-xs font-950 uppercase" id="w-v-comprador-nombre"><strong>${data.razonSocial || ''}</strong></div>
+                <div class="text-aaa text-[0.65rem] mt-4 font-800 uppercase" id="w-v-comprador-nif">NIF: ${data.nifComprador || ''}</div>
+                <div class="text-info text-[0.62rem] font-900 uppercase mt-2" id="w-v-comprador-contrato"></div>
               </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label">NIF COMPRADOR</label>
-                <input type="text" id="w-v-nif" value="${data.nifComprador}" class="wizard-input">
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label">RAZÓN SOCIAL</label>
-                <input type="text" id="w-v-rs" value="${data.razonSocial}" class="wizard-input">
-              </div>
-              <div class="grid grid-cols-2 gap-15">
+              <div class="grid grid-cols-2 gap-15 mb-12">
                   <div class="wizard-input-group">
                     <label class="wizard-label">IVA (%)</label>
-                    <input type="number" id="w-v-iva" value="${data.ivaPct}" class="wizard-input">
+                    <input type="number" id="w-v-iva" value="${data.ivaPct}" class="wizard-input font-900">
                   </div>
                   <div class="wizard-input-group">
                     <label class="wizard-label">RETENCIÓN (%)</label>
-                    <input type="number" id="w-v-ret" value="${data.retencionPct}" class="wizard-input">
+                    <input type="number" id="w-v-ret" value="${data.retencionPct}" class="wizard-input font-900">
                   </div>
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">CLASIFICACIÓN SEUROP LOTE</label>
-                <input type="text" id="w-v-seurop" value="${data.seurop || ''}" placeholder="U-2, R, O..." class="wizard-input">
+                <input type="text" id="w-v-seurop" value="${data.seurop || ''}" placeholder="EJ: U-2, R, O..." class="wizard-input uppercase font-800">
               </div>
           </div>
         `;
@@ -454,51 +436,49 @@ window.VentaMasivaWizard = {
           return true;
         }
       },
-      // STEP 5: TRANSPORTISTA + AUTORIZACIÓN VETERINARIA
       {
         content: async (data) => {
           const transportistas = await window.Transportistas.list({ activo: true }).catch(() => []);
           data._transportistas = transportistas;
           return `
-          <div class="mt-10">
-              <h4 class="text-blue text-sm mb-12">🚛 TRANSPORTISTA</h4>
+          <div class="card card-accent card-accent-purple p-16 mt-10">
+              <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">LOGÍSTICA Y AUTORIZACIÓN</div>
+
               <div class="wizard-input-group mb-12">
-                <div class="flex gap-8">
-                  <select id="w-v-transportista" class="flex-1 bg-card rounded border-muted" style="font-size:0.95rem; color:white; padding:11px;"
+                <label class="wizard-label">TRANSPORTISTA</label>
+                <div class="flex gap-8 items-center">
+                  <select id="w-v-transportista" class="flex-1 wizard-input font-800" style="padding:11px;"
                     onchange="App._onTransportistaChangeWizard(this)">
-                    <option value="">${transportistas.length === 0 ? 'No hay transportistas registrados...' : 'Seleccionar transportista...'}</option>
+                    <option value="">${transportistas.length === 0 ? 'SIN TRANSPORTISTAS ACTIVOS' : 'SELECCIONAR EMPRESA...'}</option>
                     ${transportistas.map(t =>
-                      `<option value="${t.id}" ${data.transportistaId === t.id ? 'selected' : ''}>${t.nombre} ${t.nif_cif ? '('+t.nif_cif+')' : ''} — ${t.matricula || 'sin matrícula'}</option>`
+                      `<option value="${t.id}" ${data.transportistaId === t.id ? 'selected' : ''}>${t.nombre.toUpperCase()}</option>`
                     ).join('')}
                   </select>
-                  <a href="#/transportistas" target="_blank" class="text-xs font-black text-blue flex items-center btn-inline-blue">${Icons.agregar()} Nuevo</a>
+                  <a href="#/transportistas" target="_blank" class="widget-link-btn widget-link-btn--neon neon-info px-12 py-6 min-h-0 h-auto">
+                    <span class="text-[0.6rem] font-950 uppercase">NUEVO</span>
+                  </a>
                 </div>
               </div>
-              <div id="w-v-transportista-info" class="p-12 mb-12 bg-dark rounded-10" style="display:${data.transportistaId ? 'block' : 'none'};">
-                <div class="text-white text-sm" id="w-v-transportista-nombre"><strong>${data.nombreTransportista || ''}</strong></div>
-                <div class="text-gray text-xs mt-4" id="w-v-transportista-nif">NIF: ${data.nifTransportista || ''}</div>
-                <div class="text-gray text-xs" id="w-v-transportista-matricula">🚚 ${data.matriculaTransportista || ''}</div>
-                <div class="text-gray text-xs" id="w-v-transportista-atg">ATG: ${data.atgTransportista || 'pendiente'}</div>
-                <div class="text-gray text-xs" id="w-v-transportista-desinsectacion">Desinsectación: ${data.desinsectacionVencimiento ? ('vigente hasta ' + data.desinsectacionVencimiento) : 'sin vencimiento informado'}</div>
+              <div id="w-v-transportista-info" class="p-12 mb-16 bg-black border border-222 rounded-sm" style="display:${data.transportistaId ? 'block' : 'none'};">
+                <div class="text-white text-xs font-950 uppercase" id="w-v-transportista-nombre"><strong>${data.nombreTransportista || ''}</strong></div>
+                <div class="text-aaa text-[0.65rem] mt-4 font-800 uppercase" id="w-v-transportista-nif">NIF: ${data.nifTransportista || ''}</div>
+                <div class="text-aaa text-[0.65rem] font-800 uppercase" id="w-v-transportista-matricula">${Icons.transportistas()} ${data.matriculaTransportista || ''}</div>
               </div>
 
-              <h4 class="text-purple text-sm mt-16 mb-12">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</h4>
+              <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</div>
               <div class="grid grid-cols-2 gap-12 mb-12">
                 <div class="wizard-input-group">
-                  <label class="wizard-label">VETERINARIO RESPONSABLE</label>
-                  <input type="text" id="w-v-vet-nombre" value="${data.vet_nombre}" class="wizard-input" placeholder="Nombre del veterinario">
+                  <label class="wizard-label">VETERINARIO</label>
+                  <input type="text" id="w-v-vet-nombre" value="${data.vet_nombre}" class="wizard-input uppercase font-800" placeholder="NOMBRE">
                 </div>
                 <div class="wizard-input-group">
                   <label class="wizard-label">Nº COLEGIADO</label>
-                  <input type="text" id="w-v-vet-colegiado" value="${data.vet_colegiado}" class="wizard-input" placeholder="Nº colegiado">
+                  <input type="text" id="w-v-vet-colegiado" value="${data.vet_colegiado}" class="wizard-input font-800" placeholder="0000">
                 </div>
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">FECHA AUTORIZACIÓN</label>
-                <input type="date" id="w-v-vet-fecha" value="${data.vet_fecha_autorizacion}" class="wizard-input">
-              </div>
-              <div class="text-xs text-purple-400 hint-box-violet">
-                ℹ️ La autorización veterinaria es obligatoria para la expedición de animales vivos al matadero.
+                <input type="date" id="w-v-vet-fecha" value="${data.vet_fecha_autorizacion}" class="wizard-input font-800">
               </div>
           </div>
         `;

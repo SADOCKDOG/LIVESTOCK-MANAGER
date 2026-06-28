@@ -66,51 +66,59 @@ window.AlbaranLecheWizard = {
       {
         content: async (data) => {
           return `
-          <div class="mt-10">
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">IDENTIFICACIÓN Y ORIGEN</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">FECHA RECOGIDA</label>
-              <input type="date" id="w-l-fecha" value="${data.fecha}" class="wizard-input">
+              <input type="date" id="w-l-fecha" value="${data.fecha}" class="wizard-input font-800">
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">COMUNIDAD AUTÓNOMA</label>
-              <select id="w-l-ccaa" class="wizard-input wizard-select">
-                <option value="">— Seleccionar —</option>
+              <select id="w-l-ccaa" class="wizard-input font-800">
+                <option value="">— SELECCIONAR —</option>
                 ${opcionesCCAA.map(o =>
-                  `<option value="${o.value}" ${data.comunidad_autonoma === o.value ? 'selected' : ''}>${o.label}</option>`
+                  `<option value="${o.value}" ${data.comunidad_autonoma === o.value ? 'selected' : ''}>${o.label.toUpperCase()}</option>`
                 ).join('')}
               </select>
             </div>
-            <div id="w-l-ccaa-info" class="text-xs text-aaa rounded-sm p-10 bg-darker d-none border-left-blue" style="margin:8px 0;"></div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">Nº CONTRATO LÁCTEO</label>
-              <input type="text" id="w-l-ctr" value="${data.contrato_numero || finca.contrato_lacteo_numero || ''}" placeholder="Ej: CT-2026-001" class="wizard-input">
+            <div id="w-l-ccaa-info" class="text-[0.62rem] text-aaa rounded-sm p-10 bg-black border border-222 mb-12 d-none uppercase font-800 tracking-tight leading-relaxed"></div>
+
+            <div class="grid grid-cols-2 gap-10">
+              <div class="wizard-input-group">
+                <label class="wizard-label">Nº CONTRATO</label>
+                <input type="text" id="w-l-ctr" value="${data.contrato_numero || finca.contrato_lacteo_numero || ''}" placeholder="CT-000" class="wizard-input uppercase font-800">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">CÓDIGO ADSG</label>
+                <input type="text" id="w-l-adsg" value="${data.adsg_codigo || finca.adsg_codigo || ''}" placeholder="ADSG-00" class="wizard-input uppercase font-800">
+              </div>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">CÓDIGO ADSG</label>
-              <input type="text" id="w-l-adsg" value="${data.adsg_codigo || finca.adsg_codigo || ''}" placeholder="Código ADSG" class="wizard-input">
-            </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">ESTADO DECLARACIÓN INFOLAC</label>
-              <select id="w-l-estado-tramite" class="wizard-input wizard-select">
-                <option value="borrador" ${data.estado_tramite_infolac === 'borrador' ? 'selected' : ''}>Borrador</option>
-                <option value="presentado" ${data.estado_tramite_infolac === 'presentado' ? 'selected' : ''}>Presentado</option>
-                <option value="aceptado" ${data.estado_tramite_infolac === 'aceptado' ? 'selected' : ''}>Aceptado</option>
-                <option value="rechazado" ${data.estado_tramite_infolac === 'rechazado' ? 'selected' : ''}>Rechazado</option>
+          </div>
+
+          <div class="card card-accent card-accent-blue p-16 mb-16">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">TRAMITACIÓN INFOLAC</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">ESTADO DE DECLARACIÓN</label>
+              <select id="w-l-estado-tramite" class="wizard-input font-900">
+                <option value="borrador" ${data.estado_tramite_infolac === 'borrador' ? 'selected' : ''}>BORRADOR</option>
+                <option value="presentado" ${data.estado_tramite_infolac === 'presentado' ? 'selected' : ''}>PRESENTADO</option>
+                <option value="aceptado" ${data.estado_tramite_infolac === 'aceptado' ? 'selected' : ''}>ACEPTADO</option>
+                <option value="rechazado" ${data.estado_tramite_infolac === 'rechazado' ? 'selected' : ''}>RECHAZADO</option>
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-8">
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">FECHA PRESENTACIÓN</label>
-                <input type="date" id="w-l-fecha-pres" value="${data.fecha_presentacion_infolac || ''}" class="wizard-input">
+                <label class="wizard-label">FECHA PRES.</label>
+                <input type="date" id="w-l-fecha-pres" value="${data.fecha_presentacion_infolac || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">Nº REGISTRO OFICIAL</label>
-                <input type="text" id="w-l-reg-of" value="${data.numero_registro_infolac || ''}" class="wizard-input" placeholder="Asiento oficial">
+                <label class="wizard-label">Nº REGISTRO</label>
+                <input type="text" id="w-l-reg-of" value="${data.numero_registro_infolac || ''}" class="wizard-input uppercase font-800" placeholder="ASIENTO">
               </div>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">ACUSE / JUSTIFICANTE</label>
-              <input type="text" id="w-l-acuse" value="${data.acuse_infolac || ''}" class="wizard-input" placeholder="Código de acuse">
+              <label class="wizard-label">CÓDIGO ACUSE / JUSTIFICANTE</label>
+              <input type="text" id="w-l-acuse" value="${data.acuse_infolac || ''}" class="wizard-input uppercase font-800" placeholder="CÓDIGO DE ACUSE">
             </div>
           </div>
         `;
@@ -162,9 +170,6 @@ window.AlbaranLecheWizard = {
         }
       },
 
-      // =====================================================
-      // PASO 2: Recogida — Cisterna, Letra Q, INFOLAC
-      // =====================================================
       {
         content: async (data) => {
           // Check de supresión antibióticos
@@ -177,44 +182,45 @@ window.AlbaranLecheWizard = {
               const control = await window.Trazabilidad.checkSupresion(window.db, a.id, data.fecha, "leche");
               if (!control.apto) {
                 totalBloqueados++;
-                bloqueadosHtml += `<div class="text-red" style="background: rgba(239,68,68,0.1); border-left:3px solid #ef4444; padding:8px; margin-bottom:6px; border-radius:4px; font-size:0.82rem;">
-                  <strong>${a.numero_identificacion}</strong> — ${control.motivo}</div>`;
+                bloqueadosHtml += `<div class="text-red uppercase font-900 text-[0.65rem] border-bottom-222 py-4">
+                  ${a.numero_identificacion} — ${control.motivo.toUpperCase()}</div>`;
               }
             } catch (_) {}
           }
           let advHtml = totalBloqueados > 0
-            ? `<div style="background:#2a0808; border:1px solid #ef4444; padding:12px; border-radius:10px; margin-top:10px;">
-                <h4 class="text-red text-sm" style="margin:0 0 8px;">⚠️ ${totalBloqueados} HEMBRAS CON LECHE RETENIDA</h4>
-                <p style="font-size:0.8rem; color:#fca5a5; margin-bottom:8px;">Verifica que su leche <strong>no entró en el tanque</strong>.</p>
-                <div style="max-height:130px; overflow-y:auto;">${bloqueadosHtml}</div>
-                <label class="wizard-checkbox-container" style="margin-top:8px; background:rgba(0,0,0,0.5); padding:8px; border-radius:6px;">
-                  <input type="checkbox" id="w-l-confirm-separacion" required>
-                  <span class="text-red font-bold text-82">Confirmo que la leche contaminada fue desechada</span>
+            ? `<div class="p-16 bg-red-900 border-red-500 border rounded-sm mt-15">
+                <h4 class="text-white text-xs font-950 uppercase tracking-widest mb-8">${Icons.alerta()} ${totalBloqueados} HEMBRAS CON LECHE RETENIDA</h4>
+                <p class="text-aaa text-[0.65rem] font-800 uppercase mb-8 leading-tight">VERIFICA QUE SU LECHE NO ENTRÓ EN EL TANQUE.</p>
+                <div style="max-height:100px; overflow-y:auto;">${bloqueadosHtml}</div>
+                <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-10 rounded-sm mt-10">
+                  <input type="checkbox" id="w-l-confirm-separacion" required style="accent-color:#ef4444;">
+                  <span class="uppercase font-950 text-[0.55rem] tracking-tight">CONFIRMO QUE LA LECHE FUE DESECHADA</span>
                 </label>
               </div>`
-            : `<div class="text-center" style="margin-top:10px; background:rgba(16,185,129,0.1); border:1px solid #10b981; padding:12px; border-radius:10px;">
-                <h4 class="text-green text-sm" class="m-0">✅ 0 Hembras con leche retenida</h4>
-                <p style="font-size:0.8rem; color:#a7f3d0; margin:4px 0 0;">Rebaño libre de medicamentos prohibidos.</p>
+            : `<div class="text-center mt-15 p-16 bg-black border border-green-500 rounded-sm">
+                <h4 class="text-green text-xs font-950 uppercase tracking-widest m-0">${Icons.check()} 0 HEMBRAS RETENIDAS</h4>
+                <p class="text-aaa text-[0.65rem] font-800 uppercase mt-4">REBAÑO LIBRE DE MEDICAMENTOS PROHIBIDOS.</p>
               </div>`;
 
           return `
-          <div class="mt-10">
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">LOGÍSTICA DE RECOGIDA</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">MATRÍCULA CISTERNA</label>
-              <input type="text" id="w-l-mat" value="${data.matricula}" placeholder="Placa del transporte..." class="wizard-input">
+              <input type="text" id="w-l-mat" value="${data.matricula}" placeholder="ABC-000" class="wizard-input uppercase font-900 text-lg">
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">NÚMERO MUESTRA LETRA Q</label>
-              <input type="text" id="w-l-q" value="${data.q}" placeholder="Código bote muestra..." class="wizard-input">
+              <input type="text" id="w-l-q" value="${data.q}" placeholder="CÓDIGO MUESTRA..." class="wizard-input uppercase font-800">
             </div>
-            <div class="grid grid-cols-2 gap-8">
+            <div class="grid grid-cols-2 gap-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº INFOLAC</label>
-                <input type="text" id="w-l-infolac" value="${data.numero_infolac || ''}" placeholder="INFOLAC-..." class="wizard-input">
+                <input type="text" id="w-l-infolac" value="${data.numero_infolac || ''}" placeholder="INFOLAC-00" class="wizard-input uppercase font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">Nº MUESTREO OFICIAL</label>
-                <input type="text" id="w-l-muest" value="${data.numero_muestreo_oficial || ''}" placeholder="LIGAL..." class="wizard-input">
+                <label class="wizard-label">MUESTREO OFICIAL</label>
+                <input type="text" id="w-l-muest" value="${data.numero_muestreo_oficial || ''}" placeholder="LIGAL-00" class="wizard-input uppercase font-800">
               </div>
             </div>
             ${advHtml}
@@ -238,37 +244,37 @@ window.AlbaranLecheWizard = {
         }
       },
 
-      // =====================================================
-      // PASO 3: Cadena de Frío + Temperatura + Inhibidores
-      // =====================================================
       {
         content: (data) => `
-          <div class="mt-10">
-            <div class="grid grid-cols-2 gap-8">
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">CONTROL DE CARGA</div>
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">HORA ORDEÑO</label>
-                <input type="time" id="w-l-hor" value="${data.hora_ordeno || ''}" class="wizard-input">
+                <input type="time" id="w-l-hor" value="${data.hora_ordeno || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">HORA CARGA</label>
-                <input type="time" id="w-l-hcar" value="${data.hora_carga || ''}" class="wizard-input">
+                <input type="time" id="w-l-hcar" value="${data.hora_carga || ''}" class="wizard-input font-800">
               </div>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">TEMPERATURA DE CARGA (ºC)</label>
-              <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input">
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">TEMPERATURA CARGA (ºC)</label>
+              <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input font-950 text-2xl" style="color:${data.temp <= 4 ? '#10b981' : '#ef4444'};">
             </div>
-            <div class="text-xs text-aaa rounded-sm p-10 bg-darker border-left-blue" style="margin:8px 0;">
-              ❄️ <strong>Cadena de frío legal:</strong> La leche debe enfriarse de 37°C a &lt;4°C en menos de 2 horas.
-              ${data.temp <= 4 ? `<span class="text-green">✅ Actual: ${data.temp}°C — CUMPLE</span>` : `<span class="text-red">⚠️ Actual: ${data.temp}°C — REVISAR</span>`}
+            <div class="p-10 bg-black border border-222 rounded-sm mb-12">
+              <p class="text-[0.6rem] text-aaa uppercase font-800 tracking-tight leading-relaxed m-0">
+                ${Icons.info()} <strong>CADENA FRÍO:</strong> ENFRIAR DE 37°C A <4°C EN &lt; 2 HORAS.
+                ${data.temp <= 4 ? `<span class="text-green block mt-4 font-950">ESTADO: CUMPLE</span>` : `<span class="text-red block mt-4 font-950">ESTADO: CRÍTICO</span>`}
+              </p>
             </div>
-            <label class="wizard-checkbox-container mt-6">
-              <input type="checkbox" id="w-l-frio" ${data.cadena_frio_cumplida ? 'checked' : ''}>
-              <span>Certifico cadena de frío cumplida (&lt;4°C en &lt;2h)</span>
+            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-10 rounded-sm mb-10">
+              <input type="checkbox" id="w-l-frio" ${data.cadena_frio_cumplida ? 'checked' : ''} style="accent-color:#3b82f6;">
+              <span class="uppercase font-900 text-[0.6rem] tracking-tight">CERTIFICO CADENA DE FRÍO CUMPLIDA</span>
             </label>
-            <label class="wizard-checkbox-container mt-6">
-              <input type="checkbox" id="w-l-inh" ${data.inh ? 'checked' : ''}>
-              <span>Certifico ausencia absoluta de inhibidores / biocidas</span>
+            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+              <input type="checkbox" id="w-l-inh" ${data.inh ? 'checked' : ''} style="accent-color:#3b82f6;">
+              <span class="uppercase font-950 text-[0.6rem] tracking-tight">AUSENCIA ABSOLUTA DE INHIBIDORES</span>
             </label>
           </div>
         `,
@@ -291,62 +297,59 @@ window.AlbaranLecheWizard = {
         }
       },
 
-      // =====================================================
-      // PASO 4: Laboratorio — Resultados Analíticos
-      // =====================================================
       {
         content: (data) => {
           const esCalc = (data.grasa != null && data.proteina != null)
             ? parseFloat((parseFloat(data.grasa || 0) + parseFloat(data.proteina || 0)).toFixed(2))
             : '';
           return `
-          <div class="mt-10">
-            <p class="text-xs text-gray mb-12">Introduce los resultados del boletín analítico. El extracto seco (Grasa + Proteína) se calcula automáticamente.</p>
-            <div class="grid grid-cols-2 gap-8">
+          <div class="card card-accent card-accent-purple p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">DATOS ANALÍTICOS</div>
+            <p class="text-aaa uppercase font-800 text-[0.6rem] mb-12 text-center opacity-80">EXTRACTO SECO (G+P) CALCULADO AUTOMÁTICAMENTE</p>
+
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">MATERIA GRASA (%)</label>
-                <input type="number" id="w-l-grasa" value="${data.grasa || ''}" step="0.01" class="wizard-input" oninput="document.getElementById('w-l-es-calc').value = ((parseFloat(this.value)||0)+(parseFloat(document.getElementById('w-l-prot')?.value)||0)).toFixed(2)">
+                <input type="number" id="w-l-grasa" value="${data.grasa || ''}" step="0.01" class="wizard-input font-900" oninput="document.getElementById('w-l-es-calc').value = ((parseFloat(this.value)||0)+(parseFloat(document.getElementById('w-l-prot')?.value)||0)).toFixed(2)">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">PROTEÍNA (%)</label>
-                <input type="number" id="w-l-prot" value="${data.proteina || ''}" step="0.01" class="wizard-input" oninput="document.getElementById('w-l-es-calc').value = ((parseFloat(document.getElementById('w-l-grasa')?.value)||0)+(parseFloat(this.value)||0)).toFixed(2)">
+                <input type="number" id="w-l-prot" value="${data.proteina || ''}" step="0.01" class="wizard-input font-900" oninput="document.getElementById('w-l-es-calc').value = ((parseFloat(document.getElementById('w-l-grasa')?.value)||0)+(parseFloat(this.value)||0)).toFixed(2)">
               </div>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">${Icons.grafico()} EXTRACTO SECO CALCULADO (%)</label>
-              <input type="text" id="w-l-es-calc" value="${esCalc}" class="wizard-input text-green font-bold border-green" readonly style="background:#222;">
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">${Icons.grafico()} EXTRACTO SECO TOTAL (%)</label>
+              <input type="text" id="w-l-es-calc" value="${esCalc}" class="wizard-input text-green font-950 border-green bg-black" readonly>
             </div>
-            <div class="grid grid-cols-2 gap-8 mt-12">
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">RECUENTO BACTERIAS (UFC/mL)</label>
-                <input type="number" id="w-l-ger" value="${data.germenes || ''}" class="wizard-input">
+                <label class="wizard-label">GERMENES (UFC/ML)</label>
+                <input type="number" id="w-l-ger" value="${data.germenes || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">CÉLULAS SOMÁTICAS (cel/mL)</label>
-                <input type="number" id="w-l-som" value="${data.somaticas || ''}" class="wizard-input">
+                <label class="wizard-label">SOMÁTICAS (CEL/ML)</label>
+                <input type="number" id="w-l-som" value="${data.somaticas || ''}" class="wizard-input font-800">
               </div>
             </div>
-            <div class="flex items-center gap-12 mt-12 rounded-sm p-10 bg-darker">
-              <label class="flex items-center gap-6 text-sm" class="cursor-pointer">
-                <input type="checkbox" id="w-l-ant" ${data.antibioticos ? 'checked' : ''}>
-                <span class="${data.antibioticos ? 'text-red' : 'text-gray'}">${Icons.fitosanitario()} Antibióticos detectados</span>
-              </label>
-            </div>
-            <div class="grid grid-cols-2 gap-8 mt-12">
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm mb-12">
+                <input type="checkbox" id="w-l-ant" ${data.antibioticos ? 'checked' : ''} style="accent-color:#ef4444;">
+                <span class="${data.antibioticos ? 'text-red font-950' : 'text-aaa font-800'} uppercase text-[0.65rem]">${Icons.fitosanitario()} ANTIBIÓTICOS DETECTADOS</span>
+            </label>
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">FECHA ANÁLISIS</label>
-                <input type="date" id="w-l-fec-an" value="${data.fecha_analisis || ''}" class="wizard-input">
+                <input type="date" id="w-l-fec-an" value="${data.fecha_analisis || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº BOLETÍN</label>
-                <input type="text" id="w-l-bol" value="${data.nro_boletin || ''}" class="wizard-input">
+                <input type="text" id="w-l-bol" value="${data.nro_boletin || ''}" class="wizard-input uppercase font-800" placeholder="0000">
               </div>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">LABORATORIO</label>
-              <select id="w-l-lab" class="wizard-input wizard-select">
-                <option value="LIGAL" ${data.laboratorio_nombre === 'LIGAL' ? 'selected' : ''}>LIGAL (Oficial)</option>
-                <option value="Otro" ${data.laboratorio_nombre === 'Otro' ? 'selected' : ''}>Otro laboratorio</option>
+              <label class="wizard-label">LABORATORIO EMISOR</label>
+              <select id="w-l-lab" class="wizard-input font-800">
+                <option value="LIGAL" ${data.laboratorio_nombre === 'LIGAL' ? 'selected' : ''}>LIGAL (OFICIAL)</option>
+                <option value="Otro" ${data.laboratorio_nombre === 'Otro' ? 'selected' : ''}>OTRO LABORATORIO</option>
               </select>
             </div>
           </div>`;
@@ -366,9 +369,6 @@ window.AlbaranLecheWizard = {
         }
       },
 
-      // =====================================================
-      // PASO 5: Precio y Liquidación
-      // =====================================================
       {
         content: (data) => {
           const es = (parseFloat(data.grasa || 0) + parseFloat(data.proteina || 0)).toFixed(2);
@@ -381,35 +381,36 @@ window.AlbaranLecheWizard = {
           const importeTotal = parseFloat((vol * precioFinal).toFixed(2));
 
           return `
-          <div class="mt-10">
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">LIQUIDACIÓN ESTIMADA</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">VOLUMEN RECOGIDO (LITROS)</label>
-              <input type="number" id="w-l-cant" value="${data.l}" class="wizard-input border-green" style="font-size:1rem;"
+              <input type="number" id="w-l-cant" value="${data.l}" class="wizard-input border-green font-950 text-2xl text-green"
                 onchange="App._recalcularPrecioLeche()" oninput="App._recalcularPrecioLeche()">
             </div>
-            <div class="grid grid-cols-2 gap-8">
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">PRECIO BASE (€/L)</label>
-                <input type="number" id="w-l-pb" value="${data.pb || refPrecios.precio_base_referencia}" step="0.001" class="wizard-input"
+                <input type="number" id="w-l-pb" value="${data.pb || refPrecios.precio_base_referencia}" step="0.001" class="wizard-input font-800"
                   onchange="App._recalcularPrecioLeche()" oninput="App._recalcularPrecioLeche()">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">PRECIO EXTRACTO SECO (€/pto)</label>
-                <input type="number" id="w-l-pex" value="${data.precio_extracto_seco || refPrecios.precio_por_punto_extracto}" step="0.001" class="wizard-input"
+                <label class="wizard-label">PRECIO ES (€/PTO)</label>
+                <input type="number" id="w-l-pex" value="${data.precio_extracto_seco || refPrecios.precio_por_punto_extracto}" step="0.001" class="wizard-input font-800"
                   onchange="App._recalcularPrecioLeche()" oninput="App._recalcularPrecioLeche()">
               </div>
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-16">
               <label class="wizard-label">PRIMAS / PENALIZACIONES (€)</label>
-              <input type="number" id="w-l-prim" value="${data.primas_penalizaciones || 0}" step="0.01" class="wizard-input"
+              <input type="number" id="w-l-prim" value="${data.primas_penalizaciones || 0}" step="0.01" class="wizard-input font-800"
                 onchange="App._recalcularPrecioLeche()" oninput="App._recalcularPrecioLeche()">
             </div>
-            <div class="bg-darker border-muted rounded-10 p-14 mt-12">
-              <div class="grid grid-cols-2 gap-8 text-sm">
-                <div>Extracto seco: <strong class="text-gold" id="w-l-es-display">${es}</strong>%</div>
-                <div>Tasa INLAC: <strong class="text-gray">${tasa} €</strong></div>
-                <div>Precio final unitario: <strong id="w-l-precio-final-display" class="text-green">${precioFinal.toFixed(4)} €/L</strong></div>
-                <div>Importe total: <strong id="w-l-importe-display" class="text-green">${importeTotal.toFixed(2)} €</strong></div>
+            <div class="bg-black border border-222 rounded-sm p-14 mt-12">
+              <div class="grid grid-cols-2 gap-8 text-[0.65rem] uppercase font-900 tracking-tight">
+                <div>EXTRACTO SECO: <strong class="text-gold" id="w-l-es-display">${es}</strong>%</div>
+                <div>TASA INLAC: <strong class="text-aaa">${tasa} €</strong></div>
+                <div class="mt-4 border-top-222 pt-4">PRECIO FINAL:</div><div class="mt-4 border-top-222 pt-4 text-right"><strong id="w-l-precio-final-display" class="text-green text-sm">${precioFinal.toFixed(4)} €/L</strong></div>
+                <div class="mt-2">IMPORTE TOTAL:</div><div class="mt-2 text-right"><strong id="w-l-importe-display" class="text-green text-lg">${importeTotal.toFixed(2)} €</strong></div>
               </div>
             </div>
           </div>`;
@@ -426,9 +427,6 @@ window.AlbaranLecheWizard = {
         }
       },
 
-      // =====================================================
-      // PASO 6: MOFA + Resumen Final
-      // =====================================================
       {
         content: (data) => {
           const vol = parseFloat(data.l) || 0;
@@ -443,34 +441,33 @@ window.AlbaranLecheWizard = {
           const mofa = parseFloat((importeTotal - costeAlim).toFixed(2));
 
           return `
-          <div class="mt-10">
-            <h4 class="text-amber text-base mt-0 mb-12">${Icons.grafico()} MOFA — Margen sobre Coste de Alimentación</h4>
-            <div class="wizard-input-group">
-              <label class="wizard-label">COSTE ALIMENTACIÓN DIARIO (€/día)</label>
-              <input type="number" id="w-l-cost-dia" value="${data.coste_alimentacion_diario || ''}" step="0.01" class="wizard-input">
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.grafico()} ANÁLISIS DE RENTABILIDAD</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">COSTE ALIMENTACIÓN DIARIO (€/DÍA)</label>
+              <input type="number" id="w-l-cost-dia" value="${data.coste_alimentacion_diario || ''}" step="0.01" class="wizard-input font-800">
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-16">
               <label class="wizard-label">COSTE ALIMENTACIÓN PERÍODO (€)</label>
-              <input type="number" id="w-l-cost-per" value="${costeAlim || ''}" step="0.01" class="wizard-input"
+              <input type="number" id="w-l-cost-per" value="${costeAlim || ''}" step="0.01" class="wizard-input font-900 text-lg"
                 onchange="App._recalcularMOFA()" oninput="App._recalcularMOFA()">
             </div>
 
-            <div class="p-16 bg-darker border-muted rounded" style="margin-top:14px;">
-              <h5 class="text-white text-sm" style="margin:0 0 12px;">${Icons.documento()} RESUMEN DE LA SALIDA LÁCTEA</h5>
-              <table class="text-sm w-full" style="border-collapse:collapse;">
-                <tr><td class="text-gray" class="py-4">Fecha</td><td class="text-right text-white" class="py-4">${data.fecha}</td></tr>
-                <tr><td class="text-gray" class="py-4">CCAA</td><td class="text-right text-white" class="py-4">${data.comunidad_autonoma ? opcionesCCAA.find(o=>o.value===data.comunidad_autonoma)?.label || data.comunidad_autonoma : '—'}</td></tr>
-                <tr><td class="text-gray" class="py-4">Cisterna</td><td class="text-right text-white" class="py-4">${data.matricula || '—'}</td></tr>
-                <tr><td class="text-gray" class="py-4">Volumen</td><td class="text-right text-white" class="py-4">${vol.toLocaleString()} L</td></tr>
-                <tr><td class="text-gray" class="py-4">Extracto seco</td><td class="text-right text-gold" class="py-4">${es}%</td></tr>
-                <tr><td class="text-gray" class="py-4">Precio final</td><td class="text-right text-green" class="py-4">${precioFinal.toFixed(4)} €/L</td></tr>
-                <tr><td class="text-gray" class="py-4">Importe total</td><td class="text-right text-green font-bold" class="py-4" id="w-l-resumen-importe">${importeTotal.toFixed(2)} €</td></tr>
-                <tr><td class="text-gray" class="py-4">Coste alimentación</td><td class="text-right text-red" class="py-4" id="w-l-resumen-coste">${costeAlim.toFixed(2)} €</td></tr>
-                <tr><td class="text-white font-bold" style="padding:6px 0 0; border-top:1px solid #333;">MOFA</td>
-                  <td class="font-bold" style="text-align:right; border-top:1px solid #333; color:${mofa >= 0 ? '#10b981' : '#ef4444'}; font-size:1rem;" id="w-l-resumen-mofa">
-                    ${mofa.toFixed(2)} € ${mofa >= 0 ? '✅' : '⚠️'}</td></tr>
+            <div class="p-16 bg-black border border-222 rounded-sm" style="margin-top:14px;">
+              <div class="text-[0.6rem] text-gold font-950 uppercase tracking-widest mb-10 text-center border-bottom-222 pb-6">RESUMEN DE SALIDA LÁCTEA</div>
+              <table class="text-[0.65rem] w-full uppercase font-900 tracking-tight" style="border-collapse:collapse;">
+                <tr><td class="text-gray py-4">FECHA:</td><td class="text-right text-white py-4">${data.fecha}</td></tr>
+                <tr><td class="text-gray py-4">CISTERNA:</td><td class="text-right text-white py-4">${data.matricula || '—'}</td></tr>
+                <tr><td class="text-gray py-4">VOLUMEN:</td><td class="text-right text-white py-4">${vol.toLocaleString()} L</td></tr>
+                <tr><td class="text-gray py-4">EXTRACTO SECO:</td><td class="text-right text-gold py-4">${es}%</td></tr>
+                <tr><td class="text-gray py-4">PRECIO FINAL:</td><td class="text-right text-green py-4">${precioFinal.toFixed(4)} €/L</td></tr>
+                <tr><td class="text-gray py-4">IMPORTE TOTAL:</td><td class="text-right text-green font-950 py-4" id="w-l-resumen-importe">${importeTotal.toFixed(2)} €</td></tr>
+                <tr><td class="text-gray py-4">COSTE ALIM.:</td><td class="text-right text-red py-4" id="w-l-resumen-coste">${costeAlim.toFixed(2)} €</td></tr>
+                <tr class="border-top-222"><td class="text-white font-950 pt-8">MOFA:</td>
+                  <td class="font-950 pt-8 text-right" style="color:${mofa >= 0 ? '#10b981' : '#ef4444'}; font-size:1rem;" id="w-l-resumen-mofa">
+                    ${mofa.toFixed(2)} € ${mofa >= 0 ? 'OK' : 'CRÍTICO'}</td></tr>
               </table>
-              ${mofa < 0 ? '<p class="text-red text-xs mt-8">⚠️ El MOFA es negativo — el coste de alimentación supera los ingresos. Revisa la ración o el precio de venta.</p>' : ''}
+              ${mofa < 0 ? '<div class="text-red text-[0.55rem] mt-10 text-center font-900 tracking-tighter uppercase">ALERTA: EL COSTE DE ALIMENTACIÓN SUPERA LOS INGRESOS</div>' : ''}
             </div>
           </div>`;
         },

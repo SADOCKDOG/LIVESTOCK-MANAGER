@@ -230,178 +230,200 @@ const AnimalesView = {
 
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
-        <div class="wizard-header-fixed flex justify-between items-center">
-          <h1 class="wizard-header-title">FICHA ANIMAL</h1>
-          <div class="flex gap-8">
-            <button onclick="App._leerChipNFC('a-rfid', 'a-crotal')" class="wizard-btn-action wizard-btn-nfc">
-              🛜 NFC
+        <div class="wizard-header-fixed flex justify-between items-center border-top-5-gold">
+          <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg">${Icons.animales()} FICHA ANIMAL</h1>
+          <div class="flex gap-10">
+            <button onclick="App._leerChipNFC('a-rfid', 'a-crotal')" class="widget-link-btn widget-link-btn--neon neon-accent px-12 py-6 min-h-0 h-auto">
+              <span class="text-[0.65rem] font-900 uppercase">NFC</span>
             </button>
-            <button onclick="App._escanearCrotal('a-crotal')" class="wizard-btn-action wizard-btn-primary wizard-btn-scan">
-              ${Icons.foto()} SCAN
+            <button onclick="App._escanearCrotal('a-crotal')" class="widget-link-btn widget-link-btn--neon neon-info px-12 py-6 min-h-0 h-auto">
+              <span class="text-[0.65rem] font-900 uppercase">SCAN</span>
             </button>
           </div>
         </div>
-        <div class="wizard-content-scrollable">
-          <div class="text-center mb-8">
-            <label class="wizard-crotal-label">Nº CROTAL</label>
+        <div class="wizard-content-scrollable p-20">
+          <div class="text-center mb-16">
+            <label class="text-[0.65rem] text-gray uppercase font-900 tracking-widest mb-8 block">Nº CROTAL IDENTIFICACIÓN</label>
             <input type="text" id="a-crotal"
                    value="${a.numero_identificacion}"
-                   placeholder="Ej: ES123456789012 (2 letras + 12 dígitos)" maxlength="14"
+                   placeholder="ES000000000000" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
-                   class="wizard-crotal-input">
-            <div class="text-777 text-tiny mt-4" style="line-height:1.3; padding:0 8px;">
-              Formato REGA: ES + 12 dígitos<br>
-              <span class="text-gold" id="crotal-length-counter">0/14</span>
+                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid var(--p-gold) !important;">
+            <div class="text-aaa text-[0.6rem] uppercase font-800 mt-6 tracking-wide">
+              REQUISITO REGA: ES + 12 DÍGITOS · <span class="text-gold" id="crotal-length-counter">0/14</span>
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-12 mb-12">
-            <div>
-              <label class="form-label">ESPECIE</label>
-              <select id="a-especie" class="form-input form-input-lg" onchange="AnimalesView._onEspecieChange(this)">
-                ${especies.map((e) => `<option value="${e.nombre}" ${a.especie === e.nombre ? "selected" : ""}>${e.nombre}</option>`).join("")}
+
+          <div class="card card-accent card-accent-amber p-16 mb-20">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.info()} DATOS GENERALES</div>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">ESPECIE</label>
+                <select id="a-especie" class="wizard-input" onchange="AnimalesView._onEspecieChange(this)">
+                  ${especies.map((e) => `<option value="${e.nombre}" ${a.especie === e.nombre ? "selected" : ""}>${e.nombre.toUpperCase()}</option>`).join("")}
+                </select>
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">SEXO</label>
+                <select id="a-sexo" class="wizard-input">
+                  <option value="H" ${a.sexo === "H" ? "selected" : ""}>HEMBRA (H)</option>
+                  <option value="M" ${a.sexo === "M" ? "selected" : ""}>MACHO (M)</option>
+                  <option value="C" ${a.sexo === "C" ? "selected" : ""}>CASTRADO (C)</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">RAZA</label>
+                <input type="text" id="a-raza" value="${a.raza || ""}" class="wizard-input uppercase font-800" placeholder="SIN RAZA">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">REBAÑO / LOTE</label>
+                <select id="a-rebano" class="wizard-input font-800">
+                  <option value="">SIN ASIGNAR</option>
+                  ${rebanos.map((r) => `<option value="${r.id}" ${a.rebanoId == r.id ? "selected" : ""}>${r.nombre.toUpperCase()}</option>`).join("")}
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">NACIMIENTO</label>
+                <input type="date" id="a-fecha" value="${a.fecha_nacimiento || ""}" class="wizard-input font-800">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">TIPO DE ALTA</label>
+                <select id="a-tipoalta" class="wizard-input font-800" onchange="AnimalesView._onTipoAltaChange(this)">
+                  ${tiposAlta.map((t) => `<option value="${t.value}" ${a.tipoAlta === t.value ? "selected" : ""}>${t.label.toUpperCase()}</option>`).join("")}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-accent card-accent-blue p-16 mb-20">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
+              <select id="a-categoria" class="wizard-input font-800">
+                <option value="">— SIN CLASIFICAR —</option>
+                ${categoriasAnimal.map((c) => `<option value="${c}" ${a.categoria === c ? "selected" : ""}>${c.toUpperCase()}</option>`).join("")}
               </select>
             </div>
-            <div>
-              <label class="form-label">SEXO</label>
-              <select id="a-sexo" class="form-input form-input-lg">
-                <option value="H" ${a.sexo === "H" ? "selected" : ""}>Hembra (H)</option>
-                <option value="M" ${a.sexo === "M" ? "selected" : ""}>Macho (M)</option>
-                <option value="C" ${a.sexo === "C" ? "selected" : ""}>Castrado (C)</option>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">CHIP (RFID/NFC)</label>
+                <input type="text" id="a-rfid" value="${a.rfid_codigo || ""}" placeholder="OPCIONAL" class="wizard-input font-800">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">FECHA IDENTIFICACIÓN</label>
+                <input type="date" id="a-fecha-ident" value="${a.fecha_identificacion || ""}" class="wizard-input font-800">
+              </div>
+            </div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">TIPO DE IDENTIFICACIÓN</label>
+              <select id="a-tipo-ident" class="wizard-input font-800">
+                <option value="Completa (EID + Visual)" ${a.tipo_identificacion === "Completa (EID + Visual)" ? "selected" : ""}>COMPLETA (EID + VISUAL)</option>
+                <option value="Matadero (Visual REGA)" ${a.tipo_identificacion === "Matadero (Visual REGA)" ? "selected" : ""}>MATADERO (VISUAL REGA)</option>
               </select>
             </div>
-          </div>
-          <div class="grid grid-cols-2 gap-12 mb-12">
-            <div>
-              <label class="form-label">RAZA</label>
-              <input type="text" id="a-raza" value="${a.raza || ""}" class="form-input form-input-lg">
-            </div>
-            <div>
-              <label class="form-label">REBAÑO</label>
-              <select id="a-rebano" class="form-select-gold">
-                <option value="">Sin asignar</option>
-                ${rebanos.map((r) => `<option value="${r.id}" ${a.rebanoId == r.id ? "selected" : ""}>${r.nombre}</option>`).join("")}
-              </select>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-12 mb-12">
-            <div>
-              <label class="form-label">NACIMIENTO</label>
-              <input type="date" id="a-fecha" value="${a.fecha_nacimiento || ""}" class="form-input form-input-lg">
-            </div>
-            <div>
-              <label class="form-label">TIPO ALTA</label>
-              <select id="a-tipoalta" class="form-input form-input-lg" onchange="AnimalesView._onTipoAltaChange(this)">
-                ${tiposAlta.map((t) => `<option value="${t.value}" ${a.tipoAlta === t.value ? "selected" : ""}>${t.label}</option>`).join("")}
-              </select>
-            </div>
-          </div>
-          <div class="mb-12">
-            <label class="form-label">CATEGORÍA (libro de registro)</label>
-            <select id="a-categoria" class="form-input form-input-lg">
-              <option value="">— Sin clasificar —</option>
-              ${categoriasAnimal.map((c) => `<option value="${c}" ${a.categoria === c ? "selected" : ""}>${c}</option>`).join("")}
-            </select>
-          </div>
-          <div class="grid grid-cols-2 gap-12 mb-12">
-            <div>
-              <label class="form-label">CHIP (RFID/NFC)</label>
-              <input type="text" id="a-rfid" value="${a.rfid_codigo || ""}" placeholder="Opcional..." class="form-input form-input-lg">
-            </div>
-            <div>
-              <label class="form-label">FECHA IDENTIFICACIÓN</label>
-              <input type="date" id="a-fecha-ident" value="${a.fecha_identificacion || ""}" class="form-input form-input-lg">
-            </div>
-          </div>
-          <div class="mb-12">
-            <label class="form-label">TIPO IDENTIFICACIÓN</label>
-            <select id="a-tipo-ident" class="form-input form-input-lg">
-              <option value="Completa (EID + Visual)" ${a.tipo_identificacion === "Completa (EID + Visual)" ? "selected" : ""}>Completa (EID + Visual)</option>
-              <option value="Matadero (Visual REGA)" ${a.tipo_identificacion === "Matadero (Visual REGA)" ? "selected" : ""}>Matadero (Visual REGA)</option>
-            </select>
-          </div>
-          <div class="mb-12">
-            <label class="wizard-checkbox-container mt-5">
-              <input type="checkbox" id="a-notificado" ${a.notificado_rega ? 'checked' : ''}>
-              <span>Alta comunicada oficialmente a PIGGAN/SIA</span>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
+              <input type="checkbox" id="a-notificado" ${a.notificado_rega ? 'checked' : ''} style="accent-color:#3b82f6;">
+              <span class="uppercase font-900 text-[0.65rem] tracking-tight">ALTA COMUNICADA OFICIALMENTE A PIGGAN/SIA</span>
             </label>
           </div>
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
-          <div class="badge-crotal mb-12">
-            <div class="badge-crotal-header flex items-center gap-6">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
-            <div class="grid grid-cols-2 gap-12 mb-12 mt-10">
-              <div>
-                <label class="form-label">PAÍS DE NACIMIENTO</label>
-                <select id="a-pais-nac" class="form-input form-input-lg">
-                  ${paisesNac.map((p) => `<option value="${p.value}" ${(a.pais_nacimiento || 'ES') === p.value ? "selected" : ""}>${p.label}</option>`).join("")}
+          <div class="card card-accent card-accent-green p-16 mb-20">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">PAÍS DE NACIMIENTO</label>
+                <select id="a-pais-nac" class="wizard-input font-800">
+                  ${paisesNac.map((p) => `<option value="${p.value}" ${(a.pais_nacimiento || 'ES') === p.value ? "selected" : ""}>${p.label.toUpperCase()}</option>`).join("")}
                 </select>
               </div>
-              <div>
-                <label class="form-label">FECHA ALTA EN EXPLOTACIÓN</label>
-                <input type="date" id="a-fecha-alta" value="${a.fecha_alta || ""}" class="form-input form-input-lg">
+              <div class="wizard-input-group">
+                <label class="wizard-label">FECHA ALTA EXPLOTACIÓN</label>
+                <input type="date" id="a-fecha-alta" value="${a.fecha_alta || ""}" class="wizard-input font-800">
               </div>
             </div>
-            <div id="a-procedencia-section" class="mb-12" style="display:${esCompra ? 'block' : 'none'};">
-              <label class="form-label">REGA DE PROCEDENCIA (explotación origen)</label>
-              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="Ej: ES041230000123" class="form-input form-input-lg">
+            <div id="a-procedencia-section" class="wizard-input-group mb-12" style="display:${esCompra ? 'block' : 'none'};">
+              <label class="wizard-label">REGA DE PROCEDENCIA (ORIGEN)</label>
+              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="ES041230000123" class="wizard-input font-800">
             </div>
-            <div class="mb-12">
-              <label class="form-label">MADRE (genealogía)</label>
-              <select id="a-madre" class="form-select-gold">
-                <option value="">Sin asignar</option>
-                ${hembras.map((h) => `<option value="${h.id}" ${a.madre_id == h.id ? "selected" : ""}>${h.numero_identificacion || ('#' + h.id)}${h.especie ? ' · ' + h.especie : ''}</option>`).join("")}
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">MADRE (GENEALOGÍA)</label>
+              <select id="a-madre" class="wizard-input font-800">
+                <option value="">SIN ASIGNAR</option>
+                ${hembras.map((h) => `<option value="${h.id}" ${a.madre_id == h.id ? "selected" : ""}>${(h.numero_identificacion || ('#' + h.id)).toUpperCase()}${h.especie ? ' · ' + h.especie.toUpperCase() : ''}</option>`).join("")}
               </select>
             </div>
-            <div id="a-dib-section" class="mb-12" style="display:${mostrarDIB ? 'block' : 'none'};">
-              <label class="form-label">DIB / Nº PASAPORTE (bovino/equino)</label>
-              <input type="text" id="a-dib" value="${a.dib || ""}" placeholder="Documento de Identificación Bovina" class="form-input form-input-lg">
+            <div id="a-dib-section" class="wizard-input-group mb-12" style="display:${mostrarDIB ? 'block' : 'none'};">
+              <label class="wizard-label">DIB / Nº PASAPORTE</label>
+              <input type="text" id="a-dib" value="${a.dib || ""}" placeholder="DOC. IDENTIFICACIÓN BOVINA" class="wizard-input font-800">
             </div>
-            <div class="grid grid-cols-2 gap-12">
-              <div>
-                <label class="form-label">ESTADO</label>
-                <select id="a-estado" class="form-input form-input-lg" onchange="AnimalesView._onEstadoChange(this)">
-                  <option value="activo" ${(a.estado || 'activo') === 'activo' ? "selected" : ""}>Activo</option>
-                  <option value="vendido" ${a.estado === 'vendido' ? "selected" : ""}>Vendido</option>
-                  <option value="baja" ${esBaja ? "selected" : ""}>Baja</option>
+            <div class="grid grid-cols-2 gap-12 items-start">
+              <div class="wizard-input-group">
+                <label class="wizard-label">ESTADO ACTUAL</label>
+                <select id="a-estado" class="wizard-input font-900" onchange="AnimalesView._onEstadoChange(this)">
+                  <option value="activo" ${(a.estado || 'activo') === 'activo' ? "selected" : ""}>ACTIVO</option>
+                  <option value="vendido" ${a.estado === 'vendido' ? "selected" : ""}>VENDIDO</option>
+                  <option value="baja" ${esBaja ? "selected" : ""}>BAJA (MUERTE)</option>
                 </select>
               </div>
-              <div id="a-motivo-baja-wrap" style="display:${esBaja ? 'block' : 'none'};">
-                <label class="form-label">MOTIVO DE BAJA</label>
-                <select id="a-motivo-baja" class="form-input form-input-lg">
-                  <option value="">— Selecciona —</option>
-                  ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label}</option>`).join("")}
+              <div id="a-motivo-baja-wrap" class="wizard-input-group" style="display:${esBaja ? 'block' : 'none'};">
+                <label class="wizard-label">MOTIVO DE BAJA</label>
+                <select id="a-motivo-baja" class="wizard-input font-800">
+                  <option value="">— SELECCIONA —</option>
+                  ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label.toUpperCase()}</option>`).join("")}
                 </select>
-                <div id="a-sandach-wrap" class="d-none" style="margin-top:8px; padding:8px; background:#f0f9ff; border:1px solid #0ea5e9; border-radius:6px; font-size:12px;">
-                  <div style="color:#0369a1; font-weight:600; margin-bottom:4px;">ℹ️ CLASIFICACIÓN SANDACH (Reg. UE 1069/2009)</div>
-                  <div id="a-sandach-categoria" style="color:#475569; margin-top:4px;"></div>
+                <div id="a-sandach-wrap" class="mt-8 p-10 border border-info rounded-sm bg-black d-none">
+                  <div class="text-info font-900 text-[0.55rem] mb-2 uppercase tracking-widest">CLASIFICACIÓN SANDACH</div>
+                  <div id="a-sandach-categoria" class="text-aaa text-[0.65rem] font-800 uppercase leading-tight"></div>
                 </div>
               </div>
             </div>
-            <div id="a-fecha-baja-wrap" class="mb-12" style="display:${esSalida ? 'block' : 'none'}; margin-top:12px;">
-              <label class="form-label">FECHA DE SALIDA / BAJA</label>
-              <input type="date" id="a-fecha-baja" value="${a.fecha_baja || ""}" class="form-input form-input-lg">
+            <div id="a-fecha-baja-wrap" class="wizard-input-group mt-12" style="display:${esSalida ? 'block' : 'none'};">
+              <label class="wizard-label">FECHA DE SALIDA / BAJA</label>
+              <input type="date" id="a-fecha-baja" value="${a.fecha_baja || ""}" class="wizard-input font-800">
             </div>
           </div>
 
-          <textarea id="a-notas" placeholder="NOTAS / OBSERVACIONES..."
-                    class="wizard-notas">${a.notas || ""}</textarea>
+          <div class="card card-accent card-accent-gold p-16 mb-20">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.documento()} OBSERVACIONES</div>
+            <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
+          </div>
+
           ${!esNuevo ? `
-            <div class="badge-crotal">
-              <div class="badge-crotal-header">COMPAÑEROS DE REBAÑO &mdash; Últ. pesaje</div>
-              <div id="tabla-referencia" class="badge-crotal-loading">Cargando...</div>
+            <div class="card card-accent card-accent-amber p-16 mb-20">
+               <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">COMPAÑEROS LOTE</div>
+               <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
-            <div class="badge-crotal mt-15">
-              <div class="badge-crotal-header">HISTORIAL REPRODUCTIVO</div>
-              <div id="tabla-reproduccion" class="badge-crotal-loading">Cargando...</div>
+            <div class="card card-accent card-accent-purple p-16 mb-20">
+               <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">HISTORIAL REPRO</div>
+               <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
-            <button id="btn-reproduccion" onclick="App._abrirWizardReproduccion('${id}')" class="wizard-btn-action wizard-btn-reproduccion">
-              ${Icons.reproduccion()} GESTIÓN REPRODUCTIVA
-            </button>` : ""}
+            <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-20">
+              <button id="btn-reproduccion" onclick="App._abrirWizardReproduccion('${id}')" class="widget-link-btn widget-link-btn--neon neon-accent">
+                ${Icons.reproduccion()}
+                <span class="widget-link-label">Gestión Repro.</span>
+              </button>
+            </div>` : ""}
         </div>
+
         <div class="wizard-footer-fixed grid grid-cols-3 gap-8">
-          ${!esNuevo ? `<button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action" style="background:linear-gradient(135deg,#0d9488,#0f766e);border:none;color:#fff;font-weight:800;">${Icons.rotacion()} Ver 360°</button>` : '<div></div>'}
-          <button type="button" onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">${Icons.cerrar()} Salir</button>
-          <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">${Icons.guardar()} Guardar</button>
+          ${!esNuevo ? `
+          <button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-info px-4">
+            ${Icons.rotacion()}
+            <span class="widget-link-label">360°</span>
+          </button>` : '<div></div>'}
+          <button type="button" onclick="AnimalesView._salirRegistro()" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
+            ${Icons.cerrar()}
+            <span class="widget-link-label">SALIR</span>
+          </button>
+          <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="widget-link-btn widget-link-btn--neon neon-success px-4">
+            ${Icons.guardar()}
+            <span class="widget-link-label">GUARDAR</span>
+          </button>
         </div>
       </div>`;
 

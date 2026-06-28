@@ -222,7 +222,10 @@ const PesajesUI = {
             </div>
 
             <div class="wizard-footer-fixed flex gap-10">
-                <button class="wizard-btn-action wizard-btn-success flex-1" id="btn-wizard-finish">${esModoLeche ? 'FINALIZAR CONTROL ✔' : 'FINALIZAR PESADAS ✔'}</button>
+                <button class="widget-link-btn widget-link-btn--neon neon-success flex-1" id="btn-wizard-finish">
+                    ${Icons.check()}
+                    <span class="widget-link-label">${esModoLeche ? 'FINALIZAR CONTROL' : 'FINALIZAR PESADAS'}</span>
+                </button>
             </div>
             `;
 

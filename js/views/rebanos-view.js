@@ -270,15 +270,16 @@ const RebanosView = {
     const wizardSteps = [
       {
         content: (data) => `
-          <div class="mt-10">
-            <div class="wizard-input-group">
-              <label class="wizard-label">NOMBRE DEL REBAÑO</label>
-              <input type="text" id="w-reb-nombre" value="${data.nombre}" placeholder="Ej: Lote Engorde A..." class="wizard-input">
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">IDENTIFICACIÓN</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">NOMBRE DEL REBAÑO / LOTE</label>
+              <input type="text" id="w-reb-nombre" value="${data.nombre}" placeholder="EJ: LOTE ENGORDE A..." class="wizard-input uppercase font-800">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">ESPECIE</label>
-              <select id="w-reb-especie" class="wizard-input wizard-select">
-                ${especies.map((e) => `<option value="${e.nombre}" ${data.especie === e.nombre ? "selected" : ""}>${e.nombre}</option>`).join("")}
+              <label class="wizard-label">ESPECIE PRINCIPAL</label>
+              <select id="w-reb-especie" class="wizard-input font-800">
+                ${especies.map((e) => `<option value="${e.nombre}" ${data.especie === e.nombre ? "selected" : ""}>${e.nombre.toUpperCase()}</option>`).join("")}
               </select>
             </div>
           </div>
@@ -297,18 +298,19 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">UBICACIÓN Y TIPO</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO DE PRODUCCIÓN</label>
-              <select id="w-reb-tipo" class="wizard-input wizard-select">
-                ${tipos.map((t) => `<option value="${t.nombre}" ${data.tipo === t.nombre ? "selected" : ""}>${t.nombre}</option>`).join("")}
+              <select id="w-reb-tipo" class="wizard-input font-800">
+                ${tipos.map((t) => `<option value="${t.nombre}" ${data.tipo === t.nombre ? "selected" : ""}>${t.nombre.toUpperCase()}</option>`).join("")}
               </select>
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">ZONA / PARCELA INICIAL</label>
-              <select id="w-reb-zona" class="wizard-input wizard-select" style="border-color: #d97706;">
-                <option value="">Sin asignar (Finca General)</option>
-                ${zonas.map((z) => `<option value="${z.nombre}" ${data.zonaActual === z.nombre ? "selected" : ""}>${z.nombre}</option>`).join("")}
+              <select id="w-reb-zona" class="wizard-input font-800" style="border-color: #d97706;">
+                <option value="">SIN ASIGNAR (FINCA GENERAL)</option>
+                ${zonas.map((z) => `<option value="${z.nombre}" ${data.zonaActual === z.nombre ? "selected" : ""}>${z.nombre.toUpperCase()}</option>`).join("")}
               </select>
             </div>
           </div>
@@ -320,14 +322,15 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">REQUISITOS REGA</div>
             <div class="wizard-input-group">
               <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
-              <select id="w-reb-tipo-explotacion" class="wizard-input wizard-select" style="border-color: #10b981;">
-                <option value="">— Seleccionar —</option>
-                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_explotacion_rega === t ? "selected" : ""}>${t}</option>`).join("")}
+              <select id="w-reb-tipo-explotacion" class="wizard-input font-800" style="border-color: #10b981;">
+                <option value="">— SELECCIONAR —</option>
+                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_explotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
               </select>
-              <small class="text-gray">Requisito normativo SIGGAN/BADIGEX</small>
+              <small class="text-aaa uppercase font-700 text-[0.55rem] mt-4 block">Dato normativo obligatorio para SIGGAN/BADIGEX</small>
             </div>
           </div>
         `,
@@ -337,14 +340,15 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-gold p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">CAPACIDAD Y TRAZABILIDAD</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">CAPACIDAD / AFORO MÁXIMO</label>
-              <input type="number" id="w-reb-capacidad" value="${data.capacidad_total || ''}" placeholder="Ej: 100 (opcional)" class="wizard-input">
+              <input type="number" id="w-reb-capacidad" value="${data.capacidad_total || ''}" placeholder="EJ: 100" class="wizard-input font-800">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">CÓDIGO DE LOTE / TRAZABILIDAD</label>
-              <input type="text" id="w-reb-lote" value="${data.codigo_lote || ''}" placeholder="Ej: LOTE-2026-A (opcional)" class="wizard-input">
+              <label class="wizard-label">CÓDIGO DE LOTE / LOTE IDENT.</label>
+              <input type="text" id="w-reb-lote" value="${data.codigo_lote || ''}" placeholder="EJ: LOTE-2026-A" class="wizard-input uppercase font-800">
             </div>
           </div>
         `,
@@ -355,14 +359,15 @@ const RebanosView = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">FECHA Y NOTAS</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">FECHA DE CONSTITUCIÓN</label>
-              <input type="date" id="w-reb-fecha" value="${data.fecha_constitucion}" class="wizard-input">
+              <input type="date" id="w-reb-fecha" value="${data.fecha_constitucion}" class="wizard-input font-800">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">NOTAS / OBSERVACIONES</label>
-              <textarea id="w-reb-notas" placeholder="Ración, ADSG, detalles..." class="wizard-input" style="height:80px; resize:none;">${data.notas || ''}</textarea>
+              <label class="wizard-label">OBSERVACIONES</label>
+              <textarea id="w-reb-notas" placeholder="DETALLES ADICIONALES..." class="wizard-input font-700 uppercase" style="height:80px; resize:none; font-size:0.8rem;">${data.notas || ''}</textarea>
             </div>
           </div>
         `,

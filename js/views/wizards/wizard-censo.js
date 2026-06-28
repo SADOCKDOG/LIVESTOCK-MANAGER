@@ -13,17 +13,16 @@ window.WizardCenso = {
     const steps = [
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">${Icons.calendar()} Fecha de Referencia</h3>
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">FECHA DE REFERENCIA</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">FECHA DEL CENSO</label>
-              <input type="date" id="w-cs-fecha" value="${data.fecha}" class="wizard-input">
+              <input type="date" id="w-cs-fecha" value="${data.fecha}" class="wizard-input font-800">
             </div>
-            <div class="rounded-sm nota-box nota-box-green mt-10">
-              <div class="text-xs text-aaa">
-                📌 La declaración censal obligatoria se refiere normalmente al <strong>censo a 1 de enero</strong>.
-                Se contabilizan los animales activos a la fecha indicada.
-              </div>
+            <div class="p-10 bg-black border border-222 rounded-sm">
+              <p class="text-[0.6rem] text-aaa uppercase font-900 tracking-tight leading-relaxed m-0 text-center">
+                LA DECLARACIÓN CENSAL OBLIGATORIA SE REFIERE AL <strong>CENSO A 1 DE ENERO</strong>.
+              </p>
             </div>
           </div>`,
         onChange: async (data) => {
@@ -40,21 +39,26 @@ window.WizardCenso = {
           data._censo = censo;
           const filas = Object.entries(censo.porEspecie);
           return `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🐑 Censo a ${data.fecha}</h3>
-            <div class="text-3xl font-black text-white mb-10">${censo.total} animales</div>
-            ${filas.length === 0 ? '<p class="empty-state-text">No hay animales activos en la fecha indicada.</p>' : ''}
-            ${filas.map(([esp, info]) => `
-              <div class="rounded-sm p-10 mb-8 bg-dark">
-                <div class="flex justify-between font-bold text-gold mb-6">
-                  <span>${esp}</span><span>Total: ${info.total}</span>
-                </div>
-                <div class="text-gray text-82">♀ ${info.hembras} hembras · ♂ ${info.machos} machos</div>
-                <div class="mt-4 text-gray-500 text-75">
-                  ${Object.entries(info.categorias).map(([cat, cnt]) =>
-                    `<span class="rounded-sm" style="background:#222;padding:2px 6px;margin-right:4px;">${cat}: ${cnt}</span>`).join('')}
-                </div>
-              </div>`).join('')}
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.animales()} CENSO CONSOLIDADO</div>
+            <div class="text-center bg-black border border-222 p-16 rounded-sm mb-16">
+              <div class="text-aaa uppercase font-900 text-[0.65rem] tracking-widest mb-4">TOTAL CABEZAS ACTIVAS</div>
+              <div class="text-white font-950 text-3xl tracking-tighter">${censo.total} ANIMALES</div>
+            </div>
+            ${filas.length === 0 ? '<p class="text-center text-gray uppercase font-800 text-xs p-10">No hay animales activos en la fecha</p>' : ''}
+            <div class="grid gap-10">
+              ${filas.map(([esp, info]) => `
+                <div class="rounded-sm p-12 border border-222 bg-black">
+                  <div class="flex justify-between font-950 text-gold text-sm uppercase tracking-tight mb-6">
+                    <span>${esp}</span><span>${info.total}</span>
+                  </div>
+                  <div class="text-aaa uppercase font-800 text-[0.6rem] tracking-widest">${Icons.check()} HEMBRAS: ${info.hembras} · MACHOS: ${info.machos}</div>
+                  <div class="mt-8 flex flex-wrap gap-4">
+                    ${Object.entries(info.categorias).map(([cat, cnt]) =>
+                      `<span class="bg-black border border-222 rounded-sm text-[0.55rem] text-aaa px-6 py-2 uppercase font-900">${cat}: ${cnt}</span>`).join('')}
+                  </div>
+                </div>`).join('')}
+            </div>
           </div>`;
         },
         onChange: async () => {},
@@ -68,28 +72,28 @@ window.WizardCenso = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🗂️ Tramitación Administrativa</h3>
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">TRAMITACIÓN ADMINISTRATIVA</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">ESTADO DE TRÁMITE</label>
-              <select id="w-cs-estado" class="wizard-input">
-                <option value="borrador" ${data.estado_tramite === "borrador" ? "selected" : ""}>Borrador</option>
-                <option value="presentado" ${data.estado_tramite === "presentado" ? "selected" : ""}>Presentado</option>
-                <option value="aceptado" ${data.estado_tramite === "aceptado" ? "selected" : ""}>Aceptado</option>
-                <option value="rechazado" ${data.estado_tramite === "rechazado" ? "selected" : ""}>Rechazado</option>
+              <select id="w-cs-estado" class="wizard-input font-950">
+                <option value="borrador" ${data.estado_tramite === "borrador" ? "selected" : ""}>BORRADOR</option>
+                <option value="presentado" ${data.estado_tramite === "presentado" ? "selected" : ""}>PRESENTADO</option>
+                <option value="aceptado" ${data.estado_tramite === "aceptado" ? "selected" : ""}>ACEPTADO</option>
+                <option value="rechazado" ${data.estado_tramite === "rechazado" ? "selected" : ""}>RECHAZADO</option>
               </select>
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">FECHA PRESENTACIÓN</label>
-              <input type="date" id="w-cs-presentacion" value="${data.fecha_presentacion || ""}" class="wizard-input">
+              <input type="date" id="w-cs-presentacion" value="${data.fecha_presentacion || ""}" class="wizard-input font-800">
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">NÚMERO REGISTRO OFICIAL</label>
-              <input type="text" id="w-cs-registro" value="${data.numero_registro_oficial || ""}" class="wizard-input" placeholder="Ej: CENSO-2026-0001">
+              <input type="text" id="w-cs-registro" value="${data.numero_registro_oficial || ""}" class="wizard-input uppercase font-800" placeholder="EJ: CENSO-2026">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">ACUSE RECIBO</label>
-              <textarea id="w-cs-acuse" class="wizard-input" style="min-height:70px;resize:none;">${data.acuse_recibo || ""}</textarea>
+              <label class="wizard-label">ACUSE RECIBO / JUSTIFICANTE</label>
+              <textarea id="w-cs-acuse" class="wizard-input uppercase font-700" style="min-height:70px;resize:none;font-size:0.8rem;">${data.acuse_recibo || ""}</textarea>
             </div>
           </div>
         `,

@@ -33,19 +33,19 @@ const ProduccionUI = {
       {
         content: (data) => `
           <div class="prod-options-grid">
-            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'carne'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'carne'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
               <span class="prod-opt-icon">${Icons.balanza()}</span>
               <span class="prod-opt-label">Producción<br>Cárnica (KG)</span>
             </button>
-            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'leche'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'leche'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
               <span class="prod-opt-icon">${Icons.leche()}</span>
               <span class="prod-opt-label">Producción<br>Láctea (L)</span>
             </button>
-            <button class="wizard-btn-action wizard-btn-danger wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-danger wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
               <span class="prod-opt-icon">${Icons.transportistas()}</span>
               <span class="prod-opt-label">Venta Masiva<br>Matadero</span>
             </button>
-            <button class="wizard-btn-action wizard-btn-option" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'gasto'; this.style.borderColor = '#fbbf24';">
+            <button class="wizard-btn-action wizard-btn-option" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'gasto'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
               <span class="prod-opt-icon">${Icons.documento()}</span>
               <span class="prod-opt-label">Gasto<br>Analítico</span>
             </button>
@@ -85,26 +85,26 @@ const ProduccionUI = {
           let html = '';
           if (data.operacion === 'carne') {
             html += `
-                <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'individual'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
                   <span class="wizard-sel-icon">${Icons.animales()}</span>
                   <span class="text-md uppercase font-900">Pesada Individual</span>
                 </button>
-                <button class="wizard-btn-action" class="wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'lote'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
                   <span class="wizard-sel-icon">${Icons.rebanos()}</span>
                   <span class="text-md uppercase font-900">Pesaje por Lote</span>
                 </button>
              `;
           } else if (data.operacion === 'leche') {
             html += `
-                <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'individual'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'individual'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
                   <span class="wizard-sel-icon--sm">${Icons.animales()}</span>
                   <span class="text-md uppercase font-900">Control Individual</span>
                 </button>
-                <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'lote'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'lote'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
                   <span class="wizard-sel-icon--sm">${Icons.rebanos()}</span>
                   <span class="text-md uppercase font-900">Control de Lote</span>
                 </button>
-                <button class="wizard-btn-action" class="wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; }); this.dataset.selected = 'tanque'; this.style.borderColor = '#fbbf24';">
+                <button class="wizard-btn-action wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'tanque'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
                   <span class="wizard-sel-icon--sm">${Icons.transportistas()}</span>
                   <span class="text-md uppercase font-900">Expedición Tanque</span>
                 </button>

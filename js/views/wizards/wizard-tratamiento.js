@@ -42,57 +42,61 @@ window.WizardTratamiento = {
     const wizardSteps = [
       {
         content: (data) => `
-          <div class="mt-10">
-            <div class="wizard-input-group">
-              <label class="wizard-label">MEDICAMENTO</label>
-              <select id="w-san-med" class="wizard-input wizard-select">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">DATOS DEL MEDICAMENTO</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">SELECCIÓN DE CATÁLOGO</label>
+              <select id="w-san-med" class="wizard-input font-800">
                 ${optionsHtml}
               </select>
             </div>
-            <div class="wizard-input-group" id="w-san-custom-container" class="d-none">
-              <label class="wizard-label">NOMBRE MEDICAMENTO / PRINCIPIO ACTIVO</label>
-              <input type="text" id="w-san-custom" class="wizard-input" value="${data.medicamento || ''}">
+            <div class="wizard-input-group mb-12" id="w-san-custom-container" style="display:none;">
+              <label class="wizard-label">NOMBRE / PRINCIPIO ACTIVO</label>
+              <input type="text" id="w-san-custom" class="wizard-input uppercase font-800" value="${data.medicamento || ''}">
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPERA CARNE (DÍAS)</label>
-                <input type="number" id="w-san-carne" class="wizard-input" value="${data.tiempo_espera_carne_dias || 0}">
+                <input type="number" id="w-san-carne" class="wizard-input font-900 text-lg" value="${data.tiempo_espera_carne_dias || 0}">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPERA LECHE (DÍAS)</label>
-                <input type="number" id="w-san-leche" class="wizard-input" value="${data.tiempo_espera_leche_dias || 0}">
+                <input type="number" id="w-san-leche" class="wizard-input font-900 text-lg" value="${data.tiempo_espera_leche_dias || 0}">
               </div>
             </div>
-            <div id="w-san-alerta-leche" class="wizard-alert-error d-none">
-                ⚠️ <strong>PROHIBIDO EN LACTACIÓN:</strong> Este medicamento no debe usarse en animales cuya leche se destine a consumo humano.
+            <div id="w-san-alerta-leche" class="p-10 bg-red-900 border-red-500 border rounded-sm mb-12 d-none">
+                <div class="text-white font-950 text-[0.6rem] uppercase tracking-tighter leading-tight">PROHIBIDO EN LACTACIÓN: NO DESTINAR LECHE A CONSUMO HUMANO</div>
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-16">
               <label class="wizard-label">FECHA APLICACIÓN</label>
-              <input type="date" id="w-san-fecha" class="wizard-input" value="${data.fecha}">
+              <input type="date" id="w-san-fecha" class="wizard-input font-800" value="${data.fecha}">
             </div>
 
-            <div class="wizard-section-sep">
-                <button type="button" id="btn-toggle-calc" class="btn-ghost text-blue font-bold flex items-center gap-5 p-0">
-                    <span>🧮</span> Abrir Calculadora de Dosis
+            <div class="border-top-222 pt-12">
+                <button type="button" id="btn-toggle-calc" class="widget-link-btn widget-link-btn--neon neon-info w-full px-12 py-8 min-h-0 h-auto">
+                    <span class="text-[0.65rem] font-950 uppercase">Abrir Calculadora de Dosis</span>
                 </button>
-                <div id="calc-dosis-container" class="rounded-md bg-darker wizard-calc-panel d-none">
-                    <div class="grid grid-cols-2 gap-10">
+                <div id="calc-dosis-container" class="mt-15 p-12 bg-black border border-222 rounded-sm d-none">
+                    <div class="grid grid-cols-2 gap-10 mb-12">
                         <div class="wizard-input-group">
-                            <label class="wizard-label">PESO ANIMAL (KG)</label>
-                            <input type="number" id="calc-peso" class="wizard-input" placeholder="Ej: 50">
+                            <label class="wizard-label">PESO (KG)</label>
+                            <input type="number" id="calc-peso" class="wizard-input font-800" placeholder="50">
                         </div>
                         <div class="wizard-input-group">
                             <label class="wizard-label">DOSIS (MG/KG)</label>
-                            <input type="number" id="calc-dosis" class="wizard-input" placeholder="Ej: 20">
+                            <input type="number" id="calc-dosis" class="wizard-input font-800" placeholder="20">
                         </div>
                     </div>
-                    <div class="wizard-input-group">
-                        <label class="wizard-label">CONCENTRACIÓN FRASCO (MG/ML)</label>
-                        <input type="number" id="calc-conc" class="wizard-input" placeholder="Ej: 200">
+                    <div class="wizard-input-group mb-12">
+                        <label class="wizard-label">CONCENTRACIÓN (MG/ML)</label>
+                        <input type="number" id="calc-conc" class="wizard-input font-800" placeholder="200">
                     </div>
-                    <button type="button" id="btn-calcular" class="wizard-btn-action w-full wizard-calc-btn">Calcular Volumen</button>
-                    <div id="calc-resultado" class="wizard-calc-result text-green d-none">
-                        Inyectar: <span id="calc-vol"></span> ml
+                    <button type="button" id="btn-calcular" class="widget-link-btn widget-link-btn--neon neon-success w-full px-12 py-8 min-h-0 h-auto">
+                        <span class="text-[0.65rem] font-950 uppercase">CALCULAR</span>
+                    </button>
+                    <div id="calc-resultado" class="mt-10 text-center d-none">
+                        <div class="text-aaa uppercase font-900 text-[0.55rem]">VOLUMEN A INYECTAR:</div>
+                        <div class="text-green font-950 text-xl"><span id="calc-vol"></span> ML</div>
                     </div>
                 </div>
             </div>
@@ -175,53 +179,54 @@ window.WizardTratamiento = {
       {
         // PASO 2: Libro de Tratamientos Veterinarios (SIGGAN)
         content: (data) => `
-          <div class="mt-10">
-            <div class="wizard-alert-info">
-              📒 <strong>LIBRO DE TRATAMIENTOS VETERINARIOS</strong> · Datos exigidos por el RD 1749/1998 y la tramitación SIGGAN.
-            </div>
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.libroVentas()} LIBRO DE TRATAMIENTOS</div>
+            <p class="text-aaa uppercase font-900 text-[0.55rem] tracking-widest mb-12 opacity-80 text-center">DATOS EXIGIDOS POR RD 1749/1998 Y SIGGAN</p>
+
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">MOTIVO / DIAGNÓSTICO</label>
-              <select id="w-san-motivo" class="wizard-input wizard-select">
-                ${motivosTrat.map(m => `<option value="${m.value}" ${data.motivo_tratamiento === m.value ? 'selected' : ''}>${m.label}</option>`).join('')}
+              <select id="w-san-motivo" class="wizard-input font-800">
+                ${motivosTrat.map(m => `<option value="${m.value}" ${data.motivo_tratamiento === m.value ? 'selected' : ''}>${m.label.toUpperCase()}</option>`).join('')}
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">Nº ANIMALES TRATADOS</label>
-                <input type="number" min="1" id="w-san-num-animales" class="wizard-input" value="${data.num_animales_tratados || 1}">
+                <label class="wizard-label">Nº ANIMALES</label>
+                <input type="number" min="1" id="w-san-num-animales" class="wizard-input font-800" value="${data.num_animales_tratados || 1}">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">VÍA DE ADMINISTRACIÓN</label>
-                <select id="w-san-via" class="wizard-input wizard-select">
-                  ${viasAdmin.map(v => `<option value="${v.value}" ${data.via_administracion === v.value ? 'selected' : ''}>${v.label}</option>`).join('')}
+                <label class="wizard-label">VÍA ADMIN.</label>
+                <select id="w-san-via" class="wizard-input font-800">
+                  ${viasAdmin.map(v => `<option value="${v.value}" ${data.via_administracion === v.value ? 'selected' : ''}>${v.label.toUpperCase()}</option>`).join('')}
                 </select>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">Nº LOTE MEDICAMENTO</label>
-                <input type="text" id="w-san-lote" class="wizard-input" value="${data.lote_medicamento || ''}" placeholder="Ej: L-23A45">
+                <label class="wizard-label">Nº LOTE MED.</label>
+                <input type="text" id="w-san-lote" class="wizard-input uppercase font-800" value="${data.lote_medicamento || ''}" placeholder="L-00A">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">CADUCIDAD MEDICAMENTO</label>
-                <input type="date" id="w-san-caducidad" class="wizard-input" value="${data.caducidad_medicamento || ''}">
+                <label class="wizard-label">CADUCIDAD</label>
+                <input type="date" id="w-san-caducidad" class="wizard-input font-800" value="${data.caducidad_medicamento || ''}">
               </div>
             </div>
-            <div class="wizard-section-sep-sm">
-              <label class="wizard-label text-green mb-8">VETERINARIO PRESCRIPTOR</label>
-              <div class="grid grid-cols-2 gap-10">
+
+            <div class="border-top-222 pt-12 mt-4">
+              <div class="text-[0.6rem] text-gold font-950 uppercase tracking-widest mb-10 text-center">VETERINARIO PRESCRIPTOR</div>
+              <div class="grid grid-cols-2 gap-12 mb-12">
                 <div class="wizard-input-group">
                   <label class="wizard-label">NOMBRE</label>
-                  <input type="text" id="w-san-vet" class="wizard-input" value="${data.veterinario_prescriptor || ''}" placeholder="Nombre y apellidos">
+                  <input type="text" id="w-san-vet" class="wizard-input uppercase font-800" value="${data.veterinario_prescriptor || ''}" placeholder="NOMBRE">
                 </div>
                 <div class="wizard-input-group">
-                  <label class="wizard-label">Nº COLEGIADO</label>
-                  <input type="text" id="w-san-vet-col" class="wizard-input" value="${data.veterinario_colegiado || ''}" placeholder="Nº colegiado">
+                  <label class="wizard-label">Nº COL.</label>
+                  <input type="text" id="w-san-vet-col" class="wizard-input font-800" value="${data.veterinario_colegiado || ''}" placeholder="0000">
                 </div>
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº RECETA / PRESCRIPCIÓN</label>
-                <input type="text" id="w-san-receta" class="wizard-input" value="${data.numero_receta || ''}" placeholder="Nº de receta veterinaria">
+                <input type="text" id="w-san-receta" class="wizard-input uppercase font-900" value="${data.numero_receta || ''}" placeholder="Nº OFICIAL">
               </div>
             </div>
           </div>
