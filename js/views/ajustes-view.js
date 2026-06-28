@@ -29,40 +29,57 @@ const AjustesView = {
           <div class="grid grid-cols-2 gap-6 text-82">
             <div><span class="text-gray">Finca:</span> <strong class="text-white">${activeFinca.nombre}</strong></div>
             <div><span class="text-gray">REGA:</span> <strong class="text-white">${activeFinca.codigo_REGA || activeFinca.rega || "N/D"}</strong></div>
-            <div><span class="text-gray">CCAA:</span> <strong class="text-white">${activeFinca.comunidad_autonoma === 'andalucia' ? '🌿 Andalucía' : activeFinca.comunidad_autonoma === 'extremadura' ? '🌿 Extremadura' : 'No configurada'}</strong></div>
+            <div><span class="text-gray">CCAA:</span> <strong class="text-white">${activeFinca.comunidad_autonoma === 'andalucia' ? Icons.zonas() + ' Andalucía' : activeFinca.comunidad_autonoma === 'extremadura' ? Icons.zonas() + ' Extremadura' : 'No configurada'}</strong></div>
             <div><span class="text-gray">Tipo:</span> <strong class="text-white">${activeFinca.tipo_explotacion || '—'}</strong></div>
           </div>
         </div>
-        <div class="flex gap-10 mt-10">
-          <button class="btn btn-edit flex-1" onclick="AjustesView._editarFincaPrincipal()">${Icons.editar()} Editar Datos</button>
-          <button class="btn btn-secondary flex-1" onclick="AjustesView._gestionarZonas()">${Icons.zonas()} Zonas</button>
+        <div class="grid grid-cols-2 gap-10 mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="AjustesView._editarFincaPrincipal()">
+            ${Icons.editar()}
+            <span class="widget-link-label">Editar Datos</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="AjustesView._gestionarZonas()">
+            ${Icons.zonas()}
+            <span class="widget-link-label">Gestionar Zonas</span>
+          </button>
         </div>
       </div>
       ` : ''}
 
       <!-- ===================== MIS FINCAS ===================== -->
-      <div class="card card-left-gold mb-25">
-        <div class="flex justify-between items-center mb-15"><h3 class="flex items-center gap-8">${Icons.finca()} Mis Fincas</h3><button class="btn btn-create btn-sm" onclick="App._showFincaForm()">${Icons.agregar()} Nueva</button></div>
+      <div class="card card-left-gold mb-25 p-12">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">MIS FINCAS</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="App._showFincaForm()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nueva Finca</span>
+          </button>
+        </div>
         <div class="grid gap-10">${fincas.map((f) => {
           const anims = animales.filter(a => a.rebanoId && rebanos.some(r => r.id === a.rebanoId && r.fincaId === f.id));
           return `<div class="flex justify-between items-center rounded-sm" style="background:#222; padding:12px; border:1px solid ${f.id === activeId ? "var(--p-cork)" : "#333"};">
           <div>
             <div class="font-bold" style="color:${f.id === activeId ? "var(--p-cork)" : "#fff"};">${f.nombre}</div>
-            <div class="text-gray text-xs">REGA: ${f.codigo_REGA || f.rega || "N/D"} · 🐑 ${anims.length} animales</div>
+            <div class="text-gray text-xs">REGA: ${f.codigo_REGA || f.rega || "N/D"} · ${Icons.animales()} ${anims.length} animales</div>
           </div>
-          <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Activar</button>` : `<span class="badge badge-gold text-xs">Activa</span>`}</div>
+          <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Activar</button>` : `<span class="badge badge-gold text-xs uppercase font-800">Activa</span>`}</div>
         </div>`;
         }).join("")}</div>
       </div>
 
       <!-- ===================== COPIA DE SEGURIDAD ===================== -->
-      <div class="card card-left-blue mb-20">
-        <h3 class="flex items-center gap-8">${Icons.guardar()} Copias de Seguridad</h3>
-        <p class="text-gray mt-5 text-85">Exporta o importa todos los datos de la aplicación en formato JSON.</p>
-        ${lastBackup ? `<div class="text-xs text-gray mb-8">📅 Último backup: ${new Date(lastBackup).toLocaleDateString('es-ES')}</div>` : ''}
-        <div class="flex gap-10">
-          <button class="btn btn-success flex-1" onclick="App.exportBackup()">${Icons.exportar()} Exportar</button>
-          <button class="btn btn-secondary flex-1" onclick="document.getElementById('import-backup-file').click()">${Icons.importar()} Importar</button>
+      <div class="card card-left-blue mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #3b82f6">SEGURIDAD</div>
+        <p class="text-gray mt-5 text-85 text-center">Exporta o importa todos los datos de la aplicación en formato JSON.</p>
+        <div class="grid grid-cols-2 gap-10 mt-10">
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App.exportBackup()">
+            ${Icons.exportar()}
+            <span class="widget-link-label">Exportar</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="document.getElementById('import-backup-file').click()">
+            ${Icons.importar()}
+            <span class="widget-link-label">Importar</span>
+          </button>
         </div>
         <input type="file" id="import-backup-file" class="d-none" onchange="App.importBackup(event)">
         <label class="flex items-center gap-6 mt-10 text-xs text-gray cursor-pointer" onclick="const c=document.getElementById('auto-backup'); if(c){c.checked=!c.checked;AjustesView._toggleAutoBackup(c.checked)}">
@@ -71,9 +88,9 @@ const AjustesView = {
       </div>
 
       <!-- ===================== PAQUETE LÁCTEO ===================== -->
-      <div class="card card-left-amber mb-20">
-        <h3 class="flex items-center gap-8">${Icons.leche()} Paquete Lácteo — Contratación</h3>
-        <p class="text-gray mt-5 text-85">Gestión de contratos lácteos obligatorios (RD 752/2016) y declaraciones INFOLAC.</p>
+      <div class="card card-left-amber mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #f59e0b">PAQUETE LÁCTEO</div>
+        <p class="text-gray mt-5 text-85 text-center">Gestión de contratos lácteos obligatorios (RD 752/2016) e INFOLAC.</p>
         ${activeFinca ? `
         <div class="info-box mt-10">
           <div class="grid grid-cols-2 gap-6 text-82">
@@ -83,16 +100,18 @@ const AjustesView = {
             <div><span class="text-gray">INFOLAC:</span> <strong class="text-white">${activeFinca.numero_infolac || '—'}</strong></div>
           </div>
         </div>
-        <div class="text-gray-500 mt-8 rounded-sm note-amber">
-          📌 El contrato lácteo debe tener una duración mínima de 1 año. Las declaraciones INFOLAC son mensuales y obligatorias.
-        </div>` : '<p class="text-555">Activa una finca para ver los datos de contratación láctea.</p>'}
-        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar Contrato Lácteo</button>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="App._editarFincaActiva()">
+            ${Icons.editar()}
+            <span class="widget-link-label">Editar Contrato</span>
+          </button>
+        </div>` : '<p class="text-center text-555 p-20 uppercase font-800 text-xs">Activa una finca para ver datos</p>'}
       </div>
 
       <!-- ===================== ADSG ===================== -->
-      <div class="card card-left-blue mb-20">
-        <h3 class="flex items-center gap-8">${Icons.sanidad()} ADSG — Sanidad Ganadera</h3>
-        <p class="text-gray mt-5 text-85">Agrupación de Defensa Sanitaria Ganadera. Datos del veterinario de explotación y códigos ADSG.</p>
+      <div class="card card-left-blue mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #3b82f6">ADSG</div>
+        <p class="text-gray mt-5 text-85 text-center">Sanidad Ganadera y datos del veterinario de explotación.</p>
         ${activeFinca ? `
         <div class="info-box mt-10">
           <div class="grid grid-cols-2 gap-6 text-82">
@@ -103,23 +122,26 @@ const AjustesView = {
             <div><span class="text-gray">Teléfono Vet.:</span> <strong class="text-white">${activeFinca.adsg_vet_telefono || '—'}</strong></div>
             <div><span class="text-gray">Vencimiento:</span> <strong class="${activeFinca.adsg_fecha_vencimiento ? 'text-amber' : 'text-gray'}">${activeFinca.adsg_fecha_vencimiento || '—'}${activeFinca.adsg_fecha_vencimiento ? AjustesView._diasRestantes(activeFinca.adsg_fecha_vencimiento) : ''}</strong></div>
           </div>
-        </div>` : '<p class="text-555">Activa una finca para gestionar los datos ADSG.</p>'}
-        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar ADSG</button>
+        </div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._editarFincaActiva()">
+            ${Icons.editar()}
+            <span class="widget-link-label">Editar ADSG</span>
+          </button>
+        </div>` : '<p class="text-center text-555 p-20 uppercase font-800 text-xs">Activa una finca para ver datos</p>'}
       </div>
 
       <!-- ===================== CONFIGURACIÓN AUTONÓMICA ===================== -->
-      <div class="card card-left-purple mb-20">
-        <h3 class="flex items-center gap-8">${Icons.globo()} Configuración Autonómica</h3>
-        <p class="text-gray mt-5 text-85">Normativa autonómica activa, plataforma de movimiento y umbrales PAC.</p>
+      <div class="card card-left-purple mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #8b5cf6">NORMATIVA CCAA</div>
         ${activeFinca ? (() => {
           const ccaa = activeFinca.comunidad_autonoma;
           const plataforma = ccaa && window.ComunidadesService ? window.ComunidadesService.getPlataformaMovimiento(ccaa) : null;
           const umbral = ccaa && window.ComunidadesService ? window.ComunidadesService.getUmbralPAC(ccaa) : null;
           const dist = ccaa && window.ComunidadesService ? window.ComunidadesService.getDistanciaMinimaREGA(ccaa) : null;
-          const plataformaUrl = ccaa === 'andalucia' ? 'https://www.juntadeandalucia.es/agriculturaypesca/siggan' : 'https://www.arado.gobex.es';
           return `
           <div class="info-box mt-10">
-            <div class="font-bold text-white mb-8">${ccaa === 'andalucia' ? '🌿 Andalucía' : ccaa === 'extremadura' ? '🌿 Extremadura' : '⚠️ No configurada'}</div>
+            <div class="font-bold text-white mb-8 text-center uppercase">${ccaa === 'andalucia' ? Icons.zonas() + ' Andalucía' : ccaa === 'extremadura' ? Icons.zonas() + ' Extremadura' : Icons.alerta() + ' No configurada'}</div>
             ${ccaa ? `
             <div class="grid grid-cols-2 gap-6 text-82">
               <div><span class="text-gray">Sistema Mov.:</span> <strong class="text-white">${plataforma || '—'}</strong></div>
@@ -127,15 +149,17 @@ const AjustesView = {
               <div><span class="text-gray">Umbral PAC:</span> <strong class="text-white">${umbral || '—'} UGM/año</strong></div>
               <div><span class="text-gray">Explotación:</span> <strong class="text-white">${activeFinca.tipo_explotacion || '—'} / ${activeFinca.sistema_explotacion || '—'}</strong></div>
             </div>
-            <div class="text-gray-500 mt-8 rounded-sm note-purple">
-              📌 ${ccaa === 'andalucia' ? 'Guías sanitarias automáticas (365d). Plataforma PIMA. Subvención ADSG directa.' : 'Guías requieren confirmación. Plataforma Arado/Laboreo. Control ADSG estricto.'}
-            </div>
-            <div class="flex gap-6 mt-10">
-              <a href="${plataformaUrl}" target="_blank" rel="noopener" class="btn btn-secondary text-xs flex-1 text-center" style="padding:6px;border:1px solid #8b5cf6;">${Icons.enlace()} Ir a ${plataforma || 'Plataforma'}</a>
-            </div>` : '<p class="text-555">Configura la comunidad autónoma en la ficha de la finca.</p>'}
-          </div>`; })() : '<p class="text-555">Activa una finca para ver la configuración autonómica.</p>'}
-        <button class="btn btn-edit btn-full" onclick="App._editarFincaActiva()">${Icons.editar()} Editar Configuración</button>
-        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarGuiaNormativas()">${Icons.libro()} Comparativa Normativa CCAA</button>
+            <div class="grid grid-cols-2 gap-10 mt-16">
+              <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="App._editarFincaActiva()">
+                ${Icons.editar()}
+                <span class="widget-link-label">Editar CCAA</span>
+              </button>
+              <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._mostrarGuiaNormativas()">
+                ${Icons.libro()}
+                <span class="widget-link-label">Ver Normativa</span>
+              </button>
+            </div>` : '<p class="text-center text-555 p-20 uppercase font-800 text-xs">Configura la CCAA en la finca</p>'}
+          </div>`; })() : '<p class="text-center text-555 p-20 uppercase font-800 text-xs">Activa una finca para ver datos</p>'}
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
@@ -153,11 +177,16 @@ const AjustesView = {
       </div>
 
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
-      <div class="card card-left-amber mb-20">
-        <h3 class="flex items-center gap-8">${Icons.reproduccion()} Especies y Razas</h3>
-        <p class="text-gray mt-5 text-85">Gestiona las especies activas en tu explotación y sus parámetros de referencia.</p>
+      <div class="card card-left-amber mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #f59e0b">ESPECIES</div>
+        <p class="text-gray mt-5 text-85 text-center">Gestiona las especies activas en tu explotación.</p>
         <div id="especies-container" class="mt-10">${this._renderEspecies(config)}</div>
-        <button class="btn btn-create btn-full-sm mt-8" onclick="AjustesView._agregarEspecie()">${Icons.agregar()} Añadir Especie</button>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._agregarEspecie()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Añadir Especie</span>
+          </button>
+        </div>
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
@@ -180,12 +209,12 @@ const AjustesView = {
       </div>
 
       <!-- ===================== PREFERENCIAS ===================== -->
-      <div class="card card-left-purple mb-20">
-        <h3 class="flex items-center gap-8">${Icons.ajustes()} Preferencias</h3>
-        <p class="text-gray mt-5 text-85">Configura el comportamiento general de la aplicación.</p>
+      <div class="card card-left-purple mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #8b5cf6">PREFERENCIAS</div>
+        <p class="text-gray mt-5 text-85 text-center">Configura el comportamiento general de la aplicación.</p>
         <div class="grid gap-6 mt-10">
           <label class="flex items-center gap-8 text-sm text-gray cursor-pointer checkbox-row">
-            <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> 🌙 Modo Oscuro
+            <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> Modo Oscuro
           </label>
           <label class="flex items-center gap-8 text-sm text-gray checkbox-row">
             <span>${Icons.calendar()} Formato Fecha:</span>
@@ -205,35 +234,52 @@ const AjustesView = {
       </div>
 
       <!-- ===================== INFORMACIÓN DEL SISTEMA ===================== -->
-      <div class="card card-left-gold mb-20">
-        <h3 class="flex items-center gap-8">${Icons.info()} Información del Sistema</h3>
-        <p class="text-gray mt-5 text-85">Estado de la base de datos local y versión de la aplicación.</p>
-        <div class="grid grid-cols-2 gap-6 mt-10 text-sm">
-          <div><span class="text-gray">Versión App:</span> <strong class="text-white">v4.8.0</strong></div>
-          <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IndexedDB v10</strong></div>
-          <div><span class="text-gray">Fincas:</span> <strong class="text-white">${fincas.length}</strong></div>
-          <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
-          <div><span class="text-gray">Rebaños:</span> <strong class="text-white">${rebanos.length}</strong></div>
-          <div><span class="text-gray">Service Worker:</span> <strong class="text-white">${'serviceWorker' in navigator ? '✅ Activo' : '❌ No soportado'}</strong></div>
+      <div class="card card-left-gold mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">SISTEMA</div>
+        <div class="grid grid-cols-2 gap-6 mt-16 text-sm">
+          <div><span class="text-gray uppercase font-800 text-[0.62rem]">Versión:</span> <strong class="text-white">v4.8.5</strong></div>
+          <div><span class="text-gray uppercase font-800 text-[0.62rem]">Base Datos:</span> <strong class="text-white">IDB v10</strong></div>
         </div>
-        <button class="btn btn-danger btn-full-sm mt-10" onclick="AjustesView._limpiarCache()">${Icons.eliminar()} Limpiar Caché Local</button>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="AjustesView._limpiarCache()">
+            ${Icons.eliminar()}
+            <span class="widget-link-label">Limpiar Caché</span>
+          </button>
+        </div>
       </div>
 
       <!-- ===================== GESTIÓN DE TRAZABILIDAD ===================== -->
-      <div class="card card-left-green mb-20">
-        <h3 class="flex items-center gap-8">${Icons.trazabilidad()} Gestión de Trazabilidad</h3>
-        <p class="text-gray mt-5 text-85">Genera solicitudes oficiales de remesas de crotales para tu ADSG o Administración.</p>
-        <button class="btn btn-create btn-full" onclick="App._abrirWizardPedidoCrotales()">${Icons.documento()} Generar Pedido de Crotales</button>
-        <button class="btn btn-secondary btn-full-sm" onclick="App._mostrarAyudaCrotales()">${Icons.libro()} Normativa de Identificación</button>
+      <div class="card card-left-green mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #10b981">TRAZABILIDAD</div>
+        <div class="grid grid-cols-2 gap-10 mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._abrirWizardPedidoCrotales()">
+            ${Icons.documento()}
+            <span class="widget-link-label">Generar Pedido</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._mostrarAyudaCrotales()">
+            ${Icons.libro()}
+            <span class="widget-link-label">Ver Normativa</span>
+          </button>
+        </div>
       </div>
 
       <!-- ===================== TRÁMITES SIGGAN ===================== -->
-      <div class="card card-left-purple mb-20">
-        <h3 class="flex items-center gap-8">${Icons.edificio()} Trámites SIGGAN</h3>
-        <p class="text-gray mt-5 text-85">Genera la guía de movimiento inter-explotación y la declaración censal para su tramitación oficial (SIGGAN / BADIGEX).</p>
-        <button class="btn btn-create btn-full" onclick="App._abrirWizardGuiaMovimiento()">${Icons.rotacion()} Guía de Movimiento</button>
-        <button class="btn btn-create btn-full-sm mt-10" onclick="App._abrirWizardCenso()">${Icons.documento()} Declaración Censal Anual</button>
-        <button class="btn btn-secondary btn-full-sm mt-10" onclick="AjustesView._exportarCierreMensual()">${Icons.paquete()} Cierre mensual + export SIGGAN</button>
+      <div class="card card-left-purple mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #8b5cf6">TRÁMITES OFICIALES</div>
+        <div class="grid grid-cols-3 gap-10 mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="App._abrirWizardGuiaMovimiento()">
+            ${Icons.rotacion()}
+            <span class="widget-link-label">Guía Mov.</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardCenso()">
+            ${Icons.documento()}
+            <span class="widget-link-label">Censo Anual</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="AjustesView._exportarCierreMensual()">
+            ${Icons.exportar()}
+            <span class="widget-link-label">Cierre Mens.</span>
+          </button>
+        </div>
       </div>
 
       <!-- ===================== CATÁLOGOS REGA ===================== -->
@@ -273,17 +319,25 @@ const AjustesView = {
       </div>
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
-      <div class="card card-left-red mb-20">
-        <h3 class="flex items-center gap-8">${Icons.sanidad()} Guía Farmacológica</h3>
-        <p class="text-gray mt-5 text-85">Tabla de tiempos de retiro, supresión y dosificación para evitar residuos.</p>
-        <button class="btn btn-secondary btn-full" onclick="App._mostrarAyudaMedicamentos()">${Icons.libro()} Ver Tiempos de Retiro y Dosis</button>
+      <div class="card card-left-red mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: #ef4444">FARMACOLOGÍA</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._mostrarAyudaMedicamentos()">
+            ${Icons.sanidad()}
+            <span class="widget-link-label">Ver Retiros</span>
+          </button>
+        </div>
       </div>
 
       <!-- ===================== MANUAL DE USUARIO ===================== -->
-      <div class="card card-left-gold mb-20">
-        <h3 class="flex items-center gap-8">${Icons.libro()} Manual de Usuario</h3>
-        <p class="text-gray mt-5 text-85">Guía paso a paso del uso de la aplicación, con capturas de cada módulo.</p>
-        <button class="btn btn-secondary btn-full" onclick="AjustesView._abrirManual()">${Icons.libro()} Abrir Manual</button>
+      <div class="card card-left-gold mb-20 p-12">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">AYUDA</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._abrirManual()">
+            ${Icons.libro()}
+            <span class="widget-link-label">Manual</span>
+          </button>
+        </div>
       </div>
 
       <!-- ===================== FOOTER ===================== -->

@@ -20,11 +20,19 @@ const CompradoresView = {
                 </button>
               `).join('')}
             </div>
-            <div class="flex gap-8 flex-wrap">
-              <input type="search" id="search-compradores" placeholder="🔍 Buscar por nombre, NIF o ciudad..."
+            <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+              <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+              <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+                <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
+                  ${Icons.agregar()}
+                  <span class="widget-link-label">Nuevo Comprador</span>
+                </button>
+              </div>
+            </div>
+            <div class="flex gap-8 mb-14">
+              <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
                 oninput="CompradoresView._filtrar(this.value)"
-                class="search-input">
-              <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Nuevo</button>
+                class="search-input flex-1">
             </div>
           </div>
           <div id="compr-lista"><div class="loader">Cargando compradores...</div></div>
@@ -105,25 +113,35 @@ const CompradoresView = {
             return;
         }
 
-        contenedor.innerHTML = headerHtml + `<div class="grid gap-10">${lista.map(c => `
-          <div class="card card-list-item" onclick="CompradoresView.renderDetalle(${c.id})"
-            style="border-left:4px solid ${this._colorTipo(c.tipo_comprador)};">
-            <div class="flex justify-between items-start">
-              <div class="flex-1 min-w-0">
-                <div class="text-white font-800 text-md">${c.nombre}</div>
-                <div class="text-gray mt-4 text-75">
-                  ${c.nif_cif ? '🔑 '+c.nif_cif : ''}${c.ciudad ? ' · 📍 '+c.ciudad : ''}
+        contenedor.innerHTML = headerHtml + `<div class="grid gap-10">${lista.map(c => {
+          const color = this._colorTipo(c.tipo_comprador);
+          return `
+          <div class="card card-animal no-underline" onclick="CompradoresView.renderDetalle(${c.id})"
+            style="border-left:4px solid ${color}; padding:14px; margin:0; margin-bottom:8px;">
+            <div class="flex flex-col gap-10">
+              <div class="flex justify-between items-center w-full">
+                <div class="flex items-center gap-10 min-w-0">
+                  <div class="text-xl" style="color:${color}">${Icons.compradores()}</div>
+                  <div class="text-xs">
+                    <div class="font-bold text-white uppercase text-base tracking-tight">${c.nombre}</div>
+                    <div class="text-gray mt-2 font-700 uppercase">
+                      ${c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : ''}${c.ciudad ? ' · ' + Icons.zonas() + ' ' + c.ciudad : ''}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="badge badge-sm uppercase" style="background:${color}15; color:${color}; border:1px solid ${color}35;">
+                    ${c.tipo_comprador || 'híbrido'}
+                  </span>
+                  ${c.activo === false ? '<div class="text-red text-[0.6rem] font-900 mt-4 uppercase">INACTIVO</div>' : ''}
                 </div>
               </div>
-              <div class="text-right flex-shrink-0 ml-8">
-                <span class="badge-tipo" style="background:${this._colorTipo(c.tipo_comprador, true)}; color:${this._colorTipo(c.tipo_comprador)}; border:1px solid ${this._colorTipo(c.tipo_comprador, false, true)};">
-                  ${c.tipo_comprador || 'híbrido'}
-                </span>
-                ${c.activo === false ? '<span class="text-red text-60 d-block mt-4">INACTIVO</span>' : ''}
+              <div class="text-right w-full mt-2">
+                <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
               </div>
             </div>
           </div>
-        `).join('')}</div>`;
+        `}).join('')}</div>`;
     },
 
     _colorTipo(tipo, bg = false, border = false) {
@@ -171,17 +189,23 @@ const CompradoresView = {
                   ${comprador.activo === false ? '<span class="text-red font-800 text-xs">INACTIVO</span>' : '<span class="text-green font-800 text-xs">ACTIVO</span>'}
                 </div>
               </div>
-              <div class="flex gap-6">
-                <button onclick="CompradoresView._eliminar(${id})" class="btn btn-danger btn-sm">${Icons.eliminar()} Eliminar</button>
-                <button onclick="CompradoresView.renderFormulario(${id})" class="btn btn-edit btn-sm">${Icons.editar()} Editar</button>
+              <div class="flex gap-10">
+                <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="CompradoresView._eliminar(${id})">
+                  ${Icons.eliminar()}
+                  <span class="widget-link-label">Eliminar</span>
+                </button>
+                <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView.renderFormulario(${id})">
+                  ${Icons.editar()}
+                  <span class="widget-link-label">Editar</span>
+                </button>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
-              ${comprador.nif_cif ? '<div>🔑 <strong>NIF:</strong> '+comprador.nif_cif+'</div>' : ''}
-              ${comprador.telefono ? '<div>📞 <strong>Tel:</strong> '+comprador.telefono+'</div>' : ''}
-              ${comprador.email ? '<div>📧 <strong>Email:</strong> '+comprador.email+'</div>' : ''}
-              ${comprador.ciudad ? '<div>📍 <strong>Ciudad:</strong> '+comprador.ciudad+(comprador.provincia ? ' ('+comprador.provincia+')' : '')+'</div>' : ''}
-              ${comprador.condiciones_pago ? '<div class="col-span-2">💳 <strong>Condiciones pago:</strong> '+comprador.condiciones_pago+'</div>' : ''}
+              ${comprador.nif_cif ? `<div class="flex items-center gap-4">${Icons.documento()} <strong>NIF:</strong> ${comprador.nif_cif}</div>` : ''}
+              ${comprador.telefono ? `<div class="flex items-center gap-4">${Icons.info()} <strong>Tel:</strong> ${comprador.telefono}</div>` : ''}
+              ${comprador.email ? `<div class="flex items-center gap-4">${Icons.enlace()} <strong>Email:</strong> ${comprador.email}</div>` : ''}
+              ${comprador.ciudad ? `<div class="flex items-center gap-4">${Icons.zonas()} <strong>Ciudad:</strong> ${comprador.ciudad}${comprador.provincia ? ' ('+comprador.provincia+')' : ''}</div>` : ''}
+              ${comprador.condiciones_pago ? `<div class="col-span-2 flex items-center gap-4">${Icons.dinero()} <strong>Condiciones pago:</strong> ${comprador.condiciones_pago}</div>` : ''}
             </div>
           </div>
 
@@ -205,11 +229,14 @@ const CompradoresView = {
           </div>
 
           <!-- Contratos activos -->
-          <div class="card p-16">
-            <h3 class="section-h3 flex justify-between items-center">
-              <span>${Icons.contratos()} Contratos</span>
-              <button onclick="CompradoresView._nuevoContrato(${id})" class="btn btn-create btn-sm" style="font-size:0.65rem; padding:4px 8px;">${Icons.agregar()} Añadir</button>
-            </h3>
+          <div class="card p-16 mb-14 border-222">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">CONTRATOS</div>
+            <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+              <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContrato(${id})">
+                ${Icons.agregar()}
+                <span class="widget-link-label">Añadir Contrato</span>
+              </button>
+            </div>
             ${contratos.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin contratos registrados.</p></div>' :
               contratos.map(c => `
                 <div class="info-box-sm mb-6" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:3px solid ${c.activo ? '#10b981' : '#555'};">
@@ -226,46 +253,46 @@ const CompradoresView = {
           </div>
 
           <!-- Historial de Ventas Carne -->
-          <div class="card p-16">
-            <h3 class="section-h3">${Icons.carne()} Historial de Ventas (Carne)</h3>
+          <div class="card p-16 mb-14">
+            <h3 class="section-h3 flex items-center gap-8">${Icons.carne()} Historial de Ventas (Carne)</h3>
             ${ventasCarne.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin ventas registradas.</p></div>' :
               ventasCarne.slice(0, 30).map(v => `
                 <div class="history-row">
                   <div>
-                    <div class="history-title">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
-                    <div class="history-sub">${v.pesoCanal || 0} kg · Rend: ${v.rendimientoCanal || 0}%</div>
+                    <div class="history-title uppercase font-800">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
+                    <div class="history-sub uppercase font-700 text-75">${v.pesoCanal || 0} kg · REND: ${v.rendimientoCanal || 0}%</div>
                   </div>
                   <div class="text-right">
                     <div class="history-amount text-red">${(v.precio_total || (v.pesoCanal || 0) * 5.5).toFixed(0)} €</div>
-                    <div class="kpi-sub">${v.clasificacion?.seurop || 'S/C'}</div>
+                    <div class="kpi-sub uppercase font-700 text-[0.62rem]">${v.clasificacion?.seurop || 'S/C'}</div>
                   </div>
                 </div>
               `).join('')}
-            ${ventasCarne.length > 30 ? `<div class="history-more">Mostrando 30 de ${ventasCarne.length} registros</div>` : ''}
+            ${ventasCarne.length > 30 ? `<div class="history-more text-center uppercase font-800 text-75 mt-10">Mostrando 30 de ${ventasCarne.length} registros</div>` : ''}
           </div>
 
           <!-- Historial de Leche -->
-          <div class="card p-16">
-            <h3 class="section-h3">${Icons.leche()} Historial de Entregas (Leche)</h3>
+          <div class="card p-16 mb-14">
+            <h3 class="section-h3 flex items-center gap-8">${Icons.leche()} Historial de Entregas (Leche)</h3>
             ${entregasLeche.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin entregas registradas.</p></div>' :
               entregasLeche.slice(0, 20).map(e => `
                 <div class="history-row">
                   <div>
-                    <div class="history-title">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
-                    <div class="history-sub">${e.matriculaCisterna || 'S/N'}</div>
+                    <div class="history-title uppercase font-800">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
+                    <div class="history-sub uppercase font-700 text-75">${e.matriculaCisterna || 'S/N'}</div>
                   </div>
                   <div class="text-right">
                     <div class="history-amount text-amber">${(e.cantidad || 0).toLocaleString()} L</div>
-                    <div class="kpi-sub">${e.precio_final_unitario ? (e.precio_final_unitario).toFixed(3)+' €/L' : ''}</div>
+                    <div class="kpi-sub uppercase font-700 text-[0.62rem]">${e.precio_final_unitario ? (e.precio_final_unitario).toFixed(3)+' €/L' : ''}</div>
                   </div>
                 </div>
               `).join('')}
-            ${entregasLeche.length > 20 ? `<div class="history-more">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
+            ${entregasLeche.length > 20 ? `<div class="history-more text-center uppercase font-800 text-75 mt-10">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
           </div>
 
           ${comprador.notas ? `
-          <div class="card p-16">
-            <h3 class="section-h3">${Icons.documento()} Notas</h3>
+          <div class="card p-16 mb-14">
+            <h3 class="section-h3 flex items-center gap-8">${Icons.documento()} Notas</h3>
             <p class="text-sm text-aaa m-0">${comprador.notas}</p>
           </div>` : ''}
         `;
