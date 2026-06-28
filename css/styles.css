@@ -2574,7 +2574,8 @@ label {
   font-size: 0.82rem; font-weight: 700;
   color: var(--text-p);
   text-align: center; line-height: 1.2;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* === PDF loader overlay widget === */
