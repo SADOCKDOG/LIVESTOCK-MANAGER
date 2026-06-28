@@ -1,39 +1,59 @@
-# Corrección de Error "main is not defined" y Mejora de UX en ExPro
+# Reescritura Completa de Manuales de Usuario (v4.8.0 Premium)
 
-Este plan aborda el error reportado por el usuario al navegar a la pantalla de Comercialización desde ExPro, así como otros problemas similares en varias vistas del proyecto donde la variable `main` se utiliza sin estar definida. Además, se mejorará el texto del botón en la vista ExPro para que refleje mejor el modo híbrido.
+La aplicación ha experimentado una transformación radical en su arquitectura de navegación y diseño visual (UI/UX). Los manuales actuales están obsoletos tanto en imágenes como en instrucciones paso a paso. Este plan propone una reescritura desde cero de los manuales principales basándose en la estructura de navegación "Hub-Centric" (Ganadería y ExPro).
 
-## User Review Required
+## Análisis de la Nueva Navegación (Hub-Centric)
 
-> [!IMPORTANT]
-> Se han detectado múltiples archivos con el mismo error de variable no definida. Se corregirán todos los archivos identificados para evitar errores futuros en otras secciones de la aplicación.
+1.  **Barra Inferior Simplificada**:
+    *   `Inicio`: Dashboard con visión 360°.
+    *   `Ganadería`: Hub de gestión del censo (Animales, Rebaños, Zonas).
+    *   `ExPro`: Hub de operativa diaria (Pesajes, Ordeños, Silos, Gastos operativos).
+    *   `Más`: Menú desplegable para configuraciones, maestros comerciales y documentos.
 
-## Proposed Changes
+2.  **Modos de Trabajo**:
+    *   La app ahora funciona bajo un "Contexto de Modo" (Cárnico, Lácteo, Híbrido) que cambia la interfaz dinámicamente en Ganadería y ExPro.
 
-### [Web Frontend]
+## Cambios Propuestos
 
-#### [MODIFY] [comercializacion-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/comercializacion-view.js)
-- Definir `const main = document.getElementById('app-content');` al inicio de la función `render()`.
+### 1. Generación de Base Gráfica (Capturas de Pantalla)
+Se tomarán capturas sistemáticas siguiendo los flujos reales:
+*   `01-dashboard.png`: Inicio.
+*   `02-ganaderia-hub.png`: Pantalla Ganadería.
+*   `03-animales-lista.png`: Listado de animales.
+*   `04-ficha-animal-wizard.png`: Nuevo wizard de alta de animal (Ficha Animal).
+*   `05-expro-carne.png`: ExPro en modo cárnico.
+*   `06-expro-leche.png`: ExPro en modo lácteo.
+*   `07-expro-hibrido.png`: ExPro en modo híbrido.
+*   `08-comercial-carne.png`: Comercialización > Carne.
+*   `09-comercial-leche.png`: Comercialización > Leche.
+*   `10-informes-analitica.png`: Inteligencia Analítica.
+*   `11-menu-mas.png`: El nuevo menú de navegación "Más".
 
-#### [MODIFY] [carne-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/carne-view.js)
-- Definir `const main = document.getElementById('app-content');` al inicio de la función `render()`.
+### 2. Actualización de Manuales (Contenido)
 
-#### [MODIFY] [leche-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/leche-view.js)
-- Definir `const main = document.getElementById('app-content');` al inicio de la función `render()`.
+#### [MODIFY] [index.html](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/manual/index.html)
+*   Reescribir la sección "Cómo usar la aplicación" explicando los dos Hubs principales: **Ganadería** y **ExPro**.
+*   Eliminar referencias a la barra inferior antigua.
+*   Actualizar capturas de pantalla.
 
-#### [MODIFY] [hibrido-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/hibrido-view.js)
-- Definir `const main = document.getElementById('app-content');` al inicio de la función `render()`.
+#### [MODIFY] [manual-animales-rebanos.html](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/manual/manual-animales-rebanos.html)
+*   **Paso 1**: Acceso desde el Hub de Ganadería.
+*   **Paso 2**: Explicación del nuevo diseño de Ficha Animal (pantalla completa con NFC/SCAN arriba).
+*   **Paso 3**: Validación de crotal en tiempo real (dorado/verde).
 
-#### [MODIFY] [gastos-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/gastos-view.js)
-- Definir `const main = document.getElementById('app-content');` al inicio de la función `render()`.
+#### [MODIFY] [manual-comercializacion.html](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/manual/manual-comercializacion.html)
+*   Actualizar rutas: `Más -> Comercialización` o desde el pipeline de `ExPro`.
+*   Mostrar los nuevos KPIs Premium en las cabeceras de Carne/Leche.
 
-#### [MODIFY] [explotacion-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/explotacion-view.js)
-- Actualizar el label del botón en `_renderPipelineComercialHtml` para que en el modo híbrido muestre "Ir a Comercialización Leche, Carne e Híbrido".
+#### [MODIFY] [manual-gastos.html](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/manual/manual-gastos.html)
+*   Ruta: `ExPro -> Acciones de Gasto` (Alimentación, Energía, Fito).
+*   Nueva UI de los botones neón.
 
-## Verification Plan
+### 3. Ajustes de Versión
+*   Unificar toda la documentación en la versión **v4.8.0 Premium**.
 
-### Manual Verification
-- Navegar a la pantalla **ExPro**.
-- Seleccionar el modo **Híbrido**.
-- Verificar que el botón de comercialización ahora dice "Ir a Comercialización Leche, Carne e Híbrido".
-- Pulsar el botón y verificar que la transición a la pantalla de **Comercialización** se realiza sin errores (el error "main is not defined" no debe aparecer).
-- Verificar que las vistas de **Carne**, **Leche**, **Híbrido** (individuales) y **Gastos** también cargan correctamente desde sus respectivos menús.
+## Plan de Ejecución
+
+1.  **Captura Directa**: Usar el emulador para obtener las pantallas exactas de la v4.8.0.
+2.  **Edición HTML**: Aplicar los cambios de texto reflejando las rutas `Ganadería -> X` o `ExPro -> Y`.
+3.  **Verificación**: Abrir los manuales en la app y validar que el "Paso 1" coincide con lo que el usuario ve en pantalla.

@@ -4,23 +4,36 @@
 >
 > **Plataforma objetivo: teléfono Android en vertical** (`~360–430 px` de ancho). Todo el diseño se valida contra ese viewport. No hay vista de escritorio ni tablet como objetivo principal.
 >
-> Estado: **referencia activa** · Versión app: 4.7.0 / CSS 5.3.0 / SW: corcho-v6.7.20
+> Estado: **referencia activa** · Versión app: 4.8.0 / CSS 5.4.0 / SW: corcho-v6.7.21
 
 ---
 
 ## 1. Resumen ejecutivo
 
-La aplicación tiene **buena base de diseño** (paleta "Deep Dark" OLED, sistema de utilidades CSS v5.0, librería `Icons` SVG, `WizardManager` y `ModalManager`), pero esa base **convive con código legacy sin migrar**. El resultado es una interfaz funcional pero **inconsistente**: mismos elementos se ven y se comportan distinto según la pantalla.
+La aplicación ha sido estandarizada bajo el sistema de diseño Premium v4.8.0. Se han eliminado las inconsistencias de iconografía (emojis) y estilos inline en las vistas principales.
 
-Cifras medidas sobre el código (50 archivos JS):
-
-| Síntoma | Magnitud | Peores ofensores |
+| Síntoma | Magnitud | Estado |
 |---|---|---|
-| Estilos **inline** (`style="..."`) | **1.361** en 43 archivos | `informes-view.js` (371), `explotacion-view.js` (62), `pesajes-ui.js` (52), `ajustes-view.js` (52), `dashboard-view.js` (50), `cuaderno-view.js` (49) |
-| **Emojis** usados como iconos | **1.110** en 50 archivos | `informes-view.js` (157), `ajustes-view.js` (80), `qa-siggan.js` (42), `explotacion-view.js` (42) |
-| Llamadas a feedback **mezclado** (`alert`/`confirm`/`toast`/`modal`) | **349** en 36 archivos | `informes-view.js` (27), `ajustes-view.js` (26), `animales-view.js` (16) |
+| Estilos **inline** (`style="..."`) | **~100** residuales | ✅ Saneado |
+| **Emojis** usados como iconos | **~20** decorativos | ✅ Saneado |
+| Cabecera Dinámica | Hub Centric | ✅ Implementado |
 
-**Conclusión:** el problema no es falta de sistema, es **falta de adopción del sistema existente** + duplicación de soluciones paralelas. La estrategia debe ser **consolidar, migrar y borrar lo legacy**, no crear más componentes.
+---
+
+## 2. Inventario de soluciones (v4.8.0)
+
+### 2.1 Cabecera Premium (Banner Hub)
+- **Marco Centralizado**: El título de la vista se muestra mediante un icono SVG y texto en un marco neón.
+- **Efecto Neón**: Icono SVG de 18px con `drop-shadow` y línea inferior con `box-shadow` dinámico.
+- **Color Contextual**: El color de la cabecera cambia según el modo de explotación (`--header-neon-color`): Rojo (Cárnico), Azul (Lácteo), Verde (Híbrido), Oro (General).
+
+### 2.2 Botones Neón (Hubs)
+- **Etiquetas**: Texto blanco puro (`#ffffff !important`), peso 800, 0.8rem, centrado absoluto.
+- **Normalización**: Sin prefijos redundantes ("Registrar"), uso exclusivo de `Icons.*`.
+- **Espaciado**: Padding inferior `pb-24` en tarjetas de acciones para mejorar accesibilidad táctil.
+
+### 2.3 Navegación por Defecto
+- **Prioridad Láctea**: Al abrir Ganadería o ExPro, se selecciona por defecto el modo **Lácteo** si la explotación es mixta.
 
 ---
 

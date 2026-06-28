@@ -1,22 +1,34 @@
-# Walkthrough - Corrección de Error "main is not defined" y Mejora UX en ExPro
+# Walkthrough - Reescritura de Manuales v4.8.0 Premium
 
-Se han corregido los errores de referencia a la variable `main` no definida y se ha mejorado el etiquetado de navegación en la vista ExPro.
+Se ha realizado una actualización integral y desde cero de la documentación de usuario para reflejar fielmente la nueva arquitectura de la aplicación basada en Hubs y el diseño Premium.
 
-## Cambios realizados
+## Cambios Realizados
 
-### Corrección de errores (Variable `main`)
-En las siguientes vistas, se ha añadido la definición `const main = document.getElementById('app-content');` dentro de sus funciones `render()`, lo que soluciona el error que impedía cargar el contenido al navegar desde otras secciones:
-- [comercializacion-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/comercializacion-view.js)
-- [carne-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/carne-view.js)
-- [leche-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/leche-view.js)
-- [hibrido-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/hibrido-view.js)
-- [gastos-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/gastos-view.js)
+### 1. Nueva Base Gráfica (Estandarizada)
+Se han tomado 11 capturas de pantalla clave del emulador, asegurando que cada una refleje el estado actual de la UI (Tema oscuro, acentos neón, nueva barra de navegación):
+- `01-dashboard.png`: Portada del sistema.
+- `02-ganaderia-hub.png`: Centro de gestión del censo.
+- `03-animales-lista.png`: Nuevo diseño de listado con búsqueda.
+- `04-ficha-animal-wizard.png`: Documentación del wizard a pantalla completa.
+- `05-expro-carne.png`, `06-expro-leche.png`, `07-expro-hibrido.png`: Los tres estados del Hub operativo.
+- `08-comercial-carne.png`, `09-comercial-leche.png`: Flujos de venta actualizados.
+- `10-informes-analitica.png`: Pantalla de inteligencia de negocio.
+- `11-menu-mas.png`: Nueva navegación secundaria.
 
-### Mejora de UX en ExPro
-- [explotacion-view.js](file:///C:/Users/yo/repo/LIVESTOCK-MANAGER/android/app/src/main/assets/public/js/views/explotacion-view.js): Se ha actualizado la lógica del botón de comercialización. Ahora, cuando el modo activo es **Híbrido**, el botón muestra el texto: **"Ir a Comercialización Leche, carne e híbrido"**, proporcionando una navegación más clara y contextualizada.
+### 2. Reescritura de Instrucciones Paso a Paso
+Se han redefinido las rutas de acceso en todos los archivos HTML para evitar errores de navegación:
+- **Antes**: "Registros -> Animales"
+- **Ahora**: "Ganadería -> Animales" o "ExPro -> Registrar X"
+- Se ha añadido la explicación de la **Ficha Animal Wizard**, que antes no existía como proceso independiente.
+
+### 3. Archivos Actualizados
+- `manual/index.html`: Reestructurado para explicar el concepto de Hubs (Ganadería y ExPro).
+- `manual/manual-animales-rebanos.html`: Actualizado con el flujo de alta Premium.
+- `manual/manual-comercializacion.html`: Actualizado con el acceso dual (Más o ExPro).
+- `manual/manual-gastos.html`: Simplificado para resaltar el registro rápido desde ExPro.
 
 ## Verificación
-
-Se ha verificado que:
-1. La variable `main` está correctamente definida antes de su uso en todas las funciones `render` modificadas.
-2. La lógica condicional en `explotacion-view.js` aplica el texto correcto al botón según el modo seleccionado.
+Se ha comprobado manualmente que:
+1. Las imágenes existen en `manual/img/` con los nombres correctos.
+2. Los enlaces internos del manual general (`index.html`) funcionan.
+3. El lenguaje utilizado es consistente con el tono "Premium" de la v4.8.0.

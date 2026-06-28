@@ -1,6 +1,3 @@
-- [x] Definir `main` en `comercializacion-view.js`
-- [x] Definir `main` en `carne-view.js`
-- [x] Definir `main` en `leche-view.js`
-- [x] Definir `main` en `hibrido-view.js`
-- [x] Definir `main` en `gastos-view.js`
-- [x] Actualizar texto del botón en `explotacion-view.js`
+- [x] Actualizar `compileSdkVersion` y `targetSdkVersion` a 35 en `variables.gradle`
+- [x] Incrementar `versionCode` a 481 en `android/app/build.gradle`
+- [x] Actualizar `versionName` a "4.8.0" en `android/app/build.gradle`
