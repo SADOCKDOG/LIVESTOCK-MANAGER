@@ -2798,16 +2798,16 @@ label {
 
 /* === Pesaje Wizard === */
 .btn-pesaje-close    { background: #27272a; border: none; width: 32px; height: 32px; border-radius: 50%; position: absolute; top: 50%; transform: translateY(-50%); right: 15px; z-index: 5001; cursor: pointer; font-weight: bold; }
-.pesaje-titulo-h2    { margin: 0 0 4px 0; font-size: 1.3rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
-.pesaje-rebano-box   { background: rgba(251,191,36,0.05); padding: 12px; border-radius: 10px; border: 1px solid var(--p-gold); flex-shrink: 0; }
-.pesaje-info-grid    { padding: 10px; border-radius: 8px; border: 1px solid #222; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.7rem; flex-shrink: 0; }
-.pesaje-animal-box   { text-align: center; padding: 20px 15px; background: #0a0a0a; border: 2px solid #333; border-radius: 12px; position: relative; }
-.pesaje-animal-label { text-transform: uppercase; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; }
-.pesaje-crotal       { font-size: 2.8rem; font-weight: 900; line-height: 1; text-transform: uppercase; }
-.pesaje-peso-input   { width: 100%; max-width: 200px; font-size: 3.5rem; font-weight: 900; text-align: center; background: #1a1a1a; color: white; border-radius: 16px; padding: 10px; }
-.pesaje-unidad-label { font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin-top: 5px; }
-.pesaje-leche-grid   { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.pesaje-guardar-btn  { width: 100%; max-width: 280px; margin: 0 auto; font-size: 1.1rem; padding: 15px; font-weight: 900; }
+.pesaje-titulo-h2    { margin: 0 0 4px 0; font-size: 1.4rem; text-transform: uppercase; font-weight: 950; letter-spacing: 2px; }
+.pesaje-rebano-box   { background: rgba(250, 204, 21, 0.05); padding: 16px; border-radius: 12px; border: 1px solid var(--p-gold); flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+.pesaje-info-grid    { padding: 12px; border-radius: 10px; border: 1px solid #222; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.75rem; flex-shrink: 0; background: #000; }
+.pesaje-animal-box   { text-align: center; padding: 25px 20px; background: #000; border: 2px solid #222; border-radius: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.pesaje-animal-label { text-transform: uppercase; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; font-size: 0.75rem; }
+.pesaje-crotal       { font-size: 3.5rem; font-weight: 950; line-height: 1; text-transform: uppercase; letter-spacing: -2px; }
+.pesaje-peso-input   { width: 100%; max-width: 250px; font-size: 4.5rem; font-weight: 950; text-align: center; background: #0a0a0a; color: white; border-radius: 24px; padding: 15px; margin-top: 10px; font-family: 'Inter', sans-serif; }
+.pesaje-unidad-label { font-weight: 950; font-size: 1rem; text-transform: uppercase; margin-top: 10px; letter-spacing: 3px; }
+.pesaje-leche-grid   { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pesaje-guardar-btn  { width: 100%; max-width: 320px; margin: 0 auto; font-size: 1.25rem; padding: 18px; font-weight: 950; text-transform: uppercase; letter-spacing: 1px; }
 .pesaje-logis-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pesaje-logis-grid-2 { margin-top: 8px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; }
 .pesaje-neto-box     { display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: #000; padding: 5px 10px; border-radius: 8px; }

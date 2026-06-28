@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual de Pruebas Internas — Livestock Manager v4.8.1</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --primary-color: #c6912a; /* Dorado corporativo */
+      --primary-dark: #a0731e;
+      --bg-dark: #121212;
+      --bg-card: #1e1e1e;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #ffffff;
+      color: #0f172a;
+      line-height: 1.6;
+      font-size: 11pt;
+    }
+
+    /* Estilo para pantalla y maquetación de impresión */
+    @media print {
+      body {
+        background-color: #ffffff;
+        color: #0f172a;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      .no-break {
+        page-break-inside: avoid;
+      }
+      @page {
+        size: A4;
+        margin: 15mm 15mm 20mm 15mm;
+      }
+    }
+
+    /* Portada */
+    .cover-page {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30mm;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      page-break-after: always;
+    }
+
+    .cover-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .cover-title {
+      font-size: 32pt;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .cover-subtitle {
+      font-size: 18pt;
+      font-weight: 400;
+      color: var(--text-main);
+      margin-bottom: 40px;
+    }
+
+    .cover-meta {
+      font-size: 11pt;
+      color: var(--text-muted);
+      margin-top: 50px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* Cabecera de Página (Running Header) */
+    .page-header-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+      margin-bottom: 25px;
+      width: 100%;
+    }
+
+    .header-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .header-text-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-title-text {
+      font-size: 12pt;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-dev-text {
+      font-size: 8.5pt;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .header-license-text {
+      font-size: 8.5pt;
+      color: #475569;
+      text-align: right;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    /* Estructura general de contenidos */
+    .container {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20mm;
+    }
+
+    .section-title {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .subsection-title {
+      font-size: 14pt;
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    .introduction-box {
+      background-color: #f8fafc;
+      border-left: 4px solid var(--primary-color);
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .introduction-box p {
+      margin-bottom: 0;
+      font-style: italic;
+    }
+
+    .link-box {
+      background-color: #eff6ff;
+      border: 1px dashed #3b82f6;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .link-box a {
+      color: #1d4ed8;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    /* Módulos y Capturas */
+    .module-card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      page-break-inside: avoid;
+    }
+
+    .module-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .module-name {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .module-badge {
+      font-size: 8pt;
+      font-weight: 600;
+      background-color: #f1f5f9;
+      color: #475569;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .module-layout {
+      display: flex;
+      gap: 20px;
+    }
+
+    .module-description {
+      flex: 1.2;
+    }
+
+    .module-screenshot {
+      flex: 0.8;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .screenshot-img {
+      max-width: 100%;
+      max-height: 280px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    /* Lista de verificación (Checkboxes) */
+    .checklist {
+      margin-top: 15px;
+      list-style: none;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      font-size: 10pt;
+    }
+
+    .checklist-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 1px solid #94a3b8;
+      border-radius: 3px;
+      margin-right: 10px;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .checklist-text {
+      color: #334155;
+    }
+
+    /* Tablas */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 10pt;
+    }
+
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    /* Alertas */
+    .alert-banner {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      font-size: 10pt;
+    }
+
+    .alert-danger {
+      background-color: #fef2f2;
+      border-left: 4px solid var(--danger-color);
+      color: #991b1b;
+    }
+
+    .alert-warning {
+      background-color: #fffbeb;
+      border-left: 4px solid var(--warning-color);
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PORTADA -->
+  <div class="cover-page">
+    <img src="img/Icono_512x512.png" class="cover-logo" alt="Logo">
+    <div class="cover-title">Livestock Manager</div>
+    <div class="cover-subtitle">Manual de Pruebas Internas — Versión v4.8.1</div>
+    <div class="cover-meta">
+      <p><strong>Desarrollador:</strong> David Asuar Arteaga</p>
+      <p><strong>Fecha de Emisión:</strong> 29 de junio de 2026</p>
+      <p><strong>Objetivo:</strong> Guía de validación de módulos y rutas críticas</p>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- INTRODUCCIÓN -->
+    <div class="page-break">
+      <!-- CABECERA RUNNING -->
+      <div class="page-header-block">
+        <div class="header-logo-wrap">
+          <img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App">
+          <div class="header-text-wrap">
+            <span class="header-title-text">Livestock Manager Premium</span>
+            <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span>
+          </div>
+        </div>
+        <div class="header-license-text">
+          <span>Licencia: MIT / Propietaria</span><br>
+          <span>© 2026 Todos los derechos reservados</span>
+        </div>
+      </div>
+
+      <div class="section-title">Introducción para los Testers</div>
+      <div class="introduction-box">
+        <p>¡Gracias por participar en las pruebas internas de <strong>Livestock Manager v4.8.1</strong>! Tu labor es crucial para validar las funcionalidades clave de la aplicación en dispositivos Android reales (especialmente Android 13 y 14) antes del lanzamiento oficial.</p>
+      </div>
+
+      <p>Esta versión corrige fallos críticos de exportación y compartición nativa de archivos PDF/Excel en Android 13+. A continuación, encontrarás el enlace exclusivo para testers de Google Play Store para descargar e instalar la versión de pruebas de la aplicación:</p>
+
+      <div class="link-box">
+        <p>Enlace de instalación de prueba:</p>
+        <a href="https://play.google.com/apps/internaltest/4701702444691904090" target="_blank">https://play.google.com/apps/internaltest/4701702444691904090</a>
+      </div>
+
+      <p>Por favor, asegúrate de estar registrado en el grupo de pruebas con tu cuenta de Google Play antes de abrir el enlace anterior.</p>
+    </div>
+
+    <!-- PARTE 1: INSTALACIÓN Y ARRANQUE -->
+    <div class="no-break">
+      <div class="section-title">Parte 1: Primeros Pasos y Asistente</div>
+      <p>Una vez descargada e instalada la aplicación, sigue los pasos iniciales:</p>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 5%">Paso</th>
+            <th style="width: 35%">Acción</th>
+            <th style="width: 60%">Resultado Esperado / Qué Validar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1</strong></td>
+            <td>Abrir la aplicación</td>
+            <td>Debe arrancar con un cargando y, si es la primera vez, iniciará el Asistente de Configuración Inicial de Finca.</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td>Configurar la finca demo</td>
+            <td>Introduce un nombre (ej. Finca Chamorro) y selecciona tipo "Mixto" (para habilitar tanto los módulos de carne como de leche).</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td>Cargar datos de prueba</td>
+            <td>Usa la opción de cargar datos demo en Ajustes para disponer de animales, rebaños y gastos precargados listos para validar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PARTE 2: MÓDULOS PRINCIPALES -->
+    <div class="page-break">
+      <!-- CABECERA RUNNING -->
+      <div class="page-header-block">
+        <div class="header-logo-wrap">
+          <img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App">
+          <div class="header-text-wrap">
+            <span class="header-title-text">Livestock Manager Premium</span>
+            <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span>
+          </div>
+        </div>
+        <div class="header-license-text">
+          <span>Licencia: MIT / Propietaria</span><br>
+          <span>© 2026 Todos los derechos reservados</span>
+        </div>
+      </div>
+
+      <div class="section-title">Parte 2: Guía de Módulos y Puntos Críticos</div>
+      <p>A continuación se detallan los módulos principales de la aplicación, su función y los puntos específicos que debes marcar como validados durante tus pruebas.</p>
+    </div>
+
+    <!-- Módulo 1: Inicio/Dashboard -->
+    <div class="module-card">
+      <div class="module-header">
+        <div class="module-name">1. Inicio / Dashboard</div>
+        <div class="module-badge">Principal</div>
+      </div>
+      <div class="module-layout">
+        <div class="module-description">
+          <p>Es la pantalla de bienvenida. Resume el estado global de la explotación agrícola/ganadera. Muestra KPIs numéricos rápidos, balance económico y alertas de tratamientos activos.</p>
+          <ul class="checklist">
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">Los KPIs muestran censo, zonas y rebaños correctos correspondientes a la finca activa.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">El balance de ingresos/gastos y el porcentaje de rentabilidad se actualizan inmediatamente tras registrar una venta o un gasto.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">Las alertas sanitarias de periodo de supresión de tratamientos muestran la cuenta atrás en días correctos (nunca negativos).</span>
+            </li>
+          </ul>
+        </div>
+        <div class="module-screenshot">
+          <img src="img/sc_01_inicio.png" class="screenshot-img" alt="Dashboard">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 2: Ganadería -->
+    <div class="module-card">
+      <div class="module-header">
+        <div class="module-name">2. Ganadería (Selector de Modo)</div>
+        <div class="module-badge">Hub</div>
+      </div>
+      <div class="module-layout">
+        <div class="module-description">
+          <p>Consola unificada de la cabaña ganadera. Permite filtrar la visualización del censo de animales y lotes/rebaños en tres modos de explotación.</p>
+          <ul class="checklist">
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">El selector de modo cambia dinámicamente entre Cárnico (🔴), Lácteo (🔵) e Híbrido (🟢).</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">La cabecera de la aplicación y los marcos del menú cambian de color para reflejar visualmente el modo activo.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">El modo seleccionado se guarda en la memoria interna (ModoContextoHelper) y persiste aunque navegues a otra pantalla y regreses.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="module-screenshot">
+          <img src="img/sc_05_ganaderia.png" class="screenshot-img" alt="Ganadería">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 3: ExPro (Explotación y Producción) -->
+    <div class="module-card">
+      <div class="module-header">
+        <div class="module-name">3. ExPro (Explotación y Producción)</div>
+        <div class="module-badge">Operaciones</div>
+      </div>
+      <div class="module-layout">
+        <div class="module-description">
+          <p>Panel técnico y de rendimiento de los animales. Permite registrar pesajes, controles diarios de leche, y ver los indicadores de calidad de la leche en el tanque.</p>
+          <ul class="checklist">
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">Permite añadir controles lecheros diarios (botón "Control (L)").</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">Muestra las últimas analíticas de laboratorio (grasa, proteína, células somáticas).</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">El indicador de MOFA Alimentario calcula y actualiza correctamente la eficiencia económica del ganado lácteo.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Pesada Individual:</strong> El botón de báscula (⚖) abre el wizard de pesaje individual para registrar el peso de un animal concreto.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Pesada por Lotes:</strong> Permite realizar el registro masivo de pesaje para todos los animales de un rebaño seleccionado.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;">
+          <img src="img/sc_02_expro.png" class="screenshot-img" alt="ExPro">
+          <img src="img/sc_08_wizard_pesada_individual.png" class="screenshot-img" alt="Wizard Pesaje Individual">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 4: CoMer (Comercialización) -->
+    <div class="page-break">
+      <!-- CABECERA RUNNING -->
+      <div class="page-header-block">
+        <div class="header-logo-wrap">
+          <img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App">
+          <div class="header-text-wrap">
+            <span class="header-title-text">Livestock Manager Premium</span>
+            <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span>
+          </div>
+        </div>
+        <div class="header-license-text">
+          <span>Licencia: MIT / Propietaria</span><br>
+          <span>© 2026 Todos los derechos reservados</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <div class="module-name">4. CoMer (Comercialización)</div>
+          <div class="module-badge">Finanzas</div>
+        </div>
+        <div class="module-layout">
+          <div class="module-description">
+            <p>Registro comercial de transacciones. Agrupa las ventas de carne (matadero), las entregas de leche a cisternas y el registro de compras/gastos.</p>
+            <ul class="checklist">
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">El tab de Leche muestra el acumulado en litros vendidos, el número de albaranes de entrega y el precio medio por litro.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">El botón de "Registrar Retirada" abre correctamente el formulario de albaranes de leche.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">La lista de entregas muestra el estado (Pendiente / Pagado), volumen, temperatura de recogida y extracto seco.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Generar Venta (Venta Masiva):</strong> El botón de registro de venta abre el wizard de venta masiva en 5 pasos para matadero, comprobando retenciones, IVA, transporte y generando la transacción en el historial comercial.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;">
+            <img src="img/sc_03_comer.png" class="screenshot-img" alt="CoMer">
+            <img src="img/sc_09_wizard_venta_masiva.png" class="screenshot-img" alt="Wizard Venta Masiva">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 5: Menú Más -->
+    <div class="module-card">
+      <div class="module-header">
+        <div class="module-name">5. Menú de Navegación "Más"</div>
+        <div class="module-badge">Sistema</div>
+      </div>
+      <div class="module-layout">
+        <div class="module-description">
+          <p>Despliega un menú inferior tipo "bottom sheet" que proporciona acceso directo a herramientas auxiliares, informes analíticos, manuales y configuración.</p>
+          <ul class="checklist">
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">Al pulsar "Más" en el menú inferior se abre una ventana modal con fondo oscurecido translúcido.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">Muestra los accesos a Compradores, Proveedores, Transportistas, Informes, Libro de Ventas, Informe REGA, Exportación Oficial, Manuales y Ajustes.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text">La ventana modal se cierra automáticamente al pulsar fuera o al seleccionar cualquier enlace.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="module-screenshot">
+          <img src="img/sc_04_mas.png" class="screenshot-img" alt="Menú Más">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 6: Visualización de Módulos Críticos -->
+    <div class="module-card">
+      <div class="module-header">
+        <div class="module-name">6. Censo y Estructura (Animales, Rebaños, Zonas)</div>
+        <div class="module-badge">Patrimonio</div>
+      </div>
+      <div class="module-layout">
+        <div class="module-description">
+          <p>Módulos centrales de control de activos de la explotación. Muestran el censo total de animales, la lista de rebaños y las zonas con su capacidad de carga ganadera.</p>
+          <ul class="checklist">
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Animales:</strong> El censo completo se carga correctamente, mostrando crotal, especie, raza y edad para el modo de explotación activo.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Rebaños:</strong> La lista de lotes y rebaños se visualiza y clasifica correctamente según su tipo de producción.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Zonas:</strong> Las parcelas de pasto muestran el aforo de ocupación y carga ganadera en UGM/Ha de manera adecuada.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="module-screenshot">
+          <img src="img/sc_06_animales_criticos.png" class="screenshot-img" alt="Animales, Rebaños y Zonas">
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo 7: Ajustes / Fincas -->
+    <div class="page-break">
+      <!-- CABECERA RUNNING -->
+      <div class="page-header-block">
+        <div class="header-logo-wrap">
+          <img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App">
+          <div class="header-text-wrap">
+            <span class="header-title-text">Livestock Manager Premium</span>
+            <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span>
+          </div>
+        </div>
+        <div class="header-license-text">
+          <span>Licencia: MIT / Propietaria</span><br>
+          <span>© 2026 Todos los derechos reservados</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <div class="module-name">7. Ajustes / Gestor de Finca Activa</div>
+          <div class="module-badge">Configuración</div>
+        </div>
+        <div class="module-layout">
+          <div class="module-description">
+            <p>Módulo de configuración principal. Permite dar de alta múltiples explotaciones ganaderas, cambiar de finca activa, y realizar copias de seguridad de la base de datos local (IndexedDB).</p>
+            <ul class="checklist">
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">El botón de "Editar Datos" abre el formulario para configurar datos oficiales de la finca (REGA, CCAA, titular).</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Permite crear una "Nueva Finca" y alternar la finca activa entre las fincas creadas.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text">Comprobar el backup local: exporta base de datos a formato JSON y permite restaurarla seleccionando un fichero.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="module-screenshot">
+            <img src="img/sc_07_ajustes.png" class="screenshot-img" alt="Ajustes">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTE 3: CHECKLIST DE CALIDAD -->
+    <div class="no-break">
+      <div class="section-title">Parte 3: Checklist de Estabilidad e Integridad</div>
+      <p>Por favor, realiza estas verificaciones globales para asegurar que los últimos parches de compatibilidad funcionan sin fisuras:</p>
+
+      <div class="alert-banner alert-warning">
+        ⚠️ <strong>Prueba del Compartir Nativo (CRÍTICO):</strong> Ve a <em>Informes</em> o <em>Manuales</em>, pulsa en cualquier botón de exportación PDF o Excel, y comparte el documento (por WhatsApp, Gmail o Google Drive). La aplicación <strong>no debe cerrarse ni reiniciarse</strong> de forma inesperada.
+      </div>
+
+      <ul class="checklist">
+        <li class="checklist-item">
+          <div class="checklist-checkbox"></div>
+          <span class="checklist-text"><strong>Exportación PDF:</strong> El fichero resultante se visualiza correctamente en visores externos de PDF sin textos solapados.</span>
+        </li>
+        <li class="checklist-item">
+          <div class="checklist-checkbox"></div>
+          <span class="checklist-text"><strong>Exportación Excel:</strong> Los informes financieros y comerciales se abren en Microsoft Excel u Hojas de Cálculo de Google.</span>
+        </li>
+        <li class="checklist-item">
+          <div class="checklist-checkbox"></div>
+          <span class="checklist-text"><strong>Persistencia Offline:</strong> Desactiva la conexión a internet (Modo Avión) y valida que todas las vistas de animales, rebaños y registros funcionen correctamente utilizando la base de datos local IndexedDB.</span>
+        </li>
+        <li class="checklist-item">
+          <div class="checklist-checkbox"></div>
+          <span class="checklist-text"><strong>Ciclo de Backup:</strong> Exporta un archivo de backup, realiza alguna modificación de censo (elimina un animal), restaura la copia de seguridad con la opción "Sobrescribir" y comprueba que se recuperan los datos correctamente.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- PARTE 4: REPORTAR UN ERROR -->
+    <div class="no-break">
+      <div class="section-title">Parte 4: Cómo Reportar un Error</div>
+      <p>Si durante tus pruebas experimentas un comportamiento incorrecto, un cierre inesperado o un dato incoherente, repórtalo con los siguientes datos:</p>
+      <ul>
+        <li><strong>Ruta/Módulo:</strong> En qué pestaña o vista estabas (ej. <code>/informes</code> -> Tab <code>alertas</code>)</li>
+        <li><strong>Dispositivo:</strong> Marca y modelo (ej. Xiaomi Redmi Note 12, Samsung S23)</li>
+        <li><strong>Versión de Android:</strong> Versión de Android (ej. Android 13, Android 14)</li>
+        <li><strong>Pasos para reproducir:</strong>
+          <ol>
+            <li>Tapar en el botón de menú...</li>
+            <li>Introducir datos en el campo...</li>
+            <li>Pulsar en guardar y en ese momento...</li>
+          </ol>
+        </li>
+        <li><strong>Comportamiento observado vs. esperado:</strong> Qué hizo la app y qué debería haber hecho.</li>
+        <li><strong>Captura de pantalla:</strong> Si es posible, adjunta una captura del fallo.</li>
+      </ul>
+    </div>
+
+  </div>
+
+</body>
+</html>
