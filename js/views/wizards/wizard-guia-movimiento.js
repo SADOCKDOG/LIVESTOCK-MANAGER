@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Wizard Guía de Movimiento SIGGAN — Livestock Manager Premium
  * Genera la guía de origen y sanidad pecuaria para movimientos
  * inter-explotación (entrada/salida) y la registra como movimiento oficial,
@@ -21,24 +21,24 @@ window.WizardGuiaMovimiento = {
     const steps = [
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🔄 Tipo de Movimiento</h3>
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">TIPO DE MOVIMIENTO</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">DIRECCIÓN</label>
-              <select id="w-mv-tipo" class="wizard-input wizard-select">
-                <option value="salida" ${data.tipo === 'salida' ? 'selected' : ''}>Salida (desde mi explotación)</option>
-                <option value="entrada" ${data.tipo === 'entrada' ? 'selected' : ''}>Entrada (hacia mi explotación)</option>
+              <select id="w-mv-tipo" class="wizard-input font-900">
+                <option value="salida" ${data.tipo === 'salida' ? 'selected' : ''}>SALIDA (DESDE MI EXPLOTACIÓN)</option>
+                <option value="entrada" ${data.tipo === 'entrada' ? 'selected' : ''}>ENTRADA (HACIA MI EXPLOTACIÓN)</option>
               </select>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">MOTIVO</label>
-              <select id="w-mv-motivo" class="wizard-input wizard-select">
-                ${motivos.map(m => `<option value="${m.value}" ${data.motivo === m.value ? 'selected' : ''}>${m.label}</option>`).join('')}
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">MOTIVO OFICIAL</label>
+              <select id="w-mv-motivo" class="wizard-input font-800">
+                ${motivos.map(m => `<option value="${m.value}" ${data.motivo === m.value ? 'selected' : ''}>${m.label.toUpperCase()}</option>`).join('')}
               </select>
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">FECHA DEL MOVIMIENTO</label>
-              <input type="date" id="w-mv-fecha" value="${data.fecha}" class="wizard-input">
+              <input type="date" id="w-mv-fecha" value="${data.fecha}" class="wizard-input font-800">
             </div>
           </div>`,
         onChange: async (data) => {
@@ -55,44 +55,44 @@ window.WizardGuiaMovimiento = {
         content: (data) => {
           const esSalida = data.tipo === 'salida';
           return `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🏢 Explotaciones</h3>
-            <div class="wizard-input-group">
-              <label class="wizard-label">REGA ${esSalida ? 'ORIGEN (mi explotación)' : 'DESTINO (mi explotación)'}</label>
-              <input type="text" id="w-mv-rega-propia" value="${esSalida ? data.rega_origen : data.rega_destino}" class="wizard-input" ${regaPropia ? 'readonly' : ''}>
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">EXPLOTACIONES Y CENSO</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">REGA ${esSalida ? 'ORIGEN (PROPIO)' : 'DESTINO (PROPIO)'}</label>
+              <input type="text" id="w-mv-rega-propia" value="${esSalida ? data.rega_origen : data.rega_destino}" class="wizard-input font-900 text-gold" ${regaPropia ? 'readonly' : ''}>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">REGA ${esSalida ? 'DESTINO' : 'ORIGEN'} (contraparte)</label>
-              <input type="text" id="w-mv-rega-contra" value="${esSalida ? data.rega_destino : data.rega_origen}" placeholder="Ej: ES041230000123" class="wizard-input">
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">REGA ${esSalida ? 'DESTINO' : 'ORIGEN'} (CONTRAPARTE)</label>
+              <input type="text" id="w-mv-rega-contra" value="${esSalida ? data.rega_destino : data.rega_origen}" placeholder="ES000000000000" class="wizard-input font-800 uppercase">
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">NOMBRE EXPLOTACIÓN CONTRAPARTE</label>
-              <input type="text" id="w-mv-contra-nombre" value="${data.explotacion_contraparte}" placeholder="Titular o explotación" class="wizard-input">
+              <input type="text" id="w-mv-contra-nombre" value="${data.explotacion_contraparte}" placeholder="TITULAR O EXPLOTACIÓN" class="wizard-input uppercase font-800">
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO OPERADOR DESTINO</label>
-              <select id="w-mv-tipo-operador" class="wizard-input wizard-select">
-                <option value="">— Seleccionar —</option>
-                <option value="matadero" ${data.tipo_operador_destino === 'matadero' ? 'selected' : ''}>Matadero</option>
-                <option value="operador_comercial" ${data.tipo_operador_destino === 'operador_comercial' ? 'selected' : ''}>Operador comercial</option>
-                <option value="tratante" ${data.tipo_operador_destino === 'tratante' ? 'selected' : ''}>Tratante</option>
-                <option value="cebadero" ${data.tipo_operador_destino === 'cebadero' ? 'selected' : ''}>Cebadero</option>
-                <option value="industria_lactea" ${data.tipo_operador_destino === 'industria_lactea' ? 'selected' : ''}>Industria láctea</option>
+              <select id="w-mv-tipo-operador" class="wizard-input font-800">
+                <option value="">— SELECCIONAR —</option>
+                <option value="matadero" ${data.tipo_operador_destino === 'matadero' ? 'selected' : ''}>MATADERO</option>
+                <option value="operador_comercial" ${data.tipo_operador_destino === 'operador_comercial' ? 'selected' : ''}>OPERADOR COMERCIAL</option>
+                <option value="tratante" ${data.tipo_operador_destino === 'tratante' ? 'selected' : ''}>TRATANTE</option>
+                <option value="cebadero" ${data.tipo_operador_destino === 'cebadero' ? 'selected' : ''}>CEBADERO</option>
+                <option value="industria_lactea" ${data.tipo_operador_destino === 'industria_lactea' ? 'selected' : ''}>INDUSTRIA LÁCTEA</option>
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPECIE</label>
-                <input type="text" id="w-mv-especie" value="${data.especie}" placeholder="Ovino, Bovino..." class="wizard-input">
+                <input type="text" id="w-mv-especie" value="${data.especie}" placeholder="OVINO, BOVINO..." class="wizard-input uppercase font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº ANIMALES</label>
-                <input type="number" id="w-mv-num" value="${data.num_animales}" min="1" class="wizard-input">
+                <input type="number" id="w-mv-num" value="${data.num_animales}" min="1" class="wizard-input font-900 text-lg">
               </div>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">CROTALES (uno por línea, opcional)</label>
-              <textarea id="w-mv-crotales" class="wizard-input" rows="3" placeholder="ES1409912345...">${(data.crotales || []).join('\n')}</textarea>
+              <label class="wizard-label">CROTALES (UNO POR LÍNEA)</label>
+              <textarea id="w-mv-crotales" class="wizard-input font-800 uppercase" rows="3" placeholder="ES0000..." style="resize:none;">${(data.crotales || []).join('\n')}</textarea>
             </div>
           </div>`;
         },
@@ -146,36 +146,36 @@ window.WizardGuiaMovimiento = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🚚 Transporte y Sanidad</h3>
-            <div class="wizard-input-group">
-              <label class="wizard-label">TRANSPORTISTA</label>
-              <select id="w-mv-transp" class="wizard-input wizard-select">
-                <option value="">— Manual / sin registrar —</option>
-                ${transportistas.map(t => `<option value="${t.id}" ${data.transportistaId == t.id ? 'selected' : ''}>${t.nombre} (${t.matricula || 's/m'})</option>`).join('')}
+          <div class="card card-accent card-accent-amber p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.transportistas()} LOGÍSTICA Y SANIDAD</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">TRANSPORTISTA REGISTRADO</label>
+              <select id="w-mv-transp" class="wizard-input font-800">
+                <option value="">— MANUAL / SIN REGISTRAR —</option>
+                ${transportistas.map(t => `<option value="${t.id}" ${data.transportistaId == t.id ? 'selected' : ''}>${t.nombre.toUpperCase()} (${t.matricula || 'S/M'})</option>`).join('')}
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">NOMBRE (si manual)</label>
-                <input type="text" id="w-mv-transp-nom" value="${data.transportista_nombre}" class="wizard-input">
+                <label class="wizard-label">NOMBRE TRANSPORTISTA</label>
+                <input type="text" id="w-mv-transp-nom" value="${data.transportista_nombre}" class="wizard-input uppercase font-800" placeholder="SI NO ESTÁ EN LISTA">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">MATRÍCULA</label>
-                <input type="text" id="w-mv-matricula" value="${data.matricula}" class="wizard-input">
+                <input type="text" id="w-mv-matricula" value="${data.matricula}" class="wizard-input uppercase font-900" placeholder="0000AAA">
               </div>
             </div>
-            <label class="wizard-checkbox-container mt-8">
-              <input type="checkbox" id="w-mv-desins" ${data.desinsectacion_certificada ? 'checked' : ''}>
-              <span>Desinsectación/desinfección certificada (48h previas)</span>
+            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-12">
+              <input type="checkbox" id="w-mv-desins" ${data.desinsectacion_certificada ? 'checked' : ''} style="accent-color:var(--p-gold);">
+              <span class="uppercase font-900 text-[0.6rem] tracking-tight leading-tight">DESINSECTACIÓN CERTIFICADA (48H PREVIAS)</span>
             </label>
             ${conf && conf.requiere_desinsectacion_movimiento ? `
-            <div class="nota-box nota-box-amber rounded-sm mt-10">
-              <div class="text-xs text-aaa">⚠️ ${conf.label} exige certificar la desinsectación previa al movimiento.</div>
+            <div class="p-10 bg-red-900 border border-red-500 rounded-sm mb-12">
+              <div class="text-[0.55rem] text-white uppercase font-950 tracking-widest">${Icons.alerta()} ${conf.label} EXIGE CERTIFICADO DE DESINSECTACIÓN</div>
             </div>` : ''}
-            <div class="wizard-input-group mt-10">
+            <div class="wizard-input-group">
               <label class="wizard-label">OBSERVACIONES</label>
-              <textarea id="w-mv-notas" class="wizard-input" rows="2">${data.notas}</textarea>
+              <textarea id="w-mv-notas" class="wizard-input font-700 uppercase" rows="2" style="resize:none;">${data.notas}</textarea>
             </div>
           </div>`,
         onChange: async (data) => {
@@ -195,30 +195,30 @@ window.WizardGuiaMovimiento = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🏛️ Tramitación Oficial</h3>
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-purple p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">TRAMITACIÓN ADMINISTRATIVA</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">ESTADO DEL TRÁMITE</label>
-              <select id="w-mv-estado" class="wizard-input wizard-select">
-                <option value="borrador" ${data.estado_tramite === 'borrador' ? 'selected' : ''}>Borrador</option>
-                <option value="presentado" ${data.estado_tramite === 'presentado' ? 'selected' : ''}>Presentado</option>
-                <option value="aceptado" ${data.estado_tramite === 'aceptado' ? 'selected' : ''}>Aceptado</option>
-                <option value="rechazado" ${data.estado_tramite === 'rechazado' ? 'selected' : ''}>Rechazado</option>
+              <select id="w-mv-estado" class="wizard-input font-950">
+                <option value="borrador" ${data.estado_tramite === 'borrador' ? 'selected' : ''}>BORRADOR</option>
+                <option value="presentado" ${data.estado_tramite === 'presentado' ? 'selected' : ''}>PRESENTADO</option>
+                <option value="aceptado" ${data.estado_tramite === 'aceptado' ? 'selected' : ''}>ACEPTADO</option>
+                <option value="rechazado" ${data.estado_tramite === 'rechazado' ? 'selected' : ''}>RECHAZADO</option>
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">FECHA PRESENTACIÓN</label>
-                <input type="date" id="w-mv-fecha-pres" value="${data.fecha_presentacion || ''}" class="wizard-input">
+                <input type="date" id="w-mv-fecha-pres" value="${data.fecha_presentacion || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº REGISTRO OFICIAL</label>
-                <input type="text" id="w-mv-reg-of" value="${data.numero_registro_oficial || ''}" class="wizard-input" placeholder="Nº asiento oficial">
+                <input type="text" id="w-mv-reg-of" value="${data.numero_registro_oficial || ''}" class="wizard-input uppercase font-800" placeholder="ASIENTO">
               </div>
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">ACUSE / JUSTIFICANTE</label>
-              <input type="text" id="w-mv-acuse" value="${data.acuse_recibo || ''}" class="wizard-input" placeholder="Código de acuse o justificante">
+              <input type="text" id="w-mv-acuse" value="${data.acuse_recibo || ''}" class="wizard-input uppercase font-800" placeholder="CÓDIGO DE ACUSE">
             </div>
           </div>
         `,
@@ -246,6 +246,7 @@ window.WizardGuiaMovimiento = {
     window.WizardManager.create({
       id: 'wizard-guia-movimiento',
       title: 'GUÍA DE MOVIMIENTO',
+      steps: steps,
       initialData: {
         tipo: 'salida',
         motivo: motivos[0] ? motivos[0].value : '',

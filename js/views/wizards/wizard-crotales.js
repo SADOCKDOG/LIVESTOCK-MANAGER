@@ -27,31 +27,30 @@ window.WizardCrotales = {
     const wizardSteps = [
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">${Icons.paquete()} Material Solicitado</h3>
-            <div class="wizard-input-group">
+          <div class="card card-accent card-accent-green p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.paquete()} MATERIAL SOLICITADO</div>
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">ESPECIE</label>
-              <select id="w-pd-especie" class="wizard-input wizard-select">
-                ${especiesPedido.map(e => `<option value="${e}" ${data.especie === e ? "selected" : ""}>${e}</option>`).join("")}
+              <select id="w-pd-especie" class="wizard-input font-800">
+                ${especiesPedido.map(e => `<option value="${e}" ${data.especie === e ? "selected" : ""}>${e.toUpperCase()}</option>`).join("")}
               </select>
             </div>
-            <div class="wizard-input-group">
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO DE CROTAL / MATERIAL</label>
-              <select id="w-pd-tipo" class="wizard-input wizard-select">
-                <option value="Botón + Botón (EID)" ${data.tipo === "Botón + Botón (EID)" ? "selected" : ""}>Botón + Botón (Electrónico)</option>
-                <option value="Bandera + Botón (EID)" ${data.tipo === "Bandera + Botón (EID)" ? "selected" : ""}>Bandera + Botón (Electrónico)</option>
-                <option value="Bolo Ruminal + Botón Visual" ${data.tipo === "Bolo Ruminal + Botón Visual" ? "selected" : ""}>Bolo Ruminal + Botón visual</option>
+              <select id="w-pd-tipo" class="wizard-input font-800">
+                <option value="Botón + Botón (EID)" ${data.tipo === "Botón + Botón (EID)" ? "selected" : ""}>BOTÓN + BOTÓN (ELECTRÓNICO)</option>
+                <option value="Bandera + Botón (EID)" ${data.tipo === "Bandera + Botón (EID)" ? "selected" : ""}>BANDERA + BOTÓN (ELECTRÓNICO)</option>
+                <option value="Bolo Ruminal + Botón Visual" ${data.tipo === "Bolo Ruminal + Botón Visual" ? "selected" : ""}>BOLO RUMINAL + BOTÓN VISUAL</option>
               </select>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">CANTIDAD (Nº DE IDENTIFICACIONES / PARES)</label>
-              <input type="number" id="w-pd-cant" value="${data.cantidad}" min="1" class="wizard-input text-xl border-green">
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">CANTIDAD (Nº DE PARES)</label>
+              <input type="number" id="w-pd-cant" value="${data.cantidad}" min="1" class="wizard-input font-950 text-2xl text-green">
             </div>
-            <div class="rounded-sm nota-box nota-box-green mt-10">
-              <div class="text-xs text-aaa">
-                📌 Crotal derecho (visual): código visible · Crotal izquierdo (RFID): lectura electrónica.<br>
-                Real Decreto 787/2023 y 1307/2024.
-              </div>
+            <div class="p-10 bg-black border border-222 rounded-sm mt-10">
+              <p class="text-[0.6rem] text-aaa uppercase font-800 tracking-tight leading-relaxed m-0">
+                ${Icons.info()} CROTAL DERECHO (VISUAL) · CROTAL IZQUIERDO (RFID/EID). REGLAMENTADO POR RD 787/2023 Y 1307/2024.
+              </p>
             </div>
           </div>
         `,
@@ -67,36 +66,35 @@ window.WizardCrotales = {
       },
       {
         content: (data) => `
-          <div class="mt-10">
-            <h3 class="text-green mb-15">🏢 Destino y ADSG</h3>
-            <div class="wizard-input-group">
-              <label class="wizard-label">DESTINATARIO (ADSG / OCA / ADMINISTRACIÓN)</label>
-              <input type="text" id="w-pd-adsg" value="${data.adsg_nombre}" placeholder="Ej: ADSG Sierra Norte" class="wizard-input">
+          <div class="card card-accent card-accent-blue p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.edificio()} DESTINO Y ADSG</div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">DESTINATARIO (ADSG / OCA)</label>
+              <input type="text" id="w-pd-adsg" value="${data.adsg_nombre}" placeholder="EJ: ADSG SIERRA NORTE" class="wizard-input uppercase font-800">
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">CÓDIGO ADSG (opcional)</label>
-              <input type="text" id="w-pd-adsg-cod" value="${data.adsg_codigo}" placeholder="Código de la ADSG" class="wizard-input">
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">CÓDIGO ADSG</label>
+              <input type="text" id="w-pd-adsg-cod" value="${data.adsg_codigo}" placeholder="OPCIONAL" class="wizard-input uppercase font-800">
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">VETERINARIO ADSG (opcional)</label>
-              <input type="text" id="w-pd-vet" value="${data.adsg_veterinario}" placeholder="Nombre del veterinario" class="wizard-input">
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">VETERINARIO RESPONSABLE</label>
+              <input type="text" id="w-pd-vet" value="${data.adsg_veterinario}" placeholder="NOMBRE DEL VETERINARIO" class="wizard-input uppercase font-800">
             </div>
-            <div class="grid grid-cols-2 gap-10">
+            <div class="grid grid-cols-2 gap-10 mb-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº COLEGIADO</label>
-                <input type="text" id="w-pd-vet-col" value="${data.adsg_vet_colegiado}" placeholder="Ej: 28/12345" class="wizard-input">
+                <input type="text" id="w-pd-vet-col" value="${data.adsg_vet_colegiado}" placeholder="0000" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">NIF VETERINARIO</label>
-                <input type="text" id="w-pd-vet-nif" value="${data.adsg_vet_nif}" placeholder="NIF" class="wizard-input">
+                <label class="wizard-label">NIF VET.</label>
+                <input type="text" id="w-pd-vet-nif" value="${data.adsg_vet_nif}" placeholder="NIF" class="wizard-input font-800">
               </div>
             </div>
             ${finca.comunidad_autonoma ? `
-            <div class="rounded-sm nota-box nota-box-purple mt-10">
-              <div class="text-xs text-aaa">
-                🌍 La solicitud se dirigirá a la plataforma <strong>${finca.comunidad_autonoma === 'andalucia' ? 'SIGGAN (Andalucía)' : 'BADIGEX (Extremadura)'}</strong>
-                para su tramitación oficial.
-              </div>
+            <div class="p-10 bg-black border border-222 rounded-sm">
+              <p class="text-[0.6rem] text-aaa uppercase font-900 tracking-tight leading-relaxed m-0 text-center">
+                LA SOLICITUD SE DIRIGIRÁ A <strong>${finca.comunidad_autonoma === 'andalucia' ? 'SIGGAN' : 'BADIGEX'}</strong> PARA TRAMITACIÓN OFICIAL.
+              </p>
             </div>` : ''}
           </div>
         `,
