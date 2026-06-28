@@ -11,13 +11,16 @@
     "build": "powershell -NoProfile -Command \"if (-not (Test-Path www)) { New-Item -ItemType Directory -Path www | Out-Null }; Copy-Item -Path index.html, manifest.webmanifest, sw.js -Destination www -Force; foreach ($d in 'css','js','icons') { Copy-Item -Path $d -Destination www -Recurse -Force } \"",
     "cap:add": "npx cap add android",
     "cap:sync": "npm run build && npx cap sync android",
-    "cap:open": "npx cap open android"
+    "cap:open": "npx cap open android",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@capacitor/android": "^5.7.8",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^5.7.8",
-    "@capacitor/core": "^5.7.8"
+    "@capacitor/core": "^5.7.8",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0"
   },
   "dependencies": {
     "@capacitor-community/barcode-scanner": "^4.0.1",

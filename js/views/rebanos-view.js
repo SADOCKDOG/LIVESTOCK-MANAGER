@@ -171,18 +171,26 @@ const RebanosView = {
       </div>
       
       <!-- Sanidad -->
-      <div class="card mb-20 border-top-3px border-top-3px-green card-tint-green">
-        <div class="flex justify-between items-center">
-          <div class="inf-card-title m-0 flex items-center gap-8">${Icons.sanidad()} Sanidad</div>
-          <button class="btn btn-primary btn-add" onclick="App._registrarTratamiento(${id})" style="padding:5px 12px; font-size:0.8rem;">${Icons.agregar()} Añadir</button>
+      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24">
+        <div class="section-header-theme" style="--theme-color: #10b981">SANIDAD</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Añadir Trat.</span>
+          </button>
         </div>
         <div id="lista-sanitarios-rebano" class="mt-10"></div>
       </div>
 
       <!-- Animales -->
-      <div class="flex justify-between items-center mb-15">
-        <h3 class="m-0 flex items-center gap-8">${Icons.animales()} Animales (${animales.length})</h3>
-        <button class="btn btn-primary btn-edit" onclick="App._abrirSelectorAnimales(${id})" style="padding:8px 15px;">${Icons.rotacion()} Mover</button>
+      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+        <div class="section-header-theme" style="--theme-color: #3b82f6">ANIMALES (${animales.length})</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12">
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirSelectorAnimales(${id})">
+            ${Icons.rotacion()}
+            <span class="widget-link-label">Mover Lote</span>
+          </button>
+        </div>
       </div>
       <div class="grid gap-10">
         ${animales.map((a) => {

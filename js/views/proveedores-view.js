@@ -9,6 +9,10 @@ const ProveedoresView = {
     async render() {
         const main = document.getElementById("app-content");
         main.innerHTML = `
+          <div class="mb-16 text-center">
+            <div class="section-header-neon" style="--neon-color: #10b981; max-width: 520px; margin: 0 auto;">PROVEEDORES</div>
+          </div>
+
           <div class="mb-16">
             <div id="prov-kpis"></div>
             <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">

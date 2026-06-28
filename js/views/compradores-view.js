@@ -9,36 +9,63 @@ const CompradoresView = {
 
     async render() {
         const main = document.getElementById("app-content");
+        const meta = this._getTabMeta(this._currentTab);
+
         main.innerHTML = `
-          <div class="mb-16">
-            <div class="flex gap-6 flex-wrap mb-10">
-              ${['todos','cárnico','láctico','híbrido'].map(t => `
-                <button class="filter-pill filter-pill-gold font-800 uppercase ${this._currentTab === t ? 'active' : ''}" data-tab="${t}"
-                  onclick="CompradoresView._cambiarFiltro('${t}')"
-                  style="letter-spacing:0.3px;">
-                  ${t === 'todos' ? `${Icons.documento()} Todos` : t === 'cárnico' ? `${Icons.carne()} Cárnico` : t === 'láctico' ? `${Icons.leche()} Láctico` : `${Icons.rotacion()} Híbrido`}
-                </button>
-              `).join('')}
-            </div>
-            <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-              <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
-              <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-                <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
-                  ${Icons.agregar()}
-                  <span class="widget-link-label">Nuevo Comprador</span>
-                </button>
-              </div>
-            </div>
-            <div class="flex gap-8 mb-14">
-              <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
-                oninput="CompradoresView._filtrar(this.value)"
-                class="search-input flex-1">
+          <div class="mb-16 text-center">
+            <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
+            <div class="comer-mode-switch">
+              <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} Todos</button>
+              <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} Carne</button>
+              <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} Leche</button>
+              <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} Híbrido</button>
             </div>
           </div>
+
+          <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+            <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+            <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+              <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
+                ${Icons.agregar()}
+                <span class="widget-link-label">Nuevo Comprador</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex gap-8 mb-14">
+            <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
+              oninput="CompradoresView._filtrar(this.value)"
+              class="search-input flex-1">
+          </div>
+
           <div id="compr-lista"><div class="loader">Cargando compradores...</div></div>
           <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">${Icons.agregar()}</button>`;
 
         await this._cargarDatos();
+    },
+
+    _getTabMeta(tab) {
+        const map = {
+            'todos': { color: 'var(--p-gold)', label: 'Todos' },
+            'cárnico': { color: '#ef4444', label: 'Cárnico' },
+            'láctico': { color: '#3b82f6', label: 'Láctico' },
+            'híbrido': { color: '#10b981', label: 'Híbrido' }
+        };
+        return map[tab] || map.todos;
+    },
+
+    _cambiarFiltro(tab) {
+        this._currentTab = tab;
+        document.querySelectorAll('.comer-mode-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.tab === tab);
+        });
+
+        const meta = this._getTabMeta(tab);
+        const headerNeon = document.querySelector('.section-header-neon');
+        if (headerNeon) headerNeon.style.setProperty('--neon-color', meta.color);
+
+        const busqueda = document.getElementById('search-compradores')?.value || '';
+        this._aplicarFiltros(busqueda);
     },
 
     async _cargarDatos() {

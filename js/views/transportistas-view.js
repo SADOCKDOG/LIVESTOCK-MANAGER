@@ -22,24 +22,29 @@ const TransportistasView = {
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
-            <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-              <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
-              <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-                <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="TransportistasView._abrirFormulario()">
-                  ${Icons.agregar()}
-                  <span class="widget-link-label">Nuevo Transportista</span>
-                </button>
+            <div class="mb-16 text-center">
+              <div class="section-header-neon" style="--neon-color: #3b82f6; max-width: 520px; margin: 0 auto;">LOGÍSTICA / TRANSPORTE</div>
+              <div class="comer-mode-switch">
+                 <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa;" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
+                 <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
+                 <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-6 mb-14">
+
+            <div class="max-w-600 mx-auto">
+                <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+                  <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+                  <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+                    <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="TransportistasView._abrirFormulario()">
+                      ${Icons.agregar()}
+                      <span class="widget-link-label">Nuevo Transportista</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
                     <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
                     <div class="info-box-center border-left-amber"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
-                </div>
-                <div class="tabs-scroll scroll-shadow-container mb-12 gap-6">
-                    <button class="filter-pill ${this._currentFilter === 'todos' ? 'active' : ''}" onclick="TransportistasView._setFilter('todos')">TODOS</button>
-                    <button class="filter-pill ${this._currentFilter === 'activos' ? 'active' : ''}" onclick="TransportistasView._setFilter('activos')">ACTIVOS</button>
-                    <button class="filter-pill ${this._currentFilter === 'inactivos' ? 'active' : ''}" onclick="TransportistasView._setFilter('inactivos')">INACTIVOS</button>
                 </div>
                 <div id="trans-list"></div>
             </div>
