@@ -1,10 +1,10 @@
 # Auditoría UI/UX y Guía de Diseño — Livestock Manager (SIGGAN)
 
-> **Objetivo del documento.** Diagnosticar el estado actual de la interfaz tras las modificaciones de adaptación a **SIGGAN** y definir un **sistema de diseño único** (tokens, componentes, patrones y reglas) que sirva de referencia para estandarizar toda la app antes de implementar los cambios.
+> **Objetivo del documento.** Definir el **sistema de diseño único** (tokens, componentes, patrones y reglas) que sirva de referencia normativa para toda la app.
 >
 > **Plataforma objetivo: teléfono Android en vertical** (`~360–430 px` de ancho). Todo el diseño se valida contra ese viewport. No hay vista de escritorio ni tablet como objetivo principal.
 >
-> Estado: **borrador para revisión** · Versión app: 4.5.0 / CSS 5.2.0
+> Estado: **referencia activa** · Versión app: 4.7.0 / CSS 5.3.0 / SW: corcho-v6.7.20
 
 ---
 
@@ -196,6 +196,126 @@ Reglas: **prohibido** `alert()`/`confirm()` nativos (sustituir los 349 usos prog
 - `bottom-nav` (5 + "Más") = patrón canónico; conservar safe-area.
 - Pantallas con muchas secciones (Informes, 23 tabs): agrupar en categorías o reducir; evitar scroll horizontal largo como única navegación.
 - Header contextual: corregir `--p-gold`, mantener título + botón volver + badge de finca.
+
+### 3.11 Patrones Neon UI (Fase 4+)
+
+Componentes incorporados tras las fases de migración. Todos en `css/styles.css:2524-2572`.
+
+#### Widget-link neon (botón de acceso rápido entre módulos)
+
+Botón columnar con borde y glow de color semántico. Uso típico: rejilla de acceso en vistas hub (Ganadería, ExPro).
+
+```html
+<button class="widget-link-btn--neon neon-success">
+  <!-- icono SVG via Icons.* -->
+  <span class="widget-link-label">Animales</span>
+</button>
+```
+
+```css
+.widget-link-btn--neon   /* contenedor base: flex-col, borde lateral neon, box-shadow glow */
+  + variante de color (una por botón):
+  .neon-danger   → var(--c-danger)  rojo
+  .neon-info     → var(--c-info)    azul
+  .neon-success  → var(--c-success) verde
+  .neon-warning  → var(--c-warning) ámbar
+  .neon-accent   → #a855f7          violeta
+  .neon-theme    → var(--theme-color) (color de modo activo)
+
+.widget-link-label     /* 0.85rem, bold */
+.widget-link-label-sm  /* 0.80rem, bold, line-height 1.1 — dos líneas */
+.widget-link-label-xs  /* 0.75rem, bold — texto muy largo */
+```
+
+Reglas:
+- Icono SVG (`Icons.*`) arriba, label abajo. Nunca emoji como icono.
+- Color vía clase `.neon-*`; nunca `--neon-color` inline salvo valor computado en JS.
+- `:active` tiene `scale(0.95)` incorporado; no añadir más transiciones.
+
+#### Section header neon
+
+Cabecera de sección con color temático y glow de texto.
+
+```html
+<div class="section-header-neon text-label" style="--neon-color: var(--c-success)">
+  REBAÑOS ACTIVOS
+</div>
+```
+
+`--neon-color` se acepta inline aquí porque es un **valor computado/dinámico** (color del modo activo). Esta es la única excepción a la regla de "sin inline styles".
+
+#### Mode switch (selector de modo de explotación)
+
+```html
+<div class="expro-mode-switch">
+  <button class="expro-mode-btn active" style="--mode-color:#ef4444">CÁRNICO</button>
+  <button class="expro-mode-btn"        style="--mode-color:#3b82f6">LÁCTEO</button>
+  <button class="expro-mode-btn"        style="--mode-color:#10b981">HÍBRIDO</button>
+</div>
+<!-- variante para ganadería: ganaderia-mode-switch / ganaderia-mode-btn -->
+```
+
+`--mode-color` inline está justificado: es el color semántico del modo de explotación, valor dinámico.
+
+#### Variantes de color adicionales en `.btn` (Fase 4)
+
+```css
+.btn--gold      /* var(--p-gold), texto negro — acción principal dorada */
+.btn--blue      /* var(--c-info) — acción informativa */
+.btn--purple    /* #8b5cf6 — reproducción/genética */
+.btn--red       /* var(--c-danger) — acción destructiva alternativa */
+.btn--amber     /* var(--p-gold-dark) — aviso */
+.btn--dark-red  /* #450a0a — acción destructiva de bajo perfil */
+```
+
+#### Nota-box (caja de información contextual)
+
+```html
+<div class="nota-box nota-box-green">Texto informativo</div>
+```
+
+```css
+.nota-box           /* padding 12px, font 0.85rem */
+.nota-box-red       /* fondo rojo tenue + borde izquierdo rojo */
+.nota-box-green     /* fondo verde tenue + borde izquierdo verde */
+.nota-box-purple    /* fondo violeta tenue + borde izquierdo violeta */
+.nota-box-blue      /* fondo azul tenue + borde completo azul + radius */
+.nota-box-amber     /* fondo ámbar tenue + borde izquierdo ámbar */
+```
+
+Usar para avisos SIGGAN, notas normativas, restricciones de supresión, etc.
+
+#### Hint-box (pista/ayuda dentro de formularios)
+
+```css
+.hint-box-gold    /* fondo dorado muy tenue, borde gold 20% */
+.hint-box-violet  /* fondo violeta muy tenue, borde violet 15% */
+.hint-box-green   /* fondo verde tenue, borde --c-success */
+```
+
+#### Comprador-mode-header
+
+Cabecera de contexto de modo para vistas de compradores.
+
+```html
+<div class="comprador-mode-header comprador-mode-header--hibrido">
+  Modo Híbrido
+</div>
+```
+
+```css
+.comprador-mode-header--carne   → rojo
+.comprador-mode-header--leche   → azul
+.comprador-mode-header--hibrido → verde
+```
+
+#### Card con gradiente oscuro
+
+```html
+<div class="card card-dark-gradient border-top-theme">...</div>
+```
+
+`.card-dark-gradient` añade gradiente sutil `#111→#0a0a0a`. `.border-top-theme` pinta el borde superior con `var(--theme-color, var(--p-gold))`.
 
 ---
 

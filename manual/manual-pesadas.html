@@ -3,419 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pesadas · Individual y por Lote · Livestock Manager</title>
+<title>Pesadas · Control de Peso · Livestock Manager Premium v4.8.0</title>
 <style>
   :root{
-    --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
-    --gris-claro:#777; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --carne:#ef4444;
-    --leche:#3b82f6; --peso:#8b5e3c;
+    --acento:#8b5e3c; --tinta:#1a1a1a; --gris:#555; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
   }
   *{box-sizing:border-box;}
   body{
     font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
   .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
-
   .portada{
     text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#1a1a2e,#2d2d44);
-    color:#fff; border-bottom:6px solid var(--oro-claro);
+    background:linear-gradient(160deg,#1a0a00,#3d2018);
+    color:#fff; border-bottom:6px solid var(--acento);
   }
-  .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--oro-claro); letter-spacing:.5px;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a;
-    border-radius:30px; color:var(--oro-claro); font-size:.85rem; letter-spacing:1px;}
-  .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
-
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
-    border-left:5px solid var(--peso); padding-left:14px;
-  }
-  h2.carne{border-left-color:var(--carne);}
-  h2.leche{border-left-color:var(--leche);}
-  .fase-tag{display:inline-block; background:var(--peso); color:#fff; font-size:.7rem; font-weight:700;
-    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
-  .fase-tag.carne{background:var(--carne);}
-  .fase-tag.leche{background:var(--leche);}
-  .fase-tag.wizard{background:var(--oro);}
-  .intro-mod{color:var(--gris); margin:8px 0 16px;}
-
+  .portada h1{font-size:2.3rem; margin:18px 0 6px; color:#e0a83a;}
+  h2.modulo{font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px; border-left:5px solid var(--acento); padding-left:14px;}
   ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
   ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
+    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
     background:var(--suave); border-radius:10px; border:1px solid var(--linea);
   }
   ol.pasos > li::before{
     counter-increment:paso; content:counter(paso);
     position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--peso); color:#fff; font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center;
+    background:var(--acento); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
   }
-
-  ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
-  ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
-  ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--peso); font-weight:700;}
-
-  .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#6b5418;}
-  .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#7a241b;}
-  .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#14512f;}
-  .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem;}
-
-  figure{margin:18px 0; text-align:center;}
-  figure img{
-    max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.12);
-  }
-  figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
-
-  .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
-  .seccion:last-child{border-bottom:none;}
-
-  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
-  .indice h3{margin:0 0 14px; color:var(--tinta);}
-  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
-  .indice li{margin-bottom:7px;}
-  .indice a{color:var(--tinta); text-decoration:none;}
-  .indice a:hover{color:var(--peso); text-decoration:underline;}
-
-  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
-  .ruta{color:var(--peso); font-weight:600;}
-  .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
-
-  .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
-    padding:20px 24px; margin:20px 0;}
-  .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
-  .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
-  .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
-  .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
-
-  table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
-  table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
-  table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
-
-  .tabs-ej{display:flex; gap:10px; margin:16px 0;}
-  .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
-    border:1px solid var(--linea); cursor:default;}
-  .tab-ej.carne{background:#fef2f2; color:var(--carne); border-color:var(--carne);}
-  .tab-ej.leche{background:#eff6ff; color:var(--leche); border-color:var(--leche);}
-
-  .wizard-bar{display:flex; align-items:center; gap:6px; margin:16px 0; flex-wrap:wrap;}
-  .wizard-step{display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:20px;
-    font-size:.75rem; font-weight:700; background:var(--linea); color:var(--gris);}
-  .wizard-step.active{background:var(--peso); color:#fff;}
-  .wizard-step.done{background:#d4edda; color:var(--verde);}
-
-  @media print{
-    body{font-size:12px;}
-    .portada{padding:40px 24px;}
-    .seccion{page-break-inside:avoid; padding:18px 0;}
-    figure img{max-width:230px; box-shadow:none;}
-    a{color:var(--tinta) !important; text-decoration:none;}
-    .indice ol{columns:2;}
-  }
+  figure{margin:24px 0; text-align:center;}
+  figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
+  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
+  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
+  .ruta{color:var(--acento); font-weight:700;}
 </style>
 </head>
 <body>
 
 <header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" class="logo-img">
-  <h1>⚖️ Pesadas</h1>
-  <p class="sub">Pesada Individual de Animal y Pesaje por Lote de Rebaño — Guía completa paso a paso</p>
-  <div class="badge">MANUAL PRÁCTICO · Todos los flujos de pesaje en producción cárnica</div>
+  <img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;">
+  <h1>⚖️ Registro de Pesajes</h1>
+  <p class="sub">Control de Crecimiento y Ganancia Media Diaria · Guía v4.8.0</p>
+  <div class="badge">OPTIMIZACIÓN DE CEBO PREMIUM</div>
 </header>
 
 <div class="wrap">
 
   <section class="seccion">
-    <h2 class="modulo">📖 Sobre este manual</h2>
-    <p class="intro-mod">
-      Este manual documenta los <strong>flujos de pesaje</strong> disponibles en Livestock Manager para producción cárnica:
-      la <strong>pesada individual</strong> de un animal y el <strong>pesaje por lote</strong> de un rebaño completo.
-    </p>
-    <p class="intro-mod">
-      El acceso se realiza desde <span class="ruta">Registros → Producción</span> (pestaña <strong>⚖️ Cárnica</strong>),
-      utilizando el <strong>Asistente de Producción</strong> que guía paso a paso en la selección de modalidad,
-      búsqueda del animal o rebaño, y registro del peso.
-    </p>
-
-    <div class="indice">
-      <h3>📋 Índice</h3>
-      <ol>
-        <li><a href="#acceso">Acceso a Producción Cárnica</a></li>
-        <li><a href="#asistente">Asistente de Producción</a></li>
-        <li><a href="#individual">Pesada Individual de Animal</a></li>
-        <li><a href="#ind-buscar">Búsqueda y selección del animal</a></li>
-        <li><a href="#ind-pesada">Registro de la pesada individual</a></li>
-        <li><a href="#lote">Pesaje por Lote de Rebaño</a></li>
-        <li><a href="#lote-buscar">Búsqueda y selección del rebaño</a></li>
-        <li><a href="#lote-pesada">Registro del pesaje por lote</a></li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 1. ACCESO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="acceso">
-    <span class="fase-tag">Inicio</span>
-    <h2 class="modulo">1. Acceso a Producción Cárnica</h2>
-    <p class="intro-mod">
-      Desde el menú inferior, pulsa <span class="ruta">Registros → Producción</span> para acceder a la
-      vista de producción. Por defecto se muestra la pestaña <strong>⚖️ Cárnica</strong>.
-    </p>
-
-    <figure>
-      <img src="img/peso-01-acceso.jpg" alt="Acceso a la sección de producción">
-      <figcaption>Vista principal de la sección de Producción con la pestaña Cárnica activa.</figcaption>
-    </figure>
-
-    <p>En esta pantalla puedes ver:</p>
-    <ul>
-      <li><strong>Indicadores clave:</strong> Nº de animales, peso medio, GMD media del período</li>
-      <li><strong>Últimos registros:</strong> Lista de las últimas pesadas registradas</li>
-      <li><strong>Botón de acción:</strong> <kbd>+ NUEVA PESADA</kbd> que abre el Asistente de Producción</li>
-    </ul>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 2. ASISTENTE -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="asistente">
-    <span class="fase-tag wizard">Asistente</span>
-    <h2 class="modulo">2. Asistente de Producción</h2>
-    <p class="intro-mod">
-      El <strong>Asistente de Producción</strong> es un wizard maestro que guía en la selección del
-      tipo de registro de producción. Al abrirlo con el preset <strong>"carne"</strong>, se salta el
-      primer paso (selección de especie/producto) y va directamente a la selección de modalidad.
-    </p>
-
-    <figure>
-      <img src="img/peso-02-modalidad.jpg" alt="Asistente de producción - Selección de modalidad">
-      <figcaption>Paso de selección de modalidad: elegir entre Pesada Individual o Pesaje por Lote.</figcaption>
-    </figure>
-
-    <p>El asistente muestra las dos modalidades disponibles para producción cárnica:</p>
-
-    <table class="parametros">
-      <tr><th>Modalidad</th><th>Descripción</th><th>Uso recomendado</th></tr>
-      <tr>
-        <td><span class="campo">🐄 Pesada Individual</span></td>
-        <td>Registra el peso de un solo animal</td>
-        <td>Seguimiento individualizado, cebaderos selectivos</td>
-      </tr>
-      <tr>
-        <td><span class="campo">🐑 Pesaje por Lote</span></td>
-        <td>Registra el peso de todo un rebaño de una vez</td>
-        <td>Pesajes rutinarios, control de lote completo</td>
-      </tr>
-    </table>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 3. PESADA INDIVIDUAL -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="individual">
-    <span class="fase-tag">Individual</span>
-    <h2 class="modulo">3. Pesada Individual de Animal</h2>
-    <p class="intro-mod">
-      Esta opción permite registrar el peso de un <strong>animal concreto</strong>. Es útil para
-      controles individualizados de engorde, seguimiento veterinario, o preparación para venta.
-    </p>
-
-    <div class="wizard-bar">
-      <span class="wizard-step done">1. Modalidad</span>
-      <span class="wizard-step active">2. Buscar animal</span>
-      <span class="wizard-step">3. Pesada</span>
-    </div>
-  </section>
-
-  <!-- 3.1 BUSCAR -->
-  <section class="seccion" id="ind-buscar">
-    <span class="fase-tag">Paso 1 de 2</span>
-    <h2 class="modulo">4. Búsqueda y selección del animal</h2>
-
-    <figure>
-      <img src="img/peso-03-individual-buscar.jpg" alt="Búsqueda de animal para pesada individual">
-      <figcaption>Pantalla de búsqueda de animal. Se puede buscar por DIB, nombre o filtrar por categoría.</figcaption>
-    </figure>
-
-    <p>En esta pantalla puedes:</p>
+    <h2 class="modulo">1. Acceso Rápido desde ExPro</h2>
+    <p class="intro-mod">El control de peso es fundamental para la rentabilidad cárnica. Accede desde el Hub <span class="ruta">ExPro</span>.</p>
+    <figure><img src="img/05-expro-carne.png" alt="ExPro Carne">
+      <figcaption>En ExPro (Modo Carne), pulsa el botón "Registrar Peso (kg)".</figcaption></figure>
     <ol class="pasos">
-      <li><strong>Buscar por DIB</strong> (Documento de Identificación Bovino) introduciendo el número en el campo de búsqueda</li>
-      <li><strong>Buscar por nombre</strong> si el animal tiene nombre registrado</li>
-      <li><strong>Filtrar por categoría</strong> (cebones, primalas, madres, etc.)</li>
-      <li><strong>Seleccionar el animal</strong> pulsando sobre su ficha en la lista de resultados</li>
+      <li><strong>Asistente de Producción</strong>: Al pulsar el botón, se abre un buscador inteligente de animales.</li>
+      <li><strong>Selección</strong>: Busca al animal por crotal o selecciónalo de la lista de recientes.</li>
     </ol>
-
-    <p>Una vez seleccionado el animal, la app muestra su información básica:</p>
-    <ul>
-      <li>DIB / crotal completo</li>
-      <li>Raza y sexo</li>
-      <li>Fecha de nacimiento y edad</li>
-      <li>Peso en el alta y último peso registrado (si existe)</li>
-    </ul>
-
-    <div class="tip">
-      <strong>Tip:</strong> Si tienes muchos animales, usa el filtro de categoría para acotar la búsqueda.
-      También puedes escanear el crotal con la cámara si tu dispositivo lo soporta.
-    </div>
   </section>
 
-  <!-- 3.2 PESADA -->
-  <section class="seccion" id="ind-pesada">
-    <span class="fase-tag">Paso 2 de 2</span>
-    <h2 class="modulo">5. Registro de la pesada individual</h2>
-
-    <figure>
-      <img src="img/peso-04-individual-pesada.jpg" alt="Registro de peso individual">
-      <figcaption>Formulario de registro de peso individual con campos de peso y observaciones.</figcaption>
-    </figure>
-
-    <p>En la pantalla de pesada individual se muestra:</p>
-
-    <table class="parametros">
-      <tr><th>Campo</th><th>Descripción</th></tr>
-      <tr><td><span class="campo">Animal</span></td><td>Nombre/DIB del animal seleccionado (solo lectura)</td></tr>
-      <tr><td><span class="campo">Fecha</span></td><td>Fecha de la pesada (por defecto hoy)</td></tr>
-      <tr><td><span class="campo">Peso (kg)</span></td><td>Campo principal para introducir el peso del animal</td></tr>
-      <tr><td><span class="campo">Tipo de pesada</span></td><td>Seleccionar tipo: control, alta, venta, etc.</td></tr>
-      <tr><td><span class="campo">Observaciones</span></td><td>Notas adicionales sobre la pesada (opcional)</td></tr>
-    </table>
-
-    <div class="info-tecnica">
-      <strong>📊 GMD:</strong> Si el animal tiene un peso anterior registrado, la app calcula automáticamente
-      la <strong>Ganancia Media Diaria</strong> (GMD) mostrando la ganancia o pérdida de peso desde la última pesada.
-    </div>
-
-    <div class="panel-ejemplo">
-      <h4>📐 Ejemplo de cálculo de GMD</h4>
-      <table>
-        <tr><th>Animal</th><th>Peso anterior</th><th>Peso actual</th><th>Días</th><th>GMD</th></tr>
-        <tr><td>Merino 247</td><td>32,5 kg</td><td>38,2 kg</td><td>21 días</td><td><strong>+271 g/día</strong></td></tr>
-      </table>
-    </div>
-
-    <p>Pulsa <kbd>GUARDAR</kbd> para registrar la pesada. Automáticamente:</p>
-    <ul>
-      <li>Se actualiza el peso del animal en su ficha</li>
-      <li>Se registra en el histórico de pesadas</li>
-      <li>Se recalcula la GMD del animal</li>
-      <li>Vuelves a la vista de producción</li>
-    </ul>
-  </section>
-
-  <!-- ============================================================= -->
-  <!-- 4. PESAJE POR LOTE -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="lote">
-    <span class="fase-tag">Lote</span>
-    <h2 class="modulo">6. Pesaje por Lote de Rebaño</h2>
-    <p class="intro-mod">
-      Esta opción permite registrar el peso de <strong>todos los animales de un rebaño</strong> en una sola
-      operación. Ideal para pesajes rutinarios donde se pesa a todo el grupo.
-    </p>
-
-    <div class="wizard-bar">
-      <span class="wizard-step done">1. Modalidad</span>
-      <span class="wizard-step active">2. Buscar rebaño</span>
-      <span class="wizard-step">3. Pesaje</span>
-    </div>
-  </section>
-
-  <!-- 4.1 BUSCAR -->
-  <section class="seccion" id="lote-buscar">
-    <span class="fase-tag">Paso 1 de 2</span>
-    <h2 class="modulo">7. Búsqueda y selección del rebaño</h2>
-
-    <figure>
-      <img src="img/peso-05-lote-buscar.jpg" alt="Búsqueda de rebaño para pesaje por lote">
-      <figcaption>Pantalla de búsqueda de rebaño. Selecciona el rebaño a pesar de la lista disponible.</figcaption>
-    </figure>
-
-    <p>En esta pantalla puedes:</p>
+  <section class="seccion">
+    <h2 class="modulo">2. Registro de Pesada</h2>
+    <p class="intro-mod">Introduce el peso y obtén resultados instantáneos.</p>
+    <figure><img src="img/16-pesaje-asistente.png" alt="Asistente Pesaje">
+      <figcaption>Formulario de entrada de peso con teclado numérico optimizado.</figcaption></figure>
     <ol class="pasos">
-      <li><strong>Buscar por nombre del rebaño</strong> en el campo de búsqueda</li>
-      <li><strong>Filtrar por ubicación</strong> (zona/cobertizo) si tienes varias ubicaciones</li>
-      <li><strong>Ver detalles del rebaño:</strong> número de animales, peso medio, última pesada</li>
-      <li><strong>Seleccionar el rebaño</strong> pulsando sobre su tarjeta</li>
+      <li><strong>Valor Neto</strong>: Escribe el peso actual en kilogramos.</li>
+      <li><strong>Cálculo de GMD</strong>: La app comparará este peso con el anterior y te mostrará la <strong>Ganancia Media Diaria</strong> automáticamente.</li>
+      <li><strong>Historial</strong>: El pesaje se guarda en la línea de vida del animal y actualiza los KPIs del Dashboard.</li>
     </ol>
-
-    <div class="nota">
-      <strong>Nota:</strong> Solo se muestran rebaños que contengan animales activos. Si un rebaño
-      no aparece, verifica que tenga animales dados de alta en <span class="ruta">Registros → Animales</span>.
-    </div>
   </section>
 
-  <!-- 4.2 PESADA -->
-  <section class="seccion" id="lote-pesada">
-    <span class="fase-tag">Paso 2 de 2</span>
-    <h2 class="modulo">8. Registro del pesaje por lote</h2>
-
-    <figure>
-      <img src="img/peso-06-lote-pesada.jpg" alt="Registro de pesaje por lote">
-      <figcaption>Pantalla de pesaje por lote: tabla con todos los animales del rebaño para registrar su peso.</figcaption>
-    </figure>
-
-    <p>En la pantalla de pesaje por lote se muestran <strong>todos los animales del rebaño</strong> en una tabla
-    donde puedes introducir el peso de cada uno:</p>
-
-    <table class="parametros">
-      <tr><th>Campo</th><th>Descripción</th></tr>
-      <tr><td><span class="campo">Lista de animales</span></td><td>Tabla con todos los animales del rebaño: DIB, nombre, peso anterior (si tiene)</td></tr>
-      <tr><td><span class="campo">Peso (kg)</span></td><td>Campo editable para introducir el peso de cada animal</td></tr>
-      <tr><td><span class="campo">Navegación</span></td><td>Si hay muchos animales, puedes hacer scroll o usar paginación</td></tr>
-      <tr><td><span class="campo">Fecha común</span></td><td>Fecha de la pesada para todos los animales del lote</td></tr>
-    </table>
-
-    <div class="tip">
-      <strong>Tip:</strong> Si usas una báscula conectada, puedes usar la entrada rápida: pesa un animal,
-      introduce el peso, pasa al siguiente. La app mantiene el foco en el campo de peso para agilizar el proceso.
-    </div>
-
-    <div class="info-tecnica">
-      <strong>⚡ Flujo rápido:</strong> En el pesaje por lote, la app está optimizada para trabajo de campo:
-      <ol class="pasos">
-        <li>Pesa el primer animal → introduce el peso</li>
-        <li>Pulsa <kbd>Enter</kbd> → el cursor salta al siguiente animal</li>
-        <li>Repite hasta completar el lote</li>
-        <li>Pulsa <kbd>GUARDAR TODO</kbd> → se registran todas las pesadas a la vez</li>
-      </ol>
-    </div>
-
-    <p>Al guardar, la app:</p>
-    <ul>
-      <li>Registra el peso de cada animal individualmente</li>
-      <li>Actualiza el peso medio del rebaño</li>
-      <li>Calcula la GMD individual para cada animal con peso anterior</li>
-      <li>Muestra un resumen con los resultados del pesaje</li>
-    </ul>
-
-    <div class="panel-ejemplo">
-      <h4>📋 Resumen de pesaje por lote</h4>
-      <table>
-        <tr><th>Rebaño</th><th>Animales pesados</th><th>Peso total</th><th>Peso medio</th><th>GMD media</th></tr>
-        <tr><td>Merinas Engorde</td><td>24</td><td>902,4 kg</td><td>37,6 kg</td><td>+198 g/día</td></tr>
-      </table>
-    </div>
-
-    <div class="tip">
-      <strong>Tip:</strong> Si algún animal no se ha podido pesar (por ejemplo, está en tratamiento o apartado),
-      puedes marcarlo como "No pesado" y se saltará en el registro.
-    </div>
-  </section>
-
-  <div class="text-center text-gray text-xs" style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v4.7.0 · Manual de Pesadas · Individual y por Lote
+  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
+    Livestock Manager Premium · v4.8.0 · Guía de Pesajes
   </div>
 
 </div>
-
 </body>
 </html>
