@@ -42,12 +42,16 @@ const ZonasView = {
           if (n > 0) {
             const colorEspecie = r.especie === 'Vacas' ? '#3b82f6' : r.especie === 'Ovejas' ? '#10b981' : r.especie === 'Cabras' ? '#f59e0b' : '#ec4899';
             rebanosHtml += `
-              <div class="flex justify-between items-center mt-6" style="background:rgba(0,0,0,0.3); border-left:3px solid ${colorEspecie}; padding:6px 10px; border-radius:8px;">
-                <div>
-                  <div style="font-size:0.8rem; font-weight:700; color:${colorEspecie};">${r.nombre}</div>
-                  <div class="text-gray text-2xs">${r.tipo}</div>
+              <div class="flex justify-between items-center mt-6" style="background:rgba(255,255,255,0.02); border-left:3px solid ${colorEspecie}; padding:8px 12px; border-radius:8px;">
+                <div class="flex items-center gap-8">
+                  <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
+                  <div>
+                    <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
+                    <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
+                  </div>
                 </div>
-                <div class="text-white font-800 text-85">${n}</div>
+                <div class="text-white font-900 text-sm">${n}</div>
+              </div>`;
               </div>`;
           }
         }
@@ -72,25 +76,46 @@ const ZonasView = {
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
         html += `
-          <div class="card" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px;" onclick="location.hash='/zona?index=${item.realIndex}'">
-            <div class="flex justify-between items-start mb-8">
-              <div>
-                <h3 class="m-0">${z.nombre}</h3>
-                <p class="m-0 text-gray text-xs">${z.usoPrincipal || 'Sin uso'}${superficie ? ` · ${superficie} ha` : ''}${especiesEnZona.size ? ` · ${[...especiesEnZona].join(', ')}` : ''}</p>
-                <p class="m-0 text-gray text-2xs mt-2">${pacTexto} · ${distAgua} · 🐄 ${ugmTotal.toFixed(1)} UGM (${cargaGanadera} UGM/ha)</p>
+          <div class="card no-underline" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px; margin-bottom:12px;" onclick="location.hash='/zona?index=${item.realIndex}'">
+            <div class="flex flex-col gap-10">
+              <div class="flex justify-between items-center w-full">
+                <div class="flex items-center gap-10 min-w-0">
+                  <div class="text-xl" style="color:${colorCenso}">${Icons.zonas()}</div>
+                  <div class="text-xs">
+                    <div class="font-bold text-white uppercase text-base tracking-tight">${z.nombre}</div>
+                    <div class="text-gray mt-2 font-700 uppercase">${z.usoPrincipal || 'Sin uso Principal'}${superficie ? ` · ${superficie} HA` : ''}</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="badge badge-sm uppercase font-800" style="color:${colorCenso}; border:1px solid ${colorCenso}40; background:${colorCenso}15;">${estadoTexto.split(' ')[1]}</span>
+                </div>
               </div>
-              <div class="text-right"><span class="text-xs font-bold" style="color:${colorCenso}">${estadoTexto}</span><br><span class="text-555 text-xs">Ficha ➔</span></div>
+
+              <div class="p-10 rounded" style="background:#000; border:1px solid #222;">
+                <div class="flex justify-between font-900 text-[0.65rem] mb-4 uppercase">
+                  <span class="text-gray">Carga: ${ugmTotal.toFixed(1)} UGM</span>
+                  <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
+                </div>
+                <div class="progress-track">
+                  <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; border-radius:4px; box-shadow:0 0 8px ${colorCenso}44; transition:width 0.3s;"></div>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-end w-full">
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase">
+                    ${z.codigo_pac ? `<div class="flex items-center gap-4">${Icons.documento()} PAC: ${z.codigo_pac}</div>` : ''}
+                    <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/HA</div>
+                    ${especiesEnZona.size ? `<div class="flex items-center gap-4">${Icons.animales()} ${[...especiesEnZona].join(', ')}</div>` : ''}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER ZONA ➔</div>
+                </div>
+              </div>
+
+              ${rebanosHtml ? `<div class="mt-4 border-top-222 pt-8">${rebanosHtml}</div>` : ''}
             </div>
-            <div class="p-10 rounded" style="background:#000;border:1px solid #222;">
-              <div class="flex justify-between font-800 text-xs mb-4">
-                <span class="text-gray">OCUPACIÓN</span>
-                <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
-              </div>
-              <div class="progress-track">
-                <div style="width:${Math.min(pct, 100)}%;height:100%;background:${colorCenso};border-radius:4px;box-shadow:0 0 8px ${colorCenso}44;transition:width 0.3s;"></div>
-              </div>
-            </div>
-            ${rebanosHtml ? `<div class="mt-8">${rebanosHtml}</div>` : '<div class="text-gray text-xs text-center mt-8">📍 Sin rebaños asignados</div>'}
           </div>`;
       }
       html += `</div>`;
