@@ -53,7 +53,6 @@ const ZonasView = {
                 <div class="text-white font-900 text-sm">${n}</div>
               </div>`;
           }
-          }
         }
 
         const aforo = z.aforoMax || z.aforo_maximo || 50;
