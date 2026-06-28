@@ -22,8 +22,16 @@ const TransportistasView = {
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
-            <div class="max-w-600 mx-auto">
-                <div class="grid grid-cols-3 gap-6 mb-14">
+            <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+              <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+              <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+                <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="TransportistasView._abrirFormulario()">
+                  ${Icons.agregar()}
+                  <span class="widget-link-label">Nuevo Transportista</span>
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
                     <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
                     <div class="info-box-center border-left-amber"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
@@ -32,9 +40,6 @@ const TransportistasView = {
                     <button class="filter-pill ${this._currentFilter === 'todos' ? 'active' : ''}" onclick="TransportistasView._setFilter('todos')">TODOS</button>
                     <button class="filter-pill ${this._currentFilter === 'activos' ? 'active' : ''}" onclick="TransportistasView._setFilter('activos')">ACTIVOS</button>
                     <button class="filter-pill ${this._currentFilter === 'inactivos' ? 'active' : ''}" onclick="TransportistasView._setFilter('inactivos')">INACTIVOS</button>
-                </div>
-                <div class="mb-14">
-                    <button class="btn btn-create btn-sm w-full" onclick="TransportistasView._abrirFormulario()">${Icons.agregar()} Nuevo Transportista</button>
                 </div>
                 <div id="trans-list"></div>
             </div>
@@ -64,24 +69,36 @@ const TransportistasView = {
         }
 
         container.innerHTML = transportistas.map(t => `
-            <div class="card card-list-item mb-8" onclick="TransportistasView._verDetalle(${t.id})"
-                 style="border-left:4px solid ${t.activo ? '#10b981' : '#6b7280'};">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1 min-w-0">
-                        <div class="text-white font-800 truncate text-base">
-                            ${Icons.transportistas()} ${t.nombre}
+            <div class="card card-animal no-underline mb-8" onclick="TransportistasView._verDetalle(${t.id})"
+                 style="border-left:4px solid ${t.activo ? '#10b981' : '#6b7280'}; padding:14px; margin:0; margin-bottom:10px;">
+                <div class="flex flex-col gap-10">
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-10 min-w-0">
+                            <div class="text-xl" style="color:${t.activo ? '#10b981' : '#6b7280'}">${Icons.transportistas()}</div>
+                            <div class="text-xs">
+                                <div class="font-bold text-white uppercase text-base tracking-tight">${t.nombre}</div>
+                                <div class="text-gray mt-2 font-700 uppercase">
+                                    ${t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : ''}${t.matricula ? ' · 🚚 ' + t.matricula : ''}
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-gray text-xs mt-4">
-                            ${t.nif_cif ? 'NIF: ' + t.nif_cif : ''}${t.matricula ? ' | 🚚 ' + t.matricula : ''}
-                        </div>
-                        <div class="text-555 text-xs mt-3">
-                            ${t.certificado_bienestar ? '✅ Bienestar' : '❌ Sin certificado'}${t.condiciones_termoneutrales ? ' | 🌡️ Termoneutral' : ''}
+                        <div class="text-right">
+                            <span class="badge badge-sm uppercase" style="background:${t.activo ? '#10b98115' : '#6b728015'}; color:${t.activo ? '#10b981' : '#9ca3af'}; border:1px solid ${t.activo ? '#10b98135' : '#6b728035'};">
+                                ${t.activo ? 'Activo' : 'Inactivo'}
+                            </span>
                         </div>
                     </div>
-                    <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge" style="background:${t.activo ? 'rgba(16,185,129,0.15)' : 'rgba(107,114,128,0.15)'}; color:${t.activo ? '#10b981' : '#9ca3af'};">
-                            ${t.activo ? 'Activo' : 'Inactivo'}
-                        </span>
+
+                    <div class="flex justify-between items-end w-full">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase">
+                                <div class="flex items-center gap-4">${t.certificado_bienestar ? Icons.check() + ' Bienestar OK' : Icons.alerta() + ' Sin Certificado'}</div>
+                                ${t.condiciones_termoneutrales ? `<div class="flex items-center gap-4">${Icons.info()} Termoneutral</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -104,15 +121,38 @@ const TransportistasView = {
                 </div>
 
                 <div class="card p-16 mb-14">
-                    <div class="grid grid-cols-2 gap-12">
-                        <div><small class="text-gray">NIF/CIF</small><div class="text-white font-800">${t.nif_cif || '-'}</div></div>
-                        <div><small class="text-gray">Matrícula</small><div class="text-white font-800">${t.matricula || '-'}</div></div>
-                        <div><small class="text-gray">Teléfono</small><div class="text-white">${t.telefono || '-'}</div></div>
-                        <div><small class="text-gray">Email</small><div class="text-white">${t.email || '-'}</div></div>
-                        <div><small class="text-gray">Registro Transporte</small><div class="text-white">${t.registro_transporte || '-'}</div></div>
-                        <div><small class="text-gray">Tipo Vehículo</small><div class="text-white">${this._labelTipoVehiculo(t.tipo_vehiculo)}</div></div>
-                        <div><small class="text-gray">Capacidad</small><div class="text-white">${t.capacidad_animales || '0'} animales</div></div>
-                        <div><small class="text-gray">Estado</small><div class="font-bold" style="color:${t.activo ? '#10b981' : '#ef4444'};">${t.activo ? 'Activo' : 'Inactivo'}</div></div>
+                    <div class="flex justify-between items-start mb-16">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-8 mb-4">
+                            <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,#3b82f6,#60a5fa);"></span>
+                            <h2 class="m-0 font-900 text-white uppercase text-xl">${t.nombre}</h2>
+                        </div>
+                        <div class="flex gap-8 flex-wrap">
+                          <span class="badge badge-sm uppercase" style="background:${t.activo ? '#10b98115' : '#ef444415'}; color:${t.activo ? '#10b981' : '#ef4444'}; border:1px solid ${t.activo ? '#10b98135' : '#ef444435'};">
+                            ${t.activo ? 'Activo' : 'Inactivo'}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="flex gap-10">
+                        <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="TransportistasView._eliminar(${t.id})">
+                          ${Icons.eliminar()}
+                          <span class="widget-link-label">Eliminar</span>
+                        </button>
+                        <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="TransportistasView._abrirFormulario(${t.id})">
+                          ${Icons.editar()}
+                          <span class="widget-link-label">Editar</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-12 text-sm text-aaa">
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.documento()} NIF/CIF</small><div class="text-white font-800 mt-2">${t.nif_cif || '-'}</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.transportistas()} Matrícula</small><div class="text-white font-800 mt-2">${t.matricula || '-'}</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.info()} Teléfono</small><div class="text-white mt-2">${t.telefono || '-'}</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.enlace()} Email</small><div class="text-white mt-2">${t.email || '-'}</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.documento()} Registro Transporte</small><div class="text-white mt-2">${t.registro_transporte || '-'}</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.transportistas()} Tipo Vehículo</small><div class="text-white mt-2">${this._labelTipoVehiculo(t.tipo_vehiculo)}</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.animales()} Capacidad</small><div class="text-white mt-2">${t.capacidad_animales || '0'} animales</div></div>
                     </div>
                     <div class="mt-12 flex gap-8 flex-wrap">
                         <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.certificado_bienestar ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; color:${t.certificado_bienestar ? '#10b981' : '#ef4444'};">

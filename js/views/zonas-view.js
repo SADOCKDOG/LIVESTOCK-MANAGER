@@ -52,7 +52,7 @@ const ZonasView = {
                 </div>
                 <div class="text-white font-900 text-sm">${n}</div>
               </div>`;
-              </div>`;
+          }
           }
         }
 
