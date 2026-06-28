@@ -42,11 +42,11 @@ const ExplotacionView = {
     ]);
     const eventos = (eventosRaw || []).filter(e => !e?.anulado);
 
-    this._activeMode = window.ModoContextoHelper
+    const savedMode = window.ModoContextoHelper
       ? ModoContextoHelper.getModeForBlock('explotacion', rebanos)
-      : (this._activeMode || 'leche');
+      : 'leche';
 
-    if (this._activeMode === 'hibrido') this._activeMode = 'leche';
+    this._activeMode = this._activeMode || savedMode;
 
     const rebanosIds = rebanos.map(r => r.id);
     const rebanosCarne = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'carne') : rebanos;
@@ -791,7 +791,7 @@ const ExplotacionView = {
       sessionStorage.setItem('lm.explotacion_pipeline', JSON.stringify(payload));
     } catch (_) {}
 
-    const tab = modo === 'leche' ? 'leche' : 'carne';
+    const tab = (modo === 'leche' || modo === 'hibrido') ? 'leche' : 'carne';
     window.location.hash = `#/comercializacion?tab=${tab}`;
   },
 

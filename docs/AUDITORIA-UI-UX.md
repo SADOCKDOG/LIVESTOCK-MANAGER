@@ -4,36 +4,43 @@
 >
 > **Plataforma objetivo: teléfono Android en vertical** (`~360–430 px` de ancho). Todo el diseño se valida contra ese viewport. No hay vista de escritorio ni tablet como objetivo principal.
 >
-> Estado: **referencia activa** · Versión app: 4.8.0 / CSS 5.4.0 / SW: corcho-v6.7.21
+> Estado: **referencia activa** · Versión app: 4.8.5 / CSS 5.5.0 / SW: corcho-v6.7.22
 
 ---
 
 ## 1. Resumen ejecutivo
 
-La aplicación ha sido estandarizada bajo el sistema de diseño Premium v4.8.0. Se han eliminado las inconsistencias de iconografía (emojis) y estilos inline en las vistas principales.
+La aplicación ha sido plenamente estandarizada bajo el sistema de diseño **Premium OLED v4.8.5**. Se han consolidado los cuatro grandes Hubs operativos (Ganadería, ExPro, CoMer e Informes) bajo una arquitectura visual idéntica y una navegación intuitiva.
 
 | Síntoma | Magnitud | Estado |
 |---|---|---|
 | Estilos **inline** (`style="..."`) | **~100** residuales | ✅ Saneado |
-| **Emojis** usados como iconos | **~20** decorativos | ✅ Saneado |
-| Cabecera Dinámica | Hub Centric | ✅ Implementado |
+| **Emojis** usados como iconos | **~0** funcionales | ✅ Saneado |
+| Cabecera Dinámica | Hub Centric Gold | ✅ Implementado |
+| Consistencia KPI | Alineación 2+1 | ✅ Implementado |
 
 ---
 
-## 2. Inventario de soluciones (v4.8.0)
+## 2. Inventario de soluciones (v4.8.5)
 
-### 2.1 Cabecera Premium (Banner Hub)
-- **Marco Centralizado**: El título de la vista se muestra mediante un icono SVG y texto en un marco neón.
-- **Efecto Neón**: Icono SVG de 18px con `drop-shadow` y línea inferior con `box-shadow` dinámico.
-- **Color Contextual**: El color de la cabecera cambia según el modo de explotación (`--header-neon-color`): Rojo (Cárnico), Azul (Lácteo), Verde (Híbrido), Oro (General).
+### 2.1 Cabecera Premium Gold Neon
+- **Banner Hub Centrado**: El título de la vista (Icono SVG + Texto) flota en el centro absoluto sin interferir con logo o badge.
+- **Línea de Neón Integral**: Una línea de 2px recorre toda la base del banner. El color es dinámico según el modo: Rojo (Carne), Azul (Leche), Verde (Híbrido) u Oro (General).
+- **Efecto Glow**: Icono SVG de 17px con `drop-shadow` amarillo/oro (`#facc15`) y resplandor suave.
 
-### 2.2 Botones Neón (Hubs)
-- **Etiquetas**: Texto blanco puro (`#ffffff !important`), peso 800, 0.8rem, centrado absoluto.
-- **Normalización**: Sin prefijos redundantes ("Registrar"), uso exclusivo de `Icons.*`.
-- **Espaciado**: Padding inferior `pb-24` en tarjetas de acciones para mejorar accesibilidad táctil.
+### 2.2 Hubs Operativos (Botones Neón)
+- **Etiquetas Blanco Maestro**: Texto blanco puro (`#ffffff !important`), peso 800, 0.8rem, **centrado absoluto**.
+- **Panel de Acciones**: Tarjeta con gradiente, encabezado centrado (sin línea superior) y botones neón con iconos SVG brillantes.
+- **Sincronización CoMer**: La sección de Comercialización (CoMer) ahora es un Hub con navegación superior y botones neón, eliminando los antiguos botones "Nuevo".
 
-### 2.3 Navegación por Defecto
-- **Prioridad Láctea**: Al abrir Ganadería o ExPro, se selecciona por defecto el modo **Lácteo** si la explotación es mixta.
+### 2.3 Sistema de KPIs y Registros
+- **Alineación Perfecta**: Todas las cajas KPI tienen una altura fija de `90px` para evitar descuadres.
+- **Regla de Centrado 2+1**: Si existen 3 KPIs, se muestran 2 en la primera fila y el 3º centrado debajo.
+- **Fichas de Censo**: Información enriquecida con género (♀/♂), edad calculada y Lote/Rebaño asociado con icono SVG.
+- **Fichas de Comercial**: Layout optimizado que ocupa el 100% del ancho, eliminando columnas vacías y usando iconos SVG para cada metadato (Fecha, Zona, Albarán).
+
+### 2.4 Navegación Inteligente
+- **Prioridad Láctea**: Ganadería, ExPro y CoMer seleccionan por defecto el modo **Lácteo** en explotaciones mixtas, respetando la elección manual posterior.
 
 ---
 

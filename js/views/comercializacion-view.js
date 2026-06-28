@@ -38,28 +38,36 @@ const ComercializacionView = {
       pipelineInfo = null;
     }
 
+    const meta = this._getTabMeta(this._currentTab);
+
+    // Sincronizar color de cabecera con el tab activo
+    if (window.App && App.updateHeaderColor) {
+      App.updateHeaderColor(this._currentTab === 'gastos' ? null : this._currentTab);
+    }
+
     main.innerHTML = `
-      ${pipelineInfo ? `
-      <div class="card p-12 mb-12 border-222" style="border-left:4px solid #10b981;">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider">Origen de flujo</div>
-        <div class="text-sm text-white mt-4">Registro finalizado en <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
-        <div class="text-xs text-aaa mt-4">Fitosanitarios con pendiente/no aptos: <strong class="${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? 'text-red' : 'text-green'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong> / ${pipelineInfo.cumplimiento?.totalFitosanitarios || 0}</div>
-      </div>` : ''}
-
-      <!-- KPIs globales -->
-      <div class="grid grid-cols-3 gap-6 mb-14">
-        <div class="info-box-center border-left-amber"><small class="s-lbl">${Icons.carne()} CARNE</small><div class="inf-val-lg text-amber">${ingresoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${pesoTotal.toFixed(0)} kg · ${ventas.length} ventas</small></div>
-        <div class="info-box-center border-left-gold"><small class="s-lbl">${Icons.leche()} LECHE</small><div class="inf-val-lg text-gold">${litrosTotal.toFixed(0)} L</div><small class="text-gray text-xs">${entregas.length} entregas · MOFA ${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</small></div>
-        <div class="info-box-center border-left-red"><small class="s-lbl">${Icons.gastos()} GASTOS</small><div class="inf-val-lg text-red">${gastoTotal.toLocaleString()}€</div><small class="text-gray text-xs">${gastosRecords.length} registros</small></div>
-      </div>
-
-      <div class="mb-14">
-        <div class="tabs-scroll comer-tabs scroll-shadow-container">
-          <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-          <button class="comer-tab ${this._currentTab === 'gastos' ? 'active' : ''}" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+      <!-- Selector de Modo Comercial Superior -->
+      <div class="mb-16 text-center">
+        <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMERCIALIZACIÓN</div>
+        <div class="comer-mode-switch">
+          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6;" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
         </div>
       </div>
+
+      ${pipelineInfo ? `
+      <div class="card p-12 mb-14 border-222" style="border-left:4px solid #10b981; background: rgba(16,185,129,0.05);">
+        <div class="text-[0.65rem] text-gray uppercase font-extrabold tracking-wider">Flujo activo</div>
+        <div class="text-sm text-white mt-4 font-700">Procedente de <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
+        <div class="text-[0.62rem] text-aaa mt-4">Fitosanitarios pendientes: <strong class="${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? 'text-red' : 'text-green'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong></div>
+      </div>` : ''}
+
+      <!-- KPIs dinámicos del Tab -->
+      <div class="explotacion-kpis mb-14">
+        ${this._renderKPIsTab()}
+      </div>
+
       <div id="comer-content"><div class="loader">Cargando...</div></div>`;
 
     this._cachedData = {
@@ -85,20 +93,41 @@ const ComercializacionView = {
       }
     };
 
-    // Sincronizar color de cabecera con el tab activo
-    if (window.App && App.updateHeaderColor) {
-      const mode = (this._currentTab === 'leche') ? 'leche' : (this._currentTab === 'carne' ? 'carne' : null);
-      App.updateHeaderColor(mode);
-    }
-
     this._renderTabActual();
+  },
+
+  _getTabMeta(tab) {
+    const map = {
+      carne: { color: '#ef4444', label: 'Cárnico' },
+      leche: { color: '#3b82f6', label: 'Lácteo' },
+      gastos: { color: '#8b5cf6', label: 'Gastos' }
+    };
+    return map[tab] || map.carne;
+  },
+
+  _renderKPIsTab() {
+    const d = this._cachedData;
+    const tab = this._currentTab;
+    const kpis = d.kpis[tab] || [];
+    const meta = this._getTabMeta(tab);
+
+    return kpis.map(k => `
+      <div class="explotacion-kpi-card" style="--theme-color: ${meta.color}">
+        <div class="explotacion-kpi-label">${k.label}</div>
+        <div class="explotacion-kpi-value">${k.value}</div>
+      </div>
+    `).join('');
   },
 
   _cambiarTab(tab) {
     this._currentTab = tab;
-    document.querySelectorAll('.comer-tab').forEach(b => {
+    document.querySelectorAll('.comer-mode-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.tab === tab);
     });
+
+    const meta = this._getTabMeta(tab);
+    const headerNeon = document.querySelector('.section-header-neon');
+    if (headerNeon) headerNeon.style.setProperty('--neon-color', meta.color);
 
     // Sincronizar color de cabecera
     if (window.App && App.updateHeaderColor) {
@@ -125,65 +154,61 @@ const ComercializacionView = {
   },
 
   _renderSeccion(content, opts) {
-    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
+    const { icon, title, color, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card card-animal" onclick="${r.onclick || ''}" style="border-left:4px solid ${color};">
-          <div class="flex justify-between items-start">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-6">
-                <span class="text-xl">${icon}</span>
-                <h3 class="section-h3 m-0 text-ellipsis">${r.title}</h3>
+        <div class="card card-animal no-underline" onclick="${r.onclick || ''}" style="border-left:4px solid ${color}; padding:14px; margin-bottom:10px;">
+          <div class="flex flex-col gap-10">
+            <div class="flex justify-between items-center w-full">
+              <div class="flex items-center gap-10 min-w-0">
+                <div class="text-xl" style="color:${color}; filter: drop-shadow(0 0 4px ${color}60);">${icon}</div>
+                <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</div>
               </div>
-              <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                <span>📅 ${r.date}</span>
-                ${r.zone ? `<span>·</span><span>📍 ${r.zone}</span>` : ''}
-                ${r.meta ? `<span>·</span><span>📋 ${r.meta}</span>` : ''}
+              <div class="text-right ml-10">
+                <div class="font-900 text-white text-lg leading-none">${r.value}</div>
               </div>
-              ${r.badges ? `<div class="flex flex-wrap gap-6 mt-6">${r.badges}</div>` : ''}
             </div>
-            <div class="text-right flex-shrink-0 ml-8">
-              <span class="badge badge-sm" style="background:${color}20;color:${color};border:1px solid ${color}40;display:block;margin-bottom:4px;">${r.value}</span>
-              ${r.subvalue ? `<div class="kpi-sub text-75 text-gray">${r.subvalue}</div>` : ''}
-              <span class="text-xs text-777 mt-4 block">Ver ➔</span>
+
+            <div class="flex justify-between items-end w-full">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap gap-x-12 gap-y-4 text-[0.68rem] text-gray font-700 uppercase">
+                  <span class="flex items-center gap-4">${Icons.calendar()} ${r.date}</span>
+                  ${r.zone ? `<span class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</span>` : ''}
+                  ${r.meta ? `<span class="flex items-center gap-4 text-aaa">${Icons.documento()} ${r.meta.replace(/🏷️|📄/g, '')}</span>` : ''}
+                </div>
+                ${r.badges ? `<div class="flex flex-wrap gap-4 mt-8">${r.badges}</div>` : ''}
+              </div>
+              <div class="text-right flex flex-col items-end">
+                ${r.subvalue ? `<div class="text-[0.6rem] text-aaa uppercase font-800 tracking-wider mb-4">${r.subvalue}</div>` : ''}
+                <div class="text-[0.5rem] text-gray-700 font-900 uppercase">VER ➔</div>
+              </div>
             </div>
           </div>
         </div>`).join('')
-      : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
+      : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${icon}</span>
-            <div>
-              <div class="text-white font-900 text-lg">${title}</div>
-              ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
-            </div>
-          </div>
-          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
-            ${Icons.agregar()} Nuevo
+      <!-- PANEL DE ACCIONES COMERCIALES (ESTILO NEÓN) -->
+      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+        <div class="section-header-theme" style="--theme-color: ${color}">ACCIONES</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${color}; --neon-glow: ${color}B0; --neon-inner: ${color}40" onclick="${registrarHandler}">
+            ${Icons.agregar()}
+            <span class="widget-link-label">${registrarLabel}</span>
           </button>
         </div>
+      </div>
 
-        ${kpis ? `
-        <div class="flex flex-wrap gap-4 mb-14">
-          ${kpis.map((k, idx) => {
-            const badgesCls = ['badge-gold', 'badge-blue', 'badge-green', 'badge-purple', 'badge-red'];
-            const cls = badgesCls[idx % badgesCls.length];
-            return `<span class="badge badge-sm ${cls}">${k.label}: ${k.value}</span>`;
-          }).join('')}
-        </div>` : ''}
-
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
+      <div class="card p-14 border-222">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
           ${Icons.documento()} ${listName}
         </div>
-        <div class="grid gap-10">
+        <div class="grid">
           ${recordsHtml}
         </div>
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
+      <button class="fab-btn" onclick="${registrarHandler}" style="background: ${color};" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
   },
 
   // ===================== TAB CARNE =====================
@@ -196,10 +221,8 @@ const ComercializacionView = {
 
     this._renderSeccion(content, {
       icon: Icons.carne(), title: 'Ventas de Carne', subtitle: 'Expediciones a matadero y venta directa',
-      color: '#ef4444', colorDark: '#b91c1c',
-      threeColKpis: true,
-      kpis: d.kpis.carne,
-      registrarLabel: 'Registrar Venta',
+      color: '#ef4444',
+      registrarLabel: 'REGISTRAR VENTA',
       listName: 'Lista de Ventas',
       registrarHandler: "App._abrirWizardVentaMasiva()",
       records: d.ventas.slice(0, 50).map(v => {
@@ -208,7 +231,7 @@ const ComercializacionView = {
           ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">${Icons.edificio()} ${estadoTramite.toUpperCase()}</span>`
           : '';
         return {
-          title: Icons.documento() + ' ' + (v.razonSocial || 'Matadero Central'),
+          title: (v.razonSocial || 'Matadero Central'),
           date: v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-',
           zone: v.snap_zona || '',
           value: (v.pesoCanal || 0) + ' kg',
@@ -226,10 +249,8 @@ const ComercializacionView = {
   _renderLeche(content, d) {
     this._renderSeccion(content, {
       icon: Icons.leche(), title: 'Entregas de Leche', subtitle: 'Retiradas de tanque y albaranes',
-      color: '#f59e0b', colorDark: '#b45309',
-      threeColKpis: true,
-      kpis: d.kpis.leche,
-      registrarLabel: 'Registrar Retirada',
+      color: '#3b82f6', // Azul Lácteo consistente
+      registrarLabel: 'REGISTRAR RETIRADA',
       listName: 'Lista de Entregas',
       registrarHandler: "App._abrirWizardAlbaranLeche()",
       records: d.entregas.slice(0, 50).map(e => {
@@ -240,25 +261,25 @@ const ComercializacionView = {
 
         // Añadir precio final y MOFA como badges si existen
         let extraBadges = '';
-        if (e.precio_final_unitario) extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.3);">💰 ${e.precio_final_unitario.toFixed(3)} €/L</span>`;
+        if (e.precio_final_unitario) extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.3);">${Icons.dinero()} ${e.precio_final_unitario.toFixed(3)} €/L</span>`;
         if (e.mofa != null) {
           const color = e.mofa >= 0 ? '#10b981' : '#ef4444';
-          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(${e.mofa >= 0 ? '16,185,129' : '239,68,68'},0.1); color:${color}; border:1px solid rgba(${e.mofa >= 0 ? '16,185,129' : '239,68,68'},0.3);">📈 MOFA: ${Math.round(e.mofa)} €</span>`;
+          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(${e.mofa >= 0 ? '16,185,129' : '239,68,68'},0.1); color:${color}; border:1px solid rgba(${e.mofa >= 0 ? '16,185,129' : '239,68,68'},0.3);">${Icons.grafico()} MOFA: ${Math.round(e.mofa)} €</span>`;
         }
         if (e.comunidad_autonoma) {
-          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3);">${e.comunidad_autonoma === 'andalucia' ? '🌿 AND' : '🌿 EXT'}</span>`;
+          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3);">${e.comunidad_autonoma === 'andalucia' ? Icons.zonas() + ' AND' : Icons.zonas() + ' EXT'}</span>`;
         }
         if (e.estado_tramite_infolac) {
-          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.35);">🏛️ INFOLAC: ${String(e.estado_tramite_infolac).toUpperCase()}</span>`;
+          extraBadges += `<span style="font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.35);">${Icons.edificio()} INFOLAC: ${String(e.estado_tramite_infolac).toUpperCase()}</span>`;
         }
         const allBadges = [badges, extraBadges].filter(Boolean).join(' ');
 
         return {
-          title: Icons.transportistas() + ' Cisterna: ' + (e.matriculaCisterna || 'S/N'),
+          title: 'Cisterna: ' + (e.matriculaCisterna || 'S/N'),
           date: e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-',
           zone: '',
           value: (e.cantidad || 0).toLocaleString() + ' L',
-          subvalue: '🌡️ ' + (e.temperatura || '--') + 'ºC' + (es !== '--' ? ' · 📊 ES: ' + es + '%' : ''),
+          subvalue: (e.temperatura || '--') + 'ºC' + (es !== '--' ? ' · ES: ' + es + '%' : ''),
           badges: allBadges || `<span style="font-size:0.62rem; font-weight:700; padding:2px 8px; border-radius:4px; background:${esAlerta ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}; color:${esAlerta ? '#ef4444' : '#10b981'}; border:1px solid ${esAlerta ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'};">${e.estadoAnalitica || 'PENDIENTE'}</span>`,
           onclick: "location.hash='/albaran-leche?id=" + e.id + "'"
         };
@@ -272,17 +293,15 @@ const ComercializacionView = {
   _renderGastos(content, d) {
     this._renderSeccion(content, {
       icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
-      color: '#8b5cf6', colorDark: '#6d28d9',
-      threeColKpis: false,
-      kpis: d.kpis.gastos,
-      registrarLabel: 'Registrar Gasto',
+      color: '#8b5cf6',
+      registrarLabel: 'REGISTRAR GASTO',
       listName: 'Lista de Gastos',
       registrarHandler: "App._abrirFormularioGasto()",
       records: d.gastosRecords.slice(0, 50).map(g => ({
-        title: Icons.documento() + ' ' + (g.concepto || g.categoria || 'Gasto'),
+        title: (g.concepto || g.categoria || 'Gasto'),
         date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
         zone: g.snap_zona || '',
-        meta: ' 🏷️ ' + (g.categoria || ''),
+        meta: (g.categoria || ''),
         value: (g.monto || 0).toLocaleString() + ' €',
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),

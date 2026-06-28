@@ -290,3 +290,31 @@ Before delivering UI code, verify these items:
 - [ ] Form inputs have labels
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
+
+---
+
+## Livestock Manager - Premium OLED Standards (v4.8.5)
+
+Reference rules for maintaining visual consistency in this project.
+
+### 1. Header & Navigation
+- **Hub Centric Banner**: Use `.header-banner-frame` for the view title. Icon must be 17px SVG with `#facc15` gold glow.
+- **Dynamic Neon Line**: The bottom of the header must use `var(--header-neon-color)` to match the active mode.
+- **CoMer Hub**: Use the "CoMer" label for Comercialización in bottom navigation. Link dynamically to `#/comercializacion?tab=leche` by default.
+
+### 2. Hub Layouts (Ganadería, ExPro, CoMer)
+- **Top Mode Switch**: Use `.comer-mode-switch` or equivalent at the very top. Default to **Lácteo** (#3b82f6) for mixed farms.
+- **KPI Alignment**: All KPI cards must have a fixed height of `90px`.
+- **The 2+1 Rule**: When showing 3 KPI cards, use `flex-wrap` and `justify-content: center` so the 3rd card sits centered below the first two.
+- **Section Headers**: Use `.section-header-neon` or `.section-header-theme` without a top border. Labels must be white, 800 weight, and centered.
+
+### 3. Action Buttons
+- **Neon Buttons**: Always use `.widget-link-btn--neon`.
+- **Labels**: Must be white (`#ffffff !important`), uppercase, weight 800, size 0.8rem, and perfectly centered.
+- **No Redundancy**: Avoid "Registrar" prefix. Use clear, short nouns: `Peso (kg)`, `Control (L)`, `Tratamiento`.
+
+### 4. Data Cards (Records)
+- **Full Width**: Cards must occupy 100% of the available width.
+- **SVG Only**: No functional emojis. Use `Icons.*` with resplandor.
+- **Visual Hierarchy**: Main info at top (title left, value right); metadata at bottom (SVG + text left, "VER" indicator right).
+- **Animal Info**: Show gender icon (♀/♂) and calculated age. Include Lote/Rebaño link with its SVG icon.

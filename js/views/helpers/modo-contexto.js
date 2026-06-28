@@ -26,10 +26,9 @@ const ModoContextoHelper = {
       else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
     });
 
-    // Prioridad Lácteo sobre Híbrido por defecto
-    if (tieneLeche || tieneHibrido || (tieneCarne && tieneLeche)) return 'leche';
-    if (tieneCarne) return 'carne';
-    return 'leche';
+    if (tieneHibrido || (tieneCarne && tieneLeche)) return 'hibrido';
+    if (tieneLeche) return 'leche';
+    return 'carne';
   },
 
   _matchTipoByMode(tipo, mode) {
@@ -54,6 +53,11 @@ const ModoContextoHelper = {
       const saved = localStorage.getItem(`lm.modo.${blockKey}`);
       if (saved && this.VALID_MODES.has(saved)) return saved;
     } catch (_) {}
+
+    // Si no hay modo guardado y el sistema detecta híbrido,
+    // forzamos 'leche' por defecto según requerimiento de UI.
+    if (fallback === 'hibrido') return 'leche';
+
     return fallback;
   },
 
