@@ -289,15 +289,25 @@ const InformesView = {
 
   /** Genera barra de acciones PDF+Excel centrada con marco */
   _sectionActionsHTML(seccion, label) {
-    return `<div class="mb-12 flex justify-center">
-      <div class="inf-actions-bar">
-        <button class="btn btn-primary btn-sm btn-pdf" onclick="InformesView._exportPDF()">📄 Completo</button>
-        <span class="inf-sep inf-sep-pdf"></span>
-        <button class="btn btn-primary btn-sm btn-pdf-seccion" onclick="InformesView._exportPDFSeccion('${seccion}')">📄 ${label}</button>
-        <span class="inf-sep inf-sep-xls"></span>
-        <button class="btn btn-primary btn-sm btn-excel" onclick="InformesView._exportExcel()">${Icons.exportar()} Excel</button>
+    return `
+      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">EXPORTAR INFORME</div>
+        <div class="grid grid-cols-3 gap-10">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="InformesView._exportPDF()">
+            ${Icons.documento()}
+            <span class="widget-link-label">Completo</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="InformesView._exportPDFSeccion('${seccion}')">
+            ${Icons.exportar()}
+            <span class="widget-link-label">${label}</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="InformesView._exportExcel()">
+            ${Icons.exportar()}
+            <span class="widget-link-label">Excel</span>
+          </button>
+        </div>
       </div>
-    </div>`;
+    `;
   },
 
   _renderGeneral(content, d) {

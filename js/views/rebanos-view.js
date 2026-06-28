@@ -12,12 +12,13 @@ const RebanosView = {
     const totalRebanos = rebanos.length;
     const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
     let html = `
-      <div class="mb-16">
-        <div class="flex justify-between items-center">
-          <div class="flex gap-8">
-            <button class="btn btn-create btn-sm" onclick="RebanosView._crearRebano()">${Icons.agregar()} Nuevo</button>
-          </div>
-          ${totalRebanos > 0 ? `<span class="text-xs text-gray">${rebanosActivos}/${totalRebanos} activos</span>` : ''}
+      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="RebanosView._crearRebano()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nuevo Rebaño</span>
+          </button>
         </div>
       </div>`;
 
