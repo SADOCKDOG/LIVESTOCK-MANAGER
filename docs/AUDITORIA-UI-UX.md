@@ -229,8 +229,11 @@ Botón columnar con borde y glow de color semántico. Uso típico: rejilla de ac
 
 Reglas:
 - Icono SVG (`Icons.*`) arriba, label abajo. Nunca emoji como icono.
-- Color vía clase `.neon-*`; nunca `--neon-color` inline salvo valor computado en JS.
+- El SVG hereda el tamaño fijo 24×24px por CSS (`.widget-link-btn--neon svg { width:24px; height:24px }`). No pasar parámetros de tamaño a `Icons.*`.
+- Color vía clase `.neon-*`; nunca `--neon-color` inline (excepción solo si el color es computado dinámicamente en JS y no hay clase `neon-*` aplicable).
 - `:active` tiene `scale(0.95)` incorporado; no añadir más transiciones.
+- Texto de label: mismo tamaño/fuente/color en todos los botones (`.widget-link-label`). Sin abreviaciones con punto salvo que el texto completo supere el ancho disponible tras verificar. Sin "Registrar" como prefijo — el contexto de la sección lo da el header `section-header-neon`.
+- Vocabulario estándar de acciones: `Peso (kg)` · `Ordeño (L)` · `Tratamiento` · `Alimentación` · `Energía` · `Fitosanitario` · `Carga/Consumo`.
 
 #### Section header neon
 
