@@ -38,13 +38,6 @@ const ComercializacionView = {
       pipelineInfo = null;
     }
 
-    const meta = this._getTabMeta(this._currentTab);
-
-    // Sincronizar color de cabecera con el tab activo
-    if (window.App && App.updateHeaderColor) {
-      App.updateHeaderColor(this._currentTab === 'gastos' ? null : this._currentTab);
-    }
-
     this._cachedData = {
       ventas, entregas, gastosRecords,
       kpis: {
@@ -68,14 +61,21 @@ const ComercializacionView = {
       }
     };
 
+    const meta = this._getTabMeta(this._currentTab);
+
+    // Sincronizar color de cabecera con el tab activo
+    if (window.App && App.updateHeaderColor) {
+      App.updateHeaderColor(this._currentTab === 'gastos' ? null : this._currentTab);
+    }
+
     main.innerHTML = `
       <!-- Selector de Modo Comercial Superior -->
       <div class="mb-16 text-center">
         <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMERCIALIZACIÓN</div>
         <div class="comer-mode-switch">
-          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6;" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6;" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
         </div>
       </div>
 
