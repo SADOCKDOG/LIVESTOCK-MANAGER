@@ -21,12 +21,13 @@ const AnimalesView = {
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
 
     let html = `
-      <div class="mb-16">
-        <div class="flex justify-between items-center">
-          <div class="flex gap-8">
-            <button class="btn btn-primary btn-sm btn-create" onclick="location.hash='/animal'">${Icons.agregar()} Nuevo</button>
-          </div>
-          ${animales.length > 0 ? `<span class="text-xs text-gray">${activos}/${animales.length} activos</span>` : ''}
+      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nuevo Animal</span>
+          </button>
         </div>
       </div>`;
 
