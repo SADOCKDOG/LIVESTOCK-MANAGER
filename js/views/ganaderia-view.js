@@ -112,7 +112,7 @@ const GanaderiaView = {
                 </div>
               </a>
             `).join('')
-            : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">Sin rebaños para este modo.</span></div>`
+            : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin rebaños para este modo</span></div>`
           }
         </div>
       </div>
@@ -128,25 +128,32 @@ const GanaderiaView = {
                 const sexoIcon = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '');
                 const ageText = a.fechaNacimiento ? ` · ${Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365))} años` : '';
                 return `
-                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:10px; margin:0;">
-                    <div class="flex justify-between items-center">
-                      <div class="flex items-center gap-10">
-                        <div class="text-xl" style="color:${meta.color}">${Icons.animales()}</div>
-                        <div class="text-xs">
-                          <div class="font-bold text-white uppercase">${a.crotal || a.nombre || `Animal #${a.id}`} <span class="text-gray-400 ml-4">${sexoIcon}</span></div>
-                          <div class="text-gray mt-2 font-700">${(a.especie || 'N/D').toUpperCase()} · ${(a.raza || 'N/D').toUpperCase()}${ageText}</div>
-                          <div class="text-[0.62rem] text-aaa mt-2">${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}</div>
+                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:14px; margin:0; margin-bottom:8px;">
+                    <div class="flex flex-col gap-10">
+                      <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-10 min-w-0">
+                          <div class="text-xl" style="color:${meta.color}">${Icons.animales()}</div>
+                          <div class="text-xs">
+                            <div class="font-bold text-white uppercase">${a.crotal || a.nombre || `Animal #${a.id}`} <span class="text-gray-400 ml-4">${sexoIcon}</span></div>
+                            <div class="text-gray mt-2 font-700 uppercase">${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}${ageText}</div>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <span class="badge badge-sm uppercase" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
                         </div>
                       </div>
-                      <div class="text-right">
-                        <span class="badge badge-sm uppercase" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
-                        <div class="text-[0.6rem] text-777 mt-4">VER FICHA ➔</div>
+
+                      <div class="flex justify-between items-end w-full">
+                        <div class="text-[0.65rem] text-aaa flex items-center gap-4">
+                          ${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}
+                        </div>
+                        <div class="text-[0.48rem] text-gray-600 font-900 uppercase">VER ➔</div>
                       </div>
                     </div>
                   </a>
                 `;
               }).join('')
-            : `<div class="p-14 text-center bg-darker rounded"><span class="text-555 text-xs">Sin animales para este modo.</span></div>`
+            : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin animales para este modo</span></div>`
           }
         </div>
       </div>
