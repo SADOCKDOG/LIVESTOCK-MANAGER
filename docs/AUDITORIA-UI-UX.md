@@ -1,4 +1,4 @@
-# Auditoría UI/UX y Guía de Diseño — Livestock Manager (SIGGAN)
+                                                                # Auditoría UI/UX y Guía de Diseño — Livestock Manager (SIGGAN)
 
 > **Objetivo del documento.** Definir el **sistema de diseño único** (tokens, componentes, patrones y reglas) que sirva de referencia normativa para toda la app.
 >
@@ -62,10 +62,10 @@ La aplicación ha sido plenamente estandarizada bajo el sistema de diseño **Pre
 - **Contenedor roto.** `informes-view.js:15-18` hace `main.style.maxWidth='100%'` y sobrescribe paddings, rompiendo el contenedor global de `600px`. La vista debe respetar el layout estándar.
 - **Parche frágil.** Reglas con `:has(> h2[style*="2.2rem"])` + `!important` (`:2228-2255`) parchean vistas legacy que aún inyectan `<h2 style="font-size:2.2rem">`. Hay que migrar esos `<h2>` a `.page-title-bar` y eliminar el parche.
 - **Duplicación CSS:**
-  - `.premium-input` ≡ `.wizard-input` ≡ `.form-input` (idénticos: padding 14px, radius 12px, bg `#1a1a1a`, border `#333`).
-  - `.fab` (naranja, `:1150`) vs `.fab-btn` (verde, `:2310`) — **dos FAB distintos**.
-  - Bloque de aliases de formulario declarado **dos veces**.
-  - `--accent: #7fb069` (verde alcornoque) definido pero casi sin uso; el verde real es `#10b981`/`#059669`.
+- `.premium-input` ≡ `.wizard-input` ≡ `.form-input` (idénticos: padding 14px, radius 12px, bg `#1a1a1a`, border `#333`).
+- `.fab` (naranja, `:1150`) vs `.fab-btn` (verde, `:2310`) — **dos FAB distintos**.
+- Bloque de aliases de formulario declarado **dos veces**.
+- `--accent: #7fb069` (verde alcornoque) definido pero casi sin uso; el verde real es `#10b981`/`#059669`.
 
 ### 2.3 Botones — `[MEDIA]`
 **8 sistemas paralelos** con alturas y radios sin criterio:
@@ -85,8 +85,8 @@ La aplicación ha sido plenamente estandarizada bajo el sistema de diseño **Pre
 
 ### 2.4 Formularios y Wizards — `[MEDIA]`
 - **Dos frameworks para lo mismo:**
-  1. `WizardManager` (declarativo, 9 wizards) — el camino correcto.
-  2. `formulario-finca.js` con su propio modal (`.formulario-finca-*`, inputs con radius/padding propios) + `asistente-configuracion.js`.
+1. `WizardManager` (declarativo, 9 wizards) — el camino correcto.
+2. `formulario-finca.js` con su propio modal (`.formulario-finca-*`, inputs con radius/padding propios) + `asistente-configuracion.js`.
 - Dentro del `WizardManager`, la cabecera y el footer usan **estilos inline** (`wizard-manager.js:25-27,36`) en vez de las clases `.wizard-header-*`.
 - → Unificar todos los flujos multi-paso bajo `WizardManager`; migrar `formulario-finca` a un wizard (o a un formulario estándar con `.form-*`).
 
@@ -124,31 +124,31 @@ Mantener la paleta Deep Dark y **consolidar todo el color semántico en variable
 
 ```css
 :root {
-  /* Marca */
-  --p-cork:       #d4a373;
-  --p-cork-dark:  #a0673a;
-  --p-gold:       #fbbf24;   /* ⚠️ AÑADIR: hoy se usa sin definir */
-  --p-gold-dark:  #d97706;
+/* Marca */
+--p-cork:       #d4a373;
+--p-cork-dark:  #a0673a;
+--p-gold:       #fbbf24;   /* ⚠️ AÑADIR: hoy se usa sin definir */
+--p-gold-dark:  #d97706;
 
-  /* Base OLED */
-  --bg:            #000000;
-  --surface:       #121212;
-  --surface-light: #1e1e1e;
-  --surface-input: #1a1a1a;
-  --border:        #2a2a2a;
-  --border-input:  #333333;
+/* Base OLED */
+--bg:            #000000;
+--surface:       #121212;
+--surface-light: #1e1e1e;
+--surface-input: #1a1a1a;
+--border:        #2a2a2a;
+--border-input:  #333333;
 
-  /* Texto */
-  --text-p:  #f8f9fa;
-  --text-s:  #a0a0a0;
-  --text-d:  #666666;   /* deshabilitado / placeholder */
+/* Texto */
+--text-p:  #f8f9fa;
+--text-s:  #a0a0a0;
+--text-d:  #666666;   /* deshabilitado / placeholder */
 
-  /* Semántica (única fuente de verdad para datos/estados) */
-  --c-success: #10b981;
-  --c-warning: #f59e0b;
-  --c-danger:  #ef4444;
-  --c-info:    #3b82f6;
-  --c-accent:  #8b5cf6;  /* reproducción/violeta */
+/* Semántica (única fuente de verdad para datos/estados) */
+--c-success: #10b981;
+--c-warning: #f59e0b;
+--c-danger:  #ef4444;
+--c-info:    #3b82f6;
+--c-accent:  #8b5cf6;  /* reproducción/violeta */
 }
 ```
 > Acción: reemplazar `#10b981 → var(--c-success)`, etc., en todo el código. Eliminar `--accent: #7fb069` o reutilizarlo conscientemente.
@@ -176,13 +176,13 @@ Una base + modificadores. Eliminar las 8 variantes paralelas.
 
 ```
 .btn                      /* base: flex, gap, peso 800, transición, :active scale(.97) */
-  .btn--block             /* width:100%, height 56px, radius pill (acción principal) */
-  .btn--inline            /* height 48px, radius 14px, padding lateral (inline) */
-  .btn--icon              /* 48×48, solo icono */
-  .btn--fab               /* flotante 56×56, radius pill */
+.btn--block             /* width:100%, height 56px, radius pill (acción principal) */
+.btn--inline            /* height 48px, radius 14px, padding lateral (inline) */
+.btn--icon              /* 48×48, solo icono */
+.btn--fab               /* flotante 56×56, radius pill */
 /* Semántica (color): */
-  .btn--primary  (gold→dark-gold)   .btn--secondary (surface+border)
-  .btn--success  .btn--danger  .btn--info  .btn--pdf  .btn--excel
+.btn--primary  (gold→dark-gold)   .btn--secondary (surface+border)
+.btn--success  .btn--danger  .btn--info  .btn--pdf  .btn--excel
 ```
 Reglas: altura mínima **48px**; un solo FAB (unificar `.fab` y `.fab-btn`, color = acción primaria de la vista); icono SVG + texto, nunca emoji.
 
@@ -227,20 +227,20 @@ Botón columnar con borde y glow de color semántico. Uso típico: rejilla de ac
 
 ```html
 <button class="widget-link-btn--neon neon-success">
-  <!-- icono SVG via Icons.* -->
-  <span class="widget-link-label">Animales</span>
+<!-- icono SVG via Icons.* -->
+<span class="widget-link-label">Animales</span>
 </button>
 ```
 
 ```css
 .widget-link-btn--neon   /* contenedor base: flex-col, borde lateral neon, box-shadow glow */
-  + variante de color (una por botón):
-  .neon-danger   → var(--c-danger)  rojo
-  .neon-info     → var(--c-info)    azul
-  .neon-success  → var(--c-success) verde
-  .neon-warning  → var(--c-warning) ámbar
-  .neon-accent   → #a855f7          violeta
-  .neon-theme    → var(--theme-color) (color de modo activo)
++ variante de color (una por botón):
+.neon-danger   → var(--c-danger)  rojo
+.neon-info     → var(--c-info)    azul
+.neon-success  → var(--c-success) verde
+.neon-warning  → var(--c-warning) ámbar
+.neon-accent   → #a855f7          violeta
+.neon-theme    → var(--theme-color) (color de modo activo)
 
 .widget-link-label     /* 0.85rem, bold */
 .widget-link-label-sm  /* 0.80rem, bold, line-height 1.1 — dos líneas */
@@ -261,7 +261,7 @@ Cabecera de sección con color temático y glow de texto.
 
 ```html
 <div class="section-header-neon text-label" style="--neon-color: var(--c-success)">
-  REBAÑOS ACTIVOS
+REBAÑOS ACTIVOS
 </div>
 ```
 
@@ -271,9 +271,9 @@ Cabecera de sección con color temático y glow de texto.
 
 ```html
 <div class="expro-mode-switch">
-  <button class="expro-mode-btn active" style="--mode-color:#ef4444">CÁRNICO</button>
-  <button class="expro-mode-btn"        style="--mode-color:#3b82f6">LÁCTEO</button>
-  <button class="expro-mode-btn"        style="--mode-color:#10b981">HÍBRIDO</button>
+<button class="expro-mode-btn active" style="--mode-color:#ef4444">CÁRNICO</button>
+<button class="expro-mode-btn"        style="--mode-color:#3b82f6">LÁCTEO</button>
+<button class="expro-mode-btn"        style="--mode-color:#10b981">HÍBRIDO</button>
 </div>
 <!-- variante para ganadería: ganaderia-mode-switch / ganaderia-mode-btn -->
 ```
@@ -322,7 +322,7 @@ Cabecera de contexto de modo para vistas de compradores.
 
 ```html
 <div class="comprador-mode-header comprador-mode-header--hibrido">
-  Modo Híbrido
+Modo Híbrido
 </div>
 ```
 
