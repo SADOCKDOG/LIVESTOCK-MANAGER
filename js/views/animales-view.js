@@ -33,9 +33,17 @@ const AnimalesView = {
 
     if (animales.length === 0) {
       html += `<div class="empty-state">
-        <div class="empty-state-icon">🐄</div>
+        <div class="empty-state-icon" style="color:var(--p-gold);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <button class="btn btn-primary btn-sm mt-12" onclick="location.hash='/animal'">${Icons.agregar()} Registrar primer animal</button>
+        <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+          <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+          <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
+              ${Icons.agregar()}
+              <span class="widget-link-label">Registrar primer animal</span>
+            </button>
+          </div>
+        </div>
       </div>`;
       main.innerHTML = html;
       return;
@@ -44,9 +52,9 @@ const AnimalesView = {
     // Barra de resumen
     html += `
       <div class="flex flex-wrap gap-4 mb-10">
-        ${especies.map(esp => `<span class="badge badge-sm badge-gold">${esp}: ${animales.filter(a => a.especie === esp).length}</span>`).join('')}
-        <span class="badge badge-sm badge-green">✅ ${activos} activos</span>
-        <span class="badge badge-sm badge-red">📦 ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
+        ${especies.map(esp => `<span class="badge badge-sm badge-gold uppercase">${esp}: ${animales.filter(a => a.especie === esp).length}</span>`).join('')}
+        <span class="badge badge-sm badge-green uppercase">${Icons.check()} ${activos} activos</span>
+        <span class="badge badge-sm badge-red uppercase">${Icons.paquete()} ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
       </div>`;
 
     // Búsqueda + selector de especie compacto
@@ -103,32 +111,38 @@ const AnimalesView = {
 
   _renderCard(a, r) {
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
-    const iconoEspecie = a.especie === 'Vacas' ? '🐄' : a.especie === 'Ovejas' ? '🐑' : a.especie === 'Cabras' ? '🐐' : '🐾';
-    const iconoSexo = a.sexo === 'H' ? '♀' : a.sexo === 'M' ? '♂' : '⚤';
+    const iconoSexo = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '⚤');
     const colorEstado = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : a.estado === 'baja' ? '#ef4444' : '#888';
+
     return `
-      <div class="card card-animal" onclick="location.hash='/animal?id=${a.id}'" style="border-left:4px solid ${colorEstado};">
-        <div class="flex justify-between items-start">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-6">
-              <span class="text-xl">${iconoEspecie}</span>
-              <h3 class="section-h3 m-0 text-ellipsis">${a.numero_identificacion}</h3>
+      <div class="card card-animal no-underline" onclick="location.hash='/animal?id=${a.id}'" style="border-left:4px solid ${colorEstado}; padding:14px; margin:0; margin-bottom:8px;">
+        <div class="flex flex-col gap-10">
+          <div class="flex justify-between items-center w-full">
+            <div class="flex items-center gap-10 min-w-0">
+              <div class="text-xl" style="color:${colorEstado}">${Icons.animales()}</div>
+              <div class="text-xs">
+                <div class="font-bold text-white uppercase text-base tracking-tight">${a.numero_identificacion} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
+                <div class="text-gray mt-2 font-700 uppercase">${(a.especie || 'N/D')} · ${(a.raza || 'Sin Raza')}</div>
+              </div>
             </div>
-            <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-              <span>${iconoSexo} ${a.sexo === 'H' ? 'Hembra' : a.sexo === 'M' ? 'Macho' : 'Castrado'}</span>
-              <span>·</span>
-              <span>🧬 ${a.raza || 'Sin raza'}</span>
-              <span>·</span>
-              <span>📦 ${r ? r.nombre : 'S/R'}</span>
-              ${edad !== null ? `<span>·</span><span>🎂 ${edad} años</span>` : ''}
+            <div class="text-right">
+              <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${a.estado || 'activo'}</span>
             </div>
           </div>
-          <div class="text-right flex-shrink-0">
-            <span class="badge badge-sm" style="background:${colorEstado}20;color:${colorEstado};border:1px solid ${colorEstado}40;display:block;margin-bottom:4px;">${(a.estado || 'activo').toUpperCase()}</span>
-            <span class="text-xs text-777">Ficha ➔</span>
+
+          <div class="flex justify-between items-end w-full">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+                <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
+                ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} ${edad} AÑOS</div>` : ''}
+                ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+            </div>
           </div>
         </div>
-        ${a.categoria ? `<div class="mt-4 text-xs text-gray">📋 ${a.categoria}</div>` : ''}
       </div>`;
   },
 

@@ -23,7 +23,7 @@ const RebanosView = {
       </div>`;
 
     if (rebanos.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">🐑</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--p-gold);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
     else {
       // Barra de resumen de Rebaños
       const carneCount = rebanos.filter(r => r.tipo.toLowerCase().includes('carne') || r.tipo.toLowerCase().includes('cárn')).length;
@@ -32,10 +32,10 @@ const RebanosView = {
 
       html += `
         <div class="flex flex-wrap gap-4 mb-10">
-          <span class="badge badge-sm badge-gold flex items-center gap-4">${Icons.carne()} Carne: ${carneCount}</span>
-          <span class="badge badge-sm badge-blue flex items-center gap-4">${Icons.leche()} Leche: ${lecheCount}</span>
-          <span class="badge badge-sm badge-purple flex items-center gap-4">${Icons.rotacion()} Híbridos: ${hibridoCount}</span>
-          <span class="badge badge-sm badge-green flex items-center gap-4">${Icons.check()} ${rebanosActivos} activos</span>
+          <span class="badge badge-sm badge-gold flex items-center gap-4 uppercase">${Icons.carne()} Carne: ${carneCount}</span>
+          <span class="badge badge-sm badge-blue flex items-center gap-4 uppercase">${Icons.leche()} Leche: ${lecheCount}</span>
+          <span class="badge badge-sm badge-purple flex items-center gap-4 uppercase">${Icons.rotacion()} Híbridos: ${hibridoCount}</span>
+          <span class="badge badge-sm badge-green flex items-center gap-4 uppercase">${Icons.check()} ${rebanosActivos} activos</span>
         </div>`;
 
       html += `<div class="grid gap-15">`;
@@ -46,33 +46,36 @@ const RebanosView = {
         const eventosReb = eventos.filter(e => e.entidad_id === r.id || (e.tipo_entidad === 'rebano' && e.snap_identificacion === r.nombre));
         const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
         const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
-        const iconoEsp = r.especie === 'Vacas' ? '🐄' : r.especie === 'Ovejas' ? '🐑' : r.especie === 'Cabras' ? '🐐' : '🐾';
         const colorEstado = r.estado !== 'inactivo' ? '#10b981' : '#6b7280';
 
         html += `
-          <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid ${colorEstado};">
-            <div class="flex justify-between items-start">
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-6">
-                  <span class="text-xl">${iconoEsp}</span>
-                  <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
+          <div class="card card-animal no-underline" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid ${colorEstado}; padding:14px; margin:0; margin-bottom:8px;">
+            <div class="flex flex-col gap-10">
+              <div class="flex justify-between items-center w-full">
+                <div class="flex items-center gap-10 min-w-0">
+                  <div class="text-xl" style="color:${colorEstado}">${Icons.rebanos()}</div>
+                  <div class="text-xs">
+                    <div class="font-bold text-white uppercase text-base tracking-tight">${r.nombre}</div>
+                    <div class="text-gray mt-2 font-700 uppercase">${(r.especie || 'N/D')} · ${(r.tipo || 'Sin Tipo')}</div>
+                  </div>
                 </div>
-                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray items-center">
-                  <span class="flex items-center gap-4">${Icons.reproduccion()} ${r.especie}</span>
-                  <span>·</span>
-                  <span class="flex items-center gap-4">🏷️ ${r.tipo}</span>
-                  <span>·</span>
-                  <span class="flex items-center gap-4">${Icons.zonas()} ${r.zonaActual || "S/N"}</span>
-                </div>
-                <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray items-center">
-                  <span class="flex items-center gap-4">${Icons.animales()} ${n} animales (${activos} activos)</span>
-                  ${prodLeche > 0 ? `<span>·</span><span class="flex items-center gap-4">${Icons.leche()} ${prodLeche.toFixed(0)} L</span>` : ''}
-                  ${ultimoEvento ? `<span>·</span><span class="flex items-center gap-4">${Icons.calendar()} Últ. Act: ${new Date(ultimoEvento.fecha).toLocaleDateString('es-ES')}</span>` : ''}
+                <div class="text-right">
+                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} Activos</span>
                 </div>
               </div>
-              <div class="text-right flex-shrink-0">
-                <span class="badge badge-sm" style="background:${colorEstado}20;color:${colorEstado};border:1px solid ${colorEstado}40;display:block;margin-bottom:4px;">${(r.estado || 'activo').toUpperCase()}</span>
-                <span class="text-xs text-777">Ficha ➔</span>
+
+              <div class="flex justify-between items-end w-full">
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+                    <div class="flex items-center gap-4">${Icons.zonas()} ${r.zonaActual || "Finca General"}</div>
+                    <div class="flex items-center gap-4">${Icons.animales()} ${n} Total</div>
+                    ${prodLeche > 0 ? `<div class="flex items-center gap-4 text-gold">${Icons.leche()} ${prodLeche.toFixed(0)} L</div>` : ''}
+                    ${ultimoEvento ? `<div class="flex items-center gap-4 text-aaa">${Icons.calendar()} ${new Date(ultimoEvento.fecha).toLocaleDateString()}</div>` : ''}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLE ➔</div>
+                </div>
               </div>
             </div>
           </div>`;
