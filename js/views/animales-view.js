@@ -488,7 +488,7 @@ const AnimalesView = {
         }
 
         try {
-          const notificacionId = await window.NotificacionesREGA.registrar({
+          const notificacionRes = await window.NotificacionesREGA.registrar({
             animal_id: id || 'nuevo',
             finca_id: finca?.id,
             animal_numero: crotal,
@@ -496,9 +496,9 @@ const AnimalesView = {
             tipo_evento: 'cambio_estado'
           });
 
-          // Simular envío a REGA
+          // Simular envío a REGA usando el ID devuelto en el objeto de respuesta
           const resultado = await window.NotificacionesREGA.enviarAREGA({
-            id: notificacionId,
+            id: notificacionRes.id,
             animal_numero: crotal,
             finca_rega: finca?.rega,
             tipo_evento: 'cambio_estado'
@@ -597,17 +597,22 @@ const AnimalesView = {
         try {
           const finca = await Fincas.getActive().catch(() => null);
           if (finca) {
-            const resultado = await NotificacionesREGA.registrar({
+            const resNotif = await NotificacionesREGA.registrar({
               animal_id: nuevoId,
               finca_id: finca.id,
               animal_numero: data.numero_identificacion,
-              finca_rega: finca.rega || '',
+              finca_rega: finca.rega || finca.codigo_REGA || '',
               tipo_evento: 'alta',
               observaciones: `Alta registrada ${id ? '(actualizada)' : '(nueva)'}`,
             });
-            if (resultado.exito) {
-              await NotificacionesREGA.enviarAREGA(resultado.numero_seguimiento);
-              App.toast(`✅ Notificación REGA registrada: ${resultado.numero_seguimiento}`);
+            if (resNotif.exito) {
+              await NotificacionesREGA.enviarAREGA({
+                id: resNotif.id,
+                animal_numero: data.numero_identificacion,
+                finca_rega: finca.rega || finca.codigo_REGA,
+                tipo_evento: 'alta'
+              });
+              App.toast(`✅ Notificación REGA registrada: ${resNotif.numero_seguimiento}`);
             }
           }
         } catch (err) {

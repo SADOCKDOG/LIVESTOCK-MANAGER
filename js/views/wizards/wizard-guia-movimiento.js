@@ -15,6 +15,9 @@ window.WizardGuiaMovimiento = {
     const conf = CS && ccaa ? CS.getConfiguracionCCAA(ccaa) : null;
     const regaPropia = finca.codigo_REGA || finca.rega || '';
 
+    const especiesMaestras = await window.db.getAll("config_especies").catch(() => []);
+    const animalesActivos = (await Animales.list()).filter(a => (a.estado || 'activo') === 'activo');
+
     let transportistas = [];
     try { transportistas = await Transportistas.list({ activo: true }); } catch (e) { transportistas = []; }
 
@@ -83,18 +86,42 @@ window.WizardGuiaMovimiento = {
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPECIE</label>
-                <input type="text" id="w-mv-especie" value="${data.especie}" placeholder="OVINO, BOVINO..." class="wizard-input uppercase font-800">
+                <select id="w-mv-especie" class="wizard-input font-800">
+                  <option value="">— SELECCIONAR —</option>
+                  ${especiesMaestras.map(e => `<option value="${e.nombre}" ${data.especie === e.nombre ? 'selected' : ''}>${e.nombre.toUpperCase()}</option>`).join('')}
+                </select>
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº ANIMALES</label>
-                <input type="number" id="w-mv-num" value="${data.num_animales}" min="1" class="wizard-input font-900 text-lg">
+                <input type="number" id="w-mv-num" value="${data.num_animales}" min="1" class="wizard-input font-900 text-lg" readonly>
               </div>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">CROTALES (UNO POR LÍNEA)</label>
-              <textarea id="w-mv-crotales" class="wizard-input font-800 uppercase" rows="3" placeholder="ES0000..." style="resize:none;">${(data.crotales || []).join('\n')}</textarea>
+              <label class="wizard-label">SELECCIONAR CROTALES (CENSO ACTIVO)</label>
+              <div id="w-mv-crotales-list" class="bg-black border border-222 rounded-sm p-10 mt-5" style="max-height: 180px; overflow-y: auto;">
+                  ${animalesActivos.length > 0
+                    ? animalesActivos.map(a => `
+                      <label class="flex items-center gap-10 p-10 border-bottom-222 cursor-pointer">
+                        <input type="checkbox" value="${a.numero_identificacion}" class="mv-crotal-chk" ${data.crotales.includes(a.numero_identificacion) ? 'checked' : ''}>
+                        <span class="text-white font-900 text-xs uppercase">${a.numero_identificacion} <small class="text-aaa font-700 ml-4">${a.raza || ''}</small></span>
+                      </label>
+                    `).join('')
+                    : '<div class="text-center text-gray p-20 uppercase font-900 text-xs">Sin animales activos para mover</div>'
+                  }
+              </div>
+              <small class="text-aaa uppercase font-700 text-[0.55rem] mt-4 block">Marca los animales que formarán la expedición</small>
             </div>
           </div>`;
+        },
+        onRender: (data, stepEl) => {
+          const updateCount = () => {
+            const checks = stepEl.querySelectorAll('.mv-crotal-chk:checked');
+            const numInput = stepEl.querySelector('#w-mv-num');
+            if (numInput) numInput.value = checks.length;
+          };
+          stepEl.querySelectorAll('.mv-crotal-chk').forEach(cb => {
+            cb.addEventListener('change', updateCount);
+          });
         },
         onChange: async (data) => {
           const esSalida = data.tipo === 'salida';
@@ -104,10 +131,11 @@ window.WizardGuiaMovimiento = {
           else { data.rega_destino = propia; data.rega_origen = contra; }
           data.explotacion_contraparte = document.getElementById('w-mv-contra-nombre')?.value.trim() || '';
           data.tipo_operador_destino = document.getElementById('w-mv-tipo-operador')?.value || '';
-          data.especie = document.getElementById('w-mv-especie')?.value.trim() || '';
-          data.num_animales = parseInt(document.getElementById('w-mv-num')?.value) || 0;
-          data.crotales = (document.getElementById('w-mv-crotales')?.value || '')
-            .split('\n').map(s => s.trim().toUpperCase()).filter(Boolean);
+          data.especie = document.getElementById('w-mv-especie')?.value || '';
+
+          const checks = document.querySelectorAll('.mv-crotal-chk:checked');
+          data.crotales = Array.from(checks).map(cb => cb.value);
+          data.num_animales = data.crotales.length;
         },
         validate: async (data) => {
           if (data.num_animales <= 0) { App.toastError("Indica el nº de animales"); return false; }
