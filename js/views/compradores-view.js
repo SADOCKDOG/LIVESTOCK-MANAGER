@@ -382,129 +382,142 @@ const CompradoresView = {
         ]);
 
         const main = document.getElementById("app-content");
+        const colorComp = this._colorTipo(comprador.tipo_comprador);
+
         main.innerHTML = `
-          <div class="mb-12">
-            <a href="#/compradores" class="link-back">← Volver a compradores</a>
+          <div class="mb-14">
+            <button onclick="location.hash='#/compradores'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+              <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+            </button>
           </div>
 
           <!-- Cabecera -->
-          <div class="card p-20" style="border-top:4px solid ${this._colorTipo(comprador.tipo_comprador)};">
-            <div class="flex justify-between items-start">
+          <div class="card p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
+            <div class="flex justify-between items-start mb-16">
               <div>
-                <h2 class="text-white mt-0 mb-4" style="font-size:1.3rem; border:none; padding:0;">${comprador.nombre}</h2>
-                <div class="flex gap-8 flex-wrap mb-8">
-                  <span class="badge-tipo" style="padding:3px 12px; background:${this._colorTipo(comprador.tipo_comprador, true)}; color:${this._colorTipo(comprador.tipo_comprador)}; border:1px solid ${this._colorTipo(comprador.tipo_comprador, false, true)}; font-weight:800;">
+                <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight" style="color:${colorComp} !important;">${comprador.nombre}</h2>
+                <div class="flex gap-8 flex-wrap">
+                  <span class="badge badge-sm font-950 uppercase" style="background:${colorComp}20; color:${colorComp}; border:1px solid ${colorComp}40;">
                     ${comprador.tipo_comprador || 'híbrido'}
                   </span>
-                  ${comprador.activo === false ? '<span class="text-red font-800 text-xs">INACTIVO</span>' : '<span class="text-green font-800 text-xs">ACTIVO</span>'}
+                  ${comprador.activo === false ? '<span class="badge badge-sm font-950 uppercase bg-red-900 border-red-500 text-white">INACTIVO</span>' : '<span class="badge badge-sm font-950 uppercase bg-green-900 border-green-500 text-white">ACTIVO</span>'}
                 </div>
               </div>
-              <div class="flex gap-10">
-                <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="CompradoresView._eliminar(${id})">
+              <div class="flex gap-8">
+                <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._eliminar(${id})">
                   ${Icons.eliminar()}
-                  <span class="widget-link-label">Eliminar</span>
                 </button>
-                <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView.renderFormulario(${id})">
+                <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="CompradoresView.renderFormulario(${id})">
                   ${Icons.editar()}
-                  <span class="widget-link-label">Editar</span>
                 </button>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
-              ${comprador.nif_cif ? `<div class="flex items-center gap-4">${Icons.documento()} <strong>NIF:</strong> ${comprador.nif_cif}</div>` : ''}
-              ${comprador.telefono ? `<div class="flex items-center gap-4">${Icons.info()} <strong>Tel:</strong> ${comprador.telefono}</div>` : ''}
-              ${comprador.email ? `<div class="flex items-center gap-4">${Icons.enlace()} <strong>Email:</strong> ${comprador.email}</div>` : ''}
-              ${comprador.ciudad ? `<div class="flex items-center gap-4">${Icons.zonas()} <strong>Ciudad:</strong> ${comprador.ciudad}${comprador.provincia ? ' ('+comprador.provincia+')' : ''}</div>` : ''}
-              ${comprador.condiciones_pago ? `<div class="col-span-2 flex items-center gap-4">${Icons.dinero()} <strong>Condiciones pago:</strong> ${comprador.condiciones_pago}</div>` : ''}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-15 text-xs text-gray-500 uppercase font-800 tracking-wider bg-dark p-14 rounded-sm border border-222">
+              ${comprador.nif_cif ? `<div class="flex items-center gap-6">${Icons.documento()} <span class="text-aaa">NIF:</span> <strong class="text-white">${comprador.nif_cif}</strong></div>` : ''}
+              ${comprador.telefono ? `<div class="flex items-center gap-6">${Icons.info()} <span class="text-aaa">TEL:</span> <strong class="text-white">${comprador.telefono}</strong></div>` : ''}
+              ${comprador.email ? `<div class="flex items-center gap-6 lowercase">${Icons.enlace()} <span class="text-aaa uppercase">EMAIL:</span> <strong class="text-white">${comprador.email}</strong></div>` : ''}
+              ${comprador.ciudad ? `<div class="flex items-center gap-6">${Icons.zonas()} <span class="text-aaa">UBICACIÓN:</span> <strong class="text-white">${comprador.ciudad.toUpperCase()}${comprador.provincia ? ' ('+comprador.provincia.toUpperCase()+')' : ''}</strong></div>` : ''}
+              ${comprador.condiciones_pago ? `<div class="col-span-full flex items-center gap-6 mt-4 border-top-222 pt-8">${Icons.dinero()} <span class="text-aaa">PAGO:</span> <strong class="text-white">${comprador.condiciones_pago.toUpperCase()}</strong></div>` : ''}
+              ${comprador.rega ? `<div class="col-span-full flex items-center gap-6 text-gold font-900">${Icons.informeRega()} <span class="text-aaa">REGA DESTINO:</span> ${comprador.rega}</div>` : ''}
             </div>
           </div>
 
           <!-- KPIS -->
-          <div class="grid grid-cols-3 gap-8 mb-14">
-            <div class="card p-12 text-center mb-0">
-              <div class="kpi-label">Ventas Carne</div>
-              <div class="kpi-value text-red">${resumen.total_ventas_carne}</div>
-              <div class="kpi-sub">${resumen.peso_canal_total.toLocaleString()} kg</div>
+          <div class="grid grid-cols-3 gap-8 mb-16">
+            <div class="summary-cell summary-cell-kpi border-left-red">
+              <small class="s-lbl uppercase font-900">CARNE</small>
+              <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} KG</small>
             </div>
-            <div class="card p-12 text-center mb-0">
-              <div class="kpi-label">Entregas Leche</div>
-              <div class="kpi-value text-amber">${resumen.total_entregas_leche}</div>
-              <div class="kpi-sub">${resumen.litros_totales.toLocaleString()} L</div>
+            <div class="summary-cell summary-cell-kpi border-left-amber">
+              <small class="s-lbl uppercase font-900">LECHE</small>
+              <div class="s-val inf-val-lg text-amber font-950">${resumen.total_entregas_leche}</div>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L</small>
             </div>
-            <div class="card p-12 text-center mb-0">
-              <div class="kpi-label">Contratos</div>
-              <div class="kpi-value text-violet">${contratos.length}</div>
-              <div class="kpi-sub">${resumen.contratos_activos} activos</div>
+            <div class="summary-cell summary-cell-kpi border-left-purple">
+              <small class="s-lbl uppercase font-900">CONTRATOS</small>
+              <div class="s-val inf-val-lg text-purple font-950">${contratos.length}</div>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.contratos_activos} ACTIVOS</small>
             </div>
           </div>
 
           <!-- Contratos activos -->
-          <div class="card p-16 mb-14 border-222">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">CONTRATOS</div>
-            <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <div class="card p-16 mb-16 border-222 bg-black">
+            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-16 flex items-center gap-8">
+                ${Icons.contratos()} CONTRATOS VIGENTES
+            </div>
+            <div class="grid grid-cols-1 gap-10 max-w-240 mx-auto mb-20">
               <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContrato(${id})">
                 ${Icons.agregar()}
-                <span class="widget-link-label">Añadir Contrato</span>
+                <span class="widget-link-label">NUEVO CONTRATO</span>
               </button>
             </div>
-            ${contratos.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin contratos registrados.</p></div>' :
+            <div class="grid gap-8">
+            ${contratos.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin contratos registrados.</p></div>' :
               contratos.map(c => `
-                <div class="info-box-sm mb-6" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:3px solid ${c.activo ? '#10b981' : '#555'};">
-                  <div class="flex justify-between">
-                    <span class="text-white font-bold text-85">${c.numero_contrato}</span>
-                    <span class="text-xs" style="padding:2px 8px; border-radius:6px; background:${c.activo ? 'rgba(16,185,129,0.15)' : 'rgba(85,85,85,0.15)'}; color:${c.activo ? '#10b981' : '#888'};">${c.activo ? 'Activo' : 'Inactivo'}</span>
+                <div class="info-box-sm mb-4 bg-dark border border-222" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:4px solid ${c.activo ? '#10b981' : '#444'};">
+                  <div class="flex justify-between items-center">
+                    <span class="text-white font-950 text-md uppercase tracking-tight">${c.numero_contrato}</span>
+                    <span class="badge" style="font-size:0.55rem; background:${c.activo ? '#10b98120' : '#222'}; color:${c.activo ? '#10b981' : '#666'}; border:1px solid ${c.activo ? '#10b98140' : '#333'}; border-radius:30px; padding:2px 8px; font-weight:950; text-transform:uppercase;">${c.activo ? 'ACTIVO' : 'INACTIVO'}</span>
                   </div>
-                  <div class="text-gray text-xs mt-4">
-                    ${c.tipo || 'carne'} · ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString() : '?'} ${c.fecha_fin ? '→ '+new Date(c.fecha_fin).toLocaleDateString() : ''}
-                    ${c.precios?.length ? ' · '+c.precios.length+' precio(s)' : ''}
+                  <div class="text-aaa font-800 text-[0.62rem] uppercase mt-4 tracking-wide flex flex-wrap gap-x-10 gap-y-2">
+                    <span class="flex items-center gap-4 text-blue">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()} ${c.tipo}</span>
+                    <span class="flex items-center gap-4">${Icons.calendar()} ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString() : '?'} ${c.fecha_fin ? '→ '+new Date(c.fecha_fin).toLocaleDateString() : ''}</span>
+                    ${c.precios?.length ? `<span class="flex items-center gap-4 text-gold">${Icons.dinero()} ${c.precios.length} PRECIOS</span>` : ''}
                   </div>
                 </div>
               `).join('')}
+            </div>
           </div>
 
           <!-- Historial de Ventas Carne -->
-          <div class="card p-16 mb-14">
-            <h3 class="section-h3 flex items-center gap-8">${Icons.carne()} Historial de Ventas (Carne)</h3>
-            ${ventasCarne.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin ventas registradas.</p></div>' :
+          <div class="card p-16 mb-16 border-222 bg-black">
+            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
+                ${Icons.carne()} HISTORIAL CARNE
+            </div>
+            ${ventasCarne.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas.</p></div>' :
               ventasCarne.slice(0, 30).map(v => `
-                <div class="history-row">
+                <div class="history-row border-bottom-222 py-12">
                   <div>
-                    <div class="history-title uppercase font-800">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
-                    <div class="history-sub uppercase font-700 text-75">${v.pesoCanal || 0} kg · REND: ${v.rendimientoCanal || 0}%</div>
+                    <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
+                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${v.pesoCanal || 0} KG CANAL · REND: <strong class="text-white">${v.rendimientoCanal || 0}%</strong></div>
                   </div>
                   <div class="text-right">
-                    <div class="history-amount text-red">${(v.precio_total || (v.pesoCanal || 0) * 5.5).toFixed(0)} €</div>
-                    <div class="kpi-sub uppercase font-700 text-[0.62rem]">${v.clasificacion?.seurop || 'S/C'}</div>
+                    <div class="text-red font-950 text-md">${(v.precio_total || (v.pesoCanal || 0) * 5.5).toLocaleString()} €</div>
+                    <div class="badge badge-sm mt-2 uppercase font-950 text-[0.55rem] border-red-900 bg-red-900-opacity-20">${v.clasificacion?.seurop || 'S/C'}</div>
                   </div>
                 </div>
               `).join('')}
-            ${ventasCarne.length > 30 ? `<div class="history-more text-center uppercase font-800 text-75 mt-10">Mostrando 30 de ${ventasCarne.length} registros</div>` : ''}
+            ${ventasCarne.length > 30 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 30 de ${ventasCarne.length} registros</div>` : ''}
           </div>
 
           <!-- Historial de Leche -->
-          <div class="card p-16 mb-14">
-            <h3 class="section-h3 flex items-center gap-8">${Icons.leche()} Historial de Entregas (Leche)</h3>
-            ${entregasLeche.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin entregas registradas.</p></div>' :
+          <div class="card p-16 mb-20 border-222 bg-black">
+            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
+                ${Icons.leche()} HISTORIAL LECHE
+            </div>
+            ${entregasLeche.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin entregas registradas.</p></div>' :
               entregasLeche.slice(0, 20).map(e => `
-                <div class="history-row">
+                <div class="history-row border-bottom-222 py-12">
                   <div>
-                    <div class="history-title uppercase font-800">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
-                    <div class="history-sub uppercase font-700 text-75">${e.matriculaCisterna || 'S/N'}</div>
+                    <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
+                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${Icons.transportistas()} CISTERNA: <strong class="text-white">${e.matriculaCisterna || 'S/N'}</strong></div>
                   </div>
                   <div class="text-right">
-                    <div class="history-amount text-amber">${(e.cantidad || 0).toLocaleString()} L</div>
-                    <div class="kpi-sub uppercase font-700 text-[0.62rem]">${e.precio_final_unitario ? (e.precio_final_unitario).toFixed(3)+' €/L' : ''}</div>
+                    <div class="text-amber font-950 text-md">${(e.cantidad || 0).toLocaleString()} L</div>
+                    ${e.precio_final_unitario ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">${(e.precio_final_unitario).toFixed(3)} €/L</div>` : ''}
                   </div>
                 </div>
               `).join('')}
-            ${entregasLeche.length > 20 ? `<div class="history-more text-center uppercase font-800 text-75 mt-10">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
+            ${entregasLeche.length > 20 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
           </div>
 
           ${comprador.notas ? `
-          <div class="card p-16 mb-14">
-            <h3 class="section-h3 flex items-center gap-8">${Icons.documento()} Notas</h3>
-            <p class="text-sm text-aaa m-0">${comprador.notas}</p>
-          </div>` : ''}
+          <div class="card card-accent card-accent-gold p-16 mb-40">
+            <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
+            <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${comprador.notas}</p>
+          </div>` : '<div class="pb-40"></div>'}
         `;
     },
 

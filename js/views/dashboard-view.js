@@ -205,12 +205,12 @@ const DashboardView = {
             <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : 'amber'}">
               <div class="flex justify-between items-start">
                 <div>
-                  <div class="text-white font-bold text-base">${a.medicamento}</div>
-                  <div class="text-gray text-xs mt-4">📦 ${a.rebanoNombre || 'Rebaño desconocido'}</div>
+                  <div class="text-white font-bold text-base uppercase">${a.medicamento}</div>
+                  <div class="text-gray text-[0.6rem] mt-4 uppercase font-800 tracking-wider">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
                 </div>
                 <div class="text-right">
-                  <div class="text-red font-black text-lg">${a.diasRestantes}d</div>
-                  <div class="text-gray-500 text-xs uppercase">Supresión</div>
+                  <div class="text-red font-950 text-xl">${a.diasRestantes}D</div>
+                  <div class="text-gray-500 text-[0.55rem] uppercase font-900 tracking-widest">Supresión</div>
                 </div>
               </div>
             </div>
@@ -232,10 +232,10 @@ const DashboardView = {
             <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : 'amber'}">
               <div class="flex justify-between items-center">
                 <div>
-                  <div class="text-white font-bold text-base">${a.crotal}</div>
-                  <div class="text-gray text-xs mt-4">${a.mensaje}</div>
+                  <div class="text-white font-950 text-base uppercase tracking-tight">${a.crotal}</div>
+                  <div class="text-gray text-[0.6rem] mt-4 uppercase font-800 tracking-wider">${a.mensaje}</div>
                 </div>
-                <div class="text-xl">${a.urgencia === 'rojo' ? '🚨' : '⏳'}</div>
+                <div class="text-xl" style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
               </div>
             </div>
           `).join('')}
@@ -265,14 +265,14 @@ const DashboardView = {
                 <div class="flex items-center gap-8">
                   <span class="text-purple">${iconoSVG}</span>
                   <div>
-                    <div class="text-white font-bold text-base">${a.mensaje}</div>
-                    ${a.accion ? `<div class="text-violet text-xs mt-4">💡 ${a.accion}</div>` : ''}
+                    <div class="text-white font-bold text-base uppercase">${a.mensaje}</div>
+                    ${a.accion ? `<div class="text-violet text-[0.65rem] mt-4 uppercase font-800 tracking-wider flex items-center gap-4">${Icons.info()} ${a.accion}</div>` : ''}
                   </div>
                 </div>
                 ${a.diasRestantes != null ? `<div class="text-right">
-                  <div class="text-red font-black text-lg">${a.diasRestantes}d</div>
-                  <div class="text-gray-500 text-xs uppercase">Restantes</div>
-                </div>` : `<div class="text-xl">${a.urgencia === 'rojo' ? '🚨' : '⏳'}</div>`}
+                  <div class="text-red font-950 text-xl">${a.diasRestantes}D</div>
+                  <div class="text-gray-500 text-[0.55rem] uppercase font-900 tracking-widest">Restantes</div>
+                </div>` : `<div class="text-xl" style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
               </div>
             </div>`;
           }).join('')}
@@ -458,10 +458,10 @@ const DashboardView = {
             <div class="text-2xl font-black" style="color:${kpiColor};">
               ${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}
             </div>
-            <div class="kpi-sub">
-              ${totalHembras} ♀ · ${litros7d.toFixed(0)} L/7d
-              ${litrosPorOveja != null && litrosPorOveja < 1.0 ? '<span class="text-amber"> · bajo</span>' : ''}
-              ${litrosPorOveja != null && litrosPorOveja >= 1.5 ? '<span class="text-green"> · óptimo ✓</span>' : ''}
+            <div class="kpi-sub uppercase font-800 text-[0.55rem] tracking-tighter">
+              ${totalHembras} ♀ · <span class="text-white">${litros7d.toFixed(0)} L/7d</span>
+              ${litrosPorOveja != null && litrosPorOveja < 1.0 ? '<span class="text-amber"> · BAJO</span>' : ''}
+              ${litrosPorOveja != null && litrosPorOveja >= 1.5 ? `<span class="text-green flex items-center gap-4"> · ÓPTIMO ${Icons.check()}</span>` : ''}
             </div>
           </div>
 
@@ -470,8 +470,8 @@ const DashboardView = {
             <div class="text-2xl font-black" style="color:${piensoColor};">
               ${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}
             </div>
-            <div class="kpi-sub">
-              ${eficienciaPienso != null ? 'g/L · ' + (eficienciaPienso <= 600 ? 'Excelente ✓' : eficienciaPienso <= 900 ? 'Revisar' : 'Alto') : 'Sin datos pienso'}
+            <div class="kpi-sub uppercase font-800 text-[0.55rem] tracking-tighter">
+              ${eficienciaPienso != null ? 'g/L · ' + (eficienciaPienso <= 600 ? `<span class="text-green">EXCELENTE ${Icons.check()}</span>` : 'Revisar') : 'Sin datos pienso'}
             </div>
           </div>
 

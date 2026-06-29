@@ -328,23 +328,23 @@ const LecheView = {
                   <div class="card card-animal" style="border-left:4px solid ${enSup ? '#ef4444' : '#8b5cf6'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-6">
-                          <span class="text-xl">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento}</h3>
+                        <div class="flex items-center gap-8">
+                          <span class="text-xl" style="color:${enSup ? '#ef4444' : '#3b82f6'}">${Icons.sanidad()}</span>
+                          <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
-                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                        <div class="flex flex-wrap gap-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
                           <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
-                          <span>Espera Leche: <strong>${s.tiempo_espera_leche_dias || 0} días</strong></span>
+                          <span>Espera Leche: <strong class="text-white bg-blue-900 px-4 rounded-sm">${s.tiempo_espera_leche_dias || 0} DÍAS</strong></span>
                         </div>
                       </div>
                       <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm" style="background:${enSup ? 'rgba(239,68,68,0.15)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}40;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(239,68,68,0.2)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
                   </div>`;
               }).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin tratamientos sanitarios registrados.</span></div>`
+            : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin tratamientos sanitarios registrados.</span></div>`
           }
         </div>
       </div>
@@ -360,11 +360,11 @@ const LecheView = {
       <div class="leche-entrega-card" style="--entrega-border-color:${esAlerta ? '#ef4444' : semaforo.color};" onclick="location.hash='/albaran-leche?id=${e.id}'">
         <div class="leche-entrega-content">
           <div class="leche-entrega-left">
-            <div>${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — ${(e.cantidad || 0).toLocaleString()} L</div>
-            <div class="text-xs text-gray mt-2">Cisterna: ${e.matriculaCisterna || '—'}</div>
+            <div class="text-white font-900 uppercase text-sm flex items-center gap-6">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — <span class="text-gold" style="font-size:1.1rem;">${(e.cantidad || 0).toLocaleString()}</span> <small class="text-aaa">L</small></div>
+            <div class="text-[0.65rem] text-gray uppercase font-800 mt-2 tracking-widest">Cisterna: <span class="text-white">${e.matriculaCisterna || '—'}</span></div>
           </div>
           <div class="text-right">
-            <span class="badge badge-sm" style="background:${esAlerta ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}; color:${esAlerta ? '#ef4444' : '#10b981'};">${e.estadoAnalitica || 'PENDIENTE'}</span>
+            <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.15)'}; color:${esAlerta ? '#ef4444' : '#10b981'}; border: 1px solid ${esAlerta ? '#ef4444' : '#10b981'}40;">${e.estadoAnalitica || 'PENDIENTE'}</span>
           </div>
         </div>
       </div>`;

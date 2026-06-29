@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 12;
+const DB_VERSION = 13;
 
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
@@ -16,6 +16,25 @@ async function initDB() {
     return await openDB(DB_NAME, DB_VERSION, {
         upgrade(db, oldVersion, newVersion, transaction) {
             console.log(`[DB] Upgrade: v${oldVersion} -> v${newVersion}`);
+
+            // ... (previous versions preserved)
+
+            // v13: Multi-ADSG y Costes de Referencia por Especie
+            if (oldVersion < 13) {
+                // ADSGs independientes (una finca puede tener varias)
+                if (!db.objectStoreNames.contains('adsgs')) {
+                    const store = db.createObjectStore('adsgs', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('codigo', 'codigo', { unique: true });
+                }
+
+                // Costes de referencia (alimentación estimada)
+                if (!db.objectStoreNames.contains('config_costes_referencia')) {
+                    const store = db.createObjectStore('config_costes_referencia', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('especie', 'especie');
+                }
+            }
 
             // v1: Estructura base
             if (oldVersion < 1) {

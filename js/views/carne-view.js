@@ -257,23 +257,23 @@ const CarneView = {
                 <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-6">
-                        <span class="text-xl">🐏</span>
+                      <div class="flex items-center gap-8">
+                        <span class="text-xl text-gold">${Icons.rebanos()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                       </div>
-                      <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                        <span>Especie: ${r.especie}</span>
+                      <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray font-800 uppercase">
+                        <span>Especie: <span class="text-ccc">${r.especie}</span></span>
                         <span>·</span>
-                        <span>Ubicación: ${r.zonaActual || 'Sin zona'}</span>
+                        <span>Ubicación: <span class="text-ccc">${r.zonaActual || 'Sin zona'}</span></span>
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
-                      <span class="text-xs text-777">Ver ficha ➔</span>
+                      <span class="badge badge-sm badge-gold block mb-4 font-950">${r.cantidad_animales || 0} CABEZAS</span>
+                      <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
                     </div>
                   </div>
                 </div>`).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin lotes de carne registrados.</span></div>`
+            : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin lotes de carne registrados.</span></div>`
           }
         </div>
       </div>
@@ -316,22 +316,22 @@ const CarneView = {
                 <div class="card card-animal border-4-left-green" onclick="App._abrirDetalleVentaCarne(${v.id})">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-6">
-                        <span class="text-xl">📄</span>
-                        <h3 class="section-h3 m-0 text-ellipsis">${v.numero_albaran || 'Albarán'} · ${v.razonSocial || 'Matadero'}</h3>
+                      <div class="flex items-center gap-8">
+                        <span class="text-xl text-green">${Icons.documento()}</span>
+                        <h3 class="section-h3 m-0 text-ellipsis">${v.numero_albaran || 'ALBARÁN'} · ${v.razonSocial || 'MATADERO'}</h3>
                       </div>
-                      <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                      <div class="flex flex-wrap gap-4 mt-4 text-[0.65rem] text-gray font-800 uppercase">
                         <span>📅 ${this._fmtFecha(v.fechaSacrificio)}</span>
                         <span>·</span>
-                        <span>Rend: ${v.rendimientoCanal || 0}% · Clasif: ${v.clasificacionCanal || 'N/D'}</span>
+                        <span>Rend: <span class="text-green font-900">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm text-green font-bold text-lg badge-green-outline block">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
+                      <span class="badge badge-sm text-green font-black text-lg badge-green-outline block">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
                     </div>
                   </div>
                 </div>`).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin albaranes de matadero registrados.</span></div>`
+            : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin albaranes de matadero registrados.</span></div>`
           }
         </div>
       </div>
@@ -393,23 +393,23 @@ const CarneView = {
                   <div class="card card-animal" style="border-left:4px solid ${enSup ? '#ef4444' : '#8b5cf6'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-6">
-                          <span class="text-xl">💉</span>
-                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento}</h3>
+                        <div class="flex items-center gap-8">
+                          <span class="text-xl" style="color:${enSup ? '#ef4444' : '#8b5cf6'}">${Icons.sanidad()}</span>
+                          <h3 class="section-h3 m-0 text-ellipsis uppercase font-900">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
-                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                          <span>📅 ${this._fmtFecha(s.fecha)}</span>
+                        <div class="flex flex-wrap gap-6 mt-6 text-[0.65rem] text-gray font-800 uppercase tracking-tight">
+                          <span class="flex items-center gap-4">📅 ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
-                          <span>Espera Carne: <strong>${s.tiempo_espera_carne_dias || 0} días</strong></span>
+                          <span>Espera Carne: <strong class="text-white bg-red-900 px-4 rounded-sm">${s.tiempo_espera_carne_dias || 0} DÍAS</strong></span>
                         </div>
                       </div>
                       <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm" style="background:${enSup ? 'rgba(239,68,68,0.15)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}40;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(239,68,68,0.2)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
                   </div>`;
               }).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin tratamientos sanitarios registrados.</span></div>`
+            : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin tratamientos sanitarios registrados.</span></div>`
           }
         </div>
       </div>
