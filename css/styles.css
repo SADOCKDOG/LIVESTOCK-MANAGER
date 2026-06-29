@@ -3105,9 +3105,7 @@ body[data-tema="red"]    { --p-gold: #ef4444; --p-gold-dark: #b91c1c; --p-cork: 
 .card-total-3d { box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transform: perspective(800px) rotateX(0.5deg); }
 
 /* === Ocultar contextos por preferencia === */
-body.hide-context .text-center.mt-8,
-body.hide-context .text-left.mt-6,
-body.hide-context .text-right,
+body.hide-context .mt-4,
 body.hide-context .pt-8.border-top-222 { display: none !important; }
 body.hide-context .card-dark-gradient.compact { padding-bottom: 12px !important; }
 body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }

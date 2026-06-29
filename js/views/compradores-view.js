@@ -104,7 +104,7 @@ const CompradoresView = {
                     <span class="widget-link-label">Nuevo Comprador</span>
                   </button>
                 </div>
-                <div class="text-right mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.compradores()} Registro y gestión de compradores por tipo de producción</span></div>
+                <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.compradores()} Registro y gestión de compradores por tipo de producción</span></div>
               </div>
 
               <div class="flex gap-8 mb-14">
@@ -132,7 +132,7 @@ const CompradoresView = {
                     <span class="widget-link-label">Nuevo Contrato</span>
                   </button>
                 </div>
-                <div class="text-right mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.contratos()} Creación y gestión de contratos comerciales y acuerdos de compra</span></div>
+                <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.contratos()} Creación y gestión de contratos comerciales y acuerdos de compra</span></div>
               </div>
 
               <div class="flex gap-8 mb-14">
@@ -732,6 +732,7 @@ const CompradoresView = {
 };
 
 window.CompradoresView = CompradoresView;
+
 
 
 
