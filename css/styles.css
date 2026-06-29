@@ -3064,6 +3064,20 @@ label {
     text-transform: uppercase;
 }
 
+/* === Botones modo-specific (carne/leche/hibrido) === */
+.btn-create--carne  { background: linear-gradient(135deg, var(--c-danger) 0%, #991b1b 100%) !important; color: #fff !important; border: none !important; }
+.btn-create--leche  { background: linear-gradient(135deg, var(--c-info) 0%, #1d4ed8 100%) !important; color: #fff !important; border: none !important; }
+.btn-create--hibrido { background: linear-gradient(135deg, var(--c-success) 0%, #059669 100%) !important; color: #fff !important; border: none !important; }
+.btn-tratamiento--carne   { background: var(--c-danger) !important; border-color: var(--c-danger) !important; color: #fff !important; }
+.btn-tratamiento--leche   { background: var(--c-info) !important; border-color: var(--c-info) !important; color: #fff !important; }
+.btn-tratamiento--hibrido { background: var(--c-success) !important; border-color: var(--c-success) !important; color: #fff !important; }
+.wizard-btn-mode--carne   { background: linear-gradient(135deg, var(--c-danger) 0%, #991b1b 100%) !important; color: #fff !important; border-color: transparent !important; }
+.wizard-btn-mode--leche   { background: linear-gradient(135deg, var(--c-info) 0%, #1d4ed8 100%) !important; color: #fff !important; border-color: transparent !important; }
+.wizard-btn-mode--hibrido { background: linear-gradient(135deg, var(--c-success) 0%, #059669 100%) !important; color: #fff !important; border-color: transparent !important; }
+.border-top-mode--carne   { border-top: 5px solid var(--c-danger); }
+.border-top-mode--leche   { border-top: 5px solid var(--c-info); }
+.border-top-mode--hibrido { border-top: 5px solid var(--c-success); }
+
 /* === UI/UX fixes for GanaderiaView === */
 .section-header-neon--modules { --neon-color: #facc15; }
 .max-w-360 { max-width: 360px; }

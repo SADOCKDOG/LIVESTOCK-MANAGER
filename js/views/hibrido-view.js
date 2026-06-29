@@ -353,7 +353,7 @@ const HibridoView = {
               <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
             </div>
           </div>
-          <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="HibridoView._abrirAsistenteTratamientoMix()">
+          <button class="btn btn-secondary btn-sm btn-tratamiento--hibrido" onclick="HibridoView._abrirAsistenteTratamientoMix()">
             ${Icons.agregar()} Registrar Tratamiento
           </button>
         </div>
@@ -421,7 +421,7 @@ const HibridoView = {
         overlay.style.alignItems = "center";
         overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
         overlay.innerHTML = `
-            <div class="card p-25" style="max-width:420px; border-top:5px solid #3b82f6;">
+            <div class="card p-25 border-top-mode--hibrido" style="max-width:420px;">
                 <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
                 <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -442,7 +442,7 @@ const HibridoView = {
                 </div>
 
                 <div class="flex gap-10 mt-20">
-                    <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                    <button class="wizard-btn-action wizard-btn-mode--hibrido flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                     <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
                 </div>
                 <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
@@ -498,14 +498,14 @@ const HibridoView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; border-top:5px solid #d97706;">
+      <div class="card p-25 border-top-mode--hibrido" style="max-width:380px;">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Veterinario</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanos.map(r => `<option value="${r.id}">${r.nombre} (${r.tipo} · ${r.especie})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-mode--hibrido flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>
