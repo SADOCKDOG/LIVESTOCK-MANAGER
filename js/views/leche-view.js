@@ -267,7 +267,7 @@ const LecheView = {
         ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
 
         <div class="text-center mb-12">
-          <button class="btn btn-create btn-sm" onclick="App._abrirWizardAlbaranLeche()">
+          <button class="btn btn-create--leche btn-sm" onclick="App._abrirWizardAlbaranLeche()">
             ${Icons.agregar()} Nueva Entrega (Cisterna)
           </button>
         </div>
@@ -306,7 +306,7 @@ const LecheView = {
         ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
 
         <div class="text-center mb-12">
-          <button class="btn btn-secondary btn-sm btn--purple w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
+          <button class="btn btn-secondary btn-sm btn-tratamiento--leche w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
             ${Icons.sanidad()} Registrar Tratamiento
           </button>
         </div>
@@ -403,7 +403,7 @@ const LecheView = {
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-mode--leche flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
@@ -458,14 +458,14 @@ const LecheView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; border-top:5px solid #fbbf24;">
+      <div class="card p-25 border-top-mode--leche" style="max-width:380px;">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Lácteo</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño lechero a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-mode--leche flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>
