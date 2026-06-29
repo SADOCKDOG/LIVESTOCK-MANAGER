@@ -3091,6 +3091,9 @@ label {
     text-transform: uppercase;
 }
 
+/* === Card efecto 3D para totales/balances === */
+.card-total-3d { box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transform: perspective(800px) rotateX(0.5deg); }
+
 /* === Botones modo-specific (carne/leche/hibrido) === */
 .btn-create--carne  { background: linear-gradient(135deg, var(--c-danger) 0%, #991b1b 100%) !important; color: #fff !important; border: none !important; }
 .btn-create--leche  { background: linear-gradient(135deg, var(--c-info) 0%, #1d4ed8 100%) !important; color: #fff !important; border: none !important; }
