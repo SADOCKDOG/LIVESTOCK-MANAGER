@@ -26,7 +26,7 @@
     adsg_vet_nif: '44123456D',
     provincia: 'Huelva',
     municipio: 'Almonte',
-    comunidad_autonoma: 'Andalucía',
+    comunidad_autonoma: 'andalucia',
     tipo_explotacion: 'Mixto',
     sistema_explotacion: 'Semiextensivo',
     zonas: [
@@ -157,9 +157,9 @@
 
       // 5. Compradores
       var compDefs = [
-        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765431', tipo_comprador: 'cárnico', tipo_operador: 'matadero', rega: 'ES061234000456', comunidad_autonoma: 'Extremadura', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz', activo: true },
-        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654323', tipo_comprador: 'láctico', tipo_operador: 'quesería', rega: 'ES061234000789', comunidad_autonoma: 'Extremadura', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz', activo: true },
-        { nombre: 'Ganados del Oeste SL', nif_cif: 'B76543214', tipo_comprador: 'híbrido', tipo_operador: 'intermediario', rega: 'ES061234001012', comunidad_autonoma: 'Extremadura', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres', activo: true }
+        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765431', tipo_comprador: 'cárnico', tipo_operador: 'matadero', rega: 'ES061234000456', comunidad_autonoma: 'extremadura', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz', activo: true },
+        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654323', tipo_comprador: 'láctico', tipo_operador: 'quesería', rega: 'ES061234000789', comunidad_autonoma: 'extremadura', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz', activo: true },
+        { nombre: 'Ganados del Oeste SL', nif_cif: 'B76543214', tipo_comprador: 'híbrido', tipo_operador: 'intermediario', rega: 'ES061234001012', comunidad_autonoma: 'extremadura', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres', activo: true }
       ];
       var comps = [];
       for (var c = 0; c < compDefs.length; c++) {
@@ -173,9 +173,9 @@
 
       // 6. Proveedores
       var provDefs = [
-        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432106', tipo_operador: 'fabricante_pienso', rega: 'ES061234001345', comunidad_autonoma: 'Extremadura', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'], activo: true },
-        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321096', tipo_operador: 'veterinario', rega: 'ES061234001678', comunidad_autonoma: 'Extremadura', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'], activo: true },
-        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210988', tipo_operador: 'proveedor_equipos', rega: 'ES061234002011', comunidad_autonoma: 'Extremadura', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'], activo: true }
+        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432106', tipo_operador: 'fabricante_pienso', rega: 'ES061234001345', comunidad_autonoma: 'extremadura', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'], activo: true },
+        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321096', tipo_operador: 'veterinario', rega: 'ES061234001678', comunidad_autonoma: 'extremadura', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'], activo: true },
+        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210988', tipo_operador: 'proveedor_equipos', rega: 'ES061234002011', comunidad_autonoma: 'extremadura', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'], activo: true }
       ];
       var provs = [];
       for (var pv = 0; pv < provDefs.length; pv++) {
