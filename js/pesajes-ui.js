@@ -139,9 +139,9 @@ const PesajesUI = {
                         </select>
                     </div>
                     ` : `
-                    <div class="bg-black border border-222 p-12 rounded-sm grid grid-cols-2 gap-10">
-                        <div><span class="text-gray uppercase font-800 text-[0.6rem]">${Icons.zonas()} ZONA ACTUAL:</span><br><span class="text-white font-900 text-sm uppercase">${rebano ? (rebano.zonaActual || 'FINCA GENERAL') : 'FINCA GENERAL'}</span></div>
-                        <div><span class="text-gray uppercase font-800 text-[0.6rem]">${Icons.info()} TIPO LOTE:</span><br><span class="text-white font-900 text-sm uppercase">${rebano ? rebano.tipo : 'SIN CLASIFICAR'}</span></div>
+                    <div class="bg-black border border-222 p-10 rounded-sm grid grid-cols-2 gap-10">
+                        <div><span class="text-gray uppercase font-800 text-[0.55rem]">${Icons.zonas()} ZONA ACTUAL:</span><br><span class="text-white font-900 text-xs uppercase">${rebano ? (rebano.zonaActual || 'FINCA GENERAL') : 'FINCA GENERAL'}</span></div>
+                        <div><span class="text-gray uppercase font-800 text-[0.55rem]">${Icons.info()} TIPO LOTE:</span><br><span class="text-white font-900 text-xs uppercase">${rebano ? rebano.tipo : 'SIN CLASIFICAR'}</span></div>
                     </div>
                     `}
 
@@ -274,6 +274,16 @@ const PesajesUI = {
             };
 
             selectAnimal(0);
+
+            // AUTO-FOCUS: Poner foco en el input de peso al abrir
+            setTimeout(() => {
+                const giantInput = overlay.querySelector('#w-peso-gigante');
+                if (giantInput) {
+                    giantInput.focus();
+                    // En móviles, a veces se necesita un segundo intento tras el render completo
+                    setTimeout(() => giantInput.focus(), 300);
+                }
+            }, 500);
 
             // Lógica Bruto/Tara
             if (isLogistico) {
