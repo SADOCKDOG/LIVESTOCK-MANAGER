@@ -2743,7 +2743,9 @@ label {
 .kpi-card-fixed  { flex: 0 0 140px; min-width: 0; }
 
 /* nav shortcut buttons (dashboard) */
-.btn-nav-pad     { padding: 12px !important; font-size: 0.8rem !important; }
+.btn-nav-pad     { padding: 12px !important; font-size: 0.8rem !important; color: var(--p-gold) !important; }
+.btn-nav-pad svg { color: var(--p-gold) !important; }
+.dash-summary-icon { color: var(--p-gold); font-size: 0.7rem; font-weight: 800; }
 
 /* max-height scrollables */
 .mh-200          { max-height: 200px; overflow-y: auto; }
