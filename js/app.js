@@ -1,6 +1,6 @@
 /**
- * Livestock Manager - Application Controller v4.8.6
- * UI validada v4.8.6 + flujo Industrial Animals v4.8.6 integrado correctamente
+ * Livestock Manager - Application Controller v4.8.7
+ * UI validada v4.8.7 + flujo Industrial Animals v4.8.7 integrado correctamente
  * Fix: rebanoId preservado en _guardarAnimalDetalle (bug invisible en lista)
  */
 
@@ -37,6 +37,7 @@ const App = {
     "/cuaderno": "renderCuadernoDigital",
     "/documentos": "renderDocumentos",
     "/manuales": "renderManuales",
+    "/albaranes-ventas": "renderAlbaranesVentas",
   },
 
   async init() {
@@ -328,6 +329,7 @@ const App = {
       '/cuaderno': Icons.cuaderno(),
       '/documentos': Icons.documento(),
       '/manuales': Icons.libro(),
+      '/albaranes-ventas': Icons.comercial(),
     };
 
     if (titleEl) {
@@ -837,13 +839,16 @@ const App = {
         container.innerHTML = '<em class="text-333">Sin eventos reproductivos</em>';
         return;
       }
-      container.innerHTML = eventos.slice(0, 10).map(e =>
-        `<div class="flex justify-between text-xs py-3 row-border-dark">
-          <span class="text-gold">${e.fecha || '—'}</span>
-          <span class="text-ccc">${e.tipo_evento || e.tipo || 'Evento'}</span>
-          <span class="text-gray-500">${e.resultado || e.notas || ''}</span>
-        </div>`
-      ).join('');
+      container.innerHTML = eventos.slice(0, 10).map(e => {
+        const isPos = (e.resultado || '').toLowerCase() === 'positivo';
+        const isNeg = (e.resultado || '').toLowerCase() === 'negativo';
+        const colorRes = isPos ? 'text-green' : (isNeg ? 'text-red' : 'text-gray-500');
+        return `<div class="flex justify-between items-center text-xs py-4 row-border-dark">
+          <span class="text-gold flex items-center gap-4">${Icons.calendar()} ${e.fecha || '—'}</span>
+          <span class="text-ccc font-900 uppercase">${e.tipo_evento || e.tipo || 'Evento'}</span>
+          <span class="${colorRes} font-bold uppercase">${e.resultado || e.notas || ''}</span>
+        </div>`;
+      }).join('');
     } catch (e) {
       console.warn('[App] Error cargando historial reproductivo:', e);
       container.innerHTML = '<em class="text-red">Error al cargar historial</em>';
@@ -864,12 +869,13 @@ const App = {
         container.innerHTML = '<em class="text-333">Sin compañeros de rebaño</em>';
         return;
       }
-      container.innerHTML = companeros.map(a =>
-        `<div class="flex justify-between text-xs py-2">
-          <span class="text-ccc">${a.numero_identificacion || '#'.concat(a.id)}</span>
-          <span class="text-gray-500">${a.especie || ''} · ${a.peso_actual || '—'} kg</span>
-        </div>`
-      ).join('');
+      container.innerHTML = companeros.map(a => {
+        const colorEsp = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#888';
+        return `<div class="flex justify-between items-center text-xs py-4 row-border-dark">
+          <span class="text-ccc flex items-center gap-6"><span style="color:${colorEsp}">${Icons.animales()}</span> ${a.numero_identificacion || '#'.concat(a.id)}</span>
+          <span class="text-gray-600 font-900 uppercase text-[0.6rem] tracking-tighter">${a.especie || ''} · <strong class="text-white">${a.peso_actual || '—'} kg</strong></span>
+        </div>`;
+      }).join('');
     } catch (e) {
       console.warn('[App] Error cargando referencia rebaño:', e);
       container.innerHTML = '<em class="text-red">Error al cargar compañeros</em>';
@@ -1161,14 +1167,18 @@ const App = {
       overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
       overlay.innerHTML = `
         <div class="card w-full max-w-450 border-top-4-violet p-24 modal-scroll">
-          <div class="flex justify-between items-center mb-14">
-            <div class="font-900 text-white text-lg">🧬 Gestión Reproductiva</div>
+          <div class="flex justify-between items-center mb-16">
+            <div class="font-950 text-white text-lg uppercase tracking-widest flex items-center gap-10">
+                <span class="text-violet">${Icons.reproduccion()}</span> GESTIÓN REPRO
+            </div>
             <button onclick="this.closest('.card').parentElement.remove()" class="btn-overlay-close text-gray">✕</button>
           </div>
-          <div class="mb-12 text-ccc text-sm">Animal: <strong class="text-white">${animal.numero_identificacion || '#'.concat(animal.id)}</strong></div>
+          <div class="mb-16 text-ccc text-xs uppercase font-800 tracking-wider bg-black p-10 rounded-sm border border-222">
+            Animal: <strong class="text-white ml-4">${animal.numero_identificacion || '#'.concat(animal.id)}</strong>
+          </div>
           <div class="wizard-input-group">
             <label class="wizard-label">TIPO DE EVENTO</label>
-            <select id="wiz-repro-tipo" class="wizard-input wizard-select" onchange="App._onReproTipoChange(this.value)">
+            <select id="wiz-repro-tipo" class="wizard-input wizard-select font-900" onchange="App._onReproTipoChange(this.value)">
               <option value="Celo">Celo</option>
               <option value="Inseminación Artificial" selected>Inseminación Artificial</option>
               <option value="Monta Natural">Monta Natural</option>
@@ -1181,30 +1191,36 @@ const App = {
           </div>
           <div class="wizard-input-group">
             <label class="wizard-label">FECHA</label>
-            <input type="date" id="wiz-repro-fecha" class="wizard-input" value="${new Date().toISOString().split('T')[0]}">
+            <input type="date" id="wiz-repro-fecha" class="wizard-input font-800" value="${new Date().toISOString().split('T')[0]}">
           </div>
-          <div id="wiz-repro-parto" class="d-none">
+          <div id="wiz-repro-parto" class="d-none animate-in">
             <div class="grid grid-cols-2 gap-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">CRÍAS VIVAS</label>
-                <input type="number" id="wiz-repro-crias-vivas" class="wizard-input" min="0" max="10" value="1" oninput="App._renderCriasParto()">
+                <input type="number" id="wiz-repro-crias-vivas" class="wizard-input font-900 text-lg text-green" min="0" max="10" value="1" oninput="App._renderCriasParto()">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">CRÍAS MUERTAS</label>
-                <input type="number" id="wiz-repro-crias-muertas" class="wizard-input" min="0" max="10" value="0">
+                <input type="number" id="wiz-repro-crias-muertas" class="wizard-input font-900 text-lg text-red" min="0" max="10" value="0">
               </div>
             </div>
-            <div class="text-2xs text-gray mb-8">Cada cría viva se dará de alta en el censo con su crotal y vínculo a la madre.</div>
+            <div class="text-[0.6rem] text-aaa uppercase font-700 mb-10 leading-relaxed">Cada cría viva se dará de alta en el censo con su crotal y vínculo a la madre.</div>
             <div id="wiz-repro-crias-list"></div>
           </div>
           <div class="wizard-input-group">
             <label class="wizard-label">RESULTADO / NOTAS</label>
-            <input type="text" id="wiz-repro-notas" class="wizard-input" placeholder="Ej: Positivo, Negativo, Crias: 2, ...">
+            <input type="text" id="wiz-repro-notas" class="wizard-input uppercase font-700" placeholder="EJ: POSITIVO, NEGATIVO...">
           </div>
           <div id="wiz-repro-msg" class="d-none msg-feedback"></div>
-          <div class="mt-14 flex gap-10">
-            <button id="wiz-repro-guardar" class="btn btn-primary flex-1" onclick="App._guardarEventoReproduccion('${animalId}')">✔ Guardar</button>
-            <button class="btn btn-secondary" onclick="this.closest('[style]').remove()">Cancelar</button>
+          <div class="mt-20 flex gap-10">
+            <button id="wiz-repro-guardar" class="widget-link-btn widget-link-btn--neon neon-success flex-1" onclick="App._guardarEventoReproduccion('${animalId}')">
+                ${Icons.guardar()}
+                <span class="widget-link-label">GUARDAR</span>
+            </button>
+            <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="this.closest('[style]').remove()">
+                ${Icons.cerrar()}
+                <span class="widget-link-label">CANCELAR</span>
+            </button>
           </div>
         </div>`;
       document.body.appendChild(overlay);
@@ -1265,7 +1281,7 @@ const App = {
     el.style.background = ok ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
     el.style.color = ok ? '#10b981' : '#ef4444';
     el.style.border = `1px solid ${ok ? '#10b981' : '#ef4444'}`;
-    el.textContent = (ok ? '✔ ' : '❌ ') + msg;
+    el.innerHTML = `<div class="flex items-center gap-8 font-900 uppercase text-[0.65rem] tracking-wider">${ok ? Icons.check() : Icons.alerta()} ${msg}</div>`;
     el.style.display = 'block';
   },
 
@@ -1669,6 +1685,14 @@ const App = {
       await DocumentosView.render();
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Cargando módulo de documentos...</div>';
+    }
+  },
+
+  async renderAlbaranesVentas(params) {
+    if (window.AlbaranesVentasView) {
+      await AlbaranesVentasView.render(params);
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando historial de ventas...</div>';
     }
   },
 

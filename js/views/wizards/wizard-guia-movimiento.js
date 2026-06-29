@@ -5,7 +5,7 @@
  * dirigida a la plataforma de la comunidad (SIGGAN / BADIGEX / PIMA).
  */
 window.WizardGuiaMovimiento = {
-  async abrir() {
+  async abrir(borrador = null) {
     const finca = await Fincas.getActive();
     if (!finca) { App.toastError("No hay finca activa"); return; }
 
@@ -276,25 +276,26 @@ window.WizardGuiaMovimiento = {
       title: 'GUÍA DE MOVIMIENTO',
       steps: steps,
       initialData: {
-        tipo: 'salida',
-        motivo: motivos[0] ? motivos[0].value : '',
-        fecha: new Date().toISOString().split('T')[0],
-        rega_origen: regaPropia,
-        rega_destino: '',
-        explotacion_contraparte: '',
-        especie: '',
-        num_animales: 1,
-        crotales: [],
-        tipo_operador_destino: '',
-        transportistaId: '',
-        transportista_nombre: '',
-        matricula: '',
-        desinsectacion_certificada: false,
-        estado_tramite: 'borrador',
-        fecha_presentacion: '',
-        numero_registro_oficial: '',
-        acuse_recibo: '',
-        notas: '',
+        id: borrador ? borrador.id : undefined,
+        tipo: borrador ? borrador.tipo : 'salida',
+        motivo: borrador ? borrador.motivo : (motivos[0] ? motivos[0].value : ''),
+        fecha: borrador ? borrador.fecha : new Date().toISOString().split('T')[0],
+        rega_origen: borrador ? borrador.rega_origen : regaPropia,
+        rega_destino: borrador ? borrador.rega_destino : '',
+        explotacion_contraparte: borrador ? borrador.explotacion_contraparte : '',
+        especie: borrador ? borrador.especie : '',
+        num_animales: borrador ? borrador.num_animales : 1,
+        crotales: borrador ? borrador.crotales : [],
+        tipo_operador_destino: borrador ? borrador.tipo_operador_destino : '',
+        transportistaId: borrador ? borrador.transportistaId : '',
+        transportista_nombre: borrador ? borrador.transportista_nombre : '',
+        matricula: borrador ? borrador.matricula : '',
+        desinsectacion_certificada: borrador ? !!borrador.desinsectacion_certificada : false,
+        estado_tramite: borrador ? borrador.estado_tramite : 'borrador',
+        fecha_presentacion: borrador ? borrador.fecha_presentacion : '',
+        numero_registro_oficial: borrador ? borrador.numero_registro_oficial : '',
+        acuse_recibo: borrador ? borrador.acuse_recibo : '',
+        notas: borrador ? borrador.notas : '',
       },
       onComplete: async (data) => {
         try {
@@ -305,9 +306,10 @@ window.WizardGuiaMovimiento = {
             if (t) { transpNombre = t.nombre; matricula = matricula || t.matricula; }
           }
           const movId = await Movimientos.save({
+            id: data.id || undefined,
             fincaId: await Fincas.getActiveId(),
             tipo: data.tipo,
-            numero_guia: 'G-' + Date.now().toString().slice(-8),
+            numero_guia: borrador ? borrador.numero_guia : 'G-' + Date.now().toString().slice(-8),
             rega_origen: data.rega_origen,
             rega_destino: data.rega_destino,
             explotacion_contraparte: data.explotacion_contraparte,
@@ -341,7 +343,7 @@ window.WizardGuiaMovimiento = {
             plataforma: mov.plataforma || '',
             created_at: new Date().toISOString(),
           }).catch(() => {});
-          App.toast("Guía de movimiento registrada ✅");
+          App.toast("Guía de movimiento registrada " + Icons.check());
           WizardGuiaMovimiento.generarDocumento(finca, mov);
         } catch (e) {
           App.toastError(e.message || 'No se pudo registrar el movimiento');
@@ -417,15 +419,30 @@ window.WizardGuiaMovimiento = {
           <div style="text-align:right;"><p>Emitida: <strong>${new Date().toLocaleDateString()}</strong></p></div>
         </div>
       </div>
-      <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;flex-shrink:0;">
-        <button class="btn btn-primary" id="btn-guia-print" style="width:auto;padding:0 30px;background:#10b981;">🖨 IMPRIMIR / GUARDAR PDF</button>
+      <div style="text-align:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;flex-shrink:0;">
+        <button class="btn btn-primary" id="btn-guia-print" style="width:auto;padding:0 30px;background:#10b981;">${Icons.exportar()} IMPRIMIR / GUARDAR PDF</button>
         <button class="btn btn-secondary" onclick="document.getElementById('guia-mov-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
       </div>`;
-    document.body.appendChild(overlay);
-
-    overlay.querySelector('#btn-guia-print').onclick = () => {
+    document.body.appendChild(overlay);    overlay.querySelector('#btn-guia-print').onclick = async () => {
       const el = document.getElementById(contentId);
       const filename = `Guia_Movimiento_${mov.numero_guia}.pdf`;
+
+      if (window.InformesView && window.InformesView._exportarConCompartir) {
+          await window.InformesView._exportarConCompartir(
+            async () => {
+              const opt = {
+                margin: [12, 10, 12, 10], filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+              };
+              return await html2pdf().set(opt).from(el).toPdf().output('blob');
+            },
+            'Guía de Movimiento', filename, 'application/pdf', 'guia_movimiento'
+          );
+          return;
+      }
+
       if (typeof html2pdf !== 'undefined') {
         const opt = {
           margin: [12, 10, 12, 10], filename,

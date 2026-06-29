@@ -1,9 +1,9 @@
-﻿/**
+/**
  * Wizard Pedido de Crotales — generación de documento oficial ADSG
  * Extraído de app.js para modularización
  */
 window.WizardCrotales = {
-  async abrirPedido() {
+  async abrirPedido(borrador = null) {
     const finca = await Fincas.getActive();
     if (!finca) { App.toastError("No hay finca activa"); return; }
 
@@ -116,20 +116,34 @@ window.WizardCrotales = {
       id: 'wizard-pedido-crotales',
       title: 'PEDIDO OFICIAL CROTALES',
       initialData: {
-        tipo: "Bandera + Botón (EID)",
-        especie: especiesPedido[0] || "Ovino",
-        cantidad: 50,
-        adsg_nombre: finca.adsg_nombre || "",
-        adsg_codigo: finca.adsg_codigo || "",
-        adsg_veterinario: finca.adsg_veterinario || "",
-        adsg_vet_colegiado: finca.adsg_vet_colegiado || "",
-        adsg_vet_nif: finca.adsg_vet_nif || "",
+        id: borrador ? borrador.id : undefined,
+        tipo: borrador ? borrador.tipo : "Bandera + Botón (EID)",
+        especie: borrador ? borrador.especie : (especiesPedido[0] || "Ovino"),
+        cantidad: borrador ? borrador.cantidad : 50,
+        adsg_nombre: borrador ? borrador.adsg_nombre : (finca.adsg_nombre || ""),
+        adsg_codigo: borrador ? borrador.adsg_codigo : (finca.adsg_codigo || ""),
+        adsg_veterinario: borrador ? borrador.adsg_veterinario : (finca.adsg_veterinario || ""),
+        adsg_vet_colegiado: borrador ? borrador.adsg_vet_colegiado : (finca.adsg_vet_colegiado || ""),
+        adsg_vet_nif: borrador ? borrador.adsg_vet_nif : (finca.adsg_vet_nif || ""),
       },
       steps: wizardSteps,
       onComplete: async (data) => {
+        console.log("[wizard-crotales] onComplete iniciado", data);
         try {
-          // Gap 10: Guardar pedido en BD ANTES de generar PDF
+          if (!window.db) {
+            alert("Error: Base de datos no disponible. Por favor, reinicia la aplicación.");
+            return;
+          }
+
+          if (!window.db.objectStoreNames.contains('pedidos_crotales')) {
+             alert("El sistema de pedidos requiere una actualización de base de datos (v12). Por favor, cierra y abre la aplicación.");
+             return;
+          }
+
+          App.toast("Guardando pedido...");
+          // Guardar pedido en BD ANTES de generar PDF
           const pedidoId = await PedidosCrotales.save({
+            id: data.id || undefined,
             fincaId: finca.id,
             especie: data.especie,
             tipo: data.tipo,
@@ -139,17 +153,21 @@ window.WizardCrotales = {
             adsg_veterinario: data.adsg_veterinario || '',
             adsg_vet_colegiado: data.adsg_vet_colegiado || '',
             adsg_vet_nif: data.adsg_vet_nif || '',
-            estado: 'pendiente',  // Estado inicial
-            fecha_pedido: new Date().toISOString(),
+            estado: 'pendiente',  // Al finalizar pasa a pendiente
+            fecha_pedido: borrador ? borrador.fecha_pedido : new Date().toISOString(),
           });
+
           console.log(`[wizard-crotales] Pedido guardado en BD: id=${pedidoId}`);
           App.toast(`✅ Pedido guardado (nº ${pedidoId})`);
           
           // Generar PDF DESPUÉS de persistir
           await WizardCrotales.generarPDF(finca, data, pedidoId);
         } catch (e) {
-          console.error('[wizard-crotales] Error al guardar pedido:', e.message);
-          App.toastError(`Error al guardar pedido: ${e.message}`);
+          console.error('[wizard-crotales] Error al completar pedido:', e);
+          alert("Error al procesar el pedido: " + e.message);
+
+          // Fallback: Si el guardado falla, intentar al menos generar el PDF para que no se pierda el trámite
+          await WizardCrotales.generarPDF(finca, data, "TEMP-" + Date.now());
         }
       }
     });
@@ -227,24 +245,19 @@ window.WizardCrotales = {
 
               <div style="padding:20px; border:1px solid #ccc; background:#f9f9f9; font-size:0.85rem;">
                   <p style="margin-top:0;"><strong>DECLARACIÓN:</strong><br>
-                  El abajo firmante solicita la asignación y fabricación de los medios de identificación arriba descritos para los animales de su explotación, comprometiéndose a su correcta colocación y posterior comunicación a la base de datos oficial (${plataforma}) en los plazos legalmente establecidos por el Real Decreto 787/2023 y el Real Decreto 1307/2024.</p>
-              </div>
-
-              <div style="margin-top:60px; display:flex; justify-content:space-between; align-items:flex-end;">
-                  <div style="text-align:center; width:250px;">
-                      <p style="margin-bottom:60px; color:#555;">Firma del Titular:</p>
-                      <div style="border-top:1px solid #000; padding-top:5px; font-weight:bold;">${finca.propietario || finca.nombre}</div>
-                  </div>
-                  <div style="text-align:right;">
-                      <p>Fecha de Solicitud: <strong>${new Date().toLocaleDateString()}</strong></p>
+                  Por la presente, el titular de la explotación declara conocer la normativa vigente en materia de identificación animal y solicita la expedición de los crotales arriba indicados.
+                  </p>
+                  <div style="display:flex; justify-content:space-between; margin-top:40px;">
+                    <div style="text-align:center; border-top:1px solid #000; width:40%;">Firma del Titular</div>
+                    <div style="text-align:center; border-top:1px solid #000; width:40%;">Fecha: ${new Date().toLocaleDateString()}</div>
                   </div>
               </div>
           </div>
-          <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
+          <div style="text-align:center; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
               <button class="btn btn-primary" id="btn-descargar-adsg" style="width:auto; padding:0 30px; background:#10b981;">${Icons.exportar()} DESCARGAR O ENVIAR</button>
               <button class="btn btn-secondary" onclick="document.getElementById('pedido-pdf-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
           </div>
-      `;
+    `;
     document.body.appendChild(overlay);
 
     overlay.querySelector("#btn-descargar-adsg").onclick = async () => {
@@ -260,7 +273,7 @@ window.WizardCrotales = {
         `;
         loader.innerHTML = `
           <div class="pdf-loader">
-            <div class="pdf-loader-emoji">🏷️</div>
+            <div class="pdf-loader-emoji">${Icons.paquete()}</div>
             <div class="pdf-loader-title">Generando Solicitud</div>
             <div class="pdf-loader-desc">Pedido de Crotales</div>
             <div class="pdf-loader-bar">
@@ -268,7 +281,6 @@ window.WizardCrotales = {
             </div>
             <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
           </div>
-          
         `;
         document.body.appendChild(loader);
 

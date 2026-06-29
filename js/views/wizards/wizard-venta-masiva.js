@@ -1,9 +1,9 @@
-﻿/**
+/**
  * Wizard Venta Masiva de Animales
  * Extraído de app.js para modularización (Fase 3)
  */
 window.VentaMasivaWizard = {
-  async open() {
+  async open(borrador = null) {
     const App = window.App;
     if (!App) return console.error("App no disponible");
 
@@ -14,33 +14,34 @@ window.VentaMasivaWizard = {
     });
 
     const initialData = {
-      fechaSacrificio: new Date().toISOString().split("T")[0],
-      codigoMatadero: "Matadero Central",
-      codigoICA: "",
-      numeroGuia: "",
-      confirmacionFitosanitarios: false,
-      compradorId: null,
-      nifComprador: "",
-      razonSocial: "",
-      ivaPct: 10,
-      retencionPct: 0,
-      pVivo: 0,
-      pCanal: 0,
-      gTrans: 0,
-      gMata: 0,
-      seleccionados: [],
+      id: borrador ? borrador.id : undefined,
+      fechaSacrificio: borrador ? borrador.fechaSacrificio : new Date().toISOString().split("T")[0],
+      codigoMatadero: borrador ? (borrador.codigoMatadero || 'Matadero Central') : "Matadero Central",
+      codigoICA: borrador ? borrador.codigoICA : "",
+      numeroGuia: borrador ? borrador.numeroGuia : "",
+      confirmacionFitosanitarios: borrador ? !!borrador.confirmacionFitosanitarios : false,
+      compradorId: borrador ? borrador.compradorId : null,
+      nifComprador: borrador ? borrador.nifComprador : "",
+      razonSocial: borrador ? borrador.razonSocial : "",
+      ivaPct: borrador ? borrador.ivaPct : 10,
+      retencionPct: borrador ? borrador.retencionPct : 0,
+      pVivo: borrador ? borrador.pVivo : 0,
+      pCanal: borrador ? borrador.pCanal : 0,
+      gTrans: borrador ? borrador.gTrans : 0,
+      gMata: borrador ? borrador.gMata : 0,
+      seleccionados: borrador ? (borrador.animalId || []) : [],
       _compradores: compradoresList,
       _compradoresLoaded: true,
       // Transportista
-      transportistaId: null,
-      nombreTransportista: "",
-      nifTransportista: "",
-      matriculaTransportista: "",
+      transportistaId: borrador ? borrador.transportistaId : null,
+      nombreTransportista: borrador ? borrador.nombreTransportista : "",
+      nifTransportista: borrador ? borrador.nifTransportista : "",
+      matriculaTransportista: borrador ? borrador.matriculaTransportista : "",
       // Autorización veterinaria
-      vet_nombre: "",
-      vet_colegiado: "",
-      vet_fecha_autorizacion: new Date().toISOString().split("T")[0],
-      dimoe_generado: false,
+      vet_nombre: borrador ? borrador.autorizacion_veterinaria?.vet_nombre : "",
+      vet_colegiado: borrador ? borrador.autorizacion_veterinaria?.vet_colegiado : "",
+      vet_fecha_autorizacion: borrador ? (borrador.autorizacion_veterinaria?.fecha_autorizacion || new Date().toISOString().split("T")[0]) : new Date().toISOString().split("T")[0],
+      dimoe_generado: borrador ? !!borrador.movimientoId : false,
     };
 
     App.toast("Analizando censo y estado sanitario...");
@@ -354,25 +355,25 @@ window.VentaMasivaWizard = {
                 if (infoDiv) {
                   infoDiv.style.display = 'block';
                   const estadoBadge = c.activo !== false
-                    ? '<span class="text-green">✅ Activo</span>'
-                    : '<span class="text-red">❌ Inactivo</span>';
+                    ? `<span class="text-green">${Icons.check()} Activo</span>`
+                    : `<span class="text-red">${Icons.cerrar()} Inactivo</span>`;
                   document.getElementById('w-v-comprador-nombre').innerHTML = '<strong>' + c.nombre + '</strong> ' + estadoBadge;
                   document.getElementById('w-v-comprador-nif').textContent = 'NIF: ' + (c.nif_cif || '');
                   if (contrato) {
-                    let contratoHtml = '📄 Contrato: ' + contrato.numero_contrato + ' (IVA: ' + contrato.iva_pct + '%, Ret.: ' + contrato.retencion_pct + '%)';
+                    let contratoHtml = `${Icons.documento()} Contrato: ` + contrato.numero_contrato + ' (IVA: ' + contrato.iva_pct + '%, Ret.: ' + contrato.retencion_pct + '%)';
                     if (contrato.fecha_fin) {
                       const diasRestantes = Math.ceil((new Date(contrato.fecha_fin) - new Date()) / (1000 * 60 * 60 * 24));
                       if (diasRestantes > 0 && diasRestantes <= 30) {
-                        contratoHtml += ' <span class="text-gold">⚠️ Vence en ' + diasRestantes + 'd</span>';
+                        contratoHtml += ` <span class="text-gold">${Icons.alerta()} Vence en ` + diasRestantes + 'd</span>';
                       } else if (diasRestantes <= 0) {
-                        contratoHtml += ' <span class="text-red">❌ VENCIDO</span>';
+                        contratoHtml += ` <span class="text-red">${Icons.cerrar()} VENCIDO</span>`;
                       }
                     }
                     document.getElementById('w-v-comprador-contrato').innerHTML = contratoHtml;
                     document.getElementById('w-v-iva').value = contrato.iva_pct;
                     document.getElementById('w-v-ret').value = contrato.retencion_pct;
                   } else {
-                    document.getElementById('w-v-comprador-contrato').innerHTML = '⚠️ <span class="text-red">Sin contrato activo. Crea uno en Compradores.</span>';
+                    document.getElementById('w-v-comprador-contrato').innerHTML = `${Icons.alerta()} <span class="text-red">Sin contrato activo. Crea uno en Compradores.</span>`;
                   }
                 }
               }
@@ -644,7 +645,14 @@ window.VentaMasivaWizard = {
             };
             // Asignar contrato activo si existe
             if (contratoActivo) reg.contratoId = contratoActivo.id;
-            const idV = await window.db.add("comercializacion_carne", reg);
+            let idV;
+            if (finalData.id) {
+              reg.id = Number(finalData.id);
+              await window.db.put("comercializacion_carne", reg);
+              idV = reg.id;
+            } else {
+              idV = await window.db.add("comercializacion_carne", reg);
+            }
 
             // PRIORIDAD NORMATIVA 1: cada venta debe generar su movimiento oficial
             // inter-explotación para trazabilidad legal (SIGGAN/BADIGEX).

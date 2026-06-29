@@ -52,7 +52,7 @@ window.PedidosCrotales = (() => {
       const tx = window.db.transaction([STORE_NAME], 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       const result = await new Promise((resolve, reject) => {
-        const req = store.add(pedidoData);
+        const req = store.put(pedidoData);
         req.onsuccess = () => resolve(req.result);
         req.onerror = () => reject(req.error);
       });
@@ -211,21 +211,7 @@ window.PedidosCrotales = (() => {
     }
   }
 
-  // Inicialización automática cuando db.js carga
-  if (window.db && typeof window.db.transaction === 'function') {
-    (async () => {
-      try {
-        const dbInstance = await new Promise((resolve, reject) => {
-          const req = window.dbPromise || indexedDB.open('livestock-manager');
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        });
-        if (dbInstance) initStore(dbInstance, dbInstance.version);
-      } catch (e) {
-        console.warn('[PedidosCrotales] No se pudo inicializar tabla:', e.message);
-      }
-    })();
-  }
+  // Eliminada inicialización automática redundante para evitar conflictos con db.js
 
   // API pública
   return Object.freeze({
