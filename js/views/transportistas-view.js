@@ -38,14 +38,15 @@ const TransportistasView = {
             </div>
 
             <div class="max-w-600 mx-auto">
-                <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-                  <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+                <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+                  <div class="section-header-theme">ACCIONES</div>
                   <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                     <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="TransportistasView._abrirFormulario()">
                       ${Icons.agregar()}
                       <span class="widget-link-label">Nuevo Transportista</span>
                     </button>
                   </div>
+                  <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro y gestión de transportistas, vehículos y flota de transporte</span></div>
                 </div>
                 <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
