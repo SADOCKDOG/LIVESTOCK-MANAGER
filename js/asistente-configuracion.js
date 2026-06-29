@@ -18,14 +18,14 @@ const AsistenteConfiguracion = {
                     <h1>Bienvenido</h1>
                     <p>Gestión ganadera profesional v4.8.7 Premium</p>
                     <button class="btn-tour" id="btn-iniciar-tour">
-                        ${Icons.info()} Primeros pasos
+                        💡 Primeros pasos
                     </button>
                 </div>
 
                 <div class="asistente-opciones">
                     <!-- Opción 1: Importar desde Backup -->
                     <button class="asistente-opcion" id="btn-importar">
-                        <div class="asistente-icono">${Icons.importar()}</div>
+                        <div class="asistente-icono">📥</div>
                         <div class="asistente-info-opcion">
                             <div class="asistente-titulo">Importar Backup</div>
                             <div class="asistente-descripcion">Restaura tu base de datos desde un archivo JSON</div>
@@ -34,7 +34,7 @@ const AsistenteConfiguracion = {
 
                     <!-- Opción 2: Crear Nueva Finca -->
                     <button class="asistente-opcion" id="btn-crear">
-                        <div class="asistente-icono">${Icons.agregar()}</div>
+                        <div class="asistente-icono">➕</div>
                         <div class="asistente-info-opcion">
                             <div class="asistente-titulo">Nueva Finca</div>
                             <div class="asistente-descripcion">Configura una explotación desde cero</div>
@@ -43,7 +43,7 @@ const AsistenteConfiguracion = {
 
                     <!-- Opción Demo: Cargar explotación de ejemplo -->
                     <button class="asistente-opcion" id="btn-demo">
-                        <div class="asistente-icono">${Icons.animales()}</div>
+                        <div class="asistente-icono">🐄</div>
                         <div class="asistente-info-opcion">
                             <div class="asistente-titulo">Cargar Demo CHAMORRO</div>
                             <div class="asistente-descripcion">Explora la app con una explotación de ejemplo con datos en todos los módulos</div>
@@ -52,7 +52,7 @@ const AsistenteConfiguracion = {
 
                     <!-- Opción 3: Ver Fincas Existentes -->
                     <button class="asistente-opcion d-none" id="btn-seleccionar">
-                        <div class="asistente-icono">${Icons.documento()}</div>
+                        <div class="asistente-icono">📋</div>
                         <div class="asistente-info-opcion">
                             <div class="asistente-titulo">Seleccionar Finca</div>
                             <div class="asistente-descripcion">Cambiar a una finca ya registrada</div>
@@ -158,7 +158,7 @@ const AsistenteConfiguracion = {
                 const mensaje = contenedor.querySelector('#asistente-mensaje');
                 opciones.classList.add('d-none');
                 mensaje.classList.remove('d-none');
-                mensaje.innerHTML = `<div class="text-gold text-center font-bold asistente-msg-body">${Icons.rotacion()} Cargando datos de la demo...<br><span class="text-gray text-sm font-normal">Esto puede tardar unos segundos.</span></div>`;
+                mensaje.innerHTML = '<div class="text-gold text-center font-bold asistente-msg-body">⏳ Cargando datos de la demo...<br><span class="text-gray text-sm font-normal">Esto puede tardar unos segundos.</span></div>';
 
                 try {
                     if (window.SeedData && typeof window.SeedData.run === 'function') {
@@ -168,7 +168,7 @@ const AsistenteConfiguracion = {
                         throw new Error('Módulo de datos demo no disponible.');
                     }
                 } catch (err) {
-                    mensaje.innerHTML = `<div class="text-red text-center font-bold asistente-msg-body">${Icons.cerrar()} Error cargando la demo:<br><span class="text-gray text-sm font-normal">` + (err.message || err) + '</span></div>';
+                    mensaje.innerHTML = '<div class="text-red text-center font-bold asistente-msg-body">❌ Error cargando la demo:<br><span class="text-gray text-sm font-normal">' + (err.message || err) + '</span></div>';
                     opciones.classList.remove('d-none');
                 }
             });
@@ -376,27 +376,27 @@ const AsistenteConfiguracion = {
 
         const pasos = [
             {
-                icono: Icons.home(),
+                icono: '👋',
                 titulo: 'Bienvenido a Livestock Manager',
                 texto: 'Plataforma profesional de gestión ganadera con trazabilidad industrial, control lechero, comercialización y centro de informes premium.\n\nTodo funciona 100% offline en tu dispositivo.',
                 accion: null
             },
             {
-                icono: Icons.animales(),
+                icono: '🐄',
                 titulo: 'Explorar la Demo',
                 texto: 'Prueba la app sin riesgos cargando la explotación de ejemplo "Ganadería Chamorro". Incluye animales, rebaños, pesajes, ventas, gastos, sanidad e informes completos.',
                 accion: { texto: '🚀 Cargar Demo', metodo: 'cargarDemo' }
             },
             {
-                icono: Icons.libro(),
+                icono: '📖',
                 titulo: 'Manuales de Usuario',
                 texto: 'La app incluye 8 manuales interactivos con capturas paso a paso: General, Ovino de Carne, Ovino de Leche, Producción, Comercialización, Pesadas, Control Lechero y Gastos.',
                 accion: { texto: '📚 Abrir Manuales', metodo: 'abrirManuales' }
             },
             {
-                icono: Icons.rayo(),
+                icono: '🚀',
                 titulo: '¡Manos a la obra!',
-                texto: 'Elige cómo empezar:\n\n' + Icons.importar() + ' Importa una copia de seguridad existente.\n' + Icons.agregar() + ' Crea una nueva explotación desde cero.\n' + Icons.animales() + ' Carga la demo para explorar todas las funcionalidades.\n' + Icons.libro() + ' Consulta los manuales cuando necesites ayuda.',
+                texto: 'Elige cómo empezar:\n\n📥 Importa una copia de seguridad existente.\n➕ Crea una nueva explotación desde cero.\n🐄 Carga la demo para explorar todas las funcionalidades.\n📖 Consulta los manuales cuando necesites ayuda.',
                 accion: null
             }
         ];
@@ -408,7 +408,7 @@ const AsistenteConfiguracion = {
         overlay.innerHTML = `
             <div class="tour-flotante-backdrop"></div>
             <div class="tour-flotante-card" id="tour-card">
-                <button class="tour-btn-cerrar" id="tour-cerrar">${Icons.cerrar()}</button>
+                <button class="tour-btn-cerrar" id="tour-cerrar">✕</button>
                 <div class="tour-body" id="tour-body">
                     <div class="tour-icono">${pasos[0].icono}</div>
                     <h3 class="tour-titulo">${pasos[0].titulo}</h3>
@@ -416,12 +416,12 @@ const AsistenteConfiguracion = {
                     <div class="tour-accion" id="tour-accion"></div>
                 </div>
                 <div class="tour-footer">
-                    <button class="tour-btn tour-btn-prev" id="tour-prev" disabled>${Icons.atras()} Anterior</button>
+                    <button class="tour-btn tour-btn-prev" id="tour-prev" disabled>← Anterior</button>
                     <div class="tour-dots" id="tour-dots">
                         ${pasos.map((_, i) => `<span class="tour-dot ${i === 0 ? 'activo' : ''}" data-index="${i}"></span>`).join('')}
                     </div>
-                    <button class="tour-btn tour-btn-next" id="tour-next">Siguiente ${Icons.siguiente()}</button>
-                    <button class="tour-btn tour-btn-fin d-none" id="tour-fin">${Icons.check()} ¡Comenzar!</button>
+                    <button class="tour-btn tour-btn-next" id="tour-next">Siguiente →</button>
+                    <button class="tour-btn tour-btn-fin d-none" id="tour-fin">✓ ¡Comenzar!</button>
                 </div>
             </div>
         `;
@@ -489,7 +489,7 @@ const AsistenteConfiguracion = {
                     if (!await Confirm.confirm("Cargar Demo", '¿Cargar la explotación de ejemplo "DEMO CHAMORRO"? Se añadirán datos de ejemplo en todos los módulos.', false)) return;
                     const msgDiv = document.createElement('div');
                     msgDiv.className = 'asistente-loading-overlay';
-                    msgDiv.innerHTML = `<div class="text-2rem" style="color:var(--p-gold);">${Icons.rotacion()}</div><div class="text-gold font-bold">Cargando datos demo...</div><div class="text-gray text-xs">Esto puede tardar unos segundos.</div>`;
+                    msgDiv.innerHTML = '<div class="text-2rem">⏳</div><div class="text-gold font-bold">Cargando datos demo...</div><div class="text-gray text-xs">Esto puede tardar unos segundos.</div>';
                     document.body.appendChild(msgDiv);
                     setTimeout(async () => {
                         try {
