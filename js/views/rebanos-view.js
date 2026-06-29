@@ -110,13 +110,13 @@ const RebanosView = {
       <div class="mb-20"><a href="#/rebanos" class="link-back flex items-center gap-4">${Icons.atras()} Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
 
       <!-- KPIs -->
-      <div class="grid grid-cols-3 gap-8 mb-20">
-        <div class="info-box-center border-left-amber"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-amber">${animales.length}</div></div>
-        <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos}</div></div>
-        <div class="info-box-center border-left-red"><small class="s-lbl">VENDIDOS</small><div class="inf-val-lg text-red">${vendidos}</div></div>
-        <div class="info-box-center border-left-blue"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} KG</small><div class="inf-val-lg text-blue">${totalKg.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-gold"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold">${totalLeche.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-purple"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.registros()} EVENTOS</small><div class="inf-val-lg text-purple">${eventosReb.length}</div></div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-20">
+        <div class="info-box-center border-left-amber py-12"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-amber font-950">${animales.length}</div></div>
+        <div class="info-box-center border-left-green py-12"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green font-950">${activos}</div></div>
+        <div class="info-box-center border-left-red py-12"><small class="s-lbl">VENDIDOS</small><div class="inf-val-lg text-red font-950">${vendidos}</div></div>
+        <div class="info-box-center border-left-blue py-12"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} KG</small><div class="inf-val-lg text-blue font-950">${totalKg.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-gold py-12"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold font-950">${totalLeche.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-purple py-12"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.registros()} EVENTOS</small><div class="inf-val-lg text-purple font-950">${eventosReb.length}</div></div>
       </div>
 
       <!-- Categorías -->

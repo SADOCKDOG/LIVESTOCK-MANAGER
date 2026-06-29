@@ -360,13 +360,13 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('general', 'General') + `
       <!-- KPIs compactos -->
       <div class="inf-report">
-      <div class="grid grid-cols-3 gap-8 mb-15">
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">RENTAB.</div><div class="s-val inf-val-lg ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CENSO</div><div class="s-val inf-val-lg text-blue">${totalAnimales}</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg text-amber">${(rent?.detalles?.carne || 0).toLocaleString()}€</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg text-gold">${(rent?.detalles?.leche || 0).toLocaleString()}€</div></div>
-        <div class="summary-cell summary-cell-kpi"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg text-red">${(rent?.gastos || 0).toLocaleString()}€</div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-15">
+        <div class="summary-cell"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}" style="word-break:break-all;">${balanceTotal.toLocaleString()}€</div></div>
+        <div class="summary-cell"><div class="s-lbl">RENTAB.</div><div class="s-val inf-val-lg ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
+        <div class="summary-cell"><div class="s-lbl">CENSO</div><div class="s-val inf-val-lg text-blue">${totalAnimales}</div></div>
+        <div class="summary-cell"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg text-amber" style="word-break:break-all;">${(rent?.detalles?.carne || 0).toLocaleString()}€</div></div>
+        <div class="summary-cell"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg text-gold" style="word-break:break-all;">${(rent?.detalles?.leche || 0).toLocaleString()}€</div></div>
+        <div class="summary-cell"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg text-red" style="word-break:break-all;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
       </div>
 
       ${alertas ? `<div class="card inf-alert-red">
@@ -441,20 +441,20 @@ const InformesView = {
         const diffBalance = actual.balance - (anterior?.balance || 0);
         const diffIngresos = actual.ingresos - (anterior?.ingresos || 0);
         return `<div class="card report-section border-top-3px border-top-3px-blue report-card">
-          <div class="inf-card-title flex items-center gap-6">${Icons.calendar()} Comparativa Mensual</div>
-          <div class="grid grid-cols-2 gap-8 mb-8">
-            <div class="info-box border-left-blue">
-              <small class="s-lbl">MES ACTUAL</small>
-              <div class="inf-val-md text-white">${actual.mes}</div>
-              <div class="text-sm mt-4">Ingresos: <strong class="text-green">${actual.ingresos.toLocaleString()}€</strong></div>
-              <div class="text-sm">Gastos: <strong class="text-red">${actual.gastos.toLocaleString()}€</strong></div>
-              <div class="text-sm">Balance: <strong class="${actual.balance >= 0 ? 'text-green' : 'text-red'}">${actual.balance.toLocaleString()}€</strong></div>
+          <div class="inf-card-title flex items-center gap-6 mb-12">${Icons.calendar()} Comparativa Mensual</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+            <div class="info-box-center border-left-blue py-10">
+              <small class="s-lbl uppercase mb-4">MES ACTUAL</small>
+              <div class="inf-val-md text-white font-900 mb-6">${actual.mes}</div>
+              <div class="text-xs">Ingresos: <strong class="text-green">${actual.ingresos.toLocaleString()}€</strong></div>
+              <div class="text-xs">Gastos: <strong class="text-red">${actual.gastos.toLocaleString()}€</strong></div>
+              <div class="text-sm mt-4 font-900">Balance: <strong class="${actual.balance >= 0 ? 'text-green' : 'text-red'}">${actual.balance.toLocaleString()}€</strong></div>
             </div>
-            <div class="info-box border-left-amber">
-              <small class="s-lbl">VS MES ANTERIOR</small>
-              <div class="inf-val-md text-white">${anterior?.mes || '—'}</div>
-              <div class="text-sm mt-4">Ingresos: <strong class="${diffIngresos >= 0 ? 'text-green' : 'text-red'}">${diffIngresos >= 0 ? '+' : ''}${diffIngresos.toLocaleString()}€</strong></div>
-              <div class="text-sm">Balance: <strong class="${diffBalance >= 0 ? 'text-green' : 'text-red'}">${diffBalance >= 0 ? '+' : ''}${diffBalance.toLocaleString()}€</strong></div>
+            <div class="info-box-center border-left-amber py-10">
+              <small class="s-lbl uppercase mb-4">VS MES ANTERIOR</small>
+              <div class="inf-val-md text-white font-900 mb-6">${anterior?.mes || '—'}</div>
+              <div class="text-xs">Ingresos: <strong class="${diffIngresos >= 0 ? 'text-green' : 'text-red'}">${diffIngresos >= 0 ? '+' : ''}${diffIngresos.toLocaleString()}€</strong></div>
+              <div class="text-sm mt-4 font-900">Balance: <strong class="${diffBalance >= 0 ? 'text-green' : 'text-red'}">${diffBalance >= 0 ? '+' : ''}${diffBalance.toLocaleString()}€</strong></div>
             </div>
           </div>
         </div>`;
@@ -494,32 +494,29 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-orange report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.carne()} Resumen Cárnico</div>
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="grid grid-cols-3 gap-10 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ingresos Totales</small>
-              <span class="text-xl text-amber font-950">${totalIngresos.toLocaleString()}€</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos Totales</small>
+              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${totalIngresos.toLocaleString()}€">${totalIngresos.toLocaleString()}€</span>
             </div>
-            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ventas Realizadas</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ventas Realizadas</small>
               <span class="text-xl text-blue font-950">${totalVentas}</span>
             </div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Kg Totales</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Kg Totales</small>
               <span class="text-xl text-green font-950">${kgTotal.toFixed(1)} kg</span>
             </div>
-          </div>
-          <div style="height:1px; background:#333; margin:10px 0;"></div>
-          <div class="grid grid-cols-3 gap-10 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Precio Medio Kg</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Precio Medio Kg</small>
               <span class="text-xl text-violet font-950">${precioMedioKg.toFixed(2)}€/kg</span>
             </div>
-            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Peso Medio Sacrif.</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Peso Medio Sacrif.</small>
               <span class="text-xl text-gold font-950">${ventasHist.length > 0 ? (kgTotal / ventasHist.reduce((s, v) => s + (v.animales || 1), 0)).toFixed(1) + ' kg' : '—'}</span>
             </div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">GMD Media Global</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">GMD Media Global</small>
               <span class="text-xl font-950 ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'text-green' : 'text-neutral'}">${gmdMedia !== null ? gmdMedia + ' kg/d' : '—'}</span>
             </div>
           </div>
@@ -598,36 +595,33 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.leche()} Producción Láctea</div>
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="grid grid-cols-3 gap-10 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Litros</small>
-              <span class="text-xl text-gold font-950">${lecheStats.totalLitros.toFixed(1)} L</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Litros</small>
+              <span class="text-xl text-gold font-950 truncate w-full px-4" title="${lecheStats.totalLitros.toFixed(1)} L">${lecheStats.totalLitros.toFixed(1)} L</span>
             </div>
-            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Promedio/Día</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Promedio/Día</small>
               <span class="text-xl text-amber font-950">${lecheStats.promedioDiario.toFixed(1)} L</span>
             </div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Precio Medio</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Precio Medio</small>
               <span class="text-xl text-dark-gold font-950">${lecheStats.precioMedio.toFixed(3)}€/L</span>
             </div>
-          </div>
-          <div style="height:1px; background:#333; margin:10px 0;"></div>
-          <div class="grid grid-cols-3 gap-10 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Rendimiento Medio</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Rendimiento Medio</small>
               <span class="text-xl text-blue font-950">${(() => {
                 const censoActivo = (d.animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
                 return censoActivo > 0 ? (lecheStats.promedioDiario / censoActivo).toFixed(2) : '0.00';
               })()} L/cab</span>
             </div>
-            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Registros</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Registros</small>
               <span class="text-xl text-white font-950">${lecheStats.totalRegistros} ent.</span>
             </div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">MOFA Total</small>
-              <span class="text-xl font-950 ${mofaTotal >= 0 ? 'text-green' : 'text-red'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</span>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">MOFA Total</small>
+              <span class="text-xl font-950 ${mofaTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" title="${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -847,18 +841,18 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-gold report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.animales()} Censo General</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1 py-8">
+          <div class="flex items-center justify-around text-center gap-4 flex-wrap">
+            <div class="flex-1 py-8 min-w-80">
               <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Censo</small>
               <span class="text-xl text-blue font-950">${totalAnimales}</span>
             </div>
-            <div style="width:1px; height:24px; background:#333;"></div>
-            <div class="flex-1 py-8">
+            <div class="hidden sm:block" style="width:1px; height:24px; background:#333;"></div>
+            <div class="flex-1 py-8 min-w-80">
               <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Activos</small>
               <span class="text-xl text-green font-950">${totalActivos}</span>
             </div>
-            <div style="width:1px; height:24px; background:#333;"></div>
-            <div class="flex-1 py-8">
+            <div class="hidden sm:block" style="width:1px; height:24px; background:#333;"></div>
+            <div class="flex-1 py-8 min-w-80">
               <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Vendidos</small>
               <span class="text-xl text-red font-950">${totalVendidos}</span>
             </div>
@@ -919,20 +913,18 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.libroVentas()} Libro de Ventas</div>
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Ventas</small>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Ventas</small>
               <span class="text-xl text-blue font-950">${ventas.length}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Peso Total (kg)</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Peso Total (kg)</small>
               <span class="text-xl text-green font-950">${totalKg.toFixed(1)}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Importe Total</small>
-              <span class="text-xl text-amber font-950">${totalImporte.toLocaleString()}€</span>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Importe Total</small>
+              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${totalImporte.toLocaleString()}€">${totalImporte.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -1044,24 +1036,21 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.compradores()} Informe por Comprador</div>
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Compradores</small>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Compradores</small>
               <span class="text-xl text-blue font-950">${data.length}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ingresos Totales</small>
-              <span class="text-xl text-green font-950">${totalIngresos.toLocaleString()}€</span>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos Totales</small>
+              <span class="text-xl text-green font-950 truncate w-full px-4" title="${totalIngresos.toLocaleString()}€">${totalIngresos.toLocaleString()}€</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ventas</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ventas</small>
               <span class="text-xl text-amber font-950">${totalVentas}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Kg Totales</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Kg Totales</small>
               <span class="text-xl text-purple font-950">${totalKg.toFixed(1)}</span>
             </div>
           </div>
@@ -1164,25 +1153,22 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.proveedores()} Informe por Proveedor</div>
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Proveedores</small>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Proveedores</small>
               <span class="text-xl text-amber font-950">${data.length}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Gasto Total</small>
-              <span class="text-xl text-red font-950">${totalGasto.toLocaleString()}€</span>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Gasto Total</small>
+              <span class="text-xl text-red font-950 truncate w-full px-4" title="${totalGasto.toLocaleString()}€">${totalGasto.toLocaleString()}€</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Facturas</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Facturas</small>
               <span class="text-xl text-blue font-950">${totalFacturas}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Media/Prov</small>
-              <span class="text-xl text-green font-950">${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€</span>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Media/Prov</small>
+              <span class="text-xl text-green font-950 truncate w-full px-4" title="${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€">${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€</span>
             </div>
           </div>
         </div>
@@ -1273,24 +1259,21 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.fitosanitario()} Informe Fitosanitario</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Gasto Total</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.total.toLocaleString()}€</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gasto Total</small>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:1.1rem;" title="${data.total.toLocaleString()}€">${data.total.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Operaciones</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Operaciones</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${data.numRegistros}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Zonas</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Zonas</small>
               <span class="font-950 text-amber" style="font-size:1.1rem;">${data.numZonas}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Media/Op</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Media/Op</small>
               <span class="font-950 text-purple" style="font-size:1.1rem;">${data.mediaPorOperacion.toFixed(2)}€</span>
             </div>
           </div>
@@ -1344,19 +1327,17 @@ const InformesView = {
         <div class="card report-section border-top-3px border-top-3px-red report-card">
           <div class="inf-card-title flex items-center gap-6">${Icons.alerta()} Panel de Alertas</div>
           <div class="card p-12 mb-14 border-222" style="background:rgba(239,68,68,0.02);">
-            <div class="flex items-center justify-around text-center gap-2">
-              <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Total Alertas</small>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+              <div class="info-box-center py-6">
+                <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Alertas</small>
                 <span class="font-950 text-red" style="font-size:1.2rem;">${totalAlertas}</span>
               </div>
-              <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-              <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">${Icons.alerta()} Críticas</small>
+              <div class="info-box-center py-6">
+                <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">${Icons.alerta()} Críticas</small>
                 <span class="font-950 text-red" style="font-size:1.2rem;">${rojas}</span>
               </div>
-              <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-              <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">${Icons.alerta()} Avisos</small>
+              <div class="info-box-center py-6">
+                <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">${Icons.alerta()} Avisos</small>
                 <span class="font-950 text-amber" style="font-size:1.2rem;">${totalAlertas - rojas}</span>
               </div>
             </div>
@@ -1498,18 +1479,18 @@ const InformesView = {
         ${rent ? `
         <div class="card report-section border-top-3px border-top-3px-green report-card">
           <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Resumen Económico</div>
-          <div class="grid grid-cols-3 gap-10">
-            <div class="info-box border-left-amber">
-              <small class="s-lbl">INGRESOS</small>
-              <div class="inf-val-lg text-amber">${(rent.ingresos || 0).toLocaleString()}€</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
+            <div class="info-box-center border-left-amber py-12">
+              <small class="s-lbl uppercase mb-4">INGRESOS</small>
+              <div class="inf-val-lg text-amber font-950">${(rent.ingresos || 0).toLocaleString()}€</div>
             </div>
-            <div class="info-box border-left-red">
-              <small class="s-lbl">GASTOS</small>
-              <div class="inf-val-lg text-red">${(rent.gastos || 0).toLocaleString()}€</div>
+            <div class="info-box-center border-left-red py-12">
+              <small class="s-lbl uppercase mb-4">GASTOS</small>
+              <div class="inf-val-lg text-red font-950">${(rent.gastos || 0).toLocaleString()}€</div>
             </div>
-            <div class="info-box border-left-green">
-              <small class="s-lbl">BALANCE</small>
-              <div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div>
+            <div class="info-box-center border-left-green py-12">
+              <small class="s-lbl uppercase mb-4">BALANCE</small>
+              <div class="inf-val-lg font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div>
             </div>
           </div>
         </div>` : ''}
@@ -1562,24 +1543,21 @@ const InformesView = {
       <div class="inf-report mb-14">
         <!-- KPIs Unificados -->
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Censo Total</small>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Censo Total</small>
               <span class="text-xl text-green font-950">${totalAnimales}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Activos</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Activos</small>
               <span class="text-xl text-blue font-950">${activos}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Rebaños</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Rebaños</small>
               <span class="text-xl text-amber font-950">${numRebanos}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Especies</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Especies</small>
               <span class="text-xl text-purple font-950">${especies.length}</span>
             </div>
           </div>
@@ -1614,19 +1592,17 @@ const InformesView = {
         <div class="card report-section border-top-3px border-top-3px-green report-card">
           <div class="inf-card-title">${Icons.animales()} Censo Actual</div>
           <div class="card p-12 mb-12 border-222" style="background:rgba(255,255,255,0.02);">
-            <div class="flex items-center justify-around text-center gap-2">
-              <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Total Animales</small>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+              <div class="info-box-center py-6">
+                <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Animales</small>
                 <span class="font-950 text-blue" style="font-size:1.1rem;">${totalAnimales}</span>
               </div>
-              <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-              <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Activos</small>
+              <div class="info-box-center py-6">
+                <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Activos</small>
                 <span class="font-950 text-green" style="font-size:1.1rem;">${activos}</span>
               </div>
-              <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-              <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Ventas</small>
+              <div class="info-box-center py-6">
+                <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ventas</small>
                 <span class="font-950 text-amber" style="font-size:1.1rem;">${totalVentas}</span>
               </div>
             </div>
@@ -1774,24 +1750,21 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Cuenta de Resultados PyG (Estructurada)</div>
         <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ingresos</small>
-              <span class="text-xl text-green font-950">${totalIngresosCalculado.toLocaleString()}€</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos</small>
+              <span class="text-xl text-green font-950 truncate w-full px-4" style="word-break:break-all;" title="${totalIngresosCalculado.toLocaleString()}€">${totalIngresosCalculado.toLocaleString()}€</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Gastos</small>
-              <span class="text-xl text-red font-950">${totalGastosCalculado.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Gastos</small>
+              <span class="text-xl text-red font-950 truncate w-full px-4" style="word-break:break-all;" title="${totalGastosCalculado.toLocaleString()}€">${totalGastosCalculado.toLocaleString()}€</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Margen Oper.</small>
-              <span class="text-xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Oper.</small>
+              <span class="text-xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" style="word-break:break-all;" title="${balanceTotal.toLocaleString()}€">${balanceTotal.toLocaleString()}€</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">EBITDA %</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">EBITDA %</small>
               <span class="text-xl text-blue font-950">${rentabilidadCalculada}%</span>
             </div>
           </div>
@@ -1810,14 +1783,14 @@ const InformesView = {
             <tbody>
               <tr>
                 <td style="width:24px;">${Icons.leche()}</td>
-                <td><strong>Ingresos por Venta de Leche (Entregas Lácteas)</strong></td>
-                <td class="text-right text-green">${ingLeche.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;"><strong>Ingresos por Venta de Leche (Entregas Lácteas)</strong></td>
+                <td class="text-right text-green" style="white-space:nowrap;">${ingLeche.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingLeche / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.carne()}</td>
-                <td><strong>Ingresos por Venta de Ganado (Canal / Vivo)</strong></td>
-                <td class="text-right text-green">${ingCarne.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;"><strong>Ingresos por Venta de Ganado (Canal / Vivo)</strong></td>
+                <td class="text-right text-green" style="white-space:nowrap;">${ingCarne.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingCarne / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
@@ -1837,38 +1810,38 @@ const InformesView = {
             <tbody>
               <tr>
                 <td>${Icons.pac()}</td>
-                <td>Gastos en Alimentación (Piensos, Forrajes, Ración)</td>
-                <td class="text-right text-red">${gastosAlim.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos en Alimentación (Piensos, Forrajes, Ración)</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${gastosAlim.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAlim / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.fitosanitario()}</td>
-                <td>Gastos Fitosanitarios (Tratamientos parcelas, herbicidas)</td>
-                <td class="text-right text-red">${gastosFito.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos Fitosanitarios (Tratamientos parcelas, herbicidas)</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${gastosFito.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosFito / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.sanidad()}</td>
-                <td>Gastos de Sanidad Ganadera (Medicamentos, ADSG, vacunas)</td>
-                <td class="text-right text-red">${gastosSanidad.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos de Sanidad Ganadera (Medicamentos, ADSG, vacunas)</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${gastosSanidad.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosSanidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.rayo()}</td>
-                <td>Gastos en Electricidad y Suministros (Energía, Gasoil)</td>
-                <td class="text-right text-red">${gastosElectricidad.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos en Electricidad y Suministros (Energía, Gasoil)</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${gastosElectricidad.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosElectricidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.finca()}</td>
-                <td>Gastos de Personal (Mano de obra, seguridad social)</td>
-                <td class="text-right text-red">${gastosPersonal.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos de Personal (Mano de obra, seguridad social)</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${gastosPersonal.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosPersonal / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.edificio()}</td>
-                <td>Amortizaciones (Instalaciones, maquinaria, cercados)</td>
-                <td class="text-right text-red">${gastosAmort.toLocaleString()}€</td>
+                <td style="white-space:normal; line-height:1.2; padding-right:10px;">Amortizaciones (Instalaciones, maquinaria, cercados)</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${gastosAmort.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAmort / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
@@ -1898,25 +1871,25 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title">${Icons.carne()} Coste de Producción por Animal</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Coste Medio/Cabeza</small>
-              <span class="font-950 text-purple" style="font-size:1.1rem;">${data.costeMedioCabeza.toLocaleString()}€</span>
+              <span class="font-950 text-purple" style="font-size:1.1rem; word-break:break-all;">${data.costeMedioCabeza.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Coste/Día</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${data.costeMedioDia}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Animales</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalAnimales}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Gasto Total</small>
-              <span class="font-950 text-red" style="font-size:1.1rem;">${data.totalGasto.toLocaleString()}€</span>
+              <span class="font-950 text-red" style="font-size:1.1rem; word-break:break-all;">${data.totalGasto.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -1948,30 +1921,27 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title">${Icons.grafico()} Panel de Eficiencia Técnica</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Rebaños</small>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Rebaños</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${data.numRebanos}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Activos</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Activos</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${data.activos}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">H. Lecheras</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">H. Lecheras</small>
               <span class="font-950 text-amber" style="font-size:1.1rem;">${data.totalLecheros}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Total</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total</small>
               <span class="font-950 text-purple" style="font-size:1.1rem;">${data.totalAnimales}</span>
             </div>
           </div>
         </div>
         ${data.kpis.length > 0 ? `
-        <div class="grid grid-cols-3 gap-8 mb-10">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-10">
           ${data.kpis.map(k => `
             <div class="info-box-sm" style="border-left:3px solid ${semaforo(k.status)};">
               <div class="flex justify-between items-center">
@@ -1998,25 +1968,22 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Cargas y Aforos</div>
-        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
-          <div class="flex items-center justify-around text-center gap-4">
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Sup. Pastos</small>
+        <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Sup. Pastos</small>
               <span class="text-xl text-blue font-950">${superficieTotal.toFixed(1)} ha</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Aforo Max</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Aforo Max</small>
               <span class="text-xl text-green font-950">${data.totalAforo}</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">UGM Totales</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">UGM Totales</small>
               <span class="text-xl text-amber font-950">${ugmGlobal} UGM</span>
             </div>
-            <div style="width:1px; height:20px; background:#333;"></div>
-            <div class="flex-1">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Carga Global</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Carga Global</small>
               <span class="text-xl font-950" style="color:${colorPct(parseFloat(data.pctGlobal))}">${cargaGlobal} UGM/ha</span>
             </div>
           </div>
@@ -2056,51 +2023,51 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title">${Icons.rotacion()} Rotación de Censo (${data.periodo})</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Censo Total</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalAnimales}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Activos</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${data.activos}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Entrada Neta</small>
               <span class="font-950 ${(u90.entradaNeta||0)>=0?'text-green':'text-red'}" style="font-size:1.1rem;">${(u90.entradaNeta||0)>=0?'+':''}${u90.entradaNeta||0}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Reposición</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${data.tasaReposicion}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Bajas</small>
               <span class="font-950 text-red" style="font-size:1.1rem;">${data.tasaBajas}</span>
             </div>
           </div>
         </div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Nacimientos</small>
               <span class="font-950 text-green" style="font-size:1rem;">${u90.nacimientos || 0}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Compras</small>
               <span class="font-950 text-blue" style="font-size:1rem;">${u90.compras || 0}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Ventas</small>
               <span class="font-950 text-red" style="font-size:1rem;">${u90.ventas || 0}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Bajas</small>
               <span class="font-950 text-gray" style="font-size:1rem;">${u90.bajas || 0}</span>
             </div>
@@ -2118,25 +2085,22 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-teal report-card">
         <div class="inf-card-title">${Icons.tendencia()} Flujo de Caja</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Entradas</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalEntradas.toLocaleString()}€</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Entradas</small>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalEntradas.toLocaleString()}€">${data.totalEntradas.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Salidas</small>
-              <span class="font-950 text-red" style="font-size:1.1rem;">${data.totalSalidas.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Salidas</small>
+              <span class="font-950 text-red truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalSalidas.toLocaleString()}€">${data.totalSalidas.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Neto</small>
-              <span class="font-950 ${data.totalNeto>=0?'text-green':'text-red'}" style="font-size:1.1rem;">${data.totalNeto.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Neto</small>
+              <span class="font-950 ${data.totalNeto>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalNeto.toLocaleString()}€">${data.totalNeto.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Saldo Final</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${data.saldoFinal.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Saldo Final</small>
+              <span class="font-950 text-blue truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.saldoFinal.toLocaleString()}€">${data.saldoFinal.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -2165,20 +2129,18 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} Rentabilidad por Especie</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Ingresos</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalIngresos.toLocaleString()}€</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalIngresos.toLocaleString()}€">${data.totalIngresos.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Gastos</small>
-              <span class="font-950 text-red" style="font-size:1.1rem;">${data.totalGastos.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gastos</small>
+              <span class="font-950 text-red truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalGastos.toLocaleString()}€">${data.totalGastos.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Balance</small>
-              <span class="font-950 ${data.totalBalance>=0?'text-green':'text-red'}" style="font-size:1.1rem;">${data.totalBalance.toLocaleString()}€</span>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Balance</small>
+              <span class="font-950 ${data.totalBalance>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalBalance.toLocaleString()}€">${data.totalBalance.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -2211,23 +2173,23 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Curva de Producción</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Kg Total</small>
               <span class="font-950 text-amber" style="font-size:1.1rem;">${data.totalKg.toFixed(1)}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Litros Total</small>
               <span class="font-950 text-gold" style="font-size:1.1rem;">${data.totalLitros.toFixed(1)}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Meta Kg</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${Math.round(data.metaKg)}</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Meta L</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${Math.round(data.metaLitros)}</span>
             </div>
@@ -2269,40 +2231,40 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Análisis de Punto Muerto (Break-Even)</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(239,68,68,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 text-center">
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Costes Fijos</small>
-              <span class="font-950 text-red" style="font-size:1.1rem;">${data.costesFijos.toLocaleString()}€</span>
+              <span class="font-950 text-red" style="font-size:1.1rem; word-break:break-all;">${data.costesFijos.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Costes Variables</small>
-              <span class="font-950 text-amber" style="font-size:1.1rem;">${data.costesVariables.toLocaleString()}€</span>
+              <span class="font-950 text-amber" style="font-size:1.1rem; word-break:break-all;">${data.costesVariables.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Ingresos</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.ingresosTotal.toLocaleString()}€</span>
+              <span class="font-950 text-green" style="font-size:1.1rem; word-break:break-all;">${data.ingresosTotal.toLocaleString()}€</span>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-10 mb-14">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-14">
           <div class="card p-14 card-tint-green">
-            <div class="inf-card-title mb-6 text-base">${Icons.carne()} Carne</div>
-            <div class="grid grid-cols-2 gap-6">
-              <div><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber">${data.precioMedioKg.toFixed(2)}€</div></div>
-              <div><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red">${data.costeVarKg.toFixed(2)}€</div></div>
-              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoCarne ? 'text-green' : 'text-red'}">${data.breakEvenKg} kg</div></div>
-              <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadKg}</div></div>
+            <div class="inf-card-title mb-10 text-base flex items-center gap-6">${Icons.carne()} Carne</div>
+            <div class="grid grid-cols-2 gap-x-10 gap-y-12">
+              <div class="min-w-0"><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber truncate" title="${data.precioMedioKg.toFixed(2)}€">${data.precioMedioKg.toFixed(2)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red truncate" title="${data.costeVarKg.toFixed(2)}€">${data.costeVarKg.toFixed(2)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoCarne ? 'text-green' : 'text-red'} truncate" title="${data.breakEvenKg} kg">${data.breakEvenKg} kg</div></div>
+              <div class="min-w-0"><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue truncate" title="${data.margenSeguridadKg}">${data.margenSeguridadKg}</div></div>
             </div>
           </div>
           <div class="card p-14 card-tint-amber">
-            <div class="inf-card-title mb-6 text-base">${Icons.leche()} Leche</div>
-            <div class="grid grid-cols-2 gap-6">
-              <div><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold">${data.precioMedioLitro.toFixed(3)}€</div></div>
-              <div><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red">${data.costeVarLitro.toFixed(3)}€</div></div>
-              <div><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoLeche ? 'text-green' : 'text-red'}">${data.breakEvenLitros} L</div></div>
-              <div><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue">${data.margenSeguridadLitros}</div></div>
+            <div class="inf-card-title mb-10 text-base flex items-center gap-6">${Icons.leche()} Leche</div>
+            <div class="grid grid-cols-2 gap-x-10 gap-y-12">
+              <div class="min-w-0"><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold truncate" title="${data.precioMedioLitro.toFixed(3)}€">${data.precioMedioLitro.toFixed(3)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red truncate" title="${data.costeVarLitro.toFixed(3)}€">${data.costeVarLitro.toFixed(3)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoLeche ? 'text-green' : 'text-red'} truncate" title="${data.breakEvenLitros} L">${data.breakEvenLitros} L</div></div>
+              <div class="min-w-0"><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue truncate" title="${data.margenSeguridadLitros}">${data.margenSeguridadLitros}</div></div>
             </div>
           </div>
         </div>
@@ -2325,23 +2287,23 @@ const InformesView = {
           <button class="btn btn-primary btn-sm btn--green-dk" onclick="InformesView._agregarPAC()">${Icons.agregar()} Añadir</button>
         </div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-2">
-            <div class="flex-1 py-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Solicitado</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalSolicitado.toLocaleString()}€</span>
+              <span class="font-950 text-green" style="font-size:1.1rem; word-break:break-all;">${data.totalSolicitado.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Cobrado</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${data.totalCobrado.toLocaleString()}€</span>
+              <span class="font-950 text-blue" style="font-size:1.1rem; word-break:break-all;">${data.totalCobrado.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Pendiente</small>
-              <span class="font-950 ${data.totalPendiente>0?'text-amber':'text-green'}" style="font-size:1.1rem;">${data.totalPendiente.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalPendiente>0?'text-amber':'text-green'}" style="font-size:1.1rem; word-break:break-all;">${data.totalPendiente.toLocaleString()}€</span>
             </div>
-            <div style="width:1px;height:22px;background:#2a2a2a;"></div>
-            <div class="flex-1 py-6">
+            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
+            <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Registros</small>
               <span class="font-950 text-purple" style="font-size:1.1rem;">${data.numRegistros}</span>
             </div>

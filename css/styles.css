@@ -1971,6 +1971,7 @@ label {
     align-items: center;
     justify-content: center;
     width: 100%;
+    min-width: 0;
 }
 
 /* ── LECHE VIEW SPECIFIC STYLES ── */

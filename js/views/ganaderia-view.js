@@ -78,29 +78,26 @@ const GanaderiaView = {
         <div class="text-xs text-aaa mt-4">Vista independiente por modo para patrimonio, censo, lotes y zonas.</div>
       </div>
 
-      <!-- KPIs Ganadería Unificados en Filas -->
-      <div class="card p-16 mb-16 border-222 border-left-5-mode bg-white-5">
-        <div class="text-xs text-mode font-black uppercase tracking-wider mb-10 flex items-center gap-6">
-          ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
+      <!-- KPIs Ganadería Unificados -->
+      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; background: rgba(255, 255, 255, 0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6 justify-center">
+          ${meta.icon} RENDIMIENTO GANADERO (${meta.label})
         </div>
-        <div class="flex flex-col">
-          <div class="flex">
-            <div class="flex-1 h-90 py-12 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900">Lotes / Rebaños</span>
-              <strong class="text-xl font-950 text-mode">${rebanosModo.length} lotes</strong>
-            </div>
-            <div class="flex-1 h-90 py-12 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900">Animales Activos</span>
-              <strong class="text-xl font-950 text-mode">${animalesActivos.length} cabezas</strong>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
+          <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
+            <small class="text-xs text-gray uppercase font-900 mb-4">REBAÑOS</small>
+            <strong class="text-2xl font-950" style="color: ${meta.color};">${rebanosModo.length}</strong>
           </div>
-          <div class="flex justify-center">
-            <div class="flex-1 h-90 py-12 flex justify-between items-center">
-              <span class="text-xs text-gray uppercase font-900">Zonas / Parcelas</span>
-              <strong class="text-xl font-950 text-mode">${zonas.length} parcelas</strong>
-            </div>
+          <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
+            <small class="text-xs text-gray uppercase font-900 mb-4">ACTIVOS</small>
+            <strong class="text-2xl text-green font-950">${animalesActivos.length}</strong>
+          </div>
+          <div class="info-box-center py-12">
+            <small class="text-xs text-gray uppercase font-900 mb-4">PARCELAS</small>
+            <strong class="text-2xl text-blue font-950">${zonas.length}</strong>
           </div>
         </div>
+      </div>
       </div>
 
 
