@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - DashboardView v1.0.0
  * Vista principal del Dashboard extraída de App.js para modularización.
  * Utiliza EventBus, CacheService y AlertasService.
@@ -122,27 +122,27 @@ const DashboardView = {
       <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'RESUMEN GANADERO'}</div>
         <div class="grid grid-cols-3 gap-6">
-          <div class="bg-black rounded-lg p-8 text-center border border-222">
+          <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.zonas()} ZONAS</div>
             <div class="text-xl font-black text-gold">${(finca.zonas || []).length}</div>
           </div>
-          <div class="bg-black rounded-lg p-8 text-center border border-222">
+          <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.rebanos()} REBAÑOS</div>
             <div class="text-xl font-black text-gold">${rebanos.length}</div>
           </div>
-          <div class="bg-black rounded-lg p-8 text-center border border-222">
+          <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.animales()} CENSO</div>
             <div class="text-xl font-black text-gold">${totalCenso || animales.length}</div>
           </div>
-          <div class="bg-black rounded-lg p-8 text-center border border-222">
+          <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.check()} ACTIVOS</div>
             <div class="text-xl font-black text-green">${totalActivos || activos}</div>
           </div>
-          <div class="bg-black rounded-lg p-8 text-center border border-222">
+          <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.paquete()} VENDIDOS</div>
             <div class="text-xl font-black text-red">${totalVendidos}</div>
           </div>
-          <div class="bg-black rounded-lg p-8 text-center border border-222">
+          <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.grafico()} RENTAB.</div>
             <div class="text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
           </div>
@@ -162,16 +162,16 @@ const DashboardView = {
       <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-success); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.dinero()} BALANCE ECONÓMICO</div>
         <div class="grid grid-cols-2 gap-8 mb-8">
-          <div class="bg-black rounded-lg p-10 text-center border border-222">
+          <div class="bg-dark rounded-lg p-10 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">INGRESOS</div>
             <div class="text-xl font-black text-amber">${(rent?.ingresos || 0).toLocaleString()}€</div>
           </div>
-          <div class="bg-black rounded-lg p-10 text-center border border-222">
+          <div class="bg-dark rounded-lg p-10 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">GASTOS</div>
             <div class="text-xl font-black text-red">${(rent?.gastos || 0).toLocaleString()}€</div>
           </div>
         </div>
-        <div class="flex justify-between items-center p-10 bg-black rounded-lg border border-222">
+        <div class="flex justify-between items-center p-10 bg-dark rounded-lg border border-222">
           <div>
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider">Beneficio Neto</div>
             <div class="text-lg font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €</div>
@@ -524,3 +524,4 @@ const DashboardView = {
 };
 
 window.DashboardView = DashboardView;
+
