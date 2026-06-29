@@ -79,7 +79,7 @@ const GanaderiaView = {
       </div>
 
       <!-- KPIs Ganadería Unificados en Filas -->
-      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; background: rgba(255, 255, 255, 0.02);">
+      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color};">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
