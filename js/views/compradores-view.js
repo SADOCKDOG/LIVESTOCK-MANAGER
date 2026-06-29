@@ -16,17 +16,20 @@ const CompradoresView = {
         
         main.innerHTML = `
           <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
-          <div class="comer-mode-switch mb-16" style="max-width: 420px; margin: 0 auto 20px; display: flex; gap: 8px;">
-            <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
-              style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 
-              onclick="CompradoresView._cambiarModulo('compradores')">
-              ${Icons.compradores()} Compradores
-            </button>
-            <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
-              style="--mode-color:#10b981; flex: 1; padding: 10px;" 
-              onclick="CompradoresView._cambiarModulo('contratos')">
-              ${Icons.contratos()} Contratos
-            </button>
+          <div class="card p-12 mb-16 border-222 card-dark-gradient pb-16">
+            <div class="comer-mode-switch mb-8" style="display: flex; gap: 8px;">
+              <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
+                style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 
+                onclick="CompradoresView._cambiarModulo('compradores')">
+                ${Icons.compradores()} Compradores
+              </button>
+              <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
+                style="--mode-color:#10b981; flex: 1; padding: 10px;" 
+                onclick="CompradoresView._cambiarModulo('contratos')">
+                ${Icons.contratos()} Contratos
+              </button>
+            </div>
+            <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider text-center leading-tight">Gestión de compradores por tipo de explotación y contratos comerciales</div>
           </div>
 
           <div id="module-container">
@@ -71,14 +74,17 @@ const CompradoresView = {
         if (this._activeModule === 'compradores') {
             const meta = this._getTabMeta(this._currentTab);
             container.innerHTML = `
-              <div class="mb-16 text-center">
-                <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
-                <div class="comer-mode-switch">
-                  <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
+              <div class="card p-12 mb-16 border-222 card-dark-gradient pb-16">
+                <div class="text-center mb-8">
+                  <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
+                  <div class="comer-mode-switch">
+                    <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
+                    <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
+                    <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
+                    <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
+                  </div>
                 </div>
+                <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider text-center leading-tight">Filtrar compradores por tipo de producción cárnica, láctea o híbrida</div>
               </div>
 
               <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
