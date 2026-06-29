@@ -72,6 +72,29 @@ const GastosView = {
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
+
+      <!-- Balance Consolidado de Gastos por Categoría -->
+      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444; background: rgba(239, 68, 68, 0.015);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+          ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
+        </div>
+        <div class="flex flex-col">
+          ${this._CATEGORIAS.filter(c => c.key !== 'todos').map(c => {
+            const catGasto = kpis[c.key]?.total || 0;
+            return `
+              <div class="py-10 flex justify-between items-center border-bottom-222">
+                <span class="text-xs text-gray uppercase font-800 flex items-center gap-6">${c.icon} ${c.label}</span>
+                <strong class="text-base font-900" style="color:${c.color};">${catGasto.toLocaleString()} €</strong>
+              </div>
+            `;
+          }).join('')}
+          <div class="py-12 mt-4 flex justify-between items-center text-white">
+            <span class="text-xs uppercase font-950 tracking-wider">TOTAL GENERAL GASTOS</span>
+            <strong class="text-2xl text-red font-950">${totalGeneral.toLocaleString()} €</strong>
+          </div>
+        </div>
+      </div>
+
       <div class="mb-14">
         <div class="tabs-scroll gasto-tabs scroll-shadow-container">
           ${this._CATEGORIAS.map(c => `
