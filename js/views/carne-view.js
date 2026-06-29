@@ -254,11 +254,11 @@ const CarneView = {
         <div class="grid gap-10">
           ${d.rebanosCarne.length > 0
             ? d.rebanosCarne.map(r => `
-                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-danger);">
+                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-8">
-                        <span class="text-xl" style="color:var(--c-danger);">${Icons.rebanos()}</span>
+                        <span class="text-xl text-gold">${Icons.rebanos()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                       </div>
                       <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray font-800 uppercase">
@@ -268,8 +268,8 @@ const CarneView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm font-black" style="background:rgba(239,68,68,0.15); color:var(--c-danger); border:1px solid rgba(239,68,68,0.3);">${r.cantidad_animales || 0} CABEZAS</span>
-                      <span class="text-[0.5rem] text-gray-700 font-900 uppercase flex items-center gap-4">Ver ficha ${Icons.siguiente()}</span>
+                      <span class="badge badge-sm badge-gold block mb-4 font-950">${r.cantidad_animales || 0} CABEZAS</span>
+                      <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
                     </div>
                   </div>
                 </div>`).join('')
@@ -285,18 +285,16 @@ const CarneView = {
   _renderComercializacion(content, d) {
     const html = `
       <div class="card report-section p-16 border-top-3px border-top-3px-green">
-        <div class="flex items-center gap-12 mb-16">
-          <span class="text-3xl">${Icons.transportistas()}</span>
-          <div>
-            <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
-            <div class="text-gray text-2xs">Logística, vehículos, compradores, contratos y ventas</div>
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span class="text-3xl">${Icons.transportistas()}</span>
+            <div>
+              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
+              <div class="text-gray text-2xs">Logística, vehículos, compradores, contratos y ventas</div>
+            </div>
           </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
-          <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirWizardVentaMasiva()">
-            ${Icons.agregar()}
-            <span class="widget-link-label">REGISTRAR VENTA</span>
+          <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
+            ${Icons.agregar()} Registrar Venta
           </button>
         </div>
 
@@ -315,21 +313,21 @@ const CarneView = {
         <div class="grid gap-10">
           ${d.ventasCarne.length > 0
             ? d.ventasCarne.slice(0, 15).map(v => `
-                <div class="card card-animal" onclick="App._abrirDetalleVentaCarne(${v.id})" style="border-left:4px solid var(--c-danger);">
+                <div class="card card-animal border-4-left-green" onclick="App._abrirDetalleVentaCarne(${v.id})">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-8">
-                        <span class="text-xl" style="color:var(--c-danger);">${Icons.documento()}</span>
+                        <span class="text-xl text-green">${Icons.documento()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${v.numero_albaran || 'ALBARÁN'} · ${v.razonSocial || 'MATADERO'}</h3>
                       </div>
                       <div class="flex wrap gap-4 mt-4 text-[0.65rem] text-gray font-800 uppercase">
                         <span>${Icons.calendar()} ${this._fmtFecha(v.fechaSacrificio)}</span>
                         <span>·</span>
-                        <span>Rend: <span class="font-900" style="color:var(--c-danger);">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
+                        <span>Rend: <span class="text-green font-900">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm font-black text-lg" style="background:rgba(239,68,68,0.1); color:var(--c-danger); border:1px solid rgba(239,68,68,0.3);">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
+                      <span class="badge badge-sm text-green font-black text-lg badge-green-outline block">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
                     </div>
                   </div>
                 </div>`).join('')
@@ -361,19 +359,19 @@ const CarneView = {
     const html = `
       ${supresionesHtml}
       <div class="card report-section p-16 border-top-3px border-top-3px-purple">
-        <div class="flex items-center gap-12 mb-16">
-          <span class="text-3xl">${Icons.documento()}</span>
-          <div>
-            <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
-            <div class="text-gray text-2xs">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span class="text-3xl">${Icons.documento()}</span>
+            <div>
+              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
+              <div class="text-gray text-2xs">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
+            </div>
           </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
-          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="CarneView._abrirAsistenteTratamientoCarne()">
-            ${Icons.sanidad()}
-            <span class="widget-link-label">REGISTRAR TRATAMIENTO</span>
-          </button>
+          <div class="flex gap-4">
+            <button class="btn btn-secondary btn-sm btn--purple" onclick="CarneView._abrirAsistenteTratamientoCarne()">
+              ${Icons.agregar()} Registrar Tratamiento
+            </button>
+          </div>
         </div>
 
         ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
@@ -467,7 +465,7 @@ const CarneView = {
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-mode--carne flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
@@ -531,7 +529,7 @@ const CarneView = {
           ${d.rebanosCarne.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-mode--carne flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>

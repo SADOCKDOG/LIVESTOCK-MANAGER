@@ -39,14 +39,14 @@ const GanaderiaView = {
     const especies = new Set(animalesModo.map(a => (a.especie || '').toLowerCase()).filter(Boolean));
 
     this._cache = { rebanos, animales, zonas, rebanosModo, animalesModo };
-    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: getComputedStyle(document.documentElement).getPropertyValue('--c-danger').trim() };
+    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: '#ef4444' };
 
     // Sincronizar color de cabecera con el modo activo
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
     main.innerHTML = `
       <div class="mb-16 mt-4 card p-12 border-222 card-dark-gradient pb-24">
-        <div class="section-header-neon section-header-neon--modules">MÓDULOS</div>
+        <div class="section-header-neon" style="--neon-color: #facc15;">MÓDULOS</div>
         <div class="grid grid-cols-3 gap-10">
           <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
             ${Icons.animales()}
@@ -64,40 +64,39 @@ const GanaderiaView = {
       </div>
 
       <div class="mb-16 text-center">
-        <div class="section-header-neon neon-${this._activeMode === 'carne' ? 'danger' : this._activeMode === 'leche' ? 'info' : 'success'} max-w-360">EXPLOTACIÓN</div>
+        <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 360px; margin: 0 auto;">EXPLOTACIÓN</div>
         <div class="ganaderia-mode-switch">
-          <button class="btn btn--inline ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color: var(--c-danger);" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
-          <button class="btn btn--inline ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color: var(--c-info);" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
-          <button class="btn btn--inline ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color: var(--c-success);" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
         </div>
       </div>
 
-      <div class="card p-14 mb-14 border-222 border-top-mode">
+      <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-8">Contexto activo de Ganadería</div>
         <div class="text-white font-900">${meta.icon} ${meta.label}</div>
         <div class="text-xs text-aaa mt-4">Vista independiente por modo para patrimonio, censo, lotes y zonas.</div>
       </div>
 
-      <!-- KPIs Ganadería Unificados -->
+      <!-- KPIs Ganadería Unificados en Filas -->
       <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; background: rgba(255, 255, 255, 0.02);">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6 justify-center">
-          ${meta.icon} RENDIMIENTO GANADERO (${meta.label})
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+          ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
-          <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-            <small class="text-xs text-gray uppercase font-900 mb-4">REBAÑOS</small>
-            <strong class="text-2xl font-950" style="color: ${meta.color};">${rebanosModo.length}</strong>
+        <div class="flex flex-col">
+          <div class="py-12 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900">Lotes / Rebaños</span>
+            <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} lotes</strong>
           </div>
-          <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-            <small class="text-xs text-gray uppercase font-900 mb-4">ACTIVOS</small>
-            <strong class="text-2xl text-green font-950">${animalesActivos.length}</strong>
+          <div class="py-12 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900">Animales Activos</span>
+            <strong class="text-xl font-950 text-green">${animalesActivos.length} cabezas</strong>
           </div>
-          <div class="info-box-center py-12">
-            <small class="text-xs text-gray uppercase font-900 mb-4">PARCELAS</small>
-            <strong class="text-2xl text-blue font-950">${zonas.length}</strong>
+          <div class="py-12 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900">Zonas / Parcelas</span>
+            <strong class="text-xl font-950 text-blue">${zonas.length} parcelas</strong>
           </div>
         </div>
-      </div>
       </div>
 
 
@@ -109,7 +108,7 @@ const GanaderiaView = {
         <div class="grid gap-8">
           ${rebanosModo.length > 0
             ? rebanosModo.slice(0, 8).map(r => `
-              <a href="#/rebano?id=${r.id}" class="card card-animal no-underline border-left-4-mode p-10 m-0">
+              <a href="#/rebano?id=${r.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:10px; margin:0;">
                 <div class="flex justify-between items-center">
                   <div class="text-xs">
                     <div class="font-bold text-white">${r.nombre || 'Rebaño'}</div>
@@ -132,10 +131,10 @@ const GanaderiaView = {
           ${animalesModo.length > 0
             ? animalesModo.slice(0, 10).map(a => {
                 const reb = rebanos.find(r => r.id === a.rebanoId);
-                const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
+                const sexoIcon = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '');
                 const ageText = a.fechaNacimiento ? ` · ${Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365))} años` : '';
                 return `
-                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline border-left-4-mode p-14 m-0 mb-8">
+                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:14px; margin:0; margin-bottom:8px;">
                     <div class="flex flex-col gap-10">
                       <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-10 min-w-0">
@@ -154,7 +153,7 @@ const GanaderiaView = {
                         <div class="text-[0.65rem] text-aaa flex items-center gap-4">
                           ${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}
                         </div>
-                        <div class="text-[0.48rem] text-gray-600 font-900 uppercase flex items-center gap-4">VER ${Icons.siguiente()}</div>
+                        <div class="text-[0.48rem] text-gray-600 font-900 uppercase">VER ➔</div>
                       </div>
                     </div>
                   </a>

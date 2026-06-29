@@ -224,11 +224,11 @@ const LecheView = {
         <div class="grid gap-10">
           ${d.rebanosLeche.length > 0
             ? d.rebanosLeche.map(r => `
-                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-info);">
+                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
-                        <span class="text-xl" style="color:var(--c-info);">${Icons.rebanos()}</span>
+                        <span class="text-xl">${Icons.rebanos()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                       </div>
                       <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
@@ -238,8 +238,8 @@ const LecheView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm font-black block mb-4" style="background:rgba(59,130,246,0.15); color:var(--c-info); border:1px solid rgba(59,130,246,0.3);">${r.cantidad_animales || 0} cabezas</span>
-                      <span class="text-xs text-777 flex items-center gap-4">Ficha ${Icons.siguiente()}</span>
+                      <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
+                      <span class="text-xs text-777">Ficha ➔</span>
                     </div>
                   </div>
                 </div>`).join('')
@@ -264,15 +264,13 @@ const LecheView = {
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
           </div>
         </div>
+        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
 
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
-          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardAlbaranLeche()">
-            ${Icons.agregar()}
-            <span class="widget-link-label">NUEVA ENTREGA (CISTERNA)</span>
+        <div class="text-center mb-12">
+          <button class="btn btn-create btn-sm" onclick="App._abrirWizardAlbaranLeche()">
+            ${Icons.agregar()} Nueva Entrega (Cisterna)
           </button>
         </div>
-
-        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
 
         <!-- Accesos directos comerciales -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -305,15 +303,13 @@ const LecheView = {
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
           </div>
         </div>
+        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
 
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
-          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="LecheView._abrirAsistenteTratamientoLeche()">
-            ${Icons.sanidad()}
-            <span class="widget-link-label">REGISTRAR TRATAMIENTO</span>
+        <div class="text-center mb-12">
+          <button class="btn btn-secondary btn-sm btn--purple w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
+            ${Icons.sanidad()} Registrar Tratamiento
           </button>
         </div>
-
-        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
 
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
@@ -407,7 +403,7 @@ const LecheView = {
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-mode--leche flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
@@ -462,14 +458,14 @@ const LecheView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25 border-top-mode--leche" style="max-width:380px;">
+      <div class="card p-25" style="max-width:380px; border-top:5px solid #fbbf24;">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Lácteo</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño lechero a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-mode--leche flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>

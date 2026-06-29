@@ -209,11 +209,11 @@ const HibridoView = {
         </div>
         <div class="grid gap-10">
           ${d.rebanos.map(r => `
-            <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-success);">
+            <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid #d97706;">
               <div class="flex justify-between items-start">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-6">
-                    <span class="text-xl" style="color:var(--c-success);">${Icons.rebanos()}</span>
+                    <span class="text-xl">${Icons.rebanos()}</span>
                     <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                   </div>
                   <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
@@ -221,7 +221,7 @@ const HibridoView = {
                   </div>
                 </div>
                 <div class="text-right flex-shrink-0 ml-8">
-                  <span class="badge badge-sm font-black block mb-4" style="background:rgba(16,185,129,0.15); color:var(--c-success); border:1px solid rgba(16,185,129,0.3);">${r.cantidad_animales || 0} cabezas</span>
+                  <span class="badge badge-sm badge-gold" class="block mb-4">${r.cantidad_animales || 0} cabezas</span>
                 </div>
               </div>
             </div>`).join('')}
@@ -263,23 +263,22 @@ const HibridoView = {
 
     const html = `
       <div class="card report-section p-16 border-top-3px border-top-3px-green">
-        <div class="flex items-center gap-12 mb-16">
-          <span class="text-3xl">${Icons.transportistas()}</span>
-          <div>
-            <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
-            <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span class="text-3xl">${Icons.transportistas()}</span>
+            <div>
+              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
+              <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
+            </div>
           </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto mb-16">
-          <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirWizardVentaMasiva()">
-            ${Icons.carne()}
-            <span class="widget-link-label">VENTA CARNE</span>
-          </button>
-          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardAlbaranLeche()">
-            ${Icons.leche()}
-            <span class="widget-link-label">ALBARÁN LECHE</span>
-          </button>
+          <div class="flex gap-4">
+            <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
+              ${Icons.agregar()} Venta Carne
+            </button>
+            <button class="btn btn-success btn-sm" onclick="App._abrirWizardAlbaranLeche()">
+              ${Icons.agregar()} Albarán Leche
+            </button>
+          </div>
         </div>
 
         ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
@@ -345,19 +344,17 @@ const HibridoView = {
 
     const html = `
       ${alertasHtml}
-      <div class="card report-section p-16" style="border-top:3px solid #8b5cf6;">
-        <div class="flex items-center gap-12 mb-16">
-          <span class="text-3xl">${Icons.documento()}</span>
-          <div>
-            <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
-            <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
+      <div class="card report-section p-16 border-top-3px" style="border-top-color:#8b5cf6;">
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span class="text-3xl">${Icons.documento()}</span>
+            <div>
+              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
+              <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
+            </div>
           </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
-          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="HibridoView._abrirAsistenteTratamientoMix()">
-            ${Icons.sanidad()}
-            <span class="widget-link-label">REGISTRAR TRATAMIENTO</span>
+          <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="HibridoView._abrirAsistenteTratamientoMix()">
+            ${Icons.agregar()} Registrar Tratamiento
           </button>
         </div>
 
@@ -424,7 +421,7 @@ const HibridoView = {
         overlay.style.alignItems = "center";
         overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
         overlay.innerHTML = `
-            <div class="card p-25 border-top-mode--hibrido" style="max-width:420px;">
+            <div class="card p-25" style="max-width:420px; border-top:5px solid #3b82f6;">
                 <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
                 <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -445,7 +442,7 @@ const HibridoView = {
                 </div>
 
                 <div class="flex gap-10 mt-20">
-                    <button class="wizard-btn-action wizard-btn-mode--hibrido flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                    <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                     <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
                 </div>
                 <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
@@ -501,14 +498,14 @@ const HibridoView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25 border-top-mode--hibrido" style="max-width:380px;">
+      <div class="card p-25" style="max-width:380px; border-top:5px solid #d97706;">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Veterinario</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanos.map(r => `<option value="${r.id}">${r.nombre} (${r.tipo} · ${r.especie})</option>`).join('')}
         </select>
         <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-mode--hibrido flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>

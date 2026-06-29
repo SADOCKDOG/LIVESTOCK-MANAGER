@@ -61,7 +61,7 @@ const RebanosView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="badge badge-sm uppercase" style="background:${App._hexToRgba(colorEstado, 0.08)}; color:${colorEstado}; border:1px solid ${App._hexToRgba(colorEstado, 0.2)};">${activos} Activos</span>
+                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} Activos</span>
                 </div>
               </div>
 
@@ -75,7 +75,7 @@ const RebanosView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-4">VER DETALLE ${Icons.siguiente()}</div>
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLE ➔</div>
                 </div>
               </div>
             </div>
@@ -107,16 +107,16 @@ const RebanosView = {
     animales.forEach(a => { const c = a.categoria || 'Sin categoría'; porCategoria[c] = (porCategoria[c] || 0) + 1; });
 
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/rebanos" class="link-back flex items-center gap-4">${Icons.atras()} Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
+      <div class="mb-20"><a href="#/rebanos" class="link-back">← Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
 
       <!-- KPIs -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-20">
-        <div class="info-box-center border-left-amber py-12"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-amber font-950">${animales.length}</div></div>
-        <div class="info-box-center border-left-green py-12"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green font-950">${activos}</div></div>
-        <div class="info-box-center border-left-red py-12"><small class="s-lbl">VENDIDOS</small><div class="inf-val-lg text-red font-950">${vendidos}</div></div>
-        <div class="info-box-center border-left-blue py-12"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} KG</small><div class="inf-val-lg text-blue font-950">${totalKg.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-gold py-12"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold font-950">${totalLeche.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-purple py-12"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.registros()} EVENTOS</small><div class="inf-val-lg text-purple font-950">${eventosReb.length}</div></div>
+      <div class="grid grid-cols-3 gap-8 mb-20">
+        <div class="info-box-center border-left-amber"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-amber">${animales.length}</div></div>
+        <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos}</div></div>
+        <div class="info-box-center border-left-red"><small class="s-lbl">VENDIDOS</small><div class="inf-val-lg text-red">${vendidos}</div></div>
+        <div class="info-box-center border-left-blue"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} KG</small><div class="inf-val-lg text-blue">${totalKg.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-gold"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold">${totalLeche.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-purple"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.registros()} EVENTOS</small><div class="inf-val-lg text-purple">${eventosReb.length}</div></div>
       </div>
 
       <!-- Categorías -->
@@ -163,7 +163,7 @@ const RebanosView = {
             ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${rebano.tipo_explotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
           </select></div>
           <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Notas / Observaciones</label>
-          <textarea id="r-edit-notas" class="premium-input font-700 uppercase min-h-80 resize-none">${rebano.notas || ''}</textarea></div>
+          <textarea id="r-edit-notas" class="premium-input font-700 uppercase" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
         </div>
         <div class="flex gap-10 mt-20">
           <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="RebanosView._eliminarRebano(${id})">
@@ -179,7 +179,7 @@ const RebanosView = {
       
       <!-- Sanidad -->
       <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24">
-        <div class="section-header-theme" style="--theme-color: var(--color-success)">SANIDAD</div>
+        <div class="section-header-theme" style="--theme-color: #10b981">SANIDAD</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
             ${Icons.agregar()}
@@ -191,7 +191,7 @@ const RebanosView = {
 
       <!-- Animales -->
       <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-        <div class="section-header-theme" style="--theme-color: var(--color-info)">ANIMALES (${animales.length})</div>
+        <div class="section-header-theme" style="--theme-color: #3b82f6">ANIMALES (${animales.length})</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12">
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirSelectorAnimales(${id})">
             ${Icons.rotacion()}
@@ -213,7 +213,7 @@ const RebanosView = {
                 </div>
               </div>
               <div class="flex items-center gap-8">
-                <span class="badge badge-sm uppercase" style="background:${App._hexToRgba(colorEst, 0.08)}; color:${colorEst}; border:1px solid ${App._hexToRgba(colorEst, 0.2)}; font-size: 0.55rem;">${a.estado}</span>
+                <span class="badge badge-sm uppercase" style="background:${colorEst}15; color:${colorEst}; border:1px solid ${colorEst}35; font-size: 0.55rem;">${a.estado}</span>
                 <span class="text-amber text-sm font-900">${Icons.flechaDerecha()}</span>
               </div>
             </div>
@@ -230,7 +230,7 @@ const RebanosView = {
       const tratamientos = await window.db.getAll("sanitarios_ganado") || [];
       const filtrados = tratamientos.filter(t => t.rebanoId == rebanoId);
       if (filtrados.length === 0) {
-        container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon text-gray">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin tratamientos registrados</p></div>`;
+        container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin tratamientos registrados</p></div>`;
         return;
       }
       let html = '';
@@ -238,7 +238,7 @@ const RebanosView = {
       filtrados.forEach(t => {
         html += `<div class="info-box-sm border-left-green mt-8 bg-black">
           <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(t.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0}D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red flex items-center gap-4">' + Icons.cerrar() + ' PROHIBIDO LECHE</strong>' : ''}</div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0}D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">🚫 PROHIBIDO LECHE</strong>' : ''}</div>
         </div>`;
       });
       container.innerHTML = html;
@@ -312,7 +312,7 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-green p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">UBICACIÓN Y TIPO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">UBICACIÓN Y TIPO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO DE PRODUCCIÓN</label>
               <select id="w-reb-tipo" class="wizard-input font-800">
@@ -336,7 +336,7 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">REQUISITOS REGA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">REQUISITOS REGA</div>
             <div class="wizard-input-group">
               <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
               <select id="w-reb-tipo-explotacion" class="wizard-input font-800" style="border-color: #10b981;">
