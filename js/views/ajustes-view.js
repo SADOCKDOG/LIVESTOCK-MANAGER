@@ -266,6 +266,9 @@ const AjustesView = {
           <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
             <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> MODO OSCURO (OLED)
           </label>
+          <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
+            <input type="checkbox" ${config.mostrarContextos !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleContextos(this.checked)"> MOSTRAR DESCRIPCIONES DE CONTEXTO
+          </label>
           <div class="flex flex-col gap-4">
             <label class="text-xs text-gray uppercase font-800 ml-4">Formato Fecha</label>
             <select class="wizard-input" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
@@ -408,7 +411,7 @@ const AjustesView = {
   // ===================== HELPER: CONFIG =====================
 
   async _loadConfig() {
-    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
+    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: true, formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
     try {
       const stored = await window.db.get('meta', 'appConfig');
       return stored?.value ? { ...defaults, ...stored.value } : defaults;
@@ -444,6 +447,14 @@ const AjustesView = {
     await this._saveConfig({ temaOscuro: checked });
     document.documentElement.style.colorScheme = checked ? 'dark' : 'light';
     App.toast(checked ? 'Modo oscuro' : 'Modo claro');
+  },
+
+  async _toggleContextos(checked) {
+    await this._saveConfig({ mostrarContextos: checked });
+    document.body.classList.toggle('hide-context', !checked);
+    const cards = document.querySelectorAll('.card-dark-gradient, .card-total-3d');
+    cards.forEach(c => c.classList.toggle('compact', !checked));
+    App.toast(checked ? 'Descripciones de contexto visibles' : 'Descripciones de contexto ocultas');
   },
 
   async _guardarPreferencia(key, val) {
