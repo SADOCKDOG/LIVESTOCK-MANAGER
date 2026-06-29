@@ -80,21 +80,25 @@ const GanaderiaView = {
 
       <!-- KPIs Ganadería Unificados en Filas -->
       <div class="card p-16 mb-16 border-222 border-left-5-mode bg-white-5">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+        <div class="text-xs text-mode font-black uppercase tracking-wider mb-10 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
         <div class="flex flex-col">
-          <div class="py-12 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900">Lotes / Rebaños</span>
-            <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} lotes</strong>
+          <div class="flex">
+            <div class="flex-1 h-90 py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Lotes / Rebaños</span>
+              <strong class="text-xl font-950 text-mode">${rebanosModo.length} lotes</strong>
+            </div>
+            <div class="flex-1 h-90 py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Animales Activos</span>
+              <strong class="text-xl font-950 text-mode">${animalesActivos.length} cabezas</strong>
+            </div>
           </div>
-          <div class="py-12 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900">Animales Activos</span>
-            <strong class="text-xl font-950 text-green">${animalesActivos.length} cabezas</strong>
-          </div>
-          <div class="py-12 flex justify-between items-center">
-            <span class="text-xs text-gray uppercase font-900">Zonas / Parcelas</span>
-            <strong class="text-xl font-950 text-blue">${zonas.length} parcelas</strong>
+          <div class="flex justify-center">
+            <div class="flex-1 h-90 py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900">Zonas / Parcelas</span>
+              <strong class="text-xl font-950 text-mode">${zonas.length} parcelas</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -108,7 +112,7 @@ const GanaderiaView = {
         <div class="grid gap-8">
           ${rebanosModo.length > 0
             ? rebanosModo.slice(0, 8).map(r => `
-              <a href="#/rebano?id=${r.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:10px; margin:0;">
+              <a href="#/rebano?id=${r.id}" class="card card-animal no-underline border-left-4-mode p-10 m-0">
                 <div class="flex justify-between items-center">
                   <div class="text-xs">
                     <div class="font-bold text-white">${r.nombre || 'Rebaño'}</div>
@@ -134,7 +138,7 @@ const GanaderiaView = {
                 const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
                 const ageText = a.fechaNacimiento ? ` · ${Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365))} años` : '';
                 return `
-                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:14px; margin:0; margin-bottom:8px;">
+                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline border-left-4-mode p-14 m-0 mb-8">
                     <div class="flex flex-col gap-10">
                       <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-10 min-w-0">

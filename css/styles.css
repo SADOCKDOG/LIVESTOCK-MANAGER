@@ -1044,6 +1044,7 @@ label {
 .max-w-450 { max-width: 450px; }
 .h-40      { height: 40px; }
 .h-45      { height: 45px; }
+.h-90      { height: 90px; }
 .d-block   { display: block; }
 .min-h-60  { min-height: 60px; }
 .col-span-2 { grid-column: span 2; }
@@ -3053,6 +3054,8 @@ label {
 .hint-box-green  { background: rgba(16,185,129,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--c-success); flex-shrink: 0; }
 
 /* === Batch 5 — max-width containers === */
+.max-w-220 { max-width: 220px; }
+.max-w-320 { max-width: 320px; }
 .max-w-380 { max-width: 380px; }
 .max-w-500 { max-width: 500px; }
 .max-w-600 { max-width: 600px; }
