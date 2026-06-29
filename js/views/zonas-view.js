@@ -21,7 +21,7 @@ const ZonasView = {
             <span class="widget-link-label">Nueva Zona</span>
           </button>
         </div>
-        <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">Creación y gestión de zonas, parcelas y recintos de la explotación</span></div>
+        <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">${Icons.zonas()} Creación y gestión de zonas, parcelas y recintos de la explotación</span></div>
       </div>`;
     if (zonasConIndice.length === 0)
       html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;

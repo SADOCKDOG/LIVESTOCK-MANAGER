@@ -46,7 +46,7 @@ const TransportistasView = {
                       <span class="widget-link-label">Nuevo Transportista</span>
                     </button>
                   </div>
-                  <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">Registro y gestión de transportistas, vehículos y flota de transporte</span></div>
+                  <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">${Icons.transportistas()} Registro y gestión de transportistas, vehículos y flota de transporte</span></div>
                 </div>
                 <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
