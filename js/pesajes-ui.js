@@ -123,7 +123,7 @@ const PesajesUI = {
                          <div id="w-current-crotal" class="pesaje-crotal font-black">--</div>
                          <div id="w-current-desc" class="text-aaa text-xs font-900 uppercase tracking-widest mt-8 text-center">--</div>
 
-                         <div class="mt-20 py-12 bg-black border border-222 rounded-xl">
+                         <div class="mt-20 pesaje-input-wrapper">
                              <input type="number" id="w-peso-gigante" step="0.1" inputmode="decimal" placeholder="0.0"
                                     class="pesaje-peso-input font-black">
                              <div class="pesaje-unidad-label font-950 uppercase tracking-widest">${unidadLabel}</div>
