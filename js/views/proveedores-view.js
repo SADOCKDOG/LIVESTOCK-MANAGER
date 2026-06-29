@@ -46,10 +46,22 @@ const ProveedoresView = {
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="grid grid-cols-3 gap-8 mb-16">
-                <div class="summary-cell summary-cell-kpi border-left-violet"><small class="s-lbl uppercase font-900">PROVEEDORES</small><div class="s-val inf-val-lg text-purple">${proveedores.length}</div></div>
-                <div class="summary-cell summary-cell-kpi border-left-amber"><small class="s-lbl uppercase font-900">GASTO ASIGNADO</small><div class="s-val inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
-                <div class="summary-cell summary-cell-kpi border-left-blue"><small class="s-lbl uppercase font-900">REGISTROS</small><div class="s-val inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
+              <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+                <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
+                <div class="grid grid-cols-3 gap-6">
+                  <div class="bg-black rounded-lg p-8 text-center border border-222">
+                    <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">PROVEEDORES</div>
+                    <div class="text-xl font-black" style="color:var(--c-accent);">${proveedores.length}</div>
+                  </div>
+                  <div class="bg-black rounded-lg p-8 text-center border border-222">
+                    <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">GASTO ASIG.</div>
+                    <div class="text-xl font-black" style="color:var(--c-warning);">${totalGasto.toLocaleString()}€</div>
+                  </div>
+                  <div class="bg-black rounded-lg p-8 text-center border border-222">
+                    <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">REGISTROS</div>
+                    <div class="text-xl font-black" style="color:var(--c-info);">${gastosConProveedor.length}</div>
+                  </div>
+                </div>
               </div>`;
         }
         this._cachedData = proveedores;
@@ -85,35 +97,25 @@ const ProveedoresView = {
             return;
         }
 
-        contenedor.innerHTML = `<div class="grid gap-12">${lista.map(p => `
+        contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => `
           <div class="card card-animal no-underline" onclick="ProveedoresView.renderDetalle(${p.id})"
-            style="border-left:4px solid #10b981; padding:14px; margin:0; margin-bottom:8px;">
-            <div class="flex flex-col gap-10">
-              <div class="flex justify-between items-center w-full">
-                <div class="flex items-center gap-10 min-w-0">
-                  <div class="text-xl" style="color:#10b981">${Icons.proveedores()}</div>
-                  <div class="text-xs">
-                    <div class="font-950 text-white uppercase text-base tracking-tight">${p.nombre}</div>
-                    <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
-                      ${p.nif_cif ? Icons.documento() + ' ' + p.nif_cif : ''}${p.ciudad ? ' · ' + Icons.zonas() + ' ' + p.ciudad.toUpperCase() : ''}
-                    </div>
-                  </div>
+            style="border-left:4px solid var(--c-success); padding:12px; margin:0; width:100%;">
+            <div class="flex justify-between items-start gap-6" style="width:100%;">
+              <div class="min-w-0 flex-1" style="min-width:0;">
+                <div class="flex items-center gap-6">
+                  <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap;">${p.nombre}</span>
                 </div>
-                <div class="text-right">
-                  ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:#ef444420; color:#ef4444; border:1px solid #ef444440;">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:#10b98120; color:#10b981; border:1px solid #10b98140;">ACTIVO</span>'}
+                <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
+                  ${p.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${p.nif_cif}</span>` : ''}
+                  ${p.ciudad ? `<span class="flex items-center gap-2">${Icons.zonas()} ${p.ciudad.toUpperCase()}</span>` : ''}
                 </div>
+                ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
+                <div class="flex flex-wrap gap-2 mt-2">
+                  ${p.categorias.map(cat => `<span class="text-[0.5rem] text-gray font-800 uppercase bg-black px-6 py-2 rounded-sm border border-222">${cat.toUpperCase()}</span>`).join('')}
+                </div>` : ''}
               </div>
-
-              <div class="flex justify-between items-end w-full mt-10">
-                <div class="flex-1 min-w-0">
-                  ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
-                  <div class="flex flex-wrap gap-4 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter">
-                    ${p.categorias.map(cat => `<span class="flex items-center gap-2 bg-black px-8 py-2 rounded-sm border border-222">${Icons.paquete()} ${cat.toUpperCase()}</span>`).join('')}
-                  </div>` : ''}
-                </div>
-                <div class="text-right">
-                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
-                </div>
+              <div class="flex flex-col items-end gap-3 flex-shrink-0">
+                ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:rgba(239,68,68,0.15); color:var(--c-danger); border:1px solid rgba(239,68,68,0.3);">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:rgba(16,185,129,0.15); color:var(--c-success); border:1px solid rgba(16,185,129,0.3);">ACTIVO</span>'}
               </div>
             </div>
           </div>
