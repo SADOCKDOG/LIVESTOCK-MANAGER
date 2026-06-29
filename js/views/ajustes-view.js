@@ -15,6 +15,23 @@ const AjustesView = {
     const eventos = activeId ? await window.db.getAllFromIndex('registro_eventos', 'fincaId', activeId).catch(() => []) : [];
     const docsLegales = await window.db.getAll('documentos_legales').catch(() => []);
     const tramitesFinca = activeId ? docsLegales.filter(d => Number(d.fincaId) === Number(activeId)) : [];
+    let adsgs = activeId ? await window.ADSGs.list() : [];
+    if (activeId && activeFinca && activeFinca.adsg_nombre && adsgs.length === 0) {
+      try {
+        await window.ADSGs.save({
+          nombre: activeFinca.adsg_nombre,
+          codigo: activeFinca.adsg_codigo || '',
+          veterinario: activeFinca.adsg_veterinario || '',
+          colegiado: activeFinca.adsg_vet_colegiado || '',
+          telefono: activeFinca.adsg_vet_telefono || '',
+          vet_nif: activeFinca.adsg_vet_nif || ''
+        });
+        adsgs = await window.ADSGs.list();
+      } catch (e) {
+        console.error("Error al registrar ADSG inicial:", e);
+      }
+    }
+    const costesRef = activeId ? await window.db.getAllFromIndex('config_costes_referencia', 'fincaId', Number(activeId)) : [];
     const config = await this._loadConfig();
     const lastBackup = localStorage.getItem('last_backup_date');
     const catalogoTiposREGA = window.ComunidadesService?.getTiposExplotacionREGA ? window.ComunidadesService.getTiposExplotacionREGA().slice(0, 5) : [];
@@ -115,20 +132,50 @@ const AjustesView = {
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.sanidad()} Sanidad Ganadera (ADSG)</h3>
         <p class="text-gray mt-5 text-sm">Agrupación de Defensa Sanitaria Ganadera y datos del veterinario de explotación.</p>
         ${activeFinca ? `
-        <div class="info-box mt-15">
-          <div class="grid grid-cols-2 gap-8 text-85">
-            <div><span class="text-gray">ADSG:</span> <strong class="text-white">${activeFinca.adsg_nombre || '—'}</strong></div>
-            <div><span class="text-gray">Código:</span> <strong class="text-white">${activeFinca.adsg_codigo || '—'}</strong></div>
-            <div><span class="text-gray">Veterinario:</span> <strong class="text-white">${activeFinca.adsg_veterinario || '—'}</strong></div>
-            <div><span class="text-gray">Colegiado:</span> <strong class="text-white">${activeFinca.adsg_vet_colegiado || '—'}</strong></div>
-            <div><span class="text-gray">Teléfono:</span> <strong class="text-white">${activeFinca.adsg_vet_telefono || '—'}</strong></div>
-            <div><span class="text-gray">Vencimiento:</span> <strong class="${activeFinca.adsg_fecha_vencimiento ? 'text-amber' : 'text-gray'}">${activeFinca.adsg_fecha_vencimiento || '—'}${activeFinca.adsg_fecha_vencimiento ? AjustesView._diasRestantes(activeFinca.adsg_fecha_vencimiento) : ''}</strong></div>
-          </div>
+        <div class="grid gap-10 mt-15">
+          ${adsgs.map(a => `
+            <div class="flex justify-between items-center rounded-sm bg-black border border-222 p-12">
+              <div>
+                <div class="font-bold text-white uppercase text-sm">${a.nombre}</div>
+                <div class="text-gray-500 text-[0.65rem] mt-4 uppercase font-800 tracking-wider">CÓDIGO: <strong class="text-white">${a.codigo || '—'}</strong> · VET: <strong class="text-white">${a.veterinario || '—'}</strong></div>
+              </div>
+              <div class="flex gap-6">
+                <button class="btn btn-secondary btn-sm" onclick="AjustesView._editarADSG(${a.id})">${Icons.editar()}</button>
+                <button class="btn btn-danger btn-sm" onclick="AjustesView._eliminarADSG(${a.id})">${Icons.eliminar()}</button>
+              </div>
+            </div>
+          `).join('')}
+          ${adsgs.length === 0 ? '<p class="text-center text-555 p-10 uppercase font-800 text-xs">No hay ADSGs registradas</p>' : ''}
         </div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-20">
-          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._editarFincaActiva()">
-            ${Icons.editar()}
-            <span class="widget-link-label">Editar ADSG</span>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="AjustesView._nuevoADSG()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nuevo ADSG</span>
+          </button>
+        </div>` : '<p class="text-center text-555 p-20 uppercase font-800 text-xs">Activa una finca para ver datos</p>'}
+      </div>
+
+      <!-- ===================== COSTES DE REFERENCIA ===================== -->
+      <div class="card card-accent card-accent-gold mb-25 p-20">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.dinero()} Costes de Referencia</h3>
+        <p class="text-gray mt-5 text-sm">Define el coste de alimentación estimado medio por especie para el análisis de rentabilidad.</p>
+        ${activeFinca ? `
+        <div class="grid gap-10 mt-15">
+          ${costesRef.map(c => `
+            <div class="flex justify-between items-center rounded-sm bg-black border border-222 p-12">
+              <div>
+                <div class="font-bold text-white uppercase text-sm">${c.especie}</div>
+                <div class="text-gold font-950 text-md mt-4">${c.coste_diario_estimado.toFixed(2)} € <small class="text-gray-500 font-700">/ ANIMAL / DÍA</small></div>
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="AjustesView._eliminarCosteRef(${c.id})">${Icons.eliminar()}</button>
+            </div>
+          `).join('')}
+          ${costesRef.length === 0 ? '<p class="text-center text-555 p-10 uppercase font-800 text-xs">No hay costes de referencia definidos</p>' : ''}
+        </div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-20">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._agregarCosteReferencia()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nuevo Coste Ref.</span>
           </button>
         </div>` : '<p class="text-center text-555 p-20 uppercase font-800 text-xs">Activa una finca para ver datos</p>'}
       </div>
@@ -763,6 +810,12 @@ const AjustesView = {
         const f = new Date(e.fecha);
         return f >= inicioMes && f <= finMes;
       });
+
+      if (eventosMes.length === 0) {
+        App.toastError('No hay eventos registrados en este mes para exportar');
+        return;
+      }
+
       const csv = window.ExportService.generarCSV_Movimientos(eventosMes, animales, finca);
       const ym = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
       const filename = `cierre_siggan_${ym}.csv`;
@@ -782,10 +835,192 @@ const AjustesView = {
     overlay.innerHTML = `
       <div class="manual-header">
         <strong style="color:#e0a83a;" class="inline-flex items-center gap-6">${Icons.libro()} Manual de Usuario</strong>
-        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">${Icons.cerrar()} Cerrar</button>
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn btn-secondary" style="padding:6px 12px; font-size:0.7rem;">${Icons.cerrar()} Cerrar</button>
       </div>
       <iframe src="manual/index.html" class="manual-iframe"></iframe>`;
     document.body.appendChild(overlay);
+  },
+
+  async _nuevoADSG() {
+    const fincaId = await Fincas.getActiveId();
+    const html = `
+      <div class="card p-25 max-w-400 border-top-5-blue">
+        <h3 class="mt-0 text-white font-900 uppercase">${Icons.sanidad()} NUEVA ADSG</h3>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">NOMBRE AGRUPACIÓN *</label>
+          <input type="text" id="adsg-nombre" placeholder="EJ: ADSG SIERRA NORTE" class="wizard-input uppercase font-800">
+        </div>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">CÓDIGO OFICIAL *</label>
+          <input type="text" id="adsg-codigo" placeholder="EJ: ADSG-123" class="wizard-input uppercase font-800">
+        </div>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">VETERINARIO RESPONSABLE</label>
+          <input type="text" id="adsg-vet" placeholder="NOMBRE COMPLETO" class="wizard-input uppercase font-800">
+        </div>
+        <div class="grid grid-cols-2 gap-10 mb-12">
+          <div class="wizard-input-group">
+            <label class="wizard-label">Nº COLEGIADO</label>
+            <input type="text" id="adsg-col" placeholder="0000" class="wizard-input font-800">
+          </div>
+          <div class="wizard-input-group">
+            <label class="wizard-label">NIF VET.</label>
+            <input type="text" id="adsg-vet-nif" placeholder="NIF" class="wizard-input font-800">
+          </div>
+        </div>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">TELÉFONO DE CONTACTO</label>
+          <input type="tel" id="adsg-tel" placeholder="600000000" class="wizard-input font-800">
+        </div>
+        <div class="flex gap-10 mt-20">
+          <button class="widget-link-btn widget-link-btn--neon neon-success flex-1" id="btn-save-adsg">${Icons.guardar()} <span class="widget-link-label">GUARDAR</span></button>
+          <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span></button>
+        </div>
+      </div>`;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center;';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#btn-save-adsg').onclick = async () => {
+      const nombre = document.getElementById('adsg-nombre').value.trim();
+      const codigo = document.getElementById('adsg-codigo').value.trim();
+      const veterinario = document.getElementById('adsg-vet').value.trim();
+      const colegiado = document.getElementById('adsg-col').value.trim();
+      const telefono = document.getElementById('adsg-tel').value.trim();
+      const vet_nif = document.getElementById('adsg-vet-nif').value.trim();
+
+      if (!nombre || !codigo) return App.toastError("Nombre y Código son obligatorios");
+
+      try {
+        await window.ADSGs.save({ nombre, codigo, veterinario, colegiado, telefono, vet_nif });
+        overlay.remove();
+        App.toast("✅ ADSG Guardada");
+        AjustesView.render();
+      } catch (e) { App.toastError(e.message); }
+    };
+  },
+
+  async _editarADSG(id) {
+    const adsg = await window.ADSGs.get(id);
+    if (!adsg) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center;';
+    overlay.innerHTML = `
+      <div class="card p-25 max-w-400 border-top-5-blue">
+        <h3 class="mt-0 text-white font-900 uppercase">${Icons.editar()} EDITAR ADSG</h3>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">NOMBRE AGRUPACIÓN *</label>
+          <input type="text" id="adsg-nombre" value="${adsg.nombre}" class="wizard-input uppercase font-800">
+        </div>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">CÓDIGO OFICIAL *</label>
+          <input type="text" id="adsg-codigo" value="${adsg.codigo}" class="wizard-input uppercase font-800">
+        </div>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">VETERINARIO RESPONSABLE</label>
+          <input type="text" id="adsg-vet" value="${adsg.veterinario || ''}" class="wizard-input uppercase font-800">
+        </div>
+        <div class="grid grid-cols-2 gap-10 mb-12">
+          <div class="wizard-input-group">
+            <label class="wizard-label">Nº COLEGIADO</label>
+            <input type="text" id="adsg-col" value="${adsg.colegiado || ''}" class="wizard-input font-800">
+          </div>
+          <div class="wizard-input-group">
+            <label class="wizard-label">NIF VET.</label>
+            <input type="text" id="adsg-vet-nif" value="${adsg.vet_nif || ''}" class="wizard-input font-800">
+          </div>
+        </div>
+        <div class="wizard-input-group mb-12">
+          <label class="wizard-label">TELÉFONO DE CONTACTO</label>
+          <input type="tel" id="adsg-tel" value="${adsg.telefono || ''}" class="wizard-input font-800">
+        </div>
+        <div class="flex gap-10 mt-20">
+          <button class="widget-link-btn widget-link-btn--neon neon-success flex-1" id="btn-update-adsg">${Icons.guardar()} <span class="widget-link-label">GUARDAR</span></button>
+          <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#btn-update-adsg').onclick = async () => {
+      adsg.nombre = document.getElementById('adsg-nombre').value.trim();
+      adsg.codigo = document.getElementById('adsg-codigo').value.trim();
+      adsg.veterinario = document.getElementById('adsg-vet').value.trim();
+      adsg.colegiado = document.getElementById('adsg-col').value.trim();
+      adsg.telefono = document.getElementById('adsg-tel').value.trim();
+      adsg.vet_nif = document.getElementById('adsg-vet-nif').value.trim();
+
+      try {
+        await window.ADSGs.save(adsg);
+        overlay.remove();
+        App.toast("✅ ADSG Actualizada");
+        AjustesView.render();
+      } catch (e) { App.toastError(e.message); }
+    };
+  },
+
+  async _eliminarADSG(id) {
+    if (!await Confirm.confirm("Eliminar ADSG", "¿Deseas eliminar esta agrupación?")) return;
+    await window.ADSGs.remove(id);
+    App.toast("🗑️ ADSG Eliminada");
+    AjustesView.render();
+  },
+
+  async _agregarCosteReferencia() {
+    const fincaId = await Fincas.getActiveId();
+    const especies = await window.db.getAll("config_especies");
+
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center;';
+    overlay.innerHTML = `
+      <div class="card p-25 max-w-340 border-top-5-amber">
+        <h3 class="mt-0 text-gold font-900 uppercase">${Icons.dinero()} NUEVO COSTE REF.</h3>
+        <div class="wizard-input-group mb-15">
+          <label class="wizard-label">ESPECIE</label>
+          <select id="cref-especie" class="wizard-input font-800 uppercase">
+            ${especies.map(e => `<option value="${e.nombre}">${e.nombre.toUpperCase()}</option>`).join('')}
+          </select>
+        </div>
+        <div class="wizard-input-group mb-15">
+          <label class="wizard-label">COSTE ESTIMADO (€/ANIMAL/DÍA)</label>
+          <input type="number" id="cref-valor" value="0.50" step="0.01" class="wizard-input font-950 text-xl text-amber">
+        </div>
+        <div class="flex gap-10 mt-20">
+          <button class="widget-link-btn widget-link-btn--neon neon-success flex-1" id="btn-save-cref">${Icons.guardar()} <span class="widget-link-label">GUARDAR</span></button>
+          <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#btn-save-cref').onclick = async () => {
+      const especie = document.getElementById('cref-especie').value;
+      const valor = parseFloat(document.getElementById('cref-valor').value) || 0;
+      if (valor <= 0) return App.toastError("El valor debe ser mayor a 0");
+
+      try {
+        await window.db.add('config_costes_referencia', {
+          fincaId: Number(fincaId),
+          especie,
+          coste_diario_estimado: valor,
+          actualizadoEn: new Date().toISOString()
+        });
+        overlay.remove();
+        App.toast("✅ Coste de referencia guardado");
+        AjustesView.render();
+      } catch (e) { App.toastError(e.message); }
+    };
+  },
+
+  async _eliminarCosteRef(id) {
+    if (!await Confirm.confirm("Eliminar Coste Ref.", "¿Eliminar este parámetro de coste?")) return;
+    await window.db.delete('config_costes_referencia', id);
+    App.toast("🗑️ Parámetro eliminado");
+    AjustesView.render();
   }
 };
 

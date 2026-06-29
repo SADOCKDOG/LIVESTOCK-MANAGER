@@ -43,20 +43,31 @@ window.WizardCrotales = {
                 <option value="Bolo Ruminal + Botón Visual" ${data.tipo === "Bolo Ruminal + Botón Visual" ? "selected" : ""}>BOLO RUMINAL + BOTÓN VISUAL</option>
               </select>
             </div>
+          <div class="card card-accent card-accent-gold p-16 mt-10">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.animales()} DATOS DEL PEDIDO</div>
             <div class="wizard-input-group mb-12">
-              <label class="wizard-label">CANTIDAD (Nº DE PARES)</label>
-              <input type="number" id="w-pd-cant" value="${data.cantidad}" min="1" class="wizard-input font-950 text-2xl text-green">
+              <label class="wizard-label">TIPO DE CROTAL</label>
+              <select id="w-pd-tipo" class="wizard-input">
+                <option value="Bandera + Botón (EID)" ${data.tipo === 'Bandera + Botón (EID)' ? 'selected' : ''}>🏷️ Bandera + Botón (EID)</option>
+                <option value="Bolo Ruminal (EID)" ${data.tipo === 'Bolo Ruminal (EID)' ? 'selected' : ''}>💊 Bolo Ruminal (EID)</option>
+                <option value="Crotal Visual Clásico" ${data.tipo === 'Crotal Visual Clásico' ? 'selected' : ''}>👁️ Crotal Visual Clásico</option>
+              </select>
             </div>
-            <div class="p-10 bg-black border border-222 rounded-sm mt-10">
-              <p class="text-[0.6rem] text-aaa uppercase font-800 tracking-tight leading-relaxed m-0">
-                ${Icons.info()} CROTAL DERECHO (VISUAL) · CROTAL IZQUIERDO (RFID/EID). REGLAMENTADO POR RD 787/2023 Y 1307/2024.
-              </p>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">ESPECIE DESTINO</label>
+              <select id="w-pd-especie" class="wizard-input">
+                ${especiesPedido.map(esp => `<option value="${esp}" ${data.especie === esp ? 'selected' : ''}>${esp}</option>`).join('')}
+              </select>
+            </div>
+            <div class="wizard-input-group mb-10">
+              <label class="wizard-label">CANTIDAD DE PARES</label>
+              <input type="number" id="w-pd-cant" value="${data.cantidad}" class="wizard-input font-900" min="1" step="1">
             </div>
           </div>
         `,
         onChange: async (data) => {
-          data.especie = document.getElementById('w-pd-especie')?.value || data.especie;
           data.tipo = document.getElementById('w-pd-tipo')?.value || data.tipo;
+          data.especie = document.getElementById('w-pd-especie')?.value || data.especie;
           data.cantidad = parseInt(document.getElementById('w-pd-cant')?.value) || 0;
         },
         validate: async (data) => {
@@ -65,39 +76,53 @@ window.WizardCrotales = {
         }
       },
       {
-        content: (data) => `
-          <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.edificio()} DESTINO Y ADSG</div>
-            <div class="wizard-input-group mb-12">
-              <label class="wizard-label">DESTINATARIO (ADSG / OCA)</label>
-              <input type="text" id="w-pd-adsg" value="${data.adsg_nombre}" placeholder="EJ: ADSG SIERRA NORTE" class="wizard-input uppercase font-800">
-            </div>
-            <div class="wizard-input-group mb-12">
-              <label class="wizard-label">CÓDIGO ADSG</label>
-              <input type="text" id="w-pd-adsg-cod" value="${data.adsg_codigo}" placeholder="OPCIONAL" class="wizard-input uppercase font-800">
-            </div>
-            <div class="wizard-input-group mb-12">
-              <label class="wizard-label">VETERINARIO RESPONSABLE</label>
-              <input type="text" id="w-pd-vet" value="${data.adsg_veterinario}" placeholder="NOMBRE DEL VETERINARIO" class="wizard-input uppercase font-800">
-            </div>
-            <div class="grid grid-cols-2 gap-10 mb-10">
-              <div class="wizard-input-group">
-                <label class="wizard-label">Nº COLEGIADO</label>
-                <input type="text" id="w-pd-vet-col" value="${data.adsg_vet_colegiado}" placeholder="0000" class="wizard-input font-800">
+        content: async (data) => {
+          const adsgs = await window.ADSGs.list().catch(() => []);
+          return `
+            <div class="card card-accent card-accent-blue p-16 mt-10">
+              <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.edificio()} DESTINO Y ADSG</div>
+              
+              ${adsgs.length > 0 ? `
+              <div class="wizard-input-group mb-14">
+                <label class="wizard-label">SELECCIONAR ADSG REGISTRADA</label>
+                <select id="w-pd-adsg-select" class="wizard-input text-sm font-800" onchange="WizardCrotales._onSelectADSG(this.value, ${JSON.stringify(adsgs).replace(/"/g, '&quot;')})">
+                  <option value="">-- Escribir manualmente --</option>
+                  ${adsgs.map(a => `<option value="${a.id}" ${data.adsg_codigo === a.codigo ? 'selected' : ''}>${a.nombre} (${a.codigo})</option>`).join('')}
+                </select>
               </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label">NIF VET.</label>
-                <input type="text" id="w-pd-vet-nif" value="${data.adsg_vet_nif}" placeholder="NIF" class="wizard-input font-800">
+              ` : ''}
+
+              <div class="wizard-input-group mb-12">
+                <label class="wizard-label">DESTINATARIO (ADSG / OCA) *</label>
+                <input type="text" id="w-pd-adsg" value="${data.adsg_nombre || ''}" placeholder="EJ: ADSG SIERRA NORTE" class="wizard-input uppercase font-800">
               </div>
+              <div class="wizard-input-group mb-12">
+                <label class="wizard-label">CÓDIGO ADSG</label>
+                <input type="text" id="w-pd-adsg-cod" value="${data.adsg_codigo || ''}" placeholder="OPCIONAL" class="wizard-input uppercase font-800">
+              </div>
+              <div class="wizard-input-group mb-12">
+                <label class="wizard-label">VETERINARIO RESPONSABLE</label>
+                <input type="text" id="w-pd-vet" value="${data.adsg_veterinario || ''}" placeholder="NOMBRE DEL VETERINARIO" class="wizard-input uppercase font-800">
+              </div>
+              <div class="grid grid-cols-2 gap-10 mb-10">
+                <div class="wizard-input-group">
+                  <label class="wizard-label">Nº COLEGIADO</label>
+                  <input type="text" id="w-pd-vet-col" value="${data.adsg_vet_colegiado || ''}" placeholder="0000" class="wizard-input font-800">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="wizard-label">NIF VET.</label>
+                  <input type="text" id="w-pd-vet-nif" value="${data.adsg_vet_nif || ''}" placeholder="NIF" class="wizard-input font-800">
+                </div>
+              </div>
+              ${finca.comunidad_autonoma ? `
+              <div class="p-10 bg-black border border-222 rounded-sm">
+                <p class="text-[0.6rem] text-aaa uppercase font-900 tracking-tight leading-relaxed m-0 text-center">
+                  LA SOLICITUD SE DIRIGIRÁ A <strong>${finca.comunidad_autonoma.toLowerCase() === 'andalucia' ? 'SIGGAN' : 'BADIGEX'}</strong> PARA TRAMITACIÓN OFICIAL.
+                </p>
+              </div>` : ''}
             </div>
-            ${finca.comunidad_autonoma ? `
-            <div class="p-10 bg-black border border-222 rounded-sm">
-              <p class="text-[0.6rem] text-aaa uppercase font-900 tracking-tight leading-relaxed m-0 text-center">
-                LA SOLICITUD SE DIRIGIRÁ A <strong>${finca.comunidad_autonoma === 'andalucia' ? 'SIGGAN' : 'BADIGEX'}</strong> PARA TRAMITACIÓN OFICIAL.
-              </p>
-            </div>` : ''}
-          </div>
-        `,
+          `;
+        },
         onChange: async (data) => {
           data.adsg_nombre = document.getElementById('w-pd-adsg')?.value.trim() || data.adsg_nombre;
           data.adsg_codigo = document.getElementById('w-pd-adsg-cod')?.value.trim() || '';

@@ -71,6 +71,20 @@
       await sleep(400);
       console.log('[SEED] Finca creada:', fincaId);
 
+      // Registrar ADSG demo en el almacén de ADSGs
+      try {
+        await ADSGs.save({
+          nombre: DEMO_FINCA.adsg_nombre,
+          codigo: DEMO_FINCA.adsg_codigo,
+          veterinario: DEMO_FINCA.adsg_veterinario,
+          colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          telefono: '654789012'
+        });
+        console.log('[SEED] ADSG demo registrada');
+      } catch (e) {
+        console.log('[SEED] Error registrando ADSG:', e.message);
+      }
+
       // 2. Rebaños
       var rebDefs = [
         { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId, tipo_explotacion_rega: 'Producción y reproducción' },
