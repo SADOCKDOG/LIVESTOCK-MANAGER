@@ -339,30 +339,28 @@ const InformesView = {
       <!-- Rentabilidad -->
       <div class="card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title pb-8 flex items-center gap-6">${Icons.dinero()} Rentabilidad General</div>
-        <div class="grid grid-cols-2 gap-10 mb-10">
-          <div class="info-box border-left-red">
-            <small class="s-lbl">CÁRNICA</small>
-            <div class="inf-val-lg text-amber">${(rent?.detalles?.carne || 0).toLocaleString()}€</div>
-          </div>
-          <div class="info-box border-left-gold">
-            <small class="s-lbl">LÁCTEA</small>
-            <div class="inf-val-lg text-gold">${(rent?.detalles?.leche || 0).toLocaleString()}€</div>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-10 mb-10">
-          <div class="info-box border-left-blue">
-            <small class="s-lbl">ALIM. ESTIMADA</small>
-            <div class="inf-val-md text-white">${(rent?.detalles?.alimentacion_estimada || 0).toLocaleString()}€</div>
-          </div>
-          <div class="info-box border-left-gray">
-            <small class="s-lbl">OTROS GASTOS</small>
-            <div class="inf-val-md text-white">${(rent?.detalles?.otros_gastos || 0).toLocaleString()}€</div>
-          </div>
-        </div>
-        <div class="info-box border-left-green">
-          <div class="flex justify-between">
-            <div><small class="s-lbl">BALANCE NETO</small><div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>
-            <div class="text-right"><small class="s-lbl">RENTABILIDAD</small><div class="inf-val-lg ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
+        <div class="card p-14 mb-2 border-222" style="border-left:5px solid #10b981; background:rgba(255,255,255,0.02);">
+          <div class="flex flex-col">
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Ingresos Cárnica</span>
+              <strong class="text-xl font-950 text-amber">${(rent?.detalles?.carne || 0).toLocaleString()} €</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Ingresos Láctea</span>
+              <strong class="text-xl font-950 text-gold">${(rent?.detalles?.leche || 0).toLocaleString()} €</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Alimentación Estimada</span>
+              <strong class="text-base font-900 text-red">−${(rent?.detalles?.alimentacion_estimada || 0).toLocaleString()} €</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Otros Gastos</span>
+              <strong class="text-base font-900 text-red">−${(rent?.detalles?.otros_gastos || 0).toLocaleString()} €</strong>
+            </div>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-white uppercase font-950">Balance Neto</span>
+              <span class="text-2xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €  <span class="text-base font-800">(${pctRent}%)</span></span>
+            </div>
           </div>
         </div>
       </div>
@@ -663,33 +661,32 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('reproductivo', 'Reproductivo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} KPIs Reproductivos</div>
-        <div class="grid grid-cols-2 gap-10 mb-12">
-          <div class="info-box border-left-violet">
-            <small class="s-lbl">FERTILIDAD</small>
-            <div class="inf-val-lg text-purple">${kpisRepro.tasaFertilidadPct}%</div>
-          </div>
-          <div class="info-box border-left-violet">
-            <small class="s-lbl">IEP</small>
-            <div class="inf-val-lg text-purple">${kpisRepro.intervaloEntrePartosDias}d</div>
-          </div>
-          <div class="info-box border-left-violet">
-            <small class="s-lbl">PROLIFICIDAD</small>
-            <div class="inf-val-lg text-purple">${kpisRepro.indiceProlificidad}</div>
-          </div>
-          <div class="info-box border-left-violet">
-            <small class="s-lbl">PARTOS</small>
-            <div class="inf-val-lg text-purple">${kpisRepro.totalPartosAnalizados}</div>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-10 mb-12">
-          <div class="info-box border-left-${parseFloat(tasaAbortos) > 10 ? 'red' : 'green'}">
-            <small class="s-lbl">RATIO DE ABORTOS</small>
-            <div class="inf-val-lg ${parseFloat(tasaAbortos) > 10 ? 'text-red' : 'text-green'}">${tasaAbortos}%</div>
-            <small class="text-gray text-xs">${abortos} abortos de ${totalEventos} gestaciones</small>
-          </div>
-          <div class="info-box border-left-blue">
-            <small class="s-lbl">DISTRIBUCIÓN DE PARTOS</small>
-            <div class="inf-val-md text-white">${partos.length} partos</div>
+        <div class="card p-14 mb-14 border-222" style="border-left:5px solid #8b5cf6; background:rgba(139,92,246,0.03);">
+          <div class="flex flex-col">
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Fertilidad</span>
+              <strong class="text-xl font-950 text-purple">${kpisRepro.tasaFertilidadPct}%</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Intervalo Entre Partos (IEP)</span>
+              <strong class="text-xl font-950 text-purple">${kpisRepro.intervaloEntrePartosDias} días</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Prolifeidad</span>
+              <strong class="text-xl font-950 text-purple">${kpisRepro.indiceProlificidad}</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Total Partos</span>
+              <strong class="text-xl font-950 text-blue">${kpisRepro.totalPartosAnalizados}</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Ratio de Abortos</span>
+              <strong class="text-xl font-950 ${parseFloat(tasaAbortos) > 10 ? 'text-red' : 'text-green'}">${tasaAbortos}% <span class="text-xs text-gray font-700">(${abortos} de ${totalEventos})</span></strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900">Distribución de Partos</span>
+              <strong class="text-xl font-950 text-blue">${partos.length}</strong>
+            </div>
           </div>
         </div>
         ${partos.length > 0 ? `
@@ -735,18 +732,20 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('sanidad', 'Sanidad') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.sanidad()} Sanidad y Tratamientos</div>
-        <div class="grid grid-cols-3 gap-10 mb-12">
-          <div class="info-box border-left-red">
-            <small class="s-lbl">TRATAMIENTOS</small>
-            <div class="inf-val-lg text-red">${estadisticasSanidad.totalTratamientos || 0}</div>
-          </div>
-          <div class="info-box border-left-red">
-            <small class="s-lbl">SUPRESIÓN ACTIVA</small>
-            <div class="inf-val-lg text-red">${estadisticasSanidad.retencionesActivas || 0}</div>
-          </div>
-          <div class="info-box border-left-${costeSanitarioAnimal > 0 ? 'amber' : 'gray'}">
-            <small class="s-lbl">COSTE SANITARIO/ANIMAL</small>
-            <div class="inf-val-lg text-amber">${costeSanitarioAnimal > 0 ? costeSanitarioAnimal.toFixed(2) + '€' : '—'}</div>
+        <div class="card p-14 mb-14 border-222" style="border-left:5px solid #ef4444; background:rgba(239,68,68,0.02);">
+          <div class="flex flex-col">
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Total Tratamientos</span>
+              <strong class="text-xl font-950 text-red">${estadisticasSanidad.totalTratamientos || 0}</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Supresión de Venta Activa</span>
+              <strong class="text-xl font-950 ${(estadisticasSanidad.retencionesActivas || 0) > 0 ? 'text-red' : 'text-green'}">${estadisticasSanidad.retencionesActivas || 0} lotes</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900">Coste Sanitario / Animal</span>
+              <strong class="text-xl font-950 ${costeSanitarioAnimal > 0 ? 'text-amber' : 'text-gray'}">${costeSanitarioAnimal > 0 ? costeSanitarioAnimal.toFixed(2) + ' €' : '—'}</strong>
+            </div>
           </div>
         </div>
         ${Object.keys(tratPorRebano).length > 0 ? `
@@ -807,18 +806,22 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('censo', 'Censo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-gold report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.animales()} Censo General</div>
-        <div class="grid grid-cols-3 gap-10 mb-12">
-          <div class="info-box-center border-left-blue">
-            <small class="s-lbl">TOTAL</small>
-            <div class="inf-val-lg text-blue">${totalAnimales}</div>
-          </div>
-          <div class="info-box-center border-left-green">
-            <small class="s-lbl">ACTIVOS</small>
-            <div class="inf-val-lg text-green">${totalActivos}</div>
-          </div>
-          <div class="info-box-center border-left-red">
-            <small class="s-lbl">VENDIDOS</small>
-            <div class="inf-val-lg text-red">${totalVendidos}</div>
+        <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1 py-8">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Censo</small>
+              <span class="text-xl text-blue font-950">${totalAnimales}</span>
+            </div>
+            <div style="width:1px; height:24px; background:#333;"></div>
+            <div class="flex-1 py-8">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Activos</small>
+              <span class="text-xl text-green font-950">${totalActivos}</span>
+            </div>
+            <div style="width:1px; height:24px; background:#333;"></div>
+            <div class="flex-1 py-8">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Vendidos</small>
+              <span class="text-xl text-red font-950">${totalVendidos}</span>
+            </div>
           </div>
         </div>
 
