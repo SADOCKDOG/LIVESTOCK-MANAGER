@@ -193,9 +193,9 @@ const ExplotacionView = {
 
     // Conmutador superior de Sub-módulos (Explotación, Gastos, Almacén)
     main.innerHTML = `
-      <div class="card p-14 mb-14 border-222" style="border-top:3px solid #10b981;">
+      <div class="card p-14 mb-14 border-222">
         <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: #10b981; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
+          <div class="section-header-neon" style="--neon-color: #10b981; max-width: 480px; margin: 0 auto;">${Icons.finca()} EXPLOTACIÓN ${Icons.paquete()}</div>
           <div class="comer-mode-switch" style="display: flex; gap: 8px;">
             <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
               style="--mode-color:#10b981; flex: 1; padding: 10px;" 

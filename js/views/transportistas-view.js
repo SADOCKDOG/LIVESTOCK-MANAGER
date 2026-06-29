@@ -22,9 +22,9 @@ const TransportistasView = {
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
-            <div class="card p-14 mb-14 border-222" style="border-top:3px solid #3b82f6;">
+            <div class="card p-14 mb-14 border-222">
               <div class="text-center mb-10">
-                <div class="section-header-neon" style="--neon-color: #3b82f6; max-width: 520px; margin: 0 auto;">LOGÍSTICA / TRANSPORTE</div>
+                <div class="section-header-neon" style="--neon-color: #3b82f6; max-width: 520px; margin: 0 auto;">${Icons.transportistas()} LOGÍSTICA / TRANSPORTE ${Icons.paquete()}</div>
                 <div class="comer-mode-switch">
                    <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa;" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
                    <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
