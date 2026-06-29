@@ -44,7 +44,7 @@ const ZonasView = {
             rebanosHtml += `
               <div class="flex justify-between items-center mt-6" style="background:rgba(255,255,255,0.02); border-left:3px solid ${colorEspecie}; padding:8px 12px; border-radius:8px;">
                 <div class="flex items-center gap-8">
-                  <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${App._hexToRgba(colorEspecie, 0.25)});">${Icons.rebanos()}</div>
+                  <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
                   <div>
                     <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
                     <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
@@ -61,8 +61,7 @@ const ZonasView = {
         totalOcupacion += censoTotal;
         const pct = aforo > 0 ? Math.round((censoTotal / aforo) * 100) : 0;
         const colorCenso = pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
-        const estadoIcono = pct > 100 ? Icons.statusCritico() : pct >= 80 ? Icons.statusAdvertencia() : pct >= 50 ? Icons.statusOk() : Icons.statusInactivo();
-        const estadoLabel = pct > 100 ? 'Sobrecarga' : pct >= 80 ? 'Óptimo' : pct >= 50 ? 'Aceptable' : 'Infrautilizada';
+        const estadoTexto = pct > 100 ? '🔴 Sobrecarga' : pct >= 80 ? '🟡 Óptimo' : pct >= 50 ? '🟢 Aceptable' : '⚪ Infrautilizada';
 
         const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
         let ugmTotal = 0;
@@ -76,7 +75,7 @@ const ZonasView = {
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
         html += `
-          <div class="card no-underline p-15 mb-12 cursor-pointer" style="border-top:3px solid ${colorCenso};" onclick="location.hash='/zona?index=${item.realIndex}'">
+          <div class="card no-underline" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px; margin-bottom:12px;" onclick="location.hash='/zona?index=${item.realIndex}'">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">
@@ -87,17 +86,17 @@ const ZonasView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="badge badge-sm uppercase font-800 flex items-center gap-4" style="color:${colorCenso}; border:1px solid ${App._hexToRgba(colorCenso, 0.25)}; background:${App._hexToRgba(colorCenso, 0.08)};">${estadoIcono} ${estadoLabel}</span>
+                  <span class="badge badge-sm uppercase font-800" style="color:${colorCenso}; border:1px solid ${colorCenso}40; background:${colorCenso}15;">${estadoTexto.split(' ')[1]}</span>
                 </div>
               </div>
 
-              <div class="p-10 rounded bg-black border border-222">
+              <div class="p-10 rounded" style="background:#000; border:1px solid #222;">
                 <div class="flex justify-between font-900 text-[0.65rem] mb-4 uppercase">
                   <span class="text-gray">Carga: ${ugmTotal.toFixed(1)} UGM</span>
                   <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
                 </div>
                 <div class="progress-track">
-                  <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; border-radius:4px; box-shadow:0 0 8px ${App._hexToRgba(colorCenso, 0.27)}; transition:width 0.3s;"></div>
+                  <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; border-radius:4px; box-shadow:0 0 8px ${colorCenso}44; transition:width 0.3s;"></div>
                 </div>
               </div>
 
@@ -110,7 +109,7 @@ const ZonasView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-4">VER ZONA ${Icons.siguiente()}</div>
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER ZONA ➔</div>
                 </div>
               </div>
 
@@ -123,13 +122,13 @@ const ZonasView = {
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
       const colorGlobal = pctGlobal > 100 ? '#ef4444' : pctGlobal >= 80 ? '#f59e0b' : '#10b981';
       html += `
-        <div class="card mt-15 p-15 bg-green-subtle">
+        <div class="card mt-15" style="background:rgba(16,185,129,0.03);padding:15px;">
           <div class="flex justify-between items-center mb-6">
             <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
             <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
           </div>
           <div class="progress-track progress-track--lg">
-            <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${App._hexToRgba(colorGlobal, 0.27)};"></div>
+            <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
           </div>
         </div>`;
     }
@@ -159,7 +158,7 @@ const ZonasView = {
     const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
     
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/zonas" class="link-back flex items-center gap-4">${Icons.atras()} Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
+      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
       <div class="card border-top-3px border-top-3px-orange">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>

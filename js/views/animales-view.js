@@ -59,12 +59,12 @@ const AnimalesView = {
 
     // Búsqueda + selector de especie compacto
     html += `
-      <div class="sticky-top pb-8">
+      <div class="sticky-top" style="padding-bottom:10px;">
         <div class="flex gap-8 items-center">
           <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
                  class="search-input flex-1 min-w-0">
-          <div class="search-icon-input" style="position:absolute; right:150px; pointer-events:none; color:var(--text-s);">${Icons.buscar()}</div>
+          <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
           <select id="animales-filtro-especie" class="form-select-gold"
                   onchange="AnimalesView._setFiltro('especie', this.value)"
                   style="width:130px;min-width:120px;">
@@ -84,7 +84,7 @@ const AnimalesView = {
       <!-- Botón Flotante de Acción para móviles -->
       <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
       <div id="animales-empty-search" class="empty-state-search d-none">
-        <div class="text-2xl mb-8 text-gray">${Icons.buscar()}</div>
+        <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
         <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
       </div>
 `;
@@ -113,7 +113,7 @@ const AnimalesView = {
 
   _renderCard(a, r) {
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
-    const iconoSexo = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : Icons.neutro());
+    const iconoSexo = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '⚤');
     const colorEstado = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : a.estado === 'baja' ? '#ef4444' : '#888';
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
@@ -129,7 +129,7 @@ const AnimalesView = {
               </div>
             </div>
             <div class="text-right">
-              <span class="badge badge-sm uppercase" style="background:${App._hexToRgba(colorEstado, 0.08)}; color:${colorEstado}; border:1px solid ${App._hexToRgba(colorEstado, 0.2)};">${a.estado || 'activo'}</span>
+              <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${a.estado || 'activo'}</span>
             </div>
           </div>
 
@@ -142,7 +142,7 @@ const AnimalesView = {
               </div>
             </div>
             <div class="text-right">
-              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-4">VER FICHA ${Icons.siguiente()}</div>
+              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@ const AnimalesView = {
                    value="${a.numero_identificacion}"
                    placeholder="ES000000000000" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
-                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter fs-22 border-bottom-gold">
+                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid var(--p-gold) !important;">
             <div class="text-aaa text-[0.6rem] uppercase font-800 mt-6 tracking-wide">
               REQUISITO REGA: ES + 12 DÍGITOS · <span class="text-gold" id="crotal-length-counter">0/14</span>
             </div>
@@ -303,7 +303,7 @@ const AnimalesView = {
           </div>
 
           <div class="card card-accent card-accent-blue p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
               <select id="a-categoria" class="wizard-input font-800">
@@ -336,7 +336,7 @@ const AnimalesView = {
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
           <div class="card card-accent card-accent-green p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
+            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">PAÍS DE NACIMIENTO</label>
@@ -393,7 +393,7 @@ const AnimalesView = {
 
           <div class="card card-accent card-accent-gold p-16 mb-20">
             <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.documento()} OBSERVACIONES</div>
-            <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700 resize-none fs-small">${a.notas || ""}</textarea>
+            <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
@@ -402,7 +402,7 @@ const AnimalesView = {
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="card card-accent card-accent-purple p-16 mb-20">
-               <div class="section-header-theme mb-12" style="--theme-color: var(--c-accent)">HISTORIAL REPRO</div>
+               <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">HISTORIAL REPRO</div>
                <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-20">
