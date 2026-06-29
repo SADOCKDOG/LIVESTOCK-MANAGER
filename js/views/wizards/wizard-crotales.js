@@ -85,7 +85,7 @@ window.WizardCrotales = {
               ${adsgs.length > 0 ? `
               <div class="wizard-input-group mb-14">
                 <label class="wizard-label">SELECCIONAR ADSG REGISTRADA</label>
-                <select id="w-pd-adsg-select" class="wizard-input text-sm font-800" onchange="WizardCrotales._onSelectADSG(this.value, ${JSON.stringify(adsgs).replace(/"/g, '&quot;')})">
+                <select id="w-pd-adsg-select" class="wizard-input text-sm font-800" onchange="WizardCrotales._onSelectADSG(this.value)">
                   <option value="">-- Escribir manualmente --</option>
                   ${adsgs.map(a => `<option value="${a.id}" ${data.adsg_codigo === a.codigo ? 'selected' : ''}>${a.nombre} (${a.codigo})</option>`).join('')}
                 </select>
@@ -446,5 +446,32 @@ window.WizardCrotales = {
     } catch (e) {
       App.toastError("No se pudo generar el documento. Verifica tu conexión.");
     }
+  },
+
+  async _onSelectADSG(adsgId) {
+    console.log("[WizardCrotales] _onSelectADSG seleccionado:", adsgId);
+    const adsgs = await window.ADSGs.list().catch(() => []);
+    const adsg = adsgs.find(a => Number(a.id) === Number(adsgId));
+    
+    const inputNombre = document.getElementById('w-pd-adsg');
+    const inputCodigo = document.getElementById('w-pd-adsg-cod');
+    const inputVet = document.getElementById('w-pd-vet');
+    const inputCol = document.getElementById('w-pd-vet-col');
+    const inputNif = document.getElementById('w-pd-vet-nif');
+
+    if (adsg) {
+      if (inputNombre) inputNombre.value = adsg.nombre || '';
+      if (inputCodigo) inputCodigo.value = adsg.codigo || '';
+      if (inputVet) inputVet.value = adsg.veterinario || '';
+      if (inputCol) inputCol.value = adsg.colegiado || '';
+      if (inputNif) inputNif.value = adsg.vet_nif || '';
+    } else {
+      if (inputNombre) inputNombre.value = '';
+      if (inputCodigo) inputCodigo.value = '';
+      if (inputVet) inputVet.value = '';
+      if (inputCol) inputCol.value = '';
+      if (inputNif) inputNif.value = '';
+    }
   }
 };
+
