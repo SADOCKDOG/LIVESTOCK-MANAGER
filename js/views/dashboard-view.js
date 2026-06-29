@@ -228,7 +228,7 @@ const DashboardView = {
   _renderAlertasSanitarias(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card card-accent card-accent-red p-20 card-tint-red">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-danger); width:100%">
         <h3 class="mt-0 text-red flex items-center gap-8">
           ${Icons.alerta()} Alertas Sanitarias <span class="badge rounded-xl badge-solid-danger">${alertas.length}</span>
         </h3>
@@ -255,7 +255,7 @@ const DashboardView = {
   _renderAlertasTrazabilidad(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card card-accent card-accent-orange p-20 card-tint-orange">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-warning); width:100%">
         <h3 class="mt-0 flex items-center gap-8 text-orange">
           ${Icons.alerta()} Alertas Trazabilidad (SIA) <span class="badge rounded-xl badge-solid-orange">${alertas.length}</span>
         </h3>
@@ -279,7 +279,7 @@ const DashboardView = {
   _renderAlertasAdministrativas(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card card-accent card-accent-purple p-20 card-tint-violet">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-accent); width:100%">
         <h3 class="mt-0 text-purple flex items-center gap-8">
           ${Icons.documento()} Gestión / PAC <span class="badge rounded-xl badge-solid-purple">${alertas.length}</span>
         </h3>
@@ -347,7 +347,7 @@ const DashboardView = {
     if (!indicadores) return '';
     const { numEntregas, litrosTotal, precioFinalMedio, mofaTotal, mofaRatio, conLab, esMedia, meses } = indicadores;
     return `
-      <div class="card card-accent card-accent-amber p-20 card-tint-amber">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-warning); width:100%">
         <h3 class="mt-0 flex items-center gap-8 text-yellow">
           ${Icons.leche()} Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
         </h3>
@@ -453,7 +453,7 @@ const DashboardView = {
   _renderKPIsDiariosCard(kpis) {
     if (!kpis || (!kpis.litrosPorOveja && !kpis.eficienciaPienso && !kpis.pctBajas)) {
       return `
-        <div class="card card-accent card-accent-purple p-20 card-tint-violet">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-accent); width:100%">
           <h3 class="mt-0 flex items-center gap-8 text-violet">
             ${Icons.grafico()} KPIs Diarios
           </h3>
@@ -479,7 +479,7 @@ const DashboardView = {
       : '#888';
 
     return `
-      <div class="card card-accent card-accent-purple p-20 card-tint-violet">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-accent); width:100%">
         <h3 class="mt-0 flex items-center gap-8 text-violet">
           ${Icons.grafico()} KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
         </h3>
@@ -524,5 +524,6 @@ const DashboardView = {
 };
 
 window.DashboardView = DashboardView;
+
 
 
