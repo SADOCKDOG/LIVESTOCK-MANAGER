@@ -318,7 +318,7 @@ const ExplotacionView = {
               <span class="widget-link-label">Tratamiento</span>
             </button>
           </div>
-          <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">${Icons.balanza()} Pesaje · ${Icons.sanidad()} Tratamiento sanitario</span></div>
+          <div class="text-right mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.balanza()} Pesaje · ${Icons.sanidad()} Tratamiento sanitario</span></div>
         </div>
 
         <!-- Líderes GMD -->
@@ -1289,6 +1289,7 @@ const ExplotacionView = {
 };
 
 window.ExplotacionView = ExplotacionView;
+
 
 
 
