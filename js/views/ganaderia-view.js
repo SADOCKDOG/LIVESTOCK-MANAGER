@@ -125,43 +125,42 @@ const GanaderiaView = {
 
       <div class="card p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Censo reciente (${especies.size} especie(s))
+          ${Icons.documento()} Censo reciente (${animalesModo.length} total · ${especies.size} especie(s))
         </div>
-        <div class="grid gap-8">
-          ${animalesModo.length > 0
-            ? animalesModo.slice(0, 10).map(a => {
-                const reb = rebanos.find(r => r.id === a.rebanoId);
-                const sexoIcon = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '');
-                const ageText = a.fechaNacimiento ? ` · ${Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365))} años` : '';
-                return `
-                  <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:14px; margin:0; margin-bottom:8px;">
-                    <div class="flex flex-col gap-10">
-                      <div class="flex justify-between items-center w-full">
-                        <div class="flex items-center gap-10 min-w-0">
-                          <div class="text-xl" style="color:${meta.color}">${Icons.animales()}</div>
-                          <div class="text-xs">
-                            <div class="font-bold text-white uppercase">${a.crotal || a.nombre || `Animal #${a.id}`} <span class="text-gray-400 ml-4">${sexoIcon}</span></div>
-                            <div class="text-gray mt-2 font-700 uppercase">${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}${ageText}</div>
-                          </div>
-                        </div>
-                        <div class="text-right">
-                          <span class="badge badge-sm uppercase" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
-                        </div>
+        ${animalesModo.length > 0 ? `
+        <div class="flex flex-wrap gap-4 mb-12">
+          ${[...especies].map(esp => {
+            const count = animalesModo.filter(a => (a.especie || '').toLowerCase() === esp).length;
+            const activos = animalesModo.filter(a => (a.especie || '').toLowerCase() === esp && (a.estado || 'activo') === 'activo').length;
+            return `<span class="badge badge-sm uppercase" style="background:${meta.color}15; color:${meta.color};">${esp.toUpperCase()}: ${count} (${activos} act.)</span>`;
+          }).join('')}
+        </div>
+        <div class="grid gap-6">
+          ${animalesModo.slice(0, 10).map(a => {
+              const reb = rebanos.find(r => r.id === a.rebanoId);
+              const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
+              const edad = a.fechaNacimiento ? Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365)) : null;
+              return `
+                <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:12px; margin:0;">
+                  <div class="flex justify-between items-start gap-6">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-6">
+                        <span class="text-sm font-black text-white uppercase tracking-tight">${a.numero_identificacion || a.nombre || `#${a.id}`}</span>
+                        <span class="text-gray-400" style="font-size:0.7rem;">${sexoIcon}</span>
                       </div>
-
-                      <div class="flex justify-between items-end w-full">
-                        <div class="text-[0.65rem] text-aaa flex items-center gap-4">
-                          ${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}
-                        </div>
-                        <div class="text-[0.48rem] text-gray-600 font-900 uppercase">VER ➔</div>
+                      <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
+                        <span>${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}</span>
+                        ${edad !== null ? `<span>${edad} años</span>` : ''}
+                        <span class="flex items-center gap-3">${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}</span>
                       </div>
                     </div>
-                  </a>
-                `;
-              }).join('')
-            : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin animales para este modo</span></div>`
-          }
-        </div>
+                    <span class="badge badge-sm uppercase flex-shrink-0" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
+                  </div>
+                </a>
+              `;
+            }).join('')}
+        </div>` 
+        : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin animales para este modo</span></div>`}
       </div>
     `;
   },
