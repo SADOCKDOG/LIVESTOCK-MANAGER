@@ -55,7 +55,6 @@ const TransportistasView = {
                 </div>
                 <div id="trans-list"></div>
             </div>
-            <button class="fab-btn" onclick="TransportistasView._abrirFormulario()" aria-label="Nuevo Transportista">${Icons.agregar()}</button>
         `;
         await this._renderLista();
     },

@@ -32,7 +32,7 @@ const ProveedoresView = {
             </div>
           </div>
           <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
-          <button class="fab-btn" onclick="ProveedoresView.renderFormulario()" aria-label="Nuevo Proveedor">${Icons.agregar()}</button>`;
+          `;
 
         await this._cargarDatos();
     },
