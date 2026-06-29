@@ -3091,6 +3091,16 @@ label {
     text-transform: uppercase;
 }
 
+/* === Temas de color (acento) === */
+body[data-tema="gold"]   { --p-gold: #fbbf24; --p-gold-dark: #d97706; --p-cork: #d4a373; --p-cork-dark: #a0673a; }
+body[data-tema="blue"]   { --p-gold: #3b82f6; --p-gold-dark: #1d4ed8; --p-cork: #60a5fa; --p-cork-dark: #2563eb; }
+body[data-tema="green"]  { --p-gold: #10b981; --p-gold-dark: #059669; --p-cork: #34d399; --p-cork-dark: #059669; }
+body[data-tema="purple"] { --p-gold: #8b5cf6; --p-gold-dark: #6d28d9; --p-cork: #a78bfa; --p-cork-dark: #7c3aed; }
+body[data-tema="red"]    { --p-gold: #ef4444; --p-gold-dark: #b91c1c; --p-cork: #f87171; --p-cork-dark: #dc2626; }
+.theme-dot { outline: none; }
+.theme-dot:active { transform: scale(0.9); }
+.theme-dot.active { border-color: var(--p-gold) !important; box-shadow: 0 0 12px var(--p-gold); }
+
 /* === Card efecto 3D para totales/balances === */
 .card-total-3d { box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transform: perspective(800px) rotateX(0.5deg); }
 
