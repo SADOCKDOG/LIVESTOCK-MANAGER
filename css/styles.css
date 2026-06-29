@@ -3076,4 +3076,9 @@ label {
 /* === Utilidades menores (ganadería) === */
 .resize-none { resize: none; }
 .fs-small { font-size: 0.8rem; }
+.fs-22 { font-size: 2.2rem; }
 .min-h-80 { min-height: 80px; }
+.border-bottom-gold { border-bottom: 2px solid var(--p-gold) !important; }
+.pb-8 { padding-bottom: 8px; }
+.bg-green-subtle { background: rgba(16,185,129,0.03); }
+.cursor-pointer { cursor: pointer; }

@@ -59,12 +59,12 @@ const AnimalesView = {
 
     // Búsqueda + selector de especie compacto
     html += `
-      <div class="sticky-top" style="padding-bottom:10px;">
+      <div class="sticky-top pb-8">
         <div class="flex gap-8 items-center">
           <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
                  class="search-input flex-1 min-w-0">
-          <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
+          <div class="search-icon-input" style="position:absolute; right:150px; pointer-events:none; color:var(--text-s);">${Icons.buscar()}</div>
           <select id="animales-filtro-especie" class="form-select-gold"
                   onchange="AnimalesView._setFiltro('especie', this.value)"
                   style="width:130px;min-width:120px;">
@@ -84,7 +84,7 @@ const AnimalesView = {
       <!-- Botón Flotante de Acción para móviles -->
       <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
       <div id="animales-empty-search" class="empty-state-search d-none">
-        <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
+        <div class="text-2xl mb-8 text-gray">${Icons.buscar()}</div>
         <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
       </div>
 `;
@@ -251,7 +251,7 @@ const AnimalesView = {
                    value="${a.numero_identificacion}"
                    placeholder="ES000000000000" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
-                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid var(--p-gold) !important;">
+                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter fs-22 border-bottom-gold">
             <div class="text-aaa text-[0.6rem] uppercase font-800 mt-6 tracking-wide">
               REQUISITO REGA: ES + 12 DÍGITOS · <span class="text-gold" id="crotal-length-counter">0/14</span>
             </div>

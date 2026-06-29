@@ -76,7 +76,7 @@ const ZonasView = {
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
         html += `
-          <div class="card no-underline" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px; margin-bottom:12px;" onclick="location.hash='/zona?index=${item.realIndex}'">
+          <div class="card no-underline p-15 mb-12 cursor-pointer" style="border-top:3px solid ${colorCenso};" onclick="location.hash='/zona?index=${item.realIndex}'">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">
@@ -123,7 +123,7 @@ const ZonasView = {
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
       const colorGlobal = pctGlobal > 100 ? '#ef4444' : pctGlobal >= 80 ? '#f59e0b' : '#10b981';
       html += `
-        <div class="card mt-15" style="background:rgba(16,185,129,0.03);padding:15px;">
+        <div class="card mt-15 p-15 bg-green-subtle">
           <div class="flex justify-between items-center mb-6">
             <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
             <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
