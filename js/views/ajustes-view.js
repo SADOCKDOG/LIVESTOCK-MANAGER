@@ -283,6 +283,22 @@ const AjustesView = {
               <option value="$" ${config.moneda === '$' ? 'selected' : ''}>Dólar ($)</option>
             </select>
           </div>
+          <div class="flex flex-col gap-4">
+            <label class="text-xs text-gray uppercase font-800 ml-4">Color de Acento</label>
+            <div class="flex gap-6">
+              ${[
+                { id: 'gold',   label: 'Oro',   color: '#fbbf24' },
+                { id: 'blue',   label: 'Azul',  color: '#3b82f6' },
+                { id: 'green',  label: 'Verde', color: '#10b981' },
+                { id: 'purple', label: 'Violeta', color: '#8b5cf6' },
+                { id: 'red',    label: 'Rojo',  color: '#ef4444' },
+              ].map(t => `
+                <button class="theme-dot ${config.colorTema === t.id ? 'active' : ''}" 
+                  style="background:${t.color}; width:36px; height:36px; border-radius:50%; border:3px solid ${config.colorTema === t.id ? t.color : 'transparent'}; cursor:pointer; transition:all 0.2s;"
+                  onclick="AjustesView._cambiarColor('${t.id}')" title="${t.label}"></button>
+              `).join('')}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -411,7 +427,7 @@ const AjustesView = {
   // ===================== HELPER: CONFIG =====================
 
   async _loadConfig() {
-    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: true, formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
+    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: true, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
     try {
       const stored = await window.db.get('meta', 'appConfig');
       return stored?.value ? { ...defaults, ...stored.value } : defaults;
@@ -455,6 +471,17 @@ const AjustesView = {
     const cards = document.querySelectorAll('.card-dark-gradient, .card-total-3d');
     cards.forEach(c => c.classList.toggle('compact', !checked));
     App.toast(checked ? 'Descripciones de contexto visibles' : 'Descripciones de contexto ocultas');
+  },
+
+  async _cambiarColor(tema) {
+    await this._saveConfig({ colorTema: tema });
+    document.body.setAttribute('data-tema', tema);
+    // Actualizar dots visualmente
+    document.querySelectorAll('.theme-dot').forEach(d => {
+      const isActive = d.getAttribute('onclick')?.includes(`'${tema}'`);
+      d.style.borderColor = isActive ? d.style.background : 'transparent';
+    });
+    App.toast(`🎨 Tema ${tema} aplicado`);
   },
 
   async _guardarPreferencia(key, val) {

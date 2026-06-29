@@ -101,12 +101,17 @@ const App = {
       App._setupHardwareBackButton();
       await App._ejecutarMigracionesFondo();
       App._initScrollShadows();
-      // Cargar preferencia de contextos
+      // Cargar preferencias visuales
       try {
         const cfg = await window.db.get('meta', 'appConfig');
-        if (cfg?.value?.mostrarContextos === false) {
-          document.body.classList.add('hide-context');
-          document.querySelectorAll('.card-dark-gradient, .card-total-3d').forEach(c => c.classList.add('compact'));
+        if (cfg?.value) {
+          if (cfg.value.mostrarContextos === false) {
+            document.body.classList.add('hide-context');
+            document.querySelectorAll('.card-dark-gradient, .card-total-3d').forEach(c => c.classList.add('compact'));
+          }
+          if (cfg.value.colorTema && cfg.value.colorTema !== 'gold') {
+            document.body.setAttribute('data-tema', cfg.value.colorTema);
+          }
         }
       } catch (_) {}
       await App.route();
