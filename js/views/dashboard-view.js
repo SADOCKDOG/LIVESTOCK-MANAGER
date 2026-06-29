@@ -124,27 +124,27 @@ const DashboardView = {
         <div class="grid grid-cols-3 gap-6">
           <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.zonas()} ZONAS</div>
-            <div class="text-xl font-black text-gold">${(finca.zonas || []).length}</div>
+            <div class="text-base font-950 text-gold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(finca.zonas || []).length}</div>
           </div>
           <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.rebanos()} REBAÑOS</div>
-            <div class="text-xl font-black text-gold">${rebanos.length}</div>
+            <div class="text-base font-950 text-gold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rebanos.length}</div>
           </div>
           <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.animales()} CENSO</div>
-            <div class="text-xl font-black text-gold">${totalCenso || animales.length}</div>
+            <div class="text-base font-950 text-gold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${totalCenso || animales.length}</div>
           </div>
           <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.check()} ACTIVOS</div>
-            <div class="text-xl font-black text-green">${totalActivos || activos}</div>
+            <div class="text-base font-950 text-green" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${totalActivos || activos}</div>
           </div>
           <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.paquete()} VENDIDOS</div>
-            <div class="text-xl font-black text-red">${totalVendidos}</div>
+            <div class="text-base font-950 text-red" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${totalVendidos}</div>
           </div>
           <div class="bg-dark rounded-lg p-8 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.grafico()} RENTAB.</div>
-            <div class="text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
+            <div class="text-base font-950 ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pctRent}%</div>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@ const DashboardView = {
           </div>
           <div class="bg-dark rounded-lg p-10 text-center border border-222">
             <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">GASTOS</div>
-            <div class="text-xl font-black text-red">${(rent?.gastos || 0).toLocaleString()}€</div>
+            <div class="text-base font-950 text-red" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(rent?.gastos || 0).toLocaleString()}€</div>
           </div>
         </div>
         <div class="flex justify-between items-center p-10 bg-dark rounded-lg border border-222">
@@ -524,4 +524,5 @@ const DashboardView = {
 };
 
 window.DashboardView = DashboardView;
+
 
