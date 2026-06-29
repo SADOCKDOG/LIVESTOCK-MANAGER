@@ -1,103 +1,70 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gastos · Control de Costes · Livestock Manager Premium v4.8.0</title>
-<style>
-  :root{
-    --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
-    --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-  }
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Gastos · Control de Costes · Livestock Manager Premium v4.8.0</title>
+<style>:root{
+ --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
+ --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
+ --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ }
+ .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
 
-  .portada{
-    text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#1a1a1a,#2b2b2b);
-    color:#fff; border-bottom:6px solid #f59e0b;
-  }
-  .portada h1{font-size:2.3rem; margin:18px 0 6px; color:#f59e0b;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #f59e0b; border-radius:30px; color:#f59e0b; font-size:.85rem;}
+ .portada{
+ text-align:center; padding:60px 24px 50px;
+ background:linear-gradient(160deg,#1a1a1a,#2b2b2b);
+ color:#fff; border-bottom:6px solid #f59e0b;
+ }
+ .portada h1{font-size:2.3rem; margin:18px 0 6px; color:#f59e0b;}
+ .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+ .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #f59e0b; border-radius:30px; color:#f59e0b; font-size:.85rem;}
 
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px;
-    border-left:5px solid #f59e0b; padding-left:14px;
-  }
+ h2.modulo{
+ font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px;
+ border-left:5px solid #f59e0b; padding-left:14px;
+ }
 
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:#f59e0b; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
-  }
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:#f59e0b; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
+ }
 
-  figure{margin:24px 0; text-align:center;}
-  figure img{
-    max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
-  }
-  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
+ figure{margin:24px 0; text-align:center;}
+ figure img{
+ max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px;
+ box-shadow:0 8px 20px rgba(0,0,0,.15);
+ }
+ figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
 
-  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
-  .ruta{color:#f59e0b; font-weight:700;}
-</style>
-</head>
-<body>
+ .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
+ .ruta{color:#f59e0b; font-weight:700;}</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;"><h1>Control de Gastos</h1>
+ <p class="sub">Gestión de Costes Operativos · Guía v4.8.0</p>
+ <div class="badge">ANÁLISIS DE RENTABILIDAD</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;">
-  <h1>💰 Control de Gastos</h1>
-  <p class="sub">Gestión de Costes Operativos · Guía v4.8.0</p>
-  <div class="badge">ANÁLISIS DE RENTABILIDAD</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">1. Registro Rápido desde ExPro</h2>
+ <p class="intro-mod">En la v4.8.0, registrar los gastos más comunes es más rápido que nunca desde el Hub ExPro.</p>
+ <figure><img src="img/07-expro-hibrido.png" alt="Pantalla ExPro Gastos"><figcaption>Sección de costes y cumplimiento en la consola ExPro.</figcaption></figure>
+ <ol class="pasos"><li><strong>Botones Neón</strong>: Localiza la sección "COSTES + CUMPLIMIENTO" al final de la pantalla ExPro.</li>
+ <li><strong>Selección Directa</strong>: Pulsa <kbd>Gasto Aliment.</kbd>, <kbd>Gasto Energía</kbd> o <kbd>Gasto Fito.</kbd> para abrir el wizard pre-configurado.</li>
+ <li><strong>Imputación Analítica</strong>: El sistema asociará automáticamente el gasto al modo (Carne/Leche) y te pedirá seleccionar el rebaño o zona.</li></ol></section>
 
-<div class="wrap">
+ <section class="seccion"><h2 class="modulo">2. Pantalla General de Gastos</h2>
+ <p class="intro-mod">Para una gestión avanzada o ver el historial, usa el módulo dedicado.</p>
+ <ol class="pasos"><li><strong>Acceso</strong>: Pulsa <span class="ruta">Más → Gastos</span>.</li>
+ <li><strong>Filtros por Categoría</strong>: Usa las pestañas superiores para ver el desglose por Alimentación, Sanidad, Electricidad, Personal, etc.</li>
+ <li><strong>KPIs de Registro</strong>: La cabecera muestra el total acumulado de la categoría y el número de facturas registradas.</li></ol></section>
 
-  <section class="seccion">
-    <h2 class="modulo">1. Registro Rápido desde ExPro</h2>
-    <p class="intro-mod">En la v4.8.0, registrar los gastos más comunes es más rápido que nunca desde el Hub ExPro.</p>
-    <figure><img src="img/07-expro-hibrido.png" alt="Pantalla ExPro Gastos">
-      <figcaption>Sección de costes y cumplimiento en la consola ExPro.</figcaption></figure>
-    <ol class="pasos">
-      <li><strong>Botones Neón</strong>: Localiza la sección "COSTES + CUMPLIMIENTO" al final de la pantalla ExPro.</li>
-      <li><strong>Selección Directa</strong>: Pulsa <kbd>Gasto Aliment.</kbd>, <kbd>Gasto Energía</kbd> o <kbd>Gasto Fito.</kbd> para abrir el wizard pre-configurado.</li>
-      <li><strong>Imputación Analítica</strong>: El sistema asociará automáticamente el gasto al modo (Carne/Leche) y te pedirá seleccionar el rebaño o zona.</li>
-    </ol>
-  </section>
+ <section class="seccion"><h2 class="modulo">3. Integración en Balances</h2>
+ <p class="intro-mod">Todos los gastos registrados se restan automáticamente de tus ingresos en la sección de Informes.</p>
+ <div style="background:#eafaf1; border-left:4px solid var(--verde); padding:10px; border-radius:6px; font-size:0.9rem;"><strong>Análisis MOFA</strong>: El Margen Sobre el Coste de Alimentación se calcula vinculando tus ventas de leche/carne con los gastos de categoría "Alimentación".</div></section>
 
-  <section class="seccion">
-    <h2 class="modulo">2. Pantalla General de Gastos</h2>
-    <p class="intro-mod">Para una gestión avanzada o ver el historial, usa el módulo dedicado.</p>
-    <ol class="pasos">
-      <li><strong>Acceso</strong>: Pulsa <span class="ruta">Más → Gastos</span>.</li>
-      <li><strong>Filtros por Categoría</strong>: Usa las pestañas superiores para ver el desglose por Alimentación, Sanidad, Electricidad, Personal, etc.</li>
-      <li><strong>KPIs de Registro</strong>: La cabecera muestra el total acumulado de la categoría y el número de facturas registradas.</li>
-    </ol>
-  </section>
-
-  <section class="seccion">
-    <h2 class="modulo">3. Integración en Balances</h2>
-    <p class="intro-mod">Todos los gastos registrados se restan automáticamente de tus ingresos en la sección de Informes.</p>
-    <div style="background:#eafaf1; border-left:4px solid var(--verde); padding:10px; border-radius:6px; font-size:0.9rem;">
-      💡 <strong>Análisis MOFA</strong>: El Margen Sobre el Coste de Alimentación se calcula vinculando tus ventas de leche/carne con los gastos de categoría "Alimentación".
-    </div>
-  </section>
-
-  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager Premium · v4.8.0 · Guía de Gastos
-  </div>
-
-</div>
-</body>
-</html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Guía de Gastos</div></div></body></html>

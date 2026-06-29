@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - ManualesView v1.1.0
  * Lista todos los manuales de usuario, los visualiza dentro de la app
  * y permite exportarlos a PDF.
@@ -9,7 +9,7 @@ const ManualesView = {
       id: 'index',
       titulo: 'Manual de Usuario General',
       descripcion: 'Guía completa de la aplicación: configuración, animales, producción, comercialización, informes y documentos.',
-      icono: '📖',
+      icono: 'libro',
       archivo: 'manual/index.html',
       color: '#c9851f',
     },
@@ -17,7 +17,7 @@ const ManualesView = {
       id: 'carne',
       titulo: 'Ejemplo Práctico: Ovino de Carne',
       descripcion: 'Creación de explotación de ovino de carne desde cero. Cortijo San Pedro, raza Merina, Cádiz. 12 pasos detallados.',
-      icono: '🐑🥩',
+      icono: 'carne',
       archivo: 'manual/ejemplo-ovino-carne.html',
       color: '#8b5e3c',
     },
@@ -25,7 +25,7 @@ const ManualesView = {
       id: 'leche',
       titulo: 'Ejemplo Práctico: Ovino de Leche',
       descripcion: 'Creación de explotación de ovino de leche. Quesería Los Llanos, raza Manchega, Granada. Control lechero y MOFA.',
-      icono: '🐑🧀',
+      icono: 'leche',
       archivo: 'manual/ejemplo-ovino-leche.html',
       color: '#2563eb',
     },
@@ -33,7 +33,7 @@ const ManualesView = {
       id: 'produccion',
       titulo: 'Registros de Producción',
       descripcion: 'Todos los flujos de producción cárnica y láctea: pesajes, GMD, control lechero, analíticas, liquidaciones y MOFA.',
-      icono: '📊',
+      icono: 'grafico',
       archivo: 'manual/registros-produccion.html',
       color: '#9333ea',
     },
@@ -41,7 +41,7 @@ const ManualesView = {
       id: 'comercializacion',
       titulo: 'Comercialización',
       descripcion: 'Venta Masiva de animales (5 pasos) y Albarán de Leche (6 pasos): trazabilidad, pesajes, compradores, SEUROP, transportista, analíticas, precio y MOFA.',
-      icono: '💰',
+      icono: 'comercial',
       archivo: 'manual/manual-comercializacion.html',
       color: '#8b5e3c',
     },
@@ -49,7 +49,7 @@ const ManualesView = {
       id: 'pesadas',
       titulo: 'Pesadas Individual y por Lote',
       descripcion: 'Pesada individual de animal y pesaje por lote de rebaño en producción cárnica: asistente, búsqueda, registro de peso y GMD.',
-      icono: '⚖️',
+      icono: 'balanza',
       archivo: 'manual/manual-pesadas.html',
       color: '#8b5e3c',
     },
@@ -57,7 +57,7 @@ const ManualesView = {
       id: 'control-lechero',
       titulo: 'Control Lechero',
       descripcion: 'Control lechero individual, control por lote y expedición de tanque (albarán de leche 6 pasos): calidad, analíticas, precio y MOFA.',
-      icono: '🥛',
+      icono: 'leche',
       archivo: 'manual/manual-control-lechero.html',
       color: '#2563eb',
     },
@@ -65,7 +65,7 @@ const ManualesView = {
       id: 'gastos',
       titulo: 'Gastos',
       descripcion: 'Control de costes analítico: categorías contables (alimentación, sanidad, electricidad, personal), imputación a rebaño/zona y rentabilidad.',
-      icono: '💰',
+      icono: 'gastos',
       archivo: 'manual/manual-gastos.html',
       color: '#f59e0b',
     },
@@ -73,7 +73,7 @@ const ManualesView = {
       id: 'compradores',
       titulo: 'Compradores — Gestión de Clientes',
       descripcion: 'Alta y gestión de compradores (cárnico, láctico, híbrido), contratos, historial de ventas y entregas de leche. Cómo aparece en Venta Masiva y Albarán de Leche.',
-      icono: '🏢',
+      icono: 'compradores',
       archivo: 'manual/manual-compradores.html',
       color: '#ef4444',
     },
@@ -81,7 +81,7 @@ const ManualesView = {
       id: 'proveedores',
       titulo: 'Proveedores — Trazabilidad de Costes',
       descripcion: 'Alta y gestión de proveedores, categorías de suministro, asociación a gastos analíticos e historial de gasto por proveedor.',
-      icono: '🏭',
+      icono: 'proveedores',
       archivo: 'manual/manual-proveedores.html',
       color: '#10b981',
     },
@@ -89,7 +89,7 @@ const ManualesView = {
       id: 'transportistas',
       titulo: 'Transportistas — Bienestar en Transporte',
       descripcion: 'Alta de transportistas, tipos de vehículo, certificado de bienestar animal, uso en DIMOE de Venta Masiva e historial de expediciones.',
-      icono: '🚛',
+      icono: 'transportistas',
       archivo: 'manual/manual-transportistas.html',
       color: '#3b82f6',
     },
@@ -97,7 +97,7 @@ const ManualesView = {
       id: 'animales-rebanos',
       titulo: 'Animales y Rebaños — Gestión del Censo',
       descripcion: 'Estructura Finca→Zonas→Rebaños→Animales, alta de rebaño y animal, formato normativo del crotal (ES+12 dígitos), escáner, vinculación madre-cría y estados.',
-      icono: '🐄',
+      icono: 'animales',
       archivo: 'manual/manual-animales-rebanos.html',
       color: '#c9851f',
     },
@@ -105,7 +105,7 @@ const ManualesView = {
       id: 'contratos',
       titulo: 'Contratos — Acuerdos Comerciales',
       descripcion: 'Registro de contratos con compradores: tipos (carne/leche/mixto), vigencia, IVA, tabla de precios pactados y su integración en liquidaciones.',
-      icono: '📄',
+      icono: 'contratos',
       archivo: 'manual/manual-contratos.html',
       color: '#8b5cf6',
     },
@@ -113,7 +113,7 @@ const ManualesView = {
       id: 'sanitarios',
       titulo: 'Sanitarios — Control de Tratamientos',
       descripcion: 'Registro de tratamientos veterinarios, tipos de medicamento, tiempos de espera para carne y leche, alertas de restricción y catálogo sanitario.',
-      icono: '💉',
+      icono: 'sanidad',
       archivo: 'manual/manual-sanitarios.html',
       color: '#ef4444',
     },
@@ -121,7 +121,7 @@ const ManualesView = {
       id: 'reproduccion',
       titulo: 'Reproducción — Ciclo Reproductivo',
       descripcion: 'Ciclo reproductivo completo (celo→IA→diagnóstico→parto), genealogía, trazabilidad madre-cría, historial por animal e indicadores de fertilidad.',
-      icono: '🔬',
+      icono: 'reproduccion',
       archivo: 'manual/manual-reproduccion.html',
       color: '#ec4899',
     },
@@ -148,9 +148,11 @@ const ManualesView = {
   _renderLista() {
     return this._MANUALES.map(m => `
       <div class="card manual-card" style="border-left:4px solid ${m.color}; padding:16px; cursor:pointer;"
-           onclick="ManualesView._abrirManual('${m.archivo}')">
+           onclick="ManualesView._abrirManual('${m.archivo}', '${m.titulo.replace(/'/g, "\\'")}')">
         <div class="flex items-center gap-14">
-          <span class="flex-shrink-0" style="font-size:2rem;">${m.icono}</span>
+          <span class="flex-shrink-0" style="width:32px; height:32px; color:${m.color}; display:flex; align-items:center; justify-content:center;">
+            ${Icons[m.icono] ? Icons[m.icono]({ style: 'width:32px; height:32px;' }) : ''}
+          </span>
           <div class="flex-1 min-w-0">
             <div style="font-weight:800; font-size:0.95rem; color:#fff; margin-bottom:4px;">${m.titulo}</div>
             <div style="font-size:0.78rem; color:#999; line-height:1.3;">${m.descripcion}</div>
@@ -164,7 +166,7 @@ const ManualesView = {
     `).join('');
   },
 
-  async _abrirManual(archivo) {
+  async _abrirManual(archivo, titulo) {
     // Cargar el manual dentro de un overlay con iframe y botón de salir
     const overlay = document.createElement('div');
     overlay.id = 'manual-viewer-overlay';
@@ -174,21 +176,24 @@ const ManualesView = {
     `;
 
     overlay.innerHTML = `
-      <div style="display:flex; align-items:center; justify-content:space-between;
-                  background:#1a1a2e; padding:8px 14px; flex-shrink:0; min-height:48px;">
-        <button id="btn-cerrar-manual"
-                style="background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:0.85rem;
-                       padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:700;
-                       display:flex; align-items:center; gap:6px;">
-          ${Icons.atras()} Volver
-        </button>
-        <span style="color:#e0a83a; font-weight:800; font-size:0.85rem;">${Icons.libro()} Manual</span>
-
-      </div>
       <iframe id="manual-frame" src="${archivo}"
               style="flex:1; width:100%; border:none;"
               onerror="this.parentElement.innerHTML='<div style=\\'padding:40px;text-align:center;color:#999;\\'>Error al cargar el manual.</div>'">
       </iframe>
+      <div style="display:flex; align-items:center; justify-content:space-between;
+                  background:#1a1a2e; padding:8px 14px; flex-shrink:0; min-height:48px;
+                  border-top:1px solid rgba(255,255,255,0.1);">
+        <span style="color:#fff; font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">
+          <span style="color:#e0a83a; display:flex; align-items:center;">${Icons.libro()}</span>
+          ${titulo || 'Manual'}
+        </span>
+        <button id="btn-cerrar-manual"
+                style="background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:0.85rem;
+                       padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:700;
+                       display:flex; align-items:center; gap:6px; flex-shrink:0;">
+          Volver ${Icons.siguiente()}
+        </button>
+      </div>
     `;
 
     document.body.appendChild(overlay);

@@ -1,249 +1,174 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manual de Usuario — Livestock Manager Premium v4.8.0</title>
-<style>
-  :root{
-    --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
-    --gris-claro:#777; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
-    --dark-surface: #18181b; --dark-card: #27272a;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
-  }
-  .wrap{max-width:900px; margin:0 auto; padding:0 24px;}
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manual de Usuario — Livestock Manager Premium v4.8.0</title>
+<style>:root{
+ --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
+ --gris-claro:#777; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
+ --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
+ --dark-surface: #18181b; --dark-card: #27272a;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ -webkit-print-color-adjust:exact; print-color-adjust:exact;
+ }
+ .wrap{max-width:900px; margin:0 auto; padding:0 24px;}
 
-  /* Portada */
-  .portada{
-    text-align:center; padding:70px 24px 60px; background:linear-gradient(160deg,#000,#18181b);
-    color:#fff; border-bottom:6px solid var(--oro);
-  }
-  .portada h1{font-size:2.4rem; margin:18px 0 6px; color:var(--oro-claro); letter-spacing:.5px;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:22px; padding:7px 18px; border:1px solid var(--oro);
-    border-radius:30px; color:var(--oro-claro); font-size:.85rem; letter-spacing:1px;}
-  .portada .logo{font-size:2rem; font-weight:800; color:#fff;}
-  .portada .logo span{color:var(--oro-claro);}
+ /* Portada */
+ .portada{
+ text-align:center; padding:70px 24px 60px; background:linear-gradient(160deg,#000,#18181b);
+ color:#fff; border-bottom:6px solid var(--oro);
+ }
+ .portada h1{font-size:2.4rem; margin:18px 0 6px; color:var(--oro-claro); letter-spacing:.5px;}
+ .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+ .portada .badge{display:inline-block; margin-top:22px; padding:7px 18px; border:1px solid var(--oro);
+ border-radius:30px; color:var(--oro-claro); font-size:.85rem; letter-spacing:1px;}
+ .portada .logo{font-size:2rem; font-weight:800; color:#fff;}
+ .portada .logo span{color:var(--oro-claro);}
 
-  h2.modulo{
-    font-size:1.5rem; color:var(--tinta); margin:0 0 4px; padding-top:10px;
-    border-left:5px solid var(--oro); padding-left:14px;
-  }
-  .fase-tag{display:inline-block; background:var(--oro); color:#fff; font-size:.7rem; font-weight:700;
-    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
-  .intro-mod{color:var(--gris); margin:8px 0 16px;}
+ h2.modulo{
+ font-size:1.5rem; color:var(--tinta); margin:0 0 4px; padding-top:10px;
+ border-left:5px solid var(--oro); padding-left:14px;
+ }
+ .fase-tag{display:inline-block; background:var(--oro); color:#fff; font-size:.7rem; font-weight:700;
+ padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+ .intro-mod{color:var(--gris); margin:8px 0 16px;}
 
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--oro); color:#fff; font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#6b5418;}
-  .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#7a241b;}
-  .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#14512f;}
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:var(--oro); color:#fff; font-weight:700; font-size:.85rem;
+ display:flex; align-items:center; justify-content:center;
+ }
+ .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#6b5418;}
+ .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#7a241b;}
+ .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#14512f;}
 
-  figure{margin:24px 0; text-align:center;}
-  figure img{
-    max-width:320px; width:100%; border:4px solid #1a1a1a; border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-  }
-  figcaption{font-size:.85rem; color:var(--gris-claro); margin-top:10px; font-style:italic;}
+ figure{margin:24px 0; text-align:center;}
+ figure img{
+ max-width:320px; width:100%; border:4px solid #1a1a1a; border-radius:20px;
+ box-shadow:0 10px 30px rgba(0,0,0,.25);
+ }
+ figcaption{font-size:.85rem; color:var(--gris-claro); margin-top:10px; font-style:italic;}
 
-  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
-  .seccion:last-child{border-bottom:none;}
+ .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
+ .seccion:last-child{border-bottom:none;}
 
-  /* Índice */
-  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
-  .indice h3{margin:0 0 14px; color:var(--oro);}
-  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
-  .indice li{margin-bottom:7px;}
-  .indice a{color:var(--tinta); text-decoration:none;}
-  .indice a:hover{color:var(--oro); text-decoration:underline;}
+ /* Índice */
+ .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
+ .indice h3{margin:0 0 14px; color:var(--oro);}
+ .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
+ .indice li{margin-bottom:7px;}
+ .indice a{color:var(--tinta); text-decoration:none;}
+ .indice a:hover{color:var(--oro); text-decoration:underline;}
 
-  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
-  .ruta{color:var(--oro); font-weight:700;}
+ kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
+ .ruta{color:var(--oro); font-weight:700;}
 
-  @media print{
-    body{font-size:12px;}
-    .portada{padding:50px 24px;}
-    .seccion{page-break-inside:avoid; padding:18px 0;}
-    figure img{max-width:230px; box-shadow:none;}
-    .indice ol{columns:2;}
-    a{color:var(--tinta) !important; text-decoration:none;}
-  }
-</style>
-</head>
-<body>
+ @media print{
+ body{font-size:12px;}
+ .portada{padding:50px 24px;}
+ .seccion{page-break-inside:avoid; padding:18px 0;}
+ figure img{max-width:230px; box-shadow:none;}
+ .indice ol{columns:2;}
+ a{color:var(--tinta) !important; text-decoration:none;}
+ }</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:120px; border-radius:16px; margin-bottom:10px;"><div class="logo">Livestock <span>Manager</span></div>
+ <h1>Manual de Usuario</h1>
+ <p class="sub">Sistema profesional de gestión ganadera</p>
+ <div class="badge">GUÍA PREMIUM v4.8.0</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" style="max-width:120px; border-radius:16px; margin-bottom:10px;">
-  <div class="logo">Livestock <span>Manager</span></div>
-  <h1>Manual de Usuario</h1>
-  <p class="sub">Sistema profesional de gestión ganadera</p>
-  <div class="badge">GUÍA PREMIUM v4.8.0</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">Bienvenido a la Versión 4.8.0</h2>
+ <p class="intro-mod"><strong>Livestock Manager Premium</strong> ha evolucionado para ofrecer una experiencia más fluida, rápida y profesional. Esta versión introduce una navegación simplificada basada en <strong>Hubs Operativos</strong> y un diseño en <strong>Modo Oscuro</strong> optimizado para el campo.</p>
+ <p class="intro-mod">Todos tus datos se guardan de forma segura en tu dispositivo. Recuerda realizar copias de seguridad periódicas desde el menú de Ajustes.</p>
 
-<div class="wrap">
+ <div class="indice"><h3>Índice de Contenidos</h3>
+ <ol><li><a href="#dashboard">1. Dashboard: Visión 360°</a></li>
+ <li><a href="#ganaderia">2. Hub Ganadería: Gestión del Censo</a></li>
+ <li><a href="#animales">3. Ficha Animal y Alta (Wizard)</a></li>
+ <li><a href="#expro">4. Hub ExPro: Operativa Diaria</a></li>
+ <li><a href="#comercializacion">5. Comercialización y Ventas</a></li>
+ <li><a href="#informes">6. Informes e Inteligencia Analítica</a></li>
+ <li><a href="#ajustes">7. Configuración y Copias</a></li>
+ <li><a href="#ejemplos">8. Ejemplos Prácticos</a></li></ol></div></section>
 
-  <section class="seccion">
-    <h2 class="modulo">Bienvenido a la Versión 4.8.0</h2>
-    <p class="intro-mod">
-      <strong>Livestock Manager Premium</strong> ha evolucionado para ofrecer una experiencia más fluida, rápida y profesional. Esta versión introduce una navegación simplificada basada en <strong>Hubs Operativos</strong> y un diseño en <strong>Modo Oscuro</strong> optimizado para el campo.
-    </p>
-    <p class="intro-mod">
-      Todos tus datos se guardan de forma segura en tu dispositivo. Recuerda realizar copias de seguridad periódicas desde el menú de Ajustes.
-    </p>
+ <!-- 1. DASHBOARD -->
+ <section class="seccion" id="dashboard"><span class="fase-tag">Inicio</span>
+ <h2 class="modulo">1. Dashboard: Visión 360°</h2>
+ <p class="intro-mod">Al abrir la aplicación, accedes a la pestaña <span class="ruta">Inicio</span>. Es tu centro de control principal.</p>
+ <ol class="pasos"><li><strong>Resumen de Censo</strong>: Visualiza rápidamente el total de animales activos, vendidos y la rentabilidad estimada.</li>
+ <li><strong>KPIs Diarios</strong>: Indicadores en tiempo real sobre producción láctea, ganancia de peso y eficiencia.</li>
+ <li><strong>Alertas Inteligentes</strong>: El sistema te avisa de periodos de supresión activos, tareas pendientes y vencimientos legales.</li></ol>
+ <figure><img src="img/01-dashboard.png" alt="Dashboard Premium"><figcaption>Nueva interfaz Premium con indicadores dinámicos y tema oscuro.</figcaption></figure></section>
 
-    <div class="indice">
-      <h3>📋 Índice de Contenidos</h3>
-      <ol>
-        <li><a href="#dashboard">1. Dashboard: Visión 360°</a></li>
-        <li><a href="#ganaderia">2. Hub Ganadería: Gestión del Censo</a></li>
-        <li><a href="#animales">3. Ficha Animal y Alta (Wizard)</a></li>
-        <li><a href="#expro">4. Hub ExPro: Operativa Diaria</a></li>
-        <li><a href="#comercializacion">5. Comercialización y Ventas</a></li>
-        <li><a href="#informes">6. Informes e Inteligencia Analítica</a></li>
-        <li><a href="#ajustes">7. Configuración y Copias</a></li>
-        <li><a href="#ejemplos">8. Ejemplos Prácticos</a></li>
-      </ol>
-    </div>
-  </section>
+ <!-- 2. GANADERÍA HUB -->
+ <section class="seccion" id="ganaderia"><span class="fase-tag">Censo</span>
+ <h2 class="modulo">2. Hub Ganadería: Gestión del Censo</h2>
+ <p class="intro-mod">Pulsa el icono <span class="ruta">Ganadería</span> en la barra inferior para gestionar la base de tu explotación.</p>
+ <ol class="pasos"><li><strong>Acceso Modular</strong>: Botones directos para gestionar <strong>Animales</strong>, <strong>Rebaños</strong> y <strong>Zonas</strong>.</li>
+ <li><strong>Selector de Modo</strong>: Cambia entre Cárnico, Lácteo o Híbrido para filtrar la información que ves.</li>
+ <li><strong>Vista de Rebaños</strong>: Listado de tus lotes con su ubicación actual y número de cabezas.</li></ol>
+ <figure><img src="img/02-ganaderia-hub.png" alt="Ganadería Hub"><figcaption>Centro de gestión de animales y rebaños filtrado por modo.</figcaption></figure></section>
 
-  <!-- 1. DASHBOARD -->
-  <section class="seccion" id="dashboard">
-    <span class="fase-tag">Inicio</span>
-    <h2 class="modulo">1. Dashboard: Visión 360°</h2>
-    <p class="intro-mod">Al abrir la aplicación, accedes a la pestaña <span class="ruta">Inicio</span>. Es tu centro de control principal.</p>
-    <ol class="pasos">
-      <li><strong>Resumen de Censo</strong>: Visualiza rápidamente el total de animales activos, vendidos y la rentabilidad estimada.</li>
-      <li><strong>KPIs Diarios</strong>: Indicadores en tiempo real sobre producción láctea, ganancia de peso y eficiencia.</li>
-      <li><strong>Alertas Inteligentes</strong>: El sistema te avisa de periodos de supresión activos, tareas pendientes y vencimientos legales.</li>
-    </ol>
-    <figure><img src="img/01-dashboard.png" alt="Dashboard Premium">
-      <figcaption>Nueva interfaz Premium con indicadores dinámicos y tema oscuro.</figcaption></figure>
-  </section>
+ <!-- 3. ANIMALES Y FICHA -->
+ <section class="seccion" id="animales"><span class="fase-tag">Identificación</span>
+ <h2 class="modulo">3. Ficha Animal y Alta (Wizard)</h2>
+ <p class="intro-mod">Accede al listado desde <span class="ruta">Ganadería → Animales</span>. El alta de animales ahora es un proceso guiado.</p>
+ <ol class="pasos"><li><strong>Listado Inteligente</strong>: Busca por crotal, raza o rebaño. Los colores indican el estado del animal.</li>
+ <li><strong>Nuevo Animal (Wizard)</strong>: Pulsa <kbd>Nuevo</kbd> para abrir la ficha a pantalla completa.</li>
+ <li><strong>Herramientas Superiores</strong>: Usa el botón <kbd>SCAN</kbd> para leer crotales con la cámara o <kbd>NFC</kbd> para tags compatibles.</li>
+ <li><strong>Validación REGA</strong>: El sistema valida el formato ES+12 dígitos en tiempo real (dorado si es correcto, rojo si falla).</li></ol>
+ <figure><img src="img/03-animales-lista.png" alt="Lista Animales"><figcaption>Listado de animales con búsqueda y filtros rápidos.</figcaption></figure>
+ <figure><img src="img/04-ficha-animal-wizard.png" alt="Ficha Animal"><figcaption>Nueva Ficha Animal con herramientas de escaneo y validación oficial.</figcaption></figure></section>
 
-  <!-- 2. GANADERÍA HUB -->
-  <section class="seccion" id="ganaderia">
-    <span class="fase-tag">Censo</span>
-    <h2 class="modulo">2. Hub Ganadería: Gestión del Censo</h2>
-    <p class="intro-mod">Pulsa el icono <span class="ruta">Ganadería</span> en la barra inferior para gestionar la base de tu explotación.</p>
-    <ol class="pasos">
-      <li><strong>Acceso Modular</strong>: Botones directos para gestionar <strong>Animales</strong>, <strong>Rebaños</strong> y <strong>Zonas</strong>.</li>
-      <li><strong>Selector de Modo</strong>: Cambia entre Cárnico, Lácteo o Híbrido para filtrar la información que ves.</li>
-      <li><strong>Vista de Rebaños</strong>: Listado de tus lotes con su ubicación actual y número de cabezas.</li>
-    </ol>
-    <figure><img src="img/02-ganaderia-hub.png" alt="Ganadería Hub">
-      <figcaption>Centro de gestión de animales y rebaños filtrado por modo.</figcaption></figure>
-  </section>
+ <!-- 4. EXPRO HUB -->
+ <section class="seccion" id="expro"><span class="fase-tag">Operativa</span>
+ <h2 class="modulo">4. Hub ExPro: Operativa Diaria</h2>
+ <p class="intro-mod">La consola <span class="ruta">ExPro</span> es donde registras la actividad diaria. Se adapta a tu modo de trabajo.</p>
+ <ol class="pasos"><li><strong>Acciones de Registro</strong>: Botones directos para Registrar Peso (kg), Ordeño (L) o Tratamientos sanitarios.</li>
+ <li><strong>Líderes GMD</strong>: Visualiza los animales con mayor ganancia de peso diaria.</li>
+ <li><strong>Control de Silos</strong>: Monitoriza el nivel de tus silos de pienso y registra cargas de alimento.</li>
+ <li><strong>Gestión de Gastos</strong>: Registra facturas de alimentación, energía o fitosanitarios al momento.</li></ol>
+ <figure><img src="img/07-expro-hibrido.png" alt="ExPro Hub"><figcaption>Consola ExPro unificando registros de producción y costes.</figcaption></figure></section>
 
-  <!-- 3. ANIMALES Y FICHA -->
-  <section class="seccion" id="animales">
-    <span class="fase-tag">Identificación</span>
-    <h2 class="modulo">3. Ficha Animal y Alta (Wizard)</h2>
-    <p class="intro-mod">Accede al listado desde <span class="ruta">Ganadería → Animales</span>. El alta de animales ahora es un proceso guiado.</p>
-    <ol class="pasos">
-      <li><strong>Listado Inteligente</strong>: Busca por crotal, raza o rebaño. Los colores indican el estado del animal.</li>
-      <li><strong>Nuevo Animal (Wizard)</strong>: Pulsa <kbd>➕ Nuevo</kbd> para abrir la ficha a pantalla completa.</li>
-      <li><strong>Herramientas Superiores</strong>: Usa el botón <kbd>📷 SCAN</kbd> para leer crotales con la cámara o <kbd>🛜 NFC</kbd> para tags compatibles.</li>
-      <li><strong>Validación REGA</strong>: El sistema valida el formato ES+12 dígitos en tiempo real (dorado si es correcto, rojo si falla).</li>
-    </ol>
-    <figure><img src="img/03-animales-lista.png" alt="Lista Animales">
-      <figcaption>Listado de animales con búsqueda y filtros rápidos.</figcaption></figure>
-    <figure><img src="img/04-ficha-animal-wizard.png" alt="Ficha Animal">
-      <figcaption>Nueva Ficha Animal con herramientas de escaneo y validación oficial.</figcaption></figure>
-  </section>
+ <!-- 5. COMERCIALIZACIÓN -->
+ <section class="seccion" id="comercializacion"><span class="fase-tag">Ventas</span>
+ <h2 class="modulo">5. Comercialización y Ventas</h2>
+ <p class="intro-mod">Para vender, ve a <span class="ruta">Más → Comercialización</span> o pulsa el enlace directo desde ExPro.</p>
+ <ol class="pasos"><li><strong>Pestañas Especializadas</strong>: Gestiona tus ventas de carne y entregas de leche por separado.</li>
+ <li><strong>KPIs Financieros</strong>: Ingresos totales, rendimiento de canal y MOFA lácteo en la cabecera.</li>
+ <li><strong>Wizards de Venta</strong>: Procesos guiados que generan automáticamente el <strong>Albarán PDF</strong> y el documento <strong>DIMOE</strong>.</li></ol>
+ <figure><img src="img/08-comercial-carne.png" alt="Comercialización"><figcaption>Gestión de expediciones y ventas con analítica integrada.</figcaption></figure></section>
 
-  <!-- 4. EXPRO HUB -->
-  <section class="seccion" id="expro">
-    <span class="fase-tag">Operativa</span>
-    <h2 class="modulo">4. Hub ExPro: Operativa Diaria</h2>
-    <p class="intro-mod">La consola <span class="ruta">ExPro</span> es donde registras la actividad diaria. Se adapta a tu modo de trabajo.</p>
-    <ol class="pasos">
-      <li><strong>Acciones de Registro</strong>: Botones directos para Registrar Peso (kg), Ordeño (L) o Tratamientos sanitarios.</li>
-      <li><strong>Líderes GMD</strong>: Visualiza los animales con mayor ganancia de peso diaria.</li>
-      <li><strong>Control de Silos</strong>: Monitoriza el nivel de tus silos de pienso y registra cargas de alimento.</li>
-      <li><strong>Gestión de Gastos</strong>: Registra facturas de alimentación, energía o fitosanitarios al momento.</li>
-    </ol>
-    <figure><img src="img/07-expro-hibrido.png" alt="ExPro Hub">
-      <figcaption>Consola ExPro unificando registros de producción y costes.</figcaption></figure>
-  </section>
+ <!-- 6. INFORMES -->
+ <section class="seccion" id="informes"><span class="fase-tag">Analítica</span>
+ <h2 class="modulo">6. Informes e Inteligencia Analítica</h2>
+ <p class="intro-mod">Accede desde <span class="ruta">Más → Informes</span> para analizar la rentabilidad de tu negocio.</p>
+ <ol class="pasos"><li><strong>Balances Globales</strong>: Gráficos de ingresos vs gastos.</li>
+ <li><strong>Exportación Oficial</strong>: Genera el Libro Sanitario, Censo y Libro de Movimientos para la administración.</li>
+ <li><strong>Formatos</strong>: Exporta todo en PDF Premium o Excel compatible con SIGGAN.</li></ol>
+ <figure><img src="img/10-informes-analitica.png" alt="Informes"><figcaption>Panel de informes con analítica avanzada y exportación oficial.</figcaption></figure></section>
 
-  <!-- 5. COMERCIALIZACIÓN -->
-  <section class="seccion" id="comercializacion">
-    <span class="fase-tag">Ventas</span>
-    <h2 class="modulo">5. Comercialización y Ventas</h2>
-    <p class="intro-mod">Para vender, ve a <span class="ruta">Más → Comercialización</span> o pulsa el enlace directo desde ExPro.</p>
-    <ol class="pasos">
-      <li><strong>Pestañas Especializadas</strong>: Gestiona tus ventas de carne y entregas de leche por separado.</li>
-      <li><strong>KPIs Financieros</strong>: Ingresos totales, rendimiento de canal y MOFA lácteo en la cabecera.</li>
-      <li><strong>Wizards de Venta</strong>: Procesos guiados que generan automáticamente el <strong>Albarán PDF</strong> y el documento <strong>DIMOE</strong>.</li>
-    </ol>
-    <figure><img src="img/08-comercial-carne.png" alt="Comercialización">
-      <figcaption>Gestión de expediciones y ventas con analítica integrada.</figcaption></figure>
-  </section>
+ <!-- 7. AJUSTES -->
+ <section class="seccion" id="ajustes"><span class="fase-tag">Configuración</span>
+ <h2 class="modulo">7. Configuración y Seguridad</h2>
+ <p class="intro-mod">Accede desde <span class="ruta">Más → Ajustes</span> para configurar tu explotación.</p>
+ <ol class="pasos"><li><strong>Datos de Finca</strong>: Mantén al día tu código REGA, ADSG y datos fiscales.</li>
+ <li><strong>Backup</strong>: Exporta tu copia de seguridad regularmente. La app te permite compartirla por email o guardarla en la nube.</li></ol>
+ <figure><img src="img/11-menu-mas.png" alt="Menú Más"><figcaption>Nuevo menú de navegación lateral para accesos secundarios.</figcaption></figure></section>
 
-  <!-- 6. INFORMES -->
-  <section class="seccion" id="informes">
-    <span class="fase-tag">Analítica</span>
-    <h2 class="modulo">6. Informes e Inteligencia Analítica</h2>
-    <p class="intro-mod">Accede desde <span class="ruta">Más → Informes</span> para analizar la rentabilidad de tu negocio.</p>
-    <ol class="pasos">
-      <li><strong>Balances Globales</strong>: Gráficos de ingresos vs gastos.</li>
-      <li><strong>Exportación Oficial</strong>: Genera el Libro Sanitario, Censo y Libro de Movimientos para la administración.</li>
-      <li><strong>Formatos</strong>: Exporta todo en PDF Premium o Excel compatible con SIGGAN.</li>
-    </ol>
-    <figure><img src="img/10-informes-analitica.png" alt="Informes">
-      <figcaption>Panel de informes con analítica avanzada y exportación oficial.</figcaption></figure>
-  </section>
+ <!-- 8. EJEMPLOS -->
+ <section class="seccion" id="ejemplos"><h2 class="modulo">Ejemplos Prácticos</h2>
+ <p>Consulta nuestras guías detalladas por tipo de explotación:</p>
+ <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:20px;"><a href="ejemplo-ovino-carne.html" style="flex:1; min-width:200px; padding:16px; background:var(--suave); border:1px solid var(--linea); border-radius:12px; text-decoration:none; color:inherit;"><strong>Ovino de Carne</strong><br><small>Flujo completo desde alta a matadero.</small></a>
+ <a href="ejemplo-ovino-leche.html" style="flex:1; min-width:200px; padding:16px; background:var(--suave); border:1px solid var(--linea); border-radius:12px; text-decoration:none; color:inherit;"><strong>Ovino de Leche</strong><br><small>Control lechero, analíticas y MOFA.</small></a></div></section>
 
-  <!-- 7. AJUSTES -->
-  <section class="seccion" id="ajustes">
-    <span class="fase-tag">Configuración</span>
-    <h2 class="modulo">7. Configuración y Seguridad</h2>
-    <p class="intro-mod">Accede desde <span class="ruta">Más → Ajustes</span> para configurar tu explotación.</p>
-    <ol class="pasos">
-      <li><strong>Datos de Finca</strong>: Mantén al día tu código REGA, ADSG y datos fiscales.</li>
-      <li><strong>Backup</strong>: Exporta tu copia de seguridad regularmente. La app te permite compartirla por email o guardarla en la nube.</li>
-    </ol>
-    <figure><img src="img/11-menu-mas.png" alt="Menú Más">
-      <figcaption>Nuevo menú de navegación lateral para accesos secundarios.</figcaption></figure>
-  </section>
-
-  <!-- 8. EJEMPLOS -->
-  <section class="seccion" id="ejemplos">
-    <h2 class="modulo">📘 Ejemplos Prácticos</h2>
-    <p>Consulta nuestras guías detalladas por tipo de explotación:</p>
-    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:20px;">
-      <a href="ejemplo-ovino-carne.html" style="flex:1; min-width:200px; padding:16px; background:var(--suave); border:1px solid var(--linea); border-radius:12px; text-decoration:none; color:inherit;">
-        <strong>🥩 Ovino de Carne</strong><br><small>Flujo completo desde alta a matadero.</small>
-      </a>
-      <a href="ejemplo-ovino-leche.html" style="flex:1; min-width:200px; padding:16px; background:var(--suave); border:1px solid var(--linea); border-radius:12px; text-decoration:none; color:inherit;">
-        <strong>🥛 Ovino de Leche</strong><br><small>Control lechero, analíticas y MOFA.</small>
-      </a>
-    </div>
-  </section>
-
-  <section class="seccion" style="text-align:center; color:var(--gris-claro); font-size:.85rem;">
-    <p>© 2026 Livestock Manager Premium · v4.8.0<br>
-    Diseñado para la eficiencia en el sector ganadero.</p>
-  </section>
-
-</div>
-</body>
-</html>
+ <section class="seccion" style="text-align:center; color:var(--gris-claro); font-size:.85rem;"><p>© 2026 Livestock Manager Premium · v4.8.0<br>Diseñado para la eficiencia en el sector ganadero.</p></section></div></body></html>

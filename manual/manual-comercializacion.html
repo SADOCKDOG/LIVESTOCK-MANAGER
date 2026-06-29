@@ -1,113 +1,77 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comercialización · Guía Premium v4.8.0 · Livestock Manager</title>
-<style>
-  :root{
-    --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
-    --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-  }
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Comercialización · Guía Premium v4.8.0 · Livestock Manager</title>
+<style>:root{
+ --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
+ --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
+ --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ }
+ .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
 
-  .portada{
-    text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#1a1a2e,#2d2d44);
-    color:#fff; border-bottom:6px solid var(--oro-claro);
-  }
-  .portada h1{font-size:2.3rem; margin:18px 0 6px; color:var(--oro-claro);}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a; border-radius:30px; color:var(--oro-claro); font-size:.85rem;}
+ .portada{
+ text-align:center; padding:60px 24px 50px;
+ background:linear-gradient(160deg,#1a1a2e,#2d2d44);
+ color:#fff; border-bottom:6px solid var(--oro-claro);
+ }
+ .portada h1{font-size:2.3rem; margin:18px 0 6px; color:var(--oro-claro);}
+ .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+ .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a; border-radius:30px; color:var(--oro-claro); font-size:.85rem;}
 
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px;
-    border-left:5px solid #8b5e3c; padding-left:14px;
-  }
-  .fase-tag{display:inline-block; background:#8b5e3c; color:#fff; font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:20px; text-transform:uppercase; margin-bottom:10px;}
+ h2.modulo{
+ font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px;
+ border-left:5px solid #8b5e3c; padding-left:14px;
+ }
+ .fase-tag{display:inline-block; background:#8b5e3c; color:#fff; font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:20px; text-transform:uppercase; margin-bottom:10px;}
 
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:#8b5e3c; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
-  }
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:#8b5e3c; color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
+ }
 
-  figure{margin:24px 0; text-align:center;}
-  figure img{
-    max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
-  }
-  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
+ figure{margin:24px 0; text-align:center;}
+ figure img{
+ max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px;
+ box-shadow:0 8px 20px rgba(0,0,0,.15);
+ }
+ figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
 
-  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
-  .ruta{color:#8b5e3c; font-weight:700;}
-</style>
-</head>
-<body>
+ .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
+ .ruta{color:#8b5e3c; font-weight:700;}</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;"><h1>Comercialización</h1>
+ <p class="sub">Ventas de Carne y Entregas de Leche · Guía v4.8.0</p>
+ <div class="badge">FLUJOS DE VENTA PREMIUM</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;">
-  <h1>💰 Comercialización</h1>
-  <p class="sub">Ventas de Carne y Entregas de Leche · Guía v4.8.0</p>
-  <div class="badge">FLUJOS DE VENTA PREMIUM</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">1. Acceso a Comercialización</h2>
+ <p class="intro-mod">Existen dos formas rápidas de acceder a la gestión de ventas en la v4.8.0:</p>
+ <ol class="pasos"><li><strong>Desde el Menú Más</strong>: Pulsa <span class="ruta">Más</span> en la barra inferior y selecciona <strong>Comercial</strong>.</li>
+ <li><strong>Desde el Hub ExPro</strong>: En la consola <span class="ruta">ExPro</span>, usa el botón directo <strong>"Ir a Comercialización"</strong> situado al final del panel.</li></ol>
+ <figure><img src="img/08-comercial-carne.png" alt="Pantalla Comercial Carne"><figcaption>Sección de Comercialización con pestañas de Carne y Leche.</figcaption></figure></section>
 
-<div class="wrap">
+ <section class="seccion"><h2 class="modulo">2. Venta Masiva de Carne</h2>
+ <p class="intro-mod">El wizard de venta te guía por 5 pasos obligatorios para asegurar la trazabilidad.</p>
+ <ol class="pasos"><li><strong>Selección de Animales</strong>: Marca los animales aptos para la venta.</li>
+ <li><strong>Trazabilidad</strong>: Indica fecha, matadero de destino, código ICA y Nº de Guía.</li>
+ <li><strong>Pesos</strong>: Registra el peso vivo y el peso canal de cada animal. La app calcula el rendimiento automáticamente.</li>
+ <li><strong>Clasificación SEUROP</strong>: Define la calidad de las canales (S, E, U, R, O, P).</li>
+ <li><strong>Transportista</strong>: Asocia el transporte y genera los documentos oficiales.</li></ol>
+ <div style="background:#fdecea; border-left:4px solid var(--rojo); padding:10px; border-radius:6px; font-size:0.9rem;"><strong>Bloqueo Sanitario</strong>: Si un animal está en periodo de supresión, el sistema impedirá su venta.</div></section>
 
-  <section class="seccion">
-    <h2 class="modulo">1. Acceso a Comercialización</h2>
-    <p class="intro-mod">Existen dos formas rápidas de acceder a la gestión de ventas en la v4.8.0:</p>
-    <ol class="pasos">
-      <li><strong>Desde el Menú Más</strong>: Pulsa <span class="ruta">Más</span> en la barra inferior y selecciona <strong>Comercial</strong>.</li>
-      <li><strong>Desde el Hub ExPro</strong>: En la consola <span class="ruta">ExPro</span>, usa el botón directo <strong>"Ir a Comercialización"</strong> situado al final del panel.</li>
-    </ol>
-    <figure><img src="img/08-comercial-carne.png" alt="Pantalla Comercial Carne">
-      <figcaption>Sección de Comercialización con pestañas de Carne y Leche.</figcaption></figure>
-  </section>
+ <section class="seccion"><h2 class="modulo">3. Albarán de Leche</h2>
+ <p class="intro-mod">En la pestaña <span class="ruta">Leche</span> puedes registrar las recogidas de cisterna.</p>
+ <figure><img src="img/09-comercial-leche.png" alt="Pantalla Comercial Leche"><figcaption>Gestión de entregas de leche con MOFA acumulado.</figcaption></figure>
+ <ol class="pasos"><li>Pulsa <kbd>Nuevo</kbd> para abrir el Wizard de Albarán Lácteo (6 pasos).</li>
+ <li>Registra los datos de la cisterna, temperatura de carga y Letra Q.</li>
+ <li>Introduce los resultados del laboratorio (Grasa, Proteína, Somáticas).</li>
+ <li>La app calcula el <strong>Precio Final</strong> y el <strong>MOFA</strong> mensual.</li></ol></section>
 
-  <section class="seccion">
-    <h2 class="modulo">2. Venta Masiva de Carne</h2>
-    <p class="intro-mod">El wizard de venta te guía por 5 pasos obligatorios para asegurar la trazabilidad.</p>
-    <ol class="pasos">
-      <li><strong>Selección de Animales</strong>: Marca los animales aptos para la venta.</li>
-      <li><strong>Trazabilidad</strong>: Indica fecha, matadero de destino, código ICA y Nº de Guía.</li>
-      <li><strong>Pesos</strong>: Registra el peso vivo y el peso canal de cada animal. La app calcula el rendimiento automáticamente.</li>
-      <li><strong>Clasificación SEUROP</strong>: Define la calidad de las canales (S, E, U, R, O, P).</li>
-      <li><strong>Transportista</strong>: Asocia el transporte y genera los documentos oficiales.</li>
-    </ol>
-    <div style="background:#fdecea; border-left:4px solid var(--rojo); padding:10px; border-radius:6px; font-size:0.9rem;">
-      🚨 <strong>Bloqueo Sanitario</strong>: Si un animal está en periodo de supresión, el sistema impedirá su venta.
-    </div>
-  </section>
-
-  <section class="seccion">
-    <h2 class="modulo">3. Albarán de Leche</h2>
-    <p class="intro-mod">En la pestaña <span class="ruta">Leche</span> puedes registrar las recogidas de cisterna.</p>
-    <figure><img src="img/09-comercial-leche.png" alt="Pantalla Comercial Leche">
-      <figcaption>Gestión de entregas de leche con MOFA acumulado.</figcaption></figure>
-    <ol class="pasos">
-      <li>Pulsa <kbd>➕ Nuevo</kbd> para abrir el Wizard de Albarán Lácteo (6 pasos).</li>
-      <li>Registra los datos de la cisterna, temperatura de carga y Letra Q.</li>
-      <li>Introduce los resultados del laboratorio (Grasa, Proteína, Somáticas).</li>
-      <li>La app calcula el <strong>Precio Final</strong> y el <strong>MOFA</strong> mensual.</li>
-    </ol>
-  </section>
-
-  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager Premium · v4.8.0 · Guía de Comercialización
-  </div>
-
-</div>
-</body>
-</html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Guía de Comercialización</div></div></body></html>

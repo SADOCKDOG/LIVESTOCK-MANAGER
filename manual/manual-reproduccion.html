@@ -1,82 +1,52 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproducción · Ciclo de Vida · Livestock Manager Premium v4.8.0</title>
-<style>
-  :root{
-    --acento:#ec4899; --acento-claro:#f9a8d4;
-    --tinta:#1a1a1a; --gris:#555; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-  }
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
-  .portada{
-    text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#1a0a14,#2d1a24);
-    color:#fff; border-bottom:6px solid var(--acento);
-  }
-  .portada h1{font-size:2.3rem; margin:18px 0 6px; color:var(--acento-claro);}
-  h2.modulo{font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px; border-left:5px solid var(--acento); padding-left:14px;}
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--acento); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
-  }
-  figure{margin:24px 0; text-align:center;}
-  figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
-  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
-  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
-  .ruta{color:var(--acento); font-weight:700;}
-</style>
-</head>
-<body>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Reproducción · Ciclo de Vida · Livestock Manager Premium v4.8.0</title>
+<style>:root{
+ --acento:#ec4899; --acento-claro:#f9a8d4;
+ --tinta:#1a1a1a; --gris:#555; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ }
+ .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+ .portada{
+ text-align:center; padding:60px 24px 50px;
+ background:linear-gradient(160deg,#1a0a14,#2d1a24);
+ color:#fff; border-bottom:6px solid var(--acento);
+ }
+ .portada h1{font-size:2.3rem; margin:18px 0 6px; color:var(--acento-claro);}
+ h2.modulo{font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px; border-left:5px solid var(--acento); padding-left:14px;}
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:var(--acento); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
+ }
+ figure{margin:24px 0; text-align:center;}
+ figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
+ figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
+ .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
+ .ruta{color:var(--acento); font-weight:700;}</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;"><h1>Gestión Reproductiva</h1>
+ <p class="sub">Celos, Inseminaciones, Partos y Genealogía · Guía v4.8.0</p>
+ <div class="badge">CONTROL DE CICLO PREMIUM</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;">
-  <h1>🔬 Gestión Reproductiva</h1>
-  <p class="sub">Celos, Inseminaciones, Partos y Genealogía · Guía v4.8.0</p>
-  <div class="badge">CONTROL DE CICLO PREMIUM</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">1. Acceso desde la Ficha Animal</h2>
+ <p class="intro-mod">El control reproductivo se realiza de forma individual para garantizar la trazabilidad madre-cría.</p>
+ <figure><img src="img/12-ficha-animal-360.png" alt="Ficha Animal Reproducción"><figcaption>En la Ficha del Animal, localiza el botón "GESTIÓN REPRODUCTIVA".</figcaption></figure>
+ <ol class="pasos"><li><strong>Selecciona una Hembra</strong>: Busca al animal en el listado de <span class="ruta">Ganadería → Animales</span>.</li>
+ <li><strong>Historial Vivo</strong>: Pulsa sobre ella para ver su ficha y desliza hasta el botón de gestión.</li></ol></section>
 
-<div class="wrap">
+ <section class="seccion"><h2 class="modulo">2. El Wizard de Reproducción</h2>
+ <p class="intro-mod">Registra cada hito del ciclo biológico con un clic.</p>
+ <figure><img src="img/13-wizard-reproduccion.png" alt="Wizard Reproducción"><figcaption>Wizard emergente para registro rápido de eventos.</figcaption></figure>
+ <ol class="pasos"><li><strong>Evento</strong>: Selecciona entre Celo, IA, Monta, Diagnóstico, Parto o Aborto.</li>
+ <li><strong>Parto Inteligente</strong>: Si seleccionas "Parto", la app te pedirá el crotal de la cría y la vinculará automáticamente como madre.</li>
+ <li><strong>Cierre de Ciclo</strong>: Registra el "Secado" para preparar a la hembra para la siguiente lactación.</li></ol></section>
 
-  <section class="seccion">
-    <h2 class="modulo">1. Acceso desde la Ficha Animal</h2>
-    <p class="intro-mod">El control reproductivo se realiza de forma individual para garantizar la trazabilidad madre-cría.</p>
-    <figure><img src="img/12-ficha-animal-360.png" alt="Ficha Animal Reproducción">
-      <figcaption>En la Ficha del Animal, localiza el botón "GESTIÓN REPRODUCTIVA".</figcaption></figure>
-    <ol class="pasos">
-      <li><strong>Selecciona una Hembra</strong>: Busca al animal en el listado de <span class="ruta">Ganadería → Animales</span>.</li>
-      <li><strong>Historial Vivo</strong>: Pulsa sobre ella para ver su ficha y desliza hasta el botón de gestión.</li>
-    </ol>
-  </section>
-
-  <section class="seccion">
-    <h2 class="modulo">2. El Wizard de Reproducción</h2>
-    <p class="intro-mod">Registra cada hito del ciclo biológico con un clic.</p>
-    <figure><img src="img/13-wizard-reproduccion.png" alt="Wizard Reproducción">
-      <figcaption>Wizard emergente para registro rápido de eventos.</figcaption></figure>
-    <ol class="pasos">
-      <li><strong>Evento</strong>: Selecciona entre Celo, IA, Monta, Diagnóstico, Parto o Aborto.</li>
-      <li><strong>Parto Inteligente</strong>: Si seleccionas "Parto", la app te pedirá el crotal de la cría y la vinculará automáticamente como madre.</li>
-      <li><strong>Cierre de Ciclo</strong>: Registra el "Secado" para preparar a la hembra para la siguiente lactación.</li>
-    </ol>
-  </section>
-
-  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager Premium · v4.8.0 · Guía de Reproducción
-  </div>
-
-</div>
-</body>
-</html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Guía de Reproducción</div></div></body></html>
