@@ -85,20 +85,20 @@ const GanaderiaView = {
       </div>
 
       <!-- KPIs Ganadería Unificados en Filas -->
-      <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid ${meta.color}; width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${meta.color}; width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
         <div class="flex flex-col">
-          <div class="py-12 flex justify-between items-center border-bottom-222">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rebanos()} Lotes / Rebaños</span>
             <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} lotes</strong>
           </div>
-          <div class="py-12 flex justify-between items-center border-bottom-222">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Animales Activos</span>
             <strong class="text-xl font-950 text-green">${animalesActivos.length} cabezas</strong>
           </div>
-          <div class="py-12 flex justify-between items-center">
+          <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.zonas()} Zonas / Parcelas</span>
             <strong class="text-xl font-950 text-blue">${zonas.length} parcelas</strong>
           </div>
@@ -180,3 +180,4 @@ const GanaderiaView = {
 };
 
 window.GanaderiaView = GanaderiaView;
+

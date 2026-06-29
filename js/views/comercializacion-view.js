@@ -147,8 +147,8 @@ const ComercializacionView = {
     const headerLabels = { carne: 'Balance Cárnico', leche: 'Balance Lácteo', gastos: 'Resumen Gastos' };
 
     return `
-      <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid ${meta.color}; width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${meta.color}; width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${headerIcons[tab] || Icons.info()} ${headerLabels[tab] || 'Resumen'}
         </div>
         <div class="flex flex-col">
@@ -485,6 +485,7 @@ const ComercializacionView = {
 };
 
 window.ComercializacionView = ComercializacionView;
+
 
 
 
