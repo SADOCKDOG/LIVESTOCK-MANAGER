@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - ZonasView v1.0.0
  * Vista de Zonas/Parcelas extraída de App.js para modularización.
  * Copia espejo de js/views/zonas-view.js
@@ -21,7 +21,7 @@ const ZonasView = {
             <span class="widget-link-label">Nueva Zona</span>
           </button>
         </div>
-        <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Creación y gestión de zonas, parcelas y recintos de la explotación</span></div>
+        <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">Creación y gestión de zonas, parcelas y recintos de la explotación</span></div>
       </div>`;
     if (zonasConIndice.length === 0)
       html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
@@ -335,3 +335,5 @@ const ZonasView = {
 };
 
 window.ZonasView = ZonasView;
+
+
