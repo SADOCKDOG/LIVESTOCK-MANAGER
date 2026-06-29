@@ -1171,7 +1171,8 @@ const ExplotacionView = {
           <div class="grid gap-8 mh-350" style="overflow-y:auto; max-height:400px;">
             ${listaGastos.length > 0
               ? listaGastos.map(g => {
-                  const catColor = g.categoria === 'Alimentacion' ? '#f59e0b' : (g.categoria === 'Electricidad' ? '#3b82f6' : '#10b981');
+                  const catMap = { 'Alimentacion': '#f59e0b', 'Alimentación': '#f59e0b', 'Sanidad': '#ef4444', 'Fitosanitarios': '#10b981', 'Electricidad': '#3b82f6', 'Personal': '#f97316', 'Amortizacion': '#a855f7', 'Amortización': '#a855f7' };
+                  const catColor = catMap[g.categoria] || '#888';
                   return `
                     <div class="card card-animal" style="border-left:4px solid ${catColor}; padding:12px; margin:0;">
                       <div class="flex justify-between items-center">
