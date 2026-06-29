@@ -59,6 +59,8 @@ const ASSETS = [
   './icons/icon-512.png',
   './icons/icon-placeholder.svg',
   './icons/logo-header.png',
+  './icons/Logo aplicación.png',
+  './icons/Logo%20aplicaci%C3%B3n.png',
   './icons/app-icon.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
