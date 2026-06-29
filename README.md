@@ -61,6 +61,7 @@ Para cumplir con las directrices oficiales de trazabilidad y auditoría de la Ju
   * Validación del formato del crotal oficial (estructura "ES" + 12 dígitos numéricos).
   * Control del periodo de espera de medicamentos: alerta y bloqueo del asistente de venta si el animal seleccionado tiene tratamientos con tiempo de supresión activo.
   * Conciliación entre el número de cabezas declaradas en movimientos y la existencia real en censo.
+  * Adaptación del diseño de diálogos y visores a **Safe Area** (`env(safe-area-inset-bottom)`) en las solicitudes de crotales y guías de origen para evitar solapamientos con los botones del sistema de Android.
 
 ---
 
@@ -98,6 +99,8 @@ graph TD
 │   ├── database.js              # Inicialización y persistencia de IndexedDB
 │   ├── icons.js                 # Biblioteca de iconos SVG vectoriales
 │   ├── views/                   # Controladores de las pantallas de la SPA
+│   │   ├── documentos-view.js   # Historial unificado de trámites y documentos
+│   │   ├── albaranes-ventas-view.js # Historial de entregas lácteas y ventas cárnicas
 │   │   ├── manuales-view.js     # Visor integrado de guías de usuario
 │   │   └── wizards/             # Flujos paso a paso de tareas críticas
 │   └── qa-siggan.js             # Batería de pruebas automatizadas QA
