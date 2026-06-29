@@ -269,7 +269,7 @@ const CarneView = {
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
                       <span class="badge badge-sm badge-gold block mb-4 font-950">${r.cantidad_animales || 0} CABEZAS</span>
-                      <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
+                      <span class="text-[0.5rem] text-gray-700 font-900 uppercase flex items-center gap-4">Ver ficha ${Icons.siguiente()}</span>
                     </div>
                   </div>
                 </div>`).join('')
@@ -285,16 +285,18 @@ const CarneView = {
   _renderComercializacion(content, d) {
     const html = `
       <div class="card report-section p-16 border-top-3px border-top-3px-green">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.transportistas()}</span>
-            <div>
-              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
-              <div class="text-gray text-2xs">Logística, vehículos, compradores, contratos y ventas</div>
-            </div>
+        <div class="flex items-center gap-12 mb-16">
+          <span class="text-3xl">${Icons.transportistas()}</span>
+          <div>
+            <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
+            <div class="text-gray text-2xs">Logística, vehículos, compradores, contratos y ventas</div>
           </div>
-          <button class="btn btn-create--carne btn-sm" onclick="App._abrirWizardVentaMasiva()">
-            ${Icons.agregar()} Registrar Venta
+        </div>
+
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirWizardVentaMasiva()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">REGISTRAR VENTA</span>
           </button>
         </div>
 
@@ -359,19 +361,19 @@ const CarneView = {
     const html = `
       ${supresionesHtml}
       <div class="card report-section p-16 border-top-3px border-top-3px-purple">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.documento()}</span>
-            <div>
-              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
-              <div class="text-gray text-2xs">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
-            </div>
+        <div class="flex items-center gap-12 mb-16">
+          <span class="text-3xl">${Icons.documento()}</span>
+          <div>
+            <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
+            <div class="text-gray text-2xs">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
           </div>
-          <div class="flex gap-4">
-            <button class="btn btn-secondary btn-sm btn-tratamiento--carne" onclick="CarneView._abrirAsistenteTratamientoCarne()">
-              ${Icons.agregar()} Registrar Tratamiento
-            </button>
-          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="CarneView._abrirAsistenteTratamientoCarne()">
+            ${Icons.sanidad()}
+            <span class="widget-link-label">REGISTRAR TRATAMIENTO</span>
+          </button>
         </div>
 
         ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}

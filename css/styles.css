@@ -497,10 +497,23 @@ nav.bottom-nav {
 
 /* Dashboard Grids */
 .summary-table-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
-.summary-cell { background: #1a1a1a; padding: 15px 10px; border-radius: 16px; border: 1px solid #333; text-align: center; }
+.summary-cell {
+    background: #1a1a1a;
+    padding: 12px 8px;
+    border-radius: 16px;
+    border: 1px solid #333;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+    width: 100%;
+}
 .summary-cell-kpi { padding: 10px 6px; text-align: center; }
-.s-lbl { font-size: 0.7rem; color: #888; margin-bottom: 5px; font-weight: 800; }
-.s-val { font-size: 1.5rem; font-weight: 900; color: #fff; }
+.s-lbl { font-size: 0.65rem; color: #888; margin-bottom: 4px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s-val { font-size: 1.2rem; font-weight: 900; color: #fff; line-height: 1.1; overflow-wrap: break-word; }
 .c-bo .s-val { color: #f59e0b; }
 .c-1a .s-val { color: #10b981; }
 
@@ -1952,6 +1965,11 @@ label {
     padding: 12px;
     border-radius: 8px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 /* ── LECHE VIEW SPECIFIC STYLES ── */
@@ -2156,11 +2174,15 @@ label {
     background: #1a1a1a;
     padding: 12px;
     border-radius: 8px;
+    min-width: 0;
+    overflow: hidden;
 }
 .info-box-sm {
     background: #1a1a1a;
     padding: 10px;
     border-radius: 6px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* ── Variantes de color para borde izquierdo ── */
@@ -2206,15 +2228,15 @@ label {
     margin: 12px 0 8px 0;
 }
 
-.inf-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.inf-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; table-layout: auto; }
 .inf-table thead tr  { background: #1a1a1a; border-bottom: 2px solid var(--tbl-accent, var(--p-gold-dark)); }
 .inf-table tbody tr  { border-bottom: 1px solid #222; }
 .inf-table tfoot tr  { background: #1a1a1a; border-top: 2px solid var(--tbl-accent, var(--p-gold-dark)); font-weight: bold; }
-.inf-table th { padding: 8px 6px; color: #888; font-size: 0.7rem; text-align: left; }
-.inf-table td { padding: 8px 6px; }
+.inf-table th { padding: 10px 8px; color: #888; font-size: 0.7rem; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; }
+.inf-table td { padding: 10px 8px; vertical-align: middle; word-break: break-word; }
 .inf-table-sm th { padding: 6px 8px; color: #888; font-size: 0.7rem; text-align: left; }
 .inf-table-sm td { padding: 6px 8px; }
-.inf-table tfoot td { padding: 10px 6px; }
+.inf-table tfoot td { padding: 12px 8px; }
 
 .inf-export-note {
     margin-top: 20px;
@@ -2618,18 +2640,18 @@ label {
 }
 .explotacion-kpi-card {
   background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 12px;
-  padding: 10px 8px; text-align: center; border-top: 3px solid var(--theme-color);
-  min-width: 110px;
+  padding: 10px 8px; text-align: center;
+  min-width: 100px;
   max-width: 160px;
   flex: 1 1 140px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: 90px; /* Altura fija para alineación perfecta */
+  min-height: 90px;
 }
 .explotacion-kpi-value {
-  font-size: 1.2rem; font-weight: 900; color: #fff; margin-top: auto;
+  font-size: 1.2rem; font-weight: 900; margin-top: auto;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   width: 100%;
 }
@@ -2694,14 +2716,14 @@ label {
 .ganaderia-kpi {
   background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 12px;
   text-align: center; padding: 10px 8px; border-top: 3px solid var(--kpi-color);
-  min-width: 110px;
+  min-width: 100px;
   max-width: 160px;
   flex: 1 1 140px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: 90px;
+  min-height: 90px;
 }
 .ganaderia-kpi small {
   display: flex; font-size: 0.65rem; color: #ffffff; /* Blanco Maestro */

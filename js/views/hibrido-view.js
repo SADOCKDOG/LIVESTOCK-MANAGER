@@ -263,22 +263,23 @@ const HibridoView = {
 
     const html = `
       <div class="card report-section p-16 border-top-3px border-top-3px-green">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.transportistas()}</span>
-            <div>
-              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
-              <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
-            </div>
+        <div class="flex items-center gap-12 mb-16">
+          <span class="text-3xl">${Icons.transportistas()}</span>
+          <div>
+            <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
+            <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
           </div>
-          <div class="flex gap-4">
-            <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
-              ${Icons.agregar()} Venta Carne
-            </button>
-            <button class="btn btn-success btn-sm" onclick="App._abrirWizardAlbaranLeche()">
-              ${Icons.agregar()} Albarán Leche
-            </button>
-          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirWizardVentaMasiva()">
+            ${Icons.carne()}
+            <span class="widget-link-label">VENTA CARNE</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardAlbaranLeche()">
+            ${Icons.leche()}
+            <span class="widget-link-label">ALBARÁN LECHE</span>
+          </button>
         </div>
 
         ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
@@ -344,17 +345,19 @@ const HibridoView = {
 
     const html = `
       ${alertasHtml}
-      <div class="card report-section p-16 border-top-3px" style="border-top-color:#8b5cf6;">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.documento()}</span>
-            <div>
-              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
-              <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
-            </div>
+      <div class="card report-section p-16" style="border-top:3px solid #8b5cf6;">
+        <div class="flex items-center gap-12 mb-16">
+          <span class="text-3xl">${Icons.documento()}</span>
+          <div>
+            <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
+            <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
           </div>
-          <button class="btn btn-secondary btn-sm btn-tratamiento--hibrido" onclick="HibridoView._abrirAsistenteTratamientoMix()">
-            ${Icons.agregar()} Registrar Tratamiento
+        </div>
+
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="HibridoView._abrirAsistenteTratamientoMix()">
+            ${Icons.sanidad()}
+            <span class="widget-link-label">REGISTRAR TRATAMIENTO</span>
           </button>
         </div>
 

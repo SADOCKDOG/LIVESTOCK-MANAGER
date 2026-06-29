@@ -239,7 +239,7 @@ const LecheView = {
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
                       <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
-                      <span class="text-xs text-777">Ficha ➔</span>
+                      <span class="text-xs text-777 flex items-center gap-4">Ficha ${Icons.siguiente()}</span>
                     </div>
                   </div>
                 </div>`).join('')
@@ -264,13 +264,15 @@ const LecheView = {
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
 
-        <div class="text-center mb-12">
-          <button class="btn btn-create--leche btn-sm" onclick="App._abrirWizardAlbaranLeche()">
-            ${Icons.agregar()} Nueva Entrega (Cisterna)
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardAlbaranLeche()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">NUEVA ENTREGA (CISTERNA)</span>
           </button>
         </div>
+
+        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
 
         <!-- Accesos directos comerciales -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -303,13 +305,15 @@ const LecheView = {
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
 
-        <div class="text-center mb-12">
-          <button class="btn btn-secondary btn-sm btn-tratamiento--leche w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
-            ${Icons.sanidad()} Registrar Tratamiento
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="LecheView._abrirAsistenteTratamientoLeche()">
+            ${Icons.sanidad()}
+            <span class="widget-link-label">REGISTRAR TRATAMIENTO</span>
           </button>
         </div>
+
+        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
 
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
