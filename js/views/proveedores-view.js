@@ -23,7 +23,7 @@ const ProveedoresView = {
                   <span class="widget-link-label">Nuevo Proveedor</span>
                 </button>
               </div>
-              <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">Registro y gestión de proveedores de servicios e insumos ganaderos</span></div>
+              <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">${Icons.proveedores()} Registro y gestión de proveedores de servicios e insumos ganaderos</span></div>
             </div>
             <div class="flex gap-8 mb-14">
               <input type="search" id="search-proveedores" placeholder="Buscar por nombre, NIF o ciudad..."

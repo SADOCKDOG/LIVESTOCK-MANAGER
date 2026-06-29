@@ -232,7 +232,7 @@ const ComercializacionView = {
             <span class="widget-link-label">${registrarLabel}</span>
           </button>
         </div>
-        <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
+        <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">${Icons.comercial()} Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
       </div>
 
       <div class="card p-14 border-222">
