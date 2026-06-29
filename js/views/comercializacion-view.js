@@ -70,12 +70,18 @@ const ComercializacionView = {
 
     main.innerHTML = `
       <!-- Selector de Modo Comercial Superior -->
-      <div class="mb-16 text-center">
-        <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMERCIALIZACIÓN</div>
-        <div class="comer-mode-switch">
-          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6;" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+      <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
+        <div class="text-center mb-10">
+          <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMERCIALIZACIÓN</div>
+          <div class="comer-mode-switch">
+            <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+            <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+            <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6;" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+          </div>
+        </div>
+        <div class="pt-8 border-top-222">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${meta.color === '#ef4444' ? Icons.carne() : meta.color === '#3b82f6' ? Icons.leche() : Icons.gastos()} Contexto: ${meta.label}</div>
+          <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de ventas, entregas y gastos comerciales con registro rápido y acceso a documentación.</div>
         </div>
       </div>
 

@@ -63,19 +63,19 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="mb-16 text-center">
-        <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 360px; margin: 0 auto;">EXPLOTACIÓN</div>
-        <div class="ganaderia-mode-switch">
-          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
-          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
-          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
-        </div>
-      </div>
-
       <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-8">Contexto activo de Ganadería</div>
-        <div class="text-white font-900">${meta.icon} ${meta.label}</div>
-        <div class="text-xs text-aaa mt-4">Vista independiente por modo para patrimonio, censo, lotes y zonas.</div>
+        <div class="text-center mb-10">
+          <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 360px; margin: 0 auto;">EXPLOTACIÓN</div>
+          <div class="ganaderia-mode-switch">
+            <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
+            <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
+            <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
+          </div>
+        </div>
+        <div class="pt-8 border-top-222">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${meta.icon} Contexto: ${meta.label}</div>
+          <div class="text-xs text-aaa mt-4 leading-relaxed">Vista independiente por modo para patrimonio, censo, lotes y zonas.</div>
+        </div>
       </div>
 
       <!-- KPIs Ganadería Unificados en Filas -->
