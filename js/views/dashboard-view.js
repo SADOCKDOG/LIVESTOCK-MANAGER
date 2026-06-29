@@ -121,30 +121,30 @@ const DashboardView = {
       <!-- Resumen General -->
       <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'RESUMEN GANADERO'}</div>
-        <div class="grid grid-cols-3 gap-6">
-          <div class="bg-dark rounded-lg p-8 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.zonas()} ZONAS</div>
-            <div class="text-base font-950 text-gold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(finca.zonas || []).length}</div>
+        <div class="flex flex-col">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.zonas()} Zonas</span>
+            <strong class="text-xl font-950" style="color:var(--p-gold);">${(finca.zonas || []).length}</strong>
           </div>
-          <div class="bg-dark rounded-lg p-8 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.rebanos()} REBAÑOS</div>
-            <div class="text-base font-950 text-gold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rebanos.length}</div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rebanos()} Rebaños</span>
+            <strong class="text-xl font-950" style="color:var(--p-gold);">${rebanos.length}</strong>
           </div>
-          <div class="bg-dark rounded-lg p-8 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.animales()} CENSO</div>
-            <div class="text-base font-950 text-gold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${totalCenso || animales.length}</div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Censo</span>
+            <strong class="text-xl font-950" style="color:var(--p-gold);">${totalCenso || animales.length}</strong>
           </div>
-          <div class="bg-dark rounded-lg p-8 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.check()} ACTIVOS</div>
-            <div class="text-base font-950 text-green" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${totalActivos || activos}</div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.check()} Activos</span>
+            <strong class="text-xl font-950 text-green">${totalActivos || activos}</strong>
           </div>
-          <div class="bg-dark rounded-lg p-8 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.paquete()} VENDIDOS</div>
-            <div class="text-base font-950 text-red" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${totalVendidos}</div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Vendidos</span>
+            <strong class="text-xl font-950 text-red">${totalVendidos}</strong>
           </div>
-          <div class="bg-dark rounded-lg p-8 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.grafico()} RENTAB.</div>
-            <div class="text-base font-950 ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pctRent}%</div>
+          <div class="py-8 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Rentabilidad</span>
+            <strong class="text-xl font-950 ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</strong>
           </div>
         </div>
       </div>
