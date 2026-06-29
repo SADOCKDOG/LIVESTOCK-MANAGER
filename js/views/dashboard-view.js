@@ -128,23 +128,23 @@ const DashboardView = {
       <div class="card card-accent card-accent-green p-20">
         <h3 class="mt-0 text-green flex items-center gap-8">${Icons.dinero()} Balance Económico</h3>
         <div class="grid grid-cols-2 gap-10 mb-10">
-          <div class="info-box border-left-amber">
+          <div class="info-box border-left-amber min-w-0">
             <div class="kpi-label">Ingresos</div>
-            <div class="text-2xl font-black text-amber">${(rent?.ingresos || 0).toLocaleString()}€</div>
+            <div class="text-xl sm:text-2xl font-black text-amber truncate" title="${(rent?.ingresos || 0).toLocaleString()}€">${(rent?.ingresos || 0).toLocaleString()}€</div>
           </div>
-          <div class="info-box border-left-red">
+          <div class="info-box border-left-red min-w-0">
             <div class="kpi-label">Gastos</div>
-            <div class="text-2xl font-black text-red">${(rent?.gastos || 0).toLocaleString()}€</div>
+            <div class="text-xl sm:text-2xl font-black text-red truncate" title="${(rent?.gastos || 0).toLocaleString()}€">${(rent?.gastos || 0).toLocaleString()}€</div>
           </div>
         </div>
-        <div class="flex justify-between items-center p-14 card-tint-green-lg">
-          <div>
+        <div class="flex justify-between items-center p-14 card-tint-green-lg gap-8">
+          <div class="min-w-0">
             <div class="text-xs text-gray uppercase font-bold">Beneficio Neto</div>
-            <div class="text-xl font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €</div>
+            <div class="text-lg sm:text-xl font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'} truncate" title="${balanceTotal.toLocaleString()} €">${balanceTotal.toLocaleString()} €</div>
           </div>
-          <div class="text-right">
+          <div class="text-right flex-shrink-0">
             <div class="text-xs text-gray uppercase font-bold">Rentabilidad</div>
-            <div class="text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
+            <div class="text-lg sm:text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
           </div>
         </div>
         <div class="text-center mt-12">
@@ -320,19 +320,19 @@ const DashboardView = {
           ${Icons.leche()} Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
         </h3>
         <div class="hscroll-cards">
-          <div class="info-box border-left-amber kpi-card-fixed">
+          <div class="info-box border-left-amber kpi-card-fixed min-w-0">
             <div class="kpi-label">MOFA Mensual</div>
-            <div class="text-2xl font-black ${mofaRatio >= 20 ? 'text-green' : 'text-amber'}">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
+            <div class="text-xl sm:text-2xl font-black ${mofaRatio >= 20 ? 'text-green' : 'text-amber'} truncate" title="${Math.round(mofaTotal / meses).toLocaleString()} €">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
             <div class="kpi-sub">${mofaRatio.toFixed(1)}% ingresos</div>
           </div>
-          <div class="info-box border-left-blue kpi-card-fixed">
+          <div class="info-box border-left-blue kpi-card-fixed min-w-0">
             <div class="kpi-label">Precio Medio</div>
-            <div class="text-white font-black text-2xl">${precioFinalMedio.toFixed(3)} €/L</div>
+            <div class="text-white font-black text-xl sm:text-2xl truncate" title="${precioFinalMedio.toFixed(3)} €/L">${precioFinalMedio.toFixed(3)} €/L</div>
             <div class="kpi-sub">${(litrosTotal / Math.max(1, numEntregas)).toFixed(0)} L/entrega</div>
           </div>
-          <div class="info-box border-left-purple kpi-card-fixed">
+          <div class="info-box border-left-purple kpi-card-fixed min-w-0">
             <div class="kpi-label">Extracto Seco</div>
-            <div class="text-white font-black text-2xl">${esMedia.toFixed(2)}%</div>
+            <div class="text-white font-black text-xl sm:text-2xl truncate" title="${esMedia.toFixed(2)}%">${esMedia.toFixed(2)}%</div>
             <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L</div>
           </div>
         </div>
