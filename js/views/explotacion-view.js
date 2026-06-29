@@ -1102,6 +1102,31 @@ const ExplotacionView = {
     // Ordenar los gastos por fecha descendente
     const listaGastos = (d.todosGastos || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+    // Categorías de gasto completas con iconos y colores
+    const catDef = [
+      { key: 'Alimentacion', icon: Icons.paquete(),   label: 'Alimentación',   color: 'var(--c-warning)' },
+      { key: 'Sanidad',      icon: Icons.sanidad(),   label: 'Sanidad',        color: 'var(--c-danger)' },
+      { key: 'Fitosanitarios', icon: Icons.sanidad(), label: 'Fitosanitarios', color: 'var(--c-success)' },
+      { key: 'Electricidad', icon: Icons.rayo(),      label: 'Electricidad',   color: 'var(--c-info)' },
+      { key: 'Personal',     icon: Icons.compradores(), label: 'Personal',      color: '#f97316' },
+      { key: 'Amortizacion', icon: Icons.transportistas(), label: 'Amortización', color: 'var(--c-accent)' },
+    ];
+    // Calcular total por categoría o concepto
+    const totalPorCat = {};
+    (d.todosGastos || []).forEach(g => {
+      const cat = (g.categoria || 'Varios').toLowerCase();
+      const monto = g.monto || 0;
+      totalPorCat[cat] = (totalPorCat[cat] || 0) + monto;
+    });
+    // Sumar también los que no encajan en categorías definidas
+    const catKeys = catDef.map(c => c.key.toLowerCase());
+    let otrosTotal = 0;
+    Object.entries(totalPorCat).forEach(([k, v]) => {
+      if (!catKeys.includes(k) && k !== 'varios') otrosTotal += v;
+    });
+    // Máximo 1 decimal
+    const fmt = n => Number(n).toLocaleString();
+
     let html = `
       <div style="--theme-color: #ef4444; --neon-glow: #ef4444B0; --neon-inner: #ef444440">
         <!-- KPIs GASTOS -->
@@ -1110,18 +1135,20 @@ const ExplotacionView = {
             ${Icons.dinero()} BALANCE DE COSTES
           </div>
           <div class="flex flex-col">
+            ${catDef.map(c => {
+              const total = totalPorCat[c.key.toLowerCase()] || 0;
+              if (total === 0) return '';
+              return `
             <div class="py-12 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Alimentación</span>
-              <strong class="text-xl font-950" style="color:var(--c-warning);">${(d.totalGastosAlim || 0).toLocaleString()} €</strong>
-            </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rayo()} Energía</span>
-              <strong class="text-xl font-950" style="color:var(--c-info);">${(d.totalGastosEnergia || 0).toLocaleString()} €</strong>
-            </div>
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${c.icon} ${c.label}</span>
+              <strong class="text-xl font-950" style="color:${c.color};">${fmt(total)} €</strong>
+            </div>`;
+            }).join('')}
+            ${otrosTotal > 0 ? `
             <div class="py-12 flex justify-between items-center">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.sanidad()} Fitosanitarios</span>
-              <strong class="text-xl font-950" style="color:var(--c-success);">${(d.totalGastosFito || 0).toLocaleString()} €</strong>
-            </div>
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.info()} Otros</span>
+              <strong class="text-xl font-950 text-white">${fmt(otrosTotal)} €</strong>
+            </div>` : ''}
           </div>
         </div>
 
