@@ -265,8 +265,8 @@ const CompradoresView = {
                 }
               </div>
 
-              <div class="text-right w-full mt-4">
-                <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA Y TRÁMITES ➔</div>
+              <div class="flex justify-end w-full mt-2">
+                <span class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-3">VER FICHA ${Icons.siguiente()}</span>
               </div>
             </div>
           </div>
