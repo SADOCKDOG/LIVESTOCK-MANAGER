@@ -267,25 +267,25 @@ const ExplotacionView = {
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
         <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6 justify-center">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.tendencia()} RENDIMIENTO Y EFICIENCIA DE CARNE
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">GMD MEDIA</small>
-              <strong class="text-2xl text-green font-950">+${d.gmdMedio.toFixed(2)} kg/d</strong>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.balanza()} GMD Media</span>
+              <strong class="text-xl font-950 text-green">+${d.gmdMedio.toFixed(2)} kg/d</strong>
             </div>
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">ALIMENTACIÓN</small>
-              <strong class="text-2xl text-red font-950">${d.totalGastosAlim.toLocaleString()} €</strong>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Alimentación</span>
+              <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">PESAJES</small>
-              <strong class="text-2xl text-amber font-950">${d.pesajes.length}</strong>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Pesajes</span>
+              <strong class="text-xl font-950 text-amber">${d.pesajes.length}</strong>
             </div>
-            <div class="info-box-center py-12">
-              <small class="text-xs text-gray uppercase font-900 mb-4">CENSO ACTIVO</small>
-              <strong class="text-2xl text-blue font-950">${d.animalesFinca.length}</strong>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Censo Activo</span>
+              <strong class="text-xl font-950 text-blue">${d.animalesFinca.length}</strong>
             </div>
           </div>
         </div>
@@ -357,25 +357,25 @@ const ExplotacionView = {
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
         <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #3b82f6;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6 justify-center">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.leche()} RENDIMIENTO Y EFICIENCIA DE LECHE
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">MARGEN (MOFA)</small>
-              <strong class="text-2xl font-950" style="color:${d.mofaLeche >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
+              <strong class="text-xl font-950" style="color:${d.mofaLeche >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
             </div>
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">TOTAL LECHE</small>
-              <strong class="text-2xl text-blue font-950">${this._fmt(d.totalLitros)} L</strong>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.leche()} Total Leche</span>
+              <strong class="text-xl font-950 text-blue">${this._fmt(d.totalLitros)} L</strong>
             </div>
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">EXTRACTO SECO</small>
-              <strong class="text-2xl text-gold font-950">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</strong>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Extracto Seco</span>
+              <strong class="text-xl font-950 text-gold">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</strong>
             </div>
-            <div class="info-box-center py-12">
-              <small class="text-xs text-gray uppercase font-900 mb-4">COSTES ALIM.</small>
-              <strong class="text-2xl text-red font-950">${d.totalGastosAlim.toLocaleString()} €</strong>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
+              <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
           </div>
         </div>
@@ -485,25 +485,25 @@ const ExplotacionView = {
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
         <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #10b981;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6 justify-center">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.rotacion()} RENDIMIENTO Y EFICIENCIA HÍBRIDA
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">MARGEN (MOFA)</small>
-              <strong class="text-2xl font-950" style="color:${d.mofaHibrido >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaHibrido).toLocaleString()} €</strong>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
+              <strong class="text-xl font-950" style="color:${d.mofaHibrido >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}">${Math.round(d.mofaHibrido).toLocaleString()} €</strong>
             </div>
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">EFICIENCIA</small>
-              <strong class="text-2xl text-green font-950">${d.ratioMofaHibrido.toFixed(1)}%</strong>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Eficiencia</span>
+              <strong class="text-xl font-950 text-green">${d.ratioMofaHibrido.toFixed(1)}%</strong>
             </div>
-            <div class="info-box-center py-12 border-bottom-222 sm:border-bottom-0 sm:border-right-222">
-              <small class="text-xs text-gray uppercase font-900 mb-4">COSTES ALIM.</small>
-              <strong class="text-2xl text-red font-950">${d.totalGastosAlim.toLocaleString()} €</strong>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
+              <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
-            <div class="info-box-center py-12">
-              <small class="text-xs text-gray uppercase font-900 mb-4">L / PESAJES</small>
-              <strong class="text-2xl text-blue font-950">${this._fmt(d.totalLitros)} L / ${d.pesajes.length}</strong>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} L / Pesajes</span>
+              <strong class="text-xl font-950 text-blue">${this._fmt(d.totalLitros)} L / ${d.pesajes.length}</strong>
             </div>
           </div>
         </div>
