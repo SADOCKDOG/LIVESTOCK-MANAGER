@@ -36,6 +36,7 @@ const ASSETS = [
   './js/views/manuales-view.js',
   './js/views/documentos-view.js',
   './manual/index.html',
+  './manual/estilo-manuales.css',
   './manual/ejemplo-ovino-carne.html',
   './manual/ejemplo-ovino-leche.html',
   './manual/registros-produccion.html',

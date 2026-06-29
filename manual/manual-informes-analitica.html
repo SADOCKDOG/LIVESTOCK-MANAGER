@@ -4,160 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Informes Premium · Guía Premium v4.8.7 · Livestock Manager</title>
-  <style>
-    :root {
-      --oro: #c9851f;
-      --oro-claro: #e0a83a;
-      --tinta: #1a1a1a;
-      --gris: #555;
-      --linea: #e4e4e4;
-      --fondo: #ffffff;
-      --suave: #faf7f1;
-      --verde: #0f7a4d;
-      --rojo: #c0392b;
-      --azul: #2563eb;
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--tinta);
-      background: var(--fondo);
-      margin: 0;
-      line-height: 1.6;
-      font-size: 16px;
-    }
-    .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
-    .portada {
-      text-align: center;
-      padding: 60px 24px 50px;
-      background: linear-gradient(160deg, #1a1a2e, #2d2d44);
-      color: #fff;
-      border-bottom: 6px solid var(--oro-claro);
-    }
-    .portada h1 { font-size: 2.3rem; margin: 18px 0 6px; color: var(--oro-claro); }
-    .portada .sub { font-size: 1.1rem; color: #cfcfcf; margin: 0; }
-    .portada .badge {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 7px 18px;
-      border: 1px solid #5a5a7a;
-      border-radius: 30px;
-      color: var(--oro-claro);
-      font-size: .85rem;
-    }
-    h2.modulo {
-      font-size: 1.45rem;
-      color: var(--tinta);
-      margin: 0 0 10px;
-      padding-top: 8px;
-      border-left: 5px solid var(--oro);
-      padding-left: 14px;
-    }
-    ol.pasos { padding-left: 0; counter-reset: paso; list-style: none; margin: 14px 0; }
-    ol.pasos > li {
-      position: relative;
-      padding: 10px 12px 10px 46px;
-      margin-bottom: 12px;
-      background: var(--suave);
-      border-radius: 10px;
-      border: 1px solid var(--linea);
-    }
-    ol.pasos > li::before {
-      counter-increment: paso;
-      content: counter(paso);
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--oro);
-      color: #fff;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .seccion { padding: 40px 0; border-bottom: 1px solid var(--linea); }
-    .ruta { color: var(--oro); font-weight: 700; }
-
-    /* Estilos premium de cadena de workflow para Wizards */
-    .workflow-stepper {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      margin: 20px 0;
-      padding: 16px;
-      background: #1a1a2e;
-      border-radius: 12px;
-      border: 1px solid #c9851f;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      overflow-x: auto;
-    }
-    .workflow-step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      flex: 1;
-      min-width: 100px;
-      position: relative;
-      padding: 0 8px;
-    }
-    .workflow-step-num {
-      width: 26px;
-      height: 26px;
-      background: #c9851f;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.8rem;
-      margin-bottom: 6px;
-    }
-    .workflow-step-title {
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.78rem;
-      margin-bottom: 4px;
-    }
-    .workflow-step-desc {
-      color: #a9a9b9;
-      font-size: 0.68rem;
-      line-height: 1.2;
-    }
-    .workflow-arrow {
-      color: #c9851f;
-      font-size: 1.1rem;
-      font-weight: bold;
-      padding: 0 4px;
-    }
-    @media (max-width: 600px) {
-      .workflow-stepper {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      .workflow-step {
-        flex-direction: row;
-        text-align: left;
-        min-width: unset;
-        gap: 10px;
-      }
-      .workflow-step-num {
-        margin-bottom: 0;
-      }
-      .workflow-arrow {
-        display: none;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="estilo-manuales.css">
 </head>
-<body>
+<body style="--acento: #c9851f; --acento-claro: #e0a83a;">
   <header class="portada">
+    <div class="logo-container">
+      <svg class="logo-svg" viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
     <h1>Informes Premium</h1>
     <p class="sub">Inteligencia Analítica y Balances de la Finca · Guía v4.8.7</p>
     <div class="badge">BUSINESS INTELLIGENCE APLICADO</div>
@@ -213,7 +68,7 @@
       <p>Accede a este panel desde <span class="ruta">Más → Informes</span>. En la pestaña final **Exportar** podrás realizar descargas masivas compatibles con cualquier hoja de cálculo.</p>
     </section>
 
-    <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.7 · Guía de Informes Premium</div>
+    <div class="pie-manual">Livestock Manager Premium · v4.8.7 · Guía del Usuario Oficial</div>
   </div>
 </body>
 </html>

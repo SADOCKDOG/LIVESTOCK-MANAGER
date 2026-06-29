@@ -1,114 +1,20 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Control Lechero · Producción Láctea · Livestock Manager Premium v4.8.7</title>
-<style>:root{
- --acento:#2563eb; --tinta:#1a1a1a; --gris:#555; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
- }
- *{box-sizing:border-box;}
- body{
- font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
- color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
- }
- .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
- .portada{
- text-align:center; padding:60px 24px 50px;
- background:linear-gradient(160deg,#1a2a4e,#2d4470);
- color:#fff; border-bottom:6px solid var(--acento);
- }
- .portada h1{font-size:2.3rem; margin:18px 0 6px; color:#93c5fd;}
- h2.modulo{font-size:1.45rem; color:var(--tinta); margin:0 0 10px; padding-top:8px; border-left:5px solid var(--acento); padding-left:14px;}
- ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
- ol.pasos > li{
- position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
- background:var(--suave); border-radius:10px; border:1px solid var(--linea);
- }
- ol.pasos > li::before{
- counter-increment:paso; content:counter(paso);
- position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
- background:var(--acento); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center;
- }
- figure{margin:24px 0; text-align:center;}
- figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
- figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
- .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
- .ruta{color:var(--acento); font-weight:700;}
-/* Estilos premium de cadena de workflow para Wizards */
-.workflow-stepper {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20px 0;
-  padding: 16px;
-  background: #1a1a2e;
-  border-radius: 12px;
-  border: 1px solid #c9851f;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  overflow-x: auto;
-}
-.workflow-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1;
-  min-width: 100px;
-  position: relative;
-  padding: 0 8px;
-}
-.workflow-step-num {
-  width: 26px;
-  height: 26px;
-  background: #c9851f;
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.8rem;
-  margin-bottom: 6px;
-}
-.workflow-step-title {
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.78rem;
-  margin-bottom: 4px;
-}
-.workflow-step-desc {
-  color: #a9a9b9;
-  font-size: 0.68rem;
-  line-height: 1.2;
-}
-.workflow-arrow {
-  color: #c9851f;
-  font-size: 1.1rem;
-  font-weight: bold;
-  padding: 0 4px;
-}
-@media (max-width: 600px) {
-  .workflow-stepper {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .workflow-step {
-    flex-direction: row;
-    text-align: left;
-    min-width: unset;
-    gap: 10px;
-  }
-  .workflow-step-num {
-    margin-bottom: 0;
-  }
-  .workflow-arrow {
-    display: none;
-  }
-}
-
-</style></head>
-<body><header class="portada"><h1>Control Lechero</h1>
- <p class="sub">Producción Individual y de Tanque · Guía v4.8.7</p>
- <div class="badge">CALIDAD LÁCTEA PREMIUM</div></header>
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Lechero · Guía Premium v4.8.7 · Livestock Manager</title>
+  <link rel="stylesheet" href="estilo-manuales.css">
+</head>
+<body style="--acento: #2563eb; --acento-claro: #38bdf8;"><header class="portada">
+    <div class="logo-container">
+      <svg class="logo-svg" viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <h1>Control Lechero</h1>
+    <p class="sub">Producción Individual y de Tanque · Guía v4.8.7</p>
+    <div class="badge">CALIDAD LÁCTEA PREMIUM</div>
+  </header>
 
 <div class="wrap"><section class="seccion"><h2 class="modulo">1. Acceso Rápido desde ExPro</h2>
  <p class="intro-mod">Registra la producción de cada ordeño desde el Hub <span class="ruta">ExPro</span>.</p>
@@ -162,4 +68,4 @@
  <ol class="pasos"><li><strong>Registro Diario</strong>: Mantén un control de los litros acumulados en el tanque para compararlos con la recogida de cisterna.</li>
  <li><strong>Analíticas</strong>: Los datos registrados aquí se cruzarán con los resultados de laboratorio en la sección de Comercialización.</li></ol></section>
 
- <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.7 · Guía de Control Lechero</div></div></body></html>
+ <div class="pie-manual">Livestock Manager Premium · v4.8.7 · Guía del Usuario Oficial</div></div></body></html>

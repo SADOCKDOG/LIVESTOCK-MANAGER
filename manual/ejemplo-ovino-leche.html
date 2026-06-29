@@ -1,191 +1,20 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ejemplo Práctico: Explotación de Ovino de Leche — Livestock Manager Premium</title>
-<style>:root{
- --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
- --gris-claro:#777; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
- --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --leche:#2a6496;
- }
- *{box-sizing:border-box;}
- body{
- font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
- color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
- -webkit-print-color-adjust:exact; print-color-adjust:exact;
- }
- .wrap{max-width:900px; margin:0 auto; padding:0 24px;}
-
- .portada{
- text-align:center; padding:70px 24px 60px;
- background:linear-gradient(160deg,#1a3050,#2a4a70);
- color:#fff; border-bottom:6px solid #6a9ec7;
- }
- .portada h1{font-size:2.4rem; margin:18px 0 6px; color:var(--oro-claro); letter-spacing:.5px;}
- .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
- .portada .badge{display:inline-block; margin-top:22px; padding:7px 18px; border:1px solid #6a9ec7;
- border-radius:30px; color:var(--oro-claro); font-size:.85rem; letter-spacing:1px;}
- .portada .logo{font-size:2rem; font-weight:800; color:#fff;}
- .portada .logo span{color:var(--oro-claro);}
- .portada .logo-img{max-width:100px; border-radius:14px; margin-bottom:10px;}
-
- h2.modulo{
- font-size:1.5rem; color:var(--tinta); margin:0 0 4px; padding-top:10px;
- border-left:5px solid #2a6496; padding-left:14px;
- }
- .fase-tag{display:inline-block; background:#2a6496; color:#fff; font-size:.7rem; font-weight:700;
- padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
- .intro-mod{color:var(--gris); margin:8px 0 16px;}
-
- ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
- ol.pasos > li{
- position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
- background:var(--suave); border-radius:10px; border:1px solid var(--linea);
- }
- ol.pasos > li::before{
- counter-increment:paso; content:counter(paso);
- position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
- background:#2a6496; color:#fff; font-weight:700; font-size:.85rem;
- display:flex; align-items:center; justify-content:center;
- }
-
- ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
- ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
- ul.subpasos > li::before{
- content:"•"; position:absolute; left:4px; color:#2a6496; font-weight:700;
- }
-
- .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
- margin:14px 0; font-size:.92rem; color:#6b5418;}
- .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
- margin:14px 0; font-size:.92rem; color:#7a241b;}
- .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
- margin:14px 0; font-size:.92rem; color:#14512f;}
- .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
- margin:14px 0; font-size:.92rem;}
-
- figure{margin:18px 0; text-align:center;}
- figure img{
- max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
- box-shadow:0 6px 22px rgba(0,0,0,.12);
- }
- figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
-
- .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
- .seccion:last-child{border-bottom:none;}
-
- .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
- .indice h3{margin:0 0 14px; color:#2a6496;}
- .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
- .indice li{margin-bottom:7px;}
- .indice a{color:var(--tinta); text-decoration:none;}
- .indice a:hover{color:#2a6496; text-decoration:underline;}
-
- kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
- .ruta{color:#2a6496; font-weight:600;}
- .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
-
- .resumen-ejemplo{background:var(--suave); border:2px dashed #2a6496; border-radius:14px;
- padding:20px 24px; margin:20px 0;}
- .resumen-ejemplo h4{margin:0 0 10px; color:#2a6496;}
- .resumen-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
- .resumen-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
- .resumen-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
-
- .btn-ejemplo{display:inline-block; background:#2a6496; color:#fff; font-weight:700;
- padding:2px 10px; border-radius:6px; font-size:.85rem;}
-
- table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
- table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
- table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
- table.parametros .ok{color:var(--verde); font-weight:700;}
- table.parametros .alert{color:var(--rojo); font-weight:700;}
-
- @media print{
- body{font-size:12px;}
- .portada{padding:50px 24px;}
- .seccion{page-break-inside:avoid; padding:18px 0;}
- figure img{max-width:230px; box-shadow:none;}
- .indice ol{columns:2;}
- a{color:var(--tinta) !important; text-decoration:none;}
- .resumen-ejemplo{break-inside:avoid;}
- }
-/* Estilos premium de cadena de workflow para Wizards */
-.workflow-stepper {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20px 0;
-  padding: 16px;
-  background: #1a1a2e;
-  border-radius: 12px;
-  border: 1px solid #c9851f;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  overflow-x: auto;
-}
-.workflow-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1;
-  min-width: 100px;
-  position: relative;
-  padding: 0 8px;
-}
-.workflow-step-num {
-  width: 26px;
-  height: 26px;
-  background: #c9851f;
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.8rem;
-  margin-bottom: 6px;
-}
-.workflow-step-title {
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.78rem;
-  margin-bottom: 4px;
-}
-.workflow-step-desc {
-  color: #a9a9b9;
-  font-size: 0.68rem;
-  line-height: 1.2;
-}
-.workflow-arrow {
-  color: #c9851f;
-  font-size: 1.1rem;
-  font-weight: bold;
-  padding: 0 4px;
-}
-@media (max-width: 600px) {
-  .workflow-stepper {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .workflow-step {
-    flex-direction: row;
-    text-align: left;
-    min-width: unset;
-    gap: 10px;
-  }
-  .workflow-step-num {
-    margin-bottom: 0;
-  }
-  .workflow-arrow {
-    display: none;
-  }
-}
-
-</style></head>
-<body><header class="portada"><div class="logo">Livestock <span>Manager</span></div>
- <h1>Ejemplo Práctico: Ovino de Leche</h1>
- <p class="sub">Creación y gestión completa de una explotación de ovejas para producción láctea</p>
- <div class="badge">GUÍA PASO A PASO · v4</div></header>
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejemplo Práctico: Ovino de Leche · Guía Premium v4.8.7 · Livestock Manager</title>
+  <link rel="stylesheet" href="estilo-manuales.css">
+</head>
+<body style="--acento: #c9851f; --acento-claro: #e0a83a;"><header class="portada">
+    <div class="logo-container">
+      <svg class="logo-svg" viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <h1>Ejemplo Práctico: Ovino de Leche</h1>
+    <p class="sub">Creación y gestión completa de una explotación de ovejas para producción láctea · Guía v4.8.7</p>
+    <div class="badge">GUÍA PASO A PASO · v4</div>
+  </header>
 
 <div class="wrap"><section class="seccion"><h2 class="modulo">Sobre esta guía</h2>
  <p class="intro-mod">Este manual te guiará en la creación de una <strong>explotación de ovino de leche</strong> desde cero,
