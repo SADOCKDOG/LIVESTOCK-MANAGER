@@ -31,22 +31,137 @@
  figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
- .ruta{color:var(--acento); font-weight:700;}</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;"><h1>Control Sanitario</h1>
- <p class="sub">Tratamientos, Medicamentos y Periodos de Retiro · Guía v4.8.0</p>
+ .ruta{color:var(--acento); font-weight:700;}
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><h1>Control Sanitario</h1>
+ <p class="sub">Tratamientos, Medicamentos y Periodos de Retiro · Guía v4.8.7</p>
  <div class="badge">SEGURIDAD ALIMENTARIA PREMIUM</div></header>
 
 <div class="wrap"><section class="seccion"><h2 class="modulo">1. Registro de Tratamiento desde ExPro</h2>
- <p class="intro-mod">En la v4.8.0 Premium, el registro sanitario es ágil y seguro. Accede desde el Hub <span class="ruta">ExPro</span>.</p>
- <figure><img src="img/14-tratamiento-rebano-selector.png" alt="Selector de Rebaño"><figcaption>Al pulsar "Registrar Tratamiento" en ExPro, selecciona el lote afectado.</figcaption></figure>
+ <p class="intro-mod">En la v4.8.7 Premium, el registro sanitario es ágil y seguro. Accede desde el Hub <span class="ruta">ExPro</span>.</p>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Diagnóstico</div>
+        <div class="workflow-step-desc">Causa y animales tratados</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Medicamento</div>
+        <div class="workflow-step-desc">Receta, dosis y veterinario</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Supresión</div>
+        <div class="workflow-step-desc">Cálculo de plazo seguro (Carne/Leche)</div>
+      </div>
+    </div>
+    
  <ol class="pasos"><li><strong>Selección de Lote</strong>: El sistema te permite aplicar un tratamiento a todo un rebaño o a animales individuales de ese lote.</li>
  <li><strong>Wizard de Tratamiento</strong>: Un formulario optimizado para evitar errores en la dosificación y fechas.</li></ol></section>
 
  <section class="seccion"><h2 class="modulo">2. El Asistente Sanitario</h2>
  <p class="intro-mod">Completa la información técnica para garantizar la trazabilidad.</p>
- <figure><img src="img/15-wizard-tratamiento.png" alt="Wizard Tratamiento"><figcaption>Formulario de registro con tiempos de supresión automáticos.</figcaption></figure>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Diagnóstico</div>
+        <div class="workflow-step-desc">Causa y animales tratados</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Medicamento</div>
+        <div class="workflow-step-desc">Receta, dosis y veterinario</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Supresión</div>
+        <div class="workflow-step-desc">Cálculo de plazo seguro (Carne/Leche)</div>
+      </div>
+    </div>
+    
  <ol class="pasos"><li><strong>Medicamento</strong>: Selecciona del catálogo o escribe el principio activo.</li>
  <li><strong>Periodos de Supresión</strong>: Indica los días de espera para Carne y Leche. ️ <strong>Crítico</strong>: La app bloqueará las ventas automáticamente durante estos días.</li>
  <li><strong>Aplicación</strong>: Registra la dosis, la vía (oral, inyectable) y el facultativo responsable.</li></ol></section>
 
- <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Guía de Sanidad</div></div></body></html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.7 · Guía de Sanidad</div></div></body></html>

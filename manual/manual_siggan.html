@@ -284,9 +284,84 @@
  background-color: #ecfdf5;
  border-left: 4px solid var(--success-color);
  color: #065f46;
- }</style></head>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
 <body><!-- PORTADA -->
- <div class="cover-page"><img src="img/logo-app.png" class="cover-logo" alt="Logo"><div class="cover-title">Livestock Manager</div>
+ <div class="cover-page"><div class="cover-title">Livestock Manager</div>
  <div class="cover-subtitle">Dossier de Adaptación al Sistema SIGGAN y Cuaderno Digital Oficial</div>
  <div class="cover-meta"><p><strong>Normativa de Referencia:</strong> RD 787/2023 y RD 1749/1998</p>
  <p><strong>Ámbito Técnico:</strong> Cumplimiento de Trazabilidad e Integridad Ganadera</p>
@@ -294,7 +369,7 @@
 
  <div class="container"><!-- SECCIÓN 1: INTRODUCCIÓN Y MARCO LEGAL -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/logo-app.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Cumplimiento Normativo SIGGAN / BADIGEX</span></div></div>
  <div class="header-license-text"><span>Código de Módulo: LM-SIGGAN-v4</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
@@ -309,7 +384,7 @@
 
  <!-- SECCIÓN 2: PILARES DE INTEGRACIÓN -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/logo-app.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Cumplimiento Normativo SIGGAN / BADIGEX</span></div></div>
  <div class="header-license-text"><span>Código de Módulo: LM-SIGGAN-v4</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
@@ -333,7 +408,7 @@
 
  <!-- SECCIÓN 3: LIBROS DE REGISTRO OFICIALES -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/logo-app.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Cumplimiento Normativo SIGGAN / BADIGEX</span></div></div>
  <div class="header-license-text"><span>Código de Módulo: LM-SIGGAN-v4</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
@@ -363,7 +438,7 @@
 
  <!-- SECCIÓN 4: EXPORTACIONES Y FORMATOS -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/logo-app.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Cumplimiento Normativo SIGGAN / BADIGEX</span></div></div>
  <div class="header-license-text"><span>Código de Módulo: LM-SIGGAN-v4</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 

@@ -113,8 +113,83 @@
  figure img{max-width:230px; box-shadow:none;}
  a{color:var(--tinta) !important; text-decoration:none;}
  .indice ol{columns:2;}
- }</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><h1>Proveedores</h1>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><h1>Proveedores</h1>
  <p class="sub">Trazabilidad de Costes — Guía completa paso a paso</p>
  <div class="badge">MANUAL PRÁCTICO · Gestión de proveedores y gastos analíticos</div></header>
 
@@ -277,13 +352,173 @@
  <h2 class="modulo">7. Capturas reales en app (demo CHAMORRO)</h2>
  <p class="intro-mod">Flujo visual del módulo de proveedores con datos reales de gasto de la demo.</p>
 
- <figure><img src="img/prov/prov-01.png" alt="Listado de proveedores"><figcaption>Prov-01 · Listado de proveedores</figcaption></figure>
- <figure><img src="img/prov/prov-02.png" alt="Alta de proveedor"><figcaption>Prov-02 · Apertura de formulario de alta</figcaption></figure>
- <figure><img src="img/prov/prov-03.png" alt="Formulario de proveedor"><figcaption>Prov-03 · Formulario y categorías</figcaption></figure>
- <figure><img src="img/prov/prov-04.png" alt="Ficha proveedor piensos"><figcaption>Prov-04 · Ficha de Piensos El Trébol</figcaption></figure>
- <figure><img src="img/prov/prov-05.png" alt="Historial gastos proveedor"><figcaption>Prov-05 · Historial de gastos del proveedor</figcaption></figure>
- <figure><img src="img/prov/prov-06.png" alt="Ficha proveedor veterinario"><figcaption>Prov-06 · Ficha de VetPlus</figcaption></figure>
- <figure><img src="img/prov/prov-07.png" alt="Ficha proveedor maquinaria"><figcaption>Prov-07 · Ficha de Maquinaria Agrícola La Vega</figcaption></figure>
- <figure><img src="img/prov/prov-08.png" alt="Kpis proveedores"><figcaption>Prov-08 · KPIs y resumen de proveedores</figcaption></figure></section>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Registro</div>
+        <div class="workflow-step-desc">Datos fiscales (NIF/Dirección)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Validación</div>
+        <div class="workflow-step-desc">REGA/Bienestar del vehículo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Operación</div>
+        <div class="workflow-step-desc">Uso en comercialización/gastos</div>
+      </div>
+    </div>
+    </section>
 
  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager v4.7.0 · Manual de Proveedores · Trazabilidad de Costes</div></div></body></html>

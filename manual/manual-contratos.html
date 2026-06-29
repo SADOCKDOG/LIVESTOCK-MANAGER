@@ -99,8 +99,83 @@
  figure img{max-width:230px; box-shadow:none;}
  a{color:var(--tinta) !important; text-decoration:none;}
  .indice ol{columns:2;}
- }</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><h1>Contratos</h1>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><h1>Contratos</h1>
  <p class="sub">Acuerdos Comerciales y Condiciones de Venta — Guía paso a paso</p>
  <div class="badge">MANUAL PRÁCTICO · Gestión de contratos comerciales</div></header>
 
@@ -337,8 +412,68 @@
  <h2 class="modulo">11. Capturas reales en app (demo CHAMORRO)</h2>
  <p class="intro-mod">Capturas del flujo de contratos dentro de la ficha del comprador.</p>
 
- <figure><img src="img/contr/contr-01.png" alt="Panel de contratos"><figcaption>Contr-01 · Panel de contratos en comprador</figcaption></figure>
- <figure><img src="img/contr/contr-02.png" alt="Formulario nuevo contrato"><figcaption>Contr-02 · Formulario de nuevo contrato</figcaption></figure>
- <figure><img src="img/contr/contr-03.png" alt="Tabla de precios del contrato"><figcaption>Contr-03 · Tabla de precios pactados</figcaption></figure></section>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Comprador</div>
+        <div class="workflow-step-desc">Vincular a cliente registrado</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Condiciones</div>
+        <div class="workflow-step-desc">Periodo de vigencia e IVA</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Tarifa</div>
+        <div class="workflow-step-desc">Precios base y primas de calidad</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Comprador</div>
+        <div class="workflow-step-desc">Vincular a cliente registrado</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Condiciones</div>
+        <div class="workflow-step-desc">Periodo de vigencia e IVA</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Tarifa</div>
+        <div class="workflow-step-desc">Precios base y primas de calidad</div>
+      </div>
+    </div>
+    
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Comprador</div>
+        <div class="workflow-step-desc">Vincular a cliente registrado</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Condiciones</div>
+        <div class="workflow-step-desc">Periodo de vigencia e IVA</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Tarifa</div>
+        <div class="workflow-step-desc">Precios base y primas de calidad</div>
+      </div>
+    </div>
+    </section>
 
  <div class="text-center text-gray text-xs" style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager v4.7.0 · Manual de Contratos · Acuerdos Comerciales</div></div></body></html>

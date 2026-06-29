@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Reproducción · Ciclo de Vida · Livestock Manager Premium v4.8.0</title>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Reproducción · Ciclo de Vida · Livestock Manager Premium v4.8.7</title>
 <style>:root{
  --acento:#ec4899; --acento-claro:#f9a8d4;
  --tinta:#1a1a1a; --gris:#555; --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
@@ -31,22 +31,137 @@
  figure img{max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.15);}
  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
- .ruta{color:var(--acento); font-weight:700;}</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;"><h1>Gestión Reproductiva</h1>
- <p class="sub">Celos, Inseminaciones, Partos y Genealogía · Guía v4.8.0</p>
+ .ruta{color:var(--acento); font-weight:700;}
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><h1>Gestión Reproductiva</h1>
+ <p class="sub">Celos, Inseminaciones, Partos y Genealogía · Guía v4.8.7</p>
  <div class="badge">CONTROL DE CICLO PREMIUM</div></header>
 
 <div class="wrap"><section class="seccion"><h2 class="modulo">1. Acceso desde la Ficha Animal</h2>
  <p class="intro-mod">El control reproductivo se realiza de forma individual para garantizar la trazabilidad madre-cría.</p>
- <figure><img src="img/12-ficha-animal-360.png" alt="Ficha Animal Reproducción"><figcaption>En la Ficha del Animal, localiza el botón "GESTIÓN REPRODUCTIVA".</figcaption></figure>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Inseminación</div>
+        <div class="workflow-step-desc">Fecha de celo y macho (IA/Monta)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Diagnóstico</div>
+        <div class="workflow-step-desc">Confirmación de gestación (Eco)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Parto</div>
+        <div class="workflow-step-desc">Crotalización de cría y lactancia</div>
+      </div>
+    </div>
+    
  <ol class="pasos"><li><strong>Selecciona una Hembra</strong>: Busca al animal en el listado de <span class="ruta">Ganadería → Animales</span>.</li>
  <li><strong>Historial Vivo</strong>: Pulsa sobre ella para ver su ficha y desliza hasta el botón de gestión.</li></ol></section>
 
  <section class="seccion"><h2 class="modulo">2. El Wizard de Reproducción</h2>
  <p class="intro-mod">Registra cada hito del ciclo biológico con un clic.</p>
- <figure><img src="img/13-wizard-reproduccion.png" alt="Wizard Reproducción"><figcaption>Wizard emergente para registro rápido de eventos.</figcaption></figure>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Inseminación</div>
+        <div class="workflow-step-desc">Fecha de celo y macho (IA/Monta)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Diagnóstico</div>
+        <div class="workflow-step-desc">Confirmación de gestación (Eco)</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Parto</div>
+        <div class="workflow-step-desc">Crotalización de cría y lactancia</div>
+      </div>
+    </div>
+    
  <ol class="pasos"><li><strong>Evento</strong>: Selecciona entre Celo, IA, Monta, Diagnóstico, Parto o Aborto.</li>
  <li><strong>Parto Inteligente</strong>: Si seleccionas "Parto", la app te pedirá el crotal de la cría y la vinculará automáticamente como madre.</li>
  <li><strong>Cierre de Ciclo</strong>: Registra el "Secado" para preparar a la hembra para la siguiente lactación.</li></ol></section>
 
- <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Guía de Reproducción</div></div></body></html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.7 · Guía de Reproducción</div></div></body></html>

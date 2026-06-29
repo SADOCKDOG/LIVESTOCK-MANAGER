@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Comercialización · Guía Premium v4.8.0 · Livestock Manager</title>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Comercialización · Guía Premium v4.8.7 · Livestock Manager</title>
 <style>:root{
  --oro:#c9851f; --oro-claro:#e0a83a; --tinta:#1a1a1a; --gris:#555;
  --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
@@ -46,16 +46,123 @@
  figcaption{font-size:.82rem; color:#777; margin-top:10px; font-style:italic;}
 
  .seccion{padding:40px 0; border-bottom:1px solid var(--linea);}
- .ruta{color:#8b5e3c; font-weight:700;}</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" style="max-width:90px; border-radius:14px; margin-bottom:10px;"><h1>Comercialización</h1>
- <p class="sub">Ventas de Carne y Entregas de Leche · Guía v4.8.0</p>
+ .ruta{color:#8b5e3c; font-weight:700;}
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><h1>Comercialización</h1>
+ <p class="sub">Ventas de Carne y Entregas de Leche · Guía v4.8.7</p>
  <div class="badge">FLUJOS DE VENTA PREMIUM</div></header>
 
 <div class="wrap"><section class="seccion"><h2 class="modulo">1. Acceso a Comercialización</h2>
- <p class="intro-mod">Existen dos formas rápidas de acceder a la gestión de ventas en la v4.8.0:</p>
+ <p class="intro-mod">Existen dos formas rápidas de acceder a la gestión de ventas en la v4.8.7:</p>
  <ol class="pasos"><li><strong>Desde el Menú Más</strong>: Pulsa <span class="ruta">Más</span> en la barra inferior y selecciona <strong>Comercial</strong>.</li>
  <li><strong>Desde el Hub ExPro</strong>: En la consola <span class="ruta">ExPro</span>, usa el botón directo <strong>"Ir a Comercialización"</strong> situado al final del panel.</li></ol>
- <figure><img src="img/08-comercial-carne.png" alt="Pantalla Comercial Carne"><figcaption>Sección de Comercialización con pestañas de Carne y Leche.</figcaption></figure></section>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Selección</div>
+        <div class="workflow-step-desc">Escoger animales aptos</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Trazabilidad</div>
+        <div class="workflow-step-desc">Fecha, guía DIMOE y ICA</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Pesos</div>
+        <div class="workflow-step-desc">Registrar Peso Vivo/Canal</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">4</div>
+        <div class="workflow-step-title">Clasificación</div>
+        <div class="workflow-step-desc">Modelo SEUROP</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">5</div>
+        <div class="workflow-step-title">Transportista</div>
+        <div class="workflow-step-desc">Asociar portes y firma</div>
+      </div>
+    </div>
+    </section>
 
  <section class="seccion"><h2 class="modulo">2. Venta Masiva de Carne</h2>
  <p class="intro-mod">El wizard de venta te guía por 5 pasos obligatorios para asegurar la trazabilidad.</p>
@@ -68,10 +175,48 @@
 
  <section class="seccion"><h2 class="modulo">3. Albarán de Leche</h2>
  <p class="intro-mod">En la pestaña <span class="ruta">Leche</span> puedes registrar las recogidas de cisterna.</p>
- <figure><img src="img/09-comercial-leche.png" alt="Pantalla Comercial Leche"><figcaption>Gestión de entregas de leche con MOFA acumulado.</figcaption></figure>
+ 
+    <div class="workflow-stepper">
+      <div class="workflow-step">
+        <div class="workflow-step-num">1</div>
+        <div class="workflow-step-title">Cisterna</div>
+        <div class="workflow-step-desc">Datos de carga y Letra Q</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">2</div>
+        <div class="workflow-step-title">Laboratorio</div>
+        <div class="workflow-step-desc">Grasa, proteína, células</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">3</div>
+        <div class="workflow-step-title">Volumen</div>
+        <div class="workflow-step-desc">Litros cargados y muestras</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">4</div>
+        <div class="workflow-step-title">Precio</div>
+        <div class="workflow-step-desc">Cálculo de precio final</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">5</div>
+        <div class="workflow-step-title">MOFA</div>
+        <div class="workflow-step-desc">Cálculo de Margen Lácteo</div>
+      </div>
+      <div class="workflow-arrow">➔</div>
+      <div class="workflow-step">
+        <div class="workflow-step-num">6</div>
+        <div class="workflow-step-title">Albarán</div>
+        <div class="workflow-step-desc">Generar documento oficial</div>
+      </div>
+    </div>
+    
  <ol class="pasos"><li>Pulsa <kbd>Nuevo</kbd> para abrir el Wizard de Albarán Lácteo (6 pasos).</li>
  <li>Registra los datos de la cisterna, temperatura de carga y Letra Q.</li>
  <li>Introduce los resultados del laboratorio (Grasa, Proteína, Somáticas).</li>
  <li>La app calcula el <strong>Precio Final</strong> y el <strong>MOFA</strong> mensual.</li></ol></section>
 
- <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Guía de Comercialización</div></div></body></html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.7 · Guía de Comercialización</div></div></body></html>

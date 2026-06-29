@@ -106,8 +106,83 @@
  .indice ol{columns:2;}
  a{color:var(--tinta) !important; text-decoration:none;}
  .resumen-ejemplo{break-inside:avoid;}
- }</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><div class="logo">Livestock <span>Manager</span></div>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><div class="logo">Livestock <span>Manager</span></div>
  <h1>Ejemplo Práctico: Ovino de Leche</h1>
  <p class="sub">Creación y gestión completa de una explotación de ovejas para producción láctea</p>
  <div class="badge">GUÍA PASO A PASO · v4</div></header>
@@ -158,7 +233,7 @@
  <p class="intro-mod">Al abrir la aplicación por primera vez, aparece la pantalla de bienvenida.
  Selecciona <strong>Nueva Finca</strong> para empezar a crear tu explotación láctea.</p>
 
- <figure><img src="img/leche-01-bienvenida.jpg" alt="Pantalla de bienvenida"><figcaption>Pantalla de bienvenida — pulsa "Nueva Finca".</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>Nueva Finca</kbd>.</li>
  <li>Si ya tienes otra explotación, ve a <span class="ruta">Más → Ajustes → Cambiar Finca → NUEVA FINCA</span>.</li></ol></section>
@@ -172,7 +247,7 @@
  al tipo de explotación: selecciona <strong>Leche</strong> para que la app active los módulos
  específicos de control lechero.</p>
 
- <figure><img src="img/leche-02-crear-finca.jpg" alt="Formulario de nueva finca"><figcaption>Formulario de nueva finca para explotación láctea.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Campos del formulario</h3>
  <ol class="pasos"><li><strong>Nombre:</strong> <span class="campo">Quesería Los Llanos</span></li>
@@ -203,7 +278,7 @@
  el módulo de control lechero. Accede desde <span class="ruta">Más → Ajustes</span>
  para completar la configuración específica.</p>
 
- <figure><img src="img/leche-03-ajustes-lacteo.jpg" alt="Ajustes con paquete lácteo"><figcaption>Ajustes con la sección de paquete lácteo y contrato.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Completar ficha de finca</strong> con datos de ADSG (como en el manual de carne,
  pasos 3.1 a 3.6).</li>
@@ -230,7 +305,7 @@
  <p class="intro-mod">Para una explotación láctea semiextensiva necesitarás pastos para el rebaño y una zona de
  estabulación con sala de ordeño. Accede desde <span class="ruta">Más → Zonas</span>.</p>
 
- <figure><img src="img/leche-04-zonas.jpg" alt="Listado de zonas"><figcaption>Zonas de la explotación láctea.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>Nueva Zona</kbd>. Crea las siguientes zonas:
  <ul class="subpasos"><li><span class="campo">Pastizal Alto 30ha</span> — Pasto, aforo 120</li>
@@ -248,7 +323,7 @@
  <p class="intro-mod">En una explotación láctea es recomendable tener dos rebaños: el de ordeño (hembras en producción)
  y el de secado / reposo. Accede desde <span class="ruta">Rebaños</span>.</p>
 
- <figure><img src="img/leche-05-rebanos.jpg" alt="Creación de rebaño lácteo"><figcaption>Creación del rebaño de ordeño.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Rebaño 1: Ordeño (producción activa)</h3>
  <ol class="pasos"><li>Pulsa <kbd></kbd>.</li>
@@ -283,7 +358,7 @@
  donde cada animal tiene un historial sanitario que afecta a la calidad de la leche.
  Accede desde <span class="ruta">Animales</span>.</p>
 
- <figure><img src="img/leche-06-animal-alta.jpg" alt="Alta de animal en explotación láctea"><figcaption>Formulario de alta de animal para ovino de leche.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>NUEVO</kbd>.</li>
  <li><strong>Nº de CROTAL</strong> — Identificador oficial.<br><span class="campo">ES011234567891</span>
@@ -312,7 +387,7 @@
  <p class="intro-mod">El botón <span class="btn-ejemplo">SCAN</span> está disponible tanto en el formulario de
  alta como en el de edición de animales. Permite leer automáticamente el código impreso en el crotal.</p>
 
- <figure><img src="img/leche-07-scan.jpg" alt="Escáner de crotales en explotación láctea"><figcaption>Escáner de código QR del crotal en funcionamiento.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>En el formulario de alta (o edición), localiza el campo <strong>Nº CROTAL</strong>.</li>
  <li>Pulsa el botón <span class="btn-ejemplo">SCAN</span> a la derecha del campo.</li>
@@ -345,7 +420,7 @@
  y la salud del rebaño. Accede desde <span class="ruta">Más → Control Lechero</span>.
  La pantalla tiene cinco pestañas: <strong>Wizard, Producción, Analíticas, Liquidaciones y MOFA</strong>.</p>
 
- <figure><img src="img/leche_main_new.png" alt="Pantalla de control lechero"><figcaption>Panel de control lechero con acceso desde el menú Navegación.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Registrar una entrega de leche</h3>
  <ol class="pasos"><li>En la pestaña <strong>Wizard</strong>, pulsa <kbd>NUEVA ENTREGA</kbd>.</li>
@@ -374,7 +449,7 @@
  <p class="intro-mod">La pestaña <strong>Analíticas</strong> del Control Lechero muestra la evolución de los
  parámetros de calidad y los compara con los umbrales de referencia (LIGAL).</p>
 
- <figure><img src="img/leche-09-analiticas.jpg" alt="Analíticas de leche"><figcaption>Panel de analíticas con evolución de parámetros y alertas.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Desde <span class="ruta">Más → Control Lechero → Analíticas</span>, consulta:
  <ul class="subpasos"><li><strong>Evolución de grasa y proteína</strong> — Gráfico de las últimas entregas</li>
@@ -406,7 +481,7 @@
  <p class="intro-mod">La pestaña <strong>Liquidaciones</strong> desglosa el importe económico de cada entrega,
  y la pestaña <strong>MOFA</strong> calcula el Margen Sobre el Coste de Alimentación.</p>
 
- <figure><img src="img/leche-10-liquidaciones.jpg" alt="Liquidaciones y MOFA"><figcaption>Detalle de liquidaciones con cálculo de MOFA.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Liquidaciones:</strong> Cada entrega registrada aparece con su desglose:
  <ul class="subpasos"><li>Volumen entregado (litros)</li>
@@ -426,7 +501,7 @@
  <p class="intro-mod">Para vender la leche debes tener el comprador registrado. Accede desde
  <span class="ruta">Más → Compradores</span>.</p>
 
- <figure><img src="img/leche-11-compradores.jpg" alt="Alta de comprador de leche"><figcaption>Comprador de tipo "Leche" o "Híbrido".</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>Nuevo</kbd>.</li>
  <li>Rellena:
@@ -449,7 +524,7 @@
  <p class="intro-mod">Registra la venta de leche desde <span class="ruta">Más → Comercialización → pestaña Leche</span>.
  El proceso genera automáticamente el albarán con todos los datos fiscales y sanitarios.</p>
 
- <figure><img src="img/comercializacion_leche.png" alt="Wizard de venta de leche"><figcaption>Wizard de venta de leche con datos de calidad y precio.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>En la pestaña <strong>Leche</strong>, pulsa <kbd>NUEVA VENTA</kbd>.</li>
  <li>Completa el formulario:
@@ -479,7 +554,7 @@
  <p class="intro-mod">Al confirmar la venta se genera un albarán con toda la información fiscal y de trazabilidad.
  Puedes descargarlo en PDF y compartirlo con el comprador.</p>
 
- <figure><img src="img/leche-13-albaran.jpg" alt="Albarán de leche"><figcaption>Albarán de venta de leche con trazabilidad Letra Q.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>El albarán incluye:
  <ul class="subpasos"><li><strong>Cabecera:</strong> vendedor, comprador, fecha, nº de albarán</li>
@@ -502,7 +577,7 @@
  los <strong>periodos de supresión</strong> y bloquea la comercialización si hay algún
  riesgo para la seguridad alimentaria.</p>
 
- <figure><img src="img/leche-14-trazabilidad.jpg" alt="Trazabilidad láctea"><figcaption>Panel de trazabilidad con alertas sanitarias activas.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Bloqueo por periodo de supresión:</strong> Si un animal ha recibido un tratamiento
  con tiempo de espera para leche, la app lo registra y bloquea su leche hasta que pase
