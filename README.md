@@ -22,26 +22,49 @@ A continuación se presentan capturas de pantalla de la interfaz de usuario de L
 
 ---
 
-## 2. Características Principales
+## 2. Alcance Funcional y Módulos de la App
 
-### Gestión de Explotaciones y Fincas
-* Configuración de datos del código REGA oficial de la explotación ganadera.
-* Segmentación territorial por Fincas, Zonas de pasto y Rebaños individuales.
-* Control analítico de costes fijos y variables imputables por lote o animal.
+La aplicación cuenta con una cobertura integral de los siguientes módulos:
 
-### Censo Ganadero y Trazabilidad 360
-* Identificación individualizada de cabezas de ganado por crotales oficiales.
-* Historial cronológico interactivo (Timeline de vida del animal): nacimientos, pesajes, tratamientos, traslados y ventas.
-* Integración con escáneres de cámara y lectores de mano para crotales mediante códigos de barras y códigos QR.
-
-### Registro Oficial y Cuaderno Digital (RD 787/2023)
-* Generación automatizada del Cuaderno Digital Ganadero unificando censo, libro de tratamientos veterinarios, movimientos y bajas.
-* Validación previa de consistencia ganadera para auditorías.
-* Exportación oficial en formato PDF y compartición nativa mediante el sistema de archivos de Capacitor.
+* **Gestión de Explotaciones (Fincas):** Configuración del código REGA, código CEA, datos fiscales del titular, dirección y asignación territorial de fincas.
+* **Módulo Ganadero:** Censo completo de animales activos, rebaños lógicos y zonas físicas de pastoreo/fincas.
+* **Registros de Producción:** Control e imputación de pesajes individuales o por lotes (carne) y entregas diarias de leche al tanque de refrigeración.
+* **Comercialización:** Gestión de ventas de carne, albaranes de leche con detalle de calidades (grasa, proteína, células somáticas, bacteriología) y liquidaciones comerciales.
+* **Gestión de Entidades Terceras:** Catálogo centralizado de Compradores (clientes), Proveedores (trazabilidad de costes) y Transportistas.
+* **Contratos:** Registro de acuerdos comerciales de suministro lácteo y cárnico vinculados a la explotación.
+* **Sanidad Ganadera:** Registro detallado de tratamientos veterinarios aplicados, dosificación, periodo de supresión para carne/leche y alertas preventivas de comercialización.
+* **Control Reproductivo:** Ciclo de reproducción completo (registro de celo, inseminación artificial, diagnóstico de gestación y parto), genealogía y trazabilidad madre-cría.
+* **Gastos:** Asistente de imputación de costes (alimentación, electricidad, personal, amortizaciones, etc.) para cálculo del margen neto de explotación.
+* **Informes Premium (BI):** Panel de Inteligencia Analítica con balance de Pérdidas y Ganancias (P&G), flujo de caja, punto de equilibrio (Break-even), subvenciones de la PAC e informes de aforo de carga.
+* **Gestión Documental:** Archivo oficial digital para almacenar guías de movimiento DIMOE, declaraciones ICA (Información de la Cadena Alimentaria) y actas de saneamiento.
 
 ---
 
-## 3. Arquitectura Técnica
+## 3. Adaptación al Marco Normativo SIGGAN / BADIGEX
+
+Para cumplir con las directrices oficiales de trazabilidad y auditoría de la Junta de Andalucía (SIGGAN) y del Gobierno de Extremadura (BADIGEX), el sistema implementa las siguientes adaptaciones a nivel de base de datos y flujos lógicos:
+
+### 3.1 Trazabilidad y No Borrado Destructivo
+* Queda estrictamente prohibido el borrado físico (`DELETE`) de entidades con repercusión en la cadena alimentaria (animales, tratamientos, ventas).
+* En su lugar, se ejecuta un marcado de anulación lógica y trazable (`estado: 'anulado'`), preservando el registro histórico para auditoría.
+* Cada acción operativa de anulación, alta o cambio es registrada en la tabla de auditoría `registro_eventos`.
+
+### 3.2 Ciclo de Estados Administrativos de Trámites
+* Los procesos que requieren comunicación oficial (como las guías DIMOE o altas de censo) incorporan un ciclo de estados oficializado:
+  ```text
+  Borrador ──➔ Presentado ──➔ Aceptado / Rechazado (con número de registro oficial)
+  ```
+* Se guardan metadatos como fecha de presentación, número de registro oficial y archivo de acuse de recibo PDF en la tabla `documentos_legales`.
+
+### 3.3 Validación Cruzada de Consistencia Ganadera
+* Chequeo previo automatizado en asistentes para evitar registros incongruentes:
+  * Validación del formato del crotal oficial (estructura "ES" + 12 dígitos numéricos).
+  * Control del periodo de espera de medicamentos: alerta y bloqueo del asistente de venta si el animal seleccionado tiene tratamientos con tiempo de supresión activo.
+  * Conciliación entre el número de cabezas declaradas en movimientos y la existencia real en censo.
+
+---
+
+## 4. Arquitectura Técnica
 
 La plataforma se ha desarrollado bajo una arquitectura PWA híbrida de alto rendimiento optimizada para su ejecución offline en zonas rurales sin conectividad:
 
@@ -63,7 +86,7 @@ graph TD
 
 ---
 
-## 4. Estructura del Proyecto
+## 5. Estructura del Proyecto
 
 ```text
 .
@@ -89,7 +112,7 @@ graph TD
 
 ---
 
-## 5. Instalación y Construcción
+## 6. Instalación y Construcción
 
 ### Requisitos Previos:
 * Node.js v18.0 o superior.
@@ -120,7 +143,7 @@ graph TD
 
 ---
 
-## 6. Pruebas de Calidad (QA) y Consistencia
+## 7. Pruebas de Calidad (QA) y Consistencia
 
 La aplicación incluye un completo suite de diagnóstico funcional en `js/qa-siggan.js` ejecutable directamente desde la consola de desarrollador del navegador web o del dispositivo:
 
@@ -141,6 +164,6 @@ Adicionalmente, se pueden correr chequeos específicos de la app a través del m
 
 ---
 
-## 7. Licencia
+## 8. Licencia
 
 Repositorio privado. Todos los derechos reservados. Uso exclusivo interno del proyecto Livestock Manager.
