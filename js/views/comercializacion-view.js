@@ -123,6 +123,19 @@ const ComercializacionView = {
       'Registros': Icons.paquete(),
       'Media/Registro': Icons.grafico(),
     };
+    const valueColors = {
+      'Peso Canal (kg)': 'var(--c-warning)',
+      'Animales': 'var(--c-info)',
+      'Rend. Prom.': 'var(--c-success)',
+      'Ingreso Total': 'var(--c-success)',
+      'Total Litros': 'var(--c-info)',
+      'Entregas': 'var(--c-warning)',
+      'Promedio': 'var(--c-info)',
+      'MOFA Total': 'var(--c-success)',
+      'Total (€)': 'var(--c-danger)',
+      'Registros': 'var(--c-warning)',
+      'Media/Registro': 'var(--c-info)',
+    };
 
     return `
       <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; width:100%;">
@@ -130,7 +143,7 @@ const ComercializacionView = {
           ${kpis.map(k => `
             <div class="py-10 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${icons[k.label] || Icons.info()} ${k.label}</span>
-              <strong class="text-base font-950" style="color:${meta.color};">${k.value}</strong>
+              <strong class="text-base font-950" style="color:${valueColors[k.label] || meta.color};">${k.value}</strong>
             </div>
           `).join('')}
         </div>
