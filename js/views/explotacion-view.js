@@ -414,19 +414,16 @@ const ExplotacionView = {
         </div>
 
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
-        <div class="card p-14 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-8 pb-5">
-            ${Icons.grafico()} Calidad de Tanque (Últimas Analíticas de Laboratorio)
-          </div>
-          
+        <div class="card p-14 mb-16 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.grafico()} CALIDAD DE TANQUE</div>
           <div class="scroll-shadow-container overflow-x-auto">
             <table class="premium-table">
               <thead>
                 <tr>
                   <th>Fecha</th>
                   <th>Litros</th>
-                  <th>Grasa %</th>
-                  <th>Prot. %</th>
+                  <th>Grasa</th>
+                  <th>Proteína</th>
                   <th>C.Somát.</th>
                   <th>Bacterias</th>
                   <th>Inhib.</th>
@@ -438,25 +435,20 @@ const ExplotacionView = {
                   ? d.entregasLeche.slice(0, 6).map(e => {
                       const lab = e.laboratorio || {};
                       const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
-                      
                       return `
                         <tr>
-                          <td><span class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)}</span></td>
-                          <td><strong>${(e.cantidad || 0).toLocaleString()} L</strong></td>
-                          <td>${lab.grasa != null ? lab.grasa.toFixed(2) + '%' : '—'}</td>
-                          <td>${lab.proteina != null ? lab.proteina.toFixed(2) + '%' : '—'}</td>
-                          <td class="${(lab.somaticas || 0) > 400000 ? 'text-red' : 'text-green'}">${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '—'}</td>
-                          <td class="${(lab.germenes || 0) > 1500000 ? 'text-red' : 'text-green'}">${lab.germenes ? (lab.germenes / 1000).toFixed(0) + 'k' : '—'}</td>
-                          <td class="${e.certificadoInhibidores === false || e.antibioticos ? 'text-red' : 'text-green'}">${e.certificadoInhibidores ? 'OK' : (e.certificadoInhibidores === false ? 'ALERT' : 'PEND')}</td>
-                          <td>
-                            <span class="badge" style="background:${semaforo.color}15; color:${semaforo.color}; border:1px solid ${semaforo.color}30; font-size:0.58rem; padding:2px 6px;">
-                              ${semaforo.label}
-                            </span>
-                          </td>
+                          <td><span class="flex items-center gap-4 text-white font-800" style="font-size:0.7rem;">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)}</span></td>
+                          <td class="font-900 text-white text-sm">${(e.cantidad || 0).toLocaleString()} L</td>
+                          <td style="color:var(--c-warning);">${lab.grasa != null ? lab.grasa.toFixed(1) + '%' : '—'}</td>
+                          <td style="color:var(--c-info);">${lab.proteina != null ? lab.proteina.toFixed(1) + '%' : '—'}</td>
+                          <td style="color:${(lab.somaticas || 0) > 400000 ? 'var(--c-danger)' : 'var(--c-success)'};">${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '—'}</td>
+                          <td style="color:${(lab.germenes || 0) > 1500000 ? 'var(--c-danger)' : 'var(--c-success)'};">${lab.germenes ? (lab.germenes / 1000).toFixed(0) + 'k' : '—'}</td>
+                          <td style="color:${e.certificadoInhibidores === false || e.antibioticos ? 'var(--c-danger)' : 'var(--c-success)'};">${e.certificadoInhibidores ? 'OK' : 'PEND'}</td>
+                          <td><span class="badge" style="background:${semaforo.color}15; color:${semaforo.color}; border:1px solid ${semaforo.color}30; font-size:0.58rem; padding:2px 6px;">${semaforo.label}</span></td>
                         </tr>
                       `;
                     }).join('')
-                  : `<tr><td colspan="8" class="text-center text-555 p-10">No hay analíticas registradas. Registra una entrega a cisterna.</td></tr>`
+                  : `<tr><td colspan="8" class="text-center text-555 p-10">No hay analíticas registradas.</td></tr>`
                 }
               </tbody>
             </table>
@@ -464,20 +456,18 @@ const ExplotacionView = {
         </div>
 
         <!-- Controles Ordeño Recientes -->
-        <div class="card p-14 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-            ${Icons.documento()} Ordeños y Controles Diarios Recientes
-          </div>
-          <div class="grid gap-8 mh-220">
+        <div class="card p-14 mb-16 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.leche()} ORDEÑOS Y CONTROLES DIARIOS</div>
+          <div class="grid gap-6">
             ${d.ordeños.length > 0
               ? d.ordeños.slice(0, 10).map(o => `
-                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? '#3b82f6' : '#8b5cf6'}; padding:10px; margin:0;">
-                    <div class="flex justify-between items-center">
-                      <div class="text-xs">
-                        <div class="font-bold text-white uppercase">${o.snap_identificacion || 'Control Lote/Animal'}</div>
-                        <div class="text-gray mt-4 flex items-center gap-4 font-700">${Icons.calendar()} ${this._fmtFecha(o.fecha)}</div>
+                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? '#3b82f6' : '#8b5cf6'}; padding:10px; margin:0; width:100%;">
+                    <div class="flex justify-between items-center gap-6" style="width:100%;">
+                      <div class="min-w-0 flex-1">
+                        <div class="font-bold text-white uppercase text-sm overflow-hidden text-ellipsis" style="white-space:nowrap;">${o.snap_identificacion || 'Control Lote/Animal'}</div>
+                        <div class="text-gray mt-2 flex items-center gap-4 font-700 text-[0.6rem] uppercase">${Icons.calendar()} ${this._fmtFecha(o.fecha)} · <span style="color:${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-accent)'};">${o.tipo_entidad === 'animal' ? 'Individual' : 'Lote'}</span></div>
                       </div>
-                      <span class="badge badge-sm font-bold text-blue badge-blue-outline">${o.valor_neto} L</span>
+                      <span class="font-950 flex-shrink-0" style="color:var(--c-info); font-size:1.1rem;">${o.valor_neto} L</span>
                     </div>
                   </div>`).join('')
               : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin registros de ordeño</span></div>`
