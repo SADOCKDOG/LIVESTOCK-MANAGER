@@ -2962,3 +2962,14 @@ label {
 .wizard-sel-icon--sm { font-size: 1.5rem; margin-right: 12px; }
 .error-dialog--gold  { border-color: var(--p-gold); margin: 16px; box-sizing: border-box; }
 
+/* === Estandarización de colores REGA y Crotal === */
+.input-rega-std {
+    color: #10b981 !important;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.input-crotal-std {
+    color: #fbbf24 !important;
+    font-weight: 800;
+    text-transform: uppercase;
+}

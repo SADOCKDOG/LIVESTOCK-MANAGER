@@ -192,15 +192,24 @@
         { nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109878', matricula: '1234BCD', autorizacion_transporte_ganado: 'ATG-BA-2024-001', desinsectacion_ultima_fecha: '2026-06-10', desinsectacion_vencimiento: '2026-09-10', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'camion', capacidad_animales: 40, certificado_bienestar: true, activo: true },
         { nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098769', matricula: '5678EFG', autorizacion_transporte_ganado: 'ATG-BA-2024-002', desinsectacion_ultima_fecha: '2026-06-05', desinsectacion_vencimiento: '2026-09-05', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'cisterna', capacidad_animales: 0, condiciones_termoneutrales: true, activo: true }
       ];
+      var transIds = [];
       for (var t = 0; t < transDefs.length; t++) {
-        try { await Transportistas.save(transDefs[t]); } catch (e) { console.log('[SEED] Error transportista:', e.message); }
+        try {
+          var tid = await Transportistas.save(transDefs[t]);
+          transIds.push(tid);
+        } catch (e) { console.log('[SEED] Error transportista:', e.message); }
         await sleep(100);
       }
+      var transCarneId = transIds[0] || null;
+      var transLecheId = transIds[1] || null;
 
       // 8. Contratos (alineados con ejemplos de manual)
+      var contCarneId = null;
+      var contLecheId = null;
+
       if (compCarne) {
         try {
-          await Contratos.save({
+          contCarneId = await Contratos.save({
             compradorId: compCarne.id,
             numero_contrato: 'CT-2026-001',
             tipo: 'carne',
@@ -219,7 +228,7 @@
       }
       if (compLeche) {
         try {
-          await Contratos.save({
+          contLecheId = await Contratos.save({
             compradorId: compLeche.id,
             numero_contrato: 'CT-2026-002',
             tipo: 'leche',
@@ -421,6 +430,8 @@
           await window.db.add('comercializacion_leche', {
             fincaId: fincaId,
             compradorId: compLeche ? compLeche.id : null,
+            contratoId: contLecheId || null,
+            transportistaId: transLecheId || null,
             fecha: en.fecha,
             fechaRecogida: en.fecha,
             matriculaCisterna: '5678EFG',
@@ -457,7 +468,7 @@
           var regVentaCarne = {
             animalId: terner2.id,
             compradorId: compCarne.id,
-            contratoId: null,
+            contratoId: contCarneId || null,
             fechaSacrificio: fechaSacrificio,
             codigoMatadero: 'ES10.05/M',
             pesoVivo: pesoVivoV,
@@ -476,7 +487,7 @@
             Gasto_Transporte: 35,
             Gasto_Matanza: 28,
             clasificacion: { seurop: 'U' },
-            transportistaId: null,
+            transportistaId: transCarneId || null,
             nombreTransportista: 'Transportes Ganaderos del Sur SL',
             nifTransportista: 'B32109876',
             matriculaTransportista: '1234BCD',

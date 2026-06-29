@@ -545,7 +545,7 @@ const AjustesView = {
             <div class="grid grid-cols-2 gap-10">
               <div>
                 <label class="text-xs text-gold font-bold">CÓDIGO REGA *</label>
-                <input type="text" id="edit-rega" value="${finca.codigo_REGA || finca.rega || ''}" class="wizard-input" placeholder="ES-...">
+                <input type="text" id="edit-rega" value="${finca.codigo_REGA || finca.rega || ''}" class="wizard-input input-rega-std" placeholder="ES210050001234" maxlength="14">
               </div>
               <div>
                 <label class="text-xs text-gold font-bold">COMUNIDAD AUTÓNOMA</label>
