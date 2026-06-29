@@ -318,7 +318,7 @@ const ExplotacionView = {
               <span class="widget-link-label">Tratamiento</span>
             </button>
           </div>
-          <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Registro de pesajes y tratamientos sanitarios para producción cárnica</span></div>
+          <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro de pesajes y tratamientos sanitarios para producción cárnica</span></div>
         </div>
 
         <!-- Líderes GMD -->
@@ -331,7 +331,7 @@ const ExplotacionView = {
                 <strong class="text-green">+${g.gmd.toFixed(3)} kg/día</strong>
               </div>`).join('') || '<div class="text-xs text-555">Sin datos evaluados de GMD. Registra al menos dos pesajes para el mismo animal.</div>'}
           </div>
-          <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Registro mixto de pesajes, ordeños y tratamientos para explotación híbrida</span></div>
+          <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro mixto de pesajes, ordeños y tratamientos para explotación híbrida</span></div>
         </div>
 
         <!-- Historial Consolidado -->
@@ -410,7 +410,7 @@ const ExplotacionView = {
               <span class="widget-link-label">Tratamiento</span>
             </button>
           </div>
-          <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Registro de controles lecheros y tratamientos sanitarios para producción láctea</span></div>
+          <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro de controles lecheros y tratamientos sanitarios para producción láctea</span></div>
         </div>
 
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
@@ -1133,7 +1133,7 @@ const ExplotacionView = {
               ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">REGISTRAR GASTO</span>
             </button>
           </div>
-          <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Registro de gastos por categoría: alimentación, energía, fitosanitarios y otros</span></div>
+          <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro de gastos por categoría: alimentación, energía, fitosanitarios y otros</span></div>
         </div>
 
         <!-- CONTROL NORMATIVO FITOSANITARIOS -->
@@ -1201,7 +1201,7 @@ const ExplotacionView = {
               ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">CARGA / CONSUMO</span>
             </button>
           </div>
-          <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Registro de cargas y consumos de silo para control de inventario de pienso</span></div>
+          <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro de cargas y consumos de silo para control de inventario de pienso</span></div>
         </div>
 
         <!-- HISTORIAL DE MOVIMIENTOS -->
@@ -1262,3 +1262,4 @@ const ExplotacionView = {
 };
 
 window.ExplotacionView = ExplotacionView;
+
