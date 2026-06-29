@@ -178,10 +178,10 @@ window.WizardGuiaMovimiento = {
             <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.transportistas()} LOGÍSTICA Y SANIDAD</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">TRANSPORTISTA REGISTRADO</label>
-              <select id="w-mv-transp" class="wizard-input font-800">
-                <option value="">— MANUAL / SIN REGISTRAR —</option>
-                ${transportistas.map(t => `<option value="${t.id}" ${data.transportistaId == t.id ? 'selected' : ''}>${t.nombre.toUpperCase()} (${t.matricula || 'S/M'})</option>`).join('')}
-              </select>
+               <select id="w-mv-transp" class="wizard-input font-800" onchange="WizardGuiaMovimiento._onSelectTransportista(this.value)">
+                 <option value="">— MANUAL / SIN REGISTRAR —</option>
+                 ${transportistas.map(t => `<option value="${t.id}" ${data.transportistaId == t.id ? 'selected' : ''}>${t.nombre.toUpperCase()} (${t.matricula || 'S/M'})</option>`).join('')}
+               </select>
             </div>
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
@@ -457,5 +457,24 @@ window.WizardGuiaMovimiento = {
         window.print();
       }
     };
+  },
+
+  async _onSelectTransportista(transportistaId) {
+    console.log("[WizardGuiaMovimiento] _onSelectTransportista seleccionado:", transportistaId);
+    let transportistas = [];
+    try { transportistas = await Transportistas.list({ activo: true }); } catch (e) { transportistas = []; }
+    const t = transportistas.find(x => Number(x.id) === Number(transportistaId));
+
+    const inputNombre = document.getElementById('w-mv-transp-nom');
+    const inputMatricula = document.getElementById('w-mv-matricula');
+
+    if (t) {
+      if (inputNombre) inputNombre.value = t.nombre || '';
+      if (inputMatricula) inputMatricula.value = t.matricula || '';
+    } else {
+      if (inputNombre) inputNombre.value = '';
+      if (inputMatricula) inputMatricula.value = '';
+    }
   }
 };
+
