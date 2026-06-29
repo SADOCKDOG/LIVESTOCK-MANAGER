@@ -455,33 +455,35 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('carne', 'Cárnico') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-orange report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.carne()} Resumen Cárnico</div>
-        <div class="grid grid-cols-3 gap-10 mb-12">
-          <div class="info-box border-left-amber">
-            <small class="s-lbl">INGRESOS TOTALES</small>
-            <div class="inf-val-lg text-amber">${totalIngresos.toLocaleString()}€</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-3 gap-10 text-center">
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ingresos Totales</small>
+              <span class="text-xl text-amber font-950">${totalIngresos.toLocaleString()}€</span>
+            </div>
+            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ventas Realizadas</small>
+              <span class="text-xl text-blue font-950">${totalVentas}</span>
+            </div>
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Kg Totales</small>
+              <span class="text-xl text-green font-950">${kgTotal.toFixed(1)} kg</span>
+            </div>
           </div>
-          <div class="info-box border-left-blue">
-            <small class="s-lbl">VENTAS REALIZADAS</small>
-            <div class="inf-val-lg text-blue">${totalVentas}</div>
-          </div>
-          <div class="info-box border-left-green">
-            <small class="s-lbl">KG TOTALES</small>
-            <div class="inf-val-lg text-green">${kgTotal.toFixed(1)} kg</div>
-          </div>
-        </div>
-        <div class="grid grid-cols-3 gap-10 mb-12">
-          <div class="info-box border-left-purple">
-            <small class="s-lbl">PRECIO MEDIO KG</small>
-            <div class="inf-val-lg text-violet">${precioMedioKg.toFixed(2)}€/kg</div>
-          </div>
-          <div class="info-box border-left-gold">
-            <small class="s-lbl">PESO MEDIO SACRIFICIO</small>
-            <div class="inf-val-lg text-gold">${ventasHist.length > 0 ? (kgTotal / ventasHist.reduce((s, v) => s + (v.animales || 1), 0)).toFixed(1) + ' kg' : '—'}</div>
-          </div>
-          <div class="info-box border-left-${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'green' : 'neutral'}">
-            <small class="s-lbl">GMD MEDIA GLOBAL</small>
-            <div class="inf-val-lg ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'text-green' : 'text-neutral'}">${gmdMedia !== null ? gmdMedia + ' kg/d' : '—'}</div>
-            ${gmdMedia !== null ? '<small class="text-gray text-xs block">Ganancia Media Diaria</small>' : '<small class="text-gray text-xs block">Se necesitan 2+ pesajes</small>'}
+          <div style="height:1px; background:#333; margin:10px 0;"></div>
+          <div class="grid grid-cols-3 gap-10 text-center">
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Precio Medio Kg</small>
+              <span class="text-xl text-violet font-950">${precioMedioKg.toFixed(2)}€/kg</span>
+            </div>
+            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Peso Medio Sacrif.</small>
+              <span class="text-xl text-gold font-950">${ventasHist.length > 0 ? (kgTotal / ventasHist.reduce((s, v) => s + (v.animales || 1), 0)).toFixed(1) + ' kg' : '—'}</span>
+            </div>
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">GMD Media Global</small>
+              <span class="text-xl font-950 ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'text-green' : 'text-neutral'}">${gmdMedia !== null ? gmdMedia + ' kg/d' : '—'}</span>
+            </div>
           </div>
         </div>
 
@@ -557,36 +559,38 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('leche', 'Lácteo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.leche()} Producción Láctea</div>
-        <div class="grid grid-cols-3 gap-10 mb-12">
-          <div class="info-box border-left-gold">
-            <small class="s-lbl">TOTAL LITROS</small>
-            <div class="inf-val-lg text-gold">${lecheStats.totalLitros.toFixed(1)} L</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-3 gap-10 text-center">
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Litros</small>
+              <span class="text-xl text-gold font-950">${lecheStats.totalLitros.toFixed(1)} L</span>
+            </div>
+            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Promedio/Día</small>
+              <span class="text-xl text-amber font-950">${lecheStats.promedioDiario.toFixed(1)} L</span>
+            </div>
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Precio Medio</small>
+              <span class="text-xl text-dark-gold font-950">${lecheStats.precioMedio.toFixed(3)}€/L</span>
+            </div>
           </div>
-          <div class="info-box border-left-amber">
-            <small class="s-lbl">PROMEDIO/DÍA</small>
-            <div class="inf-val-lg text-amber">${lecheStats.promedioDiario.toFixed(1)} L</div>
-          </div>
-          <div class="info-box border-left-dark-gold">
-            <small class="s-lbl">PRECIO MEDIO</small>
-            <div class="inf-val-lg text-dark-gold">${lecheStats.precioMedio.toFixed(3)}€/L</div>
-          </div>
-        </div>
-        <div class="grid grid-cols-3 gap-10 mb-12">
-          <div class="info-box border-left-blue">
-            <small class="s-lbl">RENDIMIENTO MEDIO</small>
-            <div class="inf-val-lg text-blue">${(() => {
-              const censoActivo = (d.animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
-              return censoActivo > 0 ? (lecheStats.promedioDiario / censoActivo).toFixed(2) : '0.00';
-            })()} L/cab</div>
-          </div>
-          <div class="info-box border-left-green">
-            <small class="s-lbl">REGISTROS</small>
-            <div class="inf-val-md text-white">${lecheStats.totalRegistros} entregas</div>
-          </div>
-          <div class="info-box border-left-${mofaTotal >= 0 ? 'green' : 'red'}">
-            <small class="s-lbl">MOFA TOTAL</small>
-            <div class="inf-val-md ${mofaTotal >= 0 ? 'text-green' : 'text-red'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div>
-            <small class="text-gray text-xs block">Ratio: ${mofaRatio}% sobre ingresos</small>
+          <div style="height:1px; background:#333; margin:10px 0;"></div>
+          <div class="grid grid-cols-3 gap-10 text-center">
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Rendimiento Medio</small>
+              <span class="text-xl text-blue font-950">${(() => {
+                const censoActivo = (d.animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
+                return censoActivo > 0 ? (lecheStats.promedioDiario / censoActivo).toFixed(2) : '0.00';
+              })()} L/cab</span>
+            </div>
+            <div class="py-6" style="border-left:1px solid #333; border-right:1px solid #333;">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Registros</small>
+              <span class="text-xl text-white font-950">${lecheStats.totalRegistros} ent.</span>
+            </div>
+            <div class="py-6">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">MOFA Total</small>
+              <span class="text-xl font-950 ${mofaTotal >= 0 ? 'text-green' : 'text-red'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</span>
+            </div>
           </div>
         </div>
 
@@ -871,18 +875,22 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('ventas', 'Ventas') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.libroVentas()} Libro de Ventas</div>
-        <div class="grid grid-cols-3 gap-10 mb-14">
-          <div class="info-box border-left-blue">
-            <small class="s-lbl">TOTAL VENTAS</small>
-            <div class="inf-val-lg text-blue">${ventas.length}</div>
-          </div>
-          <div class="info-box border-left-green">
-            <small class="s-lbl">PESO TOTAL (kg)</small>
-            <div class="inf-val-lg text-green">${totalKg.toFixed(1)}</div>
-          </div>
-          <div class="info-box border-left-amber">
-            <small class="s-lbl">IMPORTE TOTAL</small>
-            <div class="inf-val-lg text-amber">${totalImporte.toLocaleString()}€</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Ventas</small>
+              <span class="text-xl text-blue font-950">${ventas.length}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Peso Total (kg)</small>
+              <span class="text-xl text-green font-950">${totalKg.toFixed(1)}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Importe Total</small>
+              <span class="text-xl text-amber font-950">${totalImporte.toLocaleString()}€</span>
+            </div>
           </div>
         </div>
 
@@ -992,22 +1000,27 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('compradores', 'Compradores') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.compradores()} Informe por Comprador</div>
-        <div class="grid grid-cols-4 gap-8 mb-14">
-          <div class="info-box-center border-left-blue">
-            <small class="s-lbl">COMPRADORES</small>
-            <div class="inf-val-lg text-blue">${data.length}</div>
-          </div>
-          <div class="info-box-center border-left-green">
-            <small class="s-lbl">INGRESOS TOTALES</small>
-            <div class="inf-val-lg text-green">${totalIngresos.toLocaleString()}€</div>
-          </div>
-          <div class="info-box-center border-left-amber">
-            <small class="s-lbl">VENTAS</small>
-            <div class="inf-val-lg text-amber">${totalVentas}</div>
-          </div>
-          <div class="info-box-center border-left-purple">
-            <small class="s-lbl">KG TOTALES</small>
-            <div class="inf-val-lg text-purple">${totalKg.toFixed(1)}</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Compradores</small>
+              <span class="text-xl text-blue font-950">${data.length}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ingresos Totales</small>
+              <span class="text-xl text-green font-950">${totalIngresos.toLocaleString()}€</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ventas</small>
+              <span class="text-xl text-amber font-950">${totalVentas}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Kg Totales</small>
+              <span class="text-xl text-purple font-950">${totalKg.toFixed(1)}</span>
+            </div>
           </div>
         </div>
         ${topComprador ? `
@@ -1107,22 +1120,27 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('proveedores', 'Proveedores') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.proveedores()} Informe por Proveedor</div>
-        <div class="grid grid-cols-4 gap-8 mb-14">
-          <div class="info-box-center border-left-amber">
-            <small class="s-lbl">PROVEEDORES</small>
-            <div class="inf-val-lg text-amber">${data.length}</div>
-          </div>
-          <div class="info-box-center border-left-red">
-            <small class="s-lbl">GASTO TOTAL</small>
-            <div class="inf-val-lg text-red">${totalGasto.toLocaleString()}€</div>
-          </div>
-          <div class="info-box-center border-left-blue">
-            <small class="s-lbl">FACTURAS</small>
-            <div class="inf-val-lg text-blue">${totalFacturas}</div>
-          </div>
-          <div class="info-box-center border-left-green">
-            <small class="s-lbl">MEDIA/PROV</small>
-            <div class="inf-val-lg text-green">${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Proveedores</small>
+              <span class="text-xl text-amber font-950">${data.length}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Gasto Total</small>
+              <span class="text-xl text-red font-950">${totalGasto.toLocaleString()}€</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Facturas</small>
+              <span class="text-xl text-blue font-950">${totalFacturas}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Media/Prov</small>
+              <span class="text-xl text-green font-950">${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€</span>
+            </div>
           </div>
         </div>
         ${topProv ? `
@@ -1490,12 +1508,29 @@ const InformesView = {
     const especies = Object.keys(porEspecie);
     content.innerHTML = this._sectionActionsHTML('rega', 'REGA') + `
       <div class="inf-report mb-14">
-        <!-- KPIs -->
-        <div class="grid grid-cols-4 gap-6 mb-14">
-          <div class="info-box-center border-left-green"><small class="s-lbl">CENSO TOTAL</small><div class="inf-val-lg text-green">${totalAnimales}</div></div>
-          <div class="info-box-center border-left-blue"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-blue">${activos}</div></div>
-          <div class="info-box-center border-left-amber"><small class="s-lbl">REBAÑOS</small><div class="inf-val-lg text-amber">${numRebanos}</div></div>
-          <div class="info-box-center border-left-purple"><small class="s-lbl">ESPECIES</small><div class="inf-val-lg text-purple">${especies.length}</div></div>
+        <!-- KPIs Unificados -->
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Censo Total</small>
+              <span class="text-xl text-green font-950">${totalAnimales}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Activos</small>
+              <span class="text-xl text-blue font-950">${activos}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Rebaños</small>
+              <span class="text-xl text-amber font-950">${numRebanos}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Especies</small>
+              <span class="text-xl text-purple font-950">${especies.length}</span>
+            </div>
+          </div>
         </div>
         <!-- Datos Explotación -->
         <div class="card report-section border-top-3px border-top-3px-gold report-card">
@@ -1682,11 +1717,28 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('pyg', 'PyG') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Cuenta de Resultados PyG (Estructurada)</div>
-        <div class="grid grid-cols-4 gap-8 mb-14">
-          <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${totalIngresosCalculado.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${totalGastosCalculado.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-${balanceTotal >= 0 ? 'green' : 'red'}"><small class="s-lbl">MARGEN OPERATIVO</small><div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-blue"><small class="s-lbl">EBITDA %</small><div class="inf-val-lg text-blue">${rentabilidadCalculada}%</div></div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Ingresos</small>
+              <span class="text-xl text-green font-950">${totalIngresosCalculado.toLocaleString()}€</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Gastos</small>
+              <span class="text-xl text-red font-950">${totalGastosCalculado.toLocaleString()}€</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Margen Oper.</small>
+              <span class="text-xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">EBITDA %</small>
+              <span class="text-xl text-blue font-950">${rentabilidadCalculada}%</span>
+            </div>
+          </div>
         </div>
 
         <!-- Tabla de Pérdidas y Ganancias Contable -->
@@ -1856,11 +1908,28 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Cargas y Aforos</div>
-        <div class="grid grid-cols-4 gap-8 mb-14">
-          <div class="info-box-center border-left-blue"><small class="s-lbl">SUP. PASTOS</small><div class="inf-val-lg text-blue">${superficieTotal.toFixed(1)} ha</div></div>
-          <div class="info-box-center border-left-green"><small class="s-lbl">AFORO TOTAL</small><div class="inf-val-lg text-green">${data.totalAforo}</div></div>
-          <div class="info-box-center border-left-amber"><small class="s-lbl">UGM TOTALES</small><div class="inf-val-lg text-amber">${ugmGlobal} UGM</div></div>
-          <div class="info-box-center" style="border-left:3px solid ${colorPct(parseFloat(data.pctGlobal))};"><small class="s-lbl">CARGA GLOBAL</small><div class="inf-val-lg" style="color:${colorPct(parseFloat(data.pctGlobal))}">${cargaGlobal} UGM/ha</div></div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="flex items-center justify-around text-center gap-4">
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Sup. Pastos</small>
+              <span class="text-xl text-blue font-950">${superficieTotal.toFixed(1)} ha</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Aforo Max</small>
+              <span class="text-xl text-green font-950">${data.totalAforo}</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">UGM Totales</small>
+              <span class="text-xl text-amber font-950">${ugmGlobal} UGM</span>
+            </div>
+            <div style="width:1px; height:20px; background:#333;"></div>
+            <div class="flex-1">
+              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Carga Global</small>
+              <span class="text-xl font-950" style="color:${colorPct(parseFloat(data.pctGlobal))}">${cargaGlobal} UGM/ha</span>
+            </div>
+          </div>
         </div>
         ${data.numAlertas > 0 ? `<div class="card card-tint-red mb-14 p-12">
           <div class="flex items-center gap-8"><span class="text-xl">🚨</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
