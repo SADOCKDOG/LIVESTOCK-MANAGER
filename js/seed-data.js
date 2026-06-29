@@ -29,6 +29,10 @@
     comunidad_autonoma: 'andalucia',
     tipo_explotacion: 'Mixto',
     sistema_explotacion: 'Semiextensivo',
+    contrato_lacteo_numero: 'CT-2026-002',
+    contrato_lacteo_fecha_fin: '2027-12-31',
+    contrato_lacteo_comprador: 'Lácteos La Serena SA',
+    numero_infolac: 'INF-21005-901',
     zonas: [
       { nombre: 'Parcela Norte 42ha', superficieGrafica: 42, superficie: 42, aforoMax: 200, aforo_maximo: 200, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pasto principal de vacuno', descripcion: 'Pasto principal de vacuno', codigo_pac: 'ES-AN-21005-001', distancia_agua_m: 150 },
       { nombre: 'Parcela Sur 28ha', superficieGrafica: 28, superficie: 28, aforoMax: 150, aforo_maximo: 150, usoPrincipal: 'Barbecho', uso: 'Barbecho', localizacion: 'Rotación y barbecho', descripcion: 'Rotación y barbecho', codigo_pac: 'ES-AN-21005-002', distancia_agua_m: 300 },
