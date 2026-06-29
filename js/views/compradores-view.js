@@ -16,20 +16,26 @@ const CompradoresView = {
         
         main.innerHTML = `
           <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
-          <div class="card p-12 mb-16 border-222 card-dark-gradient pb-16">
-            <div class="comer-mode-switch mb-8" style="display: flex; gap: 8px;">
-              <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
-                style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 
-                onclick="CompradoresView._cambiarModulo('compradores')">
-                ${Icons.compradores()} Compradores
-              </button>
-              <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
-                style="--mode-color:#10b981; flex: 1; padding: 10px;" 
-                onclick="CompradoresView._cambiarModulo('contratos')">
-                ${Icons.contratos()} Contratos
-              </button>
+          <div class="card p-14 mb-14 border-222" style="border-top:3px solid #8b5cf6;">
+            <div class="text-center mb-10">
+              <div class="section-header-neon" style="--neon-color: #8b5cf6; max-width: 420px; margin: 0 auto;">GESTIÓN COMERCIAL</div>
+              <div class="comer-mode-switch" style="display: flex; gap: 8px;">
+                <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
+                  style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 
+                  onclick="CompradoresView._cambiarModulo('compradores')">
+                  ${Icons.compradores()} Compradores
+                </button>
+                <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
+                  style="--mode-color:#10b981; flex: 1; padding: 10px;" 
+                  onclick="CompradoresView._cambiarModulo('contratos')">
+                  ${Icons.contratos()} Contratos
+                </button>
+              </div>
             </div>
-            <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider text-center leading-tight">Gestión de compradores por tipo de explotación y contratos comerciales</div>
+            <div class="pt-8 border-top-222">
+              <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.compradores()} Contexto: Comercial</div>
+              <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de compradores por tipo de explotación y contratos comerciales.</div>
+            </div>
           </div>
 
           <div id="module-container">
@@ -74,8 +80,8 @@ const CompradoresView = {
         if (this._activeModule === 'compradores') {
             const meta = this._getTabMeta(this._currentTab);
             container.innerHTML = `
-              <div class="card p-12 mb-16 border-222 card-dark-gradient pb-16">
-                <div class="text-center mb-8">
+              <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
+                <div class="text-center mb-10">
                   <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
                   <div class="comer-mode-switch">
                     <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
@@ -84,7 +90,10 @@ const CompradoresView = {
                     <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
                   </div>
                 </div>
-                <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider text-center leading-tight">Filtrar compradores por tipo de producción cárnica, láctea o híbrida</div>
+                <div class="pt-8 border-top-222">
+                  <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.compradores()} Contexto: Filtros</div>
+                  <div class="text-xs text-aaa mt-4 leading-relaxed">Filtrar compradores por tipo de producción cárnica, láctea o híbrida.</div>
+                </div>
               </div>
 
               <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">

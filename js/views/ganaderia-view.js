@@ -45,23 +45,28 @@ const GanaderiaView = {
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
     main.innerHTML = `
-      <div class="mb-16 mt-4 card p-12 border-222 card-dark-gradient pb-24">
-        <div class="section-header-neon" style="--neon-color: #facc15;">MÓDULOS</div>
-        <div class="grid grid-cols-3 gap-10">
-          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
-            ${Icons.animales()}
-            <span class="widget-link-label">Animales</span>
-          </a>
-          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
-            ${Icons.rebanos()}
-            <span class="widget-link-label">Rebaños</span>
-          </a>
-          <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">
-            ${Icons.zonas()}
-            <span class="widget-link-label">Zonas</span>
-          </a>
+      <div class="card p-14 mb-14 border-222" style="border-top:3px solid #facc15;">
+        <div class="text-center mb-10">
+          <div class="section-header-neon" style="--neon-color: #facc15; max-width: 360px; margin: 0 auto;">MÓDULOS</div>
+          <div class="grid grid-cols-3 gap-10">
+            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
+              ${Icons.animales()}
+              <span class="widget-link-label">Animales</span>
+            </a>
+            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
+              ${Icons.rebanos()}
+              <span class="widget-link-label">Rebaños</span>
+            </a>
+            <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">
+              ${Icons.zonas()}
+              <span class="widget-link-label">Zonas</span>
+            </a>
+          </div>
         </div>
-        <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider mt-8 text-center leading-tight">Gestión de censo, identificación, lotes y parcelas de la explotación</div>
+        <div class="pt-8 border-top-222">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.animales()} Contexto: Módulos</div>
+          <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de censo, identificación, lotes y parcelas de la explotación.</div>
+        </div>
       </div>
 
       <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">

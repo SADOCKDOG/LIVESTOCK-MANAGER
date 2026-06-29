@@ -193,25 +193,31 @@ const ExplotacionView = {
 
     // Conmutador superior de Sub-módulos (Explotación, Gastos, Almacén)
     main.innerHTML = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-16">
-        <div class="comer-mode-switch mb-8" style="display: flex; gap: 8px;">
-          <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
-            style="--mode-color:#10b981; flex: 1; padding: 10px;" 
-            onclick="ExplotacionView._cambiarSubModulo('explotacion')">
-            ${Icons.finca()} Explotación
-          </button>
-          <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" 
-            style="--mode-color:#ef4444; flex: 1; padding: 10px;" 
-            onclick="ExplotacionView._cambiarSubModulo('gastos')">
-            ${Icons.dinero()} Gastos
-          </button>
-          <button class="comer-mode-btn ${this._activeSubModule === 'almacen' ? 'active' : ''}" 
-            style="--mode-color:#3b82f6; flex: 1; padding: 10px;" 
-            onclick="ExplotacionView._cambiarSubModulo('almacen')">
-            ${Icons.paquete()} Almacén
-          </button>
+      <div class="card p-14 mb-14 border-222" style="border-top:3px solid #10b981;">
+        <div class="text-center mb-10">
+          <div class="section-header-neon" style="--neon-color: #10b981; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
+          <div class="comer-mode-switch" style="display: flex; gap: 8px;">
+            <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
+              style="--mode-color:#10b981; flex: 1; padding: 10px;" 
+              onclick="ExplotacionView._cambiarSubModulo('explotacion')">
+              ${Icons.finca()} Explotación
+            </button>
+            <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" 
+              style="--mode-color:#ef4444; flex: 1; padding: 10px;" 
+              onclick="ExplotacionView._cambiarSubModulo('gastos')">
+              ${Icons.dinero()} Gastos
+            </button>
+            <button class="comer-mode-btn ${this._activeSubModule === 'almacen' ? 'active' : ''}" 
+              style="--mode-color:#3b82f6; flex: 1; padding: 10px;" 
+              onclick="ExplotacionView._cambiarSubModulo('almacen')">
+              ${Icons.paquete()} Almacén
+            </button>
+          </div>
         </div>
-        <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider text-center leading-tight">KPIs de producción, costes operativos y gestión de stock de silos y almacén</div>
+        <div class="pt-8 border-top-222">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.finca()} Contexto: Submódulos</div>
+          <div class="text-xs text-aaa mt-4 leading-relaxed">KPIs de producción, costes operativos y gestión de stock de silos y almacén.</div>
+        </div>
       </div>
       
       <div id="explotacion-submodule-content"></div>
