@@ -320,8 +320,8 @@ const CarneView = {
                         <span class="text-xl text-green">${Icons.documento()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${v.numero_albaran || 'ALBARÁN'} · ${v.razonSocial || 'MATADERO'}</h3>
                       </div>
-                      <div class="flex flex-wrap gap-4 mt-4 text-[0.65rem] text-gray font-800 uppercase">
-                        <span>📅 ${this._fmtFecha(v.fechaSacrificio)}</span>
+                      <div class="flex wrap gap-4 mt-4 text-[0.65rem] text-gray font-800 uppercase">
+                        <span>${Icons.calendar()} ${this._fmtFecha(v.fechaSacrificio)}</span>
                         <span>·</span>
                         <span>Rend: <span class="text-green font-900">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
                       </div>
@@ -346,7 +346,7 @@ const CarneView = {
     if (d.tratamientosSupresion.length > 0) {
       supresionesHtml = `
         <div class="supresion-alerta-box">
-          <strong>⚠️ ALERTA: SUPRESIÓN DE CARNE ACTIVA:</strong>
+          <strong class="flex items-center gap-6">${Icons.alerta()} ALERTA: SUPRESIÓN DE CARNE ACTIVA:</strong>
           <ul class="mt-4 pl-20 m-0">
             ${d.tratamientosSupresion.map(s => `
               <li>Rebaño: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> (Finaliza: ${s.fechaFin})</li>
@@ -397,8 +397,8 @@ const CarneView = {
                           <span class="text-xl" style="color:${enSup ? '#ef4444' : '#8b5cf6'}">${Icons.sanidad()}</span>
                           <h3 class="section-h3 m-0 text-ellipsis uppercase font-900">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
-                        <div class="flex flex-wrap gap-6 mt-6 text-[0.65rem] text-gray font-800 uppercase tracking-tight">
-                          <span class="flex items-center gap-4">📅 ${this._fmtFecha(s.fecha)}</span>
+                        <div class="flex wrap gap-6 mt-6 text-[0.65rem] text-gray font-800 uppercase tracking-tight">
+                          <span class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
                           <span>Espera Carne: <strong class="text-white bg-red-900 px-4 rounded-sm">${s.tiempo_espera_carne_dias || 0} DÍAS</strong></span>
                         </div>

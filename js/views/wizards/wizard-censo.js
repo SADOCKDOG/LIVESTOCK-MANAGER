@@ -249,7 +249,7 @@ window.WizardCenso = {
         </div>
       </div>
       <div style="text-align:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;flex-shrink:0;">
-        <button class="btn btn-primary" id="btn-censo-print" style="width:auto;padding:0 30px;background:#10b981;">🖨 IMPRIMIR / GUARDAR PDF</button>
+        <button class="btn btn-primary" id="btn-censo-print" style="width:auto;padding:0 30px;background:#10b981;">${Icons.exportar()} IMPRIMIR / GUARDAR PDF</button>
         <button class="btn btn-secondary" onclick="document.getElementById('censo-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
       </div>`;
     document.body.appendChild(overlay);

@@ -314,7 +314,7 @@ const TrazabilidadView = {
     loader.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;';
     loader.innerHTML = `
       <div class="pdf-loader">
-        <div class="pdf-loader-emoji">📄</div>
+        <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(1.5);">${Icons.documento()}</div>
         <div class="pdf-loader-title">Generando PDF</div>
         <div class="pdf-loader-desc">Trazabilidad 360°</div>
         <div class="pdf-loader-bar">
@@ -377,7 +377,7 @@ const TrazabilidadView = {
           <tr><td style="padding:3px 8px;color:#888;">Sexo: <strong style="color:#333;">${animal.sexo || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Edad: <strong style="color:#333;">${edad}</strong></td></tr>
           <tr><td style="padding:3px 8px;color:#888;">DIB: <strong style="color:#333;">${animal.dib || 'No registrado'}</strong></td><td style="padding:3px 8px;color:#888;">${rebano ? 'Rebaño: <strong style="color:#333;">'+rebano.nombre+'</strong>' : ''}</td></tr>
         </table>
-        <h2 style="font-size:14px;color:#333;border-bottom:2px solid #d97706;padding-bottom:8px;margin-top:20px;">📅 Línea de Vida</h2>
+        <h2 style="font-size:14px;color:#333;border-bottom:2px solid #d97706;padding-bottom:8px;margin-top:20px;display:flex;align-items:center;gap:8px;">${Icons.calendar({ class: 'icon', style: 'width:16px;height:16px' })} Línea de Vida</h2>
         ${timeline.length === 0 ? '<p style="color:#888;">No hay datos de trazabilidad para este animal.</p>' : `
         <table style="width:100%;border-collapse:collapse;margin-top:10px;">
           <thead><tr style="background:#f5f5f5;"><th style="padding:8px 10px;text-align:left;font-size:10px;color:#888;text-transform:uppercase;">Fecha</th><th style="padding:8px 10px;width:30px;"></th><th style="padding:8px 10px;text-align:left;font-size:10px;color:#888;text-transform:uppercase;">Evento</th></tr></thead>

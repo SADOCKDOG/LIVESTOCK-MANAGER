@@ -1,21 +1,11 @@
-/**
- * Livestock Manager - Módulo de UI para Producción
- * Contiene el Asistente de Registro Maestro para unificar la entrada de datos.
- */
-
 const ProduccionUI = {
-  /**
-   * Inicia el Asistente de Registro Maestro.
-   * @param {string} [operacionPreseleccionada] - Si se proporciona ('carne'|'leche'|'venta_masiva'|'gasto'),
-   *   salta la selección de tipo y abre directamente el flujo correspondiente.
-   */
   iniciarAsistente(operacionPreseleccionada, options = {}) {
     window.__registroContext = {
       ...(window.__registroContext || {}),
       origen_modulo: options.origen_modulo || null,
       modo_explotacion: options.modo_explotacion || null
     };
-    // Atajos directos: estos tipos abren su propio formulario/wizard dedicado
+
     if (operacionPreseleccionada === 'venta_masiva') {
       if (window.App) window.App._abrirWizardVentaMasiva();
       return;
@@ -29,41 +19,32 @@ const ProduccionUI = {
     }
 
     const wizardSteps = [
-      // Paso 1: Seleccionar Área
       {
-        content: (data) => `
-          <div class="prod-options-grid">
-            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'carne'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-              <span class="prod-opt-icon">${Icons.balanza()}</span>
-              <span class="prod-opt-label">Producción<br>Cárnica (KG)</span>
-            </button>
-            <button class="wizard-btn-action wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'leche'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-              <span class="prod-opt-icon">${Icons.leche()}</span>
-              <span class="prod-opt-label">Producción<br>Láctea (L)</span>
-            </button>
-            <button class="wizard-btn-action wizard-btn-danger wizard-btn-option" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'venta_masiva'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-              <span class="prod-opt-icon">${Icons.transportistas()}</span>
-              <span class="prod-opt-label">Venta Masiva<br>Matadero</span>
-            </button>
-            <button class="wizard-btn-action wizard-btn-option" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'gasto'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-              <span class="prod-opt-icon">${Icons.documento()}</span>
-              <span class="prod-opt-label">Gasto<br>Analítico</span>
-            </button>
+        content: () => `
+          <div class="wizard-input-group">
+            <label class="wizard-label">SELECCIONAR ÁREA</label>
+            <select id="prod-select-area" class="prod-select">
+              <option value="">-- ELIGE UNA OPCIÓN --</option>
+              <option value="carne">PRODUCCIÓN CÁRNICA (KG)</option>
+              <option value="leche">PRODUCCIÓN LÁCTEA (L)</option>
+              <option value="venta_masiva">VENTA MASIVA / MATADERO</option>
+              <option value="gasto">GASTO ANALÍTICO</option>
+            </select>
           </div>
         `,
         onChange: async (data) => {
-          const selected = document.querySelector('.wizard-btn-action[data-selected]');
-          if (selected) data.operacion = selected.dataset.selected;
+          const sel = document.getElementById('prod-select-area');
+          if (sel) data.operacion = sel.value;
         },
         validate: async (data) => {
           if (!data.operacion) {
             App.toastError("Debes seleccionar una opción");
             return false;
           }
-          // Si es un flujo que no necesita selección de animal, saltamos a su módulo específico y matamos este wizard
           if (data.operacion === 'venta_masiva') {
             App._abrirWizardVentaMasiva();
-            document.getElementById('wizard-produccion-maestro').remove();
+            const el = document.getElementById('wizard-produccion-maestro');
+            if (el) el.remove();
             return false;
           }
           if (data.operacion === 'gasto') {
@@ -71,50 +52,29 @@ const ProduccionUI = {
               origenModulo: options.origen_modulo || 'general',
               modoExplotacion: options.modo_explotacion || null
             });
-            document.getElementById('wizard-produccion-maestro').remove();
+            const el = document.getElementById('wizard-produccion-maestro');
+            if (el) el.remove();
             return false;
           }
-          return true; // Continúa al Paso 2 para flujos de Producción (Carne/Leche)
+          return true;
         },
       },
-      // Paso 2: Seleccionar Modalidad (Individual / Lote / Tanque)
       {
-        content: (data) => `<div id="opciones-modalidad" class="flex flex-col gap-20 mt-15 text-center"></div>`,
-        onRender: (data, stepEl) => {
-          const container = stepEl.querySelector('#opciones-modalidad');
-          let html = '';
-          if (data.operacion === 'carne') {
-            html += `
-                <button class="wizard-btn-action wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'individual'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-                  <span class="wizard-sel-icon">${Icons.animales()}</span>
-                  <span class="text-md uppercase font-900">Pesada Individual</span>
-                </button>
-                <button class="wizard-btn-action wizard-sel-btn" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'lote'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-                  <span class="wizard-sel-icon">${Icons.rebanos()}</span>
-                  <span class="text-md uppercase font-900">Pesaje por Lote</span>
-                </button>
-             `;
-          } else if (data.operacion === 'leche') {
-            html += `
-                <button class="wizard-btn-action wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'individual'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-                  <span class="wizard-sel-icon--sm">${Icons.animales()}</span>
-                  <span class="text-md uppercase font-900">Control Individual</span>
-                </button>
-                <button class="wizard-btn-action wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'lote'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-                  <span class="wizard-sel-icon--sm">${Icons.rebanos()}</span>
-                  <span class="text-md uppercase font-900">Control de Lote</span>
-                </button>
-                <button class="wizard-btn-action wizard-sel-btn--sm" onclick="this.parentElement.querySelectorAll('button').forEach(b => { delete b.dataset.selected; b.style.borderColor = 'transparent'; b.style.background = ''; }); this.dataset.selected = 'tanque'; this.style.borderColor = 'var(--p-gold)'; this.style.background = 'rgba(250, 204, 21, 0.1)';">
-                  <span class="wizard-sel-icon--sm">${Icons.transportistas()}</span>
-                  <span class="text-md uppercase font-900">Expedición Tanque</span>
-                </button>
-             `;
-          }
-          container.innerHTML = html;
-        },
+        content: (data) => `
+          <div class="wizard-input-group">
+            <label class="wizard-label">MODALIDAD</label>
+            <select id="prod-select-modalidad" class="prod-select">
+              <option value="">-- ELIGE MODALIDAD --</option>
+              ${data.operacion === 'carne'
+                ? '<option value="individual">PESADA INDIVIDUAL</option><option value="lote">PESAJE POR LOTE</option>'
+                : '<option value="individual">CONTROL INDIVIDUAL</option><option value="lote">CONTROL DE LOTE</option><option value="tanque">EXPEDICIÓN TANQUE</option>'
+              }
+            </select>
+          </div>
+        `,
         onChange: async (data) => {
-          const selected = document.querySelector('#opciones-modalidad .wizard-btn-action[data-selected]');
-          if (selected) data.tipo_objetivo = selected.dataset.selected;
+          const sel = document.getElementById('prod-select-modalidad');
+          if (sel) data.tipo_objetivo = sel.value;
         },
         validate: async (data) => {
           if (!data.tipo_objetivo) {
@@ -123,20 +83,20 @@ const ProduccionUI = {
           }
           if (data.tipo_objetivo === 'tanque') {
             window.PesajesUI.abrirWizard({ modo: 'leche_tanque' });
-            document.getElementById('wizard-produccion-maestro').remove();
+            const el = document.getElementById('wizard-produccion-maestro');
+            if (el) el.remove();
             return false;
           }
           return true;
         }
       },
-      // Paso 3: Buscar y Seleccionar Entidad (Buscador Integrado)
       {
-        content: (data) => `
+        content: () => `
           <div class="flex flex-col h-full gap-15 mt-10">
-              <input type="text" id="search-entity" placeholder="BUSCAR POR NOMBRE, RAZA O CROTAL..." class="wizard-input uppercase font-800">
-              <div id="entity-list" class="prod-entity-list">
-                  <div class="text-gray text-center p-20">Cargando registros...</div>
-              </div>
+            <input type="text" id="search-entity" placeholder="BUSCAR POR NOMBRE, RAZA O CROTAL..." class="wizard-input uppercase font-800">
+            <div id="entity-list" class="prod-entity-list">
+              <div class="text-gray text-center p-20">Cargando registros...</div>
+            </div>
           </div>
         `,
         onRender: async (data, stepEl) => {
@@ -176,20 +136,19 @@ const ProduccionUI = {
               const id = i.id;
               const title = data.tipo_objetivo === 'individual' ? i.numero_identificacion : i.nombre;
               const subtitle = data.tipo_objetivo === 'individual' ? `${i.especie} - ${i.raza}` : `${i.especie} - ${i.tipo}`;
-              const selectedStyle = data.selectedEntityId === id ? 'border-color: var(--p-gold); background: rgba(250, 204, 21, 0.05);' : 'border-color: #222;';
-              const checkStyle = data.selectedEntityId === id ? 'border-color: var(--p-gold); background: var(--p-gold); color: #000;' : 'border-color: #444; background: transparent; color: transparent;';
+              const selected = data.selectedEntityId === id;
 
               return `
-                      <div class="entity-item card" data-id="${id}" style="padding:16px; border: 2px solid; ${selectedStyle} cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition: all 0.2s; margin-bottom:8px;">
-                          <div>
-                              <div class="text-white font-900 text-lg uppercase tracking-tight">${title}</div>
-                              <div class="text-gray text-xs mt-4 uppercase font-800">${subtitle}</div>
-                          </div>
-                          <div class="entity-check" style="width:28px; height:26px; border-radius:50%; border:2px solid; ${checkStyle} display:flex; align-items:center; justify-content:center; font-weight:900;">
-                              ${data.selectedEntityId === id ? Icons.check() : ''}
-                          </div>
-                      </div>
-                  `;
+                <div class="entity-item ${selected ? 'entity-item--selected' : ''}" data-id="${id}">
+                  <div>
+                    <div class="text-white font-900 text-lg uppercase tracking-tight">${title}</div>
+                    <div class="text-gray text-xs mt-4 uppercase font-800">${subtitle}</div>
+                  </div>
+                  <div class="entity-check ${selected ? 'entity-check--selected' : ''}">
+                    ${selected ? Icons.check() : ''}
+                  </div>
+                </div>
+              `;
             }).join('');
 
             listEl.querySelectorAll('.entity-item').forEach(el => {
@@ -203,7 +162,7 @@ const ProduccionUI = {
           searchInput.oninput = (e) => renderList(e.target.value);
           renderList();
         },
-        onChange: async (data) => { },
+        onChange: async () => {},
         validate: async (data) => {
           if (!data.selectedEntityId) {
             App.toastError("Debes seleccionar un registro de la lista");
@@ -214,7 +173,6 @@ const ProduccionUI = {
       }
     ];
 
-    // Si hay operación preseleccionada, saltamos el paso de selección de tipo
     const stepsToUse = operacionPreseleccionada
       ? wizardSteps.slice(1)
       : wizardSteps;
@@ -228,14 +186,10 @@ const ProduccionUI = {
       steps: stepsToUse,
       initialData: initialData,
       onComplete: async (data) => {
-        // Genera la cadena de configuración para el Motor de Pesajes (ej: "carne_ind" o "leche_lote")
         const modo = data.operacion + '_' + (data.tipo_objetivo === 'individual' ? 'ind' : 'lote');
-
-        const config = { modo: modo };
+        const config = { modo };
         if (data.tipo_objetivo === 'individual') config.animalId = data.selectedEntityId;
         if (data.tipo_objetivo === 'lote') config.rebanoId = data.selectedEntityId;
-
-        // Transición perfecta: Cierra este Wizard y abre el de Pesajes rellenado y listo
         window.PesajesUI.abrirWizard(config);
       },
     });

@@ -28,8 +28,8 @@ window.WizardFinca = {
                   ).join('')}
                 </select>
               </div>
-              <div class="text-xs text-gray-500 mt-8 p-10 rounded-sm bg-darker">
-                ℹ️ Puedes completar los datos de ADSG, contrato lácteo y normativa desde Ajustes &gt; Editar Finca.
+              <div class="text-xs text-gray-500 mt-8 p-10 rounded-sm bg-darker flex items-center gap-6">
+                ${Icons.info()} Puedes completar los datos de ADSG, contrato lácteo y normativa desde Ajustes &gt; Editar Finca.
               </div>
             </div>
           `,
@@ -91,7 +91,7 @@ window.WizardFinca = {
               <div class="wizard-input-group"><label class="wizard-label">DIRECCIÓN POSTAL</label><input type="text" id="w-f-dir" value="${data.direccion || ''}" class="wizard-input"></div>
 
               <hr class="border-333 my-16">
-              <h4 class="text-gold text-sm mt-0 mb-12">📍 Configuración Autonómica</h4>
+              <h4 class="text-gold text-sm mt-0 mb-12 flex items-center gap-6">${Icons.zonas()} Configuración Autonómica</h4>
 
               <div class="wizard-input-group"><label class="wizard-label">COMUNIDAD AUTÓNOMA</label>
                 <select id="w-f-ccaa" class="wizard-input wizard-select">
@@ -119,7 +119,7 @@ window.WizardFinca = {
               </div>
 
               <hr class="border-333 my-16">
-              <h4 class="text-red text-sm mt-0 mb-12">🏥 ADSG (Agrupación Defensa Sanitaria)</h4>
+              <h4 class="text-red text-sm mt-0 mb-12 flex items-center gap-6">${Icons.sanidad()} ADSG (Agrupación Defensa Sanitaria)</h4>
 
               <div class="wizard-input-group"><label class="wizard-label">NOMBRE ADSG</label><input type="text" id="w-f-adsg" value="${data.adsg_nombre || ''}" placeholder="Agrupación Defensa..." class="wizard-input"></div>
               <div class="wizard-input-group"><label class="wizard-label">CÓDIGO ADSG</label><input type="text" id="w-f-adsg-cod" value="${data.adsg_codigo || ''}" class="wizard-input"></div>
@@ -159,7 +159,7 @@ window.WizardFinca = {
       {
         content: (data) => `
             <div class="mt-10">
-              <h4 class="text-yellow text-sm mt-0 mb-12">🥛 Paquete Lácteo — Contrato Obligatorio</h4>
+              <h4 class="text-yellow text-sm mt-0 mb-12 flex items-center gap-6">${Icons.leche()} Paquete Lácteo — Contrato Obligatorio</h4>
               <p class="text-gray text-xs mb-14">
                 El Paquete Lácteo exige un contrato escrito con el comprador por un período mínimo de 1 año.
               </p>
@@ -175,8 +175,8 @@ window.WizardFinca = {
 
               <hr class="border-333 my-16">
               <div class="bg-darker border-muted rounded p-14">
-                <p class="text-2xs text-gray-500" class="m-0">
-                  💡 <strong>¿No tienes contrato lácteo?</strong> Si produces leche pero no has formalizado contrato,
+                <p class="text-2xs text-gray-500 flex items-center gap-6" class="m-0">
+                  ${Icons.info()} <strong>¿No tienes contrato lácteo?</strong> Si produces leche pero no has formalizado contrato,
                   el Paquete Lácteo te obliga a hacerlo. Consulta la guía en Ajustes &gt; Paquete Lácteo.
                 </p>
               </div>

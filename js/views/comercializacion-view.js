@@ -190,7 +190,7 @@ const ComercializacionView = {
             </div>
           </div>
         </div>`).join('')
-      : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
+      : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
       <!-- PANEL DE ACCIONES COMERCIALES (ESTILO NEÓN) -->

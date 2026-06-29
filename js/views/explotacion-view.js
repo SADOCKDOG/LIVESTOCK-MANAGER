@@ -861,42 +861,25 @@ const ExplotacionView = {
   async _abrirAsistenteSilo(modo) {
     const fincaId = this._cachedData.fincaId;
     
-    let siloOptionsHtml = '';
-    if (modo === 'leche') {
-      siloOptionsHtml = `
-        <option value="1">Silo A: Pienso Concentrado Ordeño</option>
-        <option value="2">Silo B: Mezcla Unifeed Lactancia</option>
-      `;
-    } else if (modo === 'hibrido') {
-      siloOptionsHtml = `
-        <option value="1">Silo A: Concentrado Terneros</option>
-        <option value="2">Silo B: Mezcla Forrajera</option>
-        <option value="3">Silo C: Concentrado Ordeño</option>
-        <option value="4">Silo D: Unifeed Lactancia</option>
-      `;
-    } else {
-      siloOptionsHtml = `
-        <option value="1">Silo A: Concentrado Terneros</option>
-        <option value="2">Silo B: Mezcla Forrajera</option>
-      `;
-    }
+    const silos = modo === 'leche'
+      ? [{ v: '1', l: 'Silo A: Pienso Concentrado Ordeño' }, { v: '2', l: 'Silo B: Mezcla Unifeed Lactancia' }]
+      : modo === 'hibrido'
+        ? [{ v: '1', l: 'Silo A: Concentrado Terneros' }, { v: '2', l: 'Silo B: Mezcla Forrajera' }, { v: '3', l: 'Silo C: Concentrado Ordeño' }, { v: '4', l: 'Silo D: Unifeed Lactancia' }]
+        : [{ v: '1', l: 'Silo A: Concentrado Terneros' }, { v: '2', l: 'Silo B: Mezcla Forrajera' }];
 
-    const themeColor = modo === 'leche' ? '#3b82f6' : (modo === 'hibrido' ? '#10b981' : '#ef4444');
+    const modeClass = 'silo-card--' + modo;
 
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.style.zIndex = "7000";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; border-top:5px solid ${themeColor}; width:100%; margin:16px;">
+      <div class="card p-25 silo-card ${modeClass}">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.paquete()} Registro de Silo</h3>
         
         <div class="wizard-input-group">
           <label class="wizard-label">Seleccionar Silo</label>
           <select id="ws-silo-id" class="wizard-input wizard-select">
-            ${siloOptionsHtml}
+            ${silos.map(s => `<option value="${s.v}">${s.l}</option>`).join('')}
           </select>
         </div>
 
@@ -920,7 +903,7 @@ const ExplotacionView = {
         </div>
 
         <div class="flex gap-10 mt-20">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="ws-btn-save" style="background:${themeColor}; border-color:${themeColor};">Registrar ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="ws-btn-save">Registrar ${Icons.siguiente()}</button>
           <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
         </div>
       </div>
@@ -1235,7 +1218,7 @@ const ExplotacionView = {
   },
 
   async _eliminarGasto(id) {
-    if (!confirm("¿Deseas eliminar este registro de gasto definitivamente?")) return;
+    if (!await Confirm.confirm("Eliminar Gasto", "¿Deseas eliminar este registro de gasto definitivamente?", true)) return;
     try {
       await window.db.delete('gastos_ganaderia', Number(id));
       App.toast("🗑️ Gasto eliminado");
@@ -1244,7 +1227,7 @@ const ExplotacionView = {
   },
 
   async _eliminarMovimientoAlmacen(id) {
-    if (!confirm("¿Deseas eliminar este movimiento de silo definitivamente?")) return;
+    if (!await Confirm.confirm("Eliminar Movimiento", "¿Deseas eliminar este movimiento de silo definitivamente?", true)) return;
     try {
       await window.db.delete('registro_eventos', Number(id));
       App.toast("🗑️ Movimiento de almacén eliminado");
