@@ -330,9 +330,9 @@ const InformesView = {
       </div>
 
       ${alertas ? `<div class="card inf-alert-red">
-          <div class="flex items-center gap-10">
-            <span class="text-3xl">🚨</span>
-            <div><strong class="text-red text-md">${estadisticasSanidad.retencionesActivas} lotes</strong><span class="text-aaa text-sm block">con supresión de venta activa</span></div>
+          <div class="flex items-center gap-12">
+            <span class="text-3xl text-red">${Icons.alerta()}</span>
+            <div><strong class="text-red text-md uppercase font-950">${estadisticasSanidad.retencionesActivas} lotes</strong><span class="text-aaa text-xs uppercase font-800 tracking-wider block">con supresión de venta activa</span></div>
           </div>
         </div>` : ''}
 
@@ -362,27 +362,26 @@ const InformesView = {
         <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Margen Neto por Animal</div>
         ${margenA && margenA.length > 0
         ? '<div class="chart-wrap"><canvas id="chart-margen-animal" class="chart-canvas"></canvas></div>'
-        : '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p class="empty-state-text">No hay datos de ventas para calcular márgenes individuales. Registra ventas de carne para ver esta gráfica.</p></div>'}
+        : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.alerta()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay datos de ventas para calcular márgenes individuales. Registra ventas de carne para ver esta gráfica.</p></div>`}
       </div>
 
-      <!-- Repro y Sanidad compactos -->
-      <div class="grid grid-cols-2 gap-12 mb-14">
-        <div class="card border-top-3px border-top-3px-purple p-14">
-          <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.reproduccion()} Reproductivo</div>
-          <div class="flex justify-between text-sm text-aaa">
-            <div>Fertilidad: <strong class="text-violet">${kpisRepro.tasaFertilidadPct}%</strong></div>
-            <div>IEP: <strong class="text-violet">${kpisRepro.intervaloEntrePartosDias}d</strong></div>
-            <div>Prolif: <strong class="text-violet">${kpisRepro.indiceProlificidad}</strong></div>
+        <div class="grid grid-cols-2 gap-12 mb-14">
+          <div class="card border-top-3px border-top-3px-purple p-14 bg-black-opacity-50">
+            <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.reproduccion()} REPRODUCTIVO</div>
+            <div class="flex justify-between text-xs text-aaa font-800 uppercase">
+              <div>Fertilidad: <strong class="text-white">${kpisRepro.tasaFertilidadPct}%</strong></div>
+              <div>IEP: <strong class="text-white">${kpisRepro.intervaloEntrePartosDias}D</strong></div>
+            </div>
+            <div class="text-violet font-900 text-[0.6rem] mt-6 tracking-widest">PROLIFICIDAD: ${kpisRepro.indiceProlificidad}</div>
+          </div>
+          <div class="card border-top-3px border-top-3px-red p-14 bg-black-opacity-50">
+            <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.sanidad()} SANIDAD</div>
+            <div class="flex justify-between text-xs text-aaa font-800 uppercase">
+              <div>Tratamientos: <strong class="text-white">${estadisticasSanidad.totalTratamientos || 0}</strong></div>
+              <div>Supresión: <strong class="text-red">${estadisticasSanidad.retencionesActivas || 0}</strong></div>
+            </div>
           </div>
         </div>
-        <div class="card border-top-3px border-top-3px-red p-14">
-          <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.sanidad()} Sanidad</div>
-          <div class="flex justify-between text-sm text-aaa">
-            <div>Tratamientos: <strong class="text-red">${estadisticasSanidad.totalTratamientos || 0}</strong></div>
-            <div>Supresión: <strong class="text-red">${estadisticasSanidad.retencionesActivas || 0}</strong></div>
-          </div>
-        </div>
-      </div>
 
       <!-- Leche mini -->
       <!-- Comparativa mensual PyG -->
@@ -472,21 +471,21 @@ const InformesView = {
 
         ${margenA && margenA.length > 0
         ? `<div class="chart-wrap mb-12"><canvas id="chart-margen-animal-carne" class="chart-canvas"></canvas></div>`
-        : '<div class="empty-state mb-12"><div class="empty-state-icon">⚠️</div><p class="empty-state-text">No hay datos de márgenes individuales</p></div>'}
+        : `<div class="empty-state mb-12 border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.alerta()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay datos de márgenes individuales</p></div>`}
 
         ${rentZ && rentZ.length > 0
         ? `<div class="chart-wrap mb-12"><canvas id="chart-rentabilidad-zonas-carne" class="chart-canvas"></canvas></div>`
         : ''}
 
         ${ventasHist.length > 0 ? `
-        <div class="inf-section-title">Últimas ventas</div>
+        <div class="inf-section-title uppercase font-900">Últimas ventas</div>
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-amber">
             <thead><tr><th>Fecha</th><th>Animales</th><th>Kg</th><th>Total</th></tr></thead>
             <tbody>${ventasHist.slice(0, 10).map(v => `
-              <tr><td>${v.fecha || '-'}</td><td>${v.animales || 1}</td><td>${v.kg || '-'}</td><td class="text-green">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
+              <tr><td>${v.fecha || '-'}</td><td class="font-900">${v.animales || 1}</td><td class="font-900">${v.kg || '-'}</td><td class="text-green font-950">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">📭</div><p class="empty-state-text">Sin ventas registradas</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas</p></div>`}
 
         ${ventasPorRebano?.length > 0 ? `
         <div class="inf-section-title">Rentabilidad por rebaño</div>
@@ -572,26 +571,26 @@ const InformesView = {
         <div class="card mb-14 p-12 card-tint-amber">
           <div class="inf-section-title mb-8">${Icons.fitosanitario()} Calidad de la Leche (${conLab.length} analíticas)</div>
           <div class="grid grid-cols-2 gap-6">
-            <div class="info-box-sm" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
-              <small class="s-lbl">GRASA</small>
-              <div class="inf-val-md" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${grasaMedia.toFixed(2)}%</div>
-              ${umbrales ? `<small class="text-gray text-xs">Obj: ≥${umbrales.grasa.min}%</small>` : ''}
-            </div>
-            <div class="info-box-sm" style="border-left:3px solid ${semaforo(protMedia, umbrales?.proteina?.min, null)};">
-              <small class="s-lbl">PROTEÍNA</small>
-              <div class="inf-val-md" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${protMedia.toFixed(2)}%</div>
-              ${umbrales ? `<small class="text-gray text-xs">Obj: ≥${umbrales.proteina.min}%</small>` : ''}
-            </div>
-            <div class="info-box-sm" style="border-left:3px solid ${semaforo(esMedia, umbrales?.extracto_seco?.min, null)};">
-              <small class="s-lbl">EXTRACTO SECO</small>
-              <div class="inf-val-md" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${esMedia.toFixed(2)}%</div>
-              ${umbrales ? `<small class="text-gray text-xs">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
-            </div>
-            <div class="info-box-sm" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
-              <small class="s-lbl">CÉL. SOMÁTICAS</small>
-              <div class="inf-val-md" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}/mL</div>
-              ${umbrales ? `<small class="text-gray text-xs">Obj: ≤${(umbrales.somaticas.max / 1000).toFixed(0)}k</small>` : ''}
-            </div>
+          <div class="info-box-sm" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
+            <small class="s-lbl uppercase font-900">GRASA</small>
+            <div class="inf-val-md font-950" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${grasaMedia.toFixed(2)}%</div>
+            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≥${umbrales.grasa.min}%</small>` : ''}
+          </div>
+          <div class="info-box-sm" style="border-left:3px solid ${semaforo(protMedia, umbrales?.proteina?.min, null)};">
+            <small class="s-lbl uppercase font-900">PROTEÍNA</small>
+            <div class="inf-val-md font-950" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${protMedia.toFixed(2)}%</div>
+            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≥${umbrales.proteina.min}%</small>` : ''}
+          </div>
+          <div class="info-box-sm" style="border-left:3px solid ${semaforo(esMedia, umbrales?.extracto_seco?.min, null)};">
+            <small class="s-lbl uppercase font-900">EXTRACTO SECO</small>
+            <div class="inf-val-md font-950" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${esMedia.toFixed(2)}%</div>
+            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
+          </div>
+          <div class="info-box-sm" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
+            <small class="s-lbl uppercase font-900">CÉL. SOMÁTICAS</small>
+            <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}</div>
+            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≤${(umbrales.somaticas.max / 1000).toFixed(0)}k</small>` : ''}
+          </div>
           </div>
         </div>` : ''}
 
@@ -599,12 +598,11 @@ const InformesView = {
         <div class="inf-section-title">Producción por rebaño</div>
         <div class="grid grid-cols-1 gap-6 mb-10">
           ${lechePorRebano.map(r => `
-            <div class="info-box-sm flex justify-between items-center">
-              <span class="text-aaa text-sm">🥛 ${r.rebano}</span>
+            <div class="info-box-sm flex justify-between items-center bg-black border border-222">
+              <span class="text-ccc text-sm uppercase font-900 flex items-center gap-6">${Icons.rebanos()} ${r.rebano}</span>
               <div class="text-right">
-                <span class="text-gold font-800">${r.litros.toFixed(1)} L</span>
-                <span class="text-gray text-xs ml-6">${r.importe.toLocaleString()}€</span>
-                <span class="text-blue text-xs ml-6">${r.numRegistros} registros</span>
+                <span class="text-gold font-950 text-md">${r.litros.toFixed(1)} L</span>
+                <span class="text-green text-xs font-900 ml-8">${r.importe.toLocaleString()}€</span>
               </div>
             </div>`).join('')}
         </div>` : ''}
@@ -737,7 +735,7 @@ const InformesView = {
         </div>` : ''}
         ${estadisticasSanidad.porCategoria?.length > 0
         ? '<div class="chart-wrap"><canvas id="chart-sanidad-kpis" class="chart-canvas"></canvas></div>'
-        : '<div class="empty-state"><div class="empty-state-icon">💊</div><p class="empty-state-text">Sin tratamientos registrados.</p></div>'}
+        : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.sanidad()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin tratamientos registrados.</p></div>`}
       </div>
       ${gastosCat.length > 0 ? `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
@@ -1241,45 +1239,57 @@ const InformesView = {
           </div>
 
           ${alertas.sanitarias?.length > 0 ? `
-          <div class="inf-section-title text-red">🔴 Alertas Sanitarias (${alertas.sanitarias.length})</div>
+          <div class="inf-section-title text-red uppercase font-900 flex items-center gap-6">${Icons.sanidad()} Alertas Sanitarias (${alertas.sanitarias.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
             <table class="inf-table inf-table-sm tbl-accent-red">
-              <thead><tr><th>Medicamento</th><th>Rebaño</th><th>Fecha</th><th class="text-right">Días rest.</th><th class="text-center">Urgencia</th></tr></thead>
+              <thead><tr><th>Medicamento</th><th>Rebaño</th><th>Fecha</th><th class="text-right">Días rest.</th><th class="text-center">Estado</th></tr></thead>
               <tbody>${alertas.sanitarias.map(a => `
                 <tr>
-                  <td>${a.medicamento || '-'}</td>
-                  <td>${a.rebanoNombre || '-'}</td>
+                  <td class="font-800 uppercase">${a.medicamento || '-'}</td>
+                  <td class="text-xs uppercase">${a.rebanoNombre || '-'}</td>
                   <td>${a.fecha || '-'}</td>
-                  <td class="text-right font-bold ${a.diasRestantes <= 7 ? 'text-red' : a.diasRestantes <= 15 ? 'text-amber' : 'text-green'}">${a.diasRestantes}</td>
-                  <td class="text-center">${a.urgencia === 'rojo' ? '🔴' : a.urgencia === 'amarillo' ? '🟡' : '🟢'}</td>
+                  <td class="text-right font-black ${a.diasRestantes <= 7 ? 'text-red' : a.diasRestantes <= 15 ? 'text-amber' : 'text-green'}">${a.diasRestantes}D</td>
+                  <td class="text-center">
+                    <span style="color:${a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#10b981'};">
+                      ${a.urgencia === 'rojo' ? Icons.alerta() : (a.urgencia === 'amarillo' ? Icons.alerta() : Icons.check())}
+                    </span>
+                  </td>
                 </tr>`).join('')}</tbody>
             </table>
           </div>` : ''}
 
           ${alertas.trazabilidad?.length > 0 ? `
-          <div class="inf-section-title text-amber">🟠 Alertas de Trazabilidad (${alertas.trazabilidad.length})</div>
+          <div class="inf-section-title text-amber uppercase font-900 flex items-center gap-6">${Icons.trazabilidad()} Alertas de Trazabilidad (${alertas.trazabilidad.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
             <table class="inf-table inf-table-sm tbl-accent-amber">
               <thead><tr><th>Animal/Venta</th><th>Mensaje</th><th>Urgencia</th></tr></thead>
               <tbody>${alertas.trazabilidad.map(a => `
                 <tr>
-                  <td>${a.crotal || '-'}</td>
-                  <td class="text-xs">${a.mensaje || '-'}</td>
-                  <td class="text-center">${a.urgencia === 'rojo' ? '🔴' : '🟡'}</td>
+                  <td class="font-900 uppercase">${a.crotal || '-'}</td>
+                  <td class="text-xs uppercase font-700">${a.mensaje || '-'}</td>
+                  <td class="text-center">
+                    <span style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+                      ${a.urgencia === 'rojo' ? Icons.alerta() : Icons.alerta()}
+                    </span>
+                  </td>
                 </tr>`).join('')}</tbody>
             </table>
           </div>` : ''}
 
           ${alertas.administrativas?.length > 0 ? `
-          <div class="inf-section-title text-violet">🟣 Alertas Administrativas (${alertas.administrativas.length})</div>
+          <div class="inf-section-title text-violet uppercase font-900 flex items-center gap-6">${Icons.documento()} Alertas Administrativas (${alertas.administrativas.length})</div>
           <div class="table-scroll scroll-shadow-container mb-14">
             <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr><th>Sección</th><th>Mensaje</th><th>Urgencia</th></tr></thead>
               <tbody>${alertas.administrativas.map(a => `
                 <tr>
-                  <td>${a.seccion || '-'}</td>
-                  <td class="text-xs">${a.mensaje || '-'}</td>
-                  <td class="text-center">${a.urgencia === 'rojo' ? '🔴' : a.urgencia === 'amarillo' ? '🟡' : '🟢'}</td>
+                  <td class="font-900 uppercase">${a.seccion || '-'}</td>
+                  <td class="text-xs uppercase font-700">${a.mensaje || '-'}</td>
+                  <td class="text-center">
+                    <span style="color:${a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#10b981'};">
+                      ${a.urgencia === 'rojo' ? Icons.alerta() : (a.urgencia === 'amarillo' ? Icons.alerta() : Icons.check())}
+                    </span>
+                  </td>
                 </tr>`).join('')}</tbody>
             </table>
           </div>` : ''}
@@ -1292,7 +1302,7 @@ const InformesView = {
             </ul>
           </div>` : ''}
 
-          ${totalAlertas === 0 ? '<div class="empty-state"><div class="empty-state-icon">✅</div><p class="empty-state-text">No hay alertas activas. Todo correcto.</p></div>' : ''}
+          ${totalAlertas === 0 ? `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#10b981;">${Icons.check()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay alertas activas. Todo correcto.</p></div>` : ''}
         </div>
       </div>
     `;
@@ -1303,7 +1313,7 @@ const InformesView = {
   _renderPorFinca(content, d) {
     const { finca, rent, censo, animales, rebanos } = d;
     if (!finca) {
-      content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏠</div><p class="empty-state-text">No hay datos de explotación. Configura una finca primero.</p></div>`;
+      content.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.finca()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay datos de explotación. Configura una finca primero.</p></div>`;
       return;
     }
     const balanceTotal = rent?.balance || 0;
@@ -1388,7 +1398,7 @@ const InformesView = {
   _renderRega(content, d) {
     const { finca, censo, rebanos, animales, eventos, ventasCompleto } = d;
     if (!finca) {
-      content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><p class="empty-state-text">No hay datos de explotación registrados. Configura la finca primero.</p></div>`;
+      content.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.documento()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay datos de explotación registrados. Configura la finca primero.</p></div>`;
       return;
     }
 
@@ -1499,12 +1509,18 @@ const InformesView = {
                 <th>ENTIDAD</th>
               </tr></thead>
               <tbody>${eventosRecientes.map(e => {
-                const tipos = { 'expedicion': '📦 Expedición', 'ALTA_IMPORTACION': '📥 Importación', 'baja': '❌ Baja', 'control': '✅ Control', 'alta': '➕ Alta' };
+                const tipos = {
+                  'expedicion': `<span class="text-amber">${Icons.paquete()} EXPEDICIÓN</span>`,
+                  'ALTA_IMPORTACION': `<span class="text-blue">${Icons.importar()} IMPORTACIÓN</span>`,
+                  'baja': `<span class="text-red">${Icons.cerrar()} BAJA</span>`,
+                  'control': `<span class="text-green">${Icons.check()} CONTROL</span>`,
+                  'alta': `<span class="text-gold">${Icons.agregar()} ALTA</span>`
+                };
                 return `<tr>
                   <td class="nowrap">${e.fecha || '-'}</td>
-                  <td>${tipos[e.motivo_tarea] || e.motivo_tarea || 'Otro'}</td>
-                  <td>${e.motivo_tarea || '-'}</td>
-                  <td>${e.entidad_id || '-'}</td>
+                  <td class="font-900 uppercase text-[0.6rem]">${tipos[e.motivo_tarea] || e.motivo_tarea || 'Otro'}</td>
+                  <td class="uppercase font-700">${e.motivo_tarea || '-'}</td>
+                  <td class="font-800">${e.entidad_id || '-'}</td>
                 </tr>`;
               }).join('')}</tbody>
             </table>
@@ -1543,7 +1559,7 @@ const InformesView = {
               </tr>`).join('')}
             </tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">💰</div><p class="empty-state-text">Sin datos económicos registrados. Añade ventas y gastos para ver la cuenta de resultados.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.dinero()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos económicos registrados. Añade ventas y gastos para ver la cuenta de resultados.</p></div>`}
         ${data.gastosPorCategoria.length > 0 ? `
         <div class="inf-section-title">Gastos por Categoría</div>
         <div class="grid grid-cols-2 gap-6 mb-10">
@@ -1584,7 +1600,7 @@ const InformesView = {
                 <td class="text-right">${r.pctSanidad}%</td>
               </tr>`).join('')}</tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">🐄</div><p class="empty-state-text">Sin datos de gastos asociados a rebaños.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.animales()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de gastos asociados a rebaños.</p></div>`}
       </div>`;
   },
 
@@ -1613,7 +1629,7 @@ const InformesView = {
               <div class="inf-val-md text-white">${k.value}</div>
               <small class="text-gray text-xs">Objetivo: ${k.objetivo}${k.unidad}</small>
             </div>`).join('')}
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">📊</div><p class="empty-state-text">No hay suficientes datos para calcular KPIs de eficiencia.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.grafico()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay suficientes datos para calcular KPIs de eficiencia.</p></div>`}
       </div>`;
   },
 
@@ -1624,7 +1640,7 @@ const InformesView = {
     const colorPct = (p) => p > 100 ? '#ef4444' : p >= 80 ? '#10b981' : p >= 50 ? '#f59e0b' : '#6b7280';
     content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
-        <div class="inf-card-title">📐 Cargas y Aforos</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Cargas y Aforos</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-blue"><small class="s-lbl">ZONAS</small><div class="inf-val-lg text-blue">${data.numZonas}</div></div>
           <div class="info-box-center border-left-green"><small class="s-lbl">AFORO TOTAL</small><div class="inf-val-lg text-green">${data.totalAforo}</div></div>
@@ -1648,7 +1664,7 @@ const InformesView = {
                 <td class="text-center"><span class="badge badge-sm ${z.estado === 'sobrecarga' ? 'badge-red' : z.estado === 'optimo' ? 'badge-green' : z.estado === 'aceptable' ? 'badge-amber' : 'badge-gray'}">${z.estado}</span></td>
               </tr>`).join('')}</tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">📐</div><p class="empty-state-text">Sin zonas configuradas o sin datos de ocupación.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.balanza()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin zonas configuradas o sin datos de ocupación.</p></div>`}
       </div>`;
   },
 
@@ -1671,12 +1687,12 @@ const InformesView = {
           <div class="info-box border-left-red"><small class="s-lbl">TASA BAJAS</small><div class="inf-val-lg text-red">${data.tasaBajas}</div></div>
         </div>
         <div class="grid grid-cols-4 gap-8 mb-10">
-          <div class="info-box-sm text-center border-left-green"><small class="s-lbl">NACIMIENTOS</small><div class="inf-val-md text-green">${u90.nacimientos || 0}</div></div>
-          <div class="info-box-sm text-center border-left-blue"><small class="s-lbl">COMPRAS</small><div class="inf-val-md text-blue">${u90.compras || 0}</div></div>
-          <div class="info-box-sm text-center border-left-red"><small class="s-lbl">VENTAS</small><div class="inf-val-md text-red">${u90.ventas || 0}</div></div>
-          <div class="info-box-sm text-center border-left-gray"><small class="s-lbl">BAJAS</small><div class="inf-val-md text-gray">${u90.bajas || 0}</div></div>
+          <div class="info-box-sm text-center border-left-green"><small class="s-lbl uppercase font-900">NACIMIENTOS</small><div class="inf-val-md text-green">${u90.nacimientos || 0}</div></div>
+          <div class="info-box-sm text-center border-left-blue"><small class="s-lbl uppercase font-900">COMPRAS</small><div class="inf-val-md text-blue">${u90.compras || 0}</div></div>
+          <div class="info-box-sm text-center border-left-red"><small class="s-lbl uppercase font-900">VENTAS</small><div class="inf-val-md text-red">${u90.ventas || 0}</div></div>
+          <div class="info-box-sm text-center border-left-gray"><small class="s-lbl uppercase font-900">BAJAS</small><div class="inf-val-md text-gray">${u90.bajas || 0}</div></div>
         </div>
-        ${data.totalAnimales === 0 ? '<div class="empty-state"><div class="empty-state-icon">🔄</div><p class="empty-state-text">Sin datos de censo registrados.</p></div>' : ''}
+        ${data.totalAnimales === 0 ? `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.rotacion()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de censo registrados.</p></div>` : ''}
       </div>`;
   },
 
@@ -1706,7 +1722,7 @@ const InformesView = {
                 <td class="text-right text-blue font-bold">${m.acumulado.toLocaleString()}€</td>
               </tr>`).join('')}</tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">📈</div><p class="empty-state-text">Sin datos de ingresos o gastos para calcular flujo de caja.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.tendencia()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de ingresos o gastos para calcular flujo de caja.</p></div>`}
       </div>`;
   },
 
@@ -1716,7 +1732,7 @@ const InformesView = {
     const data = rentEspData || { porEspecie: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0 };
     content.innerHTML = this._sectionActionsHTML('rent-esp', 'Rent. Especie') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
-        <div class="inf-card-title">🧬 Rentabilidad por Especie</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} Rentabilidad por Especie</div>
         <div class="grid grid-cols-3 gap-8 mb-14">
           <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${data.totalIngresos.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${data.totalGastos.toLocaleString()}€</div></div>
@@ -1739,7 +1755,7 @@ const InformesView = {
               </tr>`).join('')}
             </tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">🧬</div><p class="empty-state-text">Sin datos de especies o ventas. Registra rebaños con especie asignada.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.reproduccion()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de especies o ventas. Registra rebaños con especie asignada.</p></div>`}
       </div>`;
   },
 
@@ -1749,7 +1765,7 @@ const InformesView = {
     const data = curvaProdData || { porMes: [], totalKg: 0, totalLitros: 0, totalIngresos: 0, metaKg: 0, metaLitros: 0, pctCumplimientoKg: '0', pctCumplimientoLitros: '0' };
     content.innerHTML = this._sectionActionsHTML('curva-prod', 'Curva Producción') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
-        <div class="inf-card-title">📉 Curva de Producción</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Curva de Producción</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
           <div class="info-box-center border-left-amber"><small class="s-lbl">KG TOTAL</small><div class="inf-val-lg text-amber">${data.totalKg.toFixed(1)}</div></div>
           <div class="info-box-center border-left-gold"><small class="s-lbl">LITROS TOTAL</small><div class="inf-val-lg text-gold">${data.totalLitros.toFixed(1)}</div></div>
@@ -1780,7 +1796,7 @@ const InformesView = {
                 <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
               </tr>`).join('')}</tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">📉</div><p class="empty-state-text">Sin datos de producción registrados.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.grafico()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de producción registrados.</p></div>`}
       </div>`;
   },
 
@@ -1790,7 +1806,7 @@ const InformesView = {
     const data = breakEvenData || { costesFijos: 0, costesVariables: 0, ingresosTotal: 0, breakEvenKg: 0, breakEvenLitros: 0, margenSeguridadKg: '0%', margenSeguridadLitros: '0%', cubiertoCarne: false, cubiertoLeche: false, numRebanos: 0, numMeses: 0 };
     content.innerHTML = this._sectionActionsHTML('breakeven', 'Break-Even') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
-        <div class="inf-card-title">⚖️ Análisis de Punto Muerto (Break-Even)</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Análisis de Punto Muerto (Break-Even)</div>
         <div class="grid grid-cols-3 gap-8 mb-14">
           <div class="info-box-center border-left-red"><small class="s-lbl">COSTES FIJOS</small><div class="inf-val-lg text-red">${data.costesFijos.toLocaleString()}€</div></div>
           <div class="info-box-center border-left-amber"><small class="s-lbl">COSTES VARIABLES</small><div class="inf-val-lg text-amber">${data.costesVariables.toLocaleString()}€</div></div>
@@ -1817,10 +1833,10 @@ const InformesView = {
           </div>
         </div>
         <div class="info-box mb-10">
-          <small class="s-lbl">PERÍODO ANALIZADO</small>
-          <div class="inf-val-md text-white">${data.numMeses} meses · ${data.numRebanos} rebaños</div>
+          <small class="s-lbl uppercase font-900 text-gray">PERÍODO ANALIZADO</small>
+          <div class="inf-val-md text-white">${data.numMeses} MESES · ${data.numRebanos} REBAÑOS</div>
         </div>
-        ${data.ingresosTotal === 0 ? '<div class="empty-state"><div class="empty-state-icon">⚖️</div><p class="empty-state-text">Sin datos económicos. Añade ventas y gastos para calcular el punto muerto.</p></div>' : ''}
+        ${data.ingresosTotal === 0 ? `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.balanza()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos económicos. Añade ventas y gastos para calcular el punto muerto.</p></div>` : ''}
       </div>`;
   },
 
@@ -1841,16 +1857,16 @@ const InformesView = {
           <div class="info-box-center border-left-purple"><small class="s-lbl">REGISTROS</small><div class="inf-val-lg text-purple">${data.numRegistros}</div></div>
         </div>
         ${data.porAnio.length > 0 ? `
-        <div class="inf-section-title">Resumen por año</div>
-        <div class="grid grid-cols-1 gap-4 mb-14">
+        <div class="inf-section-title uppercase font-900">Resumen por año</div>
+        <div class="grid grid-cols-1 gap-6 mb-14">
           ${data.porAnio.map(a => `
-            <div class="info-box-sm flex justify-between items-center">
-              <span class="font-bold text-white">${a.anio}</span>
-              <span class="text-gray text-xs">${a.num} ayudas</span>
+            <div class="info-box-sm flex justify-between items-center bg-black border border-222 p-12">
+              <span class="font-950 text-white text-md uppercase">${a.anio}</span>
+              <span class="text-gray-500 text-[0.6rem] uppercase font-800 tracking-wider">${a.num} AYUDAS</span>
               <div class="text-right">
-                <span class="text-green">${a.cobrado.toLocaleString()}€</span>
-                <span class="text-gray mx-4">/</span>
-                <span class="text-amber">${a.solicitado.toLocaleString()}€</span>
+                <span class="text-green font-950 text-md">${a.cobrado.toLocaleString()}€</span>
+                <span class="text-gray-700 mx-4">/</span>
+                <span class="text-amber font-900">${a.solicitado.toLocaleString()}€</span>
               </div>
             </div>`).join('')}
         </div>` : ''}
@@ -1860,18 +1876,18 @@ const InformesView = {
             <thead><tr><th>Año</th><th>Concepto</th><th>Régimen</th><th class="text-right">Solicitado</th><th class="text-right">Cobrado</th><th class="text-center">Estado</th></tr></thead>
             <tbody>${data.registros.map(r => {
               const pct = r.importe_solicitado > 0 ? ((r.importe_cobrado || 0) / r.importe_solicitado * 100).toFixed(0) : 0;
-              const est = pct >= 100 ? '✅ Cobrado' : pct > 0 ? '🔄 Parcial' : '⏳ Pendiente';
+              const est = pct >= 100 ? `${Icons.check()} COBRADO` : pct > 0 ? `${Icons.rotacion()} PARCIAL` : `${Icons.calendar()} PENDIENTE`;
               return `<tr>
-                <td class="font-bold">${r.anio || '-'}</td>
-                <td>${r.concepto || r.descripcion || 'PAC'}</td>
-                <td class="text-gray text-xs">${r.regimen || '—'}</td>
-                <td class="text-right">${(r.importe_solicitado || 0).toLocaleString()}€</td>
-                <td class="text-right text-green font-bold">${(r.importe_cobrado || 0).toLocaleString()}€</td>
-                <td class="text-center text-xs">${est}</td>
+                <td class="font-900">${r.anio || '-'}</td>
+                <td class="uppercase font-700">${r.concepto || r.descripcion || 'PAC'}</td>
+                <td class="text-gray-500 text-[0.6rem] uppercase font-800">${r.regimen || '—'}</td>
+                <td class="text-right font-800">${(r.importe_solicitado || 0).toLocaleString()}€</td>
+                <td class="text-right text-green font-950">${(r.importe_cobrado || 0).toLocaleString()}€</td>
+                <td class="text-center text-[0.6rem] font-900 uppercase">${est}</td>
               </tr>`;
             }).join('')}</tbody>
           </table>
-        </div>` : '<div class="empty-state"><div class="empty-state-icon">🌾</div><p class="empty-state-text">Sin subvenciones PAC registradas. Usa "Añadir" para registrar ayudas de la PAC, PDR, incorporación jóvenes u otras subvenciones.</p></div>'}
+        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.pac()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin subvenciones PAC registradas. Usa "Añadir" para registrar ayudas de la PAC, PDR, incorporación jóvenes u otras subvenciones.</p></div>`}
       </div>
     `;
   },
@@ -1895,8 +1911,8 @@ const InformesView = {
           <input type="text" id="pac-concepto" placeholder="PAC, PDR, Incorporación Jóvenes..." class="wizard-input">
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">Régimen</label>
-          <select id="pac-regimen" class="wizard-input wizard-select">
+          <label class="wizard-label">RÉGIMEN</label>
+          <select id="pac-regimen" class="wizard-input wizard-select font-900">
             <option value="PAC Base">PAC Base</option>
             <option value="PAC Verde">PAC Verde</option>
             <option value="PDR">PDR</option>
@@ -2546,6 +2562,66 @@ const InformesView = {
       }
 
       pdfEl.innerHTML = `
+        <style>
+  .pdf-sec {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding-bottom: 6px !important;
+    margin-top: 24px !important;
+    margin-bottom: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: -0.01em !important;
+  }
+  .pdf-sec4 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding-bottom: 4px !important;
+    margin-top: 18px !important;
+    margin-bottom: 8px !important;
+  }
+  .pdf-tbl {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 14px !important;
+    font-size: 0.82rem !important;
+  }
+  .pdf-th, .pdf-th-sm {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    text-align: left !important;
+    padding: 6px 8px !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+  }
+  .pdf-td, .pdf-td4 {
+    padding: 5px 8px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    color: #334155 !important;
+  }
+  .pdf-bg1 {
+    background: #f8fafc !important;
+  }
+  .pdf-kv, .pdf-kv6 {
+    padding: 5px 8px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+  }
+  .icon {
+    width: 18px !important;
+    height: 18px !important;
+    stroke-width: 2.5 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+  }
+</style>
+
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #d97706; padding-bottom:18px; margin-bottom:20px; width:100%;">
           <div style="display:flex; align-items:center; gap:12px;">
             ${logoBase64 ? `<img src="${logoBase64}" style="height:50px; width:auto;" alt="Logo">` : ''}
@@ -2623,7 +2699,7 @@ const InformesView = {
     if (!rent) return '';
     const balanceTotal = rent.balance || 0;
     return `
-      <h3 class="pdf-sec" style="color:#d97706;">💰 Resumen Económico</h3>
+      <h3 class="pdf-sec" style="color:#d97706;">${Icons.dinero({ class: 'icon' })} Resumen Económico</h3>
       <table class="pdf-tbl pdf-tbl-md mb-15">
         <tr><td class="pdf-kv6">Ingresos Cárnicos</td><td class="pdf-kv6 pdf-r pdf-b">${(rent.detalles?.carne || 0).toLocaleString()} €</td></tr>
         <tr><td class="pdf-kv6">Ingresos Lácteos</td><td class="pdf-kv6 pdf-r pdf-b">${(rent.detalles?.leche || 0).toLocaleString()} €</td></tr>
@@ -2638,7 +2714,7 @@ const InformesView = {
     const total = rent?.detalles?.carne || 0;
     const kgTotal = ventasHist.reduce((s, v) => s + (v.kg || 0), 0);
     return `
-      <h3 class="pdf-sec" style="color:#f59e0b;">🥩 Informe Cárnico</h3>
+      <h3 class="pdf-sec" style="color:#f59e0b;">${Icons.carne({ class: 'icon' })} Informe Cárnico</h3>
       <table class="pdf-tbl pdf-tbl-md mb-12">
         <tr><td class="pdf-kv6">Ingresos Totales Carne</td><td class="pdf-kv6 pdf-r pdf-b">${total.toLocaleString()} €</td></tr>
         <tr><td class="pdf-kv6">Ventas Registradas</td><td class="pdf-kv6 pdf-r">${ventasHist.length}</td></tr>
@@ -2657,7 +2733,7 @@ const InformesView = {
     const { lecheStats } = d;
     if (!lecheStats || lecheStats.totalLitros === 0) return '';
     return `
-      <h3 class="pdf-sec" style="color:#fbbf24;">🥛 Informe Lácteo</h3>
+      <h3 class="pdf-sec" style="color:#fbbf24;">${Icons.leche({ class: 'icon' })} Informe Lácteo</h3>
       <table class="pdf-tbl pdf-tbl-md mb-12">
         <tr><td class="pdf-kv6">Total Litros Producidos</td><td class="pdf-kv6 pdf-r pdf-b">${lecheStats.totalLitros.toFixed(1)} L</td></tr>
         <tr><td class="pdf-kv6">Promedio Diario</td><td class="pdf-kv6 pdf-r">${lecheStats.promedioDiario.toFixed(1)} L/día</td></tr>
@@ -2670,7 +2746,7 @@ const InformesView = {
   _pdfSeccionReproductivo(d) {
     const { kpisRepro } = d;
     return `
-      <h3 class="pdf-sec" style="color:#8b5cf6;">🧬 Informe Reproductivo</h3>
+      <h3 class="pdf-sec" style="color:#8b5cf6;">${Icons.reproduccion({ class: 'icon' })} Informe Reproductivo</h3>
       <table class="pdf-tbl pdf-tbl-md">
         <tr><td class="pdf-kv6">Tasa de Fertilidad</td><td class="pdf-kv6 pdf-r pdf-b">${kpisRepro.tasaFertilidadPct || 0}%</td></tr>
         <tr><td class="pdf-kv6">Intervalo Entre Partos</td><td class="pdf-kv6 pdf-r">${kpisRepro.intervaloEntrePartosDias || 0} días</td></tr>
@@ -2683,7 +2759,7 @@ const InformesView = {
   _pdfSeccionSanidad(d) {
     const { estadisticasSanidad } = d;
     return `
-      <h3 class="pdf-sec" style="color:#ef4444;">⚕️ Informe Sanitario</h3>
+      <h3 class="pdf-sec" style="color:#ef4444;">${Icons.sanidad({ class: 'icon' })} Informe Sanitario</h3>
       <table class="pdf-tbl pdf-tbl-md">
         <tr><td class="pdf-kv6">Total Tratamientos</td><td class="pdf-kv6 pdf-r pdf-b">${estadisticasSanidad.totalTratamientos || 0}</td></tr>
         <tr><td class="pdf-kv6">Supresiones Activas</td><td class="pdf-kv6 pdf-r pdf-b pdf-red">${estadisticasSanidad.retencionesActivas || 0}</td></tr>
@@ -2701,7 +2777,7 @@ const InformesView = {
     if (!censo?.length) return '';
     const totalAnimales = censo.reduce((s, r) => s + r.total, 0);
     return `
-      <h3 class="pdf-sec" style="color:#000;">🐑 Censo de Animales</h3>
+      <h3 class="pdf-sec" style="color:#000;">${Icons.animales({ class: 'icon' })} Censo de Animales</h3>
       <table class="pdf-tbl pdf-tbl-md">
         <thead><tr class="pdf-bg0"><th class="pdf-th8" style="border-bottom-color:#d97706;">Rebaño</th><th class="pdf-th8 pdf-c" style="border-bottom-color:#d97706;">Total</th><th class="pdf-th8 pdf-c" style="border-bottom-color:#d97706;">Activos</th><th class="pdf-th8 pdf-c" style="border-bottom-color:#d97706;">Vendidos</th></tr></thead>
         <tbody>${censo.map(r => `<tr><td class="pdf-td4">${r.nombre}</td><td class="pdf-td4 pdf-c pdf-b">${r.total}</td><td class="pdf-td4 pdf-c">${r.activos}</td><td class="pdf-td4 pdf-c">${r.vendidos}</td></tr>`).join('')}</tbody>
@@ -2720,7 +2796,7 @@ const InformesView = {
     const totalImporte = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
     const totalIVA = ventas.reduce((s, v) => s + (v.importe_iva || 0), 0);
     return `
-      <h3 class="pdf-sec" style="color:#3b82f6;">📒 Libro de Ventas</h3>
+      <h3 class="pdf-sec" style="color:#3b82f6;">${Icons.libroVentas({ class: 'icon' })} Libro de Ventas</h3>
       <table class="pdf-tbl pdf-tbl-xs mb-10">
         <thead><tr class="pdf-bg0">
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">Fecha</th>
@@ -2763,7 +2839,7 @@ const InformesView = {
       porEspecie[esp] = (porEspecie[esp] || 0) + 1;
     });
     return `
-      <h3 class="pdf-sec" style="color:#d97706;">📋 INFORME REGA</h3>
+      <h3 class="pdf-sec" style="color:#d97706;">${Icons.informeRega({ class: 'icon' })} Informe REGA</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Nombre Explotación</td><td class="pdf-kv">${finca.nombre || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
@@ -2775,7 +2851,7 @@ const InformesView = {
         <tr><td class="pdf-kv pdf-b">Comunidad Autónoma</td><td class="pdf-kv">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</td></tr>
       </table>
 
-      <h4 class="pdf-sec4" style="color:#10b981;">🐑 Resumen Censo</h4>
+      <h4 class="pdf-sec4" style="color:#10b981;">${Icons.animales({ class: 'icon' })} Resumen Censo</h4>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Total Animales</td><td class="pdf-kv pdf-r">${totalAnimales}</td></tr>
         <tr><td class="pdf-kv pdf-b">Animales Activos</td><td class="pdf-kv pdf-r pdf-grn">${activos}</td></tr>
@@ -2785,7 +2861,7 @@ const InformesView = {
       </table>
 
       ${rebanos?.length > 0 ? `
-      <h4 class="pdf-sec4" style="color:#f59e0b;">📦 Detalle por Rebaño</h4>
+      <h4 class="pdf-sec4" style="color:#f59e0b;">${Icons.rebanos({ class: 'icon' })} Detalle por Rebaño</h4>
       <table class="pdf-tbl pdf-tbl-sm mb-10">
         <thead><tr class="pdf-bg0">
           <th class="pdf-th-sm" style="border-bottom:2px solid #f59e0b;">Rebaño</th>
@@ -2802,7 +2878,7 @@ const InformesView = {
       </table>` : ''}
 
       ${movimientos.length > 0 ? `
-      <h4 class="pdf-sec4" style="color:#8b5cf6;">📦 Últimos Movimientos</h4>
+      <h4 class="pdf-sec4" style="color:#8b5cf6;">${Icons.trazabilidad({ class: 'icon' })} Últimos Movimientos</h4>
       <table class="pdf-tbl pdf-tbl-xs mb-10">
         <thead><tr class="pdf-bg0">
           <th class="pdf-th-sm" style="border-bottom:2px solid #8b5cf6;">Fecha</th>
@@ -2827,7 +2903,7 @@ const InformesView = {
     const totalIngresos = data.reduce((s, c) => s + c.total, 0);
     const totalKg = data.reduce((s, c) => s + c.kg, 0);
     return `
-      <h3 class="pdf-sec" style="color:#3b82f6;">🏢 Informe por Comprador</h3>
+      <h3 class="pdf-sec" style="color:#3b82f6;">${Icons.compradores({ class: 'icon' })} Informe por Comprador</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <thead><tr class="pdf-bg0">
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">Comprador</th>
@@ -2859,7 +2935,7 @@ const InformesView = {
     if (!data.length) return '';
     const totalGasto = data.reduce((s, p) => s + p.total, 0);
     return `
-      <h3 class="pdf-sec" style="color:#f59e0b;">📦 Informe por Proveedor</h3>
+      <h3 class="pdf-sec" style="color:#f59e0b;">${Icons.proveedores({ class: 'icon' })} Informe por Proveedor</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <thead><tr class="pdf-bg0">
           <th class="pdf-th" style="border-bottom-color:#f59e0b;">Proveedor</th>
@@ -2885,7 +2961,7 @@ const InformesView = {
     const data = fitosanitarioData || { registros: [], total: 0 };
     if (!data.registros.length) return '';
     return `
-      <h3 class="pdf-sec" style="color:#10b981;">🧪 Informe Fitosanitario</h3>
+      <h3 class="pdf-sec" style="color:#10b981;">${Icons.fitosanitario({ class: 'icon' })} Informe Fitosanitario</h3>
       <table class="pdf-tbl pdf-tbl-sm mb-10">
         <thead><tr class="pdf-bg0">
           <th class="pdf-th" style="border-bottom-color:#10b981;">Fecha</th>
@@ -2916,7 +2992,7 @@ const InformesView = {
                   (alertas.trazabilidad?.filter(a => a.urgencia === 'rojo').length || 0) +
                   (alertas.administrativas?.filter(a => a.urgencia === 'rojo').length || 0);
     let html = `
-      <h3 class="pdf-sec" style="color:#ef4444;">🚨 Informe de Alertas</h3>
+      <h3 class="pdf-sec" style="color:#ef4444;">${Icons.alerta({ class: 'icon' })} Informe de Alertas</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Total Alertas Activas</td><td class="pdf-kv pdf-r pdf-b pdf-red">${totalAlertas}</td></tr>
         <tr><td class="pdf-kv">Críticas (🔴)</td><td class="pdf-kv pdf-r pdf-red">${rojas}</td></tr>
@@ -2947,7 +3023,7 @@ const InformesView = {
     const totalAnimales = (animales || []).length;
     const activos = (animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
     return `
-      <h3 class="pdf-sec" style="color:#d97706;">🏠 Ficha de Explotación</h3>
+      <h3 class="pdf-sec" style="color:#d97706;">${Icons.finca({ class: 'icon' })} Ficha de Explotación</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Nombre</td><td class="pdf-kv">${finca.nombre || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
@@ -2959,7 +3035,7 @@ const InformesView = {
         <tr><td class="pdf-kv pdf-b">Rebaños</td><td class="pdf-kv pdf-r">${(rebanos || []).length}</td></tr>
       </table>
       ${rent ? `
-      <h4 class="pdf-sec4" style="color:#10b981;">💰 Resumen Económico</h4>
+      <h4 class="pdf-sec4" style="color:#10b981;">${Icons.dinero({ class: 'icon' })} Resumen Económico</h4>
       <table class="pdf-tbl pdf-tbl-md">
         <tr><td class="pdf-kv">Ingresos Totales</td><td class="pdf-kv pdf-r pdf-b">${(rent.ingresos || 0).toLocaleString()}€</td></tr>
         <tr><td class="pdf-kv">Gastos Totales</td><td class="pdf-kv pdf-r pdf-b pdf-red">${(rent.gastos || 0).toLocaleString()}€</td></tr>
@@ -2974,7 +3050,7 @@ const InformesView = {
     const { pygData } = d;
     if (!pygData || pygData.totalIngresos === 0) return '';
     return `
-      <h3 class="pdf-sec" style="color:#10b981;">💰 Cuenta de Resultados</h3>
+      <h3 class="pdf-sec" style="color:#10b981;">${Icons.dinero({ class: 'icon' })} Cuenta de Resultados</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Total Ingresos</td><td class="pdf-kv pdf-r">${pygData.totalIngresos.toLocaleString()}€</td></tr>
         <tr><td class="pdf-kv pdf-b">Total Gastos</td><td class="pdf-kv pdf-r pdf-red">${pygData.totalGastos.toLocaleString()}€</td></tr>
@@ -2994,7 +3070,7 @@ const InformesView = {
     const { costeProdData } = d;
     if (!costeProdData?.porRebano?.length) return '';
     return `
-      <h3 class="pdf-sec" style="color:#8b5cf6;">🐄 Coste de Producción por Animal</h3>
+      <h3 class="pdf-sec" style="color:#8b5cf6;">${Icons.gastos({ class: 'icon' })} Coste de Producción por Animal</h3>
       <table class="pdf-tbl pdf-tbl-sm">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Rebaño</th><th class="pdf-th-sm pdf-c">Animales</th><th class="pdf-th-sm pdf-r">Gasto Total</th><th class="pdf-th-sm pdf-r">€/Cabeza</th><th class="pdf-th-sm pdf-r">€/Día</th></tr></thead>
         <tbody>${costeProdData.porRebano.map(r => `<tr><td class="pdf-td"><strong>${r.nombre}</strong> (${r.especie})</td><td class="pdf-td pdf-c">${r.numAnimales}</td><td class="pdf-td pdf-r">${r.totalGasto.toLocaleString()}€</td><td class="pdf-td pdf-r">${r.costePorCabeza.toLocaleString()}€</td><td class="pdf-td pdf-r">${r.costePorDia}€</td></tr>`).join('')}</tbody>
@@ -3008,7 +3084,7 @@ const InformesView = {
     if (!eficienciaData?.kpis?.length) return '';
     const semaforoPdf = (s) => s === 'verde' ? '#10b981' : s === 'amarillo' ? '#f59e0b' : '#cc0000';
     return `
-      <h3 class="pdf-sec" style="color:#3b82f6;">📊 Panel de Eficiencia Técnica</h3>
+      <h3 class="pdf-sec" style="color:#3b82f6;">${Icons.grafico({ class: 'icon' })} Panel de Eficiencia Técnica</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         ${eficienciaData.kpis.map(k => `<tr><td class="pdf-kv pdf-b">${k.label}</td><td class="pdf-kv pdf-r pdf-b" style="color:${semaforoPdf(k.status)};">${k.value}</td><td class="pdf-kv pdf-r pdf-muted">Obj: ${k.objetivo}${k.unidad}</td></tr>`).join('')}
       </table>
@@ -3020,7 +3096,7 @@ const InformesView = {
     const { cargasData } = d;
     if (!cargasData?.porZona?.length) return '';
     return `
-      <h3 class="pdf-sec" style="color:#f59e0b;">📐 Cargas y Aforos</h3>
+      <h3 class="pdf-sec" style="color:#f59e0b;">${Icons.peso({ class: 'icon' })} Cargas y Aforos</h3>
       <table class="pdf-tbl pdf-tbl-sm">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Zona</th><th class="pdf-th-sm pdf-c">Aforo</th><th class="pdf-th-sm pdf-c">Ocupación</th><th class="pdf-th-sm pdf-c">%</th><th class="pdf-th-sm pdf-c">Estado</th></tr></thead>
         <tbody>${cargasData.porZona.map(z => `<tr><td class="pdf-td"><strong>${z.nombre}</strong></td><td class="pdf-td pdf-c">${z.aforo}</td><td class="pdf-td pdf-c">${z.ocupacion}</td><td class="pdf-td pdf-c">${z.pctOcupacion}%</td><td class="pdf-td pdf-c">${z.estado}</td></tr>`).join('')}</tbody>
@@ -3034,7 +3110,7 @@ const InformesView = {
     if (!rotacionData || rotacionData.totalAnimales === 0) return '';
     const u90 = rotacionData.ultimos90 || {};
     return `
-      <h3 class="pdf-sec" style="color:#3b82f6;">🔄 Rotación de Censo (${rotacionData.periodo})</h3>
+      <h3 class="pdf-sec" style="color:#3b82f6;">${Icons.rotacion({ class: 'icon' })} Rotación de Censo (${rotacionData.periodo})</h3>
       <table class="pdf-tbl pdf-tbl-md mb-8">
         <tr><td class="pdf-kv pdf-b">Censo Total</td><td class="pdf-kv pdf-r">${rotacionData.totalAnimales}</td></tr>
         <tr><td class="pdf-kv pdf-b">Animales Activos</td><td class="pdf-kv pdf-r">${rotacionData.activos}</td></tr>
@@ -3054,7 +3130,7 @@ const InformesView = {
     const meses = flujoCajaData.porMes.filter(m => m.entradas > 0 || m.salidas > 0);
     if (!meses.length) return '';
     return `
-      <h3 class="pdf-sec" style="color:#14b8a6;">📈 Flujo de Caja</h3>
+      <h3 class="pdf-sec" style="color:#14b8a6;">${Icons.grafico({ class: 'icon' })} Flujo de Caja</h3>
       <table class="pdf-tbl pdf-tbl-sm">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Mes</th><th class="pdf-th-sm pdf-r">Entradas</th><th class="pdf-th-sm pdf-r">Salidas</th><th class="pdf-th-sm pdf-r">Neto</th><th class="pdf-th-sm pdf-r">Acumulado</th></tr></thead>
         <tbody>${meses.map(m => `<tr><td class="pdf-td"><strong>${m.mes}</strong></td><td class="pdf-td pdf-r">${m.entradas.toLocaleString()}€</td><td class="pdf-td pdf-r">${m.salidas.toLocaleString()}€</td><td class="pdf-td pdf-r" style="color:${m.neto >= 0 ? '#10b981' : '#cc0000'};">${m.neto.toLocaleString()}€</td><td class="pdf-td pdf-r pdf-b">${m.acumulado.toLocaleString()}€</td></tr>`).join('')}</tbody>
@@ -3069,7 +3145,7 @@ const InformesView = {
     const { rentEspData } = d;
     if (!rentEspData?.porEspecie?.length) return '';
     return `
-      <h3 class="pdf-sec" style="color:#8b5cf6;">🧬 Rentabilidad por Especie</h3>
+      <h3 class="pdf-sec" style="color:#8b5cf6;">${Icons.reproduccion({ class: 'icon' })} Rentabilidad por Especie</h3>
       <table class="pdf-tbl pdf-tbl-sm">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Especie</th><th class="pdf-th-sm pdf-c">Animales</th><th class="pdf-th-sm pdf-r">Ingresos</th><th class="pdf-th-sm pdf-r">Gastos</th><th class="pdf-th-sm pdf-r">Balance</th></tr></thead>
         <tbody>${rentEspData.porEspecie.map(e => `<tr><td class="pdf-td"><strong>${e.especie}</strong></td><td class="pdf-td pdf-c">${e.numAnimales}</td><td class="pdf-td pdf-r">${e.ingresos.toLocaleString()}€</td><td class="pdf-td pdf-r">${e.gastos.toLocaleString()}€</td><td class="pdf-td pdf-r pdf-b" style="color:${e.balance >= 0 ? '#10b981' : '#cc0000'};">${e.balance.toLocaleString()}€</td></tr>`).join('')}</tbody>
@@ -3082,7 +3158,7 @@ const InformesView = {
     const { curvaProdData } = d;
     if (!curvaProdData?.porMes?.length) return '';
     return `
-      <h3 class="pdf-sec" style="color:#3b82f6;">📉 Curva de Producción</h3>
+      <h3 class="pdf-sec" style="color:#3b82f6;">${Icons.leche({ class: 'icon' })} Curva de Producción</h3>
       <table class="pdf-tbl pdf-tbl-xs">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Mes</th><th class="pdf-th-sm pdf-r">Kg</th><th class="pdf-th-sm pdf-r">Litros</th><th class="pdf-th-sm pdf-r">Kg Acum</th><th class="pdf-th-sm pdf-r">L Acum</th><th class="pdf-th-sm pdf-r">Ingresos</th></tr></thead>
         <tbody>${curvaProdData.porMes.map(m => `<tr><td class="pdf-td"><strong>${m.mes}</strong></td><td class="pdf-td pdf-r">${m.kg.toFixed(1)}</td><td class="pdf-td pdf-r">${m.litros.toFixed(1)}</td><td class="pdf-td pdf-r">${m.kgAcum.toFixed(1)}</td><td class="pdf-td pdf-r">${m.litrosAcum.toFixed(1)}</td><td class="pdf-td pdf-r">${m.ingresos.toLocaleString()}€</td></tr>`).join('')}</tbody>
@@ -3096,7 +3172,7 @@ const InformesView = {
     const { breakEvenData } = d;
     if (!breakEvenData || breakEvenData.ingresosTotal === 0) return '';
     return `
-      <h3 class="pdf-sec" style="color:#ef4444;">⚖️ Análisis de Punto Muerto (Break-Even)</h3>
+      <h3 class="pdf-sec" style="color:#ef4444;">${Icons.dinero({ class: 'icon' })} Análisis de Punto Muerto (Break-Even)</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Costes Fijos</td><td class="pdf-kv pdf-r">${breakEvenData.costesFijos.toLocaleString()}€</td></tr>
         <tr><td class="pdf-kv pdf-b">Costes Variables</td><td class="pdf-kv pdf-r">${breakEvenData.costesVariables.toLocaleString()}€</td></tr>
