@@ -415,18 +415,32 @@ const InformesView = {
 
         <div class="grid grid-cols-2 gap-12 mb-14">
           <div class="card border-top-3px border-top-3px-purple p-14 bg-black-opacity-50">
-            <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.reproduccion()} REPRODUCTIVO</div>
-            <div class="flex justify-between text-xs text-aaa font-800 uppercase">
-              <div>Fertilidad: <strong class="text-white">${kpisRepro.tasaFertilidadPct}%</strong></div>
-              <div>IEP: <strong class="text-white">${kpisRepro.intervaloEntrePartosDias}D</strong></div>
+            <div class="inf-card-title mb-10 flex items-center gap-6 justify-center">${Icons.reproduccion()} REPRODUCTIVO</div>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="info-box-center py-6">
+                <small class="s-lbl">FERTILIDAD</small>
+                <strong class="text-white text-md font-900">${kpisRepro.tasaFertilidadPct}%</strong>
+              </div>
+              <div class="info-box-center py-6">
+                <small class="s-lbl">IEP (DÍAS)</small>
+                <strong class="text-white text-md font-900">${kpisRepro.intervaloEntrePartosDias}</strong>
+              </div>
             </div>
-            <div class="text-violet font-900 text-[0.6rem] mt-6 tracking-widest">PROLIFICIDAD: ${kpisRepro.indiceProlificidad}</div>
+            <div class="text-center mt-8">
+              <span class="text-violet font-900 text-[0.6rem] tracking-widest uppercase">Prolificidad: ${kpisRepro.indiceProlificidad}</span>
+            </div>
           </div>
           <div class="card border-top-3px border-top-3px-red p-14 bg-black-opacity-50">
-            <div class="inf-card-title mb-8 flex items-center gap-6">${Icons.sanidad()} SANIDAD</div>
-            <div class="flex justify-between text-xs text-aaa font-800 uppercase">
-              <div>Tratamientos: <strong class="text-white">${estadisticasSanidad.totalTratamientos || 0}</strong></div>
-              <div>Supresión: <strong class="text-red">${estadisticasSanidad.retencionesActivas || 0}</strong></div>
+            <div class="inf-card-title mb-10 flex items-center gap-6 justify-center">${Icons.sanidad()} SANIDAD</div>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="info-box-center py-6">
+                <small class="s-lbl">TRATAM.</small>
+                <strong class="text-white text-md font-900">${estadisticasSanidad.totalTratamientos || 0}</strong>
+              </div>
+              <div class="info-box-center py-6">
+                <small class="s-lbl">SUPRESIÓN</small>
+                <strong class="text-red text-md font-900">${estadisticasSanidad.retencionesActivas || 0}</strong>
+              </div>
             </div>
           </div>
         </div>
@@ -461,11 +475,11 @@ const InformesView = {
       })() : ''}
 
       ${lecheStats.totalLitros > 0 ? `<div class="card report-section border-top-3px border-top-3px-amber report-card">
-        <div class="inf-card-title flex items-center gap-6">${Icons.leche()} Producción Lechera</div>
-        <div class="grid grid-cols-3 gap-8 mb-10">
-          <div class="info-box-sm text-center"><div class="s-lbl">TOTAL</div><div class="inf-val-lg text-gold">${lecheStats.totalLitros.toFixed(1)}</div></div>
-          <div class="info-box-sm text-center"><div class="s-lbl">PROM/DÍA</div><div class="inf-val-lg text-amber">${lecheStats.promedioDiario.toFixed(1)}</div></div>
-          <div class="info-box-sm text-center"><div class="s-lbl">PRECIO</div><div class="inf-val-lg text-dark-gold">${lecheStats.precioMedio.toFixed(3)}€</div></div>
+        <div class="inf-card-title flex items-center gap-6 mb-12">${Icons.leche()} Producción Lechera</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-10">
+          <div class="info-box-center py-10"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-gold font-950">${lecheStats.totalLitros.toFixed(1)} L</div></div>
+          <div class="info-box-center py-10"><small class="s-lbl">PROM/DÍA</small><div class="inf-val-lg text-amber font-950">${lecheStats.promedioDiario.toFixed(1)} L</div></div>
+          <div class="info-box-center py-10"><small class="s-lbl">PRECIO</small><div class="inf-val-lg text-dark-gold font-950">${lecheStats.precioMedio.toFixed(3)}€</div></div>
         </div>
         ${lecheStats.timeline?.length > 1 ? '<div class="chart-wrap"><canvas id="chart-leche-timeline" class="chart-canvas-sm"></canvas></div>' : ''}
       </div>` : ''}
@@ -628,28 +642,28 @@ const InformesView = {
 
         ${conLab.length > 0 ? `
         <div class="card mb-14 p-12 card-tint-amber">
-          <div class="inf-section-title mb-8">${Icons.fitosanitario()} Calidad de la Leche (${conLab.length} analíticas)</div>
-          <div class="grid grid-cols-2 gap-6">
-          <div class="info-box-sm" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
-            <small class="s-lbl uppercase font-900">GRASA</small>
-            <div class="inf-val-md font-950" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${grasaMedia.toFixed(2)}%</div>
-            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≥${umbrales.grasa.min}%</small>` : ''}
-          </div>
-          <div class="info-box-sm" style="border-left:3px solid ${semaforo(protMedia, umbrales?.proteina?.min, null)};">
-            <small class="s-lbl uppercase font-900">PROTEÍNA</small>
-            <div class="inf-val-md font-950" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${protMedia.toFixed(2)}%</div>
-            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≥${umbrales.proteina.min}%</small>` : ''}
-          </div>
-          <div class="info-box-sm" style="border-left:3px solid ${semaforo(esMedia, umbrales?.extracto_seco?.min, null)};">
-            <small class="s-lbl uppercase font-900">EXTRACTO SECO</small>
-            <div class="inf-val-md font-950" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${esMedia.toFixed(2)}%</div>
-            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
-          </div>
-          <div class="info-box-sm" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
-            <small class="s-lbl uppercase font-900">CÉL. SOMÁTICAS</small>
-            <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}</div>
-            ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-700">Obj: ≤${(umbrales.somaticas.max / 1000).toFixed(0)}k</small>` : ''}
-          </div>
+          <div class="inf-section-title mb-10 text-center uppercase font-950">${Icons.fitosanitario()} Calidad de la Leche (${conLab.length} analíticas)</div>
+          <div class="grid grid-cols-2 gap-8">
+            <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
+              <small class="s-lbl uppercase font-900">GRASA</small>
+              <div class="inf-val-md font-950" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${grasaMedia.toFixed(2)}%</div>
+              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.grasa.min}%</small>` : ''}
+            </div>
+            <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(protMedia, umbrales?.proteina?.min, null)};">
+              <small class="s-lbl uppercase font-900">PROTEÍNA</small>
+              <div class="inf-val-md font-950" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${protMedia.toFixed(2)}%</div>
+              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.proteina.min}%</small>` : ''}
+            </div>
+            <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(esMedia, umbrales?.extracto_seco?.min, null)};">
+              <small class="s-lbl uppercase font-900">EXTRACTO SECO</small>
+              <div class="inf-val-md font-950" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${esMedia.toFixed(2)}%</div>
+              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
+            </div>
+            <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
+              <small class="s-lbl uppercase font-900">CÉL. SOMÁTICAS</small>
+              <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}</div>
+              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≤${(umbrales.somaticas.max / 1000).toFixed(0)}k</small>` : ''}
+            </div>
           </div>
         </div>` : ''}
 
@@ -724,11 +738,14 @@ const InformesView = {
           </div>
         </div>
         ${partos.length > 0 ? `
-        <div class="grid grid-cols-2 gap-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
           ${Object.entries(porTrimestre).filter(([_, v]) => v > 0).map(([trim, count]) => `
-            <div class="info-box-sm flex justify-between items-center">
-              <span class="text-aaa text-sm">${trim}</span>
-              <span class="font-bold text-white">${count} <span class="text-gray text-xs">(${((count / partos.length) * 100).toFixed(0)}%)</span></span>
+            <div class="info-box-center py-8">
+              <small class="s-lbl">${trim}</small>
+              <div class="flex items-center gap-6">
+                <strong class="text-white text-md font-900">${count}</strong>
+                <span class="text-gray text-[0.6rem] font-800">(${((count / partos.length) * 100).toFixed(0)}%)</span>
+              </div>
             </div>`).join('')}
         </div>` : ''}
         <div class="mt-12"><canvas id="chart-repro-kpis" class="chart-canvas"></canvas></div>
@@ -784,12 +801,12 @@ const InformesView = {
         </div>
         ${Object.keys(tratPorRebano).length > 0 ? `
         <div class="mb-12">
-          <div class="inf-section-title">Tratamientos por rebaño</div>
-          <div class="grid grid-cols-2 gap-6">
+          <div class="inf-section-title text-center uppercase font-900 mb-8">Tratamientos por rebaño</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             ${Object.entries(tratPorRebano).sort((a, b) => b[1] - a[1]).map(([nom, cnt]) => `
-              <div class="info-box-sm flex justify-between items-center">
-                <span class="text-aaa text-sm">${nom}</span>
-                <span class="font-bold text-red">${cnt}</span>
+              <div class="info-box-center py-8">
+                <small class="s-lbl">${nom}</small>
+                <strong class="text-md font-900 text-red">${cnt}</strong>
               </div>`).join('')}
           </div>
         </div>` : ''}
@@ -841,31 +858,29 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-gold report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.animales()} Censo General</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="flex items-center justify-around text-center gap-4 flex-wrap">
-            <div class="flex-1 py-8 min-w-80">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Total Censo</small>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Censo</small>
               <span class="text-xl text-blue font-950">${totalAnimales}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px; height:24px; background:#333;"></div>
-            <div class="flex-1 py-8 min-w-80">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Activos</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Activos</small>
               <span class="text-xl text-green font-950">${totalActivos}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px; height:24px; background:#333;"></div>
-            <div class="flex-1 py-8 min-w-80">
-              <small class="text-neutral block text-[0.62rem] mb-2 uppercase font-800">Vendidos</small>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Vendidos</small>
               <span class="text-xl text-red font-950">${totalVendidos}</span>
             </div>
           </div>
         </div>
 
         ${Object.keys(porEspecie).length > 0 ? `
-        <div class="inf-section-title">Por especie/tipo</div>
-        <div class="grid grid-cols-2 gap-8 mb-12">
+        <div class="inf-section-title text-center uppercase font-900 mb-8">Por especie/tipo</div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
           ${Object.entries(porEspecie).map(([esp, count]) => `
-            <div class="info-box-sm flex justify-between">
-              <span class="inf-small text-aaa">${esp}</span>
-              <span class="inf-val-md text-white">${count}</span>
+            <div class="info-box-center py-8">
+              <small class="s-lbl">${esp}</small>
+              <strong class="text-xl text-white font-950">${count}</strong>
             </div>`).join('')}
         </div>` : ''}
 
@@ -874,12 +889,15 @@ const InformesView = {
           animales.forEach(a => { const cat = a.categoria || 'Sin categoría'; porCategoria[cat] = (porCategoria[cat] || 0) + 1; });
           const totalCats = Object.keys(porCategoria).length;
           return totalCats > 0 ? `
-        <div class="inf-section-title">Por categoría productiva</div>
-        <div class="grid grid-cols-2 gap-6 mb-12">
+        <div class="inf-section-title text-center uppercase font-900 mb-8">Por categoría productiva</div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
           ${Object.entries(porCategoria).map(([cat, cnt]) => `
-            <div class="info-box-sm flex justify-between items-center">
-              <span class="inf-small text-aaa">${cat}</span>
-              <div class="text-right"><span class="font-bold text-white">${cnt}</span><span class="text-gray text-xs ml-4">(${((cnt / animales.length) * 100).toFixed(1)}%)</span></div>
+            <div class="info-box-center py-8">
+              <small class="s-lbl">${cat}</small>
+              <div class="flex flex-col items-center">
+                <strong class="text-xl text-white font-950">${cnt}</strong>
+                <span class="text-gray text-[0.6rem] font-800 uppercase tracking-wider">${((cnt / animales.length) * 100).toFixed(1)}%</span>
+              </div>
             </div>`).join('')}
         </div>` : '';
         })() : ''}
@@ -2023,52 +2041,45 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title">${Icons.rotacion()} Rotación de Censo (${data.periodo})</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Censo Total</small>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Censo Total</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalAnimales}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Activos</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Activos</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${data.activos}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Entrada Neta</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Entrada Neta</small>
               <span class="font-950 ${(u90.entradaNeta||0)>=0?'text-green':'text-red'}" style="font-size:1.1rem;">${(u90.entradaNeta||0)>=0?'+':''}${u90.entradaNeta||0}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Reposición</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Reposición</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${data.tasaReposicion}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Bajas</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Bajas</small>
               <span class="font-950 text-red" style="font-size:1.1rem;">${data.tasaBajas}</span>
             </div>
           </div>
         </div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Nacimientos</small>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Nacimientos</small>
               <span class="font-950 text-green" style="font-size:1rem;">${u90.nacimientos || 0}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Compras</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Compras</small>
               <span class="font-950 text-blue" style="font-size:1rem;">${u90.compras || 0}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Ventas</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ventas</small>
               <span class="font-950 text-red" style="font-size:1rem;">${u90.ventas || 0}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Bajas</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Bajas</small>
               <span class="font-950 text-gray" style="font-size:1rem;">${u90.bajas || 0}</span>
             </div>
           </div>
@@ -2173,34 +2184,31 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Curva de Producción</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Kg Total</small>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Kg Total</small>
               <span class="font-950 text-amber" style="font-size:1.1rem;">${data.totalKg.toFixed(1)}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Litros Total</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Litros Total</small>
               <span class="font-950 text-gold" style="font-size:1.1rem;">${data.totalLitros.toFixed(1)}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Meta Kg</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta Kg</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${Math.round(data.metaKg)}</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Meta L</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta L</small>
               <span class="font-950 text-blue" style="font-size:1.1rem;">${Math.round(data.metaLitros)}</span>
             </div>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-8 mb-14">
-          <div class="info-box border-left-${parseFloat(data.pctCumplimientoKg) >= 100 ? 'green' : 'amber'}">
+          <div class="info-box-center border-left-${parseFloat(data.pctCumplimientoKg) >= 100 ? 'green' : 'amber'} py-10">
             <small class="s-lbl">CUMPLIMIENTO CARNE</small>
             <div class="inf-val-lg ${parseFloat(data.pctCumplimientoKg) >= 100 ? 'text-green' : 'text-amber'}">${data.pctCumplimientoKg}%</div>
           </div>
-          <div class="info-box border-left-${parseFloat(data.pctCumplimientoLitros) >= 100 ? 'green' : 'amber'}">
+          <div class="info-box-center border-left-${parseFloat(data.pctCumplimientoLitros) >= 100 ? 'green' : 'amber'} py-10">
             <small class="s-lbl">CUMPLIMIENTO LECHE</small>
             <div class="inf-val-lg ${parseFloat(data.pctCumplimientoLitros) >= 100 ? 'text-green' : 'text-amber'}">${data.pctCumplimientoLitros}%</div>
           </div>
@@ -2231,19 +2239,17 @@ const InformesView = {
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Análisis de Punto Muerto (Break-Even)</div>
         <div class="card p-12 mb-14 border-222" style="background:rgba(239,68,68,0.02);">
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 text-center">
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Costes Fijos</small>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Fijos</small>
               <span class="font-950 text-red" style="font-size:1.1rem; word-break:break-all;">${data.costesFijos.toLocaleString()}€</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Costes Variables</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Variables</small>
               <span class="font-950 text-amber" style="font-size:1.1rem; word-break:break-all;">${data.costesVariables.toLocaleString()}€</span>
             </div>
-            <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
-            <div class="py-6">
-              <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Ingresos</small>
+            <div class="info-box-center py-6">
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
               <span class="font-950 text-green" style="font-size:1.1rem; word-break:break-all;">${data.ingresosTotal.toLocaleString()}€</span>
             </div>
           </div>
@@ -2310,16 +2316,14 @@ const InformesView = {
           </div>
         </div>
         ${data.porAnio.length > 0 ? `
-        <div class="inf-section-title uppercase font-900">Resumen por año</div>
-        <div class="grid grid-cols-1 gap-6 mb-14">
+        <div class="inf-section-title text-center uppercase font-900 mb-8">Resumen por año</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-14">
           ${data.porAnio.map(a => `
-            <div class="info-box-sm flex justify-between items-center bg-black border border-222 p-12">
-              <span class="font-950 text-white text-md uppercase">${a.anio}</span>
-              <span class="text-gray-500 text-[0.6rem] uppercase font-800 tracking-wider">${a.num} AYUDAS</span>
-              <div class="text-right">
-                <span class="text-green font-950 text-md">${a.cobrado.toLocaleString()}€</span>
-                <span class="text-gray-700 mx-4">/</span>
-                <span class="text-amber font-900">${a.solicitado.toLocaleString()}€</span>
+            <div class="info-box-center py-10 bg-black border border-222">
+              <small class="s-lbl text-amber">${a.anio}</small>
+              <div class="flex flex-col items-center gap-4">
+                <div class="text-xl font-950 text-green">${a.cobrado.toLocaleString()}€ <span class="text-gray-700 text-xs mx-4">/</span> <span class="text-amber font-900 text-lg">${a.solicitado.toLocaleString()}€</span></div>
+                <span class="text-gray-500 text-[0.6rem] uppercase font-900 tracking-widest">${a.num} AYUDAS REGISTRADAS</span>
               </div>
             </div>`).join('')}
         </div>` : ''}
