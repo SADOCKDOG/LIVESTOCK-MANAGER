@@ -48,18 +48,18 @@ const ProveedoresView = {
             kpisEl.innerHTML = `
               <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
                 <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
-                <div class="grid grid-cols-3 gap-6">
-                  <div class="bg-black rounded-lg p-8 text-center border border-222">
-                    <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">PROVEEDORES</div>
-                    <div class="text-xl font-black" style="color:var(--c-accent);">${proveedores.length}</div>
+                <div class="flex flex-col">
+                  <div class="py-8 flex justify-between items-center border-bottom-222">
+                    <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.proveedores()} Proveedores</span>
+                    <strong class="text-xl font-950" style="color:var(--c-accent);">${proveedores.length}</strong>
                   </div>
-                  <div class="bg-black rounded-lg p-8 text-center border border-222">
-                    <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">GASTO ASIG.</div>
-                    <div class="text-xl font-black" style="color:var(--c-warning);">${totalGasto.toLocaleString()}€</div>
+                  <div class="py-8 flex justify-between items-center border-bottom-222">
+                    <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Gasto Asignado</span>
+                    <strong class="text-xl font-950" style="color:var(--c-warning);">${totalGasto.toLocaleString()}€</strong>
                   </div>
-                  <div class="bg-black rounded-lg p-8 text-center border border-222">
-                    <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">REGISTROS</div>
-                    <div class="text-xl font-black" style="color:var(--c-info);">${gastosConProveedor.length}</div>
+                  <div class="py-8 flex justify-between items-center">
+                    <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Registros</span>
+                    <strong class="text-xl font-950" style="color:var(--c-info);">${gastosConProveedor.length}</strong>
                   </div>
                 </div>
               </div>`;
