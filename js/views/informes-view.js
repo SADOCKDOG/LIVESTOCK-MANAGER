@@ -312,7 +312,7 @@ const InformesView = {
       }
     } catch (e) {
       console.error('[InformesView] Error en render:', e);
-      content.innerHTML = `<div class="card empty-state"><p class="text-red text-base">❌ Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
+      content.innerHTML = `<div class="card empty-state"><p class="text-red text-base">${Icons.cerrar()} Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
     }
 
     // Animación de entrada suave
@@ -548,7 +548,7 @@ const InformesView = {
         <div class="grid grid-cols-1 gap-6 mb-10">
           ${ventasPorRebano.map(r => `
             <div class="info-box-sm flex justify-between items-center">
-              <span class="text-aaa text-sm">🐑 ${r.rebano}</span>
+              <span class="text-aaa text-sm">${Icons.rebanos()} ${r.rebano}</span>
               <div class="text-right">
                 <span class="text-amber font-800">${r.total.toLocaleString()}€</span>
                 <span class="text-gray text-xs ml-6">${r.kg.toFixed(1)} kg</span>
@@ -572,7 +572,7 @@ const InformesView = {
     const { lecheStats, lechePorRebano, _cachedLeche } = d;
     const rawLeche = _cachedLeche || [];
     if (!lecheStats || lecheStats.totalLitros === 0) {
-      content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🥛</div><p class="empty-state-text">No hay datos de producción lechera registrados.</p></div>`;
+      content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.leche()}</div><p class="empty-state-text">No hay datos de producción lechera registrados.</p></div>`;
       return;
     }
     // Calcular métricas de calidad desde los datos crudos
@@ -937,7 +937,7 @@ const InformesView = {
           </div>
         </div>
 
-        ${ventas.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📭</div><p class="empty-state-text">No hay ventas registradas</p></div>' : `
+        ${ventas.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.exportacion()}</div><p class="empty-state-text">No hay ventas registradas</p></div>' : `
         <div class="table-scroll scroll-shadow-container mt-10">
           <table class="inf-table tbl-accent-blue">
             <thead>
@@ -974,7 +974,7 @@ const InformesView = {
                   <td class="text-right text-blue">${(v.importe_iva || 0).toFixed(2)}€</td>
                   <td class="text-right text-red">${irpf.toFixed(2)}€</td>
                   <td class="text-right font-bold text-green">${neto.toFixed(2)}€</td>
-                  <td class="text-center">${tieneDimoe ? '✅ DIMOE' : '✅ SIGGAN'}</td>
+                  <td class="text-center">${tieneDimoe ? '${Icons.check()} DIMOE' : '${Icons.check()} SIGGAN'}</td>
                 </tr>`;
               }).join('')}
             </tbody>
@@ -1074,7 +1074,7 @@ const InformesView = {
           </div>
         </div>` : ''}
 
-        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🏢</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>' : `
+        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.edificio()}</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>' : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-blue">
             <thead><tr>
@@ -1194,7 +1194,7 @@ const InformesView = {
           </div>
         </div>` : ''}
 
-        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📦</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>' : `
+        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>' : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-amber">
             <thead><tr>
@@ -1298,10 +1298,10 @@ const InformesView = {
 
         ${data.zonas.length > 0 ? `
         <div class="flex flex-wrap gap-6 mb-14">
-          ${data.zonas.map(z => `<span class="badge badge-green text-2xs">🌱 ${z}</span>`).join('')}
+          ${data.zonas.map(z => `<span class="badge badge-green text-2xs">${Icons.fitosanitario()} ${z}</span>`).join('')}
         </div>` : ''}
 
-        ${data.registros.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">🧪</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>' : `
+        ${data.registros.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.fitosanitario()}</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>' : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-green">
             <thead><tr>
@@ -1351,12 +1351,12 @@ const InformesView = {
               </div>
               <div style="width:1px;height:22px;background:#2a2a2a;"></div>
               <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">🔴 Críticas</small>
+                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">${Icons.alerta()} Críticas</small>
                 <span class="font-950 text-red" style="font-size:1.2rem;">${rojas}</span>
               </div>
               <div style="width:1px;height:22px;background:#2a2a2a;"></div>
               <div class="flex-1 py-6">
-                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">🟡 Avisos</small>
+                <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">${Icons.alerta()} Avisos</small>
                 <span class="font-950 text-amber" style="font-size:1.2rem;">${totalAlertas - rojas}</span>
               </div>
             </div>
@@ -1717,7 +1717,7 @@ const InformesView = {
         <!-- Movimientos recientes -->
         <div class="card report-section border-top-3px border-top-3px-purple report-card">
           <div class="inf-card-title">${Icons.paquete()} Últimos Movimientos</div>
-          ${eventosRecientes.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📦</div><p class="empty-state-text">Sin movimientos registrados</p></div>' : `
+          ${eventosRecientes.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>' : `
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr>
@@ -1809,13 +1809,13 @@ const InformesView = {
             </thead>
             <tbody>
               <tr>
-                <td style="width:24px;">🥛</td>
+                <td style="width:24px;">${Icons.leche()}</td>
                 <td><strong>Ingresos por Venta de Leche (Entregas Lácteas)</strong></td>
                 <td class="text-right text-green">${ingLeche.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingLeche / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
-                <td>🥩</td>
+                <td>${Icons.carne()}</td>
                 <td><strong>Ingresos por Venta de Ganado (Canal / Vivo)</strong></td>
                 <td class="text-right text-green">${ingCarne.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingCarne / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
@@ -1836,37 +1836,37 @@ const InformesView = {
             </thead>
             <tbody>
               <tr>
-                <td>🌾</td>
+                <td>${Icons.pac()}</td>
                 <td>Gastos en Alimentación (Piensos, Forrajes, Ración)</td>
                 <td class="text-right text-red">${gastosAlim.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAlim / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
-                <td>🧪</td>
+                <td>${Icons.fitosanitario()}</td>
                 <td>Gastos Fitosanitarios (Tratamientos parcelas, herbicidas)</td>
                 <td class="text-right text-red">${gastosFito.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosFito / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
-                <td>💉</td>
+                <td>${Icons.sanidad()}</td>
                 <td>Gastos de Sanidad Ganadera (Medicamentos, ADSG, vacunas)</td>
                 <td class="text-right text-red">${gastosSanidad.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosSanidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
-                <td>⚡</td>
+                <td>${Icons.rayo()}</td>
                 <td>Gastos en Electricidad y Suministros (Energía, Gasoil)</td>
                 <td class="text-right text-red">${gastosElectricidad.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosElectricidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
-                <td>👷</td>
+                <td>${Icons.finca()}</td>
                 <td>Gastos de Personal (Mano de obra, seguridad social)</td>
                 <td class="text-right text-red">${gastosPersonal.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosPersonal / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
               </tr>
               <tr>
-                <td>🏗️</td>
+                <td>${Icons.edificio()}</td>
                 <td>Amortizaciones (Instalaciones, maquinaria, cercados)</td>
                 <td class="text-right text-red">${gastosAmort.toLocaleString()}€</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAmort / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
@@ -2022,7 +2022,7 @@ const InformesView = {
           </div>
         </div>
         ${data.numAlertas > 0 ? `<div class="card card-tint-red mb-14 p-12">
-          <div class="flex items-center gap-8"><span class="text-xl">🚨</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
+          <div class="flex items-center gap-8"><span class="text-xl">${Icons.alerta()}</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
         </div>` : ''}
         ${data.porZona.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
@@ -2288,7 +2288,7 @@ const InformesView = {
         </div>
         <div class="grid grid-cols-2 gap-10 mb-14">
           <div class="card p-14 card-tint-green">
-            <div class="inf-card-title mb-6 text-base">🥩 Carne</div>
+            <div class="inf-card-title mb-6 text-base">${Icons.carne()} Carne</div>
             <div class="grid grid-cols-2 gap-6">
               <div><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber">${data.precioMedioKg.toFixed(2)}€</div></div>
               <div><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red">${data.costeVarKg.toFixed(2)}€</div></div>
@@ -3840,49 +3840,49 @@ const InformesView = {
 
     content.innerHTML = `
     <div class="mb-20">
-      <h3 class="text-gold mb-6">📤 Exportación Oficial</h3>
+      <h3 class="text-gold mb-6">${Icons.exportar()} Exportación Oficial</h3>
       <p class="text-gray text-sm">Genera ficheros compatibles con REGA, SIA/PIGGAN y plataformas autonómicas.</p>
     </div>
     <div class="grid gap-15">
       <div class="card card-left-amber">
         <div class="flex justify-between items-center">
           <div>
-            <h4 class="text-white mb-4">📋 REGA — Censo y Explotación</h4>
+            <h4 class="text-white mb-4">${Icons.informeRega()} REGA — Censo y Explotación</h4>
             <p class="text-gray text-xs m-0">CSV del censo actual + XML estructurado con datos de la explotación. Compatible con SIGGAN/BADIGEX.</p>
           </div>
-          <button class="btn btn-primary btn-download btn--amber" onclick="InformesView._exportREGA()">⬇ Descargar</button>
+          <button class="btn btn-primary btn-download btn--amber" onclick="InformesView._exportREGA()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
       <div class="card card-left-blue">
         <div class="flex justify-between items-center">
           <div>
-            <h4 class="text-white mb-4">🔄 SIA/PIGGAN — Movimientos</h4>
+            <h4 class="text-white mb-4">${Icons.rotacion()} SIA/PIGGAN — Movimientos</h4>
             <p class="text-gray text-xs m-0">CSV de altas, bajas y expediciones. Incluye crotal, especie, motivo y destino/origen.</p>
           </div>
-          <button class="btn btn-primary btn-download btn--blue" onclick="InformesView._exportMovimientos()">⬇ Descargar</button>
+          <button class="btn btn-primary btn-download btn--blue" onclick="InformesView._exportMovimientos()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
       <div class="card card-left-green">
         <div class="flex justify-between items-center">
           <div>
-            <h4 class="text-white mb-4">📊 PIGGAN — Producción</h4>
+            <h4 class="text-white mb-4">${Icons.grafico()} PIGGAN — Producción</h4>
             <p class="text-gray text-xs m-0">CSV de producción láctea (litros, calidad) y cárnica (peso canal, precio).</p>
           </div>
-          <button class="btn btn-primary btn-download btn--green-dk" onclick="InformesView._exportProduccion()">⬇ Descargar</button>
+          <button class="btn btn-primary btn-download btn--green-dk" onclick="InformesView._exportProduccion()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
       <div class="card card-left-purple card-tint-violet">
         <div class="flex justify-between items-center">
           <div>
-            <h4 class="text-white mb-4">📦 Exportación Completa</h4>
+            <h4 class="text-white mb-4">${Icons.paquete()} Exportación Completa</h4>
             <p class="text-gray text-xs m-0">Descarga todos los ficheros: REGA (CSV+XML), movimientos SIA y producción PIGGAN.</p>
           </div>
-          <button class="btn btn-primary btn-download btn--purple" onclick="InformesView._exportCompleto()">⬇ Todo</button>
+          <button class="btn btn-primary btn-download btn--purple" onclick="InformesView._exportCompleto()">${Icons.exportar()} Todo</button>
         </div>
       </div>
     </div>
     <div class="inf-export-note">
-      <strong class="text-gold">ℹ️ Formatos:</strong> CSV (Excel/LibreOffice, UTF-8 BOM) y XML (SIGGAN/BADIGEX). Los nombres incluyen REGA + fecha.
+      <strong class="text-gold">${Icons.info()} Formatos:</strong> CSV (Excel/LibreOffice, UTF-8 BOM) y XML (SIGGAN/BADIGEX). Los nombres incluyen REGA + fecha.
     </div>`;
   },
 
@@ -3948,7 +3948,7 @@ const InformesView = {
   _renderValidacionModal({ titulo, reporte, onConfirm }) {
     const bloqueante = !reporte.valido;
     const accent = bloqueante ? '#ef4444' : '#f59e0b';
-    const icon = bloqueante ? '⛔' : '⚠️';
+    const icon = bloqueante ? Icons.cerrar() : Icons.alerta();
 
     const erroresHtml = reporte.errores.length ? `
       <div class="mb-16">
@@ -3987,7 +3987,7 @@ const InformesView = {
       <button class="modal-val-btn" onclick="ModalManager.close('modal-validacion-export')">Entendido</button>
     ` : `
       <button class="modal-val-btn" onclick="ModalManager.close('modal-validacion-export')">Cancelar</button>
-      <button class="modal-val-btn modal-val-btn--accent" style="--val-accent:${accent}" onclick="InformesView._confirmExport()">⬇ Descargar igualmente</button>
+      <button class="modal-val-btn modal-val-btn--accent" style="--val-accent:${accent}" onclick="InformesView._confirmExport()">${Icons.exportar()} Descargar igualmente</button>
     `;
 
     InformesView._pendingExport = onConfirm || null;
