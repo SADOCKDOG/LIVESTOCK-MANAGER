@@ -1,6 +1,6 @@
 /**
- * Livestock Manager - Application Controller v4.8.5
- * UI validada v4.8.5 + flujo Industrial Animals v4.8.5 integrado correctamente
+ * Livestock Manager - Application Controller v4.8.6
+ * UI validada v4.8.6 + flujo Industrial Animals v4.8.6 integrado correctamente
  * Fix: rebanoId preservado en _guardarAnimalDetalle (bug invisible en lista)
  */
 
@@ -1599,26 +1599,10 @@ const App = {
 
   async renderGanaderia() {
     if (window.GanaderiaView) { await GanaderiaView.render(); }
-    if (!window._wizard_auto_opened) {
-      window._wizard_auto_opened = true;
-      setTimeout(async () => {
-        if (window.App && typeof App._abrirSelectorAnimales === 'function') {
-          await App._abrirSelectorAnimales(1);
-        }
-      }, 1000);
-    }
   },
 
   async renderRebanos() {
     if (window.RebanosView) { await RebanosView.render(); }
-    if (!window._wizard_auto_opened_rebanos) {
-      window._wizard_auto_opened_rebanos = true;
-      setTimeout(async () => {
-        if (window.App && typeof App._abrirSelectorAnimales === 'function') {
-          await App._abrirSelectorAnimales(1);
-        }
-      }, 1000);
-    }
   },
 
   async renderDetalleRebano(params) {
