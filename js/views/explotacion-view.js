@@ -265,19 +265,28 @@ const ExplotacionView = {
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
-        <!-- KPIs -->
-        <div class="explotacion-kpis">
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Pesajes Totales</div>
-            <div class="explotacion-kpi-value">${d.pesajes.length}</div>
+        <!-- KPI Unificado de Rendimiento y Eficiencia -->
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444; background: rgba(239, 68, 68, 0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+            ${Icons.tendencia()} BALANCE DE RENDIMIENTO Y EFICIENCIA DE CARNE
           </div>
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">GMD Medio</div>
-            <div class="explotacion-kpi-value">${d.gmdMedio.toFixed(2)} kg/d</div>
-          </div>
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Coste Ración</div>
-            <div class="explotacion-kpi-value" style="color:${themeColor}">${d.totalGastosAlim.toLocaleString()} €</div>
+          <div class="grid grid-cols-2 gap-15">
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Ganancia Media Diaria (GMD)</div>
+              <div class="font-950 text-white text-base">+${d.gmdMedio.toFixed(2)} kg/d</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Coste Ración / Alimentación</div>
+              <div class="font-950 text-red text-base">${d.totalGastosAlim.toLocaleString()} €</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Pesajes Totales</div>
+              <div class="font-950 text-white text-base">${d.pesajes.length} registros</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Animales Activos en Censo</div>
+              <div class="font-950 text-white text-base">${d.animalesFinca.length} cabezas</div>
+            </div>
           </div>
         </div>
 
@@ -346,19 +355,28 @@ const ExplotacionView = {
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
-        <!-- KPIs -->
-        <div class="explotacion-kpis">
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Total Litros</div>
-            <div class="explotacion-kpi-value">${this._fmt(d.totalLitros)} L</div>
+        <!-- KPI Unificado de Rendimiento y Eficiencia -->
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #3b82f6; background: rgba(59, 130, 246, 0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+            ${Icons.leche()} BALANCE DE RENDIMIENTO Y EFICIENCIA DE LECHE
           </div>
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Ext. Seco Medio</div>
-            <div class="explotacion-kpi-value">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</div>
-          </div>
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">MOFA Aliment.</div>
-            <div class="explotacion-kpi-value" style="color:${d.mofaLeche >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaLeche).toLocaleString()} €</div>
+          <div class="grid grid-cols-2 gap-15">
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Margen Alimentación (MOFA)</div>
+              <div class="font-950 text-base" style="color:${d.mofaLeche >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaLeche).toLocaleString()} €</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Total Leche Producida</div>
+              <div class="font-950 text-white text-base">${this._fmt(d.totalLitros)} Litros</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Extracto Seco Medio</div>
+              <div class="font-950 text-white text-base">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Coste Ración / Alimentación</div>
+              <div class="font-950 text-red text-base">${d.totalGastosAlim.toLocaleString()} €</div>
+            </div>
           </div>
         </div>
 
@@ -465,19 +483,28 @@ const ExplotacionView = {
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
-        <!-- KPIs Consolidados -->
-        <div class="explotacion-kpis">
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Margen Global</div>
-            <div class="explotacion-kpi-value" style="color:${d.mofaHibrido >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaHibrido).toLocaleString()} €</div>
+        <!-- KPI Unificado de Rendimiento y Eficiencia -->
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #10b981; background: rgba(16, 185, 129, 0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+            ${Icons.rotacion()} BALANCE DE RENDIMIENTO Y EFICIENCIA HÍBRIDA
           </div>
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Ratio MOFA</div>
-            <div class="explotacion-kpi-value">${d.ratioMofaHibrido.toFixed(1)}%</div>
-          </div>
-          <div class="explotacion-kpi-card">
-            <div class="explotacion-kpi-label">Coste Aliment.</div>
-            <div class="explotacion-kpi-value text-red">${d.totalGastosAlim.toLocaleString()} €</div>
+          <div class="grid grid-cols-2 gap-15">
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Margen Global (MOFA)</div>
+              <div class="font-950 text-base" style="color:${d.mofaHibrido >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaHibrido).toLocaleString()} €</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Eficiencia (Ratio MOFA)</div>
+              <div class="font-950 text-white text-base">${d.ratioMofaHibrido.toFixed(1)}%</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Coste Alimentación</div>
+              <div class="font-950 text-red text-base">${d.totalGastosAlim.toLocaleString()} €</div>
+            </div>
+            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
+              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Leche / Pesajes Totales</div>
+              <div class="font-950 text-white text-xs" style="margin-top:2px;">${this._fmt(d.totalLitros)} L / ${d.pesajes.length} pesajes</div>
+            </div>
           </div>
         </div>
 
