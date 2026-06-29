@@ -1102,18 +1102,23 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: #ef4444; --neon-glow: #ef4444B0; --neon-inner: #ef444440">
         <!-- KPIs GASTOS -->
-        <div class="explotacion-kpis">
-          <div class="explotacion-kpi-card" style="border-left:3px solid #f59e0b;">
-            <div class="explotacion-kpi-label">Alimentación</div>
-            <div class="explotacion-kpi-value">${(d.totalGastosAlim || 0).toLocaleString()} €</div>
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444; width:100%;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+            ${Icons.dinero()} BALANCE DE COSTES
           </div>
-          <div class="explotacion-kpi-card" style="border-left:3px solid #3b82f6;">
-            <div class="explotacion-kpi-label">Energía</div>
-            <div class="explotacion-kpi-value">${(d.totalGastosEnergia || 0).toLocaleString()} €</div>
-          </div>
-          <div class="explotacion-kpi-card" style="border-left:3px solid #10b981;">
-            <div class="explotacion-kpi-label">Fitosanitarios</div>
-            <div class="explotacion-kpi-value">${(d.totalGastosFito || 0).toLocaleString()} €</div>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Alimentación</span>
+              <strong class="text-xl font-950" style="color:var(--c-warning);">${(d.totalGastosAlim || 0).toLocaleString()} €</strong>
+            </div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rayo()} Energía</span>
+              <strong class="text-xl font-950" style="color:var(--c-info);">${(d.totalGastosEnergia || 0).toLocaleString()} €</strong>
+            </div>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.sanidad()} Fitosanitarios</span>
+              <strong class="text-xl font-950" style="color:var(--c-success);">${(d.totalGastosFito || 0).toLocaleString()} €</strong>
+            </div>
           </div>
         </div>
 
