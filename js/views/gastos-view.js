@@ -9,15 +9,15 @@ const GastosView = {
   _currentTab: 'todos',
   _cachedData: null,
 
-  // Definición de categorías contables con iconos y colores
+  // Definición de categorías contables con iconos SVG y colores
   _CATEGORIAS: [
-    { key: 'todos',        icon: '📋', label: 'Todos',          color: '#8b5cf6', colorDark: '#6d28d9' },
-    { key: 'Alimentacion', icon: '🌾', label: 'Alimentación',   color: '#f59e0b', colorDark: '#b45309' },
-    { key: 'Sanidad',      icon: '💉', label: 'Sanidad',        color: '#ef4444', colorDark: '#b91c1c' },
-    { key: 'Fitosanitarios', icon: '🌱', label: 'Fitosanitarios', color: '#10b981', colorDark: '#047857' },
-    { key: 'Electricidad', icon: '⚡', label: 'Electricidad',   color: '#3b82f6', colorDark: '#1d4ed8' },
-    { key: 'Personal',     icon: '👷', label: 'Personal',       color: '#f97316', colorDark: '#c2410c' },
-    { key: 'Amortizacion', icon: '🚜', label: 'Amortización',   color: '#a855f7', colorDark: '#7e22ce' },
+    { key: 'todos',        icon: Icons.documento(), label: 'Todos',          color: '#8b5cf6', colorDark: '#6d28d9' },
+    { key: 'Alimentacion', icon: Icons.paquete(),   label: 'Alimentación',   color: '#f59e0b', colorDark: '#b45309' },
+    { key: 'Sanidad',      icon: Icons.sanidad(),   label: 'Sanidad',        color: '#ef4444', colorDark: '#b91c1c' },
+    { key: 'Fitosanitarios', icon: Icons.sanidad(), label: 'Fitosanitarios', color: '#10b981', colorDark: '#047857' },
+    { key: 'Electricidad', icon: Icons.info(),      label: 'Electricidad',   color: '#3b82f6', colorDark: '#1d4ed8' },
+    { key: 'Personal',     icon: Icons.compradores(), label: 'Personal',      color: '#f97316', colorDark: '#c2410c' },
+    { key: 'Amortizacion', icon: Icons.transportistas(), label: 'Amortización', color: '#a855f7', colorDark: '#7e22ce' },
   ],
 
   async render() {
@@ -119,7 +119,7 @@ const GastosView = {
       listName: 'Lista de Gastos',
       registrarHandler: "App._abrirFormularioGasto()",
       records: data.records.slice(0, 50).map(g => ({
-        title: '🧾 ' + (g.concepto || g.categoria || 'Gasto'),
+        title: (g.concepto || g.categoria || 'Gasto'),
         date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
         zone: g.snap_zona || '',
         categoria: g.categoria || '',
@@ -139,15 +139,21 @@ const GastosView = {
              style="border-left:4px solid ${color}; padding:12px 14px; cursor:pointer; background:rgba(0,0,0,0.3);">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
-              <div class="text-white font-800 nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${r.title}</div>
-              <div class="text-gray" style="font-size:0.72rem; margin-top:3px;">📅 ${r.date}${r.zone ? ' | 📍 ' + r.zone : ''}${r.categoria ? ' | 🏷️ ' + r.categoria : ''}</div>
+              <div class="text-white font-900 uppercase tracking-tight nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${Icons.documento()} ${r.title}</div>
+              <div class="text-gray uppercase font-800" style="font-size:0.6rem; margin-top:5px; letter-spacing:0.5px;">
+                <span class="flex items-center gap-4">
+                  ${Icons.calendar()} ${r.date}
+                  ${r.zone ? ' | ' + Icons.zonas() + ' ' + r.zone : ''}
+                  ${r.categoria ? ' | ' + Icons.paquete() + ' ' + r.categoria.toUpperCase() : ''}
+                </span>
+              </div>
             </div>
             <div class="text-right flex-shrink-0 ml-8">
-              <div class="font-900" style="font-size:1rem; color:${color};">${r.value}</div>
+              <div class="font-950" style="font-size:1.1rem; color:${color};">${r.value}</div>
             </div>
           </div>
         </div>`).join('')
-      : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
+      : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
       <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">

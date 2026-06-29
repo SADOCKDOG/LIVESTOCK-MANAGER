@@ -66,6 +66,18 @@ const ModoContextoHelper = {
     try {
       localStorage.setItem(`lm.modo.${blockKey}`, mode);
     } catch (_) {}
+  },
+
+  getEspecieColor(especie) {
+    if (!especie) return '#6b7280'; // Gray
+    const e = especie.toLowerCase();
+    if (e.includes('vaca') || e.includes('bovin')) return '#ef4444'; // Red
+    if (e.includes('oveja') || e.includes('ovin')) return '#3b82f6'; // Blue
+    if (e.includes('cabra') || e.includes('caprin')) return '#a855f7'; // Purple
+    if (e.includes('cerdo') || e.includes('porcin')) return '#10b981'; // Green
+    if (e.includes('equin') || e.includes('caball')) return '#f59e0b'; // Orange
+    if (e.includes('avicol') || e.includes('ave')) return '#fbbf24'; // Amber
+    return '#6b7280'; // Default
   }
 };
 

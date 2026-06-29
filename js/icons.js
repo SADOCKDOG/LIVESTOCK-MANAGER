@@ -196,6 +196,11 @@ const Icons = {
       '<polyline points="9 18 15 12 9 6"/>'
     );
   },
+  flechaDerecha() {
+    return this._svg(
+      '<polyline points="9 18 15 12 9 6"/>'
+    );
+  },
   check() {
     return this._svg('<polyline points="20 6 9 17 4 12"/>');
   },

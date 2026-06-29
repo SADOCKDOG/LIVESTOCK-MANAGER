@@ -349,6 +349,16 @@ const InformesView = {
             <div class="inf-val-lg text-gold">${(rent?.detalles?.leche || 0).toLocaleString()}€</div>
           </div>
         </div>
+        <div class="grid grid-cols-2 gap-10 mb-10">
+          <div class="info-box border-left-blue">
+            <small class="s-lbl">ALIM. ESTIMADA</small>
+            <div class="inf-val-md text-white">${(rent?.detalles?.alimentacion_estimada || 0).toLocaleString()}€</div>
+          </div>
+          <div class="info-box border-left-gray">
+            <small class="s-lbl">OTROS GASTOS</small>
+            <div class="inf-val-md text-white">${(rent?.detalles?.otros_gastos || 0).toLocaleString()}€</div>
+          </div>
+        </div>
         <div class="info-box border-left-green">
           <div class="flex justify-between">
             <div><small class="s-lbl">BALANCE NETO</small><div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>

@@ -15,7 +15,7 @@ const ProduccionView = {
     main.innerHTML = `
       <div class="mb-14">
         <div class="tabs-scroll prod-tabs scroll-shadow-container">
-          <button class="prod-tab active" data-tab="carne" onclick="ProduccionView._cambiarTab('carne')">⚖️ Cárnica</button>
+          <button class="prod-tab active" data-tab="carne" onclick="ProduccionView._cambiarTab('carne')">${Icons.carne()} Cárnica</button>
           <button class="prod-tab" data-tab="leche" onclick="ProduccionView._cambiarTab('leche')">${Icons.leche()} Láctea</button>
         </div>
       </div>
@@ -108,24 +108,24 @@ const ProduccionView = {
         <div class="card card-animal" onclick="${r.onclick || ''}" style="border-left:4px solid ${borderCls};">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-6">
-                <span class="text-xl">${icon}</span>
-                <h3 class="section-h3 m-0 text-ellipsis">${r.title}</h3>
+              <div class="flex items-center gap-8">
+                <span class="text-xl" style="color:${borderCls}">${icon}</span>
+                <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${r.title}</h3>
               </div>
-              <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                <span>📅 ${r.date}</span>
-                ${r.zone ? `<span>·</span><span>📍 ${r.zone}</span>` : ''}
-                ${r.meta ? `<span>·</span><span>📋 ${r.meta}</span>` : ''}
+              <div class="flex flex-wrap gap-x-12 gap-y-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
+                <span class="flex items-center gap-4">${Icons.calendar()} ${r.date}</span>
+                ${r.zone ? `<span class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</span>` : ''}
+                ${r.meta ? `<span class="flex items-center gap-4">${Icons.documento()} ${r.meta}</span>` : ''}
               </div>
             </div>
             <div class="text-right flex-shrink-0 ml-8">
-              <span class="badge badge-sm" style="background:${borderCls}20;color:${borderCls};border:1px solid ${borderCls}40;display:block;margin-bottom:4px;">${r.value}</span>
-              <span class="text-xs text-777">Ver ➔</span>
+              <span class="badge badge-sm font-950 tracking-tighter" style="background:${borderCls}20;color:${borderCls};border:1px solid ${borderCls}40;display:block;margin-bottom:6px; font-size: 0.9rem;">${r.value}</span>
+              <span class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">Ver detalle ➔</span>
             </div>
           </div>
         </div>`;
       }).join('')
-      : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 ${emptyMsg}</span></div>`;
+      : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
       <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
@@ -163,7 +163,7 @@ const ProduccionView = {
 
   _renderCarne(content, d) {
     this._renderSeccion(content, {
-      icon: '⚖️', title: 'Producción Cárnica (kg)', subtitle: 'Pesajes individuales y por lote',
+      icon: Icons.carne(), title: 'Producción Cárnica (kg)', subtitle: 'Pesajes individuales y por lote',
       color: '#ef4444', colorDark: '#b91c1c',
       kpis: [
         { label: 'Total kg', value: this._fmt(d.kgTotal) + ' kg' },
@@ -173,7 +173,7 @@ const ProduccionView = {
       registrarHandler: "App._abrirAsistenteProduccion('carne')",
       records: d.carneEvents.slice(0, 30).map(e => {
         const isInd = e.tipo_entidad === 'animal';
-        const label = isInd ? '👤 INDIVIDUAL' : '🐄 LOTE';
+        const label = isInd ? 'INDIVIDUAL' : 'LOTE';
         const idDisplay = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} animales` : (e.snap_tipo || 'S/N'));
         return {
           title: `${label}: ${idDisplay}`,
@@ -190,7 +190,7 @@ const ProduccionView = {
 
   _renderLeche(content, d) {
     this._renderSeccion(content, {
-      icon: '🥛', title: 'Producción Láctea (L)', subtitle: 'Control lechero individual y de lote',
+      icon: Icons.leche(), title: 'Producción Láctea (L)', subtitle: 'Control lechero individual y de lote',
       color: '#3b82f6', colorDark: '#1d4ed8',
       kpis: [
         { label: 'Total litros', value: this._fmt(d.litrosTotal) + ' L' },
@@ -204,10 +204,10 @@ const ProduccionView = {
         const isLote = e.tipo_entidad === 'rebano';
         const isTanque = e.tipo_entidad === 'finca' || e.motivo_tarea === 'expedicion';
 
-        let label = '🥛 CONTROL';
-        if (isInd) label = '👤 INDIVIDUAL';
-        if (isLote) label = '🐄 LOTE';
-        if (isTanque) label = '🚛 TANQUE';
+        let label = 'CONTROL';
+        if (isInd) label = 'INDIVIDUAL';
+        if (isLote) label = 'LOTE';
+        if (isTanque) label = 'TANQUE';
 
         const idDisplayLeche = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} animales` : (e.snap_tipo || 'S/N'));
         return {
@@ -225,7 +225,7 @@ const ProduccionView = {
 
   _renderVentas(content, d) {
     this._renderSeccion(content, {
-      icon: '🚚', title: 'Venta Masiva / Matadero', subtitle: 'Expediciones y ventas de ganado',
+      icon: Icons.comercial(), title: 'Venta Masiva / Matadero', subtitle: 'Expediciones y ventas de ganado',
       color: '#f59e0b', colorDark: '#b45309',
       kpis: [
         { label: 'Total ventas', value: this._fmt(d.ventasTotal) + ' €' },
@@ -234,7 +234,7 @@ const ProduccionView = {
       registrarLabel: 'Venta', listName: 'Lista Ventas',
       registrarHandler: "App._abrirAsistenteProduccion('venta_masiva')",
       records: d.ventaEvents.slice(0, 20).map(e => ({
-        title: '🚚 Expedición: ' + (e.snap_especie || 'Ganado'),
+        title: 'Expedición: ' + (e.snap_especie || 'Ganado'),
         date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
         zone: e.snap_zona || '',
         value: (e.importe_total || e.valor_neto || 0) + ' €',
@@ -246,7 +246,7 @@ const ProduccionView = {
 
   _renderGastos(content, d) {
     this._renderSeccion(content, {
-      icon: '🧾', title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
+      icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
       color: '#8b5cf6', colorDark: '#6d28d9',
       kpis: [
         { label: 'Total gastos', value: this._fmt(d.gastosTotal) + ' €' },
@@ -255,7 +255,7 @@ const ProduccionView = {
       registrarLabel: 'Gasto', listName: 'Lista Gastos',
       registrarHandler: "App._abrirAsistenteProduccion('gasto')",
       records: d.gastosRecords.slice(0, 20).map(g => ({
-        title: '🧾 ' + (g.concepto || g.categoria || 'Gasto'),
+        title: (g.concepto || g.categoria || 'Gasto'),
         date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
         zone: g.snap_zona || '',
         value: (g.monto || 0) + ' €',

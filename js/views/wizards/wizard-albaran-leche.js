@@ -65,6 +65,11 @@ window.AlbaranLecheWizard = {
       // =====================================================
       {
         content: async (data) => {
+          const adsgs = await window.ADSGs.list();
+          // Obtener contratos de leche registrados
+          const contratos = await window.db.getAll('contratos_compra').catch(() => []);
+          const contratosLeche = contratos.filter(c => c.tipo === 'leche' && !c.anulado);
+
           return `
           <div class="card card-accent card-accent-amber p-16 mt-10">
             <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">IDENTIFICACIÓN Y ORIGEN</div>
@@ -86,11 +91,17 @@ window.AlbaranLecheWizard = {
             <div class="grid grid-cols-2 gap-10">
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº CONTRATO</label>
-                <input type="text" id="w-l-ctr" value="${data.contrato_numero || finca.contrato_lacteo_numero || ''}" placeholder="CT-000" class="wizard-input uppercase font-800">
+                <select id="w-l-ctr" class="wizard-input font-800 uppercase">
+                   <option value="${finca.contrato_lacteo_numero || ''}">${finca.contrato_lacteo_numero || '— DEF. FINCA —'}</option>
+                   ${contratosLeche.map(c => `<option value="${c.numero_contrato}" ${data.contrato_numero === c.numero_contrato ? 'selected' : ''}>${c.numero_contrato} (${c.compradorNombre || 'CLIENTE'})</option>`).join('')}
+                </select>
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">CÓDIGO ADSG</label>
-                <input type="text" id="w-l-adsg" value="${data.adsg_codigo || finca.adsg_codigo || ''}" placeholder="ADSG-00" class="wizard-input uppercase font-800">
+                <select id="w-l-adsg" class="wizard-input font-800 uppercase">
+                   <option value="${finca.adsg_codigo || ''}">${finca.adsg_codigo || '— DEF. FINCA —'}</option>
+                   ${adsgs.map(a => `<option value="${a.codigo}" ${data.adsg_codigo === a.codigo ? 'selected' : ''}>${a.codigo} (${a.nombre})</option>`).join('')}
+                </select>
               </div>
             </div>
           </div>

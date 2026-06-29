@@ -107,11 +107,11 @@ const TrazabilidadView = {
     timeline.push({
       fecha: animal.fecha_nacimiento || animal.creadoEn?.split('T')[0] || 'N/D',
       tipo: 'nacimiento',
-      icon: '🐄',
+      icon: Icons.animales(),
       titulo: 'NACIMIENTO / ALTA',
       detalle: `
-        <strong>Crotal:</strong> ${animal.numero_identificacion}<br>
-        ${animal.dib ? `<strong>DIB:</strong> ${animal.dib}<br>` : ''}
+        <strong>Crotal:</strong> <span class="text-gold font-bold">${animal.numero_identificacion}</span><br>
+        ${animal.dib ? `<strong>DIB:</strong> <span class="text-white font-bold">${animal.dib}</span><br>` : ''}
         <strong>Especie:</strong> ${animal.especie || 'N/D'}<br>
         <strong>Raza:</strong> ${animal.raza || 'N/D'}<br>
         <strong>Sexo:</strong> ${animal.sexo || 'N/D'}<br>
@@ -123,24 +123,24 @@ const TrazabilidadView = {
     // 2. SANITARIOS (cada tratamiento es un evento)
     const CS = window.ComunidadesService;
     for (const s of sanitarios) {
-      const supresion = s.tiempo_espera_carne_dias > 0 ? ` (supresión: ${s.tiempo_espera_carne_dias}d)` : '';
+      const supresion = s.tiempo_espera_carne_dias > 0 ? ` (supresión: <span class="text-red font-900">${s.tiempo_espera_carne_dias}d</span>)` : '';
       const motivo = s.motivo_tratamiento ? (CS ? CS.getMotivoTratamientoLabel(s.motivo_tratamiento) : s.motivo_tratamiento) : '';
       const via = s.via_administracion ? (CS ? CS.getViaAdministracionLabel(s.via_administracion) : s.via_administracion) : '';
       timeline.push({
         fecha: s.fecha || 'N/D',
         tipo: 'sanitario',
-        icon: '💉',
+        icon: Icons.sanidad(),
         titulo: `TRATAMIENTO: ${s.medicamento || 'N/D'}`,
         detalle: `
           <strong>Tipo:</strong> ${s.tipo_tratamiento || 'N/D'}<br>
           <strong>Producto:</strong> ${s.medicamento || 'N/D'}<br>
           ${motivo ? `<strong>Motivo:</strong> ${motivo}<br>` : ''}
           ${via ? `<strong>Vía:</strong> ${via}<br>` : ''}
-          ${s.num_animales_tratados ? `<strong>Nº animales tratados:</strong> ${s.num_animales_tratados}<br>` : ''}
+          ${s.num_animales_tratados ? `<strong>Nº animales tratados:</strong> <span class="text-white font-bold">${s.num_animales_tratados}</span><br>` : ''}
           ${s.lote_medicamento ? `<strong>Lote:</strong> ${s.lote_medicamento}<br>` : ''}
           ${s.caducidad_medicamento ? `<strong>Caducidad:</strong> ${s.caducidad_medicamento}<br>` : ''}
-          <strong>Supresión carne:</strong> ${s.tiempo_espera_carne_dias || 0} días${supresion}<br>
-          ${s.prohibidoLeche ? '<strong class="text-red">PROHIBIDO para leche</strong><br>' : ''}
+          <strong>Supresión carne:</strong> <span class="text-red font-bold">${s.tiempo_espera_carne_dias || 0}</span> días${supresion}<br>
+          ${s.prohibidoLeche ? `<strong class="text-red">${Icons.alerta()} PROHIBIDO para leche</strong><br>` : ''}
           ${s.veterinario_prescriptor ? `<strong>Veterinario:</strong> ${s.veterinario_prescriptor}${s.veterinario_colegiado ? ' (Nº ' + s.veterinario_colegiado + ')' : ''}<br>` : ''}
           ${s.numero_receta ? `<strong>Nº receta:</strong> ${s.numero_receta}<br>` : ''}
         `
@@ -150,22 +150,22 @@ const TrazabilidadView = {
     // 3. REPRODUCCIÓN
     for (const r of reproduccion) {
       const tipoLabels = {
-        'celo': { icon: '🔴', label: 'CELO' },
-        'inseminacion': { icon: '💉', label: 'INSEMINACIÓN' },
-        'gestacion': { icon: '🤰', label: 'GESTACIÓN' },
-        'parto': { icon: '🐣', label: 'PARTO' },
-        'aborto': { icon: '⚠️', label: 'ABORTO' },
-        'diagnostico_gestacion': { icon: '🔬', label: 'DIAG. GESTACIÓN' },
+        'celo': { icon: Icons.reproduccion(), label: 'CELO' },
+        'inseminacion': { icon: Icons.sanidad(), label: 'INSEMINACIÓN' },
+        'gestacion': { icon: Icons.reproduccion(), label: 'GESTACIÓN' },
+        'parto': { icon: Icons.animales(), label: 'PARTO' },
+        'aborto': { icon: Icons.alerta(), label: 'ABORTO' },
+        'diagnostico_gestacion': { icon: Icons.buscar(), label: 'DIAG. GESTACIÓN' },
       };
-      const info = tipoLabels[r.tipo_evento] || { icon: '📋', label: r.tipo_evento || 'OTRO' };
+      const info = tipoLabels[r.tipo_evento] || { icon: Icons.documento(), label: r.tipo_evento || 'OTRO' };
       timeline.push({
         fecha: r.fecha || 'N/D',
         tipo: 'reproduccion',
         icon: info.icon,
-        titulo: `${info.icon} ${info.label}`,
+        titulo: info.label,
         detalle: `
           <strong>Fecha:</strong> ${r.fecha || 'N/D'}<br>
-          ${r.resultado ? `<strong>Resultado:</strong> ${r.resultado}<br>` : ''}
+          ${r.resultado ? `<strong>Resultado:</strong> <span class="${r.resultado.toLowerCase()==='positivo'?'text-green':'text-red'} font-bold">${r.resultado.toUpperCase()}</span><br>` : ''}
           ${r.observaciones ? `<strong>Observaciones:</strong> ${r.observaciones}<br>` : ''}
         `
       });
@@ -176,11 +176,11 @@ const TrazabilidadView = {
       timeline.push({
         fecha: p.fecha || 'N/D',
         tipo: 'pesaje',
-        icon: '⚖️',
+        icon: Icons.balanza(),
         titulo: `PESAJE: ${p.valor_neto || 0} ${p.unidad || 'kg'}`,
         detalle: `
-          <strong>Peso:</strong> ${p.valor_neto || 0} ${p.unidad || 'kg'}<br>
-          ${p.motivo_tarea ? `<strong>Motivo:</strong> ${p.motivo_tarea}<br>` : ''}
+          <strong>Peso:</strong> <span class="text-green font-950" style="font-size:1.1rem;">${p.valor_neto || 0}</span> <small class="text-gray">${p.unidad || 'kg'}</small><br>
+          ${p.motivo_tarea ? `<strong>Motivo:</strong> ${p.motivo_tarea.toUpperCase()}<br>` : ''}
         `
       });
     }
@@ -188,21 +188,21 @@ const TrazabilidadView = {
     // 5. EVENTOS (registro_eventos)
     for (const e of eventos) {
       const labels = {
-        'ALTA_IMPORTACION': { icon: '📥', label: 'ALTA POR IMPORTACIÓN' },
-        'expedicion': { icon: '📦', label: 'EXPEDICIÓN' },
-        'control': { icon: '✅', label: 'CONTROL' },
-        'baja': { icon: '❌', label: 'BAJA' },
+        'ALTA_IMPORTACION': { icon: Icons.importar(), label: 'ALTA POR IMPORTACIÓN' },
+        'expedicion': { icon: Icons.paquete(), label: 'EXPEDICIÓN' },
+        'control': { icon: Icons.check(), label: 'CONTROL' },
+        'baja': { icon: Icons.cerrar(), label: 'BAJA' },
       };
-      const info = labels[e.motivo_tarea] || { icon: '📝', label: e.motivo_tarea || 'EVENTO' };
+      const info = labels[e.motivo_tarea] || { icon: Icons.documento(), label: e.motivo_tarea || 'EVENTO' };
       timeline.push({
         fecha: e.fecha || 'N/D',
         tipo: 'evento',
         icon: info.icon,
-        titulo: `${info.icon} ${info.label}`,
+        titulo: info.label,
         detalle: `
           <strong>Motivo:</strong> ${e.motivo_tarea || 'N/D'}<br>
           ${e.observaciones ? `<strong>Notas:</strong> ${e.observaciones}<br>` : ''}
-          ${e.valor_neto ? `<strong>Valor:</strong> ${e.valor_neto} ${e.unidad || ''}<br>` : ''}
+          ${e.valor_neto ? `<strong>Valor:</strong> <span class="text-gold font-bold">${e.valor_neto}</span> <small class="text-aaa">${e.unidad || ''}</small><br>` : ''}
         `
       });
     }
@@ -212,21 +212,21 @@ const TrazabilidadView = {
       timeline.push({
         fecha: v.fechaSacrificio || 'N/D',
         tipo: 'venta',
-        icon: '📦',
+        icon: Icons.paquete(),
         titulo: `VENTA / SACRIFICIO`,
         detalle: `
-          <strong>Comprador:</strong> ${v.razonSocial || 'N/D'}<br>
+          <strong>Comprador:</strong> <span class="text-white font-bold">${v.razonSocial || 'N/D'}</span><br>
           <strong>NIF:</strong> ${v.nifComprador || 'N/D'}<br>
           <strong>Fecha sacrificio:</strong> ${v.fechaSacrificio || 'N/D'}<br>
-          <strong>Peso vivo:</strong> ${v.pesoVivo || 0} kg<br>
-          <strong>Peso canal:</strong> ${v.pesoCanal || 0} kg<br>
-          <strong>Rendimiento:</strong> ${v.rendimientoCanal || 0}%<br>
+          <strong>Peso vivo:</strong> <span class="text-white font-bold">${v.pesoVivo || 0}</span> <small>kg</small><br>
+          <strong>Peso canal:</strong> <span class="text-gold font-950">${v.pesoCanal || 0}</span> <small>kg</small><br>
+          <strong>Rendimiento:</strong> <span class="text-green font-bold">${v.rendimientoCanal || 0}%</span><br>
           <strong>Matadero:</strong> ${v.codigoMatadero || 'N/D'}<br>
           <strong>Nº Albarán:</strong> ${v.numero_albaran || 'N/D'}<br>
           <strong>DIMOE:</strong> ${v.dimoe || 'N/D'}<br>
           <strong>Transportista:</strong> ${v.nombreTransportista || 'N/D'}<br>
-          ${v.clasificacion?.seurop ? `<strong>SEUROP:</strong> ${v.clasificacion.seurop}<br>` : ''}
-          <strong>IVA:</strong> ${v.IVA || 0}%<br>
+          ${v.clasificacion?.seurop ? `<strong>SEUROP:</strong> <span class="badge badge-sm badge-gold">${v.clasificacion.seurop}</span><br>` : ''}
+          <strong>IVA:</strong> <span class="text-aaa font-bold">${v.IVA || 0}%</span><br>
           ${v.autorizacion_veterinaria ? `<strong>Veterinario:</strong> ${v.autorizacion_veterinaria.vet_nombre || 'N/D'}<br>` : ''}
         `
       });
@@ -250,10 +250,15 @@ const TrazabilidadView = {
     return `
       <div class="p-12 w-full">
         <!-- Cabecera con acciones -->
-        <div class="flex items-center gap-8 mb-14 flex-wrap">
-          <button onclick="App._navigateBack()" class="btn btn-secondary btn-sm" style="padding:8px 14px;">← Volver</button>
+        <div class="flex items-center gap-12 mb-20 flex-wrap">
+          <button onclick="App._navigateBack()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-10 min-h-0 h-auto">
+            <span class="text-[0.75rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+          </button>
           <div class="flex-1"></div>
-          <button onclick="TrazabilidadView._exportarPDF()" class="btn btn-primary btn-sm" style="padding:8px 14px;background:#b45309;">${Icons.exportar()} Exportar PDF</button>
+          <button onclick="TrazabilidadView._exportarPDF()" class="widget-link-btn widget-link-btn--neon neon-warning px-16 py-10 min-h-0 h-auto">
+            ${Icons.exportar()}
+            <span class="text-[0.75rem] font-950 uppercase tracking-widest">Exportar PDF</span>
+          </button>
         </div>
 
         <!-- Datos Básicos del Animal -->
@@ -455,11 +460,13 @@ const TrazabilidadView = {
 
     return `
       <div style="position:relative; margin-bottom:15px; padding-left:45px;">
-        <div style="position:absolute; left:10px; top:18px; width:18px; height:18px; background:${c.dot}; border-radius:50%; border:2px solid #000; z-index:1; display:flex; align-items:center; justify-content:center; font-size:10px;"></div>
+        <div style="position:absolute; left:10px; top:18px; width:22px; height:22px; background:#000; border:2px solid ${c.border}; border-radius:50%; z-index:1; display:flex; align-items:center; justify-content:center; color:${c.border};">
+            <div style="transform:scale(0.7);">${item.icon}</div>
+        </div>
         <div class="p-12" style="background:${c.bg}; border:1px solid ${c.border}; border-radius:12px;">
           <div class="flex justify-between items-center">
-            <strong class="text-white text-85">${item.titulo}</strong>
-            <span class="text-gray text-2xs">${item.fecha}</span>
+            <strong class="text-white text-85 uppercase font-900">${item.titulo}</strong>
+            <span class="text-gray text-2xs font-800">${item.fecha}</span>
           </div>
           <div class="mt-8 text-sm leading-normal text-ccc">
             ${item.detalle}

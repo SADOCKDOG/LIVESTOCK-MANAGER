@@ -47,16 +47,17 @@ const RebanosView = {
         const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
         const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
         const colorEstado = r.estado !== 'inactivo' ? '#10b981' : '#6b7280';
+        const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(r.especie) : colorEstado;
 
         html += `
-          <div class="card card-animal no-underline" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid ${colorEstado}; padding:14px; margin:0; margin-bottom:8px;">
+          <div class="card card-animal no-underline" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid ${colorEspecie}; padding:14px; margin:0; margin-bottom:8px;">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">
-                  <div class="text-xl" style="color:${colorEstado}">${Icons.rebanos()}</div>
+                  <div class="text-xl" style="color:${colorEspecie}">${Icons.rebanos()}</div>
                   <div class="text-xs">
-                    <div class="font-bold text-white uppercase text-base tracking-tight">${r.nombre}</div>
-                    <div class="text-gray mt-2 font-700 uppercase">${(r.especie || 'N/D')} · ${(r.tipo || 'Sin Tipo')}</div>
+                    <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${r.nombre}</div>
+                    <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(r.especie || 'N/D').toUpperCase()}</span> · ${(r.tipo || 'Sin Tipo')}</div>
                   </div>
                 </div>
                 <div class="text-right">
@@ -121,52 +122,58 @@ const RebanosView = {
       <!-- Categorías -->
       ${Object.keys(porCategoria).length > 0 ? `
       <div class="card mb-20 border-top-3px border-top-3px-purple p-12">
-        <div class="inf-section-title mb-6 flex items-center gap-8">${Icons.documento()} Por categoría</div>
-        <div class="flex flex-wrap gap-4">${Object.entries(porCategoria).map(([c, n]) => `<span class="badge badge-sm badge-purple">${c}: ${n}</span>`).join('')}</div>
+        <div class="inf-section-title mb-6 flex items-center gap-8">${Icons.documento()} POR CATEGORÍA</div>
+        <div class="flex flex-wrap gap-4">${Object.entries(porCategoria).map(([c, n]) => `<span class="badge badge-sm badge-purple font-900">${c.toUpperCase()}: ${n}</span>`).join('')}</div>
       </div>` : ''}
 
       <!-- Edición -->
-      <div class="card border-top-3px border-top-3px-gold mb-25">
-        <div class="inf-card-title flex items-center gap-8">${Icons.editar()} Datos del Rebaño</div>
+      <div class="card border-top-3px border-top-3px-gold mb-25 p-16">
+        <div class="inf-card-title flex items-center gap-8 mb-16">${Icons.editar()} DATOS DEL REBAÑO</div>
         <div class="flex flex-col gap-15">
-          <div><label class="form-label">Nombre</label>
-          <input type="text" id="r-edit-nombre" value="${rebano.nombre}" class="premium-input"></div>
+          <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Nombre</label>
+          <input type="text" id="r-edit-nombre" value="${rebano.nombre}" class="premium-input font-800"></div>
           <div class="grid grid-cols-2 gap-10">
-            <div><label class="form-label">Especie</label>
-            <select id="r-edit-especie" class="premium-input">
-              ${especies.map((e) => `<option value="${e.nombre}" ${rebano.especie === e.nombre ? "selected" : ""}>${e.nombre}</option>`).join("")}
+            <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Especie</label>
+            <select id="r-edit-especie" class="premium-input font-800">
+              ${especies.map((e) => `<option value="${e.nombre}" ${rebano.especie === e.nombre ? "selected" : ""}>${e.nombre.toUpperCase()}</option>`).join("")}
             </select></div>
-            <div><label class="form-label">Tipo</label>
-            <select id="r-edit-tipo" class="premium-input">
-              ${tipos.map((t) => `<option value="${t.nombre}" ${rebano.tipo === t.nombre ? "selected" : ""}>${t.nombre}</option>`).join("")}
-            </select></div>
-          </div>
-          <div class="grid grid-cols-2 gap-10">
-            <div><label class="form-label">Capacidad Máxima</label>
-            <input type="number" id="r-edit-capacidad" value="${rebano.capacidad_total || ''}" class="premium-input"></div>
-            <div><label class="form-label">Código de Lote</label>
-            <input type="text" id="r-edit-lote" value="${rebano.codigo_lote || ''}" class="premium-input"></div>
-          </div>
-          <div class="grid grid-cols-2 gap-10">
-            <div><label class="form-label">Fecha Constitución</label>
-            <input type="date" id="r-edit-fecha" value="${rebano.fecha_constitucion || ''}" class="premium-input"></div>
-            <div><label class="form-label">Ubicación (Zona)</label>
-            <select id="r-edit-zona" class="premium-input border-gold">
-              <option value="">Sin asignar</option>
-              ${zonas.map((z) => `<option value="${z.nombre}" ${rebano.zonaActual === z.nombre ? "selected" : ""}>${z.nombre}</option>`).join("")}
+            <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Tipo</label>
+            <select id="r-edit-tipo" class="premium-input font-800">
+              ${tipos.map((t) => `<option value="${t.nombre}" ${rebano.tipo === t.nombre ? "selected" : ""}>${t.nombre.toUpperCase()}</option>`).join("")}
             </select></div>
           </div>
-          <div><label class="form-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
-          <select id="r-edit-tipo-explotacion-rega" class="premium-input border-green">
-            <option value="">— Seleccionar —</option>
-            ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${rebano.tipo_explotacion_rega === t ? "selected" : ""}>${t}</option>`).join("")}
+          <div class="grid grid-cols-2 gap-10">
+            <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Capacidad Máxima</label>
+            <input type="number" id="r-edit-capacidad" value="${rebano.capacidad_total || ''}" class="premium-input font-800"></div>
+            <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Código de Lote</label>
+            <input type="text" id="r-edit-lote" value="${rebano.codigo_lote || ''}" class="premium-input font-800"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-10">
+            <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Fecha Constitución</label>
+            <input type="date" id="r-edit-fecha" value="${rebano.fecha_constitucion || ''}" class="premium-input font-800"></div>
+            <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Ubicación (Zona)</label>
+            <select id="r-edit-zona" class="premium-input border-gold font-800">
+              <option value="">SIN ASIGNAR</option>
+              ${zonas.map((z) => `<option value="${z.nombre}" ${rebano.zonaActual === z.nombre ? "selected" : ""}>${z.nombre.toUpperCase()}</option>`).join("")}
+            </select></div>
+          </div>
+          <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
+          <select id="r-edit-tipo-explotacion-rega" class="premium-input border-green font-800">
+            <option value="">— SELECCIONAR —</option>
+            ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${rebano.tipo_explotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
           </select></div>
-          <div><label class="form-label">Notas / Observaciones</label>
-          <textarea id="r-edit-notas" class="premium-input" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
+          <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Notas / Observaciones</label>
+          <textarea id="r-edit-notas" class="premium-input font-700 uppercase" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
         </div>
         <div class="flex gap-10 mt-20">
-          <button class="btn btn-secondary btn-danger flex-1" onclick="RebanosView._eliminarRebano(${id})">${Icons.eliminar()} Eliminar</button>
-          <button class="btn btn-primary btn-success flex-2" onclick="RebanosView._guardarRebano(${id})">${Icons.guardar()} Guardar</button>
+          <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="RebanosView._eliminarRebano(${id})">
+            ${Icons.eliminar()}
+            <span class="widget-link-label">Eliminar</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="RebanosView._guardarRebano(${id})">
+            ${Icons.guardar()}
+            <span class="widget-link-label">Guardar Datos</span>
+          </button>
         </div>
       </div>
       
@@ -194,14 +201,20 @@ const RebanosView = {
       </div>
       <div class="grid gap-10">
         ${animales.map((a) => {
-          const icono = a.especie === 'Vacas' ? '🐄' : a.especie === 'Ovejas' ? '🐑' : a.especie === 'Cabras' ? '🐐' : '🐾';
+          const colorEsp = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#888';
           const colorEst = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : '#ef4444';
-          return `<div class="card card-item" style="border-left:4px solid ${colorEst};" onclick="location.hash='/animal?id=${a.id}'">
+          return `<div class="card card-item" style="border-left:4px solid ${colorEsp}; background: rgba(0,0,0,0.2);" onclick="location.hash='/animal?id=${a.id}'">
             <div class="flex justify-between items-center">
-              <div><span>${icono} <strong>${a.numero_identificacion}</strong> · ${a.raza || 'S/R'}</span></div>
+              <div class="flex items-center gap-10">
+                <span style="color:${colorEsp}">${Icons.animales()}</span>
+                <div class="text-xs">
+                  <div class="text-white font-900 uppercase" style="color:${colorEsp} !important;">${a.numero_identificacion}</div>
+                  <div class="text-gray-500 font-800 text-[0.6rem] uppercase mt-2">${a.raza || 'S/R'} · <span style="color:${colorEsp}; opacity:0.7;">${a.categoria || ''}</span></div>
+                </div>
+              </div>
               <div class="flex items-center gap-8">
-                <span class="text-xs text-gray">${a.sexo === 'H' ? '♀' : '♂'} ${a.categoria || ''}</span>
-                <span class="text-amber text-sm">Ver ➔</span>
+                <span class="badge badge-sm uppercase" style="background:${colorEst}15; color:${colorEst}; border:1px solid ${colorEst}35; font-size: 0.55rem;">${a.estado}</span>
+                <span class="text-amber text-sm font-900">${Icons.flechaDerecha()}</span>
               </div>
             </div>
           </div>`;
@@ -217,20 +230,20 @@ const RebanosView = {
       const tratamientos = await window.db.getAll("sanitarios_ganado") || [];
       const filtrados = tratamientos.filter(t => t.rebanoId == rebanoId);
       if (filtrados.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💉</div><p class="empty-state-text">Sin tratamientos registrados</p></div>';
+        container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.sanidad()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin tratamientos registrados</p></div>`;
         return;
       }
       let html = '';
       filtrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
       filtrados.forEach(t => {
-        html += `<div class="info-box-sm border-left-green mt-8">
-          <div class="flex justify-between"><span class="text-white font-bold">${t.medicamento}</span><span class="text-gray text-xs">${new Date(t.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-xs mt-4">Retiro carne: ${t.tiempo_espera_carne_dias || '?'}d ${t.prohibidoLeche ? '| 🚫 Leche' : ''}</div>
+        html += `<div class="info-box-sm border-left-green mt-8 bg-black">
+          <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(t.fecha).toLocaleDateString()}</span></div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0}D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">🚫 PROHIBIDO LECHE</strong>' : ''}</div>
         </div>`;
       });
       container.innerHTML = html;
     } catch (e) {
-      container.innerHTML = '<p class="text-red text-sm">Error cargando historial</p>';
+      container.innerHTML = '<p class="text-red text-sm font-900 uppercase">Error cargando historial</p>';
     }
   },
 
