@@ -451,7 +451,7 @@
         });
       }
       window.onerror = function (msg, url, line) {
-        alert("Error: " + msg + "\nLínea: " + line);
+        try { Confirm.alert("Error", "Error: " + msg + "\nLínea: " + line); } catch (e) { console.error("Error global:", msg); }
         return false;
       };
     </script>

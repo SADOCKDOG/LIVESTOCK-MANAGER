@@ -2915,9 +2915,10 @@ label {
 .pesaje-crotal       { font-size: 2.2rem; font-weight: 950; line-height: 1.1; text-transform: uppercase; letter-spacing: -1.5px; width: 100%; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 400px) { .pesaje-crotal { font-size: 1.8rem; letter-spacing: -1px; } }
 @media (max-width: 350px) { .pesaje-crotal { font-size: 1.6rem; letter-spacing: -0.5px; } }
-.pesaje-peso-input   { width: 100%; max-width: 250px; font-size: 4.5rem; font-weight: 950; text-align: center; background: #0a0a0a; color: white; border-radius: 24px; padding: 15px; margin-top: 10px; font-family: 'Inter', sans-serif; border: 3px solid #333 !important; }
+.pesaje-peso-input   { display: block; margin: 10px auto 0; width: 100%; max-width: 250px; min-width: 0; font-size: 4.5rem; font-weight: 950; text-align: center; background: #0a0a0a; color: white; border-radius: 24px; padding: 15px; font-family: 'Inter', sans-serif; border: 3px solid #333 !important; box-sizing: border-box; }
 .pesaje-peso-input:focus { border-color: var(--p-gold) !important; outline: none; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
-.pesaje-unidad-label { font-weight: 950; font-size: 0.9rem; text-transform: uppercase; margin-top: 15px; letter-spacing: 3px; }
+.pesaje-unidad-label { font-weight: 950; font-size: 0.9rem; text-transform: uppercase; margin-top: 15px; letter-spacing: 3px; text-align: center; }
+.pesaje-input-wrapper { display: flex; flex-direction: column; align-items: center; padding: 12px; background: #000; border: 1px solid #222; border-radius: 12px; }
 .pesaje-leche-grid   { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .pesaje-guardar-btn  { width: 100%; max-width: 320px; margin: 0 auto; font-size: 1.25rem; padding: 18px; font-weight: 950; text-transform: uppercase; letter-spacing: 1px; }
 .pesaje-logis-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -2927,14 +2928,60 @@ label {
 .pesaje-lista-header { padding: 8px 12px; text-transform: uppercase; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; }
 
 /* === Produccion UI — selector wizard === */
-.prod-options-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 5px; }
-.prod-opt-icon      { font-size: 2rem; margin-bottom: 8px; display: block; }
-.prod-opt-label     { font-size: 0.85rem; line-height: 1.2; }
-.wizard-sel-btn     { padding: 20px; border: 3px solid transparent; }
-.wizard-sel-btn--sm { padding: 15px; border: 3px solid transparent; }
-.h-full             { height: 100%; }
-.gap-20             { gap: 20px; }
+.prod-select        { width: 100%; padding: 16px; border-radius: 14px; background: var(--surface-input); border: 2px solid var(--border-input); color: var(--text-p); font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+.prod-select:focus  { border-color: var(--p-gold); outline: none; }
+.prod-select option { background: #1a1a1a; color: var(--text-p); padding: 12px; }
 .prod-entity-list   { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 40vh; padding-right: 5px; }
+
+/* Entity selector item */
+.entity-item         { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 2px solid #222; border-radius: 16px; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; background: var(--surface); }
+.entity-item:active  { transform: scale(0.98); }
+.entity-item--selected { border-color: var(--p-gold); background: rgba(250, 204, 21, 0.05); }
+.entity-check        { width: 28px; height: 26px; border-radius: 50%; border: 2px solid #444; display: flex; align-items: center; justify-content: center; font-weight: 900; transition: all 0.2s; }
+.entity-check--selected { border-color: var(--p-gold); background: var(--p-gold); color: #000; }
+
+/* Pesaje — mode color variants via CSS var */
+.pesaje-mode-carne { --pesaje-accent: var(--c-success); --pesaje-accent-rgb: 16, 185, 129; }
+.pesaje-mode-leche { --pesaje-accent: var(--c-warning); --pesaje-accent-rgb: 245, 158, 11; }
+.pesaje-header-fixed { position: relative; }
+.pesaje-crotal       { color: var(--pesaje-accent, var(--p-gold)) !important; text-shadow: 0 0 15px rgba(var(--pesaje-accent-rgb, 250, 204, 21), 0.25); }
+.pesaje-peso-input   { color: var(--pesaje-accent, var(--p-gold)) !important; }
+.pesaje-peso-input:focus { border-color: var(--pesaje-accent, var(--p-gold)) !important; box-shadow: 0 0 20px rgba(var(--pesaje-accent-rgb, 250, 204, 21), 0.4); }
+.pesaje-unidad-label { color: var(--pesaje-accent, var(--p-gold)); }
+.pesaje-card-accent  { border-top: 3px solid var(--pesaje-accent, var(--p-gold)); --accent-color: var(--pesaje-accent, var(--p-gold)); }
+
+/* Batch item */
+.batch-item          { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; padding: 16px; border-bottom: 1px solid #111; cursor: pointer; transition: all 0.15s; }
+.batch-item:active   { transform: scale(0.98); }
+.batch-item--active  { background: rgba(var(--pesaje-accent-rgb, 250, 204, 21), 0.05); border-left: 4px solid var(--pesaje-accent, var(--p-gold)); }
+.batch-item-crotal   { font-weight: 950; font-size: 0.95rem; text-transform: uppercase; letter-spacing: -0.5px; color: var(--pesaje-accent, var(--p-gold)); }
+.batch-item-muted    { font-size: 0.55rem; letter-spacing: 1px; margin-top: 2px; }
+.batch-item-anterior { text-align: right; font-size: 0.75rem; align-self: center; }
+.batch-item-actual   { text-align: right; font-weight: 950; font-size: 1.1rem; align-self: center; }
+.batch-item-val--empty { color: #222; }
+.batch-item-val--set   { color: var(--pesaje-accent, var(--p-gold)); }
+
+/* Pesaje — table scroll body */
+.pesaje-table-body  { overflow-y: auto; flex: 1; }
+
+/* Pesaje — info box (fecha, etc.) */
+.pesaje-fecha-box   { padding: 12px; background: #000; border: 1px solid #222; border-radius: 4px; margin-bottom: 20px; }
+
+/* Pesaje — precio box (expedición) */
+.pesaje-precio-box  { padding: 16px; border: 1px solid #222; background: #000; border-radius: 12px; }
+
+/* Pesaje — logistics neto display */
+.pesaje-neto-val    { font-size: 2rem; font-weight: 950; letter-spacing: -1px; }
+
+/* Silo/Asistente card */
+.silo-card          { max-width: 380px; width: 100%; margin: 16px; }
+.silo-card--carne   { border-top: 5px solid var(--c-danger); }
+.silo-card--leche   { border-top: 5px solid var(--c-info); }
+.silo-card--hibrido { border-top: 5px solid var(--c-success); }
+
+/* Pesaje close button SVG icon */
+.btn-pesaje-close   { display: flex; align-items: center; justify-content: center; }
+.btn-pesaje-close svg { width: 18px; height: 18px; }
 
 /* === Ajustes — sección About y manual === */
 .about-card   { background: #050505; border-radius: 32px; border: 1px solid #111; margin-top: 30px; }
@@ -2994,7 +3041,15 @@ label {
 .border-top-5-blue   { border-top: 5px solid var(--c-info); }
 .wizard-sel-icon     { font-size: 1.8rem; margin-right: 15px; }
 .wizard-sel-icon--sm { font-size: 1.5rem; margin-right: 12px; }
-.error-dialog--gold  { border-color: var(--p-gold); margin: 16px; box-sizing: border-box; }
+.error-dialog--gold    { border-color: var(--p-gold); margin: 16px; box-sizing: border-box; }
+.error-dialog--danger  { border-color: var(--c-danger); margin: 16px; box-sizing: border-box; }
+.error-dialog-icon--gold  { color: var(--p-gold); }
+.error-dialog-icon--danger { color: var(--c-danger); }
+.error-dialog-title--gold { color: var(--p-gold); }
+.error-dialog-title--danger { color: var(--c-danger); }
+.error-dialog-btn--gold { background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000; }
+.error-dialog-btn--danger { background: linear-gradient(135deg, var(--c-danger), #991b1b); color: #fff; }
+.error-dialog-overlay { background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 
 /* === Estandarización de colores REGA y Crotal === */
 .input-rega-std {
