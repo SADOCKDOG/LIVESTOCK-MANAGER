@@ -43,6 +43,14 @@
           <span id="nombre-finca-header">📍 Cargando...</span>
         </div>
       </div>
+      <!-- Dropdown del Header -->
+      <div id="header-dropdown-menu" class="header-dropdown-overlay" onclick="App._toggleHeaderDropdown()">
+        <div class="header-dropdown-content" onclick="event.stopPropagation()">
+            <div class="header-dropdown-grid" id="header-dropdown-grid">
+                <!-- Se puebla dinámicamente en app.js -->
+            </div>
+        </div>
+      </div>
     </header>
 
     <main id="app-content">

@@ -146,14 +146,14 @@ const PesajesUI = {
                     `}
 
                     <div class="pesaje-animal-box">
-                         <div class="text-75 text-gray pesaje-animal-label uppercase font-900 tracking-widest opacity-70">${esModoLeche ? 'Vaca a Registrar' : 'Animal a Pesar'}</div>
-                         <div id="w-current-crotal" class="pesaje-crotal" style="color:var(--p-gold); text-shadow: 0 0 10px rgba(250, 204, 21, 0.2);">--</div>
-                         <div id="w-current-desc" class="text-aaa text-lg font-800 uppercase tracking-tight mt-5">--</div>
+                         <div class="text-[0.65rem] text-aaa uppercase font-950 tracking-widest mb-10 opacity-70">${esModoLeche ? 'Vaca a Registrar' : 'Animal a Pesar'}</div>
+                         <div id="w-current-crotal" class="pesaje-crotal" style="color:var(--p-gold) !important; text-shadow: 0 0 15px rgba(250, 204, 21, 0.3);">--</div>
+                         <div id="w-current-desc" class="text-aaa text-base font-800 uppercase tracking-tight mt-6">--</div>
 
-                         <div class="mt-20">
+                         <div class="mt-20 py-10 bg-black-opacity-50 rounded-xl border border-222">
                              <input type="number" id="w-peso-gigante" step="0.1" inputmode="decimal" placeholder="0.0"
-                                    class="pesaje-peso-input" style="border: 3px solid ${unidadColor}; box-shadow: inset 0 0 15px ${unidadColor}20;">
-                             <div class="pesaje-unidad-label font-900" style="color:${unidadColor}; letter-spacing: 2px;">${unidadLabel}</div>
+                                    class="pesaje-peso-input" style="border: none !important; background: transparent; width: 100%; max-width: none;">
+                             <div class="pesaje-unidad-label font-950" style="color:${unidadColor}; letter-spacing: 4px; margin-top: -5px;">${unidadLabel}</div>
                          </div>
 
                          ${esModoLeche ? `

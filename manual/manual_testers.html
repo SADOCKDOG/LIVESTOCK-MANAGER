@@ -508,7 +508,7 @@
       </div>
       <div class="module-layout">
         <div class="module-description">
-          <p>Panel técnico y de rendimiento de los animales. Permite registrar pesajes, controles diarios de leche, y ver los indicadores de calidad de la leche en el tanque.</p>
+          <p>Panel técnico y de rendimiento de los animales. Permite registrar pesajes individuales y colectivos, controles diarios de leche, tratamientos médicos, y ver indicadores de eficiencia.</p>
           <ul class="checklist">
             <li class="checklist-item">
               <div class="checklist-checkbox"></div>
@@ -524,17 +524,23 @@
             </li>
             <li class="checklist-item">
               <div class="checklist-checkbox"></div>
-              <span class="checklist-text"><strong>Pesada Individual:</strong> El botón de báscula (⚖) abre el wizard de pesaje individual para registrar el peso de un animal concreto.</span>
+              <span class="checklist-text"><strong>Pesada Individual:</strong> El botón de báscula (⚖) abre el asistente en 3 pasos para registrar el peso de un animal concreto de forma individual.</span>
             </li>
             <li class="checklist-item">
               <div class="checklist-checkbox"></div>
-              <span class="checklist-text"><strong>Pesada por Lotes:</strong> Permite realizar el registro masivo de pesaje para todos los animales de un rebaño seleccionado.</span>
+              <span class="checklist-text"><strong>Pesada por Lotes:</strong> El botón "+ PESO (KG)" en la cabecera abre el asistente para seleccionar un rebaño, indicar el peso medio o lote, y registrarlo colectivamente.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Tratamiento Sanitario:</strong> El botón "+ TRATAMIENTO" abre el asistente en 3 pasos para indicar rebaño, medicamento, dosis, fecha de inicio y fin, y días de supresión oficial.</span>
             </li>
           </ul>
         </div>
         <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;">
           <img src="img/sc_02_expro.png" class="screenshot-img" alt="ExPro">
           <img src="img/sc_08_wizard_pesada_individual.png" class="screenshot-img" alt="Wizard Pesaje Individual">
+          <img src="img/sc_10_wizard_pesaje_lote.png" class="screenshot-img" alt="Wizard Pesaje por Lotes">
+          <img src="img/sc_11_wizard_tratamiento.png" class="screenshot-img" alt="Wizard Tratamiento Sanitario">
         </div>
       </div>
     </div>
@@ -571,7 +577,7 @@
               </li>
               <li class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span class="checklist-text">El botón de "Registrar Retirada" abre correctamente el formulario de albaranes de leche.</span>
+                <span class="checklist-text"><strong>Registrar Retirada (Albarán de Leche):</strong> El botón "REGISTRAR RETIRADA" abre el asistente en 3 pasos para consignar volumen, operador, temperatura de cisterna, acidez y porcentaje de extracto seco.</span>
               </li>
               <li class="checklist-item">
                 <div class="checklist-checkbox"></div>
@@ -579,13 +585,14 @@
               </li>
               <li class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span class="checklist-text"><strong>Generar Venta (Venta Masiva):</strong> El botón de registro de venta abre el wizard de venta masiva en 5 pasos para matadero, comprobando retenciones, IVA, transporte y generando la transacción en el historial comercial.</span>
+                <span class="checklist-text"><strong>Generar Venta (Venta Masiva):</strong> El botón de registro de venta en CoMer carne abre el asistente de venta masiva en 5 pasos para matadero, comprobando retenciones, IVA, transporte y generando la transacción comercial.</span>
               </li>
             </ul>
           </div>
           <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;">
             <img src="img/sc_03_comer.png" class="screenshot-img" alt="CoMer">
             <img src="img/sc_09_wizard_venta_masiva.png" class="screenshot-img" alt="Wizard Venta Masiva">
+            <img src="img/sc_12_wizard_albaran_leche.png" class="screenshot-img" alt="Wizard Albarán de Leche">
           </div>
         </div>
       </div>
@@ -633,7 +640,11 @@
           <ul class="checklist">
             <li class="checklist-item">
               <div class="checklist-checkbox"></div>
-              <span class="checklist-text"><strong>Animales:</strong> El censo completo se carga correctamente, mostrando crotal, especie, raza y edad para el modo de explotación activo.</span>
+              <span class="checklist-text"><strong>Visionado correcto de las explotaciones:</strong> El censo completo de animales, la lista de rebaños y las zonas se visualizan correctamente para cada una de las explotaciones ganaderas configuradas al alternar de finca.</span>
+            </li>
+            <li class="checklist-item">
+              <div class="checklist-checkbox"></div>
+              <span class="checklist-text"><strong>Animales:</strong> El censo de cabezas carga correctamente, mostrando crotal, especie, raza y edad para el modo de explotación activo.</span>
             </li>
             <li class="checklist-item">
               <div class="checklist-checkbox"></div>
@@ -675,7 +686,7 @@
         </div>
         <div class="module-layout">
           <div class="module-description">
-            <p>Módulo de configuración principal. Permite dar de alta múltiples explotaciones ganaderas, cambiar de finca activa, y realizar copias de seguridad de la base de datos local (IndexedDB).</p>
+            <p>Módulo de configuración principal. Permite dar de alta múltiples explotaciones ganaderas, cambiar de finca activa, realizar copias de seguridad y tramitar trámites oficiales y pedidos de trazabilidad.</p>
             <ul class="checklist">
               <li class="checklist-item">
                 <div class="checklist-checkbox"></div>
@@ -683,7 +694,19 @@
               </li>
               <li class="checklist-item">
                 <div class="checklist-checkbox"></div>
-                <span class="checklist-text">Permite crear una "Nueva Finca" y alternar la finca activa entre las fincas creadas.</span>
+                <span class="checklist-text">Permite crear una "Nueva Finca" y alternar la finca activa entre las explotaciones creadas.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Pedido de Crotales:</strong> El botón "PEDIDO CROTALES" abre el asistente en 3 pasos para encargar nuevas marcas oficiales a la autoridad de trazabilidad.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Guía de Movimiento:</strong> El botón "GUÍA MOV." abre el asistente en 4 pasos para formalizar movimientos oficiales de salida o entrada con destino/origen REGA.</span>
+              </li>
+              <li class="checklist-item">
+                <div class="checklist-checkbox"></div>
+                <span class="checklist-text"><strong>Declaración de Censo:</strong> El botón "DECLARACIÓN" abre el asistente en 3 pasos para notificar el censo de animales al registro oficial SIGGAN a fecha 1 de enero.</span>
               </li>
               <li class="checklist-item">
                 <div class="checklist-checkbox"></div>
@@ -691,8 +714,11 @@
               </li>
             </ul>
           </div>
-          <div class="module-screenshot">
+          <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;">
             <img src="img/sc_07_ajustes.png" class="screenshot-img" alt="Ajustes">
+            <img src="img/sc_14_wizard_pedido_crotales.png" class="screenshot-img" alt="Wizard Pedido de Crotales">
+            <img src="img/sc_13_wizard_guia_movimiento.png" class="screenshot-img" alt="Wizard Guía de Movimiento">
+            <img src="img/sc_15_wizard_censo_oficial.png" class="screenshot-img" alt="Wizard Censo Oficial">
           </div>
         </div>
       </div>
