@@ -406,11 +406,47 @@ const Icons = {
       '<line x1="12" y1="3" x2="12" y2="15"/>'
     );
   },
-  enlace() {
+   enlace() {
     return this._svg(
       '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>' +
       '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
     );
+  },
+
+  // ── Sexo ──
+  hembra() {
+    return this._svg(
+      '<circle cx="12" cy="8" r="5.5"/>' +
+      '<line x1="12" y1="13.5" x2="12" y2="22"/>' +
+      '<line x1="8" y1="18" x2="16" y2="18"/>'
+    );
+  },
+  macho() {
+    return this._svg(
+      '<circle cx="11" cy="13" r="5.5"/>' +
+      '<polyline points="15 3 21 3 21 9"/>' +
+      '<line x1="21" y1="3" x2="15.5" y2="8.5"/>'
+    );
+  },
+  neutro() {
+    return this._svg(
+      '<line x1="10" y1="12" x2="14" y2="12"/>' +
+      '<line x1="12" y1="10" x2="12" y2="14"/>'
+    );
+  },
+
+  // ── Indicadores de estado ──
+  statusCritico() {
+    return this._svg('<circle cx="12" cy="12" r="6" fill="#ef4444" stroke="none"/>');
+  },
+  statusAdvertencia() {
+    return this._svg('<circle cx="12" cy="12" r="6" fill="#f59e0b" stroke="none"/>');
+  },
+  statusOk() {
+    return this._svg('<circle cx="12" cy="12" r="6" fill="#10b981" stroke="none"/>');
+  },
+  statusInactivo() {
+    return this._svg('<circle cx="12" cy="12" r="6" fill="#6b7280" stroke="none"/>');
   }
 };
 

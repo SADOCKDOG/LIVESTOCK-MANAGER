@@ -61,7 +61,7 @@ const RebanosView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} Activos</span>
+                  <span class="badge badge-sm uppercase" style="background:${App._hexToRgba(colorEstado, 0.08)}; color:${colorEstado}; border:1px solid ${App._hexToRgba(colorEstado, 0.2)};">${activos} Activos</span>
                 </div>
               </div>
 
@@ -213,7 +213,7 @@ const RebanosView = {
                 </div>
               </div>
               <div class="flex items-center gap-8">
-                <span class="badge badge-sm uppercase" style="background:${colorEst}15; color:${colorEst}; border:1px solid ${colorEst}35; font-size: 0.55rem;">${a.estado}</span>
+                <span class="badge badge-sm uppercase" style="background:${App._hexToRgba(colorEst, 0.08)}; color:${colorEst}; border:1px solid ${App._hexToRgba(colorEst, 0.2)}; font-size: 0.55rem;">${a.estado}</span>
                 <span class="text-amber text-sm font-900">${Icons.flechaDerecha()}</span>
               </div>
             </div>

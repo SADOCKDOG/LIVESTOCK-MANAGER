@@ -113,7 +113,7 @@ const AnimalesView = {
 
   _renderCard(a, r) {
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
-    const iconoSexo = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '⚤');
+    const iconoSexo = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : Icons.neutro());
     const colorEstado = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : a.estado === 'baja' ? '#ef4444' : '#888';
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
@@ -129,7 +129,7 @@ const AnimalesView = {
               </div>
             </div>
             <div class="text-right">
-              <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${a.estado || 'activo'}</span>
+              <span class="badge badge-sm uppercase" style="background:${App._hexToRgba(colorEstado, 0.08)}; color:${colorEstado}; border:1px solid ${App._hexToRgba(colorEstado, 0.2)};">${a.estado || 'activo'}</span>
             </div>
           </div>
 
