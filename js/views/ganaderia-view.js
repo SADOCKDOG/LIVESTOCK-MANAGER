@@ -153,7 +153,7 @@ const GanaderiaView = {
                         <div class="text-[0.65rem] text-aaa flex items-center gap-4">
                           ${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}
                         </div>
-                        <div class="text-[0.48rem] text-gray-600 font-900 uppercase">VER ➔</div>
+                        <div class="text-[0.48rem] text-gray-600 font-900 uppercase flex items-center gap-4">VER ${Icons.siguiente()}</div>
                       </div>
                     </div>
                   </a>

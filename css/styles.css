@@ -27,6 +27,7 @@
     --c-warning: #f59e0b;
     --c-danger:  #ef4444;
     --c-info:    #3b82f6;
+    --c-accent:  #8b5cf6;  /* reproducción / violeta */
 
     /* ── TIPOGRAFÍA (escala semántica única) ── */
     --fs-display: 1.6rem;     /* KPI grande / cifra destacada */
@@ -3062,3 +3063,17 @@ label {
     font-weight: 800;
     text-transform: uppercase;
 }
+
+/* === UI/UX fixes for GanaderiaView === */
+.section-header-neon--modules { --neon-color: #facc15; }
+.max-w-360 { max-width: 360px; }
+.border-top-mode { border-top: 3px solid var(--mode-color); }
+.border-left-3-mode { border-left: 3px solid var(--mode-color); }
+.border-left-4-mode { border-left: 4px solid var(--mode-color); }
+.bg-white-5 { background: rgba(255,255,255,0.02); }
+.text-mode { color: var(--mode-color); }
+
+/* === Utilidades menores (ganadería) === */
+.resize-none { resize: none; }
+.fs-small { font-size: 0.8rem; }
+.min-h-80 { min-height: 80px; }

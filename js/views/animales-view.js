@@ -142,7 +142,7 @@ const AnimalesView = {
               </div>
             </div>
             <div class="text-right">
-              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-4">VER FICHA ${Icons.siguiente()}</div>
             </div>
           </div>
         </div>
@@ -303,7 +303,7 @@ const AnimalesView = {
           </div>
 
           <div class="card card-accent card-accent-blue p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
               <select id="a-categoria" class="wizard-input font-800">
@@ -336,7 +336,7 @@ const AnimalesView = {
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
           <div class="card card-accent card-accent-green p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">PAÍS DE NACIMIENTO</label>
@@ -393,7 +393,7 @@ const AnimalesView = {
 
           <div class="card card-accent card-accent-gold p-16 mb-20">
             <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.documento()} OBSERVACIONES</div>
-            <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
+            <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700 resize-none fs-small">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
@@ -402,7 +402,7 @@ const AnimalesView = {
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="card card-accent card-accent-purple p-16 mb-20">
-               <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">HISTORIAL REPRO</div>
+               <div class="section-header-theme mb-12" style="--theme-color: var(--c-accent)">HISTORIAL REPRO</div>
                <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-20">

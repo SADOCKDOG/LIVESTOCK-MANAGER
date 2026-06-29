@@ -90,7 +90,7 @@ const ZonasView = {
                 </div>
               </div>
 
-              <div class="p-10 rounded" style="background:#000; border:1px solid #222;">
+              <div class="p-10 rounded bg-black border border-222">
                 <div class="flex justify-between font-900 text-[0.65rem] mb-4 uppercase">
                   <span class="text-gray">Carga: ${ugmTotal.toFixed(1)} UGM</span>
                   <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
@@ -109,7 +109,7 @@ const ZonasView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER ZONA ➔</div>
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-4">VER ZONA ${Icons.siguiente()}</div>
                 </div>
               </div>
 
@@ -158,7 +158,7 @@ const ZonasView = {
     const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
     
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
+      <div class="mb-20"><a href="#/zonas" class="link-back flex items-center gap-4">${Icons.atras()} Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
       <div class="card border-top-3px border-top-3px-orange">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
