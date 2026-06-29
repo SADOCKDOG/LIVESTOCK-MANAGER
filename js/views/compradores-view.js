@@ -114,7 +114,7 @@ const CompradoresView = {
               </div>
 
               <div id="compr-lista"></div>
-              <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">${Icons.agregar()}</button>
+
             `;
             this._aplicarFiltrosCompradores();
         } else {
@@ -142,7 +142,7 @@ const CompradoresView = {
               </div>
 
               <div id="contratos-lista"></div>
-              <button class="fab-btn" style="background:#10b981;" onclick="CompradoresView._nuevoContratoLibre()" aria-label="Nuevo Contrato">${Icons.agregar()}</button>
+
             `;
             this._aplicarFiltrosContratos();
         }

@@ -243,7 +243,7 @@ const ComercializacionView = {
           ${recordsHtml}
         </div>
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" style="background: ${color};" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
+      `;
   },
 
   // ===================== TAB CARNE =====================
