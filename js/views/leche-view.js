@@ -224,11 +224,11 @@ const LecheView = {
         <div class="grid gap-10">
           ${d.rebanosLeche.length > 0
             ? d.rebanosLeche.map(r => `
-                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
+                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-info);">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
-                        <span class="text-xl">${Icons.rebanos()}</span>
+                        <span class="text-xl" style="color:var(--c-info);">${Icons.rebanos()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                       </div>
                       <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
@@ -238,7 +238,7 @@ const LecheView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
+                      <span class="badge badge-sm font-black block mb-4" style="background:rgba(59,130,246,0.15); color:var(--c-info); border:1px solid rgba(59,130,246,0.3);">${r.cantidad_animales || 0} cabezas</span>
                       <span class="text-xs text-777 flex items-center gap-4">Ficha ${Icons.siguiente()}</span>
                     </div>
                   </div>
