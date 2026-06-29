@@ -106,12 +106,12 @@ const DashboardView = {
       <div class="card card-accent mt-10">
         <h3 class="text-center text-white text-2xl mb-20">${finca.nombre || 'Resumen Ganadero'}</h3>
         <div class="summary-table-grid">
-          <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.zonas()} ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.rebanos()} REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
-          <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.animales()} CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.check()} ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
-          <div class="summary-cell c-bo"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.paquete()} VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
-          <div class="summary-cell c-1a"><div class="s-lbl flex items-center gap-4 justify-center">${Icons.grafico()} RENTAB.</div><div class="s-val ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
+          <div class="summary-cell c-bo"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.zonas()} ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
+          <div class="summary-cell c-1a"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.rebanos()} REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
+          <div class="summary-cell c-bo"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.animales()} CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
+          <div class="summary-cell c-1a"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.check()} ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
+          <div class="summary-cell c-bo"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.paquete()} VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
+          <div class="summary-cell c-1a"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.grafico()} RENTAB.</div><div class="s-val ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
         </div>
       </div>
 
