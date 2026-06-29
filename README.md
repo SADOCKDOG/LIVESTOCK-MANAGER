@@ -1,153 +1,146 @@
-# LIVESTOCK MANAGER
+# Livestock Manager Premium
 
-Plataforma de gestión ganadera diseñada para operación profesional y cumplimiento normativo, adaptada al marco SIGGAN (Andalucía) y al contexto BADIGEX (Extremadura).
+Plataforma profesional de gestión ganadera diseñada para optimizar la operativa de campo, garantizar el cumplimiento normativo oficial y agilizar la toma de decisiones financieras y comerciales. Adaptada estrictamente a la normativa legal española (RD 787/2023) y a los marcos autonómicos SIGGAN (Andalucía) y BADIGEX (Extremadura).
 
-## 1. Estado actual
+---
 
-La aplicación se encuentra en una fase funcional consolidada, con cobertura de procesos clave de explotación y ganadería, trazabilidad reforzada y flujos administrativos estructurados para operación diaria y auditoría.
+## 1. Galería de la Aplicación
 
-## 2. Alcance funcional
+A continuación se presentan capturas de pantalla de la interfaz de usuario de Livestock Manager correspondientes a la versión v4.8.7:
 
-LIVESTOCK MANAGER integra en una sola aplicación:
+| Panel de Inicio | Gestión de Fincas | Comercialización |
+| :---: | :---: | :---: |
+| <img src="manual/img/sc_01_inicio.png" width="220" alt="Inicio"> | <img src="manual/img/sc_02_expro.png" width="220" alt="Fincas"> | <img src="manual/img/sc_03_comer.png" width="220" alt="Comercialización"> |
 
-- Gestión de explotación (REGA, terceros, contratos, gastos).
-- Gestión ganadera (animales, rebaños, zonas, traslados, censo).
-- Movimientos oficiales y documentación asociada.
-- Comercialización de carne y leche.
-- Sanidad y tratamientos.
-- Registro de eventos y auditoría operativa.
+| Panel Ganadero | Visor de Manuales | Ajustes del Sistema |
+| :---: | :---: | :---: |
+| <img src="manual/img/sc_05_ganaderia.png" width="220" alt="Ganadería"> | <img src="manual/img/sc_06_manuales.png" width="220" alt="Manuales"> | <img src="manual/img/sc_07_ajustes.png" width="220" alt="Ajustes"> |
 
-## 3. Adaptación SIGGAN implementada
+| Asistente de Pesajes | Venta Masiva de Carne | Tratamientos Sanitarios |
+| :---: | :---: | :---: |
+| <img src="manual/img/sc_08_wizard_pesada_individual.png" width="220" alt="Pesajes"> | <img src="manual/img/sc_09_wizard_venta_masiva.png" width="220" alt="Ventas"> | <img src="manual/img/sc_11_wizard_tratamiento.png" width="220" alt="Sanidad"> |
 
-### 3.1 Trazabilidad y auditoría
+---
 
-- Sustitución de borrado destructivo en entidades críticas por anulación trazable.
-- Registro de acciones en `registro_eventos`.
-- Conservación de histórico para revisión técnica y normativa.
+## 2. Características Principales
 
-### 3.2 Flujo administrativo
+### Gestión de Explotaciones y Fincas
+* Configuración de datos del código REGA oficial de la explotación ganadera.
+* Segmentación territorial por Fincas, Zonas de pasto y Rebaños individuales.
+* Control analítico de costes fijos y variables imputables por lote o animal.
 
-Se han incorporado en procesos relevantes:
+### Censo Ganadero y Trazabilidad 360
+* Identificación individualizada de cabezas de ganado por crotales oficiales.
+* Historial cronológico interactivo (Timeline de vida del animal): nacimientos, pesajes, tratamientos, traslados y ventas.
+* Integración con escáneres de cámara y lectores de mano para crotales mediante códigos de barras y códigos QR.
 
-- Estado de trámite (`borrador`, `presentado`, `aceptado`, `rechazado`).
-- Fecha de presentación.
-- Número de registro oficial.
-- Acuse de recibo.
+### Registro Oficial y Cuaderno Digital (RD 787/2023)
+* Generación automatizada del Cuaderno Digital Ganadero unificando censo, libro de tratamientos veterinarios, movimientos y bajas.
+* Validación previa de consistencia ganadera para auditorías.
+* Exportación oficial en formato PDF y compartición nativa mediante el sistema de archivos de Capacitor.
 
-La persistencia documental se realiza en `documentos_legales`.
+---
 
-### 3.3 Validación de consistencia
+## 3. Arquitectura Técnica
 
-- Validaciones cruzadas entre animales, crotales y número declarado.
-- Validación de datos obligatorios según tipo de trámite.
-- Refuerzo de validaciones en asistentes de guía, traslado y censo.
+La plataforma se ha desarrollado bajo una arquitectura PWA híbrida de alto rendimiento optimizada para su ejecución offline en zonas rurales sin conectividad:
 
-## 4. Arquitectura técnica
+```mermaid
+graph TD
+    A[Interfaz de Usuario - HTML5 / CSS3 / ES6] --> B[Controlador de Vistas / Wizards]
+    B --> C[Capa de Datos Local - IndexedDB]
+    B --> D[Service Worker - Caché Offline PWA]
+    A --> E[Capacitor Bridge - API Nativa Android]
+    E --> F[Almacenamiento y Compartición de Archivos PDF]
+    E --> G[Lector de Crotales - Cámara Nativa]
+```
 
-- Frontend: HTML, CSS y JavaScript.
-- Persistencia local: IndexedDB.
-- Entorno móvil: Capacitor (Android).
-- Soporte PWA: `manifest.webmanifest` y `sw.js`.
+### Tecnologías Clave:
+* **Frontend Core:** HTML5 semántico, CSS3 estructurado (Outfit Font System) y JavaScript ES6 modular libre de dependencias externas pesadas.
+* **Persistencia:** Base de datos IndexedDB local de alta capacidad (sincronizada en segundo plano).
+* **Motor Offline:** Service Worker con precarga de recursos estáticos y vistas para soporte offline del 100% de la funcionalidad.
+* **Hibridación:** Capacitor v5 con plugins nativos para cámara (barcode-scanner), sistema de archivos y compartición nativa (Share API).
 
-## 5. Estructura del repositorio
+---
+
+## 4. Estructura del Proyecto
 
 ```text
 .
-├─ index.html
-├─ css/
-├─ js/
-│  ├─ views/
-│  │  └─ wizards/
-│  ├─ qa-siggan.js
-│  ├─ qa-test-runner.js
-│  └─ qa-diagnostico.js
-├─ icons/
-├─ www/                    # salida de build para Capacitor (no versionada)
-├─ android/                # proyecto Android (no versionado)
-├─ sync-mirrors.ps1
-├─ capacitor.config.ts
-└─ package.json
+├── index.html                   # Página principal de la aplicación (SPA)
+├── manifest.webmanifest         # Configuración PWA para instalación web
+├── sw.js                        # Service Worker de gestión de caché offline
+├── css/                         # Hojas de estilo globales
+├── js/                          # Lógica y controladores de la aplicación
+│   ├── database.js              # Inicialización y persistencia de IndexedDB
+│   ├── icons.js                 # Biblioteca de iconos SVG vectoriales
+│   ├── views/                   # Controladores de las pantallas de la SPA
+│   │   ├── manuales-view.js     # Visor integrado de guías de usuario
+│   │   └── wizards/             # Flujos paso a paso de tareas críticas
+│   └── qa-siggan.js             # Batería de pruebas automatizadas QA
+├── icons/                       # Recursos gráficos e imágenes de marca de la app
+├── manual/                      # Directorio fuente de manuales en HTML
+│   ├── estilo-manuales.css      # CSS centralizado de los manuales
+│   └── img/                     # Capturas de pantalla de soporte ilustrativo
+├── scripts/                     # Scripts auxiliares y herramientas de compilación
+├── android/                     # Proyecto nativo compilable de Android Studio
+└── package.json                 # Definición de dependencias y scripts de construcción
 ```
 
-## 6. Requisitos
+---
 
-- Node.js 18 o superior.
-- npm.
-- Android Studio.
-- JDK compatible con Capacitor 5.
+## 5. Instalación y Construcción
 
-## 7. Instalación
+### Requisitos Previos:
+* Node.js v18.0 o superior.
+* npm v9.0 o superior.
+* Android Studio (con Android SDK 33+).
+* JDK 17 o superior.
 
-```bash
-npm install
-```
-
-## 8. Comandos principales
-
-```bash
-npm run build
-npm run cap:sync
-npm run cap:open
-```
-
-Descripción:
-
-- `npm run build`: genera `www` copiando recursos web.
-- `npm run cap:sync`: ejecuta build y sincroniza con Android.
-- `npm run cap:open`: abre el proyecto Android.
-
-## 9. Flujo operativo recomendado
-
-Este proyecto se opera en dos checkouts locales sincronizados a través de GitHub (`origin/master`):
-
-- `C:\livestock-manager`: entorno de build y prueba Android.
-- `C:\Users\yo\repo\LIVESTOCK-MANAGER`: entorno de sesiones Copilot/worktrees.
-
-Norma de trabajo:
-
-1. Al iniciar sesión de trabajo:
+### Configuración del Entorno:
+1. Clonar el repositorio localmente.
+2. Instalar las dependencias de Node.js:
    ```bash
-   git pull --ff-only origin master
+   npm install
    ```
-2. Tras validar cambios:
-   ```bash
-   git add -A
-   git commit -m "mensaje"
-   git push
-   ```
-3. Si hay cambios web (JS/CSS/HTML), ejecutar:
-   ```powershell
-   .\sync-mirrors.ps1
-   ```
-4. Si se modifica `sw.js`, incrementar `CACHE_NAME` para invalidación de caché.
 
-## 10. Validación funcional y QA
+### Scripts de Compilación:
+* **Construcción Web:** Compila y copia todos los archivos web necesarios al directorio de producción `www`:
+  ```bash
+  npm run build
+  ```
+* **Sincronización con Android:** Compila el proyecto web y sincroniza todos los recursos con la carpeta nativa de Android Assets:
+  ```bash
+  npm run cap:sync
+  ```
+* **Apertura en Android Studio:** Abre la consola de desarrollo de Android Studio apuntando al proyecto móvil:
+  ```bash
+  npm run cap:open
+  ```
 
-Desde consola de la aplicación:
+---
+
+## 6. Pruebas de Calidad (QA) y Consistencia
+
+La aplicación incluye un completo suite de diagnóstico funcional en `js/qa-siggan.js` ejecutable directamente desde la consola de desarrollador del navegador web o del dispositivo:
 
 ```js
+// Ejecutar el suite completo de pruebas
 await SigganQA.runAll();
+
+// Validar la cobertura del modelo de datos de trazabilidad
 await SigganQA.run("coverage");
+
+// Limpiar registros temporales de pruebas
 await SigganQA.cleanup();
 ```
 
-Utilidades adicionales:
+Adicionalmente, se pueden correr chequeos específicos de la app a través del módulo de testeo básico:
+* `window.QATestRunner.runAll()`: Pruebas unitarias de flujo.
+* `window.QADiagnostico.run()`: Evaluación de consistencia interna del almacenamiento IndexedDB.
 
-- `window.QATestRunner.runAll()`
-- `window.QATestRunner.runLevel(1-7)`
-- `window.QADiagnostico.run()`
+---
 
-## 11. Proceso de integración a master
+## 7. Licencia
 
-1. Publicar la rama de trabajo:
-   ```bash
-   git push -u origin <branch>
-   ```
-2. Crear Pull Request a `master`.
-3. Verificar build y QA.
-4. Ejecutar merge del Pull Request.
-
-## 12. Licencia
-
-Repositorio privado de uso interno del proyecto.
-
+Repositorio privado. Todos los derechos reservados. Uso exclusivo interno del proyecto Livestock Manager.
