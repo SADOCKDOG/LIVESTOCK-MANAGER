@@ -1,458 +1,344 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transportistas · Bienestar y Trazabilidad en Transporte · Livestock Manager</title>
-<style>
-  :root{
-    --acento:#3b82f6; --acento-claro:#60a5fa;
-    --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
-    --linea:#e4e4e4; --fondo:#ffffff; --suave:#eff6ff;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --oro:#c9851f;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
-  }
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Transportistas · Bienestar y Trazabilidad en Transporte · Livestock Manager</title>
+<style>:root{
+ --acento:#3b82f6; --acento-claro:#60a5fa;
+ --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
+ --linea:#e4e4e4; --fondo:#ffffff; --suave:#eff6ff;
+ --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --oro:#c9851f;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ -webkit-print-color-adjust:exact; print-color-adjust:exact;
+ }
+ .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
 
-  .portada{
-    text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#0f1f3d,#1e3a6e);
-    color:#fff; border-bottom:6px solid var(--acento-claro);
-  }
-  .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #3a5a8a;
-    border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
-  .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
+ .portada{
+ text-align:center; padding:60px 24px 50px;
+ background:linear-gradient(160deg,#0f1f3d,#1e3a6e);
+ color:#fff; border-bottom:6px solid var(--acento-claro);
+ }
+ .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
+ .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+ .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #3a5a8a;
+ border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
+ .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
 
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
-    border-left:5px solid var(--acento); padding-left:14px;
-  }
+ h2.modulo{
+ font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
+ border-left:5px solid var(--acento); padding-left:14px;
+ }
 
-  .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
-    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
-  .fase-tag.wizard{background:var(--oro);}
-  .fase-tag.maestro{background:#6366f1;}
-  .fase-tag.normativa{background:#dc2626;}
-  .intro-mod{color:var(--gris); margin:8px 0 16px;}
+ .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
+ padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+ .fase-tag.wizard{background:var(--oro);}
+ .fase-tag.maestro{background:#6366f1;}
+ .fase-tag.normativa{background:#dc2626;}
+ .intro-mod{color:var(--gris); margin:8px 0 16px;}
 
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center;
-  }
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
+ display:flex; align-items:center; justify-content:center;
+ }
 
-  ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
-  ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
-  ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--acento); font-weight:700;}
+ ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
+ ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
+ ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--acento); font-weight:700;}
 
-  .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#6b5418;}
-  .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#7a241b;}
-  .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#14512f;}
-  .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem;}
+ .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#6b5418;}
+ .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#7a241b;}
+ .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#14512f;}
+ .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem;}
 
-  figure{margin:18px 0; text-align:center;}
-  figure img{
-    max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.12);
-  }
-  figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
+ figure{margin:18px 0; text-align:center;}
+ figure img{
+ max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
+ box-shadow:0 6px 22px rgba(0,0,0,.12);
+ }
+ figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
 
-  .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
-  .seccion:last-child{border-bottom:none;}
+ .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
+ .seccion:last-child{border-bottom:none;}
 
-  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
-  .indice h3{margin:0 0 14px; color:var(--tinta);}
-  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
-  .indice li{margin-bottom:7px;}
-  .indice a{color:var(--tinta); text-decoration:none;}
-  .indice a:hover{color:var(--acento); text-decoration:underline;}
+ .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
+ .indice h3{margin:0 0 14px; color:var(--tinta);}
+ .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
+ .indice li{margin-bottom:7px;}
+ .indice a{color:var(--tinta); text-decoration:none;}
+ .indice a:hover{color:var(--acento); text-decoration:underline;}
 
-  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
-  .ruta{color:var(--acento); font-weight:600;}
-  .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
+ kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
+ .ruta{color:var(--acento); font-weight:600;}
+ .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
 
-  .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
-    padding:20px 24px; margin:20px 0;}
-  .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
-  .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
-  .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
-  .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
+ .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
+ padding:20px 24px; margin:20px 0;}
+ .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
+ .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
+ .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
+ .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
 
-  table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
-  table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
-  table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
-  table.parametros .ok{color:var(--verde); font-weight:700;}
-  table.parametros .alert{color:var(--rojo); font-weight:700;}
+ table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
+ table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
+ table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
+ table.parametros .ok{color:var(--verde); font-weight:700;}
+ table.parametros .alert{color:var(--rojo); font-weight:700;}
 
-  .tabs-ej{display:flex; gap:10px; margin:16px 0; flex-wrap:wrap;}
-  .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
-    border:1px solid var(--linea); cursor:default; white-space:nowrap;}
-  .tab-ej.camion{background:#eff6ff; color:#1d4ed8; border-color:#3b82f6;}
-  .tab-ej.furgoneta{background:#f0fdf4; color:#166534; border-color:#22c55e;}
-  .tab-ej.remolque{background:#fef9e7; color:#b45309; border-color:#f59e0b;}
-  .tab-ej.cisterna{background:#faf5ff; color:#7e22ce; border-color:#a855f7;}
+ .tabs-ej{display:flex; gap:10px; margin:16px 0; flex-wrap:wrap;}
+ .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
+ border:1px solid var(--linea); cursor:default; white-space:nowrap;}
+ .tab-ej.camion{background:#eff6ff; color:#1d4ed8; border-color:#3b82f6;}
+ .tab-ej.furgoneta{background:#f0fdf4; color:#166534; border-color:#22c55e;}
+ .tab-ej.remolque{background:#fef9e7; color:#b45309; border-color:#f59e0b;}
+ .tab-ej.cisterna{background:#faf5ff; color:#7e22ce; border-color:#a855f7;}
 
-  @media print{
-    body{font-size:12px;}
-    .portada{padding:40px 24px;}
-    .seccion{page-break-inside:avoid; padding:18px 0;}
-    figure img{max-width:230px; box-shadow:none;}
-    a{color:var(--tinta) !important; text-decoration:none;}
-    .indice ol{columns:2;}
-  }
-</style>
-</head>
-<body>
+ @media print{
+ body{font-size:12px;}
+ .portada{padding:40px 24px;}
+ .seccion{page-break-inside:avoid; padding:18px 0;}
+ figure img{max-width:230px; box-shadow:none;}
+ a{color:var(--tinta) !important; text-decoration:none;}
+ .indice ol{columns:2;}
+ }</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><h1>Transportistas</h1>
+ <p class="sub">Bienestar y Trazabilidad en Transporte — Guía completa paso a paso</p>
+ <div class="badge">MANUAL PRÁCTICO · Registro de transportistas y expediciones</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" class="logo-img">
-  <h1>🚛 Transportistas</h1>
-  <p class="sub">Bienestar y Trazabilidad en Transporte — Guía completa paso a paso</p>
-  <div class="badge">MANUAL PRÁCTICO · Registro de transportistas y expediciones</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">Sobre este manual</h2>
+ <p class="intro-mod">Este manual documenta el <strong>módulo de Transportistas</strong> de Livestock Manager.
+ Un transportista es la empresa o autónomo que realiza el traslado de animales desde la
+ explotación hasta el matadero, mercado u otro destino. Su registro es obligatorio para
+ cumplir con la normativa de bienestar animal en el transporte y para generar correctamente
+ el documento DIMOE en las ventas de carne.</p>
+ <p class="intro-mod">El módulo también permite registrar transportistas de leche (cisternas), que aparecen
+ en los albaranes de recogida.</p>
 
-<div class="wrap">
+ <div class="indice"><h3>Índice</h3>
+ <ol><li><a href="#normativa">Normativa de bienestar en transporte</a></li>
+ <li><a href="#acceso">Acceso a Transportistas</a></li>
+ <li><a href="#formulario">Formulario de alta</a></li>
+ <li><a href="#tipos-vehiculo">Tipos de vehículo</a></li>
+ <li><a href="#venta-masiva">Uso en la Venta Masiva (DIMOE)</a></li>
+ <li><a href="#ficha">Ficha de transportista</a></li>
+ <li><a href="#ejemplo">Ejemplo con datos demo</a></li></ol></div></section>
 
-  <section class="seccion">
-    <h2 class="modulo">📖 Sobre este manual</h2>
-    <p class="intro-mod">
-      Este manual documenta el <strong>módulo de Transportistas</strong> de Livestock Manager.
-      Un transportista es la empresa o autónomo que realiza el traslado de animales desde la
-      explotación hasta el matadero, mercado u otro destino. Su registro es obligatorio para
-      cumplir con la normativa de bienestar animal en el transporte y para generar correctamente
-      el documento DIMOE en las ventas de carne.
-    </p>
-    <p class="intro-mod">
-      El módulo también permite registrar transportistas de leche (cisternas), que aparecen
-      en los albaranes de recogida.
-    </p>
+ <!-- ============================================================= -->
+ <!-- 1. NORMATIVA -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="normativa"><span class="fase-tag normativa">Normativa</span>
+ <h2 class="modulo">1. Normativa de bienestar animal en transporte</h2>
+ <p class="intro-mod">El Reglamento (CE) 1/2005 del Parlamento Europeo regula la protección de los animales
+ durante el transporte. En España, el Real Decreto 751/2006 establece los requisitos
+ específicos para el transporte de animales de granja.</p>
 
-    <div class="indice">
-      <h3>📋 Índice</h3>
-      <ol>
-        <li><a href="#normativa">Normativa de bienestar en transporte</a></li>
-        <li><a href="#acceso">Acceso a Transportistas</a></li>
-        <li><a href="#formulario">Formulario de alta</a></li>
-        <li><a href="#tipos-vehiculo">Tipos de vehículo</a></li>
-        <li><a href="#venta-masiva">Uso en la Venta Masiva (DIMOE)</a></li>
-        <li><a href="#ficha">Ficha de transportista</a></li>
-        <li><a href="#ejemplo">Ejemplo con datos demo</a></li>
-      </ol>
-    </div>
-  </section>
+ <h4>Requisitos clave para el transportista</h4>
+ <ul><li><strong>Autorización de transportista:</strong> Toda empresa o persona que transporte animales de producción con fines comerciales debe estar autorizada por la autoridad competente de su comunidad autónoma.</li>
+ <li><strong>Certificado de competencia:</strong> Los conductores y acompañantes deben acreditar formación en bienestar animal en el transporte.</li>
+ <li><strong>Medios de transporte autorizados:</strong> Los vehículos deben cumplir requisitos de espacio, ventilación, temperatura y acceso a agua para los animales.</li>
+ <li><strong>Condiciones termoneutrales:</strong> Para transportes de más de 8 horas, el vehículo debe disponer de sistemas para mantener temperatura adecuada.</li>
+ <li><strong>Registro de transporte (número INTRA):</strong> Número oficial de autorización del transportista para movimientos intracomunitarios.</li></ul>
 
-  <!-- ============================================================= -->
-  <!-- 1. NORMATIVA -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="normativa">
-    <span class="fase-tag normativa">Normativa</span>
-    <h2 class="modulo">1. Normativa de bienestar animal en transporte</h2>
-    <p class="intro-mod">
-      El Reglamento (CE) 1/2005 del Parlamento Europeo regula la protección de los animales
-      durante el transporte. En España, el Real Decreto 751/2006 establece los requisitos
-      específicos para el transporte de animales de granja.
-    </p>
+ <div class="aviso"><strong>Importante:</strong> Sin el certificado de bienestar animal, el transportista no puede
+ realizar traslados de animales vivos. En la Venta Masiva, el sistema permite indicar si el
+ transportista tiene o no este certificado, lo cual queda reflejado en el DIMOE.</div></section>
 
-    <h4>Requisitos clave para el transportista</h4>
-    <ul>
-      <li><strong>Autorización de transportista:</strong> Toda empresa o persona que transporte animales de producción con fines comerciales debe estar autorizada por la autoridad competente de su comunidad autónoma.</li>
-      <li><strong>Certificado de competencia:</strong> Los conductores y acompañantes deben acreditar formación en bienestar animal en el transporte.</li>
-      <li><strong>Medios de transporte autorizados:</strong> Los vehículos deben cumplir requisitos de espacio, ventilación, temperatura y acceso a agua para los animales.</li>
-      <li><strong>Condiciones termoneutrales:</strong> Para transportes de más de 8 horas, el vehículo debe disponer de sistemas para mantener temperatura adecuada.</li>
-      <li><strong>Registro de transporte (número INTRA):</strong> Número oficial de autorización del transportista para movimientos intracomunitarios.</li>
-    </ul>
+ <!-- ============================================================= -->
+ <!-- 2. ACCESO -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="acceso"><span class="fase-tag">Inicio</span>
+ <h2 class="modulo">2. Acceso a Transportistas</h2>
+ <p class="intro-mod">Accede al módulo de transportistas desde <span class="ruta">Más → Transportistas</span> en
+ la barra de navegación inferior.</p>
 
-    <div class="aviso">
-      <strong>Importante:</strong> Sin el certificado de bienestar animal, el transportista no puede
-      realizar traslados de animales vivos. En la Venta Masiva, el sistema permite indicar si el
-      transportista tiene o no este certificado, lo cual queda reflejado en el DIMOE.
-    </div>
-  </section>
+ <p>Desde la pantalla principal puedes:</p>
+ <ul><li>Ver el listado de transportistas activos e inactivos</li>
+ <li>Filtrar por estado (activos / inactivos)</li>
+ <li>Ver el badge de certificado de bienestar de cada transportista en la tarjeta</li>
+ <li><strong>Registrar un nuevo transportista</strong> pulsando <kbd>Nuevo Transportista</kbd></li>
+ <li>Pulsar sobre cualquier transportista para ver su ficha con el historial de expediciones</li></ul></section>
 
-  <!-- ============================================================= -->
-  <!-- 2. ACCESO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="acceso">
-    <span class="fase-tag">Inicio</span>
-    <h2 class="modulo">2. Acceso a Transportistas</h2>
-    <p class="intro-mod">
-      Accede al módulo de transportistas desde <span class="ruta">Más → Transportistas</span> en
-      la barra de navegación inferior.
-    </p>
+ <!-- ============================================================= -->
+ <!-- 3. FORMULARIO -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="formulario"><span class="fase-tag wizard">Formulario</span>
+ <h2 class="modulo">3. Formulario de alta de transportista</h2>
+ <p class="intro-mod">Se abre pulsando <kbd>Nuevo Transportista</kbd> o <kbd>️ Editar</kbd> desde la ficha.</p>
 
-    <p>Desde la pantalla principal puedes:</p>
-    <ul>
-      <li>Ver el listado de transportistas activos e inactivos</li>
-      <li>Filtrar por estado (activos / inactivos)</li>
-      <li>Ver el badge de certificado de bienestar de cada transportista en la tarjeta</li>
-      <li><strong>Registrar un nuevo transportista</strong> pulsando <kbd>➕ Nuevo Transportista</kbd></li>
-      <li>Pulsar sobre cualquier transportista para ver su ficha con el historial de expediciones</li>
-    </ul>
-  </section>
+ <h4>Campos del formulario</h4>
+ <table class="parametros"><tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
+ <tr><td><span class="campo">Nombre / Razón Social</span></td><td class="ok">Sí</td><td>Nombre de la empresa transportista o autónomo</td></tr>
+ <tr><td><span class="campo">NIF/CIF</span></td><td class="ok">Sí</td><td>Identificación fiscal. Debe ser único en el sistema.</td></tr>
+ <tr><td><span class="campo">Matrícula del Vehículo</span></td><td>No</td><td>Matrícula principal del vehículo de transporte (ej: 1234ABC). Se almacena en mayúsculas.</td></tr>
+ <tr><td><span class="campo">Registro de Transporte</span></td><td>No</td><td>Número oficial de autorización INTRA del transportista</td></tr>
+ <tr><td><span class="campo">Teléfono</span></td><td>No</td><td>Teléfono de contacto</td></tr>
+ <tr><td><span class="campo">Email</span></td><td>No</td><td>Correo electrónico de contacto</td></tr>
+ <tr><td><span class="campo">Dirección</span></td><td>No</td><td>Dirección postal completa</td></tr>
+ <tr><td><span class="campo">Ciudad</span></td><td>No</td><td>Localidad del transportista</td></tr>
+ <tr><td><span class="campo">Código Postal</span></td><td>No</td><td>CP de la localidad</td></tr>
+ <tr><td><span class="campo">Provincia</span></td><td>No</td><td>Provincia del transportista</td></tr>
+ <tr><td><span class="campo">Tipo de Vehículo</span></td><td>No</td><td>camion / furgoneta / remolque / cisterna (ver sección 4)</td></tr>
+ <tr><td><span class="campo">Capacidad (animales)</span></td><td>No</td><td>Número máximo de animales que puede transportar el vehículo. Para cisternas, poner 0.</td></tr>
+ <tr><td><span class="campo">Certificado de bienestar animal</span></td><td>No</td><td>Checkbox: el transportista dispone del certificado de bienestar en el transporte</td></tr>
+ <tr><td><span class="campo">Condiciones termoneutrales</span></td><td>No</td><td>Checkbox: el vehículo dispone de sistema de control de temperatura</td></tr>
+ <tr><td><span class="campo">Activo</span></td><td>No</td><td>Checkbox para activar/desactivar (por defecto: activado)</td></tr>
+ <tr><td><span class="campo">Notas</span></td><td>No</td><td>Observaciones adicionales</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 3. FORMULARIO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="formulario">
-    <span class="fase-tag wizard">Formulario</span>
-    <h2 class="modulo">3. Formulario de alta de transportista</h2>
-    <p class="intro-mod">
-      Se abre pulsando <kbd>➕ Nuevo Transportista</kbd> o <kbd>✏️ Editar</kbd> desde la ficha.
-    </p>
+ <ol class="pasos"><li><strong>Pulsa</strong> <kbd>Nuevo Transportista</kbd> en la pantalla de Transportistas</li>
+ <li><strong>Introduce</strong> el nombre y NIF/CIF (obligatorios)</li>
+ <li><strong>Añade</strong> la matrícula del vehículo y el número de registro de transporte</li>
+ <li><strong>Selecciona</strong> el tipo de vehículo en el desplegable</li>
+ <li><strong>Marca</strong> el checkbox de certificado de bienestar si el transportista lo tiene</li>
+ <li><strong>Pulsa</strong> <kbd>GUARDAR</kbd> para registrar el transportista</li></ol></section>
 
-    <h4>Campos del formulario</h4>
-    <table class="parametros">
-      <tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
-      <tr><td><span class="campo">Nombre / Razón Social</span></td><td class="ok">Sí</td><td>Nombre de la empresa transportista o autónomo</td></tr>
-      <tr><td><span class="campo">NIF/CIF</span></td><td class="ok">Sí</td><td>Identificación fiscal. Debe ser único en el sistema.</td></tr>
-      <tr><td><span class="campo">Matrícula del Vehículo</span></td><td>No</td><td>Matrícula principal del vehículo de transporte (ej: 1234ABC). Se almacena en mayúsculas.</td></tr>
-      <tr><td><span class="campo">Registro de Transporte</span></td><td>No</td><td>Número oficial de autorización INTRA del transportista</td></tr>
-      <tr><td><span class="campo">Teléfono</span></td><td>No</td><td>Teléfono de contacto</td></tr>
-      <tr><td><span class="campo">Email</span></td><td>No</td><td>Correo electrónico de contacto</td></tr>
-      <tr><td><span class="campo">Dirección</span></td><td>No</td><td>Dirección postal completa</td></tr>
-      <tr><td><span class="campo">Ciudad</span></td><td>No</td><td>Localidad del transportista</td></tr>
-      <tr><td><span class="campo">Código Postal</span></td><td>No</td><td>CP de la localidad</td></tr>
-      <tr><td><span class="campo">Provincia</span></td><td>No</td><td>Provincia del transportista</td></tr>
-      <tr><td><span class="campo">Tipo de Vehículo</span></td><td>No</td><td>camion / furgoneta / remolque / cisterna (ver sección 4)</td></tr>
-      <tr><td><span class="campo">Capacidad (animales)</span></td><td>No</td><td>Número máximo de animales que puede transportar el vehículo. Para cisternas, poner 0.</td></tr>
-      <tr><td><span class="campo">Certificado de bienestar animal</span></td><td>No</td><td>Checkbox: el transportista dispone del certificado de bienestar en el transporte</td></tr>
-      <tr><td><span class="campo">Condiciones termoneutrales</span></td><td>No</td><td>Checkbox: el vehículo dispone de sistema de control de temperatura</td></tr>
-      <tr><td><span class="campo">Activo</span></td><td>No</td><td>Checkbox para activar/desactivar (por defecto: activado)</td></tr>
-      <tr><td><span class="campo">Notas</span></td><td>No</td><td>Observaciones adicionales</td></tr>
-    </table>
+ <!-- ============================================================= -->
+ <!-- 4. TIPOS DE VEHÍCULO -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="tipos-vehiculo"><span class="fase-tag">Tipos</span>
+ <h2 class="modulo">4. Tipos de vehículo</h2>
+ <p class="intro-mod">El tipo de vehículo describe la modalidad de transporte del transportista. Afecta a cómo
+ se interpreta la capacidad y a las condiciones de bienestar aplicables.</p>
 
-    <ol class="pasos">
-      <li><strong>Pulsa</strong> <kbd>➕ Nuevo Transportista</kbd> en la pantalla de Transportistas</li>
-      <li><strong>Introduce</strong> el nombre y NIF/CIF (obligatorios)</li>
-      <li><strong>Añade</strong> la matrícula del vehículo y el número de registro de transporte</li>
-      <li><strong>Selecciona</strong> el tipo de vehículo en el desplegable</li>
-      <li><strong>Marca</strong> el checkbox de certificado de bienestar si el transportista lo tiene</li>
-      <li><strong>Pulsa</strong> <kbd>💾 GUARDAR</kbd> para registrar el transportista</li>
-    </ol>
-  </section>
+ <table class="parametros"><tr><th>Tipo</th><th>Valor interno</th><th>Uso típico</th></tr>
+ <tr><td><span class="campo">Camión</span></td>
+ <td><code>camion</code></td>
+ <td>Vehículo de gran tonelaje para transporte de animales vivos (vacuno, porcino, ovino). El más habitual para ventas de carne.</td></tr>
+ <tr><td><span class="campo">Furgoneta</span></td>
+ <td><code>furgoneta</code></td>
+ <td>Vehículo ligero para pequeñas cargas (caprino, aves, animales pequeños) o transporte de distancias cortas.</td></tr>
+ <tr><td><span class="campo">Remolque</span></td>
+ <td><code>remolque</code></td>
+ <td>Remolque ganadero tirado por tractor o camión. Habitual en explotaciones para movimientos entre fincas.</td></tr>
+ <tr><td><span class="campo">Cisterna</span></td>
+ <td><code>cisterna</code></td>
+ <td>Vehículo cisterna para recogida y transporte de leche. La capacidad de animales debe ser 0.</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 4. TIPOS DE VEHÍCULO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="tipos-vehiculo">
-    <span class="fase-tag">Tipos</span>
-    <h2 class="modulo">4. Tipos de vehículo</h2>
-    <p class="intro-mod">
-      El tipo de vehículo describe la modalidad de transporte del transportista. Afecta a cómo
-      se interpreta la capacidad y a las condiciones de bienestar aplicables.
-    </p>
+ <div class="tabs-ej"><span class="tab-ej camion">Camión</span>
+ <span class="tab-ej furgoneta">Furgoneta</span>
+ <span class="tab-ej remolque">Remolque</span>
+ <span class="tab-ej cisterna">Cisterna</span></div>
 
-    <table class="parametros">
-      <tr><th>Tipo</th><th>Valor interno</th><th>Uso típico</th></tr>
-      <tr>
-        <td><span class="campo">Camión</span></td>
-        <td><code>camion</code></td>
-        <td>Vehículo de gran tonelaje para transporte de animales vivos (vacuno, porcino, ovino). El más habitual para ventas de carne.</td>
-      </tr>
-      <tr>
-        <td><span class="campo">Furgoneta</span></td>
-        <td><code>furgoneta</code></td>
-        <td>Vehículo ligero para pequeñas cargas (caprino, aves, animales pequeños) o transporte de distancias cortas.</td>
-      </tr>
-      <tr>
-        <td><span class="campo">Remolque</span></td>
-        <td><code>remolque</code></td>
-        <td>Remolque ganadero tirado por tractor o camión. Habitual en explotaciones para movimientos entre fincas.</td>
-      </tr>
-      <tr>
-        <td><span class="campo">Cisterna</span></td>
-        <td><code>cisterna</code></td>
-        <td>Vehículo cisterna para recogida y transporte de leche. La capacidad de animales debe ser 0.</td>
-      </tr>
-    </table>
+ <div class="nota"><strong>Nota:</strong> El tipo de vehículo es informativo y se muestra en la ficha del
+ transportista. En el DIMOE generado en la Venta Masiva se incluye la matrícula, no el
+ tipo de vehículo.</div></section>
 
-    <div class="tabs-ej">
-      <span class="tab-ej camion">🚛 Camión</span>
-      <span class="tab-ej furgoneta">🚐 Furgoneta</span>
-      <span class="tab-ej remolque">🚜 Remolque</span>
-      <span class="tab-ej cisterna">🥛 Cisterna</span>
-    </div>
+ <!-- ============================================================= -->
+ <!-- 5. VENTA MASIVA / DIMOE -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="venta-masiva"><span class="fase-tag">DIMOE</span>
+ <h2 class="modulo">5. El transportista en la Venta Masiva (DIMOE)</h2>
+ <p class="intro-mod">En la <strong>Venta Masiva</strong> de animales, uno de los pasos del wizard solicita los
+ datos del transportista. Estos datos son imprescindibles para generar el <strong>DIMOE</strong>
+ (Documento de Identificación y Movimiento de Ovino y Caprino) o el equivalente para otras
+ especies.</p>
 
-    <div class="nota">
-      <strong>Nota:</strong> El tipo de vehículo es informativo y se muestra en la ficha del
-      transportista. En el DIMOE generado en la Venta Masiva se incluye la matrícula, no el
-      tipo de vehículo.
-    </div>
-  </section>
+ <h4>Datos del transportista que van al DIMOE</h4>
+ <table class="parametros"><tr><th>Dato</th><th>Campo en transportista</th></tr>
+ <tr><td>Nombre del transportista</td><td><span class="campo">nombre</span></td></tr>
+ <tr><td>NIF/CIF del transportista</td><td><span class="campo">nif_cif</span></td></tr>
+ <tr><td>Matrícula del vehículo</td><td><span class="campo">matricula</span></td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 5. VENTA MASIVA / DIMOE -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="venta-masiva">
-    <span class="fase-tag">DIMOE</span>
-    <h2 class="modulo">5. El transportista en la Venta Masiva (DIMOE)</h2>
-    <p class="intro-mod">
-      En la <strong>Venta Masiva</strong> de animales, uno de los pasos del wizard solicita los
-      datos del transportista. Estos datos son imprescindibles para generar el <strong>DIMOE</strong>
-      (Documento de Identificación y Movimiento de Ovino y Caprino) o el equivalente para otras
-      especies.
-    </p>
+ <p>En el wizard de Venta Masiva puedes:</p>
+ <ul><li><strong>Seleccionar un transportista registrado</strong> (los datos se autocompletan)</li>
+ <li>O <strong>introducir los datos manualmente</strong> si el transportista no está en el sistema</li></ul>
 
-    <h4>Datos del transportista que van al DIMOE</h4>
-    <table class="parametros">
-      <tr><th>Dato</th><th>Campo en transportista</th></tr>
-      <tr><td>Nombre del transportista</td><td><span class="campo">nombre</span></td></tr>
-      <tr><td>NIF/CIF del transportista</td><td><span class="campo">nif_cif</span></td></tr>
-      <tr><td>Matrícula del vehículo</td><td><span class="campo">matricula</span></td></tr>
-    </table>
+ <div class="tip"><strong>Tip:</strong> Registra previamente los transportistas habituales para agilizar el
+ proceso de venta. Al seleccionarlos en el wizard, todos los campos del DIMOE se rellenan
+ automáticamente.</div></section>
 
-    <p>En el wizard de Venta Masiva puedes:</p>
-    <ul>
-      <li><strong>Seleccionar un transportista registrado</strong> (los datos se autocompletan)</li>
-      <li>O <strong>introducir los datos manualmente</strong> si el transportista no está en el sistema</li>
-    </ul>
+ <!-- ============================================================= -->
+ <!-- 6. FICHA -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="ficha"><span class="fase-tag maestro">Ficha</span>
+ <h2 class="modulo">6. Ficha de transportista</h2>
+ <p class="intro-mod">Pulsa sobre cualquier transportista en el listado para abrir su ficha detallada.</p>
 
-    <div class="tip">
-      <strong>Tip:</strong> Registra previamente los transportistas habituales para agilizar el
-      proceso de venta. Al seleccionarlos en el wizard, todos los campos del DIMOE se rellenan
-      automáticamente.
-    </div>
-  </section>
+ <h4>La ficha muestra:</h4>
+ <table class="parametros"><tr><th>Sección</th><th>Contenido</th></tr>
+ <tr><td><span class="campo">KPIs</span></td><td>Total de expediciones realizadas y peso vivo total transportado</td></tr>
+ <tr><td><span class="campo">Datos identificativos</span></td><td>NIF, matrícula, registro de transporte, tipo de vehículo, capacidad</td></tr>
+ <tr><td><span class="campo">Estado bienestar</span></td><td>Badge de certificado de bienestar (verde/rojo) y badge de condiciones termoneutrales</td></tr>
+ <tr><td><span class="campo">Contacto</span></td><td>Teléfono, email, dirección</td></tr>
+ <tr><td><span class="campo">Historial expediciones</span></td><td>Lista de todas las ventas de carne en las que ha participado este transportista, con fecha, animal y peso vivo</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 6. FICHA -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="ficha">
-    <span class="fase-tag maestro">Ficha</span>
-    <h2 class="modulo">6. Ficha de transportista</h2>
-    <p class="intro-mod">
-      Pulsa sobre cualquier transportista en el listado para abrir su ficha detallada.
-    </p>
+ <div class="aviso"><strong>No se puede eliminar un transportista</strong> si tiene expediciones registradas.
+ Márcalo como <strong>inactivo</strong> si ya no trabaja contigo pero quieres conservar el
+ historial de sus expediciones anteriores.</div></section>
 
-    <h4>La ficha muestra:</h4>
-    <table class="parametros">
-      <tr><th>Sección</th><th>Contenido</th></tr>
-      <tr><td><span class="campo">KPIs</span></td><td>Total de expediciones realizadas y peso vivo total transportado</td></tr>
-      <tr><td><span class="campo">Datos identificativos</span></td><td>NIF, matrícula, registro de transporte, tipo de vehículo, capacidad</td></tr>
-      <tr><td><span class="campo">Estado bienestar</span></td><td>Badge de certificado de bienestar (verde/rojo) y badge de condiciones termoneutrales</td></tr>
-      <tr><td><span class="campo">Contacto</span></td><td>Teléfono, email, dirección</td></tr>
-      <tr><td><span class="campo">Historial expediciones</span></td><td>Lista de todas las ventas de carne en las que ha participado este transportista, con fecha, animal y peso vivo</td></tr>
-    </table>
+ <!-- ============================================================= -->
+ <!-- 7. SIGGAN -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="siggan"><span class="fase-tag normativa">SIGGAN · Andalucía</span>
+ <h2 class="modulo">7. Transportistas y la Guía de Movimiento SIGGAN</h2>
+ <p class="intro-mod">Todo movimiento de animales entre explotaciones exige una <strong>Guía de Movimiento</strong>
+ (también llamada DIMOE en el ámbito nacional). En Andalucía, esta guía se tramita y queda registrada
+ en SIGGAN. El transportista es un dato obligatorio en cada guía.</p>
 
-    <div class="aviso">
-      <strong>No se puede eliminar un transportista</strong> si tiene expediciones registradas.
-      Márcalo como <strong>inactivo</strong> si ya no trabaja contigo pero quieres conservar el
-      historial de sus expediciones anteriores.
-    </div>
-  </section>
+ <h4>Datos del transportista requeridos por SIGGAN</h4>
+ <table class="parametros"><tr><th>Campo</th><th>Requerido en Guía de Movimiento</th></tr>
+ <tr><td>NIF/CIF</td><td>Sí — identifica al operador de transporte</td></tr>
+ <tr><td>Matrícula del vehículo</td><td>Sí — identificación del medio de transporte</td></tr>
+ <tr><td>Autorización de transporte</td><td>Sí — número de autorización sanitaria</td></tr>
+ <tr><td>Certificado bienestar animal</td><td>Sí (para viajes &gt; 8 h o &gt; 50 km en rumiantes)</td></tr>
+ <tr><td>Desinsectación del vehículo</td><td>Exigida en movimientos con riesgo sanitario</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 7. SIGGAN -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="siggan">
-    <span class="fase-tag normativa">SIGGAN · Andalucía</span>
-    <h2 class="modulo">7. Transportistas y la Guía de Movimiento SIGGAN</h2>
-    <p class="intro-mod">
-      Todo movimiento de animales entre explotaciones exige una <strong>Guía de Movimiento</strong>
-      (también llamada DIMOE en el ámbito nacional). En Andalucía, esta guía se tramita y queda registrada
-      en SIGGAN. El transportista es un dato obligatorio en cada guía.
-    </p>
+ <h4>Flujo SIGGAN para un movimiento</h4>
+ <ol class="pasos"><li>Da de alta el transportista en <span class="ruta">Más → Transportistas</span> con todos sus datos.</li>
+ <li>Registra el movimiento desde <span class="ruta">Ajustes → Trámites SIGGAN → Guía de Movimiento</span>:
+ el sistema incorpora automáticamente la matrícula y el certificado del transportista seleccionado.</li>
+ <li>Introduce el <strong>REGA de origen y destino</strong>, las fechas de carga/descarga y el número de animales.</li>
+ <li>Exporta o imprime la guía para que el conductor la lleve durante el transporte.</li></ol>
 
-    <h4>Datos del transportista requeridos por SIGGAN</h4>
-    <table class="parametros">
-      <tr><th>Campo</th><th>Requerido en Guía de Movimiento</th></tr>
-      <tr><td>NIF/CIF</td><td>Sí — identifica al operador de transporte</td></tr>
-      <tr><td>Matrícula del vehículo</td><td>Sí — identificación del medio de transporte</td></tr>
-      <tr><td>Autorización de transporte</td><td>Sí — número de autorización sanitaria</td></tr>
-      <tr><td>Certificado bienestar animal</td><td>Sí (para viajes &gt; 8 h o &gt; 50 km en rumiantes)</td></tr>
-      <tr><td>Desinsectación del vehículo</td><td>Exigida en movimientos con riesgo sanitario</td></tr>
-    </table>
+ <div class="aviso"><strong>Obligación legal:</strong> El transportista debe llevar en el vehículo la Guía de Movimiento
+ durante todo el trayecto. Sin ella, la carga puede ser retenida en cualquier control de carretera.</div></section>
 
-    <h4>Flujo SIGGAN para un movimiento</h4>
-    <ol class="pasos">
-      <li>Da de alta el transportista en <span class="ruta">Más → Transportistas</span> con todos sus datos.</li>
-      <li>Registra el movimiento desde <span class="ruta">Ajustes → Trámites SIGGAN → Guía de Movimiento</span>:
-          el sistema incorpora automáticamente la matrícula y el certificado del transportista seleccionado.</li>
-      <li>Introduce el <strong>REGA de origen y destino</strong>, las fechas de carga/descarga y el número de animales.</li>
-      <li>Exporta o imprime la guía para que el conductor la lleve durante el transporte.</li>
-    </ol>
+ <!-- ============================================================= -->
+ <!-- 8. EJEMPLO (renumerado) -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="ejemplo"><span class="fase-tag">Ejemplo</span>
+ <h2 class="modulo">7. Ejemplo con la demo CHAMORRO</h2>
+ <p class="intro-mod">La demo <strong>CHAMORRO</strong> incluye 2 transportistas precargados que ilustran
+ los dos casos de uso más habituales:</p>
 
-    <div class="aviso">
-      <strong>Obligación legal:</strong> El transportista debe llevar en el vehículo la Guía de Movimiento
-      durante todo el trayecto. Sin ella, la carga puede ser retenida en cualquier control de carretera.
-    </div>
-  </section>
+ <div class="panel-ejemplo"><h4>Transportistas de la demo CHAMORRO</h4>
+ <table><tr><th>Nombre</th><th>NIF/CIF</th><th>Matrícula</th><th>Tipo</th><th>Cert. Bienestar</th><th>Termoneutral</th></tr>
+ <tr><td>Transportes Ganaderos del Sur SL</td><td>B32109876</td><td>1234BCD</td><td>camion</td><td>Sí</td><td>—</td></tr>
+ <tr><td>Logística Láctea Extremeña</td><td>B21098765</td><td>5678EFG</td><td>cisterna</td><td>—</td><td>Sí</td></tr></table></div>
 
-  <!-- ============================================================= -->
-  <!-- 8. EJEMPLO (renumerado) -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="ejemplo">
-    <span class="fase-tag">Ejemplo</span>
-    <h2 class="modulo">7. Ejemplo con la demo CHAMORRO</h2>
-    <p class="intro-mod">
-      La demo <strong>CHAMORRO</strong> incluye 2 transportistas precargados que ilustran
-      los dos casos de uso más habituales:
-    </p>
+ <p>En la demo:</p>
+ <ul><li><strong>Transportes Ganaderos del Sur SL</strong> (matrícula 1234BCD) aparece en la venta
+ del ternero ES123456789016, en el DIMOE número DIMOE-ALB-2025-0007. Es un camión ganadero
+ con certificado de bienestar animal.</li>
+ <li><strong>Logística Láctea Extremeña</strong> (matrícula 5678EFG) aparece como la cisterna
+ que recoge la leche en los 3 albaranes de entrega a Lácteos La Serena SA. Al ser una cisterna
+ de leche, tiene condiciones termoneutrales pero su capacidad de animales es 0.</li></ul>
 
-    <div class="panel-ejemplo">
-      <h4>📐 Transportistas de la demo CHAMORRO</h4>
-      <table>
-        <tr><th>Nombre</th><th>NIF/CIF</th><th>Matrícula</th><th>Tipo</th><th>Cert. Bienestar</th><th>Termoneutral</th></tr>
-        <tr><td>Transportes Ganaderos del Sur SL</td><td>B32109876</td><td>1234BCD</td><td>camion</td><td>✅ Sí</td><td>—</td></tr>
-        <tr><td>Logística Láctea Extremeña</td><td>B21098765</td><td>5678EFG</td><td>cisterna</td><td>—</td><td>✅ Sí</td></tr>
-      </table>
-    </div>
+ <div class="nota"><strong>Ciudad de Logística Láctea Extremeña:</strong> Villanueva de la Serena (Badajoz).
+ Es un ejemplo de empresa de transporte lácteo ubicada en la comarca de La Serena, muy habitual
+ en la ganadería vacuna de leche extremeña.</div></section>
 
-    <p>En la demo:</p>
-    <ul>
-      <li><strong>Transportes Ganaderos del Sur SL</strong> (matrícula 1234BCD) aparece en la venta
-        del ternero ES123456789016, en el DIMOE número DIMOE-ALB-2025-0007. Es un camión ganadero
-        con certificado de bienestar animal.</li>
-      <li><strong>Logística Láctea Extremeña</strong> (matrícula 5678EFG) aparece como la cisterna
-        que recoge la leche en los 3 albaranes de entrega a Lácteos La Serena SA. Al ser una cisterna
-        de leche, tiene condiciones termoneutrales pero su capacidad de animales es 0.</li>
-    </ul>
+ <section class="seccion" id="capturas"><span class="fase-tag">Capturas</span>
+ <h2 class="modulo">8. Capturas reales en app (demo CHAMORRO)</h2>
+ <p class="intro-mod">Evidencia visual del flujo de alta, ficha y uso operativo de transportistas.</p>
 
-    <div class="nota">
-      <strong>Ciudad de Logística Láctea Extremeña:</strong> Villanueva de la Serena (Badajoz).
-      Es un ejemplo de empresa de transporte lácteo ubicada en la comarca de La Serena, muy habitual
-      en la ganadería vacuna de leche extremeña.
-    </div>
-  </section>
+ <figure><img src="img/trans/trans-01.png" alt="Listado de transportistas"><figcaption>Trans-01 · Listado de transportistas</figcaption></figure>
+ <figure><img src="img/trans/trans-02.png" alt="Alta de transportista"><figcaption>Trans-02 · Formulario de alta</figcaption></figure>
+ <figure><img src="img/trans/trans-03.png" alt="Selector tipo de vehiculo"><figcaption>Trans-03 · Selección de tipo de vehículo</figcaption></figure>
+ <figure><img src="img/trans/trans-04.png" alt="Certificados de bienestar"><figcaption>Trans-04 · Campos de certificados y condiciones</figcaption></figure>
+ <figure><img src="img/trans/trans-05.png" alt="Ficha transportes ganaderos"><figcaption>Trans-05 · Ficha de Transportes Ganaderos del Sur</figcaption></figure>
+ <figure><img src="img/trans/trans-06.png" alt="Ficha logistica lactea"><figcaption>Trans-06 · Ficha de Logística Láctea Extremeña</figcaption></figure>
+ <figure><img src="img/trans/trans-07.png" alt="Detalle de kpis transportista"><figcaption>Trans-07 · Detalle de KPIs por transportista</figcaption></figure>
+ <figure><img src="img/trans/trans-08.png" alt="Resumen kpis transportistas"><figcaption>Trans-08 · Resumen de KPIs en listado</figcaption></figure></section>
 
-  <section class="seccion" id="capturas">
-    <span class="fase-tag">Capturas</span>
-    <h2 class="modulo">8. Capturas reales en app (demo CHAMORRO)</h2>
-    <p class="intro-mod">
-      Evidencia visual del flujo de alta, ficha y uso operativo de transportistas.
-    </p>
-
-    <figure><img src="img/trans/trans-01.png" alt="Listado de transportistas"><figcaption>Trans-01 · Listado de transportistas</figcaption></figure>
-    <figure><img src="img/trans/trans-02.png" alt="Alta de transportista"><figcaption>Trans-02 · Formulario de alta</figcaption></figure>
-    <figure><img src="img/trans/trans-03.png" alt="Selector tipo de vehiculo"><figcaption>Trans-03 · Selección de tipo de vehículo</figcaption></figure>
-    <figure><img src="img/trans/trans-04.png" alt="Certificados de bienestar"><figcaption>Trans-04 · Campos de certificados y condiciones</figcaption></figure>
-    <figure><img src="img/trans/trans-05.png" alt="Ficha transportes ganaderos"><figcaption>Trans-05 · Ficha de Transportes Ganaderos del Sur</figcaption></figure>
-    <figure><img src="img/trans/trans-06.png" alt="Ficha logistica lactea"><figcaption>Trans-06 · Ficha de Logística Láctea Extremeña</figcaption></figure>
-    <figure><img src="img/trans/trans-07.png" alt="Detalle de kpis transportista"><figcaption>Trans-07 · Detalle de KPIs por transportista</figcaption></figure>
-    <figure><img src="img/trans/trans-08.png" alt="Resumen kpis transportistas"><figcaption>Trans-08 · Resumen de KPIs en listado</figcaption></figure>
-  </section>
-
-  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v4.7.0 · Manual de Transportistas · Bienestar y Trazabilidad en Transporte
-  </div>
-
-</div>
-</body>
-</html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager v4.7.0 · Manual de Transportistas · Bienestar y Trazabilidad en Transporte</div></div></body></html>

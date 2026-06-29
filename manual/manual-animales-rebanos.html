@@ -1,199 +1,143 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Animales y Rebaños · Gestión del Censo · Livestock Manager Premium</title>
-<style>
-  :root{
-    --acento:#c9851f; --acento-claro:#e0a83a;
-    --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
-    --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-  }
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Animales y Rebaños · Gestión del Censo · Livestock Manager Premium</title>
+<style>:root{
+ --acento:#c9851f; --acento-claro:#e0a83a;
+ --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
+ --linea:#e4e4e4; --fondo:#ffffff; --suave:#faf7f1;
+ --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ }
+ .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
 
-  .portada{
-    text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#1a1a2e,#2d2d44);
-    color:#fff; border-bottom:6px solid var(--acento-claro);
-  }
-  .portada h1{font-size:2.3rem; margin:18px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a;
-    border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
-  .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
+ .portada{
+ text-align:center; padding:60px 24px 50px;
+ background:linear-gradient(160deg,#1a1a2e,#2d2d44);
+ color:#fff; border-bottom:6px solid var(--acento-claro);
+ }
+ .portada h1{font-size:2.3rem; margin:18px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
+ .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+ .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #5a5a7a;
+ border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
+ .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
 
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
-    border-left:5px solid var(--acento); padding-left:14px;
-  }
-  h2.hub{border-left-color:#facc15;}
+ h2.modulo{
+ font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
+ border-left:5px solid var(--acento); padding-left:14px;
+ }
+ h2.hub{border-left-color:#facc15;}
 
-  .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
-    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
-  .fase-tag.hub{background:#facc15; color:#000;}
-  .fase-tag.animal{background:#c9851f;}
-  .fase-tag.normativa{background:#dc2626;}
-  .intro-mod{color:var(--gris); margin:8px 0 16px;}
+ .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
+ padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+ .fase-tag.hub{background:#facc15; color:#000;}
+ .fase-tag.animal{background:#c9851f;}
+ .fase-tag.normativa{background:#dc2626;}
+ .intro-mod{color:var(--gris); margin:8px 0 16px;}
 
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center;
-  }
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:12px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
+ display:flex; align-items:center; justify-content:center;
+ }
 
-  .nota{background:#fff8e8; border-left:4px solid var(--acento); padding:10px 14px; border-radius:6px; margin:14px 0; font-size:.92rem; color:#6b5418;}
+ .nota{background:#fff8e8; border-left:4px solid var(--acento); padding:10px 14px; border-radius:6px; margin:14px 0; font-size:.92rem; color:#6b5418;}
 
-  figure{margin:24px 0; text-align:center;}
-  figure img{
-    max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
-  }
-  figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
+ figure{margin:24px 0; text-align:center;}
+ figure img{
+ max-width:320px; width:100%; border:3px solid #1a1a1a; border-radius:16px;
+ box-shadow:0 8px 20px rgba(0,0,0,.15);
+ }
+ figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
 
-  .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
-  .seccion:last-child{border-bottom:none;}
+ .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
+ .seccion:last-child{border-bottom:none;}
 
-  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
-  .indice h3{margin:0 0 14px; color:var(--tinta);}
-  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
-  .indice li{margin-bottom:7px;}
-  .indice a{color:var(--tinta); text-decoration:none;}
-  .indice a:hover{color:var(--acento); text-decoration:underline;}
+ .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
+ .indice h3{margin:0 0 14px; color:var(--tinta);}
+ .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
+ .indice li{margin-bottom:7px;}
+ .indice a{color:var(--tinta); text-decoration:none;}
+ .indice a:hover{color:var(--acento); text-decoration:underline;}
 
-  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
-  .ruta{color:var(--acento); font-weight:700;}
+ kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
+ .ruta{color:var(--acento); font-weight:700;}
 
-  @media print{
-    body{font-size:12px;}
-    figure img{max-width:230px; box-shadow:none;}
-  }
-</style>
-</head>
-<body>
+ @media print{
+ body{font-size:12px;}
+ figure img{max-width:230px; box-shadow:none;}
+ }</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><h1>Gestión de Animales</h1>
+ <p class="sub">Control del Censo · Hub Ganadería · Guía Premium v4.8.0</p>
+ <div class="badge">MANUAL 360° · Gestión Individual y por Lote</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" class="logo-img">
-  <h1>🐄 Gestión de Animales</h1>
-  <p class="sub">Control del Censo · Hub Ganadería · Guía Premium v4.8.0</p>
-  <div class="badge">MANUAL 360° · Gestión Individual y por Lote</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">Introducción al Módulo de Animales</h2>
+ <p class="intro-mod">La gestión de <strong>Animales</strong> es el corazón de Livestock Manager. En la versión 4.8.0 Premium, hemos rediseñado el listado y las fichas para ofrecer una visión 360° de cada individuo, integrando trazabilidad, sanidad y producción en una sola interfaz.</p>
 
-<div class="wrap">
+ <div class="indice"><h3>Índice de Animales</h3>
+ <ol><li><a href="#hub">Acceso desde Hub Ganadería</a></li>
+ <li><a href="#listado">Listado Maestro de Animales</a></li>
+ <li><a href="#filtros">Búsqueda y Filtros de Especie</a></li>
+ <li><a href="#alta">Alta Individual (Wizard Premium)</a></li>
+ <li><a href="#escaner">Uso de Escáner y NFC</a></li>
+ <li><a href="#ficha">Ficha Animal 360°</a></li>
+ <li><a href="#trazabilidad">Trazabilidad y SIGGAN</a></li></ol></div></section>
 
-  <section class="seccion">
-    <h2 class="modulo">📖 Introducción al Módulo de Animales</h2>
-    <p class="intro-mod">
-      La gestión de <strong>Animales</strong> es el corazón de Livestock Manager. En la versión 4.8.0 Premium, hemos rediseñado el listado y las fichas para ofrecer una visión 360° de cada individuo, integrando trazabilidad, sanidad y producción en una sola interfaz.
-    </p>
+ <!-- ============================================================= -->
+ <section class="seccion" id="hub"><span class="fase-tag hub">Hub Ganadería</span>
+ <h2 class="modulo hub">1. Acceso al Hub</h2>
+ <p class="intro-mod">La puerta de entrada a tus animales es el Hub de <span class="ruta">Ganadería</span> en la barra inferior.</p>
+ <figure><img src="img/02-ganaderia-hub.png" alt="Hub Ganadería"><figcaption>En el Hub de Ganadería, pulsa el botón "Animales" para acceder al censo completo.</figcaption></figure></section>
 
-    <div class="indice">
-      <h3>📋 Índice de Animales</h3>
-      <ol>
-        <li><a href="#hub">Acceso desde Hub Ganadería</a></li>
-        <li><a href="#listado">Listado Maestro de Animales</a></li>
-        <li><a href="#filtros">Búsqueda y Filtros de Especie</a></li>
-        <li><a href="#alta">Alta Individual (Wizard Premium)</a></li>
-        <li><a href="#escaner">Uso de Escáner y NFC</a></li>
-        <li><a href="#ficha">Ficha Animal 360°</a></li>
-        <li><a href="#trazabilidad">Trazabilidad y SIGGAN</a></li>
-      </ol>
-    </div>
-  </section>
+ <!-- ============================================================= -->
+ <section class="seccion" id="listado"><span class="fase-tag animal">Listado Maestro</span>
+ <h2 class="modulo">2. Listado de Todos los Animales</h2>
+ <p class="intro-mod">El listado muestra todos los animales registrados con indicadores visuales de estado y especie.</p>
+ <figure><img src="img/03-animales-lista.png" alt="Lista Animales"><figcaption>Listado Premium: Tarjetas con crotal, raza, rebaño y badges de estado (Activo/Vendido/Baja).</figcaption></figure>
+ <ol class="pasos"><li><strong>Tarjetas de Animal</strong>: Cada tarjeta es un resumen vivo. El color del borde izquierdo indica el estado sanitario o comercial.</li>
+ <li><strong>Resumen por Especie</strong>: Los badges superiores indican cuántas cabezas tienes de cada especie (Vacas, Ovejas, etc.).</li>
+ <li><strong>Acceso a Ficha</strong>: Pulsa sobre cualquier tarjeta para abrir la visión detallada del animal.</li></ol></section>
 
-  <!-- ============================================================= -->
-  <section class="seccion" id="hub">
-    <span class="fase-tag hub">Hub Ganadería</span>
-    <h2 class="modulo hub">1. Acceso al Hub</h2>
-    <p class="intro-mod">La puerta de entrada a tus animales es el Hub de <span class="ruta">Ganadería</span> en la barra inferior.</p>
-    <figure><img src="img/02-ganaderia-hub.png" alt="Hub Ganadería">
-      <figcaption>En el Hub de Ganadería, pulsa el botón "Animales" para acceder al censo completo.</figcaption></figure>
-  </section>
+ <!-- ============================================================= -->
+ <section class="seccion" id="filtros"><span class="fase-tag">Inteligencia</span>
+ <h2 class="modulo">3. Búsqueda y Filtros Inteligentes</h2>
+ <p class="intro-mod">Gestionar cientos de animales es fácil con las herramientas de filtrado neón.</p>
+ <ol class="pasos"><li><strong>Buscador Global</strong>: Escribe el crotal (incluso solo los últimos números), la raza o el nombre del rebaño. El listado se filtra en tiempo real.</li>
+ <li><strong>Selector de Especie</strong>: Usa el desplegable dorado a la derecha para filtrar por especie y limpiar la vista.</li>
+ <li><strong>Estados</strong>: Filtra rápidamente para ver solo los animales vendidos o los que están en la explotación (activos).</li></ol></section>
 
-  <!-- ============================================================= -->
-  <section class="seccion" id="listado">
-    <span class="fase-tag animal">Listado Maestro</span>
-    <h2 class="modulo">2. Listado de Todos los Animales</h2>
-    <p class="intro-mod">El listado muestra todos los animales registrados con indicadores visuales de estado y especie.</p>
-    <figure><img src="img/03-animales-lista.png" alt="Lista Animales">
-      <figcaption>Listado Premium: Tarjetas con crotal, raza, rebaño y badges de estado (Activo/Vendido/Baja).</figcaption></figure>
-    <ol class="pasos">
-      <li><strong>Tarjetas de Animal</strong>: Cada tarjeta es un resumen vivo. El color del borde izquierdo indica el estado sanitario o comercial.</li>
-      <li><strong>Resumen por Especie</strong>: Los badges superiores indican cuántas cabezas tienes de cada especie (Vacas, Ovejas, etc.).</li>
-      <li><strong>Acceso a Ficha</strong>: Pulsa sobre cualquier tarjeta para abrir la visión detallada del animal.</li>
-    </ol>
-  </section>
+ <!-- ============================================================= -->
+ <section class="seccion" id="alta"><span class="fase-tag">Registro</span>
+ <h2 class="modulo">4. Alta de Animal (Wizard Premium)</h2>
+ <p class="intro-mod">El nuevo asistente de alta garantiza que no olvides ningún dato legal.</p>
+ <figure><img src="img/04-ficha-animal-wizard.png" alt="Wizard Alta"><figcaption>Formulario de alta con validación REGA y herramientas de captura rápida.</figcaption></figure>
+ <ol class="pasos"><li><strong>Validación de Crotal</strong>: Introduce el número. Si el formato es ES + 12 dígitos, el campo brilla en dorado. Si el animal ya existe, la app te avisará.</li>
+ <li><strong>Asociación de Rebaño</strong>: Es obligatorio asociar el animal a un rebaño existente para que herede su ubicación (Zona).</li>
+ <li><strong>Datos de Producción</strong>: Indica peso inicial y fecha de nacimiento para activar el cálculo automático de GMD (Ganancia Media Diaria).</li></ol></section>
 
-  <!-- ============================================================= -->
-  <section class="seccion" id="filtros">
-    <span class="fase-tag">Inteligencia</span>
-    <h2 class="modulo">3. Búsqueda y Filtros Inteligentes</h2>
-    <p class="intro-mod">Gestionar cientos de animales es fácil con las herramientas de filtrado neón.</p>
-    <ol class="pasos">
-      <li><strong>Buscador Global</strong>: Escribe el crotal (incluso solo los últimos números), la raza o el nombre del rebaño. El listado se filtra en tiempo real.</li>
-      <li><strong>Selector de Especie</strong>: Usa el desplegable dorado a la derecha para filtrar por especie y limpiar la vista.</li>
-      <li><strong>Estados</strong>: Filtra rápidamente para ver solo los animales vendidos o los que están en la explotación (activos).</li>
-    </ol>
-  </section>
+ <!-- ============================================================= -->
+ <section class="seccion" id="escaner"><span class="fase-tag">Tecnología</span>
+ <h2 class="modulo">5. Captura Rápida: SCAN y NFC</h2>
+ <p class="intro-mod">No pierdas tiempo tecleando en el campo. Usa la tecnología integrada.</p>
+ <ol class="pasos"><li><strong>SCAN (Cámara)</strong>: Pulsa <kbd>SCAN</kbd> para activar la cámara. Lee códigos de barras o QR impresos en los crotales.</li>
+ <li><strong>NFC (Lectura de Chip)</strong>: Pulsa <kbd>NFC</kbd> para leer tags de proximidad compatibles (13.56 MHz).</li></ol>
+ <div class="nota">️ <strong>Nota técnica</strong>: Los chips electrónicos oficiales (LF 134.2 kHz) requieren un lector Bluetooth externo. El botón NFC interno es para tags inteligentes complementarios.</div></section>
 
-  <!-- ============================================================= -->
-  <section class="seccion" id="alta">
-    <span class="fase-tag">Registro</span>
-    <h2 class="modulo">4. Alta de Animal (Wizard Premium)</h2>
-    <p class="intro-mod">El nuevo asistente de alta garantiza que no olvides ningún dato legal.</p>
-    <figure><img src="img/04-ficha-animal-wizard.png" alt="Wizard Alta">
-      <figcaption>Formulario de alta con validación REGA y herramientas de captura rápida.</figcaption></figure>
-    <ol class="pasos">
-      <li><strong>Validación de Crotal</strong>: Introduce el número. Si el formato es ES + 12 dígitos, el campo brilla en dorado. Si el animal ya existe, la app te avisará.</li>
-      <li><strong>Asociación de Rebaño</strong>: Es obligatorio asociar el animal a un rebaño existente para que herede su ubicación (Zona).</li>
-      <li><strong>Datos de Producción</strong>: Indica peso inicial y fecha de nacimiento para activar el cálculo automático de GMD (Ganancia Media Diaria).</li>
-    </ol>
-  </section>
+ <!-- ============================================================= -->
+ <section class="seccion" id="ficha"><span class="fase-tag">Visión 360°</span>
+ <h2 class="modulo">6. Ficha Animal 360° (Detalle)</h2>
+ <p class="intro-mod">Al pulsar un animal, accedes a toda su historia y potencial productivo.</p>
+ <figure><img src="img/12-ficha-animal-360.png" alt="Ficha Detalle"><figcaption>Visión completa: Trazabilidad, Genealogía, Historial Reproductivo y Pesajes.</figcaption></figure>
+ <ol class="pasos"><li><strong>Línea de Vida</strong>: Histórico de todos los eventos (traslados, vacunas, pesajes) en orden cronológico.</li>
+ <li><strong>Gestión Reproductiva</strong>: Registra celos, inseminaciones y partos directamente desde la ficha.</li>
+ <li><strong>Botón 360°</strong>: Pulsa "Ver 360°" para un análisis profundo de rentabilidad e historial de este animal concreto.</li></ol></section>
 
-  <!-- ============================================================= -->
-  <section class="seccion" id="escaner">
-    <span class="fase-tag">Tecnología</span>
-    <h2 class="modulo">5. Captura Rápida: SCAN y NFC</h2>
-    <p class="intro-mod">No pierdas tiempo tecleando en el campo. Usa la tecnología integrada.</p>
-    <ol class="pasos">
-      <li><strong>SCAN (Cámara)</strong>: Pulsa <kbd>📷 SCAN</kbd> para activar la cámara. Lee códigos de barras o QR impresos en los crotales.</li>
-      <li><strong>NFC (Lectura de Chip)</strong>: Pulsa <kbd>🛜 NFC</kbd> para leer tags de proximidad compatibles (13.56 MHz).</li>
-    </ol>
-    <div class="nota">
-      ⚠️ <strong>Nota técnica</strong>: Los chips electrónicos oficiales (LF 134.2 kHz) requieren un lector Bluetooth externo. El botón NFC interno es para tags inteligentes complementarios.
-    </div>
-  </section>
-
-  <!-- ============================================================= -->
-  <section class="seccion" id="ficha">
-    <span class="fase-tag">Visión 360°</span>
-    <h2 class="modulo">6. Ficha Animal 360° (Detalle)</h2>
-    <p class="intro-mod">Al pulsar un animal, accedes a toda su historia y potencial productivo.</p>
-    <figure><img src="img/12-ficha-animal-360.png" alt="Ficha Detalle">
-      <figcaption>Visión completa: Trazabilidad, Genealogía, Historial Reproductivo y Pesajes.</figcaption></figure>
-    <ol class="pasos">
-      <li><strong>Línea de Vida</strong>: Histórico de todos los eventos (traslados, vacunas, pesajes) en orden cronológico.</li>
-      <li><strong>Gestión Reproductiva</strong>: Registra celos, inseminaciones y partos directamente desde la ficha.</li>
-      <li><strong>Botón 360°</strong>: Pulsa "Ver 360°" para un análisis profundo de rentabilidad e historial de este animal concreto.</li>
-    </ol>
-  </section>
-
-  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager Premium · v4.8.0 · Manual de Gestión de Animales
-  </div>
-
-</div>
-</body>
-</html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager Premium · v4.8.0 · Manual de Gestión de Animales</div></div></body></html>

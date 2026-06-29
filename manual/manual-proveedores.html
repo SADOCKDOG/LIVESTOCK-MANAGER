@@ -1,379 +1,289 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proveedores · Trazabilidad de Costes · Livestock Manager</title>
-<style>
-  :root{
-    --acento:#10b981; --acento-claro:#34d399;
-    --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
-    --linea:#e4e4e4; --fondo:#ffffff; --suave:#f0fdf7;
-    --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --oro:#c9851f;
-  }
-  *{box-sizing:border-box;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
-  }
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Proveedores · Trazabilidad de Costes · Livestock Manager</title>
+<style>:root{
+ --acento:#10b981; --acento-claro:#34d399;
+ --tinta:#1a1a1a; --gris:#555; --gris-claro:#777;
+ --linea:#e4e4e4; --fondo:#ffffff; --suave:#f0fdf7;
+ --verde:#0f7a4d; --rojo:#c0392b; --azul:#2563eb; --oro:#c9851f;
+ }
+ *{box-sizing:border-box;}
+ body{
+ font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ color:var(--tinta); background:var(--fondo); margin:0; line-height:1.6; font-size:16px;
+ -webkit-print-color-adjust:exact; print-color-adjust:exact;
+ }
+ .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
 
-  .portada{
-    text-align:center; padding:60px 24px 50px;
-    background:linear-gradient(160deg,#0a2e1e,#1a4a30);
-    color:#fff; border-bottom:6px solid var(--acento-claro);
-  }
-  .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
-  .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
-  .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #3a6a4a;
-    border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
-  .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
+ .portada{
+ text-align:center; padding:60px 24px 50px;
+ background:linear-gradient(160deg,#0a2e1e,#1a4a30);
+ color:#fff; border-bottom:6px solid var(--acento-claro);
+ }
+ .portada h1{font-size:2.3rem; margin:14px 0 6px; color:var(--acento-claro); letter-spacing:.5px;}
+ .portada .sub{font-size:1.1rem; color:#cfcfcf; margin:0;}
+ .portada .badge{display:inline-block; margin-top:20px; padding:7px 18px; border:1px solid #3a6a4a;
+ border-radius:30px; color:var(--acento-claro); font-size:.85rem; letter-spacing:1px;}
+ .portada .logo-img{max-width:90px; border-radius:14px; margin-bottom:8px;}
 
-  h2.modulo{
-    font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
-    border-left:5px solid var(--acento); padding-left:14px;
-  }
+ h2.modulo{
+ font-size:1.45rem; color:var(--tinta); margin:0 0 4px; padding-top:8px;
+ border-left:5px solid var(--acento); padding-left:14px;
+ }
 
-  .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
-    padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
-  .fase-tag.wizard{background:var(--oro);}
-  .fase-tag.maestro{background:#6366f1;}
-  .fase-tag.categoria{background:#f59e0b;}
-  .intro-mod{color:var(--gris); margin:8px 0 16px;}
+ .fase-tag{display:inline-block; background:var(--acento); color:#fff; font-size:.7rem; font-weight:700;
+ padding:3px 10px; border-radius:20px; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;}
+ .fase-tag.wizard{background:var(--oro);}
+ .fase-tag.maestro{background:#6366f1;}
+ .fase-tag.categoria{background:#f59e0b;}
+ .intro-mod{color:var(--gris); margin:8px 0 16px;}
 
-  ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
-  ol.pasos > li{
-    position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
-    background:var(--suave); border-radius:10px; border:1px solid var(--linea);
-  }
-  ol.pasos > li::before{
-    counter-increment:paso; content:counter(paso);
-    position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
-    background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center;
-  }
+ ol.pasos{padding-left:0; counter-reset:paso; list-style:none; margin:14px 0;}
+ ol.pasos > li{
+ position:relative; padding:10px 12px 10px 46px; margin-bottom:8px;
+ background:var(--suave); border-radius:10px; border:1px solid var(--linea);
+ }
+ ol.pasos > li::before{
+ counter-increment:paso; content:counter(paso);
+ position:absolute; left:10px; top:10px; width:26px; height:26px; border-radius:50%;
+ background:var(--acento); color:#fff; font-weight:700; font-size:.85rem;
+ display:flex; align-items:center; justify-content:center;
+ }
 
-  ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
-  ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
-  ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--acento); font-weight:700;}
+ ul.subpasos{padding-left:20px; list-style:none; margin:6px 0;}
+ ul.subpasos > li{position:relative; padding:3px 0 3px 24px; font-size:.93rem;}
+ ul.subpasos > li::before{content:"•"; position:absolute; left:4px; color:var(--acento); font-weight:700;}
 
-  .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#6b5418;}
-  .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#7a241b;}
-  .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem; color:#14512f;}
-  .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
-    margin:14px 0; font-size:.92rem;}
+ .nota{background:#fff8e8; border-left:4px solid var(--oro); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#6b5418;}
+ .aviso{background:#fdecea; border-left:4px solid var(--rojo); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#7a241b;}
+ .tip{background:#eafaf1; border-left:4px solid var(--verde); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem; color:#14512f;}
+ .info-tecnica{background:#eef4ff; border-left:4px solid var(--azul); padding:10px 14px; border-radius:6px;
+ margin:14px 0; font-size:.92rem;}
 
-  figure{margin:18px 0; text-align:center;}
-  figure img{
-    max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.12);
-  }
-  figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
+ figure{margin:18px 0; text-align:center;}
+ figure img{
+ max-width:300px; width:100%; border:1px solid var(--linea); border-radius:14px;
+ box-shadow:0 6px 22px rgba(0,0,0,.12);
+ }
+ figcaption{font-size:.82rem; color:var(--gris-claro); margin-top:8px; font-style:italic;}
 
-  .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
-  .seccion:last-child{border-bottom:none;}
+ .seccion{padding:34px 0; border-bottom:1px solid var(--linea);}
+ .seccion:last-child{border-bottom:none;}
 
-  .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
-  .indice h3{margin:0 0 14px; color:var(--tinta);}
-  .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
-  .indice li{margin-bottom:7px;}
-  .indice a{color:var(--tinta); text-decoration:none;}
-  .indice a:hover{color:var(--acento); text-decoration:underline;}
+ .indice{background:var(--suave); border:1px solid var(--linea); border-radius:14px; padding:24px 28px; margin:34px 0;}
+ .indice h3{margin:0 0 14px; color:var(--tinta);}
+ .indice ol{columns:2; column-gap:40px; padding-left:18px; margin:0;}
+ .indice li{margin-bottom:7px;}
+ .indice a{color:var(--tinta); text-decoration:none;}
+ .indice a:hover{color:var(--acento); text-decoration:underline;}
 
-  kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
-  .ruta{color:var(--acento); font-weight:600;}
-  .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
+ kbd{background:#1a1a1a; color:#fff; border-radius:5px; padding:1px 7px; font-size:.85em; font-family:inherit;}
+ .ruta{color:var(--acento); font-weight:600;}
+ .campo{background:#f0eef0; border-radius:4px; padding:0 5px; font-size:.9em;}
 
-  .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
-    padding:20px 24px; margin:20px 0;}
-  .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
-  .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
-  .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
-  .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
+ .panel-ejemplo{background:var(--suave); border:2px dashed #aaa; border-radius:14px;
+ padding:20px 24px; margin:20px 0;}
+ .panel-ejemplo h4{margin:0 0 10px; color:var(--tinta);}
+ .panel-ejemplo table{width:100%; border-collapse:collapse; font-size:.9rem;}
+ .panel-ejemplo th{text-align:left; padding:4px 8px; border-bottom:1px solid var(--linea); color:var(--gris); font-weight:600;}
+ .panel-ejemplo td{padding:4px 8px; border-bottom:1px solid var(--linea);}
 
-  table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
-  table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
-  table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
-  table.parametros .ok{color:var(--verde); font-weight:700;}
-  table.parametros .alert{color:var(--rojo); font-weight:700;}
+ table.parametros{width:100%; border-collapse:collapse; font-size:.9rem; margin:14px 0;}
+ table.parametros th{background:var(--suave); text-align:left; padding:6px 10px; border:1px solid var(--linea); font-weight:600;}
+ table.parametros td{padding:6px 10px; border:1px solid var(--linea);}
+ table.parametros .ok{color:var(--verde); font-weight:700;}
+ table.parametros .alert{color:var(--rojo); font-weight:700;}
 
-  .tabs-ej{display:flex; gap:10px; margin:16px 0; flex-wrap:wrap;}
-  .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
-    border:1px solid var(--linea); cursor:default; white-space:nowrap;}
-  .tab-ej.ali{background:#fef9e7; color:#b45309; border-color:#f59e0b;}
-  .tab-ej.sani{background:#fef2f2; color:#b91c1c; border-color:#ef4444;}
-  .tab-ej.fito{background:#f0fdf4; color:#166534; border-color:#22c55e;}
-  .tab-ej.elec{background:#eff6ff; color:#1d4ed8; border-color:#3b82f6;}
-  .tab-ej.pers{background:#fff7ed; color:#c2410c; border-color:#f97316;}
-  .tab-ej.amor{background:#faf5ff; color:#7e22ce; border-color:#a855f7;}
+ .tabs-ej{display:flex; gap:10px; margin:16px 0; flex-wrap:wrap;}
+ .tab-ej{padding:8px 16px; border-radius:30px; font-size:.8rem; font-weight:700; text-transform:uppercase;
+ border:1px solid var(--linea); cursor:default; white-space:nowrap;}
+ .tab-ej.ali{background:#fef9e7; color:#b45309; border-color:#f59e0b;}
+ .tab-ej.sani{background:#fef2f2; color:#b91c1c; border-color:#ef4444;}
+ .tab-ej.fito{background:#f0fdf4; color:#166534; border-color:#22c55e;}
+ .tab-ej.elec{background:#eff6ff; color:#1d4ed8; border-color:#3b82f6;}
+ .tab-ej.pers{background:#fff7ed; color:#c2410c; border-color:#f97316;}
+ .tab-ej.amor{background:#faf5ff; color:#7e22ce; border-color:#a855f7;}
 
-  @media print{
-    body{font-size:12px;}
-    .portada{padding:40px 24px;}
-    .seccion{page-break-inside:avoid; padding:18px 0;}
-    figure img{max-width:230px; box-shadow:none;}
-    a{color:var(--tinta) !important; text-decoration:none;}
-    .indice ol{columns:2;}
-  }
-</style>
-</head>
-<body>
+ @media print{
+ body{font-size:12px;}
+ .portada{padding:40px 24px;}
+ .seccion{page-break-inside:avoid; padding:18px 0;}
+ figure img{max-width:230px; box-shadow:none;}
+ a{color:var(--tinta) !important; text-decoration:none;}
+ .indice ol{columns:2;}
+ }</style></head>
+<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><h1>Proveedores</h1>
+ <p class="sub">Trazabilidad de Costes — Guía completa paso a paso</p>
+ <div class="badge">MANUAL PRÁCTICO · Gestión de proveedores y gastos analíticos</div></header>
 
-<header class="portada">
-  <img src="img/logo-app.png" alt="Livestock Manager" class="logo-img">
-  <h1>🏭 Proveedores</h1>
-  <p class="sub">Trazabilidad de Costes — Guía completa paso a paso</p>
-  <div class="badge">MANUAL PRÁCTICO · Gestión de proveedores y gastos analíticos</div>
-</header>
+<div class="wrap"><section class="seccion"><h2 class="modulo">Sobre este manual</h2>
+ <p class="intro-mod">Este manual documenta el <strong>módulo de Proveedores</strong> de Livestock Manager.
+ Un proveedor es la empresa o autónomo de quien se compran insumos, servicios o suministros
+ para la explotación. Registrar los proveedores permite asociar cada gasto a su origen,
+ obteniendo una trazabilidad completa de los costes.</p>
+ <p class="intro-mod">Los proveedores se clasifican por <strong>categorías</strong> que se corresponden con las
+ categorías contables de gastos (alimentación, sanidad, amortización…). Esto permite filtrar
+ el proveedor adecuado al registrar un gasto y analizar el gasto por proveedor en los informes.</p>
 
-<div class="wrap">
+ <div class="indice"><h3>Índice</h3>
+ <ol><li><a href="#acceso">Acceso a Proveedores</a></li>
+ <li><a href="#formulario">Formulario de alta</a></li>
+ <li><a href="#categorias">Categorías de proveedor</a></li>
+ <li><a href="#gastos">Asociar un gasto a un proveedor</a></li>
+ <li><a href="#ficha">Ficha de proveedor</a></li>
+ <li><a href="#ejemplo">Ejemplo con datos demo</a></li></ol></div></section>
 
-  <section class="seccion">
-    <h2 class="modulo">📖 Sobre este manual</h2>
-    <p class="intro-mod">
-      Este manual documenta el <strong>módulo de Proveedores</strong> de Livestock Manager.
-      Un proveedor es la empresa o autónomo de quien se compran insumos, servicios o suministros
-      para la explotación. Registrar los proveedores permite asociar cada gasto a su origen,
-      obteniendo una trazabilidad completa de los costes.
-    </p>
-    <p class="intro-mod">
-      Los proveedores se clasifican por <strong>categorías</strong> que se corresponden con las
-      categorías contables de gastos (alimentación, sanidad, amortización…). Esto permite filtrar
-      el proveedor adecuado al registrar un gasto y analizar el gasto por proveedor en los informes.
-    </p>
+ <!-- ============================================================= -->
+ <!-- 1. ACCESO -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="acceso"><span class="fase-tag">Inicio</span>
+ <h2 class="modulo">1. Acceso a Proveedores</h2>
+ <p class="intro-mod">Accede al módulo de proveedores desde <span class="ruta">Más → Proveedores</span> en la
+ barra de navegación inferior.</p>
 
-    <div class="indice">
-      <h3>📋 Índice</h3>
-      <ol>
-        <li><a href="#acceso">Acceso a Proveedores</a></li>
-        <li><a href="#formulario">Formulario de alta</a></li>
-        <li><a href="#categorias">Categorías de proveedor</a></li>
-        <li><a href="#gastos">Asociar un gasto a un proveedor</a></li>
-        <li><a href="#ficha">Ficha de proveedor</a></li>
-        <li><a href="#ejemplo">Ejemplo con datos demo</a></li>
-      </ol>
-    </div>
-  </section>
+ <p>Desde la pantalla principal puedes:</p>
+ <ul><li>Ver los <strong>KPIs</strong> de proveedores activos y gasto total asociado</li>
+ <li>Buscar por nombre, NIF/CIF o ciudad</li>
+ <li>Filtrar por estado (activos / inactivos)</li>
+ <li><strong>Registrar un nuevo proveedor</strong> pulsando <kbd>Nuevo</kbd></li>
+ <li>Pulsar sobre cualquier proveedor para ver su ficha con el historial de gastos</li></ul></section>
 
-  <!-- ============================================================= -->
-  <!-- 1. ACCESO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="acceso">
-    <span class="fase-tag">Inicio</span>
-    <h2 class="modulo">1. Acceso a Proveedores</h2>
-    <p class="intro-mod">
-      Accede al módulo de proveedores desde <span class="ruta">Más → Proveedores</span> en la
-      barra de navegación inferior.
-    </p>
+ <!-- ============================================================= -->
+ <!-- 2. FORMULARIO -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="formulario"><span class="fase-tag wizard">Formulario</span>
+ <h2 class="modulo">2. Formulario de alta de proveedor</h2>
+ <p class="intro-mod">Se abre pulsando <kbd>Nuevo</kbd> o <kbd>️ Editar</kbd> desde la ficha del proveedor.</p>
 
-    <p>Desde la pantalla principal puedes:</p>
-    <ul>
-      <li>Ver los <strong>KPIs</strong> de proveedores activos y gasto total asociado</li>
-      <li>Buscar por nombre, NIF/CIF o ciudad</li>
-      <li>Filtrar por estado (activos / inactivos)</li>
-      <li><strong>Registrar un nuevo proveedor</strong> pulsando <kbd>➕ Nuevo</kbd></li>
-      <li>Pulsar sobre cualquier proveedor para ver su ficha con el historial de gastos</li>
-    </ul>
-  </section>
+ <h4>Campos del formulario</h4>
+ <table class="parametros"><tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
+ <tr><td><span class="campo">Nombre / Razón Social</span></td><td class="ok">Sí</td><td>Nombre completo de la empresa o autónomo</td></tr>
+ <tr><td><span class="campo">NIF/CIF</span></td><td>No</td><td>Identificación fiscal. Si se introduce, debe ser único en el sistema.</td></tr>
+ <tr><td><span class="campo">Dirección</span></td><td>No</td><td>Dirección postal completa</td></tr>
+ <tr><td><span class="campo">Código Postal</span></td><td>No</td><td>CP de la localidad del proveedor</td></tr>
+ <tr><td><span class="campo">Ciudad</span></td><td>No</td><td>Localidad del proveedor</td></tr>
+ <tr><td><span class="campo">Provincia</span></td><td>No</td><td>Provincia del proveedor</td></tr>
+ <tr><td><span class="campo">Teléfono</span></td><td>No</td><td>Teléfono de contacto</td></tr>
+ <tr><td><span class="campo">Email</span></td><td>No</td><td>Correo electrónico de contacto</td></tr>
+ <tr><td><span class="campo">Categorías</span></td><td>No</td><td>Una o varias categorías de suministro (ver sección 3)</td></tr>
+ <tr><td><span class="campo">Condiciones de Pago</span></td><td>No</td><td>Ej: "30 días", "al contado", "60 días fin de mes"</td></tr>
+ <tr><td><span class="campo">Notas</span></td><td>No</td><td>Observaciones adicionales</td></tr>
+ <tr><td><span class="campo">Activo</span></td><td>No</td><td>Checkbox para activar/desactivar el proveedor (por defecto: activado)</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 2. FORMULARIO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="formulario">
-    <span class="fase-tag wizard">Formulario</span>
-    <h2 class="modulo">2. Formulario de alta de proveedor</h2>
-    <p class="intro-mod">
-      Se abre pulsando <kbd>➕ Nuevo</kbd> o <kbd>✏️ Editar</kbd> desde la ficha del proveedor.
-    </p>
+ <ol class="pasos"><li><strong>Pulsa</strong> <kbd>Nuevo</kbd> en la pantalla de Proveedores</li>
+ <li><strong>Introduce</strong> el nombre del proveedor (obligatorio)</li>
+ <li><strong>Añade</strong> el NIF/CIF si lo tienes disponible</li>
+ <li><strong>Selecciona</strong> las categorías de suministro que apliquen</li>
+ <li><strong>Rellena</strong> los datos de contacto y ubicación opcionales</li>
+ <li><strong>Pulsa</strong> <kbd>GUARDAR</kbd> para registrar el proveedor</li></ol></section>
 
-    <h4>Campos del formulario</h4>
-    <table class="parametros">
-      <tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
-      <tr><td><span class="campo">Nombre / Razón Social</span></td><td class="ok">Sí</td><td>Nombre completo de la empresa o autónomo</td></tr>
-      <tr><td><span class="campo">NIF/CIF</span></td><td>No</td><td>Identificación fiscal. Si se introduce, debe ser único en el sistema.</td></tr>
-      <tr><td><span class="campo">Dirección</span></td><td>No</td><td>Dirección postal completa</td></tr>
-      <tr><td><span class="campo">Código Postal</span></td><td>No</td><td>CP de la localidad del proveedor</td></tr>
-      <tr><td><span class="campo">Ciudad</span></td><td>No</td><td>Localidad del proveedor</td></tr>
-      <tr><td><span class="campo">Provincia</span></td><td>No</td><td>Provincia del proveedor</td></tr>
-      <tr><td><span class="campo">Teléfono</span></td><td>No</td><td>Teléfono de contacto</td></tr>
-      <tr><td><span class="campo">Email</span></td><td>No</td><td>Correo electrónico de contacto</td></tr>
-      <tr><td><span class="campo">Categorías</span></td><td>No</td><td>Una o varias categorías de suministro (ver sección 3)</td></tr>
-      <tr><td><span class="campo">Condiciones de Pago</span></td><td>No</td><td>Ej: "30 días", "al contado", "60 días fin de mes"</td></tr>
-      <tr><td><span class="campo">Notas</span></td><td>No</td><td>Observaciones adicionales</td></tr>
-      <tr><td><span class="campo">Activo</span></td><td>No</td><td>Checkbox para activar/desactivar el proveedor (por defecto: activado)</td></tr>
-    </table>
+ <!-- ============================================================= -->
+ <!-- 3. CATEGORÍAS -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="categorias"><span class="fase-tag categoria">Categorías</span>
+ <h2 class="modulo">3. Categorías de proveedor</h2>
+ <p class="intro-mod">Las categorías de proveedor se corresponden con las <strong>categorías contables de gastos</strong>.
+ Un proveedor puede tener una o varias categorías asignadas.</p>
 
-    <ol class="pasos">
-      <li><strong>Pulsa</strong> <kbd>➕ Nuevo</kbd> en la pantalla de Proveedores</li>
-      <li><strong>Introduce</strong> el nombre del proveedor (obligatorio)</li>
-      <li><strong>Añade</strong> el NIF/CIF si lo tienes disponible</li>
-      <li><strong>Selecciona</strong> las categorías de suministro que apliquen</li>
-      <li><strong>Rellena</strong> los datos de contacto y ubicación opcionales</li>
-      <li><strong>Pulsa</strong> <kbd>💾 GUARDAR</kbd> para registrar el proveedor</li>
-    </ol>
-  </section>
+ <table class="parametros"><tr><th>Categoría</th><th>Valor interno</th><th>Icono</th><th>Tipo de suministro típico</th></tr>
+ <tr><td><span class="campo">Alimentación</span></td><td><code>Alimentacion</code></td><td></td><td>Piensos, forrajes, cereales, suplementos minerales</td></tr>
+ <tr><td><span class="campo">Sanidad</span></td><td><code>Sanidad</code></td><td></td><td>Medicamentos, vacunas, material veterinario, honorarios veterinarios</td></tr>
+ <tr><td><span class="campo">Fitosanitarios</span></td><td><code>Fitosanitarios</code></td><td></td><td>Herbicidas, pesticidas, abonos, semillas tratadas</td></tr>
+ <tr><td><span class="campo">Electricidad</span></td><td><code>Electricidad</code></td><td></td><td>Comercializadoras de electricidad, gas, combustibles</td></tr>
+ <tr><td><span class="campo">Personal</span></td><td><code>Personal</code></td><td></td><td>Agencias de trabajo temporal, asesorías laborales</td></tr>
+ <tr><td><span class="campo">Amortización</span></td><td><code>Amortizacion</code></td><td></td><td>Proveedores de maquinaria, instalaciones, vehículos, talleres</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 3. CATEGORÍAS -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="categorias">
-    <span class="fase-tag categoria">Categorías</span>
-    <h2 class="modulo">3. Categorías de proveedor</h2>
-    <p class="intro-mod">
-      Las categorías de proveedor se corresponden con las <strong>categorías contables de gastos</strong>.
-      Un proveedor puede tener una o varias categorías asignadas.
-    </p>
+ <div class="tabs-ej"><span class="tab-ej ali">Alimentación</span>
+ <span class="tab-ej sani">Sanidad</span>
+ <span class="tab-ej fito">Fitosanitarios</span>
+ <span class="tab-ej elec">Electricidad</span>
+ <span class="tab-ej pers">Personal</span>
+ <span class="tab-ej amor">Amortización</span></div>
 
-    <table class="parametros">
-      <tr><th>Categoría</th><th>Valor interno</th><th>Icono</th><th>Tipo de suministro típico</th></tr>
-      <tr><td><span class="campo">Alimentación</span></td><td><code>Alimentacion</code></td><td>🌾</td><td>Piensos, forrajes, cereales, suplementos minerales</td></tr>
-      <tr><td><span class="campo">Sanidad</span></td><td><code>Sanidad</code></td><td>💉</td><td>Medicamentos, vacunas, material veterinario, honorarios veterinarios</td></tr>
-      <tr><td><span class="campo">Fitosanitarios</span></td><td><code>Fitosanitarios</code></td><td>🌱</td><td>Herbicidas, pesticidas, abonos, semillas tratadas</td></tr>
-      <tr><td><span class="campo">Electricidad</span></td><td><code>Electricidad</code></td><td>⚡</td><td>Comercializadoras de electricidad, gas, combustibles</td></tr>
-      <tr><td><span class="campo">Personal</span></td><td><code>Personal</code></td><td>👷</td><td>Agencias de trabajo temporal, asesorías laborales</td></tr>
-      <tr><td><span class="campo">Amortización</span></td><td><code>Amortizacion</code></td><td>🚜</td><td>Proveedores de maquinaria, instalaciones, vehículos, talleres</td></tr>
-    </table>
+ <div class="tip"><strong>Tip:</strong> Un proveedor puede pertenecer a varias categorías. Por ejemplo, una
+ cooperativa que vende tanto piensos como productos fitosanitarios puede tener marcadas
+ las categorías <strong>Alimentación</strong> y <strong>Fitosanitarios</strong> simultáneamente.</div>
 
-    <div class="tabs-ej">
-      <span class="tab-ej ali">🌾 Alimentación</span>
-      <span class="tab-ej sani">💉 Sanidad</span>
-      <span class="tab-ej fito">🌱 Fitosanitarios</span>
-      <span class="tab-ej elec">⚡ Electricidad</span>
-      <span class="tab-ej pers">👷 Personal</span>
-      <span class="tab-ej amor">🚜 Amortización</span>
-    </div>
+ <div class="info-tecnica"><strong>Nota técnica:</strong> Los valores internos son sensibles a mayúsculas/minúsculas y
+ deben coincidir exactamente: <code>Alimentacion</code> (sin tilde), <code>Sanidad</code>,
+ <code>Fitosanitarios</code>, <code>Electricidad</code>, <code>Personal</code>,
+ <code>Amortizacion</code> (sin tilde).</div></section>
 
-    <div class="tip">
-      <strong>Tip:</strong> Un proveedor puede pertenecer a varias categorías. Por ejemplo, una
-      cooperativa que vende tanto piensos como productos fitosanitarios puede tener marcadas
-      las categorías <strong>Alimentación</strong> y <strong>Fitosanitarios</strong> simultáneamente.
-    </div>
+ <!-- ============================================================= -->
+ <!-- 4. GASTOS -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="gastos"><span class="fase-tag">Gastos</span>
+ <h2 class="modulo">4. Asociar un gasto a un proveedor</h2>
+ <p class="intro-mod">Al registrar un gasto desde <span class="ruta">Registros → Gastos → Gasto</span>,
+ el wizard ofrece un campo opcional para seleccionar el proveedor asociado.</p>
 
-    <div class="info-tecnica">
-      <strong>Nota técnica:</strong> Los valores internos son sensibles a mayúsculas/minúsculas y
-      deben coincidir exactamente: <code>Alimentacion</code> (sin tilde), <code>Sanidad</code>,
-      <code>Fitosanitarios</code>, <code>Electricidad</code>, <code>Personal</code>,
-      <code>Amortizacion</code> (sin tilde).
-    </div>
-  </section>
+ <ol class="pasos"><li><strong>Abre</strong> el wizard de gasto pulsando <kbd>Gasto</kbd></li>
+ <li><strong>Selecciona</strong> la categoría contable del gasto (Alimentación, Sanidad, etc.)</li>
+ <li>En el campo <span class="campo">Proveedor</span>, <strong>selecciona</strong> el proveedor de la lista desplegable</li>
+ <li>La lista muestra los proveedores activos <strong>filtrados por la categoría seleccionada</strong> (si tienes categorías asignadas)</li>
+ <li><strong>Completa</strong> el resto del gasto (concepto, importe, rebaño/zona) y guarda</li></ol>
 
-  <!-- ============================================================= -->
-  <!-- 4. GASTOS -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="gastos">
-    <span class="fase-tag">Gastos</span>
-    <h2 class="modulo">4. Asociar un gasto a un proveedor</h2>
-    <p class="intro-mod">
-      Al registrar un gasto desde <span class="ruta">Registros → Gastos → ➕ Gasto</span>,
-      el wizard ofrece un campo opcional para seleccionar el proveedor asociado.
-    </p>
+ <div class="nota"><strong>Nota:</strong> El campo de proveedor es opcional. Si no seleccionas ninguno, el gasto
+ se registra igualmente pero sin trazabilidad de proveedor. Para un análisis completo de costes
+ por proveedor en los informes, es recomendable asociar siempre el proveedor al gasto.</div></section>
 
-    <ol class="pasos">
-      <li><strong>Abre</strong> el wizard de gasto pulsando <kbd>➕ Gasto</kbd></li>
-      <li><strong>Selecciona</strong> la categoría contable del gasto (Alimentación, Sanidad, etc.)</li>
-      <li>En el campo <span class="campo">Proveedor</span>, <strong>selecciona</strong> el proveedor de la lista desplegable</li>
-      <li>La lista muestra los proveedores activos <strong>filtrados por la categoría seleccionada</strong> (si tienes categorías asignadas)</li>
-      <li><strong>Completa</strong> el resto del gasto (concepto, importe, rebaño/zona) y guarda</li>
-    </ol>
+ <!-- ============================================================= -->
+ <!-- 5. FICHA -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="ficha"><span class="fase-tag maestro">Ficha</span>
+ <h2 class="modulo">5. Ficha de proveedor</h2>
+ <p class="intro-mod">Pulsa sobre un proveedor en el listado para abrir su ficha detallada.</p>
 
-    <div class="nota">
-      <strong>Nota:</strong> El campo de proveedor es opcional. Si no seleccionas ninguno, el gasto
-      se registra igualmente pero sin trazabilidad de proveedor. Para un análisis completo de costes
-      por proveedor en los informes, es recomendable asociar siempre el proveedor al gasto.
-    </div>
-  </section>
+ <h4>La ficha muestra:</h4>
+ <table class="parametros"><tr><th>Sección</th><th>Contenido</th></tr>
+ <tr><td><span class="campo">KPIs</span></td><td>Total de gastos (nº y €), gasto último año, gasto promedio por operación</td></tr>
+ <tr><td><span class="campo">Datos de contacto</span></td><td>NIF, dirección, teléfono, email, condiciones de pago</td></tr>
+ <tr><td><span class="campo">Categorías</span></td><td>Etiquetas de las categorías asignadas al proveedor</td></tr>
+ <tr><td><span class="campo">Historial de gastos</span></td><td>Lista de todos los gastos asociados, ordenados por fecha descendente</td></tr>
+ <tr><td><span class="campo">Desglose por categoría</span></td><td>Total gastado en cada categoría contable para este proveedor</td></tr></table>
 
-  <!-- ============================================================= -->
-  <!-- 5. FICHA -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="ficha">
-    <span class="fase-tag maestro">Ficha</span>
-    <h2 class="modulo">5. Ficha de proveedor</h2>
-    <p class="intro-mod">
-      Pulsa sobre un proveedor en el listado para abrir su ficha detallada.
-    </p>
+ <div class="tip"><strong>Tip:</strong> El desglose por categoría de la ficha es especialmente útil para
+ proveedores multiservicio: puedes ver exactamente cuánto les has comprado en piensos,
+ cuánto en sanidad y cuánto en otros conceptos.</div></section>
 
-    <h4>La ficha muestra:</h4>
-    <table class="parametros">
-      <tr><th>Sección</th><th>Contenido</th></tr>
-      <tr><td><span class="campo">KPIs</span></td><td>Total de gastos (nº y €), gasto último año, gasto promedio por operación</td></tr>
-      <tr><td><span class="campo">Datos de contacto</span></td><td>NIF, dirección, teléfono, email, condiciones de pago</td></tr>
-      <tr><td><span class="campo">Categorías</span></td><td>Etiquetas de las categorías asignadas al proveedor</td></tr>
-      <tr><td><span class="campo">Historial de gastos</span></td><td>Lista de todos los gastos asociados, ordenados por fecha descendente</td></tr>
-      <tr><td><span class="campo">Desglose por categoría</span></td><td>Total gastado en cada categoría contable para este proveedor</td></tr>
-    </table>
+ <!-- ============================================================= -->
+ <!-- 6. EJEMPLO -->
+ <!-- ============================================================= -->
+ <section class="seccion" id="ejemplo"><span class="fase-tag">Ejemplo</span>
+ <h2 class="modulo">6. Ejemplo con la demo CHAMORRO</h2>
+ <p class="intro-mod">La demo <strong>CHAMORRO</strong> incluye 3 proveedores precargados, cada uno con una
+ categoría distinta:</p>
 
-    <div class="tip">
-      <strong>Tip:</strong> El desglose por categoría de la ficha es especialmente útil para
-      proveedores multiservicio: puedes ver exactamente cuánto les has comprado en piensos,
-      cuánto en sanidad y cuánto en otros conceptos.
-    </div>
-  </section>
+ <div class="panel-ejemplo"><h4>Proveedores de la demo CHAMORRO</h4>
+ <table><tr><th>Nombre</th><th>NIF/CIF</th><th>Categoría</th><th>Ciudad</th><th>Provincia</th></tr>
+ <tr><td>Piensos El Trébol SA</td><td>A65432109</td><td>Alimentacion</td><td>Zafra</td><td>Badajoz</td></tr>
+ <tr><td>Farmacia Veterinaria VetPlus</td><td>B54321098</td><td>Sanidad</td><td>Badajoz</td><td>Badajoz</td></tr>
+ <tr><td>Maquinaria Agrícola La Vega</td><td>B43210987</td><td>Amortizacion</td><td>Plasencia</td><td>Cáceres</td></tr></table></div>
 
-  <!-- ============================================================= -->
-  <!-- 6. EJEMPLO -->
-  <!-- ============================================================= -->
-  <section class="seccion" id="ejemplo">
-    <span class="fase-tag">Ejemplo</span>
-    <h2 class="modulo">6. Ejemplo con la demo CHAMORRO</h2>
-    <p class="intro-mod">
-      La demo <strong>CHAMORRO</strong> incluye 3 proveedores precargados, cada uno con una
-      categoría distinta:
-    </p>
+ <p>En la demo, estos proveedores aparecen asociados a los siguientes gastos:</p>
+ <ul><li><strong>Piensos El Trébol SA</strong> — asociado a "Pienso concentrado vacuno" (2.340,50 €), "Paja para cama y lecho" (680 €) y "Pienso lactancia corderos" (540 €)</li>
+ <li><strong>Farmacia Veterinaria VetPlus</strong> — asociado a "Vacunación trimestral" (425 €) y "Veterinario revisión rebaño" (260 €)</li>
+ <li><strong>Maquinaria Agrícola La Vega</strong> — asociado a "Gasoil tractor" (320,75 €) y "Mantenimiento valla parcela norte" (890 €)</li></ul>
 
-    <div class="panel-ejemplo">
-      <h4>📐 Proveedores de la demo CHAMORRO</h4>
-      <table>
-        <tr><th>Nombre</th><th>NIF/CIF</th><th>Categoría</th><th>Ciudad</th><th>Provincia</th></tr>
-        <tr><td>Piensos El Trébol SA</td><td>A65432109</td><td>🌾 Alimentacion</td><td>Zafra</td><td>Badajoz</td></tr>
-        <tr><td>Farmacia Veterinaria VetPlus</td><td>B54321098</td><td>💉 Sanidad</td><td>Badajoz</td><td>Badajoz</td></tr>
-        <tr><td>Maquinaria Agrícola La Vega</td><td>B43210987</td><td>🚜 Amortizacion</td><td>Plasencia</td><td>Cáceres</td></tr>
-      </table>
-    </div>
+ <div class="panel-ejemplo"><h4>Resumen de gastos por proveedor (demo)</h4>
+ <table><tr><th>Proveedor</th><th>Nº gastos</th><th>Total (€)</th><th>Categoría</th></tr>
+ <tr><td>Piensos El Trébol SA</td><td>3</td><td>3.560,50</td><td>Alimentación</td></tr>
+ <tr><td>Farmacia Veterinaria VetPlus</td><td>2</td><td>685,00</td><td>Sanidad</td></tr>
+ <tr><td>Maquinaria Agrícola La Vega</td><td>2</td><td>1.210,75</td><td>Amortización</td></tr></table></div></section>
 
-    <p>En la demo, estos proveedores aparecen asociados a los siguientes gastos:</p>
-    <ul>
-      <li><strong>Piensos El Trébol SA</strong> — asociado a "Pienso concentrado vacuno" (2.340,50 €), "Paja para cama y lecho" (680 €) y "Pienso lactancia corderos" (540 €)</li>
-      <li><strong>Farmacia Veterinaria VetPlus</strong> — asociado a "Vacunación trimestral" (425 €) y "Veterinario revisión rebaño" (260 €)</li>
-      <li><strong>Maquinaria Agrícola La Vega</strong> — asociado a "Gasoil tractor" (320,75 €) y "Mantenimiento valla parcela norte" (890 €)</li>
-    </ul>
+ <section class="seccion" id="capturas"><span class="fase-tag">Capturas</span>
+ <h2 class="modulo">7. Capturas reales en app (demo CHAMORRO)</h2>
+ <p class="intro-mod">Flujo visual del módulo de proveedores con datos reales de gasto de la demo.</p>
 
-    <div class="panel-ejemplo">
-      <h4>📊 Resumen de gastos por proveedor (demo)</h4>
-      <table>
-        <tr><th>Proveedor</th><th>Nº gastos</th><th>Total (€)</th><th>Categoría</th></tr>
-        <tr><td>Piensos El Trébol SA</td><td>3</td><td>3.560,50</td><td>Alimentación</td></tr>
-        <tr><td>Farmacia Veterinaria VetPlus</td><td>2</td><td>685,00</td><td>Sanidad</td></tr>
-        <tr><td>Maquinaria Agrícola La Vega</td><td>2</td><td>1.210,75</td><td>Amortización</td></tr>
-      </table>
-    </div>
-  </section>
+ <figure><img src="img/prov/prov-01.png" alt="Listado de proveedores"><figcaption>Prov-01 · Listado de proveedores</figcaption></figure>
+ <figure><img src="img/prov/prov-02.png" alt="Alta de proveedor"><figcaption>Prov-02 · Apertura de formulario de alta</figcaption></figure>
+ <figure><img src="img/prov/prov-03.png" alt="Formulario de proveedor"><figcaption>Prov-03 · Formulario y categorías</figcaption></figure>
+ <figure><img src="img/prov/prov-04.png" alt="Ficha proveedor piensos"><figcaption>Prov-04 · Ficha de Piensos El Trébol</figcaption></figure>
+ <figure><img src="img/prov/prov-05.png" alt="Historial gastos proveedor"><figcaption>Prov-05 · Historial de gastos del proveedor</figcaption></figure>
+ <figure><img src="img/prov/prov-06.png" alt="Ficha proveedor veterinario"><figcaption>Prov-06 · Ficha de VetPlus</figcaption></figure>
+ <figure><img src="img/prov/prov-07.png" alt="Ficha proveedor maquinaria"><figcaption>Prov-07 · Ficha de Maquinaria Agrícola La Vega</figcaption></figure>
+ <figure><img src="img/prov/prov-08.png" alt="Kpis proveedores"><figcaption>Prov-08 · KPIs y resumen de proveedores</figcaption></figure></section>
 
-  <section class="seccion" id="capturas">
-    <span class="fase-tag">Capturas</span>
-    <h2 class="modulo">7. Capturas reales en app (demo CHAMORRO)</h2>
-    <p class="intro-mod">
-      Flujo visual del módulo de proveedores con datos reales de gasto de la demo.
-    </p>
-
-    <figure><img src="img/prov/prov-01.png" alt="Listado de proveedores"><figcaption>Prov-01 · Listado de proveedores</figcaption></figure>
-    <figure><img src="img/prov/prov-02.png" alt="Alta de proveedor"><figcaption>Prov-02 · Apertura de formulario de alta</figcaption></figure>
-    <figure><img src="img/prov/prov-03.png" alt="Formulario de proveedor"><figcaption>Prov-03 · Formulario y categorías</figcaption></figure>
-    <figure><img src="img/prov/prov-04.png" alt="Ficha proveedor piensos"><figcaption>Prov-04 · Ficha de Piensos El Trébol</figcaption></figure>
-    <figure><img src="img/prov/prov-05.png" alt="Historial gastos proveedor"><figcaption>Prov-05 · Historial de gastos del proveedor</figcaption></figure>
-    <figure><img src="img/prov/prov-06.png" alt="Ficha proveedor veterinario"><figcaption>Prov-06 · Ficha de VetPlus</figcaption></figure>
-    <figure><img src="img/prov/prov-07.png" alt="Ficha proveedor maquinaria"><figcaption>Prov-07 · Ficha de Maquinaria Agrícola La Vega</figcaption></figure>
-    <figure><img src="img/prov/prov-08.png" alt="Kpis proveedores"><figcaption>Prov-08 · KPIs y resumen de proveedores</figcaption></figure>
-  </section>
-
-  <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">
-    Livestock Manager v4.7.0 · Manual de Proveedores · Trazabilidad de Costes
-  </div>
-
-</div>
-</body>
-</html>
+ <div style="margin-top:28px; padding-bottom:30px; text-align:center; color:#999; font-size:.75rem;">Livestock Manager v4.7.0 · Manual de Proveedores · Trazabilidad de Costes</div></div></body></html>
