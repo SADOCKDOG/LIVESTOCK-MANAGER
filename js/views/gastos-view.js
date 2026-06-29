@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - GastosView v2.0.0
  * Vista de Gastos con tabs por Categoría Contable.
  * Sigue el mismo patrón que ProduccionView: tabs, KPIs, botón registrar, listado.
@@ -164,12 +164,20 @@ const GastosView = {
             ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
           </div>
         </div>
-        ${kpis ? `<div class="grid grid-cols-2 gap-8 mb-12">
-          ${kpis.map(k => `
-            <div class="bg-dark" style="padding:10px 8px; border-radius:8px; border-left:3px solid ${color};">
-              <small class="text-gray text-tiny" style="text-transform:uppercase; font-weight:700; letter-spacing:0.3px;">${k.label}</small>
-              <div class="text-white font-900" style="font-size:1.1rem;">${k.value}</div>
-            </div>`).join('')}
+        ${kpis ? `
+        <!-- KPIs Gastos Unificados en Filas -->
+        <div class="card p-16 mb-12 border-222" style="border-left: 5px solid ${color}; background: rgba(255, 255, 255, 0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+            ${Icons.dinero()} BALANCE DE GASTOS
+          </div>
+          <div class="flex flex-col">
+            ${kpis.map((k, index) => `
+              <div class="py-12 flex justify-between items-center ${index < kpis.length - 1 ? 'border-bottom-222' : ''}">
+                <span class="text-xs text-gray uppercase font-900">${k.label}</span>
+                <strong class="text-xl font-950" style="color: ${k.label.includes('Total') ? '#ef4444' : '#3b82f6'};">${k.value}</strong>
+              </div>
+            `).join('')}
+          </div>
         </div>` : ''}
         <div class="text-center mb-12">
           <button class="btn btn-create btn-sm" onclick="${registrarHandler}">

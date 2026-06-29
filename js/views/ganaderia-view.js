@@ -78,18 +78,24 @@ const GanaderiaView = {
         <div class="text-xs text-aaa mt-4">Vista independiente por modo para patrimonio, censo, lotes y zonas.</div>
       </div>
 
-      <div class="ganaderia-kpis">
-        <div class="ganaderia-kpi" style="--kpi-color:${meta.color}">
-          <small>Lotes/Rebaños</small>
-          <strong>${rebanosModo.length}</strong>
+      <!-- KPIs Ganadería Unificados en Filas -->
+      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; background: rgba(255, 255, 255, 0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+          ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
-        <div class="ganaderia-kpi" style="--kpi-color:${meta.color}">
-          <small>Animales Activos</small>
-          <strong>${animalesActivos.length}</strong>
-        </div>
-        <div class="ganaderia-kpi" style="--kpi-color:${meta.color}">
-          <small>Zonas</small>
-          <strong>${zonas.length}</strong>
+        <div class="flex flex-col">
+          <div class="py-12 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900">Lotes / Rebaños</span>
+            <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} lotes</strong>
+          </div>
+          <div class="py-12 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900">Animales Activos</span>
+            <strong class="text-xl font-950 text-green">${animalesActivos.length} cabezas</strong>
+          </div>
+          <div class="py-12 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900">Zonas / Parcelas</span>
+            <strong class="text-xl font-950 text-blue">${zonas.length} parcelas</strong>
+          </div>
         </div>
       </div>
 

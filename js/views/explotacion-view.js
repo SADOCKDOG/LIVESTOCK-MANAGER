@@ -633,14 +633,14 @@ const ExplotacionView = {
     }
 
     let html = `
-      <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${borderStyleColor};">
-        <div class="mb-10">
-          <div class="text-xs text-white font-black uppercase flex items-center gap-6 mb-8">${Icons.paquete()} ALMACÉN Y STOCK DE SILOS</div>
+      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+          ${Icons.paquete()} BALANCE DE STOCK Y LLENADO DE SILOS
         </div>
-        <div class="grid gap-10">
+        <div class="flex flex-col">
     `;
 
-    silos.forEach(s => {
+    silos.forEach((s, index) => {
       const cargas = siloEventos.filter(e => e.entidad_id === s.id && e.rol_contable === 'COMPRA').reduce((sum, e) => sum + (e.valor_neto || 0), 0);
       const consumos = siloEventos.filter(e => e.entidad_id === s.id && e.rol_contable === 'CONSUMO').reduce((sum, e) => sum + (e.valor_neto || 0), 0);
       const actual = Math.max(0, s.inicial + cargas - consumos);
@@ -650,13 +650,17 @@ const ExplotacionView = {
       else if (pct < 50) colorBar = '#f59e0b'; // Naranja/Aviso
 
       html += `
-        <div class="text-75">
-          <div class="flex justify-between font-bold mb-4">
-            <span class="text-ccc">${s.nombre}</span>
-            <span class="text-white">${actual.toLocaleString()} / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
+        <div class="py-12 ${index < silos.length - 1 ? 'border-bottom-222' : ''} flex flex-col gap-6">
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900">${s.nombre}</span>
+            <strong class="text-xl font-950" style="color:${colorBar};">${actual.toLocaleString()} kg</strong>
           </div>
-          <div class="silo-bar">
-            <div style="background:${colorBar}; width:${pct}%; height:100%; transition: width 0.3s;"></div>
+          <div class="flex justify-between items-center text-[0.68rem] text-aaa">
+            <span>Capacidad: ${s.capacidad.toLocaleString()} kg</span>
+            <span style="color:${colorBar}; font-weight:800;">${pct}% lleno</span>
+          </div>
+          <div class="silo-bar mt-2" style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; overflow: hidden;">
+            <div style="background:${colorBar}; width:${pct}%; height:100%; transition: width 0.3s; border-radius: 3px;"></div>
           </div>
         </div>
       `;
