@@ -2945,7 +2945,7 @@ label {
 .pesaje-mode-carne { --pesaje-accent: var(--c-success); --pesaje-accent-rgb: 16, 185, 129; }
 .pesaje-mode-leche { --pesaje-accent: var(--c-warning); --pesaje-accent-rgb: 245, 158, 11; }
 .pesaje-header-fixed { position: relative; }
-.pesaje-crotal       { color: var(--pesaje-accent, var(--p-gold)) !important; text-shadow: 0 0 15px rgba(var(--pesaje-accent-rgb, 250, 204, 21), 0.25); }
+.pesaje-crotal       { color: var(--pesaje-accent, var(--p-gold)) !important; text-shadow: 0 0 15px rgba(var(--pesaje-accent-rgb, 250, 204, 21), 0.25); text-align: center; }
 .pesaje-peso-input   { color: var(--pesaje-accent, var(--p-gold)) !important; }
 .pesaje-peso-input:focus { border-color: var(--pesaje-accent, var(--p-gold)) !important; box-shadow: 0 0 20px rgba(var(--pesaje-accent-rgb, 250, 204, 21), 0.4); }
 .pesaje-unidad-label { color: var(--pesaje-accent, var(--p-gold)); }
