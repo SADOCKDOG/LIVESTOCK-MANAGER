@@ -205,36 +205,21 @@ const ComercializacionView = {
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card card-animal no-underline" onclick="${r.onclick || ''}" style="border-left:4px solid ${color}; padding:14px; margin-bottom:10px;">
-          <div class="flex flex-col gap-10">
-            <div class="flex justify-between items-center w-full">
-              <div class="flex items-center gap-10 min-w-0">
-                <div class="text-xl" style="color:${color}; filter: drop-shadow(0 0 4px ${color}60);">${icon}</div>
-                <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</div>
+        <div class="card card-animal no-underline" onclick="${r.onclick || ''}" style="border-left:4px solid ${color}; padding:12px; margin-bottom:8px;">
+          <div class="flex justify-between items-start gap-6">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-6">
+                <span class="text-sm font-black text-white uppercase tracking-tight">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</span>
               </div>
-              <div class="text-right ml-10">
-                <div class="font-900 text-white text-lg leading-none">${r.value}</div>
+              <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
+                <span class="flex items-center gap-3">${Icons.calendar()} ${r.date}</span>
+                ${r.zone ? `<span class="flex items-center gap-3">${Icons.zonas()} ${r.zone}</span>` : ''}
+                ${r.subvalue ? `<span class="flex items-center gap-3 text-aaa">${Icons.info()} ${r.subvalue}</span>` : ''}
+                ${r.meta ? `<span class="flex items-center gap-3 text-aaa">${Icons.documento()} ${r.meta}</span>` : ''}
               </div>
+              ${r.badges ? `<div class="flex flex-wrap gap-3 mt-3">${r.badges}</div>` : ''}
             </div>
-
-            <div class="flex flex-col w-full mt-10">
-              <!-- Metadatos y Referencias -->
-              <div class="flex flex-wrap gap-x-12 gap-y-3 mb-10 text-[0.68rem] text-gray font-800 uppercase">
-                  <div class="flex items-center gap-4">${Icons.calendar()} ${r.date}</div>
-                  ${r.zone ? `<div class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</div>` : ''}
-                  ${r.subvalue ? `<div class="flex items-center gap-4 text-aaa">${Icons.info()} ${r.subvalue}</div>` : ''}
-                  ${r.meta ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${r.meta.replace(/🏷️|📄/g, '')}</div>` : ''}
-              </div>
-
-              <!-- Grid de Badges (2 columnas para ocupar ancho) -->
-              <div class="grid grid-cols-2 gap-x-8 gap-y-4 w-full">
-                ${r.badges}
-              </div>
-
-              <div class="text-right w-full mt-12">
-                <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLE ➔</div>
-              </div>
-            </div>
+            <span class="text-lg font-950 flex-shrink-0" style="color:${color};">${r.value}</span>
           </div>
         </div>`).join('')
       : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} ${emptyMsg}</span></div>`;
