@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'corcho-v6.7.23';
+const CACHE_NAME = 'corcho-v6.7.23';
 const ASSETS = [
   './',
   './index.html',
@@ -50,6 +50,10 @@ const ASSETS = [
   './manual/manual-reproduccion.html',
   './manual/manual-sanitarios.html',
   './manual/manual-transportistas.html',
+  './manual/manual-cuaderno-digital.html',
+  './manual/manual-trazabilidad.html',
+  './manual/manual-informes-analitica.html',
+  './manual/manual-gestion-documental.html',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-placeholder.svg',
