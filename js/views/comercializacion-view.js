@@ -110,13 +110,31 @@ const ComercializacionView = {
     const tab = this._currentTab;
     const kpis = d.kpis[tab] || [];
     const meta = this._getTabMeta(tab);
+    const icons = {
+      'Peso Canal (kg)': Icons.balanza(),
+      'Animales': Icons.animales(),
+      'Rend. Prom.': Icons.grafico(),
+      'Ingreso Total': Icons.dinero(),
+      'Total Litros': Icons.leche(),
+      'Entregas': Icons.paquete(),
+      'Promedio': Icons.grafico(),
+      'MOFA Total': Icons.dinero(),
+      'Total (€)': Icons.dinero(),
+      'Registros': Icons.paquete(),
+      'Media/Registro': Icons.grafico(),
+    };
 
-    return kpis.map(k => `
-      <div class="explotacion-kpi-card" style="--theme-color: ${meta.color}">
-        <div class="explotacion-kpi-label">${k.label}</div>
-        <div class="explotacion-kpi-value">${k.value}</div>
-      </div>
-    `).join('');
+    return `
+      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; width:100%;">
+        <div class="flex flex-col">
+          ${kpis.map(k => `
+            <div class="py-10 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
+              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${icons[k.label] || Icons.info()} ${k.label}</span>
+              <strong class="text-base font-950" style="color:${meta.color};">${k.value}</strong>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
   },
 
   _cambiarTab(tab) {
