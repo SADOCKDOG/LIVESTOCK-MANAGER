@@ -242,7 +242,7 @@ const AjustesView = {
         <p class="text-gray mt-5 text-sm">Estado técnico de la base de datos local y versión actual de la aplicación.</p>
         <div class="info-box mt-15">
           <div class="grid grid-cols-2 gap-8 text-85">
-            <div><span class="text-gray">Versión:</span> <strong class="text-white">v4.8.6</strong></div>
+            <div><span class="text-gray">Versión:</span> <strong class="text-white">v4.8.7</strong></div>
             <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IDB v10</strong></div>
             <div><span class="text-gray">Fincas:</span> <strong class="text-white">${fincas.length}</strong></div>
             <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
@@ -352,7 +352,7 @@ const AjustesView = {
         <div class="mt-20"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-900 no-underline text-md uppercase">📩 soporte.sdogfarm@gmail.com</a></div>
         <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-900 no-underline text-md uppercase inline-flex items-center gap-6">🐙 GitHub</a></div>
         <div class="mt-40 text-[0.65rem] text-444 uppercase font-900 tracking-widest about-footer">
-          © 2026 Livestock Manager Premium · v4.8.6<br>
+          © 2026 Livestock Manager Premium · v4.8.7<br>
           Todos los derechos reservados.
         </div>
       </div>`;
@@ -764,16 +764,11 @@ const AjustesView = {
         return f >= inicioMes && f <= finMes;
       });
       const csv = window.ExportService.generarCSV_Movimientos(eventosMes, animales, finca);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
       const ym = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
-      a.href = url;
-      a.download = `cierre_siggan_${ym}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      const filename = `cierre_siggan_${ym}.csv`;
+
+      await window.ExportService.descargar(csv, filename, 'text/csv;charset=utf-8');
+
       App.toast(`📦 Cierre mensual exportado (${eventosMes.length} eventos)`);
     } catch (e) {
       App.toastError('No se pudo exportar cierre mensual: ' + e.message);

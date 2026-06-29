@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 11;
+const DB_VERSION = 12;
 
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
@@ -217,6 +217,16 @@ async function initDB() {
                     store.createIndex('finca_id', 'finca_id');
                     store.createIndex('fecha_notificacion', 'fecha_notificacion');
                     store.createIndex('estado_notificacion', 'estado_notificacion');
+                }
+            }
+
+            // v12: SIGGAN — Pedidos de Crotales
+            if (oldVersion < 12) {
+                if (!db.objectStoreNames.contains('pedidos_crotales')) {
+                    const store = db.createObjectStore('pedidos_crotales', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId', { unique: false });
+                    store.createIndex('fecha_pedido', 'fecha_pedido', { unique: false });
+                    store.createIndex('numero_seguimiento', 'numero_seguimiento', { unique: true });
                 }
             }
 
