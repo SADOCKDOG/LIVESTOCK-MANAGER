@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - AnimalesView v1.0.0
  * Vista de Animales extraída de App.js para modularización.
  * Copia espejo de js/views/animales-view.js
@@ -113,16 +113,17 @@ const AnimalesView = {
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
     const iconoSexo = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '⚤');
     const colorEstado = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : a.estado === 'baja' ? '#ef4444' : '#888';
+    const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
     return `
-      <div class="card card-animal no-underline" onclick="location.hash='/animal?id=${a.id}'" style="border-left:4px solid ${colorEstado}; padding:14px; margin:0; margin-bottom:8px;">
+      <div class="card card-animal no-underline" onclick="location.hash='/animal?id=${a.id}'" style="border-left:4px solid ${colorEspecie}; padding:14px; margin:0; margin-bottom:8px;">
         <div class="flex flex-col gap-10">
           <div class="flex justify-between items-center w-full">
             <div class="flex items-center gap-10 min-w-0">
-              <div class="text-xl" style="color:${colorEstado}">${Icons.animales()}</div>
+              <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
               <div class="text-xs">
-                <div class="font-bold text-white uppercase text-base tracking-tight">${a.numero_identificacion} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
-                <div class="text-gray mt-2 font-700 uppercase">${(a.especie || 'N/D')} · ${(a.raza || 'Sin Raza')}</div>
+                <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${a.numero_identificacion} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
+                <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
               </div>
             </div>
             <div class="text-right">
@@ -348,7 +349,7 @@ const AnimalesView = {
             </div>
             <div id="a-procedencia-section" class="wizard-input-group mb-12" style="display:${esCompra ? 'block' : 'none'};">
               <label class="wizard-label">REGA DE PROCEDENCIA (ORIGEN)</label>
-              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="ES041230000123" class="wizard-input font-800">
+              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="ES041230000123" class="wizard-input font-800 input-rega-std" maxlength="14">
             </div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">MADRE (GENEALOGÍA)</label>

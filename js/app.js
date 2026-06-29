@@ -1259,7 +1259,7 @@ const App = {
       html += `<div data-cria-row class="grid grid-cols-2 gap-10 mb-8 row-sep-222">
           <div class="wizard-input-group m-0">
             <label class="wizard-label">CROTAL CRÍA ${i + 1}</label>
-            <input type="text" class="wizard-input cria-crotal" maxlength="14" placeholder="ES + 12 dígitos" value="${p.crotal}">
+            <input type="text" class="wizard-input cria-crotal input-crotal-std" maxlength="14" placeholder="ES + 12 dígitos" value="${p.crotal}">
           </div>
           <div class="wizard-input-group m-0">
             <label class="wizard-label">SEXO</label>

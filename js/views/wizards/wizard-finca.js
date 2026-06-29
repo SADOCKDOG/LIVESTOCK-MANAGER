@@ -17,7 +17,7 @@ window.WizardFinca = {
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">CÓDIGO REGA</label>
-                <input type="text" id="w-fn-rega" value="${data.codigo_REGA || ''}" placeholder="ES..." class="wizard-input">
+                 <input type="text" id="w-fn-rega" value="${data.codigo_REGA || ''}" placeholder="ES210050001234" class="wizard-input input-rega-std" maxlength="14">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">COMUNIDAD AUTÓNOMA</label>
@@ -86,7 +86,7 @@ window.WizardFinca = {
         content: (data) => `
             <div class="mt-10">
               <div class="wizard-input-group"><label class="wizard-label">NOMBRE DE LA FINCA</label><input type="text" id="w-f-nombre" value="${data.nombre || ''}" class="wizard-input"></div>
-              <div class="wizard-input-group"><label class="wizard-label">CÓDIGO REGA</label><input type="text" id="w-f-rega" value="${data.codigo_REGA || ''}" placeholder="ES..." class="wizard-input"></div>
+              <div class="wizard-input-group"><label class="wizard-label">CÓDIGO REGA</label><input type="text" id="w-f-rega" value="${data.codigo_REGA || ''}" placeholder="ES210050001234" class="wizard-input input-rega-std" maxlength="14"></div>
               <div class="wizard-input-group"><label class="wizard-label">NIF / CIF</label><input type="text" id="w-f-nif" value="${data.nif_cif || ''}" class="wizard-input"></div>
               <div class="wizard-input-group"><label class="wizard-label">DIRECCIÓN POSTAL</label><input type="text" id="w-f-dir" value="${data.direccion || ''}" class="wizard-input"></div>
 

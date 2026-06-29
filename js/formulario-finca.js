@@ -135,7 +135,7 @@ const FormularioFinca = {
 
                         <div class="form-group">
                             <label class="form-label" for="regaFinca"><span class="requerido" id="regaReq" style="display:none;">*</span> Código REGA</label>
-                            <input class="form-input" type="text" id="regaFinca" name="rega" placeholder="Ej: ES041230000123" maxlength="25" />
+                             <input class="form-input input-rega-std" type="text" id="regaFinca" name="rega" placeholder="Ej: ES210050001234" maxlength="14" />
                             <span class="formulario-finca-error" data-campo="rega"></span>
                             <small class="formulario-finca-ayuda">ES + 2 díg. provincia + 3 díg. municipio + 7 díg. secuencial</small>
                         </div>

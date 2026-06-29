@@ -62,11 +62,11 @@ window.WizardGuiaMovimiento = {
             <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">EXPLOTACIONES Y CENSO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">REGA ${esSalida ? 'ORIGEN (PROPIO)' : 'DESTINO (PROPIO)'}</label>
-              <input type="text" id="w-mv-rega-propia" value="${esSalida ? data.rega_origen : data.rega_destino}" class="wizard-input font-900 text-gold" ${regaPropia ? 'readonly' : ''}>
+              <input type="text" id="w-mv-rega-propia" value="${esSalida ? data.rega_origen : data.rega_destino}" class="wizard-input font-900 input-rega-std" ${regaPropia ? 'readonly' : ''} maxlength="14">
             </div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">REGA ${esSalida ? 'DESTINO' : 'ORIGEN'} (CONTRAPARTE)</label>
-              <input type="text" id="w-mv-rega-contra" value="${esSalida ? data.rega_destino : data.rega_origen}" placeholder="ES000000000000" class="wizard-input font-800 uppercase">
+              <input type="text" id="w-mv-rega-contra" value="${esSalida ? data.rega_destino : data.rega_origen}" placeholder="ES000000000000" class="wizard-input font-800 uppercase input-rega-std" maxlength="14">
             </div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">NOMBRE EXPLOTACIÓN CONTRAPARTE</label>

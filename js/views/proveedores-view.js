@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ProveedoresView - Livestock Manager Premium v4.0
  * Vista de proveedores: lista, detalle con trazabilidad de gastos, formulario.
  */
@@ -45,10 +45,10 @@ const ProveedoresView = {
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="grid grid-cols-3 gap-6 mb-14">
-                <div class="info-box-center border-left-violet"><small class="s-lbl">PROVEEDORES</small><div class="inf-val-lg text-purple">${proveedores.length}</div></div>
-                <div class="info-box-center border-left-amber"><small class="s-lbl">GASTO ASIGNADO</small><div class="inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
-                <div class="info-box-center border-left-blue"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
+              <div class="grid grid-cols-3 gap-8 mb-16">
+                <div class="summary-cell summary-cell-kpi border-left-violet"><small class="s-lbl uppercase font-900">PROVEEDORES</small><div class="s-val inf-val-lg text-purple">${proveedores.length}</div></div>
+                <div class="summary-cell summary-cell-kpi border-left-amber"><small class="s-lbl uppercase font-900">GASTO ASIGNADO</small><div class="s-val inf-val-lg text-amber">${totalGasto.toLocaleString()}€</div></div>
+                <div class="summary-cell summary-cell-kpi border-left-blue"><small class="s-lbl uppercase font-900">REGISTROS</small><div class="s-val inf-val-lg text-blue">${gastosConProveedor.length}</div></div>
               </div>`;
         }
         this._cachedData = proveedores;
@@ -73,16 +73,18 @@ const ProveedoresView = {
 
         if (lista.length === 0) {
             contenedor.innerHTML = `
-              <div class="empty-state">
-                <div class="empty-state-icon">${Icons.edificio()}</div>
-                <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
+              <div class="empty-state border border-222">
+                <div class="empty-state-icon" style="color:#555;">${Icons.proveedores()}</div>
+                <p class="empty-state-text uppercase font-900 text-xs">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
                 <button onclick="ProveedoresView.renderFormulario()"
-                  class="btn btn-create btn-sm mt-10">${Icons.agregar()} Registrar primer proveedor</button>
+                  class="widget-link-btn widget-link-btn--neon neon-success px-16 mt-10">
+                  ${Icons.agregar()} <span class="widget-link-label">REGISTRAR PRIMERO</span>
+                </button>
               </div>`;
             return;
         }
 
-        contenedor.innerHTML = `<div class="grid gap-10">${lista.map(p => `
+        contenedor.innerHTML = `<div class="grid gap-12">${lista.map(p => `
           <div class="card card-animal no-underline" onclick="ProveedoresView.renderDetalle(${p.id})"
             style="border-left:4px solid #10b981; padding:14px; margin:0; margin-bottom:8px;">
             <div class="flex flex-col gap-10">
@@ -90,22 +92,22 @@ const ProveedoresView = {
                 <div class="flex items-center gap-10 min-w-0">
                   <div class="text-xl" style="color:#10b981">${Icons.proveedores()}</div>
                   <div class="text-xs">
-                    <div class="font-bold text-white uppercase text-base tracking-tight">${p.nombre}</div>
-                    <div class="text-gray mt-2 font-700 uppercase">
-                      ${p.nif_cif ? Icons.documento() + ' ' + p.nif_cif : ''}${p.ciudad ? ' · ' + Icons.zonas() + ' ' + p.ciudad : ''}
+                    <div class="font-950 text-white uppercase text-base tracking-tight">${p.nombre}</div>
+                    <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
+                      ${p.nif_cif ? Icons.documento() + ' ' + p.nif_cif : ''}${p.ciudad ? ' · ' + Icons.zonas() + ' ' + p.ciudad.toUpperCase() : ''}
                     </div>
                   </div>
                 </div>
                 <div class="text-right">
-                  ${p.activo === false ? '<span class="badge badge-sm uppercase" style="background:#ef444415; color:#ef4444; border:1px solid #ef444435;">INACTIVO</span>' : '<span class="badge badge-sm uppercase" style="background:#10b98115; color:#10b981; border:1px solid #10b98135;">ACTIVO</span>'}
+                  ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:#ef444420; color:#ef4444; border:1px solid #ef444440;">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:#10b98120; color:#10b981; border:1px solid #10b98140;">ACTIVO</span>'}
                 </div>
               </div>
 
-              <div class="flex justify-between items-end w-full">
+              <div class="flex justify-between items-end w-full mt-10">
                 <div class="flex-1 min-w-0">
                   ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
-                  <div class="flex flex-wrap gap-4 text-[0.62rem] text-aaa font-800 uppercase">
-                    ${p.categorias.map(cat => `<span class="flex items-center gap-2">${Icons.documento()} ${cat}</span>`).join('')}
+                  <div class="flex flex-wrap gap-4 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter">
+                    ${p.categorias.map(cat => `<span class="flex items-center gap-2 bg-black px-8 py-2 rounded-sm border border-222">${Icons.paquete()} ${cat.toUpperCase()}</span>`).join('')}
                   </div>` : ''}
                 </div>
                 <div class="text-right">
@@ -132,97 +134,103 @@ const ProveedoresView = {
 
         const main = document.getElementById("app-content");
         main.innerHTML = `
-          <div class="mb-12">
-            <a href="#/proveedores" class="link-back">← Volver a proveedores</a>
+          <div class="mb-14">
+            <button onclick="location.hash='#/proveedores'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+              <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+            </button>
           </div>
 
           <!-- Cabecera -->
-          <div class="card p-20 border-top-3px border-top-3px-green">
-            <div class="flex justify-between items-start">
+          <div class="card p-20 border-top-3px border-top-3px-green bg-black">
+            <div class="flex justify-between items-start mb-16">
               <div>
-                <h2 class="text-white mt-0 mb-4 text-2xl">${proveedor.nombre}</h2>
-                <div class="mb-8">
-                  ${proveedor.activo === false ? '<span class="text-red font-800 text-xs">INACTIVO</span>' : '<span class="text-green font-800 text-xs">ACTIVO</span>'}
+                <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
+                <div class="mt-4">
+                  ${proveedor.activo === false
+                    ? '<span class="badge badge-sm font-950 uppercase" style="background:#ef444420; color:#ef4444; border:1px solid #ef444440;">INACTIVO</span>'
+                    : '<span class="badge badge-sm font-950 uppercase" style="background:#10b98120; color:#10b981; border:1px solid #10b98140;">ACTIVO</span>'}
                 </div>
               </div>
-              <div class="flex gap-10">
-                <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="ProveedoresView._eliminar(${id})">
+              <div class="flex gap-8">
+                <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="ProveedoresView._eliminar(${id})">
                   ${Icons.eliminar()}
-                  <span class="widget-link-label">Eliminar</span>
                 </button>
-                <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ProveedoresView.renderFormulario(${id})">
+                <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="ProveedoresView.renderFormulario(${id})">
                   ${Icons.editar()}
-                  <span class="widget-link-label">Editar</span>
                 </button>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-6 mt-12 text-sm text-aaa">
-              ${proveedor.nif_cif ? `<div class="flex items-center gap-4">${Icons.documento()} <strong>NIF:</strong> ${proveedor.nif_cif}</div>` : ''}
-              ${proveedor.telefono ? `<div class="flex items-center gap-4">${Icons.info()} <strong>Tel:</strong> ${proveedor.telefono}</div>` : ''}
-              ${proveedor.email ? `<div class="flex items-center gap-4">${Icons.enlace()} <strong>Email:</strong> ${proveedor.email}</div>` : ''}
-              ${proveedor.ciudad ? `<div class="flex items-center gap-4">${Icons.zonas()} <strong>Ciudad:</strong> ${proveedor.ciudad}${proveedor.provincia ? ' ('+proveedor.provincia+')' : ''}</div>` : ''}
-              ${proveedor.condiciones_pago ? `<div class="col-span-2 flex items-center gap-4">${Icons.dinero()} <strong>Condiciones pago:</strong> ${proveedor.condiciones_pago}</div>` : ''}
-              ${Array.isArray(proveedor.categorias) && proveedor.categorias.length > 0 ? `<div class="col-span-2 flex items-center gap-4">${Icons.documento()} <strong>Categorías:</strong> ${proveedor.categorias.join(', ')}</div>` : ''}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-15 text-xs text-gray-500 uppercase font-800 tracking-wider bg-dark p-14 rounded-sm border border-222">
+              ${proveedor.nif_cif ? `<div class="flex items-center gap-6">${Icons.documento()} <span class="text-aaa">NIF:</span> <strong class="text-white">${proveedor.nif_cif}</strong></div>` : ''}
+              ${proveedor.telefono ? `<div class="flex items-center gap-6">${Icons.info()} <span class="text-aaa">TEL:</span> <strong class="text-white">${proveedor.telefono}</strong></div>` : ''}
+              ${proveedor.email ? `<div class="flex items-center gap-6 lowercase">${Icons.enlace()} <span class="text-aaa uppercase">EMAIL:</span> <strong class="text-white">${proveedor.email}</strong></div>` : ''}
+              ${proveedor.ciudad ? `<div class="flex items-center gap-6">${Icons.zonas()} <span class="text-aaa">UBICACIÓN:</span> <strong class="text-white">${proveedor.ciudad.toUpperCase()}${proveedor.provincia ? ' ('+proveedor.provincia.toUpperCase()+')' : ''}</strong></div>` : ''}
+              ${proveedor.condiciones_pago ? `<div class="col-span-full flex items-center gap-6 mt-4 border-top-222 pt-8">${Icons.dinero()} <span class="text-aaa">PAGO:</span> <strong class="text-white">${proveedor.condiciones_pago.toUpperCase()}</strong></div>` : ''}
             </div>
           </div>
 
           <!-- KPIs -->
-          <div class="grid grid-cols-3 gap-8 mb-14">
-            <div class="card p-12 text-center mb-0">
-              <div class="kpi-label">Total Gastado</div>
-              <div class="kpi-value text-green text-xl">${resumen.total_gastado.toFixed(2)} €</div>
+          <div class="grid grid-cols-3 gap-8 mb-16">
+            <div class="summary-cell summary-cell-kpi border-left-green">
+              <small class="s-lbl uppercase font-900">TOTAL GASTADO</small>
+              <div class="s-val inf-val-lg text-green font-950">${resumen.total_gastado.toLocaleString()}€</div>
             </div>
-            <div class="card p-12 text-center mb-0">
-              <div class="kpi-label">Registros</div>
-              <div class="kpi-value text-blue">${resumen.total_gastos}</div>
-              <div class="kpi-sub">gasto medio ${resumen.gasto_promedio.toFixed(1)} €</div>
+            <div class="summary-cell summary-cell-kpi border-left-blue">
+              <small class="s-lbl uppercase font-900">REGISTROS</small>
+              <div class="s-val inf-val-lg text-blue font-950">${resumen.total_gastos}</div>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">MEDIA: ${resumen.gasto_promedio.toFixed(1)}€</small>
             </div>
-            <div class="card p-12 text-center mb-0">
-              <div class="kpi-label">Gasto Anual</div>
-              <div class="kpi-value text-red text-xl">${resumen.gasto_anual.toFixed(2)} €</div>
-              <div class="kpi-sub">últimos 12 meses</div>
+            <div class="summary-cell summary-cell-kpi border-left-red">
+              <small class="s-lbl uppercase font-900">GASTO ANUAL</small>
+              <div class="s-val inf-val-lg text-red font-950">${resumen.gasto_anual.toLocaleString()}€</div>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">ÚLTIMOS 12M</small>
             </div>
           </div>
 
           <!-- Desglose por categoría -->
-          <div class="card p-16 mb-14">
-            <h3 class="section-h3 flex items-center gap-8">${Icons.grafico()} Gastos por Categoría</h3>
-            ${Object.keys(resumen.por_categoria).length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin gastos registrados.</p></div>' :
+          <div class="card p-16 mb-16 border-222 bg-black">
+            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
+                ${Icons.grafico()} GASTOS POR CATEGORÍA
+            </div>
+            ${Object.keys(resumen.por_categoria).length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text font-800 text-xs">Sin gastos registrados.</p></div>' :
               Object.entries(resumen.por_categoria).map(([cat, info]) => `
-                <div class="history-row">
-                  <div>
-                    <span class="history-title">${cat}</span>
-                    <span class="history-sub ml-8 uppercase font-700 text-75">(${info.count} REGISTROS)</span>
+                <div class="history-row border-bottom-222 py-10">
+                  <div class="flex items-center gap-8">
+                    <span class="text-white font-900 uppercase text-xs">${Icons.paquete()} ${cat}</span>
+                    <span class="text-gray-600 font-800 text-[0.6rem] uppercase tracking-tighter">(${info.count} REGISTROS)</span>
                   </div>
-                  <div class="history-amount text-green">${info.total.toFixed(2)} €</div>
+                  <div class="text-green font-950 text-md">${info.total.toLocaleString()} €</div>
                 </div>
               `).join('')}
           </div>
 
           <!-- Historial de Gastos -->
-          <div class="card p-16 mb-14">
-            <h3 class="section-h3 flex items-center gap-8">${Icons.dinero()} Historial de Gastos</h3>
-            ${gastos.length === 0 ? '<div class="empty-state mt-0 mb-0"><p class="empty-state-text">Sin gastos registrados.</p></div>' :
+          <div class="card p-16 mb-20 border-222 bg-black">
+            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
+                ${Icons.dinero()} ÚLTIMOS REGISTROS
+            </div>
+            ${gastos.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text font-800 text-xs">Sin gastos registrados.</p></div>' :
               gastos.slice(0, 30).map(g => `
-                <div class="history-row">
+                <div class="history-row border-bottom-222 py-12">
                   <div>
-                    <div class="history-title uppercase font-800">${Icons.calendar()} ${g.fecha ? new Date(g.fecha).toLocaleDateString() : '-'}</div>
-                    <div class="history-sub uppercase font-700 text-75">${g.categoria || 'Otros'}${g.descripcion ? ' · '+g.descripcion : ''}</div>
+                    <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${g.fecha ? new Date(g.fecha).toLocaleDateString() : '-'}</div>
+                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${g.categoria || 'Otros'}${g.descripcion ? ' · '+g.descripcion : ''}</div>
                   </div>
                   <div class="text-right">
-                    <div class="history-amount text-red">${(g.monto || 0).toFixed(2)} €</div>
-                    ${g.iva ? `<div class="kpi-sub uppercase font-700 text-[0.62rem]">IVA: ${g.iva}%</div>` : ''}
+                    <div class="text-red font-950 text-md">${(g.monto || 0).toLocaleString()} €</div>
+                    ${g.iva ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">IVA: ${g.iva}%</div>` : ''}
                   </div>
                 </div>
               `).join('')}
-            ${gastos.length > 30 ? `<div class="history-more text-center uppercase font-800 text-75 mt-10">Mostrando 30 de ${gastos.length} registros</div>` : ''}
+            ${gastos.length > 30 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 30 de ${gastos.length} registros</div>` : ''}
           </div>
 
           ${proveedor.notas ? `
-          <div class="card p-16">
-            <h3 class="section-h3">${Icons.documento()} Notas</h3>
-            <p class="text-sm text-aaa m-0">${proveedor.notas}</p>
-          </div>` : ''}
+          <div class="card card-accent card-accent-gold p-16 mb-40">
+            <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
+            <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${proveedor.notas}</p>
+          </div>` : '<div class="pb-40"></div>'}
         `;
     },
 
@@ -243,108 +251,125 @@ const ProveedoresView = {
 
         const main = document.getElementById("app-content");
         main.innerHTML = `
-          <div class="mb-12">
-            <a href="${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}" class="link-back">← Volver</a>
+          <div class="mb-14">
+            <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+              <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
+            </button>
           </div>
-          <div class="card p-20 border-top-3px border-top-3px-green">
-            <h2 class="text-green mt-0 mb-16 text-md" style="border:none; padding:0;">${esEdicion ? `${Icons.editar()} Editar Proveedor` : `${Icons.agregar()} Nuevo Proveedor`}</h2>
+          <div class="card card-accent card-accent-green p-20 bg-black">
+            <div class="section-header-theme mb-20" style="--theme-color: #10b981">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
 
-            <label class="form-label">NOMBRE / RAZÓN SOCIAL *</label>
-            <input type="text" id="p-nombre" value="${p.nombre}" class="premium-input mb-12" placeholder="Ej: Suministros Agrícolas S.L.">
+            <div class="wizard-input-group mb-15">
+                <label class="wizard-label">NOMBRE / RAZÓN SOCIAL *</label>
+                <input type="text" id="p-nombre" value="${p.nombre}" class="wizard-input uppercase font-900" placeholder="EJ: SUMINISTROS AGRÍCOLAS S.L.">
+            </div>
 
-            <div class="grid grid-cols-2 gap-10 mb-12">
-              <div>
-                <label class="form-label">NIF / CIF</label>
-                <input type="text" id="p-nif" value="${p.nif_cif}" class="premium-input" placeholder="B12345678">
+            <div class="grid grid-cols-2 gap-12 mb-15">
+              <div class="wizard-input-group">
+                <label class="wizard-label">NIF / CIF</label>
+                <input type="text" id="p-nif" value="${p.nif_cif}" class="wizard-input uppercase font-800" placeholder="B12345678">
               </div>
-              <div>
-                <label class="form-label">TELÉFONO</label>
-                <input type="tel" id="p-tel" value="${p.telefono}" class="premium-input">
+              <div class="wizard-input-group">
+                <label class="wizard-label">TELÉFONO</label>
+                <input type="tel" id="p-tel" value="${p.telefono}" class="wizard-input font-800" placeholder="600000000">
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-10 mb-12">
-              <div>
-                <label class="form-label">TIPO OPERADOR SIGGAN</label>
-                <select id="p-tipo-operador" class="premium-input">
-                  <option value="proveedor_servicios" ${!p.tipo_operador || p.tipo_operador === 'proveedor_servicios' ? 'selected' : ''}>Proveedor servicios</option>
-                  <option value="piensos" ${p.tipo_operador === 'piensos' ? 'selected' : ''}>Piensos</option>
-                  <option value="sanitario" ${p.tipo_operador === 'sanitario' ? 'selected' : ''}>Sanitario</option>
-                  <option value="maquinaria" ${p.tipo_operador === 'maquinaria' ? 'selected' : ''}>Maquinaria</option>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-15">
+              <div class="wizard-input-group">
+                <label class="wizard-label">TIPO OPERADOR SIGGAN</label>
+                <select id="p-tipo-operador" class="wizard-input wizard-select font-800">
+                  <option value="proveedor_servicios" ${!p.tipo_operador || p.tipo_operador === 'proveedor_servicios' ? 'selected' : ''}>PROVEEDOR SERVICIOS</option>
+                  <option value="piensos" ${p.tipo_operador === 'piensos' ? 'selected' : ''}>PIENSOS</option>
+                  <option value="sanitario" ${p.tipo_operador === 'sanitario' ? 'selected' : ''}>SANITARIO</option>
+                  <option value="maquinaria" ${p.tipo_operador === 'maquinaria' ? 'selected' : ''}>MAQUINARIA</option>
                 </select>
               </div>
-              <div>
-                <label class="form-label">REGA</label>
-                <input type="text" id="p-rega" value="${p.rega || ''}" class="premium-input" placeholder="ES041230000123">
+              <div class="wizard-input-group">
+                <label class="wizard-label">REGA</label>
+                <input type="text" id="p-rega" value="${p.rega || ''}" class="wizard-input uppercase font-800 input-rega-std" placeholder="ES041230000123" maxlength="14">
               </div>
-              <div>
-                <label class="form-label">CCAA</label>
-                <select id="p-ccaa" class="premium-input">
-                  <option value="">—</option>
-                  <option value="andalucia" ${p.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>Andalucía</option>
-                  <option value="extremadura" ${p.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>Extremadura</option>
+              <div class="wizard-input-group">
+                <label class="wizard-label">CCAA</label>
+                <select id="p-ccaa" class="wizard-input wizard-select font-800">
+                  <option value="">— SIN DEFINIR —</option>
+                  <option value="andalucia" ${p.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>ANDALUCÍA</option>
+                  <option value="extremadura" ${p.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>EXTREMADURA</option>
                 </select>
               </div>
             </div>
 
-            <label class="form-label">DIRECCIÓN</label>
-            <input type="text" id="p-dir" value="${p.direccion}" class="premium-input mb-12">
+            <div class="wizard-input-group mb-15">
+                <label class="wizard-label">DIRECCIÓN POSTAL</label>
+                <input type="text" id="p-dir" value="${p.direccion}" class="wizard-input uppercase font-800">
+            </div>
 
-            <div class="grid grid-cols-3 gap-10 mb-12">
-              <div>
-                <label class="form-label">CÓDIGO POSTAL</label>
-                <input type="text" id="p-cp" value="${p.codigo_postal}" class="premium-input">
+            <div class="grid grid-cols-3 gap-12 mb-15">
+              <div class="wizard-input-group">
+                <label class="wizard-label">C.P.</label>
+                <input type="text" id="p-cp" value="${p.codigo_postal}" class="wizard-input font-800">
               </div>
-              <div>
-                <label class="form-label">CIUDAD</label>
-                <input type="text" id="p-ciudad" value="${p.ciudad}" class="premium-input">
+              <div class="wizard-input-group">
+                <label class="wizard-label">CIUDAD</label>
+                <input type="text" id="p-ciudad" value="${p.ciudad}" class="wizard-input uppercase font-800">
               </div>
-              <div>
-                <label class="form-label">PROVINCIA</label>
-                <input type="text" id="p-prov" value="${p.provincia}" class="premium-input">
+              <div class="wizard-input-group">
+                <label class="wizard-label">PROVINCIA</label>
+                <input type="text" id="p-prov" value="${p.provincia}" class="wizard-input uppercase font-800">
               </div>
             </div>
 
-            <div class="mb-12">
-              <label class="form-label">CATEGORÍAS</label>
-              <div class="flex flex-wrap gap-6">
-                ${CATEGORIAS_DISPONIBLES.map(cat => `
-                  <label class="text-ccc" style="display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:10px;
-                    background:${(Array.isArray(p.categorias) && p.categorias.includes(cat)) ? 'rgba(5,150,105,0.15)' : '#1a1a1a'};
-                    border:1px solid ${(Array.isArray(p.categorias) && p.categorias.includes(cat)) ? 'rgba(5,150,105,0.3)' : '#333'};
-                    cursor:pointer; font-size:0.7rem; font-weight:600;">
-                    <input type="checkbox" value="${cat}" ${(Array.isArray(p.categorias) && p.categorias.includes(cat)) ? 'checked' : ''}
-                      style="accent-color:#059669;"
-                      onchange="this.parentElement.style.background=this.checked ? 'rgba(5,150,105,0.15)' : '#1a1a1a';
-                               this.parentElement.style.borderColor=this.checked ? 'rgba(5,150,105,0.3)' : '#333';">
+            <div class="mb-20 bg-dark p-14 rounded-sm border border-222">
+              <label class="wizard-label text-gold font-950 uppercase tracking-widest mb-10 d-block">${Icons.paquete()} CATEGORÍAS DE SUMINISTRO</label>
+              <div class="flex flex-wrap gap-8">
+                ${CATEGORIAS_DISPONIBLES.map(cat => {
+                   const isChecked = Array.isArray(p.categorias) && p.categorias.includes(cat);
+                   return `
+                  <label class="category-chip ${isChecked ? 'active' : ''}" style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:30px;
+                    background:${isChecked ? 'rgba(16,185,129,0.15)' : '#111'};
+                    border:1px solid ${isChecked ? '#10b981' : '#333'};
+                    cursor:pointer; font-size:0.65rem; font-weight:900; color:${isChecked ? '#10b981' : '#aaa'}; text-transform:uppercase; letter-spacing:0.5px;">
+                    <input type="checkbox" value="${cat}" ${isChecked ? 'checked' : ''} class="d-none"
+                      onchange="this.parentElement.style.background=this.checked ? 'rgba(16,185,129,0.15)' : '#111';
+                               this.parentElement.style.borderColor=this.checked ? '#10b981' : '#333';
+                               this.parentElement.style.color=this.checked ? '#10b981' : '#aaa';">
                     ${cat}
-                  </label>
-                `).join('')}
+                  </label>`;
+                }).join('')}
               </div>
             </div>
 
-            <label class="form-label">EMAIL</label>
-            <input type="email" id="p-email" value="${p.email}" class="premium-input mb-12">
+            <div class="wizard-input-group mb-15">
+                <label class="wizard-label">EMAIL CONTACTO</label>
+                <input type="email" id="p-email" value="${p.email}" class="wizard-input font-800 lowercase">
+            </div>
 
-            <label class="form-label">CONDICIONES DE PAGO</label>
-            <input type="text" id="p-pago" value="${p.condiciones_pago}" class="premium-input mb-12">
+            <div class="wizard-input-group mb-15">
+                <label class="wizard-label">CONDICIONES DE PAGO</label>
+                <input type="text" id="p-pago" value="${p.condiciones_pago}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
+            </div>
 
-            <label class="form-label">NOTAS</label>
-            <textarea id="p-notas" class="premium-input mb-12" style="min-height:60px; resize:none;">${p.notas}</textarea>
+            <div class="wizard-input-group mb-15">
+                <label class="wizard-label">NOTAS / OBSERVACIONES</label>
+                <textarea id="p-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${p.notas}</textarea>
+            </div>
 
-            <label class="wizard-checkbox-container mb-16">
-              <input type="checkbox" id="p-activo" ${p.activo !== false ? 'checked' : ''}>
-              <span>Proveedor activo</span>
+            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
+              <input type="checkbox" id="p-activo" ${p.activo !== false ? 'checked' : ''} style="accent-color:#10b981;">
+              <span class="uppercase font-950 tracking-widest text-[0.65rem]">Proveedor activo en el sistema</span>
             </label>
 
-            <div class="flex justify-between items-center mt-20">
-              ${esEdicion ? `<button onclick="ProveedoresView._eliminar(${id})" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
-              <div class="flex gap-10">
-                <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="btn btn-secondary">${Icons.cerrar()} Cancelar</button>
-                <button onclick="ProveedoresView._guardar(${id || ''})" class="btn btn-success">${Icons.guardar()} Guardar</button>
-              </div>
+            <div class="grid grid-cols-2 gap-10 mt-20">
+                <button onclick="ProveedoresView._guardar(${id || ''})" class="widget-link-btn widget-link-btn--neon neon-success">
+                  ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
+                </button>
+                <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="widget-link-btn widget-link-btn--neon neon-danger">
+                  ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
+                </button>
             </div>
+            ${esEdicion ? `<div class="mt-15 text-center"><button onclick="ProveedoresView._eliminar(${id})" class="text-red font-900 text-[0.6rem] uppercase tracking-widest p-10 opacity-60 hover:opacity-100 transition-all">${Icons.eliminar()} Eliminar definitivamente</button></div>` : ''}
           </div>
+          <div class="pb-40"></div>
         `;
     },
 
