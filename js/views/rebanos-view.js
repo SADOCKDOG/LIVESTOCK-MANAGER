@@ -230,7 +230,7 @@ const RebanosView = {
       const tratamientos = await window.db.getAll("sanitarios_ganado") || [];
       const filtrados = tratamientos.filter(t => t.rebanoId == rebanoId);
       if (filtrados.length === 0) {
-        container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.sanidad()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin tratamientos registrados</p></div>`;
+        container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin tratamientos registrados</p></div>`;
         return;
       }
       let html = '';

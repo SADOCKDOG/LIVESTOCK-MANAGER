@@ -22,7 +22,7 @@ const DashboardView = {
     const alertasSanitarias = alertas.sanitarias || [];
     const alertasTrazabilidad = alertas.trazabilidad || [];
     const alertasAdministrativas = alertas.administrativas || [];
-    const alertaEpoca = alertas.calendario || { titulo: '📅 Calendario', sugerencias: [] };
+    const alertaEpoca = alertas.calendario || { titulo: 'Calendario Preventivo', sugerencias: [] };
 
     const kpisDiarios = await this._calcularKPIsDiarios(finca, rebanos, animales);
     const indicadoresLeche = await this._calcularIndicadoresLacteos(finca);
@@ -156,7 +156,7 @@ const DashboardView = {
 
       <!-- Calendario Preventivo -->
       <div class="card card-accent card-accent-blue p-20 card-tint-blue">
-        <h3 class="mt-0 text-blue flex items-center gap-8">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}️]+\s*/u, '')}</h3>
+        <h3 class="mt-0 text-blue flex items-center gap-8">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
         ${alertaEpoca.sugerencias?.length > 0 ? `
         <ul class="text-85 text-gray m-0 leading-normal mt-10 pl-20">
           ${alertaEpoca.sugerencias.map(s => `<li class="mb-4">${s}</li>`).join('')}

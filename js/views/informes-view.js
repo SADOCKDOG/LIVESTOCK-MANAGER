@@ -2944,7 +2944,7 @@ const InformesView = {
       loader.className = 'pdf-loader-overlay';
       loader.innerHTML = `
         <div class="pdf-gen-modal">
-          <div class="pdf-loader-emoji">📄</div>
+          <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
           <div class="pdf-gen-title">Generando PDF</div>
           <div class="pdf-gen-sub">Informe: ${seccion || 'Completo'}</div>
           <div class="pdf-gen-bar-wrap">
@@ -2952,7 +2952,6 @@ const InformesView = {
           </div>
           <div id="pdf-progress-text" class="pdf-gen-label">PROCESANDO...</div>
         </div>
-        
       `;
       document.body.appendChild(loader);
 
@@ -3486,22 +3485,22 @@ const InformesView = {
       <h3 class="pdf-sec" style="color:#ef4444;">${Icons.alerta({ class: 'icon' })} Informe de Alertas</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Total Alertas Activas</td><td class="pdf-kv pdf-r pdf-b pdf-red">${totalAlertas}</td></tr>
-        <tr><td class="pdf-kv">Críticas (🔴)</td><td class="pdf-kv pdf-r pdf-red">${rojas}</td></tr>
-        <tr><td class="pdf-kv">Advertencias (🟡/🟢)</td><td class="pdf-kv pdf-r">${totalAlertas - rojas}</td></tr>
+        <tr><td class="pdf-kv">Estado Crítico</td><td class="pdf-kv pdf-r pdf-red">${rojas}</td></tr>
+        <tr><td class="pdf-kv">Avisos y Seguimiento</td><td class="pdf-kv pdf-r">${totalAlertas - rojas}</td></tr>
       </table>`;
     if (alertas.sanitarias?.length > 0) {
-      html += `<h4 style="color:#ef4444;">🔴 Sanitarias</h4>
+      html += `<h4 style="color:#ef4444; display:flex; align-items:center; gap:6px;">${Icons.sanidad({ class: 'icon', style: 'width:14px;height:14px' })} Sanitarias</h4>
       <table class="pdf-tbl pdf-tbl-xs mb-10">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Medicamento</th><th class="pdf-th-sm">Rebaño</th><th class="pdf-th-sm pdf-r">Días</th></tr></thead>
         <tbody>${alertas.sanitarias.slice(0, 10).map(a => `<tr><td class="pdf-td">${a.medicamento || '-'}</td><td class="pdf-td">${a.rebanoNombre || '-'}</td><td class="pdf-td pdf-r">${a.diasRestantes}</td></tr>`).join('')}</tbody>
       </table>`;
     }
     if (alertas.trazabilidad?.length > 0) {
-      html += `<h4 style="color:#f59e0b;">🟠 Trazabilidad</h4>
+      html += `<h4 style="color:#f59e0b; display:flex; align-items:center; gap:6px;">${Icons.trazabilidad({ class: 'icon', style: 'width:14px;height:14px' })} Trazabilidad</h4>
       <p class="pdf-tbl-xs pdf-muted">${alertas.trazabilidad.length} alertas activas. Revisar identificaciones y documentación.</p>`;
     }
     if (alertas.administrativas?.length > 0) {
-      html += `<h4 style="color:#8b5cf6;">🟣 Administrativas</h4>
+      html += `<h4 style="color:#8b5cf6; display:flex; align-items:center; gap:6px;">${Icons.documento({ class: 'icon', style: 'width:14px;height:14px' })} Administrativas</h4>
       <p class="pdf-tbl-xs pdf-muted">${alertas.administrativas.length} alertas activas. Revisar contratos, PAC y vencimientos.</p>`;
     }
     return html;

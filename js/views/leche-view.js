@@ -243,7 +243,7 @@ const LecheView = {
                     </div>
                   </div>
                 </div>`).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin lotes registrados.</span></div>`
+            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin lotes registrados.</span></div>`
           }
         </div>
       </div>

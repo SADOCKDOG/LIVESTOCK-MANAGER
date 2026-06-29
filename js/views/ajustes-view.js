@@ -114,7 +114,7 @@ const AjustesView = {
         <div class="info-box mt-15">
           <div class="grid grid-cols-2 gap-8 text-85">
             <div><span class="text-gray">Nº Contrato:</span> <strong class="text-white">${activeFinca.contrato_lacteo_numero || '—'}</strong></div>
-            <div><span class="text-gray">Vencimiento:</span> <strong class="${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? 'text-red' : 'text-white'}">${activeFinca.contrato_lacteo_fecha_fin || '—'}${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? ' ⚠️ Vencido' : ''}</strong></div>
+            <div><span class="text-gray">Vencimiento:</span> <strong class="${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? 'text-red' : 'text-white'}">${activeFinca.contrato_lacteo_fecha_fin || '—'}${activeFinca.contrato_lacteo_fecha_fin && new Date(activeFinca.contrato_lacteo_fecha_fin) < new Date() ? ' ' + Icons.alerta() + ' Vencido' : ''}</strong></div>
             <div><span class="text-gray">Comprador:</span> <strong class="text-white">${activeFinca.contrato_lacteo_comprador || '—'}</strong></div>
             <div><span class="text-gray">INFOLAC:</span> <strong class="text-white">${activeFinca.numero_infolac || '—'}</strong></div>
           </div>
@@ -443,7 +443,7 @@ const AjustesView = {
   async _toggleTema(checked) {
     await this._saveConfig({ temaOscuro: checked });
     document.documentElement.style.colorScheme = checked ? 'dark' : 'light';
-    App.toast(checked ? '🌙 Modo oscuro' : '☀️ Modo claro');
+    App.toast(checked ? 'Modo oscuro' : 'Modo claro');
   },
 
   async _guardarPreferencia(key, val) {
@@ -499,7 +499,7 @@ const AjustesView = {
     const especies = config.especies || [];
     if (idx >= 0 && idx < especies.length) especies.splice(idx, 1);
     await this._saveConfig({ especies });
-    App.toast('🗑️ Especie eliminada');
+    App.toast('Especie eliminada');
     App.renderAjustes();
   },
 
@@ -507,7 +507,7 @@ const AjustesView = {
     if (!await Confirm.confirm("Limpiar Caché", "¿Limpiar caché local? Se recargarán los datos desde la base de datos.", true)) return;
     if (window.CacheService) CacheService.clearAll();
     localStorage.removeItem('seed_data_completed');
-    App.toast('🗑️ Caché limpiada');
+    App.toast('Caché limpiada');
   },
 
   _diasRestantes(fechaStr) {
@@ -520,7 +520,7 @@ const AjustesView = {
 
   async _cambiarFincaActiva(id) {
     await Fincas.setActiveId(id);
-    App.toast('🏠 Finca activa cambiada');
+    App.toast('Finca activa cambiada');
     App.renderAjustes();
   },
 
@@ -822,7 +822,7 @@ const AjustesView = {
 
       await window.ExportService.descargar(csv, filename, 'text/csv;charset=utf-8');
 
-      App.toast(`📦 Cierre mensual exportado (${eventosMes.length} eventos)`);
+      App.toast(`Cierre mensual exportado (${eventosMes.length} eventos)`);
     } catch (e) {
       App.toastError('No se pudo exportar cierre mensual: ' + e.message);
     }

@@ -191,20 +191,17 @@ const Confirm = {
 
         const id = 'confirm-dialog-' + Date.now();
         
-        const iconHtml = typeof Icons !== 'undefined' ? (danger ? Icons.alerta() : Icons.info()) : (danger ? '⚠️' : 'ℹ️');
-        const titleColor = danger ? 'var(--c-danger)' : 'var(--p-gold)';
-        const btnPrimaryStyle = danger
-            ? 'background: linear-gradient(135deg, var(--c-danger), #991b1b);'
-            : 'background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000;';
+        const iconHtml = typeof Icons !== 'undefined' ? (danger ? Icons.alerta() : Icons.info()) : (danger ? Icons.alerta() : Icons.info());
+        const variant = danger ? 'danger' : 'gold';
 
         const contentHtml = `
-            <div class="error-dialog" style="border-color: ${danger ? 'var(--c-danger)' : 'var(--p-gold)'}; margin: 16px; box-sizing: border-box;">
-                <div class="error-dialog-icon" style="color:${danger ? 'var(--c-danger)' : 'var(--p-gold)'};">${iconHtml}</div>
-                <div class="error-dialog-title" style="color: ${titleColor};">${title}</div>
-                <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
+            <div class="error-dialog error-dialog--${variant}">
+                <div class="error-dialog-icon error-dialog-icon--${variant}">${iconHtml}</div>
+                <div class="error-dialog-title error-dialog-title--${variant}">${title}</div>
+                <div class="error-dialog-msg">${msg}</div>
                 <div class="error-dialog-actions">
                     <button class="error-dialog-btn secondary" id="${id}-cancel">${cancelText}</button>
-                    <button class="error-dialog-btn primary" id="${id}-ok" style="${btnPrimaryStyle}">${okText}</button>
+                    <button class="error-dialog-btn primary error-dialog-btn--${variant}" id="${id}-ok">${okText}</button>
                 </div>
             </div>
         `;
@@ -212,9 +209,7 @@ const Confirm = {
         const overlay = ModalManager.show(id, contentHtml, { closeOnOverlayClick: false });
 
         if (overlay) {
-            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-            overlay.style.backdropFilter = 'blur(6px)';
-            overlay.style.webkitBackdropFilter = 'blur(6px)';
+            overlay.classList.add('error-dialog-overlay');
         }
 
         let resolved = false;
@@ -275,21 +270,19 @@ const Confirm = {
             const inputId = id + '-input';
             const contentHtml = `
                 <div class="error-dialog error-dialog--gold">
-                    <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
-                    <div class="error-dialog-msg" style="color: var(--text-p, #fff); font-size: 0.95rem; margin-bottom: 16px;">${msg}</div>
+                    <div class="error-dialog-title error-dialog-title--gold">${title}</div>
+                    <div class="error-dialog-msg">${msg}</div>
                     <input id="${inputId}" type="text" value="${defaultValue.replace(/"/g, '&quot;')}" placeholder="${placeholder}"
                            class="wizard-input mb-20 w-full">
                     <div class="error-dialog-actions">
                         <button class="error-dialog-btn secondary" id="${id}-cancel">Cancelar</button>
-                        <button class="error-dialog-btn primary" id="${id}-ok" style="background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000;">Aceptar</button>
+                        <button class="error-dialog-btn primary error-dialog-btn--gold" id="${id}-ok">Aceptar</button>
                     </div>
                 </div>
             `;
             const overlay = ModalManager.show(id, contentHtml, { closeOnOverlayClick: false });
             if (overlay) {
-                overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-                overlay.style.backdropFilter = 'blur(6px)';
-                overlay.style.webkitBackdropFilter = 'blur(6px)';
+                overlay.classList.add('error-dialog-overlay');
             }
 
             const input = document.getElementById(inputId);
@@ -322,22 +315,20 @@ const Confirm = {
     alert: function (title, msg) {
         return new Promise((resolve) => {
             const id = 'alert-dialog-' + Date.now();
-            const alertIconHtml = typeof Icons !== 'undefined' ? Icons.info() : 'ℹ️';
+            const alertIconHtml = typeof Icons !== 'undefined' ? Icons.info() : Icons.info();
             const contentHtml = `
                 <div class="error-dialog error-dialog--gold">
-                    <div class="error-dialog-icon" style="color:var(--p-gold);">${alertIconHtml}</div>
-                    <div class="error-dialog-title" style="color: var(--p-gold);">${title}</div>
-                    <div class="error-dialog-msg" style="color: var(--text, #fff); font-size: 0.95rem; margin-bottom: 24px;">${msg}</div>
+                    <div class="error-dialog-icon error-dialog-icon--gold">${alertIconHtml}</div>
+                    <div class="error-dialog-title error-dialog-title--gold">${title}</div>
+                    <div class="error-dialog-msg">${msg}</div>
                     <div class="error-dialog-actions justify-center">
-                        <button class="error-dialog-btn primary" id="${id}-ok" style="background: linear-gradient(135deg, var(--p-gold), #b45309); color: #000; max-width: 150px;">Aceptar</button>
+                        <button class="error-dialog-btn primary error-dialog-btn--gold" id="${id}-ok">Aceptar</button>
                     </div>
                 </div>
             `;
             const overlay = ModalManager.show(id, contentHtml, { closeOnOverlayClick: false });
             if (overlay) {
-                overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-                overlay.style.backdropFilter = 'blur(6px)';
-                overlay.style.webkitBackdropFilter = 'blur(6px)';
+                overlay.classList.add('error-dialog-overlay');
             }
             document.getElementById(`${id}-ok`).addEventListener('click', () => {
                 ModalManager.close(id);

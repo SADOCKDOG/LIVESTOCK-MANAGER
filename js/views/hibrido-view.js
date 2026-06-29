@@ -397,7 +397,7 @@ const HibridoView = {
                     </div>
                   </div>`;
               }).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">📭 Sin tratamientos sanitarios.</span></div>`
+            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin tratamientos sanitarios.</span></div>`
           }
         </div>
       </div>

@@ -61,9 +61,10 @@ const AnimalesView = {
     html += `
       <div class="sticky-top" style="padding-bottom:10px;">
         <div class="flex gap-8 items-center">
-          <input type="search" id="search-animales" placeholder="🔍 Buscar por crotal, raza o rebaño..."
+          <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
                  class="search-input flex-1 min-w-0">
+          <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
           <select id="animales-filtro-especie" class="form-select-gold"
                   onchange="AnimalesView._setFiltro('especie', this.value)"
                   style="width:130px;min-width:120px;">
@@ -83,9 +84,10 @@ const AnimalesView = {
       <!-- Botón Flotante de Acción para móviles -->
       <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
       <div id="animales-empty-search" class="empty-state-search d-none">
-        <div class="text-2xl mb-8">🔍</div>
-        <p class="text-gray-500">No se encontraron animales con ese criterio.</p>
-      </div>`;
+        <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
+        <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
+      </div>
+`;
 
     main.innerHTML = html;
     AnimalesView._cache = { animales, rebanoMap };

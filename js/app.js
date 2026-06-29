@@ -402,11 +402,11 @@ const App = {
       const ivaInput = document.getElementById('w-v-iva');
       const retInput = document.getElementById('w-v-ret');
       if (contrato) {
-        if (contratoEl) contratoEl.textContent = '📄 Contrato: ' + contrato.numero_contrato + ' (IVA: ' + contrato.iva_pct + '%, Ret.: ' + contrato.retencion_pct + '%)';
+        if (contratoEl) contratoEl.innerHTML = `<span>${Icons.documento()}</span> Contrato: ${contrato.numero_contrato} (IVA: ${contrato.iva_pct}%, Ret.: ${contrato.retencion_pct}%)`;
         if (ivaInput) ivaInput.value = contrato.iva_pct;
         if (retInput) retInput.value = contrato.retencion_pct;
       } else {
-        if (contratoEl) contratoEl.textContent = '⚠️ Sin contrato activo';
+        if (contratoEl) contratoEl.innerHTML = `<span>${Icons.alerta()}</span> Sin contrato activo`;
       }
     } catch(e) {
       console.warn(e);
@@ -463,7 +463,7 @@ const App = {
     const nifEl = document.getElementById('w-v-transportista-nif');
     if (nifEl) nifEl.textContent = 'NIF: ' + (data.nifTransportista || '');
     const matEl = document.getElementById('w-v-transportista-matricula');
-    if (matEl) matEl.textContent = '🚚 ' + (data.matriculaTransportista || '');
+    if (matEl) matEl.innerHTML = `<span class="flex items-center gap-4">${Icons.transportistas()} ${data.matriculaTransportista || ''}</span>`;
     const atgEl = document.getElementById('w-v-transportista-atg');
     if (atgEl) atgEl.textContent = 'ATG: ' + (data.atgTransportista || 'pendiente');
     const desEl = document.getElementById('w-v-transportista-desinsectacion');

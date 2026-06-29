@@ -164,9 +164,9 @@ const AlbaranesVentasView = {
             </div>
             <div class="mt-10 flex gap-6">
               ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:#f59e0b; border-color:#f59e0b;" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">✏️ Editar Borrador</button>
+                <button class="btn btn-sm btn-outline text-xs" style="color:#f59e0b; border-color:#f59e0b;" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">${Icons.editar()} Editar Borrador</button>
               ` : `
-                <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id})">🖨 Imprimir Albarán</button>
+                <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id})">${Icons.exportar()} Imprimir Albarán</button>
               `}
               <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._verDetalle(${reg.id}, '${reg.tipo}')">${Icons.documento()} Ver Detalle</button>
             </div>
@@ -278,9 +278,9 @@ const AlbaranesVentasView = {
           <div class="mt-10 text-center" style="display:flex; gap:10px; justify-content:center;">
             <button class="btn btn-secondary btn-sm" onclick="this.closest('[style]').remove()">Cerrar</button>
             ${reg.estado_tramite_infolac === 'borrador' || reg.estado === 'borrador' ? `
-              <button class="btn btn-primary btn-sm" onclick="AlbaranesVentasView._editarBorrador('${tipo}', ${reg.id}); this.closest('[style]').remove();">✏️ Editar</button>
+              <button class="btn btn-primary btn-sm" onclick="AlbaranesVentasView._editarBorrador('${tipo}', ${reg.id}); this.closest('[style]').remove();">${Icons.editar()} Editar</button>
             ` : `
-              <button class="btn btn-primary btn-sm" onclick="AlbaranesVentasView._imprimirDoc('${tipo}', ${reg.id}); this.closest('[style]').remove();">🖨 Imprimir</button>
+              <button class="btn btn-primary btn-sm" onclick="AlbaranesVentasView._imprimirDoc('${tipo}', ${reg.id}); this.closest('[style]').remove();">${Icons.exportar()} Imprimir</button>
             `}
           </div>
         </div>`;

@@ -48,9 +48,9 @@ window.WizardCrotales = {
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO DE CROTAL</label>
               <select id="w-pd-tipo" class="wizard-input">
-                <option value="Bandera + Botón (EID)" ${data.tipo === 'Bandera + Botón (EID)' ? 'selected' : ''}>🏷️ Bandera + Botón (EID)</option>
-                <option value="Bolo Ruminal (EID)" ${data.tipo === 'Bolo Ruminal (EID)' ? 'selected' : ''}>💊 Bolo Ruminal (EID)</option>
-                <option value="Crotal Visual Clásico" ${data.tipo === 'Crotal Visual Clásico' ? 'selected' : ''}>👁️ Crotal Visual Clásico</option>
+                <option value="Bandera + Botón (EID)" ${data.tipo === 'Bandera + Botón (EID)' ? 'selected' : ''}>Bandera + Botón (EID)</option>
+                <option value="Bolo Ruminal (EID)" ${data.tipo === 'Bolo Ruminal (EID)' ? 'selected' : ''}>Bolo Ruminal (EID)</option>
+                <option value="Crotal Visual Clásico" ${data.tipo === 'Crotal Visual Clásico' ? 'selected' : ''}>Crotal Visual Clásico</option>
               </select>
             </div>
             <div class="wizard-input-group mb-12">
@@ -156,12 +156,12 @@ window.WizardCrotales = {
         console.log("[wizard-crotales] onComplete iniciado", data);
         try {
           if (!window.db) {
-            alert("Error: Base de datos no disponible. Por favor, reinicia la aplicación.");
+            await Confirm.alert("Error", "Base de datos no disponible. Por favor, reinicia la aplicación.");
             return;
           }
 
           if (!window.db.objectStoreNames.contains('pedidos_crotales')) {
-             alert("El sistema de pedidos requiere una actualización de base de datos (v12). Por favor, cierra y abre la aplicación.");
+             await Confirm.alert("Actualización Requerida", "El sistema de pedidos requiere una actualización de base de datos (v12). Por favor, cierra y abre la aplicación.");
              return;
           }
 
@@ -189,7 +189,7 @@ window.WizardCrotales = {
           await WizardCrotales.generarPDF(finca, data, pedidoId);
         } catch (e) {
           console.error('[wizard-crotales] Error al completar pedido:', e);
-          alert("Error al procesar el pedido: " + e.message);
+          await Confirm.alert("Error", "Error al procesar el pedido: " + e.message);
 
           // Fallback: Si el guardado falla, intentar al menos generar el PDF para que no se pierda el trámite
           await WizardCrotales.generarPDF(finca, data, "TEMP-" + Date.now());

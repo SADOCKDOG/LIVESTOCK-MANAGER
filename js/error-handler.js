@@ -451,15 +451,16 @@ const ErrorHandler = {
   },
 
   _getIconForType(type) {
+    if (typeof Icons === 'undefined') return '';
     const icons = {
-      VALIDATION_ERROR: "❌",
-      DATABASE_ERROR: "🔴",
-      NOT_FOUND: "🔍",
-      UNAUTHORIZED: "🔒",
-      CONSTRAINT_ERROR: "⛔",
-      UNKNOWN_ERROR: "⚠️",
+      VALIDATION_ERROR: Icons.cerrar,
+      DATABASE_ERROR: Icons.info,
+      NOT_FOUND: Icons.buscar,
+      UNAUTHORIZED: Icons.cerrar,
+      CONSTRAINT_ERROR: Icons.alerta,
+      UNKNOWN_ERROR: Icons.alerta,
     };
-    return icons[type] || "⚠️";
+    return (icons[type] || Icons.alerta)();
   },
 
   _getSeverityForType(type) {
