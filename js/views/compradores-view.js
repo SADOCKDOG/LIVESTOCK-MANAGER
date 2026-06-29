@@ -1,47 +1,134 @@
 /**
- * CompradoresView - Livestock Manager Premium v4.0
- * Vista de compradores: lista, ficha detalle, formulario de alta/edición.
+ * CompradoresView - Livestock Manager Premium v4.2.0
+ * Vista modular de compradores y contratos.
+ * Ofrece dos gestiones unificadas en la parte superior: Compradores y Contratos, con trazabilidad completa.
  */
 
 const CompradoresView = {
+    _activeModule: 'compradores', // 'compradores' o 'contratos'
     _currentTab: 'todos',
-    _cachedData: null,
+    _cachedCompradores: null,
+    _cachedContratos: null,
+    _searchQuery: '',
 
     async render() {
         const main = document.getElementById("app-content");
-        const meta = this._getTabMeta(this._currentTab);
-
+        
         main.innerHTML = `
-          <div class="mb-16 text-center">
-            <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
-            <div class="comer-mode-switch">
-              <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} Todos</button>
-              <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} Carne</button>
-              <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} Leche</button>
-              <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} Híbrido</button>
-            </div>
+          <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
+          <div class="comer-mode-switch mb-16" style="max-width: 420px; margin: 0 auto 20px; display: flex; gap: 8px;">
+            <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
+              style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 
+              onclick="CompradoresView._cambiarModulo('compradores')">
+              ${Icons.compradores()} Compradores
+            </button>
+            <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
+              style="--mode-color:#10b981; flex: 1; padding: 10px;" 
+              onclick="CompradoresView._cambiarModulo('contratos')">
+              ${Icons.contratos()} Contratos
+            </button>
           </div>
 
-          <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-            <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
-            <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-              <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
-                ${Icons.agregar()}
-                <span class="widget-link-label">Nuevo Comprador</span>
-              </button>
-            </div>
+          <div id="module-container">
+            <div class="loader">Cargando módulo...</div>
           </div>
-
-          <div class="flex gap-8 mb-14">
-            <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
-              oninput="CompradoresView._filtrar(this.value)"
-              class="search-input flex-1">
-          </div>
-
-          <div id="compr-lista"><div class="loader">Cargando compradores...</div></div>
-          <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">${Icons.agregar()}</button>`;
+        `;
 
         await this._cargarDatos();
+    },
+
+    async _cargarDatos() {
+        try {
+            const compradores = await Compradores.list().catch(() => []);
+            const contratos = await Contratos.list().catch(() => []);
+
+            this._cachedCompradores = compradores;
+            this._cachedContratos = contratos;
+
+            this._renderActiveModule();
+        } catch (e) {
+            console.error('[CompradoresView] Error:', e);
+            document.getElementById("module-container").innerHTML = `<div class="card text-center p-40 text-red">❌ Error al cargar datos: ${e.message}</div>`;
+        }
+    },
+
+    _cambiarModulo(modulo) {
+        this._activeModule = modulo;
+        this._searchQuery = '';
+        
+        // Actualizar estado de los botones superiores
+        document.querySelectorAll('.comer-mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(modulo.slice(0, -1)));
+        });
+
+        this.render();
+    },
+
+    _renderActiveModule() {
+        const container = document.getElementById("module-container");
+        if (!container) return;
+
+        if (this._activeModule === 'compradores') {
+            const meta = this._getTabMeta(this._currentTab);
+            container.innerHTML = `
+              <div class="mb-16 text-center">
+                <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
+                <div class="comer-mode-switch">
+                  <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} Todos</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} Carne</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} Leche</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} Híbrido</button>
+                </div>
+              </div>
+
+              <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+                <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+                <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+                  <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
+                    ${Icons.agregar()}
+                    <span class="widget-link-label">Nuevo Comprador</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex gap-8 mb-14">
+                <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
+                  oninput="CompradoresView._filtrarCompradores(this.value)"
+                  class="search-input flex-1" value="${this._searchQuery}">
+              </div>
+
+              <div id="compr-lista"></div>
+              <button class="fab-btn" onclick="CompradoresView.renderFormulario()" aria-label="Nuevo Comprador">${Icons.agregar()}</button>
+            `;
+            this._aplicarFiltrosCompradores();
+        } else {
+            // Módulo de Contratos
+            container.innerHTML = `
+              <div class="mb-16 text-center">
+                <div class="section-header-neon" style="--neon-color: #10b981; max-width: 520px; margin: 0 auto;">CONTRATOS COMERCIALES</div>
+              </div>
+
+              <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+                <div class="section-header-theme" style="--theme-color: #10b981">ACCIONES</div>
+                <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+                  <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContratoLibre()">
+                    ${Icons.agregar()}
+                    <span class="widget-link-label">Añadir Contrato</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex gap-8 mb-14">
+                <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
+                  oninput="CompradoresView._filtrarContratos(this.value)"
+                  class="search-input flex-1" value="${this._searchQuery}">
+              </div>
+
+              <div id="contratos-lista"></div>
+              <button class="fab-btn" style="background:#10b981;" onclick="CompradoresView._nuevoContratoLibre()" aria-label="Nuevo Contrato">${Icons.agregar()}</button>
+            `;
+            this._aplicarFiltrosContratos();
+        }
     },
 
     _getTabMeta(tab) {
@@ -64,60 +151,34 @@ const CompradoresView = {
         const headerNeon = document.querySelector('.section-header-neon');
         if (headerNeon) headerNeon.style.setProperty('--neon-color', meta.color);
 
-        const busqueda = document.getElementById('search-compradores')?.value || '';
-        this._aplicarFiltros(busqueda);
+        this._aplicarFiltrosCompradores();
     },
 
-    async _cargarDatos() {
-        const compradores = await Compradores.list();
-        const fincaId = await Fincas.getActiveId();
-        const [ventasCarne, ventasLeche] = await Promise.all([
-            window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
-            window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-        ]);
-        const ingresoTotal = ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0) +
-            ventasLeche.reduce((s, v) => s + (v.importe_total || (v.cantidad || 0) * (v.precioBase || 0)), 0);
-        const tipos = { cárnico: 0, láctico: 0, híbrido: 0 };
-        compradores.forEach(c => { if (tipos[c.tipo_comprador] !== undefined) tipos[c.tipo_comprador]++; });
-        this._cachedData = compradores;
-        this._renderLista(compradores);
+    _filtrarCompradores(value) {
+        this._searchQuery = value;
+        this._aplicarFiltrosCompradores();
     },
 
-    _cambiarFiltro(tab) {
-        this._currentTab = tab;
-        document.querySelectorAll('button[data-tab]').forEach(b => {
-            if (b.dataset.tab === tab) {
-                b.classList.add('active');
-            } else {
-                b.classList.remove('active');
-            }
-        });
-        const busqueda = document.getElementById('search-compradores')?.value || '';
-        this._aplicarFiltros(busqueda);
-    },
-
-    _filtrar(texto) {
-        this._aplicarFiltros(texto);
-    },
-
-    _aplicarFiltros(busqueda) {
-        if (!this._cachedData) return;
-        let filtrados = this._cachedData;
+    _aplicarFiltrosCompradores() {
+        if (!this._cachedCompradores) return;
+        let filtrados = this._cachedCompradores;
+        
         if (this._currentTab !== 'todos') {
             filtrados = filtrados.filter(c => c.tipo_comprador === this._currentTab);
         }
-        if (busqueda) {
-            const q = busqueda.toLowerCase();
+        
+        if (this._searchQuery) {
+            const q = this._searchQuery.toLowerCase();
             filtrados = filtrados.filter(c =>
                 (c.nombre || '').toLowerCase().includes(q) ||
                 (c.nif_cif || '').toLowerCase().includes(q) ||
                 (c.ciudad || '').toLowerCase().includes(q)
             );
         }
-        this._renderLista(filtrados);
+        this._renderListaCompradores(filtrados);
     },
 
-    _renderLista(lista) {
+    _renderListaCompradores(lista) {
         const contenedor = document.getElementById('compr-lista');
         if (!contenedor) return;
 
@@ -134,19 +195,30 @@ const CompradoresView = {
             contenedor.innerHTML = headerHtml + `
               <div class="empty-state">
                 <div class="empty-state-icon">${Icons.edificio()}</div>
-                <p class="empty-state-text">${this._cachedData?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
+                <p class="empty-state-text">${this._cachedCompradores?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
                 <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Registrar primer comprador</button>
               </div>`;
             return;
         }
 
+        // Crear mapa de contratos por comprador para renderizar en la lista
+        const contratosPorComprador = {};
+        (this._cachedContratos || []).forEach(ct => {
+            if (!contratosPorComprador[ct.compradorId]) {
+                contratosPorComprador[ct.compradorId] = [];
+            }
+            contratosPorComprador[ct.compradorId].push(ct);
+        });
+
         contenedor.innerHTML = headerHtml + `<div class="grid gap-10">${lista.map(c => {
           const color = this._colorTipo(c.tipo_comprador);
+          const cContratos = contratosPorComprador[c.id] || [];
+
           return `
           <div class="card card-animal no-underline" onclick="CompradoresView.renderDetalle(${c.id})"
-            style="border-left:4px solid ${color}; padding:14px; margin:0; margin-bottom:8px;">
+            style="border-left:4px solid ${color}; padding:14px; margin:0; margin-bottom:8px; cursor:pointer;">
             <div class="flex flex-col gap-10">
-              <div class="flex justify-between items-center w-full">
+              <div class="flex justify-between items-start w-full">
                 <div class="flex items-center gap-10 min-w-0">
                   <div class="text-xl" style="color:${color}">${Icons.compradores()}</div>
                   <div class="text-xs">
@@ -163,9 +235,110 @@ const CompradoresView = {
                   ${c.activo === false ? '<div class="text-red text-[0.6rem] font-900 mt-4 uppercase">INACTIVO</div>' : ''}
                 </div>
               </div>
-              <div class="text-right w-full mt-2">
-                <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+              
+              <!-- Contratos asociados al comprador (GAP 7: Trazabilidad) -->
+              <div class="mt-6 text-xs text-ccc style-border-top" style="border-top:1px solid #333; padding-top:8px; margin-top:4px;">
+                <span class="font-800 text-gray">Contratos vinculados:</span>
+                ${cContratos.length === 0 ? '<span class="text-gray-500 italic ml-4">Sin contratos asignados</span>' : 
+                  cContratos.map(ct => `
+                    <span class="badge" style="margin-left:4px; font-size:0.65rem; background:${ct.activo ? '#10b98120' : '#444'}; color:${ct.activo ? '#10b981' : '#888'}; border:1px solid ${ct.activo ? '#10b98140' : '#555'}; padding:1px 6px; border-radius:4px; font-weight:800;">
+                      ${ct.numero_contrato} (${ct.activo ? 'Activo' : 'Vencido/Inactivo'})
+                    </span>
+                  `).join('')
+                }
               </div>
+
+              <div class="text-right w-full mt-2">
+                <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA Y TRÁMITES ➔</div>
+              </div>
+            </div>
+          </div>
+        `}).join('')}</div>`;
+    },
+
+    _filtrarContratos(value) {
+        this._searchQuery = value;
+        this._aplicarFiltrosContratos();
+    },
+
+    _aplicarFiltrosContratos() {
+        if (!this._cachedContratos) return;
+        let filtrados = this._cachedContratos;
+
+        if (this._searchQuery) {
+            const q = this._searchQuery.toLowerCase();
+            filtrados = filtrados.filter(ct =>
+                (ct.numero_contrato || '').toLowerCase().includes(q) ||
+                (ct.condiciones || '').toLowerCase().includes(q)
+            );
+        }
+        this._renderListaContratos(filtrados);
+    },
+
+    _renderListaContratos(lista) {
+        const contenedor = document.getElementById('contratos-lista');
+        if (!contenedor) return;
+
+        if (lista.length === 0) {
+            contenedor.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-state-icon">${Icons.contratos()}</div>
+                <p class="empty-state-text">Aún no hay contratos registrados.</p>
+                <button class="btn btn-create btn-sm" style="background:#10b981;" onclick="CompradoresView._nuevoContratoLibre()">${Icons.agregar()} Crear primer contrato</button>
+              </div>`;
+            return;
+        }
+
+        // Crear mapa para resolver el nombre del comprador
+        const compradorMap = {};
+        (this._cachedCompradores || []).forEach(c => { compradorMap[c.id] = c; });
+
+        contenedor.innerHTML = `<div class="grid gap-10">${lista.map(ct => {
+          const comp = compradorMap[ct.compradorId];
+          const color = ct.tipo === 'leche' ? '#3b82f6' : (ct.tipo === 'carne' ? '#ef4444' : '#10b981');
+          
+          return `
+          <div class="card" style="border-left:4px solid ${color}; padding:14px; margin-bottom:8px;">
+            <div class="flex justify-between items-start w-full">
+              <div>
+                <div class="font-800 text-xs" style="color:${color}; display:flex; align-items:center; gap:6px;">
+                  ${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}
+                  CONTRATO ${ct.tipo.toUpperCase()}
+                  <span class="badge" style="background:${ct.activo ? 'rgba(16,185,129,0.15)' : 'rgba(85,85,85,0.15)'}; color:${ct.activo ? '#10b981' : '#888'}; font-size:0.6rem; padding:1px 6px; border-radius:4px; font-weight:900; text-transform:uppercase;">
+                    ${ct.activo ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <div class="font-950 text-white text-base mt-4">${ct.numero_contrato}</div>
+              </div>
+              <div class="text-right text-xs text-ccc">
+                Vigencia: ${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}
+                ${ct.fecha_fin ? ' al ' + new Date(ct.fecha_fin).toLocaleDateString() : ' (Indefinido)'}
+              </div>
+            </div>
+            
+            <div class="mt-8 text-xs text-ccc">
+              <div>Comprador: 
+                ${comp ? `
+                  <a href="#/comprador?id=${comp.id}" class="text-gold font-800 hover-underline">${comp.nombre} (${comp.tipo_comprador})</a>
+                ` : `
+                  <span class="text-red font-800">No asignado / Comprador huérfano</span>
+                `}
+              </div>
+              ${ct.condiciones ? `<div class="mt-4 italic">Condiciones: ${ct.condiciones}</div>` : ''}
+              ${ct.precios && ct.precios.length > 0 ? `
+                <div class="mt-6 flex flex-wrap gap-4">
+                  ${ct.precios.map(pr => `
+                    <span style="background:#222; border:1px solid #333; padding:1px 6px; border-radius:4px; font-size:0.65rem;">
+                      ${pr.producto}: <strong>${pr.precio_unitario.toFixed(2)} €/${pr.unidad}</strong>
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="mt-12 flex gap-6">
+              <button class="btn btn-sm btn-outline text-xs" onclick="CompradoresView._verContrato(${ct.id})">${Icons.editar()} Editar Contrato</button>
+              ${comp ? `<button class="btn btn-sm btn-outline text-xs" onclick="location.hash='#/comprador?id=${comp.id}'">${Icons.compradores()} Ficha Comprador</button>` : ''}
             </div>
           </div>
         `}).join('')}</div>`;
@@ -174,7 +347,7 @@ const CompradoresView = {
     _colorTipo(tipo, bg = false, border = false) {
         const colores = {
             'cárnico': { text: '#ef4444', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' },
-            'láctico': { text: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
+            'láctico': { text: '#3b82f6', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
             'híbrido': { text: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' }
         };
         const c = colores[tipo] || colores['híbrido'];
@@ -186,6 +359,11 @@ const CompradoresView = {
     // ============================================
     // DETALLE COMPRADOR
     // ============================================
+
+    async renderDetail(id) {
+      // Método wrapper para mantener compatibilidad con cualquier llamada
+      await this.renderDetalle(id);
+    },
 
     async renderDetalle(id) {
         const comprador = await Compradores.get(id);
@@ -210,7 +388,7 @@ const CompradoresView = {
               <div>
                 <h2 class="text-white mt-0 mb-4" style="font-size:1.3rem; border:none; padding:0;">${comprador.nombre}</h2>
                 <div class="flex gap-8 flex-wrap mb-8">
-                  <span class="badge-tipo" style="padding:3px 12px; background:${this._colorTipo(comprador.tipo_comprador, true)}; color:${this._colorTipo(comprador.tipo_comprador)}; border:1px solid ${this._colorTipo(comprador.tipo_comprador, false, true)};">
+                  <span class="badge-tipo" style="padding:3px 12px; background:${this._colorTipo(comprador.tipo_comprador, true)}; color:${this._colorTipo(comprador.tipo_comprador)}; border:1px solid ${this._colorTipo(comprador.tipo_comprador, false, true)}; font-weight:800;">
                     ${comprador.tipo_comprador || 'híbrido'}
                   </span>
                   ${comprador.activo === false ? '<span class="text-red font-800 text-xs">INACTIVO</span>' : '<span class="text-green font-800 text-xs">ACTIVO</span>'}
@@ -455,6 +633,7 @@ const CompradoresView = {
                 telefono: document.getElementById('c-tel').value.trim(),
                 email: document.getElementById('c-email').value.trim(),
                 condiciones_pago: document.getElementById('c-pago').value.trim(),
+                notes: '',
                 notas: document.getElementById('c-notas').value.trim(),
                 activo: document.getElementById('c-activo').checked
             };
@@ -468,8 +647,6 @@ const CompradoresView = {
             // Si venimos del wizard de venta, volver
             if (window._volverAWizardVenta) {
               window._volverAWizardVenta = false;
-              // Quitar overlay oculto del wizard y recargar la ruta comercializacion
-              // para que se cree el wizard fresco con el nuevo comprador disponible
               const wizardOverlay = document.getElementById('wizard-venta-masiva');
               if (wizardOverlay) wizardOverlay.remove();
               location.hash = '#/comercializacion';
@@ -495,6 +672,10 @@ const CompradoresView = {
 
     _nuevoContrato(compradorId) {
         location.hash = '#/contrato?compradorId=' + compradorId;
+    },
+
+    _nuevoContratoLibre() {
+        location.hash = '#/contrato';
     },
 
     _verContrato(id) {

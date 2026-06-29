@@ -1,6 +1,6 @@
 /**
- * ContratosView - Livestock Manager Premium v4.0
- * Vista de contratos de compra: detalle con tabla de precios, formulario.
+ * ContratosView - Livestock Manager Premium v4.1.0
+ * Vista de contratos de compra: detalle con tabla de precios, formulario y selección de comprador.
  */
 
 const ContratosView = {
@@ -28,37 +28,32 @@ const ContratosView = {
             activo: true
         };
 
-        let comprador = contrato.compradorId ? await Compradores.get(contrato.compradorId) : null;
+        const compradores = await Compradores.list().catch(() => []);
 
         const main = document.getElementById("app-content");
         main.innerHTML = `
           <div class="mb-12">
-            <a href="${comprador ? '#/comprador?id='+contrato.compradorId : '#/compradores'}" class="link-back">← Volver</a>
+            <a href="#/compradores" class="link-back">← Volver</a>
           </div>
           <div class="card" style="border-top:4px solid #8b5cf6; padding:20px;">
             <h2 class="text-gold m-0 mb-16" style="font-size:1.1rem; border:none; padding:0;">
               ${esEdicion ? `${Icons.editar()} Contrato: ` + contrato.numero_contrato : `${Icons.agregar()} Nuevo Contrato`}
             </h2>
 
-            ${comprador ? `
-            <div class="bg-dark rounded-10 mb-16 flex justify-between items-center" style="padding:10px 14px;">
-              <span class="text-white font-bold">Comprador: ${comprador.nombre}</span>
-              <span class="badge badge-purple">${comprador.tipo_comprador}</span>
-            </div>` : `
             <div class="mb-16">
               <label class="form-label">COMPRADOR *</label>
               <select id="ct-comprador" class="premium-input">
                 <option value="">Seleccionar comprador...</option>
-                ${(await Compradores.list({ activo: true })).map(c =>
+                ${compradores.map(c =>
                   `<option value="${c.id}" ${Number(contrato.compradorId) === c.id ? 'selected' : ''}>${c.nombre} (${c.tipo_comprador})</option>`
                 ).join('')}
               </select>
-            </div>`}
+            </div>
 
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div>
                 <label class="form-label">Nº CONTRATO *</label>
-                <input type="text" id="ct-numero" value="${contrato.numero_contrato}" class="premium-input" placeholder="CT-2024-001">
+                <input type="text" id="ct-numero" value="${contrato.numero_contrato || ''}" class="premium-input" placeholder="CT-2024-001">
               </div>
               <div>
                 <label class="form-label">TIPO</label>
@@ -73,7 +68,7 @@ const ContratosView = {
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div>
                 <label class="form-label">FECHA INICIO *</label>
-                <input type="date" id="ct-inicio" value="${contrato.fecha_inicio}" class="premium-input">
+                <input type="date" id="ct-inicio" value="${contrato.fecha_inicio || ''}" class="premium-input">
               </div>
               <div>
                 <label class="form-label">FECHA FIN (opcional)</label>
@@ -84,16 +79,16 @@ const ContratosView = {
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div>
                 <label class="form-label">IVA (%)</label>
-                <input type="number" id="ct-iva" value="${contrato.iva_pct}" class="premium-input" step="0.1">
+                <input type="number" id="ct-iva" value="${contrato.iva_pct !== undefined ? contrato.iva_pct : 10}" class="premium-input" step="0.1">
               </div>
               <div>
                 <label class="form-label">RETENCIÓN REAGP (%)</label>
-                <input type="number" id="ct-ret" value="${contrato.retencion_pct}" class="premium-input" step="0.1">
+                <input type="number" id="ct-ret" value="${contrato.retencion_pct !== undefined ? contrato.retencion_pct : 0}" class="premium-input" step="0.1">
               </div>
             </div>
 
             <label class="form-label">CONDICIONES</label>
-            <textarea id="ct-cond" class="premium-input mb-12" style="min-height:60px; resize:none;">${contrato.condiciones}</textarea>
+            <textarea id="ct-cond" class="premium-input mb-12" style="min-height:60px; resize:none;">${contrato.condiciones || ''}</textarea>
 
             <!-- TABLA DE PRECIOS -->
             <div class="mt-16 mb-12">
@@ -115,9 +110,9 @@ const ContratosView = {
             </label>
 
             <div class="flex justify-between items-center mt-20">
-              ${esEdicion ? `<button onclick="App.toastError('Para eliminar el contrato, desactívelo.')" class="btn btn-danger" style="opacity: 0.5;">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
+              ${esEdicion ? `<button onclick="ContratosView._eliminarContrato(${contrato.id})" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
               <div class="flex gap-10">
-                <button onclick="location.hash='${comprador ? '#/comprador?id='+contrato.compradorId : '#/compradores'}'" class="btn btn-secondary">${Icons.cerrar()} Cancelar</button>
+                <button onclick="location.hash='#/compradores'" class="btn btn-secondary">${Icons.cerrar()} Cancelar</button>
                 <button onclick="ContratosView._guardar('${id || ''}')" class="btn btn-success">${Icons.guardar()} Guardar</button>
               </div>
             </div>
@@ -156,7 +151,6 @@ const ContratosView = {
     _addPrecioRow() {
         const container = document.getElementById('ct-precios-container');
         if (!container) return;
-        // Quitar mensaje vacío si existe
         const emptyMsg = container.querySelector('.empty-state');
         if (emptyMsg) emptyMsg.remove();
         container.insertAdjacentHTML('beforeend', this._renderPrecioRow({ producto: '', precio_unitario: '', unidad: 'kg' }, Date.now()));
@@ -174,12 +168,9 @@ const ContratosView = {
 
     async _guardar(id) {
         try {
-            const compradorId = id ? null : (
-                parseInt(document.getElementById('ct-comprador')?.value) ||
-                parseInt(document.querySelector('[data-compradorid]')?.dataset.compradorid)
-            );
+            const compradorId = parseInt(document.getElementById('ct-comprador').value) || null;
             const data = {
-                id: id || undefined,
+                id: id ? Number(id) : undefined,
                 compradorId: compradorId,
                 numero_contrato: document.getElementById('ct-numero').value.trim(),
                 tipo: document.getElementById('ct-tipo').value,
@@ -195,11 +186,25 @@ const ContratosView = {
             if (!data.numero_contrato) return App.toastError('El número de contrato es obligatorio');
             if (!data.compradorId) return App.toastError('Selecciona un comprador');
 
-            const nuevoId = await Contratos.save(data);
+            await Contratos.save(data);
             App.toast(id ? 'Contrato actualizado ✔' : 'Contrato creado ✔');
-            location.hash = '#/comprador?id=' + data.compradorId;
+            
+            // Volver a la sección de compradores/contratos
+            location.hash = '#/compradores';
         } catch (e) {
             App.toastError(e.message);
+        }
+    },
+
+    async _eliminarContrato(id) {
+        if (confirm("¿Estás seguro de eliminar este contrato? Esta acción no se puede deshacer.")) {
+            try {
+                await Contratos.delete(id);
+                App.toast("Contrato eliminado ✔");
+                location.hash = '#/compradores';
+            } catch (e) {
+                App.toastError("Error al eliminar contrato: " + e.message);
+            }
         }
     }
 };
