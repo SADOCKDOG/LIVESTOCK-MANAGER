@@ -29,6 +29,7 @@ const AnimalesView = {
             <span class="widget-link-label">Nuevo Animal</span>
           </button>
         </div>
+        <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Alta, identificación y registro de nuevos animales en el censo</span></div>
       </div>`;
 
     if (animales.length === 0) {
@@ -43,6 +44,7 @@ const AnimalesView = {
               <span class="widget-link-label">Registrar primer animal</span>
             </button>
           </div>
+          <div class="text-center mt-8"><span class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider leading-tight">Alta, identificación y registro de nuevos animales en el censo</span></div>
         </div>
       </div>`;
       main.innerHTML = html;
