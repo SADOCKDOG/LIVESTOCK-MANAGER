@@ -13,20 +13,26 @@
   var DEMO_FINCA = {
     nombre: 'Ganadería CHAMORRO (DEMO)',
     propietario: 'Familia Chamorro',
-    direccion: 'Ctra. EX-203, Km 15, Parcela 42',
+    direccion: 'Ctra. Almonte-El Rocío, Km 12',
     telefonoContacto: '+34 654 123 456',
     nif_cif: 'B12345678',
     email: 'demo.chamorro@example.com',
-    rega: 'ES041230000123',  // Cádiz (04) + municipio (123) + secuencial (0000123) — formato REGA válido
-    cea: 'BA-12345-67',
-    adsg_nombre: 'ADSG Tierra de Barros',
+    rega: 'ES210050001234',
+    cea: 'AN-21005-01',
+    adsg_nombre: 'ADSG El Condado',
+    adsg_codigo: 'ADSG-AN-21005',
+    adsg_veterinario: 'Dr. Manuel Castillo',
+    adsg_vet_colegiado: '21/1045',
+    adsg_vet_nif: '44123456D',
+    provincia: 'Huelva',
+    municipio: 'Almonte',
     comunidad_autonoma: 'Andalucía',
     tipo_explotacion: 'Mixto',
     sistema_explotacion: 'Semiextensivo',
     zonas: [
-      { nombre: 'Parcela Norte 42ha', superficieGrafica: 42, superficie: 42, aforoMax: 200, aforo_maximo: 200, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pasto principal de vacuno', descripcion: 'Pasto principal de vacuno', codigo_pac: 'ES-BA-0001-001', distancia_agua_m: 150 },
-      { nombre: 'Parcela Sur 28ha', superficieGrafica: 28, superficie: 28, aforoMax: 150, aforo_maximo: 150, usoPrincipal: 'Barbecho', uso: 'Barbecho', localizacion: 'Rotación y barbecho', descripcion: 'Rotación y barbecho', codigo_pac: 'ES-BA-0001-002', distancia_agua_m: 300 },
-      { nombre: 'Pastos Este 15ha', superficieGrafica: 15, superficie: 15, aforoMax: 250, aforo_maximo: 250, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pastos de ovino', descripcion: 'Pastos de ovino', codigo_pac: 'ES-BA-0001-003', distancia_agua_m: 80 }
+      { nombre: 'Parcela Norte 42ha', superficieGrafica: 42, superficie: 42, aforoMax: 200, aforo_maximo: 200, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pasto principal de vacuno', descripcion: 'Pasto principal de vacuno', codigo_pac: 'ES-AN-21005-001', distancia_agua_m: 150 },
+      { nombre: 'Parcela Sur 28ha', superficieGrafica: 28, superficie: 28, aforoMax: 150, aforo_maximo: 150, usoPrincipal: 'Barbecho', uso: 'Barbecho', localizacion: 'Rotación y barbecho', descripcion: 'Rotación y barbecho', codigo_pac: 'ES-AN-21005-002', distancia_agua_m: 300 },
+      { nombre: 'Pastos Este 15ha', superficieGrafica: 15, superficie: 15, aforoMax: 250, aforo_maximo: 250, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pastos de ovino', descripcion: 'Pastos de ovino', codigo_pac: 'ES-AN-21005-003', distancia_agua_m: 80 }
     ]
   };
 
@@ -204,7 +210,7 @@
             numero_contrato: 'CT-2026-002',
             tipo: 'leche',
             fecha_inicio: '2026-01-01',
-            fecha_fin: '2026-06-30',
+            fecha_fin: '2027-12-31',
             iva_pct: 10,
             retencion_pct: 0,
             condiciones: 'Recogida cada 2 días. Bonificación +0,02€ si grasa >3,8%. Almacenamiento 4°C.',
