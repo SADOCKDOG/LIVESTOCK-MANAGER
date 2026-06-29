@@ -125,6 +125,38 @@ const ManualesView = {
       archivo: 'manual/manual-reproduccion.html',
       color: '#ec4899',
     },
+    {
+      id: 'cuaderno-digital',
+      titulo: 'Cuaderno Digital Ganadero (RD 787/2023)',
+      descripcion: 'Generación del Cuaderno Digital de Explotación Ganadera: censo, movimientos, libro de tratamientos sanitarios y exportación oficial.',
+      icono: 'contratos',
+      archivo: 'manual/manual-cuaderno-digital.html',
+      color: '#10b981',
+    },
+    {
+      id: 'trazabilidad',
+      titulo: 'Trazabilidad 360° de Animales',
+      descripcion: 'Línea de tiempo cronológica con la vida completa del animal: nacimiento, pesajes, tratamientos, reproducción y venta final.',
+      icono: 'trazabilidad',
+      archivo: 'manual/manual-trazabilidad.html',
+      color: '#9333ea',
+    },
+    {
+      id: 'informes-analitica',
+      titulo: 'Informes Premium e Inteligencia Analítica',
+      descripcion: 'Inteligencia analítica para balances financieros (P y G, punto de equilibrio, PAC), rendimiento reproductivo, curvas de producción y exportaciones.',
+      icono: 'grafico',
+      archivo: 'manual/manual-informes-analitica.html',
+      color: '#e0a83a',
+    },
+    {
+      id: 'gestion-documental',
+      titulo: 'Documentos de Transporte y Guías DIMOE',
+      descripcion: 'Gestión y archivo oficial de documentos de movimiento de ganado, guías DIMOE y cadena alimentaria (ICA).',
+      icono: 'documento',
+      archivo: 'manual/manual-gestion-documental.html',
+      color: '#3b82f6',
+    },
   ],
 
   async render() {
