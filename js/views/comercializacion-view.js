@@ -232,7 +232,7 @@ const ComercializacionView = {
             <span class="widget-link-label">${registrarLabel}</span>
           </button>
         </div>
-        <div class="text-right mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.comercial()} Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
+        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.comercial()} Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
       </div>
 
       <div class="card p-14 border-222">
@@ -485,6 +485,7 @@ const ComercializacionView = {
 };
 
 window.ComercializacionView = ComercializacionView;
+
 
 
 
