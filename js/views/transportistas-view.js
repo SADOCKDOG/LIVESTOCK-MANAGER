@@ -22,8 +22,8 @@ const TransportistasView = {
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
-            <div class="card p-12 mb-16 border-222 card-dark-gradient pb-16">
-              <div class="text-center mb-8">
+            <div class="card p-14 mb-14 border-222" style="border-top:3px solid #3b82f6;">
+              <div class="text-center mb-10">
                 <div class="section-header-neon" style="--neon-color: #3b82f6; max-width: 520px; margin: 0 auto;">LOGÍSTICA / TRANSPORTE</div>
                 <div class="comer-mode-switch">
                    <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa;" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
@@ -31,7 +31,10 @@ const TransportistasView = {
                    <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
                 </div>
               </div>
-              <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider text-center leading-tight">Gestión de transportistas, vehículos y estado de actividad</div>
+              <div class="pt-8 border-top-222">
+                <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.transportistas()} Contexto: Transporte</div>
+                <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de transportistas, vehículos y estado de actividad.</div>
+              </div>
             </div>
 
             <div class="max-w-600 mx-auto">
