@@ -101,17 +101,51 @@ const DashboardView = {
     const totalActivos = censo.reduce((s, r) => s + r.activos, 0);
     const totalVendidos = censo.reduce((s, r) => s + r.vendidos, 0);
 
+    const modoAuto = (() => {
+      let tieneCarne = false, tieneLeche = false, tieneHibrido = false;
+      rebanos.forEach(r => {
+        const tipo = (r.tipo || '').toLowerCase();
+        if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
+        else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
+        else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
+      });
+      if (tieneHibrido || (tieneCarne && tieneLeche)) return 'hibrido';
+      if (tieneLeche) return 'leche';
+      return 'carne';
+    })();
+    const modoColor = modoAuto === 'carne' ? '#ef4444' : modoAuto === 'leche' ? '#3b82f6' : '#10b981';
+    const modoLabel = modoAuto === 'hibrido' ? 'Híbrido' : modoAuto === 'leche' ? 'Leche' : 'Carne';
+    const modoIcon = modoAuto === 'hibrido' ? Icons.rotacion() : modoAuto === 'leche' ? Icons.leche() : Icons.carne();
+
     return `
       <!-- Resumen General -->
-      <div class="card card-accent mt-10">
-        <h3 class="text-center text-white text-2xl mb-20">${finca.nombre || 'Resumen Ganadero'}</h3>
-        <div class="summary-table-grid">
-          <div class="summary-cell c-bo"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.zonas()} ZONAS</div><div class="s-val">${(finca.zonas || []).length}</div></div>
-          <div class="summary-cell c-1a"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.rebanos()} REBAÑOS</div><div class="s-val">${rebanos.length}</div></div>
-          <div class="summary-cell c-bo"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.animales()} CENSO</div><div class="s-val">${totalCenso || animales.length}</div></div>
-          <div class="summary-cell c-1a"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.check()} ACTIVOS</div><div class="s-val text-green">${totalActivos || activos}</div></div>
-          <div class="summary-cell c-bo"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.paquete()} VENDIDOS</div><div class="s-val text-red">${totalVendidos}</div></div>
-          <div class="summary-cell c-1a"><div class="dash-summary-icon flex items-center gap-4 justify-center">${Icons.grafico()} RENTAB.</div><div class="s-val ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'RESUMEN GANADERO'}</div>
+        <div class="grid grid-cols-3 gap-6">
+          <div class="bg-black rounded-lg p-8 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.zonas()} ZONAS</div>
+            <div class="text-xl font-black text-gold">${(finca.zonas || []).length}</div>
+          </div>
+          <div class="bg-black rounded-lg p-8 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.rebanos()} REBAÑOS</div>
+            <div class="text-xl font-black text-gold">${rebanos.length}</div>
+          </div>
+          <div class="bg-black rounded-lg p-8 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.animales()} CENSO</div>
+            <div class="text-xl font-black text-gold">${totalCenso || animales.length}</div>
+          </div>
+          <div class="bg-black rounded-lg p-8 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.check()} ACTIVOS</div>
+            <div class="text-xl font-black text-green">${totalActivos || activos}</div>
+          </div>
+          <div class="bg-black rounded-lg p-8 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.paquete()} VENDIDOS</div>
+            <div class="text-xl font-black text-red">${totalVendidos}</div>
+          </div>
+          <div class="bg-black rounded-lg p-8 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider flex items-center gap-3 justify-center mb-4">${Icons.grafico()} RENTAB.</div>
+            <div class="text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
+          </div>
         </div>
       </div>
 
@@ -125,69 +159,67 @@ const DashboardView = {
       </div>
 
       <!-- Balance Económico -->
-      <div class="card card-accent card-accent-green p-20">
-        <h3 class="mt-0 text-green flex items-center gap-8">${Icons.dinero()} Balance Económico</h3>
-        <div class="grid grid-cols-2 gap-10 mb-10">
-          <div class="info-box border-left-amber min-w-0">
-            <div class="kpi-label">Ingresos</div>
-            <div class="text-xl sm:text-2xl font-black text-amber truncate" title="${(rent?.ingresos || 0).toLocaleString()}€">${(rent?.ingresos || 0).toLocaleString()}€</div>
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-success); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.dinero()} BALANCE ECONÓMICO</div>
+        <div class="grid grid-cols-2 gap-8 mb-8">
+          <div class="bg-black rounded-lg p-10 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">INGRESOS</div>
+            <div class="text-xl font-black text-amber">${(rent?.ingresos || 0).toLocaleString()}€</div>
           </div>
-          <div class="info-box border-left-red min-w-0">
-            <div class="kpi-label">Gastos</div>
-            <div class="text-xl sm:text-2xl font-black text-red truncate" title="${(rent?.gastos || 0).toLocaleString()}€">${(rent?.gastos || 0).toLocaleString()}€</div>
-          </div>
-        </div>
-        <div class="flex justify-between items-center p-14 card-tint-green-lg gap-8">
-          <div class="min-w-0">
-            <div class="text-xs text-gray uppercase font-bold">Beneficio Neto</div>
-            <div class="text-lg sm:text-xl font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'} truncate" title="${balanceTotal.toLocaleString()} €">${balanceTotal.toLocaleString()} €</div>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <div class="text-xs text-gray uppercase font-bold">Rentabilidad</div>
-            <div class="text-lg sm:text-xl font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
+          <div class="bg-black rounded-lg p-10 text-center border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">GASTOS</div>
+            <div class="text-xl font-black text-red">${(rent?.gastos || 0).toLocaleString()}€</div>
           </div>
         </div>
-        <div class="text-center mt-12">
-          <a href="#/informes" class="text-green no-underline text-sm font-bold">Ver Informes Detallados →</a>
+        <div class="flex justify-between items-center p-10 bg-black rounded-lg border border-222">
+          <div>
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider">Beneficio Neto</div>
+            <div class="text-lg font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider">Rentabilidad</div>
+            <div class="text-lg font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
+          </div>
+        </div>
+        <div class="text-center mt-8">
+          <a href="#/informes" class="text-green no-underline text-xs font-900 uppercase tracking-wider">Ver Informes Detallados ${Icons.siguiente()}</a>
         </div>
       </div>
 
       ${this._renderIndicadoresLacteos(indicadoresLeche)}
 
       <!-- Calendario Preventivo -->
-      <div class="card card-accent card-accent-blue p-20 card-tint-blue">
-        <h3 class="mt-0 text-blue flex items-center gap-8">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-info); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</div>
         ${alertaEpoca.sugerencias?.length > 0 ? `
-        <ul class="text-85 text-gray m-0 leading-normal mt-10 pl-20">
-          ${alertaEpoca.sugerencias.map(s => `<li class="mb-4">${s}</li>`).join('')}
-        </ul>` : '<div class="text-gray text-sm mt-10">Sin sugerencias para esta temporada.</div>'}
-        <div class="text-center mt-12">
-          <a href="#/informes?tab=alertas" class="text-blue no-underline text-sm font-bold">Ver Alertas Completas →</a>
+        <ul class="text-xs text-gray m-0 leading-relaxed mt-6 pl-16">
+          ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
+        </ul>` : '<div class="text-xs text-gray mt-6">Sin sugerencias para esta temporada.</div>'}
+        <div class="text-center mt-8">
+          <a href="#/informes?tab=alertas" class="text-blue no-underline text-xs font-900 uppercase tracking-wider">Ver Alertas Completas ${Icons.siguiente()}</a>
         </div>
       </div>
 
       <!-- Accesos Rápidos -->
-      <div class="card p-20">
-        <h3 class="mt-0 text-white flex items-center gap-8">${Icons.rayo()} Accesos Rápidos</h3>
-        <div class="grid grid-cols-2 gap-8 mt-10">
-          <a href="#/animales" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.animales()} Animales</a>
-          <a href="#/rebanos" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.rebanos()} Rebaños</a>
-          ${(() => {
-            let tieneCarne = false;
-            let tieneLeche = false;
-            let tieneHibrido = false;
-            rebanos.forEach(r => {
-              const tipo = (r.tipo || '').toLowerCase();
-              if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
-              else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
-              else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
-            });
-            let modo = 'carne';
-            if (tieneHibrido || (tieneCarne && tieneLeche)) modo = 'hibrido';
-            else if (tieneLeche) modo = 'leche';
-            return `<a href="#/${modo}" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.grafico()} Módulo ${modo === 'hibrido' ? 'Híbrido' : modo === 'leche' ? 'Leche' : 'Carne'}</a>`;
-          })()}
-          <a href="#/informes" class="btn btn-primary btn-sm text-center btn-nav-pad">${Icons.tendencia()} Informes</a>
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.rayo()} ACCESOS RÁPIDOS</div>
+        <div class="grid grid-cols-2 gap-8">
+          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
+            ${Icons.animales()}
+            <span class="widget-link-label">Animales</span>
+          </a>
+          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
+            ${Icons.rebanos()}
+            <span class="widget-link-label">Rebaños</span>
+          </a>
+          <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40;">
+            ${modoIcon}
+            <span class="widget-link-label">${modoLabel}</span>
+          </a>
+          <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success">
+            ${Icons.tendencia()}
+            <span class="widget-link-label">Informes</span>
+          </a>
         </div>
       </div>
     `;
