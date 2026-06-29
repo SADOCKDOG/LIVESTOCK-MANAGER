@@ -610,10 +610,10 @@ const ExplotacionView = {
 
     html += `
         </div>
-        <div class="mt-20 py-16 flex flex-col items-center gap-12 border-top-222">
-          <div class="section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%; padding:0; margin-bottom: 5px;">ALMACÉN</div>
-          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${borderStyleColor}; --neon-glow: ${borderStyleColor}B0; --neon-inner: ${borderStyleColor}40; width: 100%; max-width: 200px; padding: 15px 12px;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
-            ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-sm tracking-widest">CARGA / CONSUMO</span>
+        <div class="mt-20 py-24 flex flex-col items-center gap-15 border-top-222">
+          <div class="section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%; padding:0; margin-bottom: 5px; letter-spacing: 2px;">ALMACÉN</div>
+          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${borderStyleColor}; --neon-glow: ${borderStyleColor}B0; --neon-inner: ${borderStyleColor}40; width: 100%; max-width: 220px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+            ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">CARGA / CONSUMO</span>
           </button>
         </div>
       </div>
@@ -647,20 +647,20 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <div class="py-24 border-y border-222 mb-24 bg-black-opacity-50 flex flex-col items-center">
-            <div class="section-header-neon mb-16" style="--neon-color: ${color}; padding:0; letter-spacing: 2px;">GASTOS</div>
+        <div class="py-32 border-y border-222 mb-32 bg-black-opacity-50 flex flex-col items-center">
+            <div class="section-header-neon mb-20" style="--neon-color: ${color}; padding:0; letter-spacing: 3px;">GASTOS</div>
             <div class="grid grid-cols-3 gap-12 px-6 w-full">
-              <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')" style="padding: 14px 5px; min-height: 70px;">
+              <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')" style="padding: 16px 5px; min-height: 85px;">
                 ${Icons.agregar()}
-                <span class="widget-link-label text-[0.6rem] font-950">ALIMENTACIÓN</span>
+                <span class="widget-link-label text-[0.65rem] font-950">ALIMENTACIÓN</span>
               </button>
-              <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')" style="padding: 14px 5px; min-height: 70px;">
+              <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', '${modo}')" style="padding: 16px 5px; min-height: 85px;">
                 ${Icons.agregar()}
-                <span class="widget-link-label text-[0.6rem] font-950">ENERGÍA</span>
+                <span class="widget-link-label text-[0.65rem] font-950">ENERGÍA</span>
               </button>
-              <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')" style="padding: 14px 5px; min-height: 70px;">
+              <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', '${modo}')" style="padding: 16px 5px; min-height: 85px;">
                 ${Icons.agregar()}
-                <span class="widget-link-label text-[0.6rem] font-950">FITOSANITARIO</span>
+                <span class="widget-link-label text-[0.65rem] font-950">FITOSANITARIO</span>
               </button>
             </div>
         </div>

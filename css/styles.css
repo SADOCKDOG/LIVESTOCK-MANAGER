@@ -2878,7 +2878,9 @@ label {
 .pesaje-info-grid    { padding: 12px; border-radius: 10px; border: 1px solid #222; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.75rem; flex-shrink: 0; background: #000; }
 .pesaje-animal-box   { text-align: center; padding: 25px 20px; background: #000; border: 2px solid #222; border-radius: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .pesaje-animal-label { text-transform: uppercase; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; font-size: 0.75rem; }
-.pesaje-crotal       { font-size: 3.5rem; font-weight: 950; line-height: 1; text-transform: uppercase; letter-spacing: -2px; }
+.pesaje-crotal       { font-size: 3.2rem; font-weight: 950; line-height: 1; text-transform: uppercase; letter-spacing: -2.5px; width: 100%; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 400px) { .pesaje-crotal { font-size: 2.4rem; letter-spacing: -1.5px; } }
+@media (max-width: 350px) { .pesaje-crotal { font-size: 2.1rem; letter-spacing: -1px; } }
 .pesaje-peso-input   { width: 100%; max-width: 250px; font-size: 4.5rem; font-weight: 950; text-align: center; background: #0a0a0a; color: white; border-radius: 24px; padding: 15px; margin-top: 10px; font-family: 'Inter', sans-serif; }
 .pesaje-unidad-label { font-weight: 950; font-size: 1rem; text-transform: uppercase; margin-top: 10px; letter-spacing: 3px; }
 .pesaje-leche-grid   { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
