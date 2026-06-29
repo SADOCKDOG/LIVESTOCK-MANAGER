@@ -366,6 +366,13 @@ Orden por **impacto visual / riesgo**. Cada fase es entregable y verificable de 
 - [ ] Sin colores/espaciados literales: usar variables CSS.
 - [ ] Iconos vía `Icons.*` (SVG), no emoji funcional.
 - [ ] Botones de la familia `.btn` (altura ≥ 48px).
+- [ ] Botones de acción principal en vistas modo-specific: usar `widget-link-btn widget-link-btn--neon neon-{color}`
+      con icono SVG + `.widget-link-label` apilados en columna (nunca `btn-create` / `btn-success`).
+      Color por modo: Carne → `neon-danger`, Leche → `neon-info`, Híbrido → `neon-success`.
+      Tratamiento sanitario → `neon-accent` en cualquier modo.
+- [ ] Cards de registros/datos: usar `.card-animal` con `style="border-left:4px solid ${color}"`
+      dinámico (nunca clases fijas como `border-4-left-green`).
+      Estructura: título + fecha con icono a izquierda, badge de valor a derecha.
 - [ ] Inputs `.form-*` (alto ≥ 48px, font ≥ 16px).
 - [ ] Mensajes vía `Toast`/`Confirm`, nunca `alert`/`confirm` nativos.
 - [ ] Probado a 360px de ancho (Android vertical), respetando safe-areas.
