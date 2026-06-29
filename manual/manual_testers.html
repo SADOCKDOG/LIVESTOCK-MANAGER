@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><title>Manual de Pruebas Internas — Livestock Manager v4.8.1</title>
+<html lang="es"><head><meta charset="UTF-8"><title>Manual de Pruebas Internas — Livestock Manager v4.8.7</title>
  <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
  :root {
@@ -332,22 +332,97 @@
  background-color: #fffbeb;
  border-left: 4px solid var(--warning-color);
  color: #92400e;
- }</style></head>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
 <body><!-- PORTADA -->
- <div class="cover-page"><img src="img/Icono_512x512.png" class="cover-logo" alt="Logo"><div class="cover-title">Livestock Manager</div>
- <div class="cover-subtitle">Manual de Pruebas Internas — Versión v4.8.1</div>
+ <div class="cover-page"><div class="cover-title">Livestock Manager</div>
+ <div class="cover-subtitle">Manual de Pruebas Internas — Versión v4.8.7</div>
  <div class="cover-meta"><p><strong>Desarrollador:</strong> David Asuar Arteaga</p>
  <p><strong>Fecha de Emisión:</strong> 29 de junio de 2026</p>
  <p><strong>Objetivo:</strong> Guía de validación de módulos y rutas críticas</p></div></div>
 
  <div class="container"><!-- INTRODUCCIÓN -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span></div></div>
  <div class="header-license-text"><span>Licencia: MIT / Propietaria</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
  <div class="section-title">Introducción para los Testers</div>
- <div class="introduction-box"><p>¡Gracias por participar en las pruebas internas de <strong>Livestock Manager v4.8.1</strong>! Tu labor es crucial para validar las funcionalidades clave de la aplicación en dispositivos Android reales (especialmente Android 13 y 14) antes del lanzamiento oficial.</p></div>
+ <div class="introduction-box"><p>¡Gracias por participar en las pruebas internas de <strong>Livestock Manager v4.8.7</strong>! Tu labor es crucial para validar las funcionalidades clave de la aplicación en dispositivos Android reales (especialmente Android 13 y 14) antes del lanzamiento oficial.</p></div>
 
  <p>Esta versión corrige fallos críticos de exportación y compartición nativa de archivos PDF/Excel en Android 13+. A continuación, encontrarás el enlace exclusivo para testers de Google Play Store para descargar e instalar la versión de pruebas de la aplicación:</p>
 
@@ -374,7 +449,7 @@
 
  <!-- PARTE 2: MÓDULOS PRINCIPALES -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span></div></div>
  <div class="header-license-text"><span>Licencia: MIT / Propietaria</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
@@ -391,7 +466,7 @@
  <span class="checklist-text">El balance de ingresos/gastos y el porcentaje de rentabilidad se actualizan inmediatamente tras registrar una venta o un gasto.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text">Las alertas sanitarias de periodo de supresión de tratamientos muestran la cuenta atrás en días correctos (nunca negativos).</span></li></ul></div>
- <div class="module-screenshot"><img src="img/sc_01_inicio.png" class="screenshot-img" alt="Dashboard"></div></div></div>
+ <div class="module-screenshot"></div></div></div>
 
  <!-- Módulo 2: Ganadería -->
  <div class="module-card"><div class="module-header"><div class="module-name">2. Ganadería (Selector de Modo)</div>
@@ -403,7 +478,7 @@
  <span class="checklist-text">La cabecera de la aplicación y los marcos del menú cambian de color para reflejar visualmente el modo activo.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text">El modo seleccionado se guarda en la memoria interna (ModoContextoHelper) y persiste aunque navegues a otra pantalla y regreses.</span></li></ul></div>
- <div class="module-screenshot"><img src="img/sc_05_ganaderia.png" class="screenshot-img" alt="Ganadería"></div></div></div>
+ <div class="module-screenshot"></div></div></div>
 
  <!-- Módulo 3: ExPro (Explotación y Producción) -->
  <div class="module-card"><div class="module-header"><div class="module-name">3. ExPro (Explotación y Producción)</div>
@@ -421,11 +496,11 @@
  <span class="checklist-text"><strong>Pesada por Lotes:</strong> El botón "+ PESO (KG)" en la cabecera abre el asistente para seleccionar un rebaño, indicar el peso medio o lote, y registrarlo colectivamente.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text"><strong>Tratamiento Sanitario:</strong> El botón "+ TRATAMIENTO" abre el asistente en 3 pasos para indicar rebaño, medicamento, dosis, fecha de inicio y fin, y días de supresión oficial.</span></li></ul></div>
- <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"><img src="img/sc_02_expro.png" class="screenshot-img" alt="ExPro"><img src="img/sc_08_wizard_pesada_individual.png" class="screenshot-img" alt="Wizard Pesaje Individual"><img src="img/sc_10_wizard_pesaje_lote.png" class="screenshot-img" alt="Wizard Pesaje por Lotes"><img src="img/sc_11_wizard_tratamiento.png" class="screenshot-img" alt="Wizard Tratamiento Sanitario"></div></div></div>
+ <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"></div></div></div>
 
  <!-- Módulo 4: CoMer (Comercialización) -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span></div></div>
  <div class="header-license-text"><span>Licencia: MIT / Propietaria</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
@@ -442,7 +517,7 @@
  <span class="checklist-text"><strong>Generar Venta (Venta Masiva):</strong> El botón de registro de venta en CoMer carne abre el asistente de venta masiva en 5 pasos para matadero, comprobando retenciones, IVA, transporte y generando la transacción comercial.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text"><strong>Asistente de Gasto:</strong> Permite registrar un nuevo gasto analítico en 1 paso, asignando proveedor, concepto, monto total, categoría y rebaño obligatorio.</span></li></ul></div>
- <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"><img src="img/sc_03_comer.png" class="screenshot-img" alt="CoMer"><img src="img/sc_09_wizard_venta_masiva.png" class="screenshot-img" alt="Wizard Venta Masiva"><img src="img/sc_12_wizard_albaran_leche.png" class="screenshot-img" alt="Wizard Albarán de Leche"><img src="img/sc_16_wizard_gasto.png" class="screenshot-img" alt="Wizard Registrar Gasto"></div></div></div></div>
+ <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"></div></div></div></div>
 
  <!-- Módulo 5: Menú Más -->
  <div class="module-card"><div class="module-header"><div class="module-name">5. Menú de Navegación "Más"</div>
@@ -454,7 +529,7 @@
  <span class="checklist-text">Muestra los accesos a Compradores, Proveedores, Transportistas, Informes, Libro de Ventas, Informe REGA, Exportación Oficial, Manuales y Ajustes.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text">La ventana modal se cierra automáticamente al pulsar fuera o al seleccionar cualquier enlace.</span></li></ul></div>
- <div class="module-screenshot"><img src="img/sc_04_mas.png" class="screenshot-img" alt="Menú Más"></div></div></div>
+ <div class="module-screenshot"></div></div></div>
 
  <!-- Módulo 6: Visualización de Módulos Críticos -->
  <div class="module-card"><div class="module-header"><div class="module-name">6. Censo y Estructura (Animales, Rebaños, Zonas)</div>
@@ -470,11 +545,11 @@
  <span class="checklist-text"><strong>Zonas:</strong> Las parcelas de pasto muestran el aforo de ocupación y carga ganadera en UGM/Ha de manera adecuada.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text"><strong>Asistente de Traslado:</strong> Permite realizar el traslado masivo de animales seleccionados a otro rebaño/lote de destino en 3 pasos.</span></li></ul></div>
- <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"><img src="img/sc_06_animales_criticos.png" class="screenshot-img" alt="Animales, Rebaños y Zonas"><img src="img/sc_17_wizard_traslado.png" class="screenshot-img" alt="Wizard Traslado de Animales"></div></div></div>
+ <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"></div></div></div>
 
  <!-- Módulo 7: Ajustes / Fincas -->
  <div class="page-break"><!-- CABECERA RUNNING -->
- <div class="page-header-block"><div class="header-logo-wrap"><img src="img/Icono_512x512.png" class="header-logo-img" alt="Logo App"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
+ <div class="page-header-block"><div class="header-logo-wrap"><div class="header-text-wrap"><span class="header-title-text">Livestock Manager Premium</span>
  <span class="header-dev-text">Desarrollador: David Asuar Arteaga</span></div></div>
  <div class="header-license-text"><span>Licencia: MIT / Propietaria</span><br><span>© 2026 Todos los derechos reservados</span></div></div>
 
@@ -493,7 +568,7 @@
  <span class="checklist-text"><strong>Declaración de Censo:</strong> El botón "DECLARACIÓN" abre el asistente en 3 pasos para notificar el censo de animales al registro oficial SIGGAN a fecha 1 de enero.</span></li>
  <li class="checklist-item"><div class="checklist-checkbox"></div>
  <span class="checklist-text">Comprobar el backup local: exporta base de datos a formato JSON y permite restaurarla seleccionando un fichero.</span></li></ul></div>
- <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"><img src="img/sc_07_ajustes.png" class="screenshot-img" alt="Ajustes"><img src="img/sc_18_wizard_finca.png" class="screenshot-img" alt="Wizard Editar Finca"><img src="img/sc_14_wizard_pedido_crotales.png" class="screenshot-img" alt="Wizard Pedido de Crotales"><img src="img/sc_13_wizard_guia_movimiento.png" class="screenshot-img" alt="Wizard Guía de Movimiento"><img src="img/sc_15_wizard_censo_oficial.png" class="screenshot-img" alt="Wizard Censo Oficial"></div></div></div></div>
+ <div class="module-screenshot" style="display: flex; flex-direction: column; gap: 15px;"></div></div></div></div>
 
  <!-- PARTE 3: CHECKLIST DE CALIDAD -->
  <div class="no-break"><div class="section-title">Parte 3: Checklist de Estabilidad e Integridad</div>

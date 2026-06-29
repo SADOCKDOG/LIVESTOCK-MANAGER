@@ -102,8 +102,83 @@
  .indice ol{columns:2;}
  a{color:var(--tinta) !important; text-decoration:none;}
  .resumen-ejemplo{break-inside:avoid;}
- }</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><div class="logo">Livestock <span>Manager</span></div>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><div class="logo">Livestock <span>Manager</span></div>
  <h1>Ejemplo Práctico: Ovino de Carne</h1>
  <p class="sub">Creación y gestión completa de una explotación de ovejas para carne</p>
  <div class="badge">GUÍA PASO A PASO · v4</div></header>
@@ -151,7 +226,7 @@
  con cuatro opciones. Como vamos a crear una explotación nueva, seleccionamos la opción
  <strong>Nueva Finca</strong>.</p>
 
- <figure><img src="img/carne-01-bienvenida.jpg" alt="Pantalla de bienvenida"><figcaption>Pantalla de bienvenida — pulsa "Nueva Finca" para empezar.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Pulsa <kbd>Nueva Finca</kbd></strong> en la pantalla de inicio.</li>
  <li>Si ya tienes una explotación creada y quieres crear otra, ve a
@@ -170,7 +245,7 @@
  con todos los datos legales y de configuración. Rellena cada campo con atención:
  los datos de REGA y comunidad autónoma determinan la normativa aplicable.</p>
 
- <figure><img src="img/carne-02-crear-finca.jpg" alt="Formulario de nueva finca"><figcaption>Formulario de creación de finca con todos los campos.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Campos del formulario</h3>
  <ol class="pasos"><li><strong>Nombre de la explotación</strong><br><span class="campo">Cortijo San Pedro</span> — Nombre comercial o legal de la explotación.</li>
@@ -205,7 +280,7 @@
  <p class="intro-mod">Una vez creada la finca, conviene completar algunos datos adicionales antes de registrar ganado.
  Accede desde <span class="ruta">Más → Ajustes</span>.</p>
 
- <figure><img src="img/carne-03-ajustes.jpg" alt="Pantalla de ajustes"><figcaption>Pantalla de ajustes con la ficha de finca y configuración.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Completar datos ADSG</strong> (si procede)<br>Rellena los campos de la Agrupación de Defensa Sanitaria:
  <ul class="subpasos"><li><span class="campo">ADSG Sierra de Cádiz</span> — Nombre de la ADSG</li>
@@ -232,7 +307,7 @@
  de ovino de carne necesitarás varias parcelas de pasto y una zona de estabulación / manejo.
  Accede desde <span class="ruta">Más → Zonas</span>.</p>
 
- <figure><img src="img/carne-04-zonas.jpg" alt="Listado de zonas"><figcaption>Listado de zonas de la explotación.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Crear cada zona</h3>
  <ol class="pasos"><li>Pulsa <kbd>Nueva Zona</kbd>.</li>
@@ -260,7 +335,7 @@
  necesitarás al menos dos rebaños: <strong>madres (reproductoras)</strong> y
  <strong>cebo (recría)</strong>. Accede desde <span class="ruta">Rebaños</span> en la barra inferior.</p>
 
- <figure><img src="img/carne-05-rebanos.jpg" alt="Creación de rebaño"><figcaption>Creación del rebaño de madres de ovino.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Rebaño 1: Madres reproductoras</h3>
  <ol class="pasos"><li>Pulsa <kbd></kbd> en la esquina superior derecha.</li>
@@ -295,7 +370,7 @@
  los animales de uno en uno o usar la carga masiva desde el rebaño. Aquí veremos el alta
  individual detallada. Accede desde <span class="ruta">Animales</span> en la barra inferior.</p>
 
- <figure><img src="img/animales_list.png" alt="Formulario de alta de animal"><figcaption>Listado de animales con el nuevo diseño Premium.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>NUEVO</kbd> en la barra superior.</li>
  <li><strong>Nº de CROTAL</strong> — Campo principal, identificador único oficial.<br><span class="campo">ES011234567890</span><br>Formato: <strong>ES</strong> + 2 dígitos de CC.AA. + 10 dígitos de identificación individual.
@@ -337,7 +412,7 @@
  leer el código impreso en el crotal usando la cámara del dispositivo. Es más rápido y evita
  errores de escritura.</p>
 
- <figure><img src="img/carne-07-scan.jpg" alt="Escáner de crotales con la cámara"><figcaption>Escáner de código QR/barras del crotal en acción.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>En el formulario de alta de animal, localiza el campo <strong>Nº CROTAL</strong>.</li>
  <li>Pulsa el botón <span class="btn-ejemplo">SCAN</span> situado a la derecha del campo.
@@ -374,7 +449,7 @@
  diaria (GMD) y determinar el momento óptimo de venta. Accede desde
  <span class="ruta">Registros → Producción</span> o desde la ficha individual del animal.</p>
 
- <figure><img src="img/expro_carne.png" alt="Registro de pesajes"><figcaption>Registro de pesaje desde la consola ExPro.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Pesaje individual</strong> desde la ficha del animal:
  <ul class="subpasos"><li>Abre la lista de animales y pulsa sobre el animal que quieras pesar.</li>
@@ -402,7 +477,7 @@
  y controla automáticamente los periodos de supresión. Accede desde la ficha del animal o desde
  <span class="ruta">Rebaños → [rebaño] → Tratamientos</span>.</p>
 
- <figure><img src="img/carne-09-sanidad.jpg" alt="Registro de tratamiento sanitario"><figcaption>Registro de tratamiento con cálculo de periodo de supresión.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>TRATAMIENTO</kbd> desde la ficha del animal o del rebaño.</li>
  <li>Rellena:
@@ -430,7 +505,7 @@
  <p class="intro-mod">Antes de realizar una venta, debes dar de alta al comprador. Accede desde
  <span class="ruta">Más → Compradores</span>.</p>
 
- <figure><img src="img/carne-10-compradores.jpg" alt="Alta de comprador"><figcaption>Formulario de nuevo comprador para carne.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Pulsa <kbd>Nuevo</kbd>.</li>
  <li>Rellena:
@@ -454,7 +529,7 @@
  el albarán, el DIMOE y se actualiza el estado del animal. Accede desde
  <span class="ruta">Más → Comercialización</span>.</p>
 
- <figure><img src="img/carne-11-comercializacion.jpg" alt="Wizard de venta de carne"><figcaption>Wizard de venta de carne con todos los datos necesarios.</figcaption></figure>
+ 
 
  <h3 style="margin:20px 0 10px; font-size:1.1rem;">Registrar una venta de carne</h3>
  <ol class="pasos"><li>En la pestaña <strong>Carne</strong>, pulsa <kbd>NUEVA VENTA</kbd>.</li>
@@ -493,7 +568,7 @@
  <p class="intro-mod">Al confirmar la venta, la app genera automáticamente varios documentos. Puedes consultarlos
  desde <span class="ruta">Más → Documentos</span> y desde el detalle de la venta.</p>
 
- <figure><img src="img/carne-12-albaran.jpg" alt="Albarán generado"><figcaption>Albarán de venta de carne con todos los datos fiscales.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Albarán de venta</strong> — Documento con:
  <ul class="subpasos"><li>Cabecera: vendedor (tu finca), comprador, fecha y nº de albarán.</li>

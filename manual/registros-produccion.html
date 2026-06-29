@@ -118,8 +118,83 @@
  figure img{max-width:230px; box-shadow:none;}
  a{color:var(--tinta) !important; text-decoration:none;}
  .indice ol{columns:2;}
- }</style></head>
-<body><header class="portada"><img src="img/logo-app.png" alt="Livestock Manager" class="logo-img"><h1>Registros de Producción</h1>
+ }
+/* Estilos premium de cadena de workflow para Wizards */
+.workflow-stepper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 12px;
+  border: 1px solid #c9851f;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+  position: relative;
+  padding: 0 8px;
+}
+.workflow-step-num {
+  width: 26px;
+  height: 26px;
+  background: #c9851f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.workflow-step-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.workflow-step-desc {
+  color: #a9a9b9;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.workflow-arrow {
+  color: #c9851f;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+@media (max-width: 600px) {
+  .workflow-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .workflow-step {
+    flex-direction: row;
+    text-align: left;
+    min-width: unset;
+    gap: 10px;
+  }
+  .workflow-step-num {
+    margin-bottom: 0;
+  }
+  .workflow-arrow {
+    display: none;
+  }
+}
+
+</style></head>
+<body><header class="portada"><h1>Registros de Producción</h1>
  <p class="sub">Guía completa de registro de producción Cárnica y Láctea paso a paso</p>
  <div class="badge">MANUAL TÉCNICO · Todos los flujos de trabajo</div></header>
 
@@ -133,7 +208,7 @@
  <span class="ruta">Registros → Producción</span> en la barra inferior, o desde
  <span class="ruta">Registros → Producción</span> directamente.</p>
 
- <figure><img src="img/prod-00-acceso.jpg" alt="Acceso a la sección de producción"><figcaption>Pantalla superior de producción con pestañas Cárnica / Láctea.</figcaption></figure>
+ 
 
  <div class="tabs-ej"><span class="tab-ej carne">️ Cárnica</span>
  <span class="tab-ej leche">Láctea</span></div>
@@ -167,7 +242,7 @@
  la app carga todos los registros de la finca activa y los organiza en dos pestañas:
  <strong>️ Cárnica</strong> y <strong>Láctea</strong>.</p>
 
- <figure><img src="img/prod-01-vista-general.jpg" alt="Vista general de producción"><figcaption>Vista general con KPIs y listado de registros.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Pestaña Cárnica — KPIs superiores:</strong>
  <ul class="subpasos"><li><strong>Total kg</strong> — Suma de todos los pesos registrados</li>
@@ -192,7 +267,7 @@
  Se abre desde el botón de la vista de producción o directamente al pulsar
  <kbd>Registrar Cárnica</kbd> o <kbd>Registrar Láctea</kbd>.</p>
 
- <figure><img src="img/prod-02-asistente.jpg" alt="Asistente de registro maestro"><figcaption>Asistente de registro con selección de tipo de producción.</figcaption></figure>
+ 
 
  <h3 style="margin:18px 0 10px; font-size:1rem;">Estructura del asistente (3 pasos comunes)</h3>
 
@@ -241,7 +316,7 @@
  preseleccionado. Se usa para seguimiento de crecimiento individual, controles sanitarios
  o preparación para venta.</p>
 
- <figure><img src="img/prod-03-carne-individual.jpg" alt="Pesada individual"><figcaption>Gestor de pesajes en modo individual (cárnico).</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Desde el asistente: selecciona <strong>️ Cárnica → Pesada Individual → el animal</strong>.</li>
  <li>Se abre la pantalla del Gestor de Pesajes con los siguientes elementos:</li></ol>
@@ -288,7 +363,7 @@
  <p class="intro-mod">Permite pesar varios animales del mismo rebaño de forma secuencial y rápida,
  ideal para pesadas rutinarias de control de engorde.</p>
 
- <figure><img src="img/prod-04-carne-lote.jpg" alt="Pesaje por lote"><figcaption>Gestor de pesajes en modo lote con lista de animales.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Desde el asistente: <strong>️ Cárnica → Pesaje por Lote → selecciona el rebaño</strong>.</li>
  <li>Se abre el Gestor de Pesajes. La pantalla cambia ligeramente:</li></ol>
@@ -320,7 +395,7 @@
  muestra campos adicionales de báscula y logística para capturar todos los datos
  necesarios para el DIMOE y la clasificación SEUROP.</p>
 
- <figure><img src="img/prod-05-carne-logistica.jpg" alt="Pesaje con logística"><figcaption>Formulario de expedición con datos de báscula, matrícula y precio.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>El formulario se abre igual que un pesaje individual o por lote, pero con el motivo
  <strong>expedición</strong> pre-seleccionado (se accede desde Venta Masiva / Matadero).</li>
@@ -352,7 +427,7 @@
  <p class="intro-mod">De cada pesaje, la app calcula automáticamente la <strong>Ganancia Media Diaria (GMD)</strong>
  y ofrece proyecciones de peso para ayudar a planificar la fecha óptima de venta.</p>
 
- <figure><img src="img/prod-06-gmd.jpg" alt="GMD y proyecciones"><figcaption>Detalle de la GMD calculada entre pesajes consecutivos.</figcaption></figure>
+ 
 
  <ol class="pasos"><li><strong>Cálculo de GMD:</strong>
  <div class="info-tecnica" style="margin:8px 0;"><code>GMD = (Peso actual - Peso anterior) / (Fecha actual - Fecha anterior) en días</code><br>Ejemplo: (45.5 kg - 42.0 kg) / 30 días = <strong>0.117 kg/día</strong> (117 g/día)</div></li>
@@ -374,7 +449,7 @@
  <p class="intro-mod">El wizard de venta masiva permite registrar una expedición completa al matadero con múltiples animales,
  datos del comprador y generación automática de albarán y DIMOE.</p>
 
- <figure><img src="img/prod-07-venta-masiva.jpg" alt="Venta masiva"><figcaption>Wizard de venta masiva con selección de animales y datos de matadero.</figcaption></figure>
+ 
 
  <ol class="pasos" start="1"><li>Desde el asistente, selecciona <strong>Venta Masiva / Matadero</strong> (o desde <span class="ruta">Comercialización → Carne</span>).</li>
  <li>Se abre el wizard de venta masiva (gestionado por <code>VentaMasivaWizard</code>).</li>
@@ -399,7 +474,7 @@
  <p class="intro-mod">Durante la venta de carne, la app solicita la <strong>clasificación SEUROP</strong> de la canal,
  necesaria para la documentación oficial de matadero y la liquidación.</p>
 
- <figure><img src="img/prod-08-seurop.jpg" alt="Clasificación SEUROP"><figcaption>Selección de conformación SEUROP y engrasamiento.</figcaption></figure>
+ 
 
  <table class="parametros"><tr><th>Conformación</th><th>Letra</th><th>Descripción</th></tr>
  <tr><td>Superior</td><td><strong>S</strong></td><td>Perfiles ultraconvexos, desarrollo muscular excepcional</td></tr>
@@ -433,7 +508,7 @@
  Se muestra la producción anterior para referencia y se pueden introducir
  parámetros de calidad opcionales (grasa y proteína).</p>
 
- <figure><img src="img/prod-09-leche-individual.jpg" alt="Control lechero individual"><figcaption>Control lechero individual con grasa y proteína.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Desde el asistente: <strong>Láctea → Control Individual → selecciona la hembra</strong>.</li>
  <li>Se abre el Gestor de Pesajes en modo leche individual.</li></ol>
@@ -464,7 +539,7 @@
  <p class="intro-mod">Permite registrar la producción de todas las hembras de un rebaño de forma secuencial,
  similar al pesaje por lote de cárnica pero con unidad en litros y campos de calidad.</p>
 
- <figure><img src="img/prod-10-leche-lote.jpg" alt="Control lechero de lote"><figcaption>Control lechero de lote con lista de hembras y producciones.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Desde el asistente: <strong>Láctea → Control de Lote → selecciona el rebaño lechero</strong>.</li>
  <li>Se abre el Gestor de Pesajes en modo lote lechero. Características específicas:
@@ -489,13 +564,13 @@
  precio y MOFA. Se accede desde <span class="ruta">Láctea → Expedición de Tanque</span>
  o desde <span class="ruta">Más → Control Lechero → Wizard</span>.</p>
 
- <figure><img src="img/prod-11-leche-wizard-paso1.jpg" alt="Wizard leche paso 1"><figcaption>Paso 1: Datos generales, CCAA, contrato y ADSG.</figcaption></figure>
+ 
 
  <h3 style="margin:18px 0 10px; font-size:1.1rem;">Los 6 pasos del wizard de albarán de leche</h3>
 
  <!-- Paso 1 -->
  <h4 style="color:var(--leche); margin:18px 0 6px;">Paso 1 — Datos generales</h4>
- <figure><img src="img/prod-12-leche-wizard-paso2.jpg" alt="Wizard leche paso 2"><figcaption>Paso 2: Cisterna, letra Q, INFOLAC y alertas de retención.</figcaption></figure>
+ 
  <table class="parametros"><tr><th>Campo</th><th>Ejemplo</th><th>Obligatorio</th></tr>
  <tr><td>Fecha recogida</td><td><span class="campo">15/05/2025</span></td><td>Sí</td></tr>
  <tr><td>Comunidad Autónoma</td><td><span class="campo">Andalucía</span></td><td>Sí</td></tr>
@@ -518,7 +593,7 @@
 
  <!-- Paso 3 -->
  <h4 style="color:var(--leche); margin:18px 0 6px;">Paso 3 — Cadena de frío e inhibidores</h4>
- <figure><img src="img/prod-13-leche-wizard-paso3.jpg" alt="Wizard leche paso 3"><figcaption>Paso 3: Cadena de frío, temperatura y certificación de inhibidores.</figcaption></figure>
+ 
  <table class="parametros"><tr><th>Campo</th><th>Ejemplo</th><th>Umbral legal</th></tr>
  <tr><td>Hora ordeño</td><td><span class="campo">07:30</span></td><td>—</td></tr>
  <tr><td>Hora carga</td><td><span class="campo">10:00</span></td><td>—</td></tr>
@@ -532,7 +607,7 @@
 
  <!-- Paso 4 -->
  <h4 style="color:var(--leche); margin:18px 0 6px;">Paso 4 — Laboratorio (resultados analíticos)</h4>
- <figure><img src="img/prod-14-leche-wizard-paso4.jpg" alt="Wizard leche paso 4"><figcaption>Paso 4: Analítica de laboratorio con extracto seco calculado.</figcaption></figure>
+ 
  <table class="parametros"><tr><th>Campo</th><th>Ejemplo</th><th>Umbral LIGAL (ovino)</th></tr>
  <tr><td>Materia grasa (%)</td><td><span class="campo">6.80</span></td><td>≥ 5.5%</td></tr>
  <tr><td>Proteína (%)</td><td><span class="campo">5.70</span></td><td>≥ 4.5%</td></tr>
@@ -549,7 +624,7 @@
 
  <!-- Paso 5 -->
  <h4 style="color:var(--leche); margin:18px 0 6px;">Paso 5 — Precio y liquidación</h4>
- <figure><img src="img/prod-15-leche-wizard-paso5.jpg" alt="Wizard leche paso 5"><figcaption>Paso 5: Volumen, precio base, extracto seco y primas/penalizaciones.</figcaption></figure>
+ 
  <table class="parametros"><tr><th>Campo</th><th>Ejemplo</th><th>Fórmula</th></tr>
  <tr><td>Volumen recogido (L)</td><td><span class="campo">420</span></td><td>—</td></tr>
  <tr><td>Precio base (€/L)</td><td><span class="campo">0.4500</span></td><td>Según contrato</td></tr>
@@ -564,7 +639,7 @@
 
  <!-- Paso 6 -->
  <h4 style="color:var(--leche); margin:18px 0 6px;">Paso 6 — MOFA y resumen final</h4>
- <figure><img src="img/prod-16-leche-wizard-paso6.jpg" alt="Wizard leche paso 6"><figcaption>Paso 6: MOFA con resumen completo de la salida láctea.</figcaption></figure>
+ 
  <table class="parametros"><tr><th>Campo</th><th>Ejemplo</th><th>Detalle</th></tr>
  <tr><td>Coste alimentación diario (€/día)</td><td><span class="campo">45.00</span></td><td>Coste diario de alimentación del rebaño</td></tr>
  <tr><td>Coste alimentación periodo (€)</td><td><span class="campo">135.00</span></td><td>Coste del periodo entre entregas</td></tr>
@@ -574,7 +649,7 @@
  supera los ingresos. Revisa la ración o el precio de venta."</div>
 
  <h4 style="color:var(--leche); margin:18px 0 6px;">Resumen final del wizard</h4>
- <figure><img src="img/prod-17-leche-resumen.jpg" alt="Resumen final salida láctea"><figcaption>Resumen completo antes de confirmar la salida láctea.</figcaption></figure>
+ 
  <p>Al confirmar, la app guarda todos los datos en <code>comercializacion_leche</code>,
  genera la estructura de albarán, registra en el Libro Maestro de Eventos y abre
  automáticamente el PDF del albarán para compartir o imprimir.</p></section>
@@ -587,7 +662,7 @@
  <p class="intro-mod">La pestaña <strong>Analíticas</strong> del Control Lechero muestra la evolución
  de los parámetros de calidad y los compara con los umbrales de referencia.</p>
 
- <figure><img src="img/prod-18-analiticas.jpg" alt="Panel de analíticas"><figcaption>Panel de analíticas con evolución de grasa, proteína y células somáticas.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Accede desde <span class="ruta">Más → Control Lechero → Analíticas</span>.</li>
  <li>Visualiza los indicadores:
@@ -654,7 +729,7 @@
  <p class="intro-mod">La pestaña <strong>Liquidaciones</strong> del Control Lechero muestra el histórico
  económico de todas las entregas registradas, con su desglose de primas, tasas e importe total.</p>
 
- <figure><img src="img/prod-19-liquidaciones.jpg" alt="Liquidaciones"><figcaption>Histórico de liquidaciones con importes y MOFA por entrega.</figcaption></figure>
+ 
 
  <ol class="pasos"><li>Accede desde <span class="ruta">Más → Control Lechero → Liquidaciones</span>.</li>
  <li>Cada entrega muestra:
