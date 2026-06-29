@@ -205,11 +205,11 @@ const ComercializacionView = {
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card card-animal no-underline" onclick="${r.onclick || ''}" style="border-left:4px solid ${color}; padding:12px; margin-bottom:8px;">
-          <div class="flex justify-between items-start gap-6">
-            <div class="min-w-0 flex-1">
+        <div class="card card-animal no-underline" onclick="${r.onclick || ''}" style="border-left:4px solid ${color}; padding:12px; margin-bottom:8px; width:100%;">
+          <div class="flex justify-between items-start gap-6" style="width:100%;">
+            <div class="min-w-0 flex-1" style="min-width:0;">
               <div class="flex items-center gap-6">
-                <span class="text-sm font-black text-white uppercase tracking-tight">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</span>
+                <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap;">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</span>
               </div>
               <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
                 <span class="flex items-center gap-3">${Icons.calendar()} ${r.date}</span>
@@ -234,7 +234,7 @@ const ComercializacionView = {
             <span class="widget-link-label">${registrarLabel}</span>
           </button>
         </div>
-        <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
+        <div class="text-left mt-6"><span class="text-[0.6rem] text-gray uppercase font-700 tracking-wider leading-normal">Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
       </div>
 
       <div class="card p-14 border-222">
@@ -487,5 +487,6 @@ const ComercializacionView = {
 };
 
 window.ComercializacionView = ComercializacionView;
+
 
 
