@@ -96,14 +96,15 @@ const CompradoresView = {
                 </div>
               </div>
 
-              <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-                <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+              <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+                <div class="section-header-theme">ACCIONES</div>
                 <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                   <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
                     ${Icons.agregar()}
                     <span class="widget-link-label">Nuevo Comprador</span>
                   </button>
                 </div>
+                <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro y gestión de compradores por tipo de producción</span></div>
               </div>
 
               <div class="flex gap-8 mb-14">
@@ -123,14 +124,15 @@ const CompradoresView = {
                 <div class="section-header-neon" style="--neon-color: #10b981; max-width: 520px; margin: 0 auto;">CONTRATOS COMERCIALES</div>
               </div>
 
-              <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-                <div class="section-header-theme" style="--theme-color: #10b981">ACCIONES</div>
+              <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #10b981;">
+                <div class="section-header-theme">ACCIONES</div>
                 <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                   <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContratoLibre()">
                     ${Icons.agregar()}
                     <span class="widget-link-label">Nuevo Contrato</span>
                   </button>
                 </div>
+                <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Creación y gestión de contratos comerciales y acuerdos de compra</span></div>
               </div>
 
               <div class="flex gap-8 mb-14">

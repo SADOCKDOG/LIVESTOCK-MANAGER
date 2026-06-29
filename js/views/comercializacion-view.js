@@ -241,8 +241,8 @@ const ComercializacionView = {
 
     content.innerHTML = `
       <!-- PANEL DE ACCIONES COMERCIALES (ESTILO NEÓN) -->
-      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-        <div class="section-header-theme" style="--theme-color: ${color}">ACCIONES</div>
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: ${color};">
+        <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${color}; --neon-glow: ${color}B0; --neon-inner: ${color}40" onclick="${registrarHandler}">
             ${Icons.agregar()}

@@ -15,14 +15,15 @@ const ProveedoresView = {
 
           <div class="mb-16">
             <div id="prov-kpis"></div>
-            <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-              <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+            <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+              <div class="section-header-theme">ACCIONES</div>
               <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                 <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ProveedoresView.renderFormulario()">
                   ${Icons.agregar()}
                   <span class="widget-link-label">Nuevo Proveedor</span>
                 </button>
               </div>
+              <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Registro y gestión de proveedores de servicios e insumos ganaderos</span></div>
             </div>
             <div class="flex gap-8 mb-14">
               <input type="search" id="search-proveedores" placeholder="Buscar por nombre, NIF o ciudad..."

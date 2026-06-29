@@ -12,14 +12,15 @@ const RebanosView = {
     const totalRebanos = rebanos.length;
     const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-        <div class="section-header-theme" style="--theme-color: var(--p-gold)">ACCIONES</div>
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+        <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="RebanosView._crearRebano()">
             ${Icons.agregar()}
             <span class="widget-link-label">Nuevo Rebaño</span>
           </button>
         </div>
+        <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Creación y gestión de lotes, rebaños y agrupaciones ganaderas</span></div>
       </div>`;
 
     if (rebanos.length === 0)
@@ -178,8 +179,8 @@ const RebanosView = {
       </div>
       
       <!-- Sanidad -->
-      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24">
-        <div class="section-header-theme" style="--theme-color: #10b981">SANIDAD</div>
+      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24" style="--theme-color: #10b981;">
+        <div class="section-header-theme">SANIDAD</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
             ${Icons.agregar()}
