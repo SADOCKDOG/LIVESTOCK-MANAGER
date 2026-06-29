@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - ExplotacionView v1.2.0
  * Vista unificada del Módulo ExPro (Explotación y Producción)
  * Contiene tres modos seleccionables en la parte superior: Carne (Rojo), Leche (Azul), Híbrido (Verde)
@@ -6,7 +6,13 @@
 
 const ExplotacionView = {
   _activeMode: 'leche', // default
+  _activeSubModule: 'explotacion', // default
   _cachedData: null,
+
+  _cambiarSubModulo(subModulo) {
+    this._activeSubModule = subModulo;
+    this.render();
+  },
 
   _fmtFecha(dateStr) {
     if (!dateStr) return '-';
@@ -185,28 +191,58 @@ const ExplotacionView = {
     // Sincronizar color de cabecera con el modo activo
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
-    // Renderizar cabecera con TRES BOTONES ARRIBA
-    const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444');
+    // Conmutador superior de Sub-módulos (Explotación, Gastos, Almacén)
     main.innerHTML = `
-      <!-- Selector de Modo ExPro Superior -->
-      <div class="mb-16 text-center">
-        <div class="section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
-        <div class="expro-mode-switch">
-          <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
-          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
-          <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
-        </div>
+      <div class="comer-mode-switch mb-16" style="max-width: 520px; margin: 0 auto 20px; display: flex; gap: 8px;">
+        <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
+          style="--mode-color:#10b981; flex: 1; padding: 10px;" 
+          onclick="ExplotacionView._cambiarSubModulo('explotacion')">
+          ${Icons.finca()} Explotación
+        </button>
+        <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" 
+          style="--mode-color:#ef4444; flex: 1; padding: 10px;" 
+          onclick="ExplotacionView._cambiarSubModulo('gastos')">
+          ${Icons.dinero()} Gastos
+        </button>
+        <button class="comer-mode-btn ${this._activeSubModule === 'almacen' ? 'active' : ''}" 
+          style="--mode-color:#3b82f6; flex: 1; padding: 10px;" 
+          onclick="ExplotacionView._cambiarSubModulo('almacen')">
+          ${Icons.paquete()} Almacén
+        </button>
       </div>
-      <div id="expro-mode-content"></div>
+      
+      <div id="explotacion-submodule-content"></div>
     `;
 
-    const modeContent = document.getElementById('expro-mode-content');
-    if (this._activeMode === 'leche') {
-      this._renderLeche(modeContent);
-    } else if (this._activeMode === 'hibrido') {
-      this._renderHibrido(modeContent);
-    } else {
-      this._renderCarne(modeContent);
+    const subContainer = document.getElementById('explotacion-submodule-content');
+
+    if (this._activeSubModule === 'explotacion') {
+      const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444');
+      subContainer.innerHTML = `
+        <!-- Selector de Modo ExPro Superior -->
+        <div class="mb-16 text-center">
+          <div class="section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
+          <div class="expro-mode-switch">
+            <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
+            <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
+            <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
+          </div>
+        </div>
+        <div id="expro-mode-content"></div>
+      `;
+
+      const modeContent = document.getElementById('expro-mode-content');
+      if (this._activeMode === 'leche') {
+        this._renderLeche(modeContent);
+      } else if (this._activeMode === 'hibrido') {
+        this._renderHibrido(modeContent);
+      } else {
+        this._renderCarne(modeContent);
+      }
+    } else if (this._activeSubModule === 'gastos') {
+      this._renderGastosView();
+    } else if (this._activeSubModule === 'almacen') {
+      this._renderAlmacenView();
     }
 
     if (window.enableScrollShadows) {
@@ -294,9 +330,6 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <!-- Almacén y Silos -->
-        ${this._renderSilosHtml(d.fincaId, d.siloEventos, 'carne')}
-        ${this._renderCostesCumplimientoHtml('carne')}
         ${this._renderPipelineComercialHtml('carne')}
       </div>
     `;
@@ -416,9 +449,6 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <!-- Almacén y Silos -->
-        ${this._renderSilosHtml(d.fincaId, d.siloEventos, 'leche')}
-        ${this._renderCostesCumplimientoHtml('leche')}
         ${this._renderPipelineComercialHtml('leche')}
       </div>
     `;
@@ -538,9 +568,6 @@ const ExplotacionView = {
           </div>
         </div>
 
-        <!-- Almacén y Silos -->
-        ${this._renderSilosHtml(d.fincaId, d.siloEventos, 'hibrido')}
-        ${this._renderCostesCumplimientoHtml('hibrido')}
         ${this._renderPipelineComercialHtml('hibrido')}
       </div>
     `;
@@ -1030,6 +1057,177 @@ const ExplotacionView = {
     } catch (e) {
       App.toastError(e.message);
     }
+  },
+
+  _renderGastosView() {
+    const d = this._cachedData;
+    const container = document.getElementById('explotacion-submodule-content');
+    if (!container) return;
+
+    const fitoPendientes = (d.gastosFito || []).filter(g => g.control_normativo?.aptoComercializacion === false).length;
+    const fitoConControl = (d.gastosFito || []).filter(g => g.control_normativo?.registroProducto && g.control_normativo?.dosisAplicada).length;
+
+    // Ordenar los gastos por fecha descendente
+    const listaGastos = (d.todosGastos || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    let html = `
+      <div style="--theme-color: #ef4444; --neon-glow: #ef4444B0; --neon-inner: #ef444440">
+        <!-- KPIs GASTOS -->
+        <div class="explotacion-kpis">
+          <div class="explotacion-kpi-card" style="border-left:3px solid #f59e0b;">
+            <div class="explotacion-kpi-label">Alimentación</div>
+            <div class="explotacion-kpi-value">${(d.totalGastosAlim || 0).toLocaleString()} €</div>
+          </div>
+          <div class="explotacion-kpi-card" style="border-left:3px solid #3b82f6;">
+            <div class="explotacion-kpi-label">Energía</div>
+            <div class="explotacion-kpi-value">${(d.totalGastosEnergia || 0).toLocaleString()} €</div>
+          </div>
+          <div class="explotacion-kpi-card" style="border-left:3px solid #10b981;">
+            <div class="explotacion-kpi-label">Fitosanitarios</div>
+            <div class="explotacion-kpi-value">${(d.totalGastosFito || 0).toLocaleString()} €</div>
+          </div>
+        </div>
+
+        <!-- ACCIONES RÁPIDAS DE GASTOS -->
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+          <div class="section-header-theme" style="--theme-color: #ef4444">${Icons.dinero()} NUEVO REGISTRO DE GASTO</div>
+          <div class="grid grid-cols-3 gap-10">
+            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', 'carne')" style="padding: 16px 5px; min-height: 80px;">
+              ${Icons.agregar()}
+              <span class="widget-link-label text-[0.65rem] font-950">ALIMENTACIÓN</span>
+            </button>
+            <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', 'carne')" style="padding: 16px 5px; min-height: 80px;">
+              ${Icons.agregar()}
+              <span class="widget-link-label text-[0.65rem] font-950">ENERGÍA</span>
+            </button>
+            <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', 'carne')" style="padding: 16px 5px; min-height: 80px;">
+              ${Icons.agregar()}
+              <span class="widget-link-label text-[0.65rem] font-950">FITOSANITARIO</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CONTROL NORMATIVO FITOSANITARIOS -->
+        <div class="card p-12 mb-16 border-222" style="border-left:4px solid #10b981;">
+          <div class="text-xs text-white font-black uppercase flex items-center gap-6 mb-8">${Icons.sanidad()} CUMPLIMIENTO REGISTRO FITOSANITARIO</div>
+          <div class="text-[0.65rem] text-aaa uppercase font-900 leading-relaxed">
+            Aplicaciones con control completo: <strong class="text-white">${fitoConControl}</strong><br>
+            Lotes no aptos para comercialización por periodo de supresión: 
+            <strong style="color:${fitoPendientes > 0 ? '#ef4444' : '#10b981'}">${fitoPendientes}</strong>
+          </div>
+        </div>
+
+        <!-- LISTADO / HISTORIAL DE GASTOS -->
+        <div class="card p-16 mb-16 border-222">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
+            ${Icons.documento()} Historial de gastos registrados
+          </div>
+          <div class="grid gap-8 mh-350" style="overflow-y:auto; max-height:400px;">
+            ${listaGastos.length > 0
+              ? listaGastos.map(g => {
+                  const catColor = g.categoria === 'Alimentacion' ? '#f59e0b' : (g.categoria === 'Electricidad' ? '#3b82f6' : '#10b981');
+                  return `
+                    <div class="card card-animal" style="border-left:4px solid ${catColor}; padding:12px; margin:0;">
+                      <div class="flex justify-between items-center">
+                        <div class="text-xs">
+                          <div class="font-bold text-white uppercase">${g.concepto || 'Gasto Ganadero'}</div>
+                          <div class="text-gray-500 mt-4 flex items-center gap-4 font-700">
+                            ${Icons.calendar()} ${this._fmtFecha(g.fecha)} · ${g.categoria ? g.categoria.toUpperCase() : 'VARIOS'}
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-10">
+                          <span class="badge badge-sm font-bold" style="background:${catColor}10; color:${catColor}; border:1px solid ${catColor}30;">${(g.monto || 0).toLocaleString()} €</span>
+                          <button class="btn btn-danger btn-sm" style="padding:4px 8px;" onclick="ExplotacionView._eliminarGasto(${g.id})">${Icons.eliminar()}</button>
+                        </div>
+                      </div>
+                    </div>`;
+                }).join('')
+              : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin gastos registrados</span></div>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML = html;
+  },
+
+  _renderAlmacenView() {
+    const d = this._cachedData;
+    const container = document.getElementById('explotacion-submodule-content');
+    if (!container) return;
+
+    // Historial de movimientos de almacén / silos ordenado por fecha desc
+    const movimientosAlmacen = (d.siloEventos || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    let html = `
+      <div style="--theme-color: #3b82f6; --neon-glow: #3b82f6B0; --neon-inner: #3b82f640">
+        <!-- Niveles de llenado de silos -->
+        ${this._renderSilosHtml(d.fincaId, d.siloEventos, this._activeMode)}
+
+        <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+          <div class="section-header-theme" style="--theme-color: #3b82f6">${Icons.paquete()} GESTIÓN DE STOCK</div>
+          <div class="flex justify-center mt-10">
+            <button class="widget-link-btn widget-link-btn--neon neon-info" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${this._activeMode}')">
+              ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">CARGA / CONSUMO</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- HISTORIAL DE MOVIMIENTOS -->
+        <div class="card p-16 mb-16 border-222">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
+            ${Icons.documento()} Historial de movimientos de silo
+          </div>
+          <div class="grid gap-8 mh-350" style="overflow-y:auto; max-height:400px;">
+            ${movimientosAlmacen.length > 0
+              ? movimientosAlmacen.map(ev => {
+                  const esCompra = ev.rol_contable === 'COMPRA';
+                  const badgeColor = esCompra ? '#10b981' : '#ef4444';
+                  const labelMov = esCompra ? 'CARGA' : 'CONSUMO';
+                  return `
+                    <div class="card card-animal" style="border-left:4px solid ${badgeColor}; padding:12px; margin:0;">
+                      <div class="flex justify-between items-center">
+                        <div class="text-xs">
+                          <div class="font-bold text-white uppercase">${ev.snap_identificacion || 'Silo'}</div>
+                          <div class="text-gray-500 mt-4 flex items-center gap-4 font-700">
+                            ${Icons.calendar()} ${this._fmtFecha(ev.fecha)} · <span style="color:${badgeColor}; font-weight:800;">${labelMov}</span>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-10">
+                          <span class="badge badge-sm font-bold" style="background:${badgeColor}10; color:${badgeColor}; border:1px solid ${badgeColor}30;">
+                            ${esCompra ? '+' : '-'}${ev.valor_neto.toLocaleString()} kg
+                          </span>
+                          <button class="btn btn-danger btn-sm" style="padding:4px 8px;" onclick="ExplotacionView._eliminarMovimientoAlmacen(${ev.id})">${Icons.eliminar()}</button>
+                        </div>
+                      </div>
+                    </div>`;
+                }).join('')
+              : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin movimientos registrados</span></div>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML = html;
+  },
+
+  async _eliminarGasto(id) {
+    if (!confirm("¿Deseas eliminar este registro de gasto definitivamente?")) return;
+    try {
+      await window.db.delete('gastos_ganaderia', Number(id));
+      App.toast("🗑️ Gasto eliminado");
+      this.render();
+    } catch (e) { App.toastError("Error al eliminar gasto: " + e.message); }
+  },
+
+  async _eliminarMovimientoAlmacen(id) {
+    if (!confirm("¿Deseas eliminar este movimiento de silo definitivamente?")) return;
+    try {
+      await window.db.delete('registro_eventos', Number(id));
+      App.toast("🗑️ Movimiento de almacén eliminado");
+      this.render();
+    } catch (e) { App.toastError("Error al eliminar movimiento: " + e.message); }
   }
 };
 
