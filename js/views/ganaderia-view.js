@@ -85,15 +85,15 @@ const GanaderiaView = {
         </div>
         <div class="flex flex-col">
           <div class="py-12 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900">Lotes / Rebaños</span>
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rebanos()} Lotes / Rebaños</span>
             <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} lotes</strong>
           </div>
           <div class="py-12 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900">Animales Activos</span>
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Animales Activos</span>
             <strong class="text-xl font-950 text-green">${animalesActivos.length} cabezas</strong>
           </div>
           <div class="py-12 flex justify-between items-center">
-            <span class="text-xs text-gray uppercase font-900">Zonas / Parcelas</span>
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.zonas()} Zonas / Parcelas</span>
             <strong class="text-xl font-950 text-blue">${zonas.length} parcelas</strong>
           </div>
         </div>
