@@ -74,7 +74,7 @@ const GastosView = {
       </div>
 
       <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444; background: rgba(239, 68, 68, 0.015);">
+      <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid #ef4444; background: rgba(239, 68, 68, 0.015);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
           ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
         </div>
@@ -189,7 +189,7 @@ const GastosView = {
         </div>
         ${kpis ? `
         <!-- KPIs Gastos Unificados en Filas -->
-        <div class="card p-16 mb-12 border-222" style="border-left: 5px solid ${color}; background: rgba(255, 255, 255, 0.02);">
+        <div class="card p-16 mb-12 border-222 card-total-3d" style="border-top: 5px solid ${color}; background: rgba(255, 255, 255, 0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.dinero()} BALANCE DE GASTOS
           </div>
@@ -221,3 +221,4 @@ const GastosView = {
 };
 
 window.GastosView = GastosView;
+
