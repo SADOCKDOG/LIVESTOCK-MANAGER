@@ -16,9 +16,9 @@ const CompradoresView = {
         
         main.innerHTML = `
           <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
-          <div class="card p-14 mb-14 border-222" style="border-top:3px solid #8b5cf6;">
+          <div class="card p-14 mb-14 border-222">
             <div class="text-center mb-10">
-              <div class="section-header-neon" style="--neon-color: #8b5cf6; max-width: 420px; margin: 0 auto;">GESTIÓN COMERCIAL</div>
+              <div class="section-header-neon" style="--neon-color: #8b5cf6; max-width: 420px; margin: 0 auto;">${Icons.compradores()} GESTIÓN COMERCIAL ${Icons.contratos()}</div>
               <div class="comer-mode-switch" style="display: flex; gap: 8px;">
                 <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
                   style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 

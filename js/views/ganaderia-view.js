@@ -45,9 +45,9 @@ const GanaderiaView = {
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
     main.innerHTML = `
-      <div class="card p-14 mb-14 border-222" style="border-top:3px solid #facc15;">
+      <div class="card p-14 mb-14 border-222">
         <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: #facc15; max-width: 360px; margin: 0 auto;">MÓDULOS</div>
+          <div class="section-header-neon" style="--neon-color: #facc15; max-width: 360px; margin: 0 auto;">${Icons.animales()} MÓDULOS ${Icons.zonas()}</div>
           <div class="grid grid-cols-3 gap-10">
             <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
               ${Icons.animales()}

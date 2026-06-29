@@ -70,9 +70,9 @@ const ComercializacionView = {
 
     main.innerHTML = `
       <!-- Selector de Modo Comercial Superior -->
-      <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
+      <div class="card p-14 mb-14 border-222">
         <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMERCIALIZACIÓN</div>
+          <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">${Icons.transportistas()} COMERCIALIZACIÓN ${Icons.dinero()}</div>
           <div class="comer-mode-switch">
             <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
             <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
