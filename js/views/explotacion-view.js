@@ -270,22 +270,22 @@ const ExplotacionView = {
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.tendencia()} BALANCE DE RENDIMIENTO Y EFICIENCIA DE CARNE
           </div>
-          <div class="grid grid-cols-2 gap-15">
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Ganancia Media Diaria (GMD)</div>
-              <div class="font-950 text-white text-base">+${d.gmdMedio.toFixed(2)} kg/d</div>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Ganancia Media Diaria (GMD)</span>
+              <strong class="text-xl text-green font-950">+${d.gmdMedio.toFixed(2)} kg/d</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Coste Ración / Alimentación</div>
-              <div class="font-950 text-red text-base">${d.totalGastosAlim.toLocaleString()} €</div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Coste Ración / Alimentación</span>
+              <strong class="text-xl text-red font-950">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Pesajes Totales</div>
-              <div class="font-950 text-white text-base">${d.pesajes.length} registros</div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Pesajes Totales</span>
+              <strong class="text-xl text-amber font-950">${d.pesajes.length} registros</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Animales Activos en Censo</div>
-              <div class="font-950 text-white text-base">${d.animalesFinca.length} cabezas</div>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900">Animales Activos en Censo</span>
+              <strong class="text-xl text-blue font-950">${d.animalesFinca.length} cabezas</strong>
             </div>
           </div>
         </div>
@@ -360,22 +360,22 @@ const ExplotacionView = {
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.leche()} BALANCE DE RENDIMIENTO Y EFICIENCIA DE LECHE
           </div>
-          <div class="grid grid-cols-2 gap-15">
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Margen Alimentación (MOFA)</div>
-              <div class="font-950 text-base" style="color:${d.mofaLeche >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaLeche).toLocaleString()} €</div>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Margen Alimentación (MOFA)</span>
+              <strong class="text-xl font-950" style="color:${d.mofaLeche >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Total Leche Producida</div>
-              <div class="font-950 text-white text-base">${this._fmt(d.totalLitros)} Litros</div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Total Leche Producida</span>
+              <strong class="text-xl text-blue font-950">${this._fmt(d.totalLitros)} L</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Extracto Seco Medio</div>
-              <div class="font-950 text-white text-base">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Extracto Seco Medio</span>
+              <strong class="text-xl text-gold font-950">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Coste Ración / Alimentación</div>
-              <div class="font-950 text-red text-base">${d.totalGastosAlim.toLocaleString()} €</div>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900">Coste Ración / Alimentación</span>
+              <strong class="text-xl text-red font-950">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
           </div>
         </div>
@@ -488,22 +488,22 @@ const ExplotacionView = {
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.rotacion()} BALANCE DE RENDIMIENTO Y EFICIENCIA HÍBRIDA
           </div>
-          <div class="grid grid-cols-2 gap-15">
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Margen Global (MOFA)</div>
-              <div class="font-950 text-base" style="color:${d.mofaHibrido >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaHibrido).toLocaleString()} €</div>
+          <div class="flex flex-col">
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Margen Global (MOFA)</span>
+              <strong class="text-xl font-950" style="color:${d.mofaHibrido >= 0 ? '#10b981' : '#ef4444'}">${Math.round(d.mofaHibrido).toLocaleString()} €</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Eficiencia (Ratio MOFA)</div>
-              <div class="font-950 text-white text-base">${d.ratioMofaHibrido.toFixed(1)}%</div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Eficiencia (Ratio MOFA)</span>
+              <strong class="text-xl text-green font-950">${d.ratioMofaHibrido.toFixed(1)}%</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Coste Alimentación</div>
-              <div class="font-950 text-red text-base">${d.totalGastosAlim.toLocaleString()} €</div>
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">Coste Alimentación</span>
+              <strong class="text-xl text-red font-950">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
-            <div class="p-10 bg-black-opacity-40 border-222 rounded text-center">
-              <div class="text-[0.62rem] text-gray uppercase font-800 mb-4">Leche / Pesajes Totales</div>
-              <div class="font-950 text-white text-xs" style="margin-top:2px;">${this._fmt(d.totalLitros)} L / ${d.pesajes.length} pesajes</div>
+            <div class="py-12 flex justify-between items-center">
+              <span class="text-xs text-gray uppercase font-900">Leche / Pesajes Totales</span>
+              <strong class="text-xl text-blue font-950">${this._fmt(d.totalLitros)} L / ${d.pesajes.length} pes.</strong>
             </div>
           </div>
         </div>
