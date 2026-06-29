@@ -20,7 +20,7 @@ const RebanosView = {
             <span class="widget-link-label">Nuevo Rebaño</span>
           </button>
         </div>
-        <div class="text-center mt-8"><span class="text-xs text-gray uppercase font-extrabold tracking-wider leading-relaxed">Creación y gestión de lotes, rebaños y agrupaciones ganaderas</span></div>
+        <div class="text-right mt-4"><span class="text-[0.55rem] text-gray uppercase font-700 tracking-wider leading-normal">Creación y gestión de lotes, rebaños y agrupaciones ganaderas</span></div>
       </div>`;
 
     if (rebanos.length === 0)
@@ -446,3 +446,5 @@ const RebanosView = {
 };
 
 window.RebanosView = RebanosView;
+
+
