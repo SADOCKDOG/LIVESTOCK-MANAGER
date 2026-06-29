@@ -266,7 +266,7 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444;">
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #ef4444; width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.tendencia()} RENDIMIENTO Y EFICIENCIA DE CARNE
           </div>
@@ -356,7 +356,7 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #3b82f6;">
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #3b82f6; width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.leche()} RENDIMIENTO Y EFICIENCIA DE LECHE
           </div>
@@ -484,7 +484,7 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #10b981;">
+        <div class="card p-16 mb-16 border-222" style="border-left: 5px solid #10b981; width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
             ${Icons.rotacion()} RENDIMIENTO Y EFICIENCIA HÍBRIDA
           </div>

@@ -137,8 +137,14 @@ const ComercializacionView = {
       'Media/Registro': 'var(--c-info)',
     };
 
+    const headerIcons = { carne: Icons.carne(), leche: Icons.leche(), gastos: Icons.gastos() };
+    const headerLabels = { carne: 'Balance Cárnico', leche: 'Balance Lácteo', gastos: 'Resumen Gastos' };
+
     return `
       <div class="card p-16 mb-16 border-222" style="border-left: 5px solid ${meta.color}; width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+          ${headerIcons[tab] || Icons.info()} ${headerLabels[tab] || 'Resumen'}
+        </div>
         <div class="flex flex-col">
           ${kpis.map(k => `
             <div class="py-10 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
