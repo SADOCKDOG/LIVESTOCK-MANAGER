@@ -281,24 +281,24 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid #ef4444; width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #ef4444; width:100%;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.tendencia()} RENDIMIENTO Y EFICIENCIA DE CARNE
           </div>
           <div class="flex flex-col">
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.balanza()} GMD Media</span>
               <strong class="text-xl font-950 text-green">+${d.gmdMedio.toFixed(2)} kg/d</strong>
             </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Alimentación</span>
               <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Pesajes</span>
               <strong class="text-xl font-950 text-amber">${d.pesajes.length}</strong>
             </div>
-            <div class="py-12 flex justify-between items-center">
+            <div class="py-8 flex justify-between items-center">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Censo Activo</span>
               <strong class="text-xl font-950 text-blue">${d.animalesFinca.length}</strong>
             </div>
@@ -373,24 +373,24 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid #3b82f6; width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #3b82f6; width:100%;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.leche()} RENDIMIENTO Y EFICIENCIA DE LECHE
           </div>
           <div class="flex flex-col">
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
               <strong class="text-xl font-950" style="color:${d.mofaLeche >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
             </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.leche()} Total Leche</span>
               <strong class="text-xl font-950 text-blue">${this._fmt(d.totalLitros)} L</strong>
             </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Extracto Seco</span>
               <strong class="text-xl font-950 text-gold">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D'}</strong>
             </div>
-            <div class="py-12 flex justify-between items-center">
+            <div class="py-8 flex justify-between items-center">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
               <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
@@ -414,7 +414,7 @@ const ExplotacionView = {
         </div>
 
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
-        <div class="card p-14 mb-16 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.grafico()} CALIDAD DE TANQUE</div>
           <div class="scroll-shadow-container overflow-x-auto">
             <table class="premium-table">
@@ -456,7 +456,7 @@ const ExplotacionView = {
         </div>
 
         <!-- Controles Ordeño Recientes -->
-        <div class="card p-14 mb-16 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.leche()} ORDEÑOS Y CONTROLES DIARIOS</div>
           <div class="grid gap-6">
             ${d.ordeños.length > 0
@@ -492,24 +492,24 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid #10b981; width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #10b981; width:100%;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.rotacion()} RENDIMIENTO Y EFICIENCIA HÍBRIDA
           </div>
           <div class="flex flex-col">
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
               <strong class="text-xl font-950" style="color:${d.mofaHibrido >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}">${Math.round(d.mofaHibrido).toLocaleString()} €</strong>
             </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Eficiencia</span>
               <strong class="text-xl font-950 text-green">${d.ratioMofaHibrido.toFixed(1)}%</strong>
             </div>
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
               <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
             </div>
-            <div class="py-12 flex justify-between items-center">
+            <div class="py-8 flex justify-between items-center">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} L / Pesajes</span>
               <strong class="text-xl font-950 text-blue">${this._fmt(d.totalLitros)} L / ${d.pesajes.length}</strong>
             </div>
@@ -641,8 +641,8 @@ const ExplotacionView = {
     }
 
     let html = `
-      <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.paquete()} BALANCE DE STOCK Y LLENADO DE SILOS
         </div>
         <div class="flex flex-col">
@@ -1120,8 +1120,8 @@ const ExplotacionView = {
     let html = `
       <div style="--theme-color: #ef4444; --neon-glow: #ef4444B0; --neon-inner: #ef444440">
         <!-- KPIs GASTOS -->
-        <div class="card p-16 mb-16 border-222 card-total-3d" style="border-top: 5px solid #ef4444; width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-10 flex items-center gap-6">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #ef4444; width:100%;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.dinero()} BALANCE DE COSTES
           </div>
           <div class="flex flex-col">
@@ -1129,13 +1129,13 @@ const ExplotacionView = {
               const total = totalPorCat[c.key.toLowerCase()] || 0;
               if (total === 0) return '';
               return `
-            <div class="py-12 flex justify-between items-center border-bottom-222">
+            <div class="py-8 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${c.icon} ${c.label}</span>
               <strong class="text-xl font-950" style="color:${c.color};">${fmt(total)} €</strong>
             </div>`;
             }).join('')}
             ${otrosTotal > 0 ? `
-            <div class="py-12 flex justify-between items-center">
+            <div class="py-8 flex justify-between items-center">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.info()} Otros</span>
               <strong class="text-xl font-950 text-white">${fmt(otrosTotal)} €</strong>
             </div>` : ''}
@@ -1279,6 +1279,7 @@ const ExplotacionView = {
 };
 
 window.ExplotacionView = ExplotacionView;
+
 
 
 
