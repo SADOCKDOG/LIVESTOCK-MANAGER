@@ -124,29 +124,31 @@ window.VentaMasivaWizard = {
 
           const results = await Promise.all(checkPromises);
 
-          if (bloqueado) {
-              totalBloqueados++;
-              const motivos = [];
-              if (!controlSanitario.apto) motivos.push(`${controlSanitario?.diasRestantes ?? "X"}D`);
-              if (!gateKeep.gateEdad) motivos.push('JOVEN');
-              if (!gateKeep.gateDib) motivos.push('SIN DIB');
-              if (!gateKeep.gateGestacion) motivos.push('GEST.');
-              tablaFilasHtml += `
-              <tr class="tr-blocked border-bottom-222">
-                  <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg opacity-20"></td>
-                  <td class="font-900 p-14 uppercase text-white">${animal.numero_identificacion}</td>
-                  <td class="p-14 text-aaa uppercase font-800">${animal.raza}</td>
-                  <td class="text-red font-950 p-14 uppercase text-[0.6rem] tracking-tight">${motivos.join(' | ')}</td>
-              </tr>`;
-            } else {
-              tablaFilasHtml += `
-              <tr class="tr-active border-bottom-222">
-                  <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg cursor-pointer"></td>
-                  <td class="text-gold font-950 p-14 uppercase">${animal.numero_identificacion}</td>
-                  <td class="p-14 text-white uppercase font-800">${animal.raza}</td>
-                  <td class="text-green font-950 p-14 uppercase text-[0.6rem] tracking-tight">APTO</td>
-              </tr>`;
-            }
+          for (let { animal, rebano, controlSanitario, gateKeep, bloqueado } of results) {
+            if (bloqueado) {
+                totalBloqueados++;
+                const motivos = [];
+                if (!controlSanitario.apto) motivos.push(`${controlSanitario?.diasRestantes ?? "X"}D`);
+                if (!gateKeep.gateEdad) motivos.push('JOVEN');
+                if (!gateKeep.gateDib) motivos.push('SIN DIB');
+                if (!gateKeep.gateGestacion) motivos.push('GEST.');
+                tablaFilasHtml += `
+                <tr class="tr-blocked border-bottom-222">
+                    <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg opacity-20"></td>
+                    <td class="font-900 p-14 uppercase text-white">${animal.numero_identificacion}</td>
+                    <td class="p-14 text-aaa uppercase font-800">${animal.raza}</td>
+                    <td class="text-red font-950 p-14 uppercase text-[0.6rem] tracking-tight">${motivos.join(' | ')}</td>
+                </tr>`;
+              } else {
+                tablaFilasHtml += `
+                <tr class="tr-active border-bottom-222">
+                    <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg cursor-pointer"></td>
+                    <td class="text-gold font-950 p-14 uppercase">${animal.numero_identificacion}</td>
+                    <td class="p-14 text-white uppercase font-800">${animal.raza}</td>
+                    <td class="text-green font-950 p-14 uppercase text-[0.6rem] tracking-tight">APTO</td>
+                </tr>`;
+              }
+          }
 
           return `
               <div class="card card-accent card-accent-green p-16 mt-10">

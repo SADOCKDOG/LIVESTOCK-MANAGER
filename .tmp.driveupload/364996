@@ -1,0 +1,147 @@
+/**
+ * Livestock Manager - Premium & Freemium Manager v1.0.0
+ * Controla el acceso a funciones premium y bloquea la finca demo.
+ */
+
+window.PremiumManager = {
+  // Constantes de límites para usuarios Free
+  LIMITES_FREE: {
+    ZONAS: 1,
+    REBANOS: 1,
+    ANIMALES: 5,
+    PROVEEDORES: 1,
+    COMPRADORES: 1
+  },
+
+  isDemoFinca(finca) {
+    if (!finca) return false;
+    return finca.nombre === 'Ganadería CHAMORRO (DEMO)' || (finca.nombre && finca.nombre.includes('(DEMO)'));
+  },
+
+  isPremium() {
+    // Por defecto false hasta integrar In-App Purchases (RevenueCat / Play Billing)
+    // Para probar, podemos inyectar lm_premium_unlocked en localStorage
+    return localStorage.getItem('lm_premium_unlocked') === 'true';
+  },
+
+  /**
+   * Valida si el usuario puede crear/editar un elemento en la finca actual.
+   * Retorna TRUE si DEBE BLOQUEARSE.
+   * Retorna FALSE si PUEDE CONTINUAR.
+   */
+  async checkLimites(fincaId, tipoElemento) {
+    const finca = await Fincas.getById(fincaId);
+    
+    // 1. MODO ESCAPARATE: Finca Demo es Solo Lectura absoluta (ni crear, ni editar)
+    if (this.isDemoFinca(finca)) {
+      App.toastError("🔒 La Finca de demostración es de solo lectura. Crea tu propia finca para trabajar.");
+      return true; // Bloquea
+    }
+
+    // 2. MODO TRABAJO PREMIUM: Si ha pagado, no hay límites
+    if (this.isPremium()) return false; 
+
+    // 3. MODO TRABAJO FREEMIUM: Validar límites en fincas de usuario
+    if (tipoElemento === 'animales') {
+      const allAnimals = await Animales.list();
+      const rebanosFinca = await Rebanos.list(fincaId);
+      const rebIds = rebanosFinca.map(r => r.id);
+      const animalesFinca = allAnimals.filter(a => rebIds.includes(a.rebanoId));
+      if (animalesFinca.length >= this.LIMITES_FREE.ANIMALES) {
+        this.showPaywall("Has alcanzado el límite de " + this.LIMITES_FREE.ANIMALES + " animales en la versión gratuita.");
+        return true;
+      }
+    } else if (tipoElemento === 'zonas') {
+      const zonas = finca.zonas || [];
+      if (zonas.length >= this.LIMITES_FREE.ZONAS) {
+        this.showPaywall("Has alcanzado el límite de " + this.LIMITES_FREE.ZONAS + " zona en la versión gratuita.");
+        return true;
+      }
+    } else if (tipoElemento === 'rebanos') {
+      const rebanos = await Rebanos.list(fincaId);
+      if (rebanos.length >= this.LIMITES_FREE.REBANOS) {
+        this.showPaywall("Has alcanzado el límite de " + this.LIMITES_FREE.REBANOS + " rebaño en la versión gratuita.");
+        return true;
+      }
+    } else if (tipoElemento === 'proveedores') {
+      const provs = await window.db.getAllFromIndex('proveedores', 'fincaId', fincaId);
+      if (provs.length >= this.LIMITES_FREE.PROVEEDORES) {
+        this.showPaywall("Has alcanzado el límite de " + this.LIMITES_FREE.PROVEEDORES + " proveedor en la versión gratuita.");
+        return true;
+      }
+    } else if (tipoElemento === 'compradores') {
+      const comps = await window.db.getAllFromIndex('compradores', 'fincaId', fincaId);
+      if (comps.length >= this.LIMITES_FREE.COMPRADORES) {
+        this.showPaywall("Has alcanzado el límite de " + this.LIMITES_FREE.COMPRADORES + " comprador en la versión gratuita.");
+        return true;
+      }
+    }
+
+    return false; // No bloquea
+  },
+
+  /**
+   * Bloquea el acceso a pantallas enteras o funciones (Exportación, Informes, etc)
+   */
+  checkPremiumFeature(featureName) {
+    if (this.isPremium()) return false;
+    this.showPaywall(`La función de ${featureName} es exclusiva de la versión Premium.`);
+    return true; // Bloquea
+  },
+
+  /**
+   * Bloqueo global de escritura para la Finca Demo
+   */
+  async checkEsSoloLectura(fincaId) {
+    const finca = await Fincas.getById(fincaId);
+    if (this.isDemoFinca(finca)) {
+      App.toastError("🔒 Finca Demo de solo lectura. No puedes modificar sus datos.");
+      return true; // Bloquea
+    }
+    return false; // No bloquea
+  },
+
+  /**
+   * Muestra el muro de pago (Paywall modal)
+   */
+  showPaywall(mensaje) {
+    if (document.getElementById('premium-paywall')) return; // Ya está abierto
+
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-overlay';
+    overlay.id = 'premium-paywall';
+    overlay.style.zIndex = "9999";
+    overlay.innerHTML = \`
+      <div class="wizard-card modal-scroll" style="text-align:center; padding: 30px; border: 2px solid #fbbf24;">
+        <div style="font-size: 3.5rem; margin-bottom: 10px; animation: bounce 2s infinite;">👑</div>
+        <h2 style="color: #fbbf24; margin-bottom: 15px; font-weight: 900; letter-spacing: -0.5px;">Livestock Manager Premium</h2>
+        <p style="color: #eee; margin-bottom: 25px; line-height: 1.6; font-size: 1.05rem;">\${mensaje}</p>
+        
+        <div style="background: rgba(251, 191, 36, 0.1); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 25px;">
+          <h4 style="color: #fbbf24; margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase;">Beneficios del Pago Único:</h4>
+          <ul style="color:#ddd; margin-left: 0; padding-left: 0; list-style: none; font-size: 0.95rem; display: flex; flex-direction: column; gap: 10px;">
+            <li class="flex items-center gap-8"><span style="color:#10b981;">✔</span> Animales y registros ilimitados</li>
+            <li class="flex items-center gap-8"><span style="color:#10b981;">✔</span> Informes y Analíticas Avanzadas</li>
+            <li class="flex items-center gap-8"><span style="color:#10b981;">✔</span> Comercialización y Control de Silos</li>
+            <li class="flex items-center gap-8"><span style="color:#10b981;">✔</span> Importación/Exportación de Excel y Backups</li>
+            <li class="flex items-center gap-8"><span style="color:#10b981;">✔</span> Cuaderno Digital de Explotación en PDF</li>
+            <li class="flex items-center gap-8" style="margin-top: 5px; color: #fbbf24; font-weight: bold;">⭐ PAGO ÚNICO PARA TODA LA VIDA. SIN SUSCRIPCIONES.</li>
+          </ul>
+        </div>
+
+        <button class="btn btn-success" style="width: 100%; margin-bottom:12px; padding: 15px; font-size: 1.1rem; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #000; font-weight: 900; border: none;" onclick="PremiumManager.purchase()">
+          DESBLOQUEAR PREMIUM AHORA
+        </button>
+        <button class="btn btn-ghost" style="width: 100%; color: #888;" onclick="this.closest('.wizard-overlay').remove()">
+          Continuar con las limitaciones gratuitas
+        </button>
+      </div>
+    \`;
+    document.body.appendChild(overlay);
+  },
+
+  purchase() {
+    // Aquí implementaremos las llamadas a la API nativa de Billing de Android (Capacitor Purchases)
+    App.toastError("⌛ Conectando con Google Play Billing...");
+  }
+};

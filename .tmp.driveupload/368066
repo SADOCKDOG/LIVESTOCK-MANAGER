@@ -1,0 +1,38 @@
+{
+  "name": "livestock-manager-premium",
+  "version": "4.5.0",
+  "private": true,
+  "description": "Sistema profesional de gestión ganadera con comercialización masiva, trazabilidad industrial, Informes Premium y Gestión por Especies v4.0.0.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SADOCKDOG/LIVESTOCK-MANAGER.git"
+  },
+  "scripts": {
+    "build": "powershell -NoProfile -Command \"if (-not (Test-Path www)) { New-Item -ItemType Directory -Path www | Out-Null }; Copy-Item -Path index.html, manifest.webmanifest, sw.js -Destination www -Force; foreach ($d in 'css','js','icons') { Copy-Item -Path $d -Destination www -Recurse -Force } \"",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npx cap open android"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^5.7.8",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^5.7.8",
+    "@capacitor/core": "^5.7.8"
+  },
+  "dependencies": {
+    "@capacitor-community/barcode-scanner": "^4.0.1",
+    "@capacitor/app": "^5.0.7",
+    "@capacitor/filesystem": "^5.2.2",
+    "@capacitor/share": "^5.0.8",
+    "@capawesome/capacitor-file-picker": "^5.3.0",
+    "@earendil-works/pi-agent-core": "^0.78.0",
+    "@earendil-works/pi-ai": "^0.78.0",
+    "chrome-remote-interface": "^0.34.0",
+    "puppeteer": "^25.1.0"
+  },
+  "overrides": {
+    "minimatch": "3.1.4",
+    "uuid": "11.1.1",
+    "protobufjs": "7.6.3"
+  }
+}
