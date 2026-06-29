@@ -220,12 +220,18 @@ const ExplotacionView = {
       const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444');
       subContainer.innerHTML = `
         <!-- Selector de Modo ExPro Superior -->
-        <div class="mb-16 text-center">
-          <div class="section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
-          <div class="expro-mode-switch">
-            <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
-            <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
-            <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
+        <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${_headerColor};">
+          <div class="text-center mb-10">
+            <div class="section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
+            <div class="expro-mode-switch">
+              <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
+              <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
+              <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
+            </div>
+          </div>
+          <div class="pt-8 border-top-222">
+            <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${_headerColor === '#ef4444' ? Icons.carne() : _headerColor === '#3b82f6' ? Icons.leche() : Icons.rotacion()} Contexto: ${_headerColor === '#ef4444' ? 'Cárnico' : _headerColor === '#3b82f6' ? 'Lácteo' : 'Híbrido'}</div>
+            <div class="text-xs text-aaa mt-4 leading-relaxed">Panel de control por modo con KPIS, registros de producción, acciones rápidas y acceso a comercialización.</div>
           </div>
         </div>
         <div id="expro-mode-content"></div>
