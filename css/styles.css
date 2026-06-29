@@ -3107,7 +3107,7 @@ body[data-tema="red"]    { --p-gold: #ef4444; --p-gold-dark: #b91c1c; --p-cork: 
 /* === Ocultar contextos por preferencia === */
 body.hide-context .text-center.mt-8,
 body.hide-context .text-left.mt-6,
-body.hide-context .text-right.mt-4,
+body.hide-context .text-right,
 body.hide-context .pt-8.border-top-222 { display: none !important; }
 body.hide-context .card-dark-gradient.compact { padding-bottom: 12px !important; }
 body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
