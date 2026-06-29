@@ -61,6 +61,7 @@ const GanaderiaView = {
             <span class="widget-link-label">Zonas</span>
           </a>
         </div>
+        <div class="text-[0.55rem] text-gray-600 uppercase font-800 tracking-wider mt-8 text-center leading-tight">Gestión de censo, identificación, lotes y parcelas de la explotación</div>
       </div>
 
       <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
