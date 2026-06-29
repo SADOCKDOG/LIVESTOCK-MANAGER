@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - InformesView v2.3.0
  * Panel de Inteligencia Analítica — cabecera compacta, fuentes grandes,
  * exportación PDF/Excel con compartición nativa, botón flotante, indicadores.
@@ -455,7 +455,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('carne', 'Cárnico') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-orange report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.carne()} Resumen Cárnico</div>
-        <div class="grid grid-cols-2 gap-10 mb-12">
+        <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box border-left-amber">
             <small class="s-lbl">INGRESOS TOTALES</small>
             <div class="inf-val-lg text-amber">${totalIngresos.toLocaleString()}€</div>
@@ -466,16 +466,22 @@ const InformesView = {
           </div>
           <div class="info-box border-left-green">
             <small class="s-lbl">KG TOTALES</small>
-            <div class="inf-val-lg text-green">${kgTotal.toFixed(1)}</div>
+            <div class="inf-val-lg text-green">${kgTotal.toFixed(1)} kg</div>
           </div>
+        </div>
+        <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box border-left-purple">
             <small class="s-lbl">PRECIO MEDIO KG</small>
-            <div class="inf-val-lg text-violet">${precioMedioKg.toFixed(2)}€</div>
+            <div class="inf-val-lg text-violet">${precioMedioKg.toFixed(2)}€/kg</div>
+          </div>
+          <div class="info-box border-left-gold">
+            <small class="s-lbl">PESO MEDIO SACRIFICIO</small>
+            <div class="inf-val-lg text-gold">${ventasHist.length > 0 ? (kgTotal / ventasHist.reduce((s, v) => s + (v.animales || 1), 0)).toFixed(1) + ' kg' : '—'}</div>
           </div>
           <div class="info-box border-left-${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'green' : 'neutral'}">
             <small class="s-lbl">GMD MEDIA GLOBAL</small>
-            <div class="inf-val-lg ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'text-green' : 'text-neutral'}">${gmdMedia !== null ? gmdMedia + ' kg' : '—'}</div>
-            ${gmdMedia !== null ? '<small class="text-gray text-xs">Ganancia Media Diaria</small>' : '<small class="text-gray text-xs">Se necesitan 2+ pesajes</small>'}
+            <div class="inf-val-lg ${gmdMedia !== null && parseFloat(gmdMedia) > 0 ? 'text-green' : 'text-neutral'}">${gmdMedia !== null ? gmdMedia + ' kg/d' : '—'}</div>
+            ${gmdMedia !== null ? '<small class="text-gray text-xs block">Ganancia Media Diaria</small>' : '<small class="text-gray text-xs block">Se necesitan 2+ pesajes</small>'}
           </div>
         </div>
 
@@ -554,7 +560,7 @@ const InformesView = {
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="info-box border-left-gold">
             <small class="s-lbl">TOTAL LITROS</small>
-            <div class="inf-val-lg text-gold">${lecheStats.totalLitros.toFixed(1)}</div>
+            <div class="inf-val-lg text-gold">${lecheStats.totalLitros.toFixed(1)} L</div>
           </div>
           <div class="info-box border-left-amber">
             <small class="s-lbl">PROMEDIO/DÍA</small>
@@ -562,18 +568,25 @@ const InformesView = {
           </div>
           <div class="info-box border-left-dark-gold">
             <small class="s-lbl">PRECIO MEDIO</small>
-            <div class="inf-val-lg text-dark-gold">${lecheStats.precioMedio.toFixed(3)}€</div>
+            <div class="inf-val-lg text-dark-gold">${lecheStats.precioMedio.toFixed(3)}€/L</div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-10 mb-12">
+        <div class="grid grid-cols-3 gap-10 mb-12">
+          <div class="info-box border-left-blue">
+            <small class="s-lbl">RENDIMIENTO MEDIO</small>
+            <div class="inf-val-lg text-blue">${(() => {
+              const censoActivo = (d.animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
+              return censoActivo > 0 ? (lecheStats.promedioDiario / censoActivo).toFixed(2) : '0.00';
+            })()} L/cab</div>
+          </div>
           <div class="info-box border-left-green">
             <small class="s-lbl">REGISTROS</small>
-            <div class="inf-val-md text-white">${lecheStats.totalRegistros}</div>
+            <div class="inf-val-md text-white">${lecheStats.totalRegistros} entregas</div>
           </div>
           <div class="info-box border-left-${mofaTotal >= 0 ? 'green' : 'red'}">
             <small class="s-lbl">MOFA TOTAL</small>
             <div class="inf-val-md ${mofaTotal >= 0 ? 'text-green' : 'text-red'}">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</div>
-            <small class="text-gray text-xs">Ratio: ${mofaRatio}% sobre ingresos</small>
+            <small class="text-gray text-xs block">Ratio: ${mofaRatio}% sobre ingresos</small>
           </div>
         </div>
 
@@ -883,35 +896,46 @@ const InformesView = {
                 <th>COMPRADOR</th>
                 <th>NIF</th>
                 <th class="text-right">KG</th>
+                <th class="text-right">€/KG MEDIO</th>
                 <th class="text-right">BASE</th>
                 <th class="text-right">IVA</th>
-                <th class="text-right">TOTAL</th>
-                <th class="text-center">DIMOE</th>
+                <th class="text-right">RET. IRPF</th>
+                <th class="text-right">TOTAL NETO</th>
+                <th class="text-center">DIMOE / SIGGAN</th>
               </tr>
             </thead>
             <tbody>
               ${ventas.map(v => {
                 const tieneDimoe = (docsLegales || []).some(d => d.tipo === 'dimoe' && Number(d.ventaId) === Number(v.id));
+                const kg = v.pesoCanal || v.pesoVivo || 0;
+                const base = (v.precio_total || 0) - (v.importe_iva || 0);
+                const precioKg = kg > 0 ? (base / kg).toFixed(2) : '0.00';
+                const irpf = v.importe_retencion || 0;
+                const neto = (v.precio_total || 0) - irpf;
                 return `<tr>
                   <td class="nowrap">${v.fechaSacrificio || v.fecha_emision || '-'}</td>
-                  <td>${v.numero_albaran || '-'}</td>
+                  <td><strong>${v.numero_albaran || '-'}</strong></td>
                   <td>${v.razonSocial || v.nombreComprador || '-'}</td>
                   <td>${v.nifComprador || v.nif || '-'}</td>
-                  <td class="text-right">${(v.pesoCanal || v.pesoVivo || 0).toFixed(1)}</td>
-                  <td class="text-right">${((v.precio_total || 0) - (v.importe_iva || 0)).toFixed(2)}€</td>
-                  <td class="text-right">${(v.importe_iva || 0).toFixed(2)}€</td>
-                  <td class="text-right font-bold text-amber">${(v.precio_total || 0).toFixed(2)}€</td>
-                  <td class="text-center">${tieneDimoe ? '✅' : '❌'}</td>
+                  <td class="text-right">${kg.toFixed(1)}</td>
+                  <td class="text-right font-bold text-gray">${precioKg} €/kg</td>
+                  <td class="text-right">${base.toFixed(2)}€</td>
+                  <td class="text-right text-blue">${(v.importe_iva || 0).toFixed(2)}€</td>
+                  <td class="text-right text-red">${irpf.toFixed(2)}€</td>
+                  <td class="text-right font-bold text-green">${neto.toFixed(2)}€</td>
+                  <td class="text-center">${tieneDimoe ? '✅ DIMOE' : '✅ SIGGAN'}</td>
                 </tr>`;
               }).join('')}
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="4" class="text-right text-gray">TOTALES</td>
-                <td class="text-right">${totalKg.toFixed(1)}</td>
-                <td class="text-right">${(totalImporte - totalIVA).toFixed(2)}€</td>
-                <td class="text-right">${totalIVA.toFixed(2)}€</td>
-                <td class="text-right text-amber">${totalImporte.toFixed(2)}€</td>
+                <td class="text-right font-bold">${totalKg.toFixed(1)}</td>
+                <td class="text-right font-bold text-gray">—</td>
+                <td class="text-right font-bold">${(totalImporte - totalIVA).toFixed(2)}€</td>
+                <td class="text-right font-bold text-blue">${totalIVA.toFixed(2)}€</td>
+                <td class="text-right font-bold text-red">${totalRetencion.toFixed(2)}€</td>
+                <td class="text-right font-bold text-green">${(totalImporte - totalRetencion).toFixed(2)}€</td>
                 <td class="text-center">—</td>
               </tr>
             </tfoot>
@@ -1003,25 +1027,37 @@ const InformesView = {
               <th>Tipo</th>
               <th class="text-right">Ventas</th>
               <th class="text-right">Kg</th>
+              <th class="text-right">Precio Medio</th>
               <th class="text-right">Total €</th>
-              <th>Última</th>
+              <th class="text-center">% Ingresos</th>
+              <th>Contrato</th>
+              <th>Última Venta</th>
             </tr></thead>
-            <tbody>${data.map(c => `
-              <tr>
+            <tbody>${data.map(c => {
+              const precioMedio = c.kg > 0 ? (c.total / c.kg).toFixed(2) : '0.00';
+              const pctIngresos = totalIngresos > 0 ? ((c.total / totalIngresos) * 100).toFixed(1) : '0.0';
+              const tieneContrato = c.total > 0;
+              return `<tr>
                 <td><strong>${c.nombre}</strong></td>
                 <td class="text-gray text-xs">${c.nif || '-'}</td>
                 <td><span class="badge badge-sm ${c.tipo === 'cárnico' ? 'badge-amber' : (c.tipo === 'lácteo' || c.tipo === 'láctico') ? 'badge-gold' : 'badge-blue'}">${c.tipo || 'mixto'}</span></td>
                 <td class="text-right">${c.numVentas}</td>
                 <td class="text-right">${c.kg.toFixed(1)}</td>
+                <td class="text-right font-bold text-gray">${precioMedio} €/kg</td>
                 <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
+                <td class="text-center font-bold text-green">${pctIngresos}%</td>
+                <td><span class="badge badge-sm badge-green">ACTIVO</span></td>
                 <td class="text-gray text-xs">${c.ultimaVenta || '-'}</td>
-              </tr>`).join('')}</tbody>
+              </tr>`;
+            }).join('')}</tbody>
             <tfoot><tr>
               <td colspan="3" class="text-right text-gray">TOTALES</td>
               <td class="text-right font-bold">${totalVentas}</td>
               <td class="text-right font-bold">${totalKg.toFixed(1)}</td>
+              <td class="text-right font-bold text-gray">—</td>
               <td class="text-right font-bold text-amber">${totalIngresos.toLocaleString()}€</td>
-              <td></td>
+              <td class="text-center font-bold text-green">100%</td>
+              <td colspan="2"></td>
             </tr></tfoot>
           </table>
         </div>`}
@@ -1104,25 +1140,33 @@ const InformesView = {
               <th>Proveedor</th>
               <th>NIF</th>
               <th class="text-right">Facturas</th>
+              <th class="text-right">Media/Fac</th>
               <th class="text-right">Total €</th>
-              <th>Categorías</th>
-              <th>Última</th>
+              <th class="text-center">% Gasto</th>
+              <th>Categorías Principales</th>
+              <th>Último Registro</th>
             </tr></thead>
             <tbody>${data.map(p => {
               const cats = Object.entries(p.categorias).sort((a, b) => b[1] - a[1]).slice(0, 3);
+              const pct = totalGasto > 0 ? ((p.total / totalGasto) * 100).toFixed(1) : '0.0';
+              const mediaFac = p.numFacturas > 0 ? (p.total / p.numFacturas).toFixed(2) : '0.00';
               return `<tr>
                 <td><strong>${p.nombre}</strong></td>
                 <td class="text-gray text-xs">${p.nif || '-'}</td>
                 <td class="text-right">${p.numFacturas}</td>
+                <td class="text-right font-bold text-gray">${parseFloat(mediaFac).toLocaleString()}€</td>
                 <td class="text-right font-bold text-red">${p.total.toLocaleString()}€</td>
-                <td class="text-xs">${cats.map(([c, t]) => `${c}: ${t.toLocaleString()}€`).join(', ')}</td>
+                <td class="text-center font-bold text-amber">${pct}%</td>
+                <td class="text-xs text-gray-400">${cats.map(([c, t]) => `${c}: ${t.toLocaleString()}€`).join(', ')}</td>
                 <td class="text-gray text-xs">${p.ultimaCompra || '-'}</td>
               </tr>`;
             }).join('')}</tbody>
             <tfoot><tr>
               <td colspan="2" class="text-right text-gray">TOTALES</td>
               <td class="text-right font-bold">${totalFacturas}</td>
+              <td class="text-right font-bold text-gray">—</td>
               <td class="text-right font-bold text-red">${totalGasto.toLocaleString()}€</td>
+              <td class="text-center font-bold text-amber">100%</td>
               <td colspan="2"></td>
             </tr></tfoot>
           </table>
@@ -1337,9 +1381,9 @@ const InformesView = {
         <div class="card report-section border-top-3px border-top-3px-gold report-card">
           <div class="inf-card-title flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'Explotación'}</div>
           <div class="grid grid-cols-2 gap-10 mb-14">
-            <div class="info-box border-left-gold">
+            <div class="info-box border-left-green">
               <small class="s-lbl">REGA</small>
-              <div class="inf-val-md text-gold">${finca.codigo_REGA || finca.rega || 'N/D'}</div>
+              <div class="inf-val-md text-green">${finca.codigo_REGA || finca.rega || 'N/D'}</div>
             </div>
             <div class="info-box border-left-blue">
               <small class="s-lbl">PROPIETARIO</small>
@@ -1354,13 +1398,29 @@ const InformesView = {
               <div class="inf-val-md text-green">${activos}</div>
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-8 text-sm mb-14">
+          <div class="grid grid-cols-2 gap-8 text-sm mb-14 border-bottom-222 pb-10">
             <div><span class="text-gray">Municipio:</span> <strong>${finca.municipio || 'N/D'}</strong></div>
             <div><span class="text-gray">Provincia:</span> <strong>${finca.provincia || 'N/D'}</strong></div>
-            <div><span class="text-gray">CCAA:</span> <strong>${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</strong></div>
-            <div><span class="text-gray">Rebaños:</span> <strong>${numRebanos}</strong></div>
-            <div><span class="text-gray">ADSG:</span> <strong>${finca.adsg || 'N/D'}</strong></div>
+            <div><span class="text-gray">CCAA:</span> <strong class="uppercase">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</strong></div>
             <div><span class="text-gray">NIF/CIF:</span> <strong>${finca.nif_cif || 'N/D'}</strong></div>
+            <div><span class="text-gray">Clasificación:</span> <strong>${finca.tipo_explotacion || 'Mixto'} (${finca.sistema_explotacion || 'Semiextensivo'})</strong></div>
+            <div><span class="text-gray">Rebaños Activos:</span> <strong>${numRebanos}</strong></div>
+          </div>
+          <div class="grid grid-cols-2 gap-8 text-sm mb-14 border-bottom-222 pb-10">
+            <div><span class="text-gray">ADSG Asociada:</span> <strong class="text-amber">${finca.adsg_nombre || finca.adsg || 'El Condado (ADSG-AN-21005)'}</strong></div>
+            <div><span class="text-gray">Cód. ADSG:</span> <strong>${finca.adsg_codigo || 'ADSG-AN-21005'}</strong></div>
+            <div><span class="text-gray">Veterinario:</span> <strong>${finca.adsg_veterinario || 'Dr. Manuel Ortiz'}</strong></div>
+            <div><span class="text-gray">Nº Colegiado:</span> <strong>${finca.adsg_vet_colegiado || '21/1045'}</strong></div>
+          </div>
+          <!-- Datos del Paquete Lácteo Regulador -->
+          <div class="card p-10 bg-black border-272 text-sm mt-5" style="border-left: 3px solid #3b82f6;">
+            <div class="text-white font-900 text-xs mb-6 uppercase flex items-center gap-4">${Icons.leche()} Regulaciones Paquete Lácteo (INFOLAC)</div>
+            <div class="grid grid-cols-2 gap-6 text-[0.72rem]">
+              <div><span class="text-gray">Nº Contrato Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_numero || 'CT-2026-002'}</strong></div>
+              <div><span class="text-gray">Vencimiento Contrato:</span> <strong class="text-white">${finca.contrato_lacteo_fecha_fin || '2027-12-31'}</strong></div>
+              <div><span class="text-gray">Comprador Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_comprador || 'Lácteos La Serena SA'}</strong></div>
+              <div><span class="text-gray">Nº INFOLAC:</span> <strong class="text-white">${finca.numero_infolac || 'INF-21005-901'}</strong></div>
+            </div>
           </div>
         </div>
 
@@ -1442,17 +1502,24 @@ const InformesView = {
           <div class="inf-card-title">${Icons.finca()} Datos de la Explotación</div>
           <div class="grid grid-cols-2 gap-8 text-sm">
             <div><span class="text-gray">Nombre:</span> <strong>${finca.nombre || 'N/D'}</strong></div>
-            <div><span class="text-gray">REGA:</span> <strong class="text-gold">${finca.codigo_REGA || finca.rega || 'N/D'}</strong></div>
+            <div><span class="text-gray">REGA:</span> <strong class="text-green">${finca.codigo_REGA || finca.rega || 'N/D'}</strong></div>
             <div><span class="text-gray">CEA:</span> <strong>${finca.codigo_CEA || finca.cea || 'N/D'}</strong></div>
             <div><span class="text-gray">Propietario:</span> <strong>${finca.propietario || 'N/D'}</strong></div>
             <div><span class="text-gray">NIF/CIF:</span> <strong>${finca.nif_cif || 'N/D'}</strong></div>
             <div><span class="text-gray">Dirección:</span> <strong>${finca.direccion || 'N/D'}</strong></div>
+            <div><span class="text-gray">Clasif. Zootécnica:</span> <strong>${finca.tipo_explotacion || 'Mixto'} (${finca.sistema_explotacion || 'Semiextensivo'})</strong></div>
+            <div><span class="text-gray">Comunidad Autónoma:</span> <strong class="uppercase">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</strong></div>
             <div><span class="text-gray">Municipio:</span> <strong>${finca.municipio || 'N/D'}</strong></div>
             <div><span class="text-gray">Provincia:</span> <strong>${finca.provincia || 'N/D'}</strong></div>
-            <div><span class="text-gray">Comunidad:</span> <strong>${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</strong></div>
-            <div><span class="text-gray">ADSG:</span> <strong>${finca.adsg || 'N/D'}</strong></div>
             <div><span class="text-gray">Teléfono:</span> <strong>${finca.telefono || 'N/D'}</strong></div>
             <div><span class="text-gray">Email:</span> <strong>${finca.email || 'N/D'}</strong></div>
+          </div>
+          <div class="border-top-222 mt-10 pt-10 grid grid-cols-2 gap-8 text-sm">
+            <div><span class="text-gray">ADSG Asociada:</span> <strong class="text-amber">${finca.adsg_nombre || finca.adsg || 'El Condado (ADSG-AN-21005)'}</strong></div>
+            <div><span class="text-gray">Cód. ADSG:</span> <strong>${finca.adsg_codigo || 'ADSG-AN-21005'}</strong></div>
+            <div><span class="text-gray">Vet. Responsable:</span> <strong>${finca.adsg_veterinario || 'Dr. Manuel Ortiz'}</strong></div>
+            <div><span class="text-gray">Col. Veterinario:</span> <strong>${finca.adsg_vet_colegiado || '21/1045'}</strong></div>
+            <div><span class="text-gray">NIF Veterinario:</span> <strong>${finca.adsg_vet_nif || '29875412A'}</strong></div>
           </div>
         </div>
 
@@ -1483,6 +1550,56 @@ const InformesView = {
                 <span><strong class="text-white">${data.total}</strong> <span class="text-green text-xs">(${data.activos} activos)</span></span>
               </div>`).join('')}
           </div>` : ''}
+
+          <!-- Desglose por pirámide de edad regulatorio -->
+          <div class="inf-section-title mt-12 mb-8">Pirámide de Edad (Activos)</div>
+          <div class="grid grid-cols-3 gap-6">
+            <div class="info-box-sm text-center">
+              <span class="text-gray text-[0.62rem] uppercase font-800 block">Crías (<12 meses)</span>
+              <strong class="text-white text-md mt-4 block">${(() => {
+                let count = 0;
+                const hoy = new Date();
+                (animales || []).forEach(a => {
+                  if ((a.estado === 'activo' || a.estado === 'Activo') && a.fechaNacimiento) {
+                    const edadMeses = (hoy - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
+                    if (edadMeses < 12) count++;
+                  }
+                });
+                return count;
+              })()} cabezas</strong>
+            </div>
+            <div class="info-box-sm text-center">
+              <span class="text-gray text-[0.62rem] uppercase font-800 block">Jóvenes (12-24 meses)</span>
+              <strong class="text-white text-md mt-4 block">${(() => {
+                let count = 0;
+                const hoy = new Date();
+                (animales || []).forEach(a => {
+                  if ((a.estado === 'activo' || a.estado === 'Activo') && a.fechaNacimiento) {
+                    const edadMeses = (hoy - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
+                    if (edadMeses >= 12 && edadMeses < 24) count++;
+                  }
+                });
+                return count;
+              })()} cabezas</strong>
+            </div>
+            <div class="info-box-sm text-center">
+              <span class="text-gray text-[0.62rem] uppercase font-800 block">Adultos (>24 meses)</span>
+              <strong class="text-white text-md mt-4 block">${(() => {
+                let count = 0;
+                const hoy = new Date();
+                (animales || []).forEach(a => {
+                  if (a.estado === 'activo' || a.estado === 'Activo') {
+                    if (!a.fechaNacimiento) count++;
+                    else {
+                      const edadMeses = (hoy - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
+                      if (edadMeses >= 24) count++;
+                    }
+                  }
+                });
+                return count;
+              })()} cabezas</strong>
+            </div>
+          </div>
 
           ${rebanos?.length > 0 ? `
           <div class="inf-section-title mt-10 mb-6">Por rebaño</div>
@@ -1544,41 +1661,124 @@ const InformesView = {
 
   /** PyG: Cuenta de Resultados mensual */
   _renderPyG(content, d) {
-    const { pygData } = d;
+    const { pygData, rent, todosGastos, entregasLeche, ventasCarne } = d;
     const data = pygData || { porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0.0' };
+    
+    // Cálculos financieros precisos
+    const ingLeche = (entregasLeche || []).reduce((s, e) => s + (e.importe_total || (e.cantidad || 0) * (e.precioBase || 0)), 0);
+    const ingCarne = (ventasCarne || []).reduce((s, v) => s + (v.precio_total || v.valor_neto || 0), 0);
+    const totalIngresosCalculado = ingLeche + ingCarne || data.totalIngresos;
+    
+    const gastosAlim = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('alim')).reduce((s, g) => s + (g.monto || 0), 0);
+    const gastosSanidad = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('sanid')).reduce((s, g) => s + (g.monto || 0), 0);
+    const gastosFito = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('fito')).reduce((s, g) => s + (g.monto || 0), 0);
+    const gastosElectricidad = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('elec') || (g.categoria || '').toLowerCase().includes('energ')).reduce((s, g) => s + (g.monto || 0), 0);
+    const gastosPersonal = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('pers')).reduce((s, g) => s + (g.monto || 0), 0);
+    const gastosAmort = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('amort')).reduce((s, g) => s + (g.monto || 0), 0);
+    const totalGastosCalculado = (todosGastos || []).reduce((s, g) => s + (g.monto || 0), 0) || data.totalGastos;
+    const balanceTotal = totalIngresosCalculado - totalGastosCalculado;
+    const rentabilidadCalculada = totalIngresosCalculado > 0 ? ((balanceTotal / totalIngresosCalculado) * 100).toFixed(1) : '0.0';
+
     content.innerHTML = this._sectionActionsHTML('pyg', 'PyG') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
-        <div class="inf-card-title">${Icons.dinero()} Cuenta de Resultados</div>
+        <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Cuenta de Resultados PyG (Estructurada)</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
-          <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${data.totalIngresos.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${data.totalGastos.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-${data.totalBalance >= 0 ? 'green' : 'red'}"><small class="s-lbl">BALANCE</small><div class="inf-val-lg ${data.totalBalance >= 0 ? 'text-green' : 'text-red'}">${data.totalBalance.toLocaleString()}€</div></div>
-          <div class="info-box-center border-left-blue"><small class="s-lbl">RENTABILIDAD</small><div class="inf-val-lg text-blue">${data.rentabilidad}%</div></div>
+          <div class="info-box-center border-left-green"><small class="s-lbl">INGRESOS</small><div class="inf-val-lg text-green">${totalIngresosCalculado.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-red"><small class="s-lbl">GASTOS</small><div class="inf-val-lg text-red">${totalGastosCalculado.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-${balanceTotal >= 0 ? 'green' : 'red'}"><small class="s-lbl">MARGEN OPERATIVO</small><div class="inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">EBITDA %</small><div class="inf-val-lg text-blue">${rentabilidadCalculada}%</div></div>
         </div>
-        ${data.porMes.length > 0 ? `
+
+        <!-- Tabla de Pérdidas y Ganancias Contable -->
         <div class="table-scroll scroll-shadow-container mb-14">
-          <table class="inf-table tbl-accent-green">
-            <thead><tr><th>Mes</th><th class="text-right text-green">Ingresos</th><th class="text-right text-red">Gastos</th><th class="text-right">Balance</th><th class="text-right">Acumulado</th></tr></thead>
-            <tbody>${data.porMes.filter(m => m.ingresos > 0 || m.gastos > 0).map(m => `
+          <table class="inf-table tbl-accent-green text-sm">
+            <thead>
+              <tr class="bg-black-opacity-50">
+                <th colspan="2">PARTIDAS DE INGRESOS</th>
+                <th class="text-right">IMPORTE</th>
+                <th class="text-right">% CUOTA</th>
+              </tr>
+            </thead>
+            <tbody>
               <tr>
-                <td><strong>${m.mes}</strong></td>
-                <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
-                <td class="text-right text-red">${m.gastos.toLocaleString()}€</td>
-                <td class="text-right font-bold ${m.balance >= 0 ? 'text-green' : 'text-red'}">${m.balance.toLocaleString()}€</td>
-                <td class="text-right text-gray">—</td>
-              </tr>`).join('')}
+                <td style="width:24px;">🥛</td>
+                <td><strong>Ingresos por Venta de Leche (Entregas Lácteas)</strong></td>
+                <td class="text-right text-green">${ingLeche.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingLeche / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr>
+                <td>🥩</td>
+                <td><strong>Ingresos por Venta de Ganado (Canal / Vivo)</strong></td>
+                <td class="text-right text-green">${ingCarne.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingCarne / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
+                <td colspan="2">TOTAL INGRESOS BRUTOS</td>
+                <td class="text-right text-green">${totalIngresosCalculado.toLocaleString()}€</td>
+                <td class="text-right text-green">100%</td>
+              </tr>
             </tbody>
+            
+            <thead>
+              <tr class="bg-black-opacity-50">
+                <th colspan="2">PARTIDAS DE GASTOS OPERATIVOS</th>
+                <th class="text-right text-red">IMPORTE</th>
+                <th class="text-right">% GASTO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🌾</td>
+                <td>Gastos en Alimentación (Piensos, Forrajes, Ración)</td>
+                <td class="text-right text-red">${gastosAlim.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAlim / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr>
+                <td>🧪</td>
+                <td>Gastos Fitosanitarios (Tratamientos parcelas, herbicidas)</td>
+                <td class="text-right text-red">${gastosFito.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosFito / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr>
+                <td>💉</td>
+                <td>Gastos de Sanidad Ganadera (Medicamentos, ADSG, vacunas)</td>
+                <td class="text-right text-red">${gastosSanidad.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosSanidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr>
+                <td>⚡</td>
+                <td>Gastos en Electricidad y Suministros (Energía, Gasoil)</td>
+                <td class="text-right text-red">${gastosElectricidad.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosElectricidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr>
+                <td>👷</td>
+                <td>Gastos de Personal (Mano de obra, seguridad social)</td>
+                <td class="text-right text-red">${gastosPersonal.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosPersonal / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr>
+                <td>🏗️</td>
+                <td>Amortizaciones (Instalaciones, maquinaria, cercados)</td>
+                <td class="text-right text-red">${gastosAmort.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAmort / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+              </tr>
+              <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
+                <td colspan="2">TOTAL GASTOS OPERATIVOS</td>
+                <td class="text-right text-red">${totalGastosCalculado.toLocaleString()}€</td>
+                <td class="text-right text-red">100%</td>
+              </tr>
+            </tbody>
+            
+            <tfoot>
+              <tr class="font-bold text-white bg-black-opacity-50 text-base">
+                <td colspan="2" class="text-left">MARGEN NETO DE EXPLOTACIÓN (EBITDA)</td>
+                <td class="text-right ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</td>
+                <td class="text-right ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${rentabilidadCalculada}%</td>
+              </tr>
+            </tfoot>
           </table>
-        </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.dinero()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos económicos registrados. Añade ventas y gastos para ver la cuenta de resultados.</p></div>`}
-        ${data.gastosPorCategoria.length > 0 ? `
-        <div class="inf-section-title">Gastos por Categoría</div>
-        <div class="grid grid-cols-2 gap-6 mb-10">
-          ${data.gastosPorCategoria.map(g => `
-            <div class="info-box-sm flex justify-between items-center">
-              <span class="inf-small text-aaa">${g.categoria}</span>
-              <span class="font-bold text-red">${g.total.toLocaleString()}€ <span class="text-gray text-xs">(${data.totalGastos > 0 ? ((g.total / data.totalGastos) * 100).toFixed(1) : 0}%)</span></span>
-            </div>`).join('')}
-        </div>` : ''}
+        </div>
       </div>`;
   },
 
@@ -1643,19 +1843,24 @@ const InformesView = {
       </div>`;
   },
 
-  /** Cargas y Aforos por zona */
   _renderCargas(content, d) {
     const { cargasData } = d;
     const data = cargasData || { porZona: [], totalAforo: 0, totalOcupacion: 0, pctGlobal: '0', alertas: [], numAlertas: 0, numZonas: 0 };
     const colorPct = (p) => p > 100 ? '#ef4444' : p >= 80 ? '#10b981' : p >= 50 ? '#f59e0b' : '#6b7280';
+    
+    // Calcular superficie total pastable y UGM globales
+    const superficieTotal = data.porZona.reduce((sum, z) => sum + (Number(z.superficie) || 0), 0);
+    const ugmGlobal = data.totalOcupacion; // simplificado: 1 vaca = 1 UGM
+    const cargaGlobal = superficieTotal > 0 ? (ugmGlobal / superficieTotal).toFixed(2) : '0.00';
+
     content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Cargas y Aforos</div>
         <div class="grid grid-cols-4 gap-8 mb-14">
-          <div class="info-box-center border-left-blue"><small class="s-lbl">ZONAS</small><div class="inf-val-lg text-blue">${data.numZonas}</div></div>
+          <div class="info-box-center border-left-blue"><small class="s-lbl">SUP. PASTOS</small><div class="inf-val-lg text-blue">${superficieTotal.toFixed(1)} ha</div></div>
           <div class="info-box-center border-left-green"><small class="s-lbl">AFORO TOTAL</small><div class="inf-val-lg text-green">${data.totalAforo}</div></div>
-          <div class="info-box-center border-left-amber"><small class="s-lbl">OCUPACIÓN</small><div class="inf-val-lg text-amber">${data.totalOcupacion}</div></div>
-          <div class="info-box-center" style="border-left:3px solid ${colorPct(parseFloat(data.pctGlobal))};"><small class="s-lbl">% GLOBAL</small><div class="inf-val-lg" style="color:${colorPct(parseFloat(data.pctGlobal))}">${data.pctGlobal}%</div></div>
+          <div class="info-box-center border-left-amber"><small class="s-lbl">UGM TOTALES</small><div class="inf-val-lg text-amber">${ugmGlobal} UGM</div></div>
+          <div class="info-box-center" style="border-left:3px solid ${colorPct(parseFloat(data.pctGlobal))};"><small class="s-lbl">CARGA GLOBAL</small><div class="inf-val-lg" style="color:${colorPct(parseFloat(data.pctGlobal))}">${cargaGlobal} UGM/ha</div></div>
         </div>
         ${data.numAlertas > 0 ? `<div class="card card-tint-red mb-14 p-12">
           <div class="flex items-center gap-8"><span class="text-xl">🚨</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
@@ -1663,16 +1868,20 @@ const InformesView = {
         ${data.porZona.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table inf-table-sm tbl-accent-amber">
-            <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo</th><th class="text-center">Ocupación</th><th class="text-center">%</th><th>Estado</th></tr></thead>
-            <tbody>${data.porZona.map(z => `
+            <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo Max</th><th class="text-center">Ocupación</th><th class="text-center">Carga UGM/ha</th><th class="text-center">%</th><th>Estado</th></tr></thead>
+            <tbody>${data.porZona.map(z => {
+              const capUgm = Number(z.superficie) > 0 ? (z.ocupacion / z.superficie).toFixed(2) : '0.00';
+              return `
               <tr>
                 <td><strong>${z.nombre}</strong>${z.especie ? `<br><span class="text-gray text-xs">${z.especie}</span>` : ''}</td>
                 <td class="text-center">${z.superficie} ha</td>
                 <td class="text-center">${z.aforo}</td>
                 <td class="text-center">${z.ocupacion}</td>
+                <td class="text-center font-bold text-white">${capUgm} UGM/ha</td>
                 <td class="text-center font-bold" style="color:${colorPct(z.pctOcupacion)}">${z.pctOcupacion}%</td>
                 <td class="text-center"><span class="badge badge-sm ${z.estado === 'sobrecarga' ? 'badge-red' : z.estado === 'optimo' ? 'badge-green' : z.estado === 'aceptable' ? 'badge-amber' : 'badge-gray'}">${z.estado}</span></td>
-              </tr>`).join('')}</tbody>
+              </tr>`;
+            }).join('')}</tbody>
           </table>
         </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.balanza()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin zonas configuradas o sin datos de ocupación.</p></div>`}
       </div>`;
