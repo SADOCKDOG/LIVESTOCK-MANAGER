@@ -145,7 +145,7 @@ const GanaderiaView = {
                   <div class="flex justify-between items-start gap-6">
                     <div class="min-w-0 flex-1">
                       <div class="flex items-center gap-6">
-                        <span class="text-sm font-black text-white uppercase tracking-tight">${a.numero_identificacion || a.nombre || `#${a.id}`}</span>
+                        <span class="text-lg font-black text-gold uppercase tracking-tight">${a.numero_identificacion || a.nombre || `#${a.id}`}</span>
                         <span class="text-gray-400" style="font-size:0.7rem;">${sexoIcon}</span>
                       </div>
                       <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
