@@ -153,6 +153,10 @@ const ComercializacionView = {
       App.updateHeaderColor(mode);
     }
 
+    // Re-renderizar KPIs con el tab activo
+    const kpisContainer = document.querySelector('.explotacion-kpis');
+    if (kpisContainer) kpisContainer.innerHTML = this._renderKPIsTab();
+
     this._renderTabActual();
     window.scrollTo(0, 0);
   },
