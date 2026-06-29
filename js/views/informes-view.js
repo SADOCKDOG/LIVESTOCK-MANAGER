@@ -101,16 +101,29 @@ const InformesView = {
 
   _renderTabsHeader() {
     const activeCatKey = this._obtenerCategoriaDeTab(this._currentTab);
+    // Colores por categoría
+    const catColors = {
+      general: '#f59e0b',
+      operaciones: '#10b981',
+      economico: '#3b82f6',
+      comercial: '#8b5cf6',
+      exportar: '#6b7280'
+    };
+    const activeColor = catColors[activeCatKey] || '#f59e0b';
 
-    // 1. Renderizar Nivel 1: Categorías
+    // 1. Nivel 1: Categorías
     let catsHtml = `
       <div class="scroll-shadow-container scroll-tabs-row mb-6">
-        <div class="informes-categories py-4">
+        <div class="informes-categories py-4" id="inf-cat-row">
     `;
     for (const [catKey, cat] of Object.entries(this._categories)) {
-      const activeClass = catKey === activeCatKey ? 'active' : '';
+      const isActive = catKey === activeCatKey;
+      const col = catColors[catKey] || '#f59e0b';
       catsHtml += `
-        <button class="inf-cat-tab ${activeClass}" onclick="InformesView._cambiarCategoria('${catKey}')">
+        <button class="inf-cat-tab ${isActive ? 'active' : ''}" 
+                id="inf-cat-${catKey}"
+                style="${isActive ? `--tab-color:${col}; background:${col}15; border-color:${col}; color:${col} !important; box-shadow: 0 0 12px ${col}50;` : `--tab-color:${col};`}"
+                onclick="InformesView._cambiarCategoria('${catKey}')">
           ${cat.icon} ${cat.label}
         </button>
       `;
@@ -120,17 +133,21 @@ const InformesView = {
       </div>
     `;
 
-    // 2. Renderizar Nivel 2: Sub-tabs de la categoría activa
+    // 2. Nivel 2: Sub-tabs de la categoría activa
     const activeCat = this._categories[activeCatKey];
     let subTabsHtml = `
       <div class="scroll-shadow-container scroll-tabs-row mb-12">
-        <div class="informes-tabs py-2">
+        <div class="informes-tabs py-2" id="inf-tab-row">
     `;
     for (const [tabKey, tabLabel] of Object.entries(activeCat.tabs)) {
-      const activeClass = tabKey === this._currentTab ? 'active' : '';
+      const isActive = tabKey === this._currentTab;
       const subTabIcon = this._obtenerIconoDeSubTab(tabKey);
       subTabsHtml += `
-        <button class="inf-tab ${activeClass}" data-tab="${tabKey}" onclick="InformesView._cambiarTab('${tabKey}')">
+        <button class="inf-tab ${isActive ? 'active' : ''}" 
+                id="inf-tab-${tabKey}"
+                data-tab="${tabKey}"
+                style="${isActive ? `--tab-color:${activeColor}; background:${activeColor}18; border-color:${activeColor}; color:${activeColor} !important; box-shadow: 0 0 8px ${activeColor}40;` : ''}"
+                onclick="InformesView._cambiarTab('${tabKey}')">
           ${subTabIcon} ${tabLabel}
         </button>
       `;
@@ -147,12 +164,24 @@ const InformesView = {
     const firstTab = Object.keys(this._categories[catKey].tabs)[0];
     this._currentTab = firstTab;
     this._actualizarHeader();
+    // Scroll automático al tab activo de categoría
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`inf-cat-${catKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      const tel = document.getElementById(`inf-tab-${firstTab}`);
+      if (tel) tel.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
     this._renderTabActual();
   },
 
   _cambiarTab(tab) {
     this._currentTab = tab;
     this._actualizarHeader();
+    // Scroll automático al sub-tab activo
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`inf-tab-${tab}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
     this._renderTabActual();
   },
 
@@ -249,6 +278,10 @@ const InformesView = {
     const content = document.getElementById("informes-content");
     if (!content) return;
 
+    // Animación de salida
+    content.style.opacity = '0';
+    content.style.transform = 'translateY(6px)';
+
     try {
       switch (this._currentTab) {
         case 'general': this._renderGeneral(content, d); break;
@@ -281,29 +314,36 @@ const InformesView = {
       console.error('[InformesView] Error en render:', e);
       content.innerHTML = `<div class="card empty-state"><p class="text-red text-base">❌ Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
     }
+
+    // Animación de entrada suave
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        content.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+        content.style.opacity = '1';
+        content.style.transform = 'translateY(0)';
+      });
+    });
+
     // Scroll up after tab switch
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   // ===================== RENDER POR TABS =====================
 
-  /** Genera barra de acciones PDF+Excel centrada con marco */
+  /** Genera barra de acciones PDF+Excel compacta e inline */
   _sectionActionsHTML(seccion, label) {
     return `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-        <div class="section-header-theme" style="--theme-color: var(--p-gold)">EXPORTAR INFORME</div>
-        <div class="grid grid-cols-3 gap-10">
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="InformesView._exportPDF()">
-            ${Icons.documento()}
-            <span class="widget-link-label">Completo</span>
+      <div class="inf-export-bar mb-14">
+        <span class="inf-export-label">${label}</span>
+        <div class="inf-export-btns">
+          <button class="inf-export-btn" onclick="InformesView._exportPDFSeccion('${seccion}')" title="Exportar ${label} a PDF">
+            ${Icons.documento()} PDF
           </button>
-          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="InformesView._exportPDFSeccion('${seccion}')">
-            ${Icons.exportar()}
-            <span class="widget-link-label">${label}</span>
+          <button class="inf-export-btn inf-export-btn--excel" onclick="InformesView._exportExcel()" title="Exportar a Excel">
+            ${Icons.exportar()} Excel
           </button>
-          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="InformesView._exportExcel()">
-            ${Icons.exportar()}
-            <span class="widget-link-label">Excel</span>
+          <button class="inf-export-btn inf-export-btn--full" onclick="InformesView._exportPDF()" title="Exportar informe completo">
+            ${Icons.documento()} Completo
           </button>
         </div>
       </div>
