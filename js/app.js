@@ -101,6 +101,14 @@ const App = {
       App._setupHardwareBackButton();
       await App._ejecutarMigracionesFondo();
       App._initScrollShadows();
+      // Cargar preferencia de contextos
+      try {
+        const cfg = await window.db.get('meta', 'appConfig');
+        if (cfg?.value?.mostrarContextos === false) {
+          document.body.classList.add('hide-context');
+          document.querySelectorAll('.card-dark-gradient, .card-total-3d').forEach(c => c.classList.add('compact'));
+        }
+      } catch (_) {}
       await App.route();
     } catch (error) {
       console.error(error);
