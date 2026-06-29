@@ -153,9 +153,9 @@ const ComercializacionView = {
         </div>
         <div class="flex flex-col">
           ${kpis.map(k => `
-            <div class="py-10 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
+            <div class="py-12 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
               <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${icons[k.label] || Icons.info()} ${k.label}</span>
-              <strong class="text-base font-950" style="color:${valueColors[k.label] || meta.color};">${k.value}</strong>
+              <strong class="text-xl font-950" style="color:${valueColors[k.label] || meta.color};">${k.value}</strong>
             </div>
           `).join('')}
         </div>
