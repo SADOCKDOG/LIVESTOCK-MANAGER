@@ -48,6 +48,10 @@ window.PedidosCrotales = (() => {
       eventos: pedido.eventos || []
     };
 
+    if (pedidoData.id === null || pedidoData.id === undefined) {
+      delete pedidoData.id;
+    }
+
     try {
       const tx = window.db.transaction([STORE_NAME], 'readwrite');
       const store = tx.objectStore(STORE_NAME);
