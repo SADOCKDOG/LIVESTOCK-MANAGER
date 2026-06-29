@@ -254,11 +254,11 @@ const CarneView = {
         <div class="grid gap-10">
           ${d.rebanosCarne.length > 0
             ? d.rebanosCarne.map(r => `
-                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
+                <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-danger);">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-8">
-                        <span class="text-xl text-gold">${Icons.rebanos()}</span>
+                        <span class="text-xl" style="color:var(--c-danger);">${Icons.rebanos()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
                       </div>
                       <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray font-800 uppercase">
@@ -268,7 +268,7 @@ const CarneView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold block mb-4 font-950">${r.cantidad_animales || 0} CABEZAS</span>
+                      <span class="badge badge-sm font-black" style="background:rgba(239,68,68,0.15); color:var(--c-danger); border:1px solid rgba(239,68,68,0.3);">${r.cantidad_animales || 0} CABEZAS</span>
                       <span class="text-[0.5rem] text-gray-700 font-900 uppercase flex items-center gap-4">Ver ficha ${Icons.siguiente()}</span>
                     </div>
                   </div>
@@ -315,21 +315,21 @@ const CarneView = {
         <div class="grid gap-10">
           ${d.ventasCarne.length > 0
             ? d.ventasCarne.slice(0, 15).map(v => `
-                <div class="card card-animal border-4-left-green" onclick="App._abrirDetalleVentaCarne(${v.id})">
+                <div class="card card-animal" onclick="App._abrirDetalleVentaCarne(${v.id})" style="border-left:4px solid var(--c-danger);">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-8">
-                        <span class="text-xl text-green">${Icons.documento()}</span>
+                        <span class="text-xl" style="color:var(--c-danger);">${Icons.documento()}</span>
                         <h3 class="section-h3 m-0 text-ellipsis">${v.numero_albaran || 'ALBARÁN'} · ${v.razonSocial || 'MATADERO'}</h3>
                       </div>
                       <div class="flex wrap gap-4 mt-4 text-[0.65rem] text-gray font-800 uppercase">
                         <span>${Icons.calendar()} ${this._fmtFecha(v.fechaSacrificio)}</span>
                         <span>·</span>
-                        <span>Rend: <span class="text-green font-900">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
+                        <span>Rend: <span class="font-900" style="color:var(--c-danger);">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm text-green font-black text-lg badge-green-outline block">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
+                      <span class="badge badge-sm font-black text-lg" style="background:rgba(239,68,68,0.1); color:var(--c-danger); border:1px solid rgba(239,68,68,0.3);">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
                     </div>
                   </div>
                 </div>`).join('')
