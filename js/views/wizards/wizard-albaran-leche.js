@@ -1,9 +1,9 @@
-﻿/**
+/**
  * Wizard Albarán de Leche (Salida Láctea)
  * Extraído de app.js para modularización (Fase 3)
  */
 window.AlbaranLecheWizard = {
-  async open() {
+  async open(borrador = null) {
     const App = window.App;
     if (!App) return console.error("App no disponible");
 
@@ -485,37 +485,38 @@ window.AlbaranLecheWizard = {
       id: 'wizard-leche-colectivo-container',
       title: 'SALIDA LÁCTEA',
       initialData: {
-        fecha: new Date().toISOString().split("T")[0],
-        comunidad_autonoma: finca.comunidad_autonoma || '',
-        contrato_numero: finca.contrato_lacteo_numero || '',
-        adsg_codigo: finca.adsg_codigo || '',
-        matricula: "",
-        q: "",
-        numero_infolac: finca.numero_infolac || '',
-        numero_muestreo_oficial: '',
-        hora_ordeno: '',
-        hora_carga: '',
-        temp: 4.5,
-        cadena_frio_cumplida: true,
-        inh: true,
-        grasa: '',
-        proteina: '',
-        germenes: '',
-        somaticas: '',
-        antibioticos: false,
-        fecha_analisis: new Date().toISOString().split("T")[0],
-        nro_boletin: '',
-        laboratorio_nombre: 'LIGAL',
-        estado_tramite_infolac: 'borrador',
-        fecha_presentacion_infolac: '',
-        numero_registro_infolac: '',
-        acuse_infolac: '',
-        l: 0,
-        pb: refPrecios.precio_base_referencia,
-        precio_extracto_seco: refPrecios.precio_por_punto_extracto,
-        primas_penalizaciones: 0,
-        coste_alimentacion_diario: 0,
-        coste_alimentacion_periodo: 0,
+        id: borrador ? borrador.id : undefined,
+        fecha: borrador ? borrador.fechaRecogida : new Date().toISOString().split("T")[0],
+        comunidad_autonoma: borrador ? borrador.comunidad_autonoma : (finca.comunidad_autonoma || ''),
+        contrato_numero: borrador ? borrador.contrato_numero : (finca.contrato_lacteo_numero || ''),
+        adsg_codigo: borrador ? borrador.adsg_codigo : (finca.adsg_codigo || ''),
+        matricula: borrador ? borrador.matriculaCisterna : "",
+        q: borrador ? borrador.numero_Muestra_Letra_Q : "",
+        numero_infolac: borrador ? borrador.numero_infolac : (finca.numero_infolac || ''),
+        numero_muestreo_oficial: borrador ? borrador.numero_muestreo_oficial : '',
+        hora_ordeno: borrador ? borrador.hora_ordeno : '',
+        hora_carga: borrador ? borrador.hora_carga : '',
+        temp: borrador ? borrador.temperatura : 4.5,
+        cadena_frio_cumplida: borrador ? !!borrador.cadena_frio_cumplida : true,
+        inh: borrador ? !!borrador.certificadoInhibidores : true,
+        grasa: borrador ? borrador.laboratorio?.grasa : '',
+        proteina: borrador ? borrador.laboratorio?.proteina : '',
+        germenes: borrador ? borrador.laboratorio?.germenes : '',
+        somaticas: borrador ? borrador.laboratorio?.somaticas : '',
+        antibioticos: borrador ? !!borrador.laboratorio?.antibioticos : false,
+        fecha_analisis: borrador ? borrador.laboratorio?.fecha_analisis : new Date().toISOString().split("T")[0],
+        nro_boletin: borrador ? borrador.laboratorio?.nro_boletin : '',
+        laboratorio_nombre: borrador ? borrador.laboratorio?.laboratorio_nombre : 'LIGAL',
+        estado_tramite_infolac: borrador ? borrador.estado_tramite_infolac : 'borrador',
+        fecha_presentacion_infolac: borrador ? borrador.fecha_presentacion_infolac : '',
+        numero_registro_infolac: borrador ? borrador.numero_registro_infolac : '',
+        acuse_infolac: borrador ? borrador.acuse_infolac : '',
+        l: borrador ? borrador.cantidad : 0,
+        pb: borrador ? borrador.precioBase : refPrecios.precio_base_referencia,
+        precio_extracto_seco: borrador ? borrador.precio_extracto_seco : refPrecios.precio_por_punto_extracto,
+        primas_penalizaciones: borrador ? borrador.primas_penalizaciones : 0,
+        coste_alimentacion_diario: borrador ? borrador.coste_alimentacion_diario : 0,
+        coste_alimentacion_periodo: borrador ? borrador.coste_alimentacion_periodo : 0,
       },
       steps: wizardSteps,
       onComplete: async (dataLeche) => {
@@ -590,12 +591,23 @@ window.AlbaranLecheWizard = {
             coste_alimentacion_diario: dataLeche.coste_alimentacion_diario || 0,
             coste_alimentacion_periodo: costeAlim,
             mofa: mofa,
-            creadoEn: new Date().toISOString(),
+            creadoEn: borrador ? borrador.creadoEn : new Date().toISOString(),
           };
 
-          const idL = await window.db.add("comercializacion_leche", reg);
+          let idL;
+          if (dataLeche.id) {
+            reg.id = Number(dataLeche.id);
+            await window.db.put("comercializacion_leche", reg);
+            idL = reg.id;
+          } else {
+            idL = await window.db.add("comercializacion_leche", reg);
+          }
           const numeroDocInfolac = `INFOLAC-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${idL}`;
-          await window.db.add('documentos_legales', {
+          
+          const docsLegales = await window.db.getAll('documentos_legales').catch(() => []);
+          const docPrevio = docsLegales.find(d => d.tipo === 'infolac_declaracion' && d.referencia_operacion_id === idL);
+          const docData = {
+            id: docPrevio ? docPrevio.id : undefined,
             tipo: 'infolac_declaracion',
             fincaId,
             numero: numeroDocInfolac,
@@ -606,8 +618,14 @@ window.AlbaranLecheWizard = {
             acuse_recibo: reg.acuse_infolac,
             referencia_operacion_id: idL,
             plataforma: window.ComunidadesService?.getConfiguracionCCAA?.(dataLeche.comunidad_autonoma || '')?.sistema_movimiento || '',
-            created_at: new Date().toISOString()
-          }).catch(() => {});
+            created_at: docPrevio ? docPrevio.created_at : new Date().toISOString(),
+            actualizadoEn: new Date().toISOString()
+          };
+          if (docData.id) {
+            await window.db.put('documentos_legales', docData);
+          } else {
+            await window.db.add('documentos_legales', docData);
+          }
           const est = await window.Trazabilidad.generarEstructuraAlbaran(
             window.db,
             { ...reg, id: idL },
