@@ -373,6 +373,8 @@ Orden por **impacto visual / riesgo**. Cada fase es entregable y verificable de 
 - [ ] Cards de registros/datos: usar `.card-animal` con `style="border-left:4px solid ${color}"`
       dinámico (nunca clases fijas como `border-4-left-green`).
       Estructura: título + fecha con icono a izquierda, badge de valor a derecha.
+- [ ] Textos de contexto en cards: usar `text-xs text-gray uppercase font-extrabold tracking-wider` para línea de label,
+      `text-xs text-aaa mt-4 leading-relaxed` para descripción. Nunca `text-[0.55rem]` o `text-gray-600`.
 - [ ] Inputs `.form-*` (alto ≥ 48px, font ≥ 16px).
 - [ ] Mensajes vía `Toast`/`Confirm`, nunca `alert`/`confirm` nativos.
 - [ ] Probado a 360px de ancho (Android vertical), respetando safe-areas.
