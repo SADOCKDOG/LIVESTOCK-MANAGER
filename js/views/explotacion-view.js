@@ -1090,19 +1090,10 @@ const ExplotacionView = {
 
         <!-- ACCIONES RÁPIDAS DE GASTOS -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme" style="--theme-color: #ef4444">${Icons.dinero()} NUEVO REGISTRO DE GASTO</div>
-          <div class="grid grid-cols-3 gap-10">
-            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', 'carne')" style="padding: 16px 5px; min-height: 80px;">
-              ${Icons.agregar()}
-              <span class="widget-link-label text-[0.65rem] font-950">ALIMENTACIÓN</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="ExplotacionView._abrirWizardGastoModo('Electricidad', 'carne')" style="padding: 16px 5px; min-height: 80px;">
-              ${Icons.agregar()}
-              <span class="widget-link-label text-[0.65rem] font-950">ENERGÍA</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="ExplotacionView._abrirWizardGastoModo('Fitosanitarios', 'carne')" style="padding: 16px 5px; min-height: 80px;">
-              ${Icons.agregar()}
-              <span class="widget-link-label text-[0.65rem] font-950">FITOSANITARIO</span>
+          <div class="section-header-theme" style="--theme-color: #ef4444">${Icons.dinero()} GESTIÓN DE COSTOS</div>
+          <div class="flex justify-center mt-10">
+            <button class="widget-link-btn widget-link-btn--neon neon-theme" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
+              ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">REGISTRAR GASTO</span>
             </button>
           </div>
         </div>
