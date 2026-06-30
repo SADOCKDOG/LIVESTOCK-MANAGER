@@ -28,7 +28,6 @@ const DocumentosView = {
         fecha: p.fecha_pedido || p.createdAt,
         createdAt: p.fecha_pedido || p.createdAt,
         estado: p.estado || 'borrador',
-        acuseManual: p.acuse_manual || p.acuseManual || '',
         isPedidoCrotales: true,
         dataRaw: p
       }));
@@ -41,28 +40,14 @@ const DocumentosView = {
         fecha: m.fecha || m.creadoEn,
         createdAt: m.creadoEn || m.fecha,
         estado: m.estado_tramite || 'borrador',
-        acuseManual: m.acuse_manual || m.acuseManual || '',
         isMovimiento: true,
         dataRaw: m
       }));
 
       // Unificar todos los documentos
       // Filtrar de documentos_legales aquellos que ya se representarán a través de movimientos/pedidos para evitar duplicados visuales
-      const docsNormalizados = docs
-        .filter(d => d.tipo !== 'guia_movimiento' && d.tipo !== 'infolac_declaracion')
-        .map(d => ({
-          id: d.id,
-          tipo: d.tipo || 'documento',
-          numero: d.numero || d.referencia || 'S/N',
-          fecha: d.fecha_emision || d.fecha || d.created_at,
-          createdAt: d.created_at || d.fecha_emision || d.fecha,
-          estado: d.estado_tramite || d.estado || 'presentado',
-          acuseManual: d.acuse_manual || d.acuseManual || '',
-          dataRaw: d
-        }));
-
       const docsUnificados = [
-        ...docsNormalizados,
+        ...docs.filter(d => d.tipo !== 'guia_movimiento' && d.tipo !== 'infolac_declaracion'),
         ...pedidosNormalizados,
         ...movimientosNormalizados
       ];
@@ -102,16 +87,7 @@ const DocumentosView = {
 
     const docsRecientes = docs.slice(0, 5);
 
-    const bannerInterno = `
-      <div class="card card-dark-gradient border-222 modo-interno-banner mb-14" style="border-top:5px solid var(--c-warning);">
-        <div class="section-header-theme" style="--theme-color: var(--c-warning);">${Icons.alerta()} MODO INTERNO SIGGAN</div>
-        <p class="text-xs text-aaa mt-6">
-          Genera la documentación desde Livestock Manager y sube los ficheros a SIGGAN/BADIGEX de forma manual. Registra aquí el número de acuse o el justificante recibido para mantener la trazabilidad interna.
-        </p>
-      </div>`;
-
     return `
-      ${bannerInterno}
       <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} DOCUMENTOS</div>
         <div class="grid grid-cols-5 gap-4 mb-6">
@@ -209,10 +185,6 @@ const DocumentosView = {
           descHtml = doc.numero || 'Sin número registrado';
         }
 
-        const acuseHtml = doc.acuseManual
-          ? `<div class="text-xs text-green mt-6">📎 Acuse manual: <span class="font-900">${doc.acuseManual}</span></div>`
-          : `<div class="text-xs text-red mt-6">📎 Acuse manual pendiente</div>`;
-
         return `
           <div class="card" style="border-left:4px solid ${color};">
             <div class="flex justify-between items-start">
@@ -229,14 +201,12 @@ const DocumentosView = {
             <div class="mt-6 text-xs text-ccc">
               ${descHtml}
             </div>
-            ${acuseHtml}
-            <div class="mt-8 flex gap-6 flex-wrap">
+            <div class="mt-8 flex gap-6">
               ${esBorrador ? `
                 <button class="btn btn-sm btn-outline text-xs" style="color:#f59e0b; border-color:#f59e0b;" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">✏️ Editar Borrador</button>
               ` : `
                 <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">🖨 Imprimir PDF</button>
               `}
-              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">📎 Guardar acuse</button>
               <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verDetalle(${doc.id}, '${doc.tipo}')">${Icons.documento()} Detalle</button>
             </div>
           </div>
@@ -419,165 +389,51 @@ const DocumentosView = {
     const label = labels[doc.tipo] || doc.tipo;
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
-    overlay.id = `doc-detail-overlay-${docId}`;
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-
+    
     let infoExtra = '';
     if (doc.isPedidoCrotales) {
       infoExtra = `
         <div><span class="text-gray">Cantidad:</span> <span class="text-white">${doc.dataRaw.cantidad} pares</span></div>
         <div><span class="text-gray">Especie:</span> <span class="text-white">${doc.dataRaw.especie}</span></div>
         <div><span class="text-gray">Material:</span> <span class="text-white">${doc.dataRaw.tipo}</span></div>
-        <div class="col-span-2"><span class="text-gray">ADSG / Destinatario:</span> <span class="text-white">${doc.dataRaw.adsg_nombre || '—'}</span></div>
+        <div class="col-span-2"><span class="text-gray">ADSG / Destinatario:</span> <span class="text-white">${doc.dataRaw.adsg_nombre}</span></div>
       `;
     } else if (doc.isMovimiento) {
       infoExtra = `
-        <div><span class="text-gray">Tipo Mov.:</span> <span class="text-white">${(doc.dataRaw.tipo || '').toUpperCase()}</span></div>
+        <div><span class="text-gray">Tipo Mov.:</span> <span class="text-white">${doc.dataRaw.tipo.toUpperCase()}</span></div>
         <div><span class="text-gray">Nº Animales:</span> <span class="text-white">${doc.dataRaw.num_animales}</span></div>
-        <div class="col-span-2"><span class="text-gray">REGA Origen:</span> <span class="text-white">${doc.dataRaw.rega_origen || '—'}</span></div>
-        <div class="col-span-2"><span class="text-gray">REGA Destino:</span> <span class="text-white">${doc.dataRaw.rega_destino || '—'}</span></div>
+        <div class="col-span-2"><span class="text-gray">REGA Origen:</span> <span class="text-white">${doc.dataRaw.rega_origen}</span></div>
+        <div class="col-span-2"><span class="text-gray">REGA Destino:</span> <span class="text-white">${doc.dataRaw.rega_destino}</span></div>
       `;
     } else {
-      infoExtra = `<div class="col-span-2"><span class="text-gray-500">Documento general cargado</span></div>`;
+      infoExtra = `<div class="col-span-2"><span class="text-gray-500">Documento General Cargado</span></div>`;
     }
 
-    const acuseTexto = doc.acuseManual
-      ? `<span class="text-green">📎 Acuse manual: ${doc.acuseManual}</span>`
-      : '<span class="text-red">📎 Acuse manual pendiente</span>';
-
     overlay.innerHTML = `
-      <div class="card" style="max-width:520px;width:100%;border-top:4px solid ${color};padding:24px;">
-        <div class="flex justify-between items-start mb-10">
+      <div class="card" style="max-width:500px;width:100%;border-top:4px solid ${color};padding:24px;">
+        <div class="flex justify-between items-center mb-14">
           <div>
             <div class="font-800 text-sm" style="color:${color};">${label}</div>
             <div class="font-900 text-white text-lg">${doc.numero || 'S/N'}</div>
-            <div class="text-xs text-ccc mt-2">${this._fmtFecha(doc.createdAt || doc.fecha)}</div>
           </div>
-          <button onclick="document.getElementById('doc-detail-overlay-${docId}').remove()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;">${Icons.cerrar()}</button>
+          <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">${Icons.cerrar()}</button>
         </div>
-        <div class="grid grid-cols-2 gap-8 text-xs text-ccc mb-8">
-          <div><span class="text-gray">Estado:</span> <span class="text-white">${(doc.estado || 'desconocido').toUpperCase()}</span></div>
-          <div><span class="text-gray">Tipo:</span> <span class="text-white">${doc.tipo}</span></div>
+        <div class="grid grid-cols-2 gap-8 text-sm mb-14">
+          <div><span class="text-gray">Fecha:</span> <span class="text-white">${this._fmtFecha(doc.createdAt || doc.fecha)}</span></div>
+          <div><span class="text-gray">Estado Trámite:</span> <span class="text-gold" style="color:${doc.estado === 'borrador' ? '#f59e0b' : '#10b981'};">${doc.estado.toUpperCase()}</span></div>
           ${infoExtra}
         </div>
-        <div class="text-xs mb-8">${acuseTexto}</div>
-        <div class="flex flex-wrap gap-8 justify-end text-xs">
-          <button class="btn btn-sm" onclick="document.getElementById('doc-detail-overlay-${docId}').remove()">Cerrar</button>
-          <button class="btn btn-sm btn-outline" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">📎 Registrar acuse</button>
+        <div class="mt-10 text-center" style="display:flex; gap:10px; justify-content:center;">
+          <button class="btn btn-secondary btn-sm" onclick="this.closest('[style]').remove()">Cerrar</button>
           ${doc.estado === 'borrador' ? `
-            <button class="btn btn-sm btn-primary" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id}); document.getElementById('doc-detail-overlay-${docId}').remove();">✏️ Editar</button>
+            <button class="btn btn-primary btn-sm" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id}); this.closest('[style]').remove();">✏️ Editar</button>
           ` : `
-            <button class="btn btn-sm btn-primary" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id}); document.getElementById('doc-detail-overlay-${docId}').remove();">🖨 Imprimir</button>
+            <button class="btn btn-primary btn-sm" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id}); this.closest('[style]').remove();">🖨 Imprimir</button>
           `}
         </div>
       </div>`;
     document.body.appendChild(overlay);
-  },
-
-  async _registrarAcuse(docId, tipo, esMovimiento, esPedidoCrotales) {
-    try {
-      const detailOverlay = document.getElementById(`doc-detail-overlay-${docId}`);
-      if (detailOverlay) detailOverlay.remove();
-
-      let registro = null;
-      if (esMovimiento) {
-        registro = await window.db.get('movimientos_ganado', Number(docId));
-      } else if (esPedidoCrotales) {
-        registro = await window.db.get('pedidos_crotales', Number(docId));
-      } else {
-        registro = await window.db.get('documentos_legales', Number(docId));
-      }
-      if (!registro) throw new Error('Documento no encontrado');
-
-      const valorActual = registro.acuse_manual || '';
-      this._mostrarAcuseModal({
-        docId,
-        tipo,
-        esMovimiento,
-        esPedidoCrotales,
-        valorActual
-      });
-    } catch (e) {
-      App.toastError('Error al abrir acuse: ' + e.message);
-    }
-  },
-
-  _mostrarAcuseModal({ docId, tipo, esMovimiento, esPedidoCrotales, valorActual }) {
-    const existing = document.getElementById('acuse-overlay');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'acuse-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-
-    const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : 'Guía DIMOE';
-    overlay.innerHTML = `
-      <div class="card" style="max-width:520px;width:100%;border-top:4px solid var(--c-warning);padding:24px;">
-        <div class="flex justify-between items-center mb-8">
-          <div>
-            <div class="font-900 text-sm" style="color:var(--c-warning);">${docLabel}</div>
-            <div class="text-xs text-aaa">Introduce el número de acuse o referencia oficial</div>
-          </div>
-          <button id="acuse-close" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;">${Icons.cerrar()}</button>
-        </div>
-        <label class="text-xs text-gray mb-2" for="acuse-input">Referencia / justificante</label>
-        <input id="acuse-input" type="text" class="wizard-input font-800" placeholder="Ej: SIGGAN-2026-000123" value="${valorActual.replace(/"/g, '&quot;')}">
-        <div class="text-[0.65rem] text-aaa mt-2">Puedes pegar el código del acuse, URL o anotación breve.</div>
-        <div class="flex gap-8 justify-end mt-10">
-          <button class="btn btn-sm" id="acuse-cancel">Cancelar</button>
-          <button class="btn btn-sm btn-primary" id="acuse-save">Guardar</button>
-        </div>
-      </div>`;
-
-    document.body.appendChild(overlay);
-    const input = overlay.querySelector('#acuse-input');
-    setTimeout(() => { input?.focus(); input?.setSelectionRange(input.value.length, input.value.length); }, 120);
-
-    overlay.querySelector('#acuse-cancel').addEventListener('click', () => overlay.remove());
-    overlay.querySelector('#acuse-close').addEventListener('click', () => overlay.remove());
-    overlay.querySelector('#acuse-save').addEventListener('click', async () => {
-      const valor = input.value;
-      const ok = await this._guardarAcuseValor({ docId, tipo, esMovimiento, esPedidoCrotales, valor });
-      if (ok) overlay.remove();
-    });
-  },
-
-  async _guardarAcuseValor({ docId, tipo, esMovimiento, esPedidoCrotales, valor }) {
-    const referencia = (valor || '').trim();
-    if (!referencia) {
-      App.toastError('Referencia vacía. No se registró ningún acuse.');
-      return false;
-    }
-
-    try {
-      if (esMovimiento) {
-        const movimiento = await window.db.get('movimientos_ganado', Number(docId));
-        if (!movimiento) throw new Error('Movimiento no encontrado');
-        movimiento.acuse_manual = referencia;
-        movimiento.actualizadoEn = new Date().toISOString();
-        await window.db.put('movimientos_ganado', movimiento);
-      } else if (esPedidoCrotales) {
-        const pedido = await window.db.get('pedidos_crotales', Number(docId));
-        if (!pedido) throw new Error('Pedido no encontrado');
-        pedido.acuse_manual = referencia;
-        pedido.actualizadoEn = new Date().toISOString();
-        await window.db.put('pedidos_crotales', pedido);
-      } else {
-        const registro = await window.db.get('documentos_legales', Number(docId));
-        if (!registro) throw new Error('Documento no encontrado');
-        registro.acuse_manual = referencia;
-        registro.actualizadoEn = new Date().toISOString();
-        await window.db.put('documentos_legales', registro);
-      }
-
-      App.toast('Acuse manual registrado');
-      this.render();
-      return true;
-    } catch (e) {
-      App.toastError('Error al registrar acuse: ' + e.message);
-      return false;
-    }
   },
 };
 
