@@ -26,6 +26,9 @@ const Movimientos = {
       if (filtros.tipo) {
         movs = movs.filter(m => m.tipo === filtros.tipo);
       }
+      movs.forEach(m => {
+        if (m.acuse_manual === undefined) m.acuse_manual = '';
+      });
       return movs.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
     }, { entity: 'Movimientos', action: 'list' });
   },
@@ -129,11 +132,13 @@ const Movimientos = {
       if (esEdicion) {
         movData.id = Number(data.id);
         const previo = await this.get(movData.id);
+        movData.acuse_manual = data.acuse_manual !== undefined ? data.acuse_manual : (previo?.acuse_manual || '');
         movData.creadoEn = previo?.creadoEn || new Date().toISOString();
         await window.db.put('movimientos_ganado', movData);
         movId = movData.id;
       } else {
         movData.creadoEn = new Date().toISOString();
+        movData.acuse_manual = data.acuse_manual || '';
         movId = await window.db.add('movimientos_ganado', movData);
         movData.id = movId;
       }
