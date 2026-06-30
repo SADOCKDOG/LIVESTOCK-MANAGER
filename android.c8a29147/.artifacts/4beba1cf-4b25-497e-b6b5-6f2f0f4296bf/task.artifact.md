@@ -1,3 +1,0 @@
-- [x] Actualizar `compileSdkVersion` y `targetSdkVersion` a 35 en `variables.gradle`
-- [x] Incrementar `versionCode` a 481 en `android/app/build.gradle`
-- [x] Actualizar `versionName` a "4.8.0" en `android/app/build.gradle`
