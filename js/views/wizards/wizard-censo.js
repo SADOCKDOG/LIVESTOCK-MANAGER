@@ -196,8 +196,8 @@ window.WizardCenso = {
   generarDocumento(finca, fecha, censo) {
     const overlay = document.createElement('div');
     overlay.id = 'censo-overlay';
-    overlay.className = 'wizard-full-screen';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:4000;background:white;color:black;display:flex;flex-direction:column;';
+    overlay.className = 'wizard-full-screen animate-in';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:white;color:black;display:flex;flex-direction:column;';
     const contentId = `censo-content-${Date.now()}`;
     const regaPropia = finca.codigo_REGA || finca.rega || '—';
     const filas = Object.entries(censo.porEspecie);
@@ -249,26 +249,135 @@ window.WizardCenso = {
         </div>
       </div>
       <div style="text-align:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;flex-shrink:0;">
-        <button class="btn btn-primary" id="btn-censo-print" style="width:auto;padding:0 30px;background:#10b981;">${Icons.exportar()} IMPRIMIR / GUARDAR PDF</button>
+        <button class="btn btn-primary" id="btn-censo-print" style="width:auto;padding:0 30px;background:#10b981;color:white;font-weight:bold;">${Icons.exportar()} IMPRIMIR / COMPARTIR</button>
         <button class="btn btn-secondary" onclick="document.getElementById('censo-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
       </div>`;
     document.body.appendChild(overlay);
 
-    overlay.querySelector('#btn-censo-print').onclick = () => {
-      const el = document.getElementById(contentId);
-      const filename = `Censo_${regaPropia}_${fecha}.pdf`;
-      if (typeof html2pdf !== 'undefined') {
+    overlay.querySelector('#btn-censo-print').onclick = async () => {
+      let loader;
+      try {
+        loader = document.createElement('div');
+        loader.id = 'pdf-loader-overlay';
+        loader.style.cssText = `
+          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+        `;
+        loader.innerHTML = `
+          <div class="pdf-loader">
+            <div class="pdf-loader-emoji">⏳</div>
+            <div class="pdf-loader-title">Generando Declaración</div>
+            <div class="pdf-loader-desc">Informe de Censo Anual</div>
+            <div class="pdf-loader-bar">
+              <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
+            </div>
+            <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
+          </div>
+        `;
+        document.body.appendChild(loader);
+
+        const updateProgress = (pct, text) => {
+          const bar = loader.querySelector('#pdf-progress-bar');
+          const txt = loader.querySelector('#pdf-progress-text');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = text.toUpperCase();
+        };
+
+        const el = document.getElementById(contentId);
+        if (!el) {
+          App.toastError("Error: contenido no encontrado");
+          loader.remove();
+          return;
+        }
+
+        updateProgress(30, 'Preparando documento...');
+        const tempContainer = document.createElement('div');
+        tempContainer.style.cssText = `position:fixed; left:0; top:0; width:800px; z-index:10; background:#fff; color:#000; padding:40px; font-family:serif; visibility:visible;`;
+        tempContainer.innerHTML = el.innerHTML;
+        document.body.appendChild(tempContainer);
+
+        const filename = `Declaracion_Censal_${regaPropia}_${fecha}.pdf`;
+
         const opt = {
-          margin: [12, 10, 12, 10], filename,
+          margin: [12, 10, 12, 10],
+          filename: filename,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
-        html2pdf().set(opt).from(el).save(filename);
-      } else if (window.WizardCrotales && WizardCrotales._fallbackPDF) {
-        WizardCrotales._fallbackPDF(el, filename);
-      } else {
-        window.print();
+
+        if (typeof html2pdf === 'undefined') {
+          document.body.removeChild(tempContainer);
+          loader.remove();
+          if (window.WizardCrotales && WizardCrotales._fallbackPDF) {
+            WizardCrotales._fallbackPDF(el, filename);
+          } else {
+            window.print();
+          }
+          return;
+        }
+
+        updateProgress(70, 'Rasterizando PDF...');
+        const pdfBlob = await html2pdf().set(opt).from(tempContainer).toPdf().output('blob');
+        document.body.removeChild(tempContainer);
+
+        updateProgress(90, 'Compartiendo...');
+
+        const shareTitle = 'Declaración Censal';
+        const shareText = `Censo oficial de la explotación ${regaPropia} a fecha ${fecha}`;
+
+        const fileObj = {
+          blob: pdfBlob,
+          fileName: filename,
+          mimeType: 'application/pdf',
+          titulo: 'Declaración Censal',
+          shareTitle,
+          shareText
+        };
+
+        if (window.InformesView && typeof InformesView._ejecutarShare === 'function') {
+          await InformesView._ejecutarShare(fileObj);
+        } else {
+          // Implementación local de share
+          const cap = window.Capacitor;
+          if (cap?.Plugins?.Share) {
+            const reader = new FileReader();
+            const dataUri = await new Promise((resolve, reject) => {
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(pdfBlob);
+            });
+            const result = await cap.Plugins.Filesystem.writeFile({
+              path: filename,
+              data: dataUri.split(',')[1],
+              directory: 'CACHE'
+            });
+            await cap.Plugins.Share.share({
+              title: shareTitle,
+              text: shareText,
+              url: result.uri,
+              files: [result.uri],
+              dialogTitle: 'Compartir Declaración con…'
+            });
+          } else if (navigator.share) {
+            const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+            await navigator.share({ title: shareTitle, text: shareText, files: [file] });
+          } else {
+            html2pdf().set(opt).from(el).save(filename);
+          }
+        }
+
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 400));
+        loader.remove();
+        App.toast("Declaración enviada ✅");
+
+      } catch (e) {
+        console.error("Error en generación PDF Censo:", e);
+        if (loader) loader.remove();
+        App.toastError("Error al generar PDF: " + e.message);
       }
     };
   }

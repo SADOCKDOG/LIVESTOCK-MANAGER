@@ -761,7 +761,6 @@ const App = {
             </div>
             <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
           </div>
-          
         `;
         document.body.appendChild(loader);
 
@@ -776,37 +775,90 @@ const App = {
         const sourceEl = overlay.querySelector(`#${contentId}`);
         const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
         const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; z-index:9990; background:#fff; color:#000; padding:30px;`;
+        tempContainer.style.cssText = `position:fixed; left:0; top:0; width:800px; z-index:10; background:#fff; color:#000; padding:30px; visibility:visible;`;
         tempContainer.innerHTML = sourceEl.innerHTML;
+        // Forzar color negro en hijos para evitar herencia de temas oscuros
+        tempContainer.querySelectorAll('*').forEach(el => el.style.color = 'black');
         document.body.appendChild(tempContainer);
+
+        const filename = `albaran_${albaran.cabecera.numero_albaran}.pdf`;
 
         const opt = {
           margin: [12, 10, 12, 10],
-          filename: `albaran_${albaran.cabecera.numero_albaran}.pdf`,
+          filename: filename,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
-            width: 800,
-            scrollX: 0,
-            scrollY: currentScroll,
-            height: tempContainer.scrollHeight,
-            windowHeight: tempContainer.scrollHeight
+            backgroundColor: '#ffffff'
           },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
-        updateProgress(70, 'Generando archivo...');
-        await html2pdf().set(opt).from(tempContainer).save();
+        if (typeof html2pdf === 'undefined') {
+          document.body.removeChild(tempContainer);
+          loader.remove();
+          html2pdf().set(opt).from(sourceEl).save();
+          return;
+        }
 
+        updateProgress(70, 'Rasterizando PDF...');
+        const pdfBlob = await html2pdf().set(opt).from(tempContainer).toPdf().output('blob');
         document.body.removeChild(tempContainer);
+
+        updateProgress(90, 'Compartiendo...');
+
+        const shareTitle = 'Albarán de Expedición';
+        const shareText = `Albarán nº ${albaran.cabecera.numero_albaran}`;
+
+        const fileObj = {
+          blob: pdfBlob,
+          fileName: filename,
+          mimeType: 'application/pdf',
+          titulo: 'Albarán',
+          shareTitle,
+          shareText
+        };
+
+        if (window.InformesView && typeof InformesView._ejecutarShare === 'function') {
+          await InformesView._ejecutarShare(fileObj);
+        } else {
+          const cap = window.Capacitor;
+          if (cap?.Plugins?.Share) {
+            const reader = new FileReader();
+            const dataUri = await new Promise((resolve, reject) => {
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(pdfBlob);
+            });
+            const result = await cap.Plugins.Filesystem.writeFile({
+              path: filename,
+              data: dataUri.split(',')[1],
+              directory: 'CACHE'
+            });
+            await cap.Plugins.Share.share({
+              title: shareTitle,
+              text: shareText,
+              url: result.uri,
+              files: [result.uri],
+              dialogTitle: 'Compartir Albarán con…'
+            });
+          } else if (navigator.share) {
+            const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+            await navigator.share({ title: shareTitle, text: shareText, files: [file] });
+          } else {
+            html2pdf().set(opt).from(sourceEl).save(filename);
+          }
+        }
+
         updateProgress(100, '¡Listo!');
         await new Promise(r => setTimeout(r, 500));
         loader.remove();
       } catch (e) {
         console.error('[App PDF] Error:', e);
         if (loader) loader.remove();
+        App.toastError("Error al generar PDF: " + e.message);
       }
     };
   },
