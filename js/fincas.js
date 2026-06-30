@@ -240,6 +240,9 @@ const Fincas = {
      */
     async crearNueva(datos) {
         return await ErrorHandler.tryAsync(async () => {
+            if (window.PremiumManager && window.PremiumManager.isFree() && !datos.demo) {
+                throw new Error('La creación de fincas solo está disponible en la versión Premium');
+            }
             // Validar campos requeridos
             ErrorHandler.validateRequired('nombre', datos.nombre, 'Nombre es requerido');
             ErrorHandler.validateRequired('propietario', datos.propietario, 'Propietario es requerido');

@@ -39,7 +39,45 @@ const AjustesView = {
     const catalogoTiposResumen = catalogoTiposREGA.slice(0, 5);
     const catalogoTiposResto = catalogoTiposREGA.slice(5);
 
+    var isFree = window.PremiumManager && window.PremiumManager.isFree();
+
     main.innerHTML = `
+      ${isFree ? `
+      <div class="card mb-25 p-20" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
+        <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(217,119,6,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(217,119,6,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div class="flex items-center gap-15">
+          <div style="flex-shrink:0;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(217,119,6,0.3);">
+            ${Icons.premium()}
+          </div>
+          <div class="flex-1">
+            <div class="text-white font-900 text-base uppercase tracking-wider" style="letter-spacing:0.5px;">Livestock Manager</div>
+            <div class="flex items-center gap-6 mt-4">
+              <span style="display:inline-block;padding:2px 10px;border-radius:20px;background:rgba(217,119,6,0.15);color:#d97706;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">Free</span>
+              <span class="text-gray text-xs">Versi&oacute;n gratuita</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-18 p-16" style="background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid rgba(255,255,255,0.05);">
+          <p class="text-gray text-sm mt-0 mb-12" style="line-height:1.6;">
+            Est&aacute;s usando la <strong class="text-white">versi&oacute;n gratuita</strong> con datos de demostraci&oacute;n.
+            Actualiza a Premium para acceder a todas las funciones profesionales.
+          </p>
+          <div class="grid grid-cols-2 gap-8 text-xs mb-14">
+            <div class="flex items-center gap-8 text-gray"><span style="color:#22c55e;font-weight:bold;">&#10003;</span> Datos demo precargados</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:#22c55e;font-weight:bold;">&#10003;</span> Crear registros propios</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> Exportar / Importar</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> M&uacute;ltiples fincas</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> Editar registros demo</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> L&iacute;mite 15 animales / 30 gastos</div>
+          </div>
+          <button class="btn w-full" style="background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:14px 32px;font-weight:900;font-size:0.85rem;border-radius:12px;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(217,119,6,0.25);" onclick="App.toast('Disponible pr&oacute;ximamente en Google Play')">
+            ${Icons.estrella()} Actualizar a Premium
+          </button>
+        </div>
+      </div>
+      ` : ''}
+
       <!-- ===================== GESTOR DE FINCA ===================== -->
       ${activeFinca ? `
       <div class="card card-accent card-accent-green mb-25 p-20">
@@ -71,10 +109,16 @@ const AjustesView = {
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.finca()} Mis Fincas</h3>
         <p class="text-gray mt-5 text-sm">Gestiona tus explotaciones ganaderas y cambia la finca activa del sistema.</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-15 mb-20">
+          ${isFree ? `
+          <div class="info-box" style="background:#1a1a2e;border:1px solid #d97706;">
+            <p class="text-center text-gray text-sm my-10">${Icons.alerta()} La creación de múltiples fincas está disponible en Premium.</p>
+          </div>
+          ` : `
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="App._showFincaForm()">
             ${Icons.agregar()}
             <span class="widget-link-label">Nueva Finca</span>
           </button>
+          `}
         </div>
         <div class="grid gap-10">${fincas.map((f) => {
           const anims = animales.filter(a => a.rebanoId && rebanos.some(r => r.id === a.rebanoId && r.fincaId === f.id));
@@ -92,6 +136,11 @@ const AjustesView = {
       <div class="card card-accent card-accent-blue mb-25 p-20">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.guardar()} Copias de Seguridad</h3>
         <p class="text-gray mt-5 text-sm">Exporta o importa todos los datos de la aplicación en formato JSON para seguridad.</p>
+        ${isFree ? `
+        <div class="info-box mt-15" style="background:#1a1a2e;border:1px solid #d97706;">
+          <p class="text-center text-gray text-sm my-10">${Icons.alerta()} Las copias de seguridad están disponibles en la versión Premium.</p>
+        </div>
+        ` : `
         <div class="grid grid-cols-2 gap-10 mt-15 mb-15">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App.exportBackup()">
             ${Icons.exportar()}
@@ -106,6 +155,7 @@ const AjustesView = {
         <label class="flex items-center gap-8 mt-10 text-xs text-gray cursor-pointer" onclick="const c=document.getElementById('auto-backup'); if(c){c.checked=!c.checked;AjustesView._toggleAutoBackup(c.checked)}">
           <input type="checkbox" id="auto-backup" ${config.autoBackup ? 'checked' : ''} style="accent-color:#3b82f6;"> Backup automático al salir
         </label>
+        `}
       </div>
 
       <!-- ===================== PAQUETE LÁCTEO ===================== -->

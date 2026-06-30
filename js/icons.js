@@ -406,6 +406,24 @@ const Icons = {
       '<line x1="12" y1="3" x2="12" y2="15"/>'
     );
   },
+   corona() {
+     return this._svg(
+       '<path d="M12 2l2.4 4.8 5.3.7-3.9 3.8.9 5.4L12 14.5 7.3 16.7l.9-5.4L4.3 7.5l5.3-.7z"/>'
+     );
+   },
+   estrella() {
+     return this._svg(
+       '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+     );
+   },
+   /* Desbloqueado / Premium */
+   premium() {
+     return this._svg(
+       '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>' +
+       '<path d="M7 11V7a5 5 0 0 1 10 0v4"/>' +
+       '<circle cx="12" cy="16" r="1" fill="currentColor"/>'
+     );
+   },
    enlace() {
     return this._svg(
       '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>' +

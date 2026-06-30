@@ -50,6 +50,13 @@ const Sanitarios = {
 
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+                const existente = await this.get(data.id);
+                if (existente && existente.demo) {
+                    throw new Error('No puedes modificar registros sanitarios de demostración en la versión gratuita');
+                }
+            }
+
             // Integración con Catálogo Sanitario: auto-rellenar datos si se seleccionó un medicamento del catálogo
             if (data.catalogoMedId && window.CatalogoSanitario) {
                 const med = window.CatalogoSanitario.obtenerMedicamento(data.catalogoMedId);
@@ -93,6 +100,13 @@ const Sanitarios = {
     },
 
     async delete(id) {
+        if (window.PremiumManager && window.PremiumManager.isFree()) {
+            const record = await this.get(id);
+            if (record && record.demo) {
+                throw new Error('No puedes eliminar registros sanitarios de demostración en la versión gratuita');
+            }
+        }
+
         const result = await window.db.delete('sanitarios_ganado', Number(id));
         if (window.EventBus) {
             window.EventBus.emit('tratamiento:deleted', { id: Number(id) });

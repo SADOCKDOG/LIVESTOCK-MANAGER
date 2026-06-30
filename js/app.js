@@ -91,8 +91,13 @@ const App = {
 
       const fincas = await Fincas.list();
       if (fincas.length === 0 || !(await Fincas.getActiveId())) {
-        await AsistenteConfiguracion.mostrarAsistente();
-        return;
+        if (window.PremiumManager && window.PremiumManager.isFree()) {
+          console.log("[FREE] Auto-cargando demo CHAMORRO...");
+          await window.SeedData.run(true);
+        } else {
+          await AsistenteConfiguracion.mostrarAsistente();
+          return;
+        }
       }
 
       await App.updateHeader();
@@ -1881,6 +1886,10 @@ const App = {
   },
 
   async exportBackup() {
+    if (window.PremiumManager && window.PremiumManager.isFree()) {
+      App.toastError("La exportación de copias de seguridad solo está disponible en la versión Premium");
+      return;
+    }
     try {
       App.toast("Generando copia de seguridad...");
       const stores = [
@@ -1969,6 +1978,10 @@ const App = {
   },
 
   async importBackup(event) {
+    if (window.PremiumManager && window.PremiumManager.isFree()) {
+      App.toastError("La importación de copias de seguridad solo está disponible en la versión Premium");
+      return;
+    }
     const file = event.target.files[0];
     if (!file) return;
     App.toast(`Restaurando backup: ${file.name}...`);
@@ -2006,6 +2019,10 @@ const App = {
   },
 
   async _showFincaForm() {
+    if (window.PremiumManager && window.PremiumManager.isFree()) {
+      App.toastError('La creación de múltiples fincas solo está disponible en Premium');
+      return;
+    }
     if (window.WizardFinca) {
       window.WizardFinca.showForm();
     }

@@ -56,6 +56,15 @@ const Animales = {
           }
         }
 
+        // Límite de animales en versión gratuita
+        if (!esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+          const todos = await window.db.getAll('animales');
+          const noDemo = todos.filter(a => !a.demo && !a?.anulado);
+          if (noDemo.length >= window.PremiumManager.maxAnimals()) {
+            throw new Error('Has alcanzado el límite de animales en la versión gratuita (máx. ' + window.PremiumManager.maxAnimals() + '). Actualiza a Premium para añadir más.');
+          }
+        }
+
         // 1. Control de Duplicados (solo si es nuevo o ha cambiado el crotal)
         if (!esEdicion) {
           const existente = await window.db.getFromIndex(
@@ -69,6 +78,9 @@ const Animales = {
             );
         } else {
           const actual = await this.get(data.id);
+          if (actual && window.PremiumManager && window.PremiumManager.isFree() && actual.demo && !data.demo) {
+            throw new Error('No puedes modificar animales de demostración en la versión gratuita');
+          }
           if (actual && actual.numero_identificacion !== crotal) {
             const existente = await window.db.getFromIndex(
               "animales",
@@ -219,6 +231,9 @@ const Animales = {
         const animal = await this.get(numId);
 
         if (!animal) return;
+        if (window.PremiumManager && window.PremiumManager.isFree() && animal.demo) {
+          throw new Error('No puedes eliminar animales de demostración en la versión gratuita');
+        }
 
         // Proteger integridad referencial comercial
         const [prodCarne, comCarne, eventos] = await Promise.all([

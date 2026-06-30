@@ -47,6 +47,13 @@ const Compradores = {
         return await ErrorHandler.tryAsync(async () => {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+                const existente = await this.get(data.id);
+                if (existente && existente.demo) {
+                    throw new Error('No puedes modificar compradores de demostración en la versión gratuita');
+                }
+            }
+
             ErrorHandler.validateRequired('nombre', data.nombre, 'Nombre o razón social es obligatorio');
             const nifVal = ErrorHandler.validateNifCif(data.nif_cif, { required: true });
             const tipoOperador = (data.tipo_operador || '').trim() || (
@@ -102,6 +109,13 @@ const Compradores = {
 
     async delete(id) {
         return await ErrorHandler.tryAsync(async () => {
+            if (window.PremiumManager && window.PremiumManager.isFree()) {
+                const record = await this.get(id);
+                if (record && record.demo) {
+                    throw new Error('No puedes eliminar compradores de demostración en la versión gratuita');
+                }
+            }
+
             // Verificar que no tenga ventas asociadas
             const [ventasCarne, entregasLeche] = await Promise.all([
                 this.getVentasCarne(id),

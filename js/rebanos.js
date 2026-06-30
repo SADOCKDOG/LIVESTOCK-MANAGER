@@ -37,12 +37,15 @@ const Rebanos = {
 
     async delete(id) {
         const numId = Number(id);
+        const rebano = await this.get(numId);
+        if (rebano && window.PremiumManager && window.PremiumManager.isFree() && rebano.demo) {
+            throw new Error('No puedes eliminar rebaños de demostración en la versión gratuita');
+        }
         const animales = await window.db.getAllFromIndex('animales', 'rebanoId', numId);
         const activos = (animales || []).filter(a => !a?.anulado && (a.estado || 'activo') === 'activo');
         if (activos.length > 0) {
             throw new Error('No se puede eliminar el rebaño porque tiene animales asociados.');
         }
-        const rebano = await this.get(numId);
         if (!rebano) return;
         rebano.estado = 'inactivo';
         rebano.anulado = true;

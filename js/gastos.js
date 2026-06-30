@@ -34,6 +34,21 @@ const Gastos = {
 
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (!esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+              const todos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaActivaId);
+              const noDemo = todos.filter(g => !g.demo);
+              if (noDemo.length >= window.PremiumManager.maxGastos()) {
+                throw new Error('Has alcanzado el límite de gastos en la versión gratuita (máx. ' + window.PremiumManager.maxGastos() + '). Actualiza a Premium para añadir más.');
+              }
+            }
+
+            if (esEdicion) {
+              const existente = await window.db.get('gastos_ganaderia', Number(data.id));
+              if (existente && window.PremiumManager && window.PremiumManager.isFree() && existente.demo) {
+                throw new Error('No puedes modificar gastos de demostración en la versión gratuita');
+              }
+            }
+
             // Capturar Snapshot de contexto
             const snapMetadata = window.SnapshotService
                 ? await window.SnapshotService.buildSnapMetadata(data.rebanoId)
@@ -123,6 +138,10 @@ const Gastos = {
     },
 
     async delete(id) {
+        const gasto = await window.db.get('gastos_ganaderia', Number(id));
+        if (gasto && window.PremiumManager && window.PremiumManager.isFree() && gasto.demo) {
+          throw new Error('No puedes eliminar gastos de demostración en la versión gratuita');
+        }
         await window.db.delete('gastos_ganaderia', Number(id));
         if (window.EventBus) {
             window.EventBus.emit('gasto:deleted', { id: Number(id) });

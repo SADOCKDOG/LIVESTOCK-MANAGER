@@ -46,6 +46,13 @@ const Contratos = {
         return await ErrorHandler.tryAsync(async () => {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+                const existente = await this.get(data.id);
+                if (existente && existente.demo) {
+                    throw new Error('No puedes modificar contratos de demostración en la versión gratuita');
+                }
+            }
+
             ErrorHandler.validateRequired('compradorId', data.compradorId, 'Comprador es obligatorio');
             ErrorHandler.validateRequired('numero_contrato', data.numero_contrato, 'Número de contrato es obligatorio');
             ErrorHandler.validateRequired('fecha_inicio', data.fecha_inicio, 'Fecha de inicio es obligatoria');
@@ -84,6 +91,13 @@ const Contratos = {
 
     async delete(id) {
         return await ErrorHandler.tryAsync(async () => {
+            if (window.PremiumManager && window.PremiumManager.isFree()) {
+                const record = await this.get(id);
+                if (record && record.demo) {
+                    throw new Error('No puedes eliminar contratos de demostración en la versión gratuita');
+                }
+            }
+
             await window.db.delete('contratos_compra', Number(id));
             if (window.EventBus) {
                 window.EventBus.emit('contrato:deleted', { id: Number(id) });

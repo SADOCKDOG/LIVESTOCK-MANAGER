@@ -11,6 +11,7 @@
   'use strict';
 
   var DEMO_FINCA = {
+    demo: true,
     nombre: 'Ganadería CHAMORRO (DEMO)',
     propietario: 'Familia Chamorro',
     direccion: 'Ctra. Almonte-El Rocío, Km 12',
@@ -57,6 +58,11 @@
 
   async function seedDatabase(force) {
     try {
+      var isFree = window.PremiumManager && window.PremiumManager.isFree();
+      if (isFree && localStorage.getItem('seed_data_completed') === 'true') {
+        console.log('[SEED] Ya seedeado (FREE)');
+        return;
+      }
       if (!force && localStorage.getItem('seed_data_completed') === 'true') {
         console.log('[SEED] Ya seedeado');
         return;
@@ -64,6 +70,10 @@
 
       var existing = await Fincas.list();
       if (existing && existing.length > 0) {
+        if (isFree) {
+          console.log('[SEED] Ya hay datos (FREE)');
+          return;
+        }
         showToast('Ya hay datos en la app; la demo no se carga para no sobrescribir.', '#ef4444');
         return;
       }
@@ -91,9 +101,9 @@
 
       // 2. Rebaños
       var rebDefs = [
-        { nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId, tipo_explotacion_rega: 'Producción y reproducción' },
-        { nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' },
-        { nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' }
+        { demo: true, nombre: 'Vacas Frisonas', tipo: 'Láctea', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 50, fincaId: fincaId, tipo_explotacion_rega: 'Producción y reproducción' },
+        { demo: true, nombre: 'Terneros Cebo', tipo: 'Cárnica', especie: 'Vacas', zonaActual: 'Parcela Norte 42ha', capacidad_total: 30, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' },
+        { demo: true, nombre: 'Ovejas Merinas', tipo: 'Cárnica', especie: 'Ovejas', zonaActual: 'Pastos Este 15ha', capacidad_total: 200, fincaId: fincaId, tipo_explotacion_rega: 'Cebo o engorde (Cebadero)' }
       ];
       var rebs = [];
       for (var i = 0; i < rebDefs.length; i++) {
@@ -105,15 +115,15 @@
 
       // 3. Animales (rebanoId asignado directamente en la definición)
       var animDefs = [
-        { numero_identificacion: 'ES123456789012', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2021-03-15', sexo: 'H', raza: 'Frisona', peso_inicial: 580, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V1-2021' },
-        { numero_identificacion: 'ES123456789013', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2020-07-22', sexo: 'H', raza: 'Frisona', peso_inicial: 620, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V2-2020' },
-        { numero_identificacion: 'ES123456789014', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2022-01-10', sexo: 'H', raza: 'Frisona', peso_inicial: 510, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V3-2022' },
-        { numero_identificacion: 'ES123456789015', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-11-05', sexo: 'M', raza: 'Frisona', peso_inicial: 180, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T1-2024', madre_id: null },
-        { numero_identificacion: 'ES123456789016', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-10-20', sexo: 'M', raza: 'Frisona', peso_inicial: 195, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T2-2024', madre_id: null },
-        { numero_identificacion: 'ES654321098765', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2022-06-01', sexo: 'H', raza: 'Merina', peso_inicial: 55, rebanoId: rebOvejas.id, categoria: 'Madres' },
-        { numero_identificacion: 'ES654321098766', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2023-02-14', sexo: 'H', raza: 'Merina', peso_inicial: 52, rebanoId: rebOvejas.id, categoria: 'Madres' },
-        { numero_identificacion: 'ES654321098767', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2021-11-30', sexo: 'H', raza: 'Merina', peso_inicial: 58, rebanoId: rebOvejas.id, categoria: 'Madres' },
-        { numero_identificacion: 'ES654321098768', especie: 'Ovejas', tipo: 'Cordero', estado: 'activo', fecha_nacimiento: '2024-05-18', sexo: 'M', raza: 'Merina', peso_inicial: 60, rebanoId: rebOvejas.id, categoria: 'Cebo' }
+        { demo: true, numero_identificacion: 'ES123456789012', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2021-03-15', sexo: 'H', raza: 'Frisona', peso_inicial: 580, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V1-2021' },
+        { demo: true, numero_identificacion: 'ES123456789013', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2020-07-22', sexo: 'H', raza: 'Frisona', peso_inicial: 620, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V2-2020' },
+        { demo: true, numero_identificacion: 'ES123456789014', especie: 'Vacas', tipo: 'Vaca Frisona', estado: 'activo', fecha_nacimiento: '2022-01-10', sexo: 'H', raza: 'Frisona', peso_inicial: 510, rebanoId: rebVacas.id, categoria: 'Producción', dib: 'DIB-V3-2022' },
+        { demo: true, numero_identificacion: 'ES123456789015', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-11-05', sexo: 'M', raza: 'Frisona', peso_inicial: 180, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T1-2024', madre_id: null },
+        { demo: true, numero_identificacion: 'ES123456789016', especie: 'Vacas', tipo: 'Ternero', estado: 'activo', fecha_nacimiento: '2024-10-20', sexo: 'M', raza: 'Frisona', peso_inicial: 195, rebanoId: rebTerneros.id, categoria: 'Recría', dib: 'DIB-T2-2024', madre_id: null },
+        { demo: true, numero_identificacion: 'ES654321098765', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2022-06-01', sexo: 'H', raza: 'Merina', peso_inicial: 55, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { demo: true, numero_identificacion: 'ES654321098766', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2023-02-14', sexo: 'H', raza: 'Merina', peso_inicial: 52, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { demo: true, numero_identificacion: 'ES654321098767', especie: 'Ovejas', tipo: 'Oveja Merina', estado: 'activo', fecha_nacimiento: '2021-11-30', sexo: 'H', raza: 'Merina', peso_inicial: 58, rebanoId: rebOvejas.id, categoria: 'Madres' },
+        { demo: true, numero_identificacion: 'ES654321098768', especie: 'Ovejas', tipo: 'Cordero', estado: 'activo', fecha_nacimiento: '2024-05-18', sexo: 'M', raza: 'Merina', peso_inicial: 60, rebanoId: rebOvejas.id, categoria: 'Cebo' }
       ];
       var anims = [];
       for (var a = 0; a < animDefs.length; a++) {
@@ -161,9 +171,9 @@
 
       // 5. Compradores
       var compDefs = [
-        { nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765431', tipo_comprador: 'cárnico', tipo_operador: 'matadero', rega: 'ES061234000456', comunidad_autonoma: 'extremadura', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz', activo: true },
-        { nombre: 'Lácteos La Serena SA', nif_cif: 'A87654323', tipo_comprador: 'láctico', tipo_operador: 'quesería', rega: 'ES061234000789', comunidad_autonoma: 'extremadura', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz', activo: true },
-        { nombre: 'Ganados del Oeste SL', nif_cif: 'B76543214', tipo_comprador: 'híbrido', tipo_operador: 'intermediario', rega: 'ES061234001012', comunidad_autonoma: 'extremadura', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres', activo: true }
+        { demo: true, nombre: 'Cárnicas Extremeñas SL', nif_cif: 'B98765431', tipo_comprador: 'cárnico', tipo_operador: 'matadero', rega: 'ES061234000456', comunidad_autonoma: 'extremadura', telefono: '+34 924 111 222', ciudad: 'Mérida', provincia: 'Badajoz', activo: true },
+        { demo: true, nombre: 'Lácteos La Serena SA', nif_cif: 'A87654323', tipo_comprador: 'láctico', tipo_operador: 'quesería', rega: 'ES061234000789', comunidad_autonoma: 'extremadura', telefono: '+34 924 333 444', ciudad: 'Don Benito', provincia: 'Badajoz', activo: true },
+        { demo: true, nombre: 'Ganados del Oeste SL', nif_cif: 'B76543214', tipo_comprador: 'híbrido', tipo_operador: 'intermediario', rega: 'ES061234001012', comunidad_autonoma: 'extremadura', telefono: '+34 927 555 666', ciudad: 'Cáceres', provincia: 'Cáceres', activo: true }
       ];
       var comps = [];
       for (var c = 0; c < compDefs.length; c++) {
@@ -177,9 +187,9 @@
 
       // 6. Proveedores
       var provDefs = [
-        { nombre: 'Piensos El Trébol SA', nif_cif: 'A65432106', tipo_operador: 'fabricante_pienso', rega: 'ES061234001345', comunidad_autonoma: 'extremadura', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'], activo: true },
-        { nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321096', tipo_operador: 'veterinario', rega: 'ES061234001678', comunidad_autonoma: 'extremadura', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'], activo: true },
-        { nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210988', tipo_operador: 'proveedor_equipos', rega: 'ES061234002011', comunidad_autonoma: 'extremadura', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'], activo: true }
+        { demo: true, nombre: 'Piensos El Trébol SA', nif_cif: 'A65432106', tipo_operador: 'fabricante_pienso', rega: 'ES061234001345', comunidad_autonoma: 'extremadura', ciudad: 'Zafra', provincia: 'Badajoz', categorias: ['Alimentacion'], activo: true },
+        { demo: true, nombre: 'Farmacia Veterinaria VetPlus', nif_cif: 'B54321096', tipo_operador: 'veterinario', rega: 'ES061234001678', comunidad_autonoma: 'extremadura', ciudad: 'Badajoz', provincia: 'Badajoz', categorias: ['Sanidad'], activo: true },
+        { demo: true, nombre: 'Maquinaria Agrícola La Vega', nif_cif: 'B43210988', tipo_operador: 'proveedor_equipos', rega: 'ES061234002011', comunidad_autonoma: 'extremadura', ciudad: 'Plasencia', provincia: 'Cáceres', categorias: ['Amortizacion'], activo: true }
       ];
       var provs = [];
       for (var pv = 0; pv < provDefs.length; pv++) {
@@ -193,8 +203,8 @@
 
       // 7. Transportistas
       var transDefs = [
-        { nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109878', matricula: '1234BCD', autorizacion_transporte_ganado: 'ATG-BA-2024-001', desinsectacion_ultima_fecha: '2026-06-10', desinsectacion_vencimiento: '2026-09-10', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'camion', capacidad_animales: 40, certificado_bienestar: true, activo: true },
-        { nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098769', matricula: '5678EFG', autorizacion_transporte_ganado: 'ATG-BA-2024-002', desinsectacion_ultima_fecha: '2026-06-05', desinsectacion_vencimiento: '2026-09-05', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'cisterna', capacidad_animales: 0, condiciones_termoneutrales: true, activo: true }
+        { demo: true, nombre: 'Transportes Ganaderos del Sur SL', nif_cif: 'B32109878', matricula: '1234BCD', autorizacion_transporte_ganado: 'ATG-BA-2024-001', desinsectacion_ultima_fecha: '2026-06-10', desinsectacion_vencimiento: '2026-09-10', ciudad: 'Almendralejo', provincia: 'Badajoz', tipo_vehiculo: 'camion', capacidad_animales: 40, certificado_bienestar: true, activo: true },
+        { demo: true, nombre: 'Logística Láctea Extremeña', nif_cif: 'B21098769', matricula: '5678EFG', autorizacion_transporte_ganado: 'ATG-BA-2024-002', desinsectacion_ultima_fecha: '2026-06-05', desinsectacion_vencimiento: '2026-09-05', ciudad: 'Villanueva de la Serena', provincia: 'Badajoz', tipo_vehiculo: 'cisterna', capacidad_animales: 0, condiciones_termoneutrales: true, activo: true }
       ];
       var transIds = [];
       for (var t = 0; t < transDefs.length; t++) {
@@ -214,6 +224,7 @@
       if (compCarne) {
         try {
           contCarneId = await Contratos.save({
+            demo: true,
             compradorId: compCarne.id,
             numero_contrato: 'CT-2026-001',
             tipo: 'carne',
@@ -233,6 +244,7 @@
       if (compLeche) {
         try {
           contLecheId = await Contratos.save({
+            demo: true,
             compradorId: compLeche.id,
             numero_contrato: 'CT-2026-002',
             tipo: 'leche',
@@ -256,13 +268,13 @@
       var hace20d = new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
       var gastosDefs = [
-        { concepto: 'Pienso concentrado vacuno', fecha: hace10d, monto: 2340.50, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
-        { concepto: 'Paja para cama y lecho', fecha: hace20d, monto: 680.00, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
-        { concepto: 'Vacunación trimestral', fecha: '2025-03-10', monto: 425.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null },
-        { concepto: 'Gasoil tractor', fecha: '2025-03-15', monto: 320.75, categoria: 'Amortizacion', proveedorId: provMaq ? provMaq.id : null },
-        { concepto: 'Mantenimiento valla parcela norte', fecha: '2025-03-20', monto: 890.00, categoria: 'Amortizacion', proveedorId: provMaq ? provMaq.id : null },
-        { concepto: 'Pienso lactancia corderos', fecha: hace10d, monto: 540.00, categoria: 'Alimentacion', rebanoId: rebOvejas.id, proveedorId: provPienso ? provPienso.id : null },
-        { concepto: 'Veterinario revisión rebaño', fecha: hoyStr, monto: 260.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null }
+        { demo: true, concepto: 'Pienso concentrado vacuno', fecha: hace10d, monto: 2340.50, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
+        { demo: true, concepto: 'Paja para cama y lecho', fecha: hace20d, monto: 680.00, categoria: 'Alimentacion', rebanoId: rebVacas.id, proveedorId: provPienso ? provPienso.id : null },
+        { demo: true, concepto: 'Vacunación trimestral', fecha: '2025-03-10', monto: 425.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null },
+        { demo: true, concepto: 'Gasoil tractor', fecha: '2025-03-15', monto: 320.75, categoria: 'Amortizacion', proveedorId: provMaq ? provMaq.id : null },
+        { demo: true, concepto: 'Mantenimiento valla parcela norte', fecha: '2025-03-20', monto: 890.00, categoria: 'Amortizacion', proveedorId: provMaq ? provMaq.id : null },
+        { demo: true, concepto: 'Pienso lactancia corderos', fecha: hace10d, monto: 540.00, categoria: 'Alimentacion', rebanoId: rebOvejas.id, proveedorId: provPienso ? provPienso.id : null },
+        { demo: true, concepto: 'Veterinario revisión rebaño', fecha: hoyStr, monto: 260.00, categoria: 'Sanidad', rebanoId: rebVacas.id, proveedorId: provVet ? provVet.id : null }
       ];
       for (var g = 0; g < gastosDefs.length; g++) {
         try { await Gastos.save(gastosDefs[g]); } catch (e) { console.log('[SEED] Error gasto:', e.message); }
@@ -272,6 +284,7 @@
       // 10. Sanitarios (alineados con ejemplos de manual)
       var sanDefs = [
         {
+          demo: true,
           tipo_tratamiento: 'Vacunación',
           medicamento: 'Nobivac IP',
           fecha: '2026-06-10',
@@ -282,6 +295,7 @@
           rebanoId: rebVacas.id
         },
         {
+          demo: true,
           tipo_tratamiento: 'Desparasitación',
           medicamento: 'Ivermectina 1%',
           fecha: '2026-06-01',
@@ -292,6 +306,7 @@
           rebanoId: rebVacas.id
         },
         {
+          demo: true,
           tipo_tratamiento: 'Antibiótico',
           medicamento: 'Penicilina G inyectable (500.000 UI)',
           fecha: '2026-06-05',
@@ -313,10 +328,10 @@
       // 11. Eventos reproductivos (vaca1, alineados con ejemplos de manual)
       if (vaca1) {
         var repDefs = [
-          { tipo_evento: 'Celo', fecha: '2025-08-20', animalId: vaca1.id },
-          { tipo_evento: 'Inseminación Artificial', fecha: '2025-08-21', animalId: vaca1.id, semenalId: 'Reproductor-5' },
-          { tipo_evento: 'Diagnóstico Gestación', fecha: '2025-09-20', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 30 },
-          { tipo_evento: 'Parto', fecha: '2026-05-30', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
+          { demo: true, tipo_evento: 'Celo', fecha: '2025-08-20', animalId: vaca1.id },
+          { demo: true, tipo_evento: 'Inseminación Artificial', fecha: '2025-08-21', animalId: vaca1.id, semenalId: 'Reproductor-5' },
+          { demo: true, tipo_evento: 'Diagnóstico Gestación', fecha: '2025-09-20', animalId: vaca1.id, resultado: 'Positivo', dias_gestacion: 30 },
+          { demo: true, tipo_evento: 'Parto', fecha: '2026-05-30', animalId: vaca1.id, crias_vivas: 1, crias_muertas: 0, observaciones: 'Parto sin complicaciones' }
         ];
         for (var r2 = 0; r2 < repDefs.length; r2++) {
           try { await Reproduccion.saveEvento(repDefs[r2]); } catch (e) { console.log('[SEED] Error reproducción:', e.message); }
@@ -337,6 +352,7 @@
         for (var pp = 0; pp < pcItem.pesos.length; pp++) {
           try {
             await window.db.add('registro_eventos', {
+              demo: true,
               fincaId: fincaId,
               fecha: pcItem.pesos[pp].f,
               entidad_id: pcItem.animal.id,
@@ -367,6 +383,7 @@
             var litros = 22 + Math.round(Math.random() * 8);
             // 1. Guardar en tabla cifrada (para el historial de leche)
             await Produccion.saveLeche({
+              demo: true,
               vacaId: prodLecheVacas[plv].id,
               fecha: lecheFechas[lf],
               cantidad_litros: litros,
@@ -375,6 +392,7 @@
 
             // 2. Registrar en Libro Maestro (registro_eventos) para visibilidad en Producción
             await window.db.add('registro_eventos', {
+              demo: true,
               fincaId: fincaId,
               fecha: lecheFechas[lf],
               entidad_id: prodLecheVacas[plv].id,
@@ -398,6 +416,7 @@
       // Registro de EXPEDICIÓN DE TANQUE (ejemplo lácteo)
       try {
         await window.db.add('registro_eventos', {
+          demo: true,
           fincaId: fincaId,
           fecha: hoyStr,
           entidad_id: fincaId,
@@ -432,6 +451,7 @@
         var costeAlim = 420;
         try {
           await window.db.add('comercializacion_leche', {
+            demo: true,
             fincaId: fincaId,
             compradorId: compLeche ? compLeche.id : null,
             contratoId: contLecheId || null,
@@ -470,6 +490,7 @@
           var pesoVivoV = 300, pesoCanalV = 168;
           var fechaSacrificio = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
           var regVentaCarne = {
+            demo: true,
             animalId: terner2.id,
             compradorId: compCarne.id,
             contratoId: contCarneId || null,
@@ -504,6 +525,7 @@
           // También registrar en ventas_ganado cifrado (para analítica y reportes)
           try {
             await Produccion.saveVentas({
+              demo: true,
               animal_id_list: [terner2.id],
               precio_total: regVentaCarne.precio_total,
               comprador: compCarne.nombre,
@@ -517,6 +539,7 @@
           if (aVendido) { aVendido.estado = 'vendido'; await Animales.save(aVendido); }
           // DIMOE como documento legal
           await window.db.add('documentos_legales', {
+            demo: true,
             tipo: 'dimoe',
             ventaId: idVentaCarne,
             animalId: terner2.id,

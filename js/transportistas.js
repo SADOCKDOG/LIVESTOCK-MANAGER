@@ -52,6 +52,13 @@ const Transportistas = {
         return await ErrorHandler.tryAsync(async () => {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+                const existente = await this.get(data.id);
+                if (existente && existente.demo) {
+                    throw new Error('No puedes modificar transportistas de demostración en la versión gratuita');
+                }
+            }
+
             ErrorHandler.validateRequired('nombre', data.nombre, 'Nombre o razón social es obligatorio');
             const nifVal = ErrorHandler.validateNifCif(data.nif_cif, { required: true });
             ErrorHandler.validateRequired('autorizacion_transporte_ganado', data.autorizacion_transporte_ganado, 'La autorización ATG es obligatoria');
@@ -110,6 +117,13 @@ const Transportistas = {
 
     async delete(id) {
         return await ErrorHandler.tryAsync(async () => {
+            if (window.PremiumManager && window.PremiumManager.isFree()) {
+                const record = await this.get(id);
+                if (record && record.demo) {
+                    throw new Error('No puedes eliminar transportistas de demostración en la versión gratuita');
+                }
+            }
+
             const expediciones = await Transportistas.getExpediciones(id);
             if (expediciones.length > 0) {
                 throw new Error(`No se puede eliminar: el transportista tiene ${expediciones.length} expedición(es) registrada(s).`);
