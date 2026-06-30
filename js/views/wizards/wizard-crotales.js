@@ -191,252 +191,110 @@ window.WizardCrotales = {
     });
   },
 
-  async generarPDF(finca, data, pedidoId = null) {
+  async   async generarPDF(finca, data, pedidoId = null) {
     App.toast("Generando documento oficial...");
-    const overlay = document.createElement('div');
-    overlay.id = "pedido-pdf-overlay";
-    overlay.className = "wizard-full-screen animate-in";
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:white;color:black;display:flex;flex-direction:column;';
+    const html = this._buildPDFHtml(finca, data, pedidoId);
+    await this._mostrarPDF(html, `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}`, 'Solicitud Crotales');
+  },
 
+  _buildPDFHtml(finca, data, pedidoId) {
     const ccaa = finca.comunidad_autonoma;
     const ccaaLabel = ccaa === 'andalucia' ? 'Andalucía' : ccaa === 'extremadura' ? 'Extremadura' : '—';
     const plataforma = ccaa === 'andalucia' ? 'SIGGAN' : ccaa === 'extremadura' ? 'BADIGEX' : 'SIA/PIGGAN';
-    const contentId = `pdf-content-${Date.now()}`;
-    overlay.innerHTML = `
-          <div style="flex:1; width:100%; min-height:500px; margin:0; background:white; color:black; padding:40px; font-family:serif; box-sizing:border-box; overflow-y:auto;" id="${contentId}">
-              <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:20px; margin-bottom:30px;">
-                  <h1 style="margin:0; font-size:1.5rem; text-transform:uppercase;">SOLICITUD DE MATERIAL DE IDENTIFICACIÓN ANIMAL</h1>
-                  <h3 style="margin:5px 0 0 0; color:#555; font-weight:normal;">Documento de delegación para ADSG / Autoridad Competente</h3>
-              </div>
-
-              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px; margin-bottom:20px; font-size: 0.9rem;">
-                  <div>
-                      <h4 style="border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:0;">DATOS DEL TITULAR</h4>
-                      <p><strong>Nombre/Razón Social:</strong> ${finca.propietario || finca.nombre}<br>
-                      <strong>NIF/CIF:</strong> ${finca.nif_cif || 'No especificado'}<br>
-                      <strong>Dirección:</strong> ${finca.direccion || 'No especificada'}<br>
-                      <strong>Teléfono:</strong> ${finca.telefonoContacto || finca.telefono || 'No especificado'}<br>
-                      <strong>Email:</strong> ${finca.email || 'No especificado'}</p>
-                  </div>
-                  <div>
-                      <h4 style="border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:0;">DATOS DE LA EXPLOTACIÓN</h4>
-                      <p><strong>Nombre Finca:</strong> ${finca.nombre}<br>
-                      <strong>Código REGA:</strong> ${finca.codigo_REGA || finca.rega || 'No especificado'}<br>
-                      <strong>Comunidad Autónoma:</strong> ${ccaaLabel}<br>
-                      <strong>Plataforma Destino:</strong> ${plataforma}<br>
-                      <strong>Dirigido a (ADSG/OCA):</strong> ${data.adsg_nombre}</p>
-                  </div>
-              </div>
-
-              ${data.adsg_codigo || data.adsg_veterinario ? `
-              <div style="margin-bottom:20px; font-size:0.9rem;">
-                  <h4 style="border-bottom:1px solid #ddd; padding-bottom:5px;">DATOS ADSG / VETERINARIO</h4>
-                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <p class="m-0">
-                      ${data.adsg_codigo ? `<strong>Código ADSG:</strong> ${data.adsg_codigo}<br>` : ''}
-                      ${data.adsg_veterinario ? `<strong>Veterinario ADSG:</strong> ${data.adsg_veterinario}<br>` : ''}
-                    </p>
-                    <p class="m-0">
-                      ${data.adsg_vet_colegiado ? `<strong>Nº Colegiado:</strong> ${data.adsg_vet_colegiado}<br>` : ''}
-                      ${data.adsg_vet_nif ? `<strong>NIF Veterinario:</strong> ${data.adsg_vet_nif}` : ''}
-                    </p>
-                  </div>
-              </div>` : ''}
-
-              <div style="margin-bottom:30px;">
-                  <h4 style="border-bottom:1px solid #ddd; padding-bottom:5px;">MATERIAL SOLICITADO</h4>
-                  <table style="width:100%; border-collapse:collapse; margin-top:10px;">
-                      <thead>
-                          <tr style="background:#eee;">
-                              <th style="padding:10px; border:1px solid #ccc; text-align:left;">Tipo de Dispositivo (Visual + Electrónico)</th>
-                              <th style="padding:10px; border:1px solid #ccc; text-align:center;">Cantidad (Pares)</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <tr>
-                              <td style="padding:10px; border:1px solid #ccc;">${data.tipo}${data.especie ? ` · ${data.especie}` : ''}</td>
-                              <td style="padding:10px; border:1px solid #ccc; text-align:center; font-weight:bold; font-size:1.2rem;">${data.cantidad}</td>
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-
-              <div style="padding:20px; border:1px solid #ccc; background:#f9f9f9; font-size:0.85rem;">
-                  <p style="margin-top:0;"><strong>DECLARACIÓN:</strong><br>
-                  Por la presente, el titular de la explotación declara conocer la normativa vigente en materia de identificación animal y solicita la expedición de los crotales arriba indicados.
-                  </p>
-                  <div style="display:flex; justify-content:space-between; margin-top:40px;">
-                    <div style="text-align:center; border-top:1px solid #000; width:40%;">Firma del Titular</div>
-                    <div style="text-align:center; border-top:1px solid #000; width:40%;">Fecha: ${new Date().toLocaleDateString()}</div>
-                  </div>
-              </div>
+    return `
+      <div style="padding:40px;font-family:serif;max-width:800px;margin:0 auto;color:#000;background:#fff;">
+        <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:20px;margin-bottom:30px;">
+          <h1 style="margin:0;font-size:1.5rem;text-transform:uppercase;">SOLICITUD DE MATERIAL DE IDENTIFICACIÓN ANIMAL</h1>
+          <h3 style="margin:5px 0 0 0;color:#555;font-weight:normal;">Documento de delegación para ADSG / Autoridad Competente</h3>
+        </div>
+        <div style="display:flex;gap:40px;margin-bottom:20px;font-size:0.9rem;">
+          <div style="flex:1;">
+            <h4 style="border-bottom:1px solid #ddd;padding-bottom:5px;margin-top:0;">DATOS DEL TITULAR</h4>
+            <p><strong>Nombre/Razón Social:</strong> ${finca.propietario || finca.nombre}<br>
+            <strong>NIF/CIF:</strong> ${finca.nif_cif || 'No especificado'}<br>
+            <strong>Dirección:</strong> ${finca.direccion || 'No especificada'}<br>
+            <strong>Teléfono:</strong> ${finca.telefonoContacto || finca.telefono || 'No especificado'}<br>
+            <strong>Email:</strong> ${finca.email || 'No especificado'}</p>
           </div>
-          <div style="text-align:center; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-              <button class="btn btn-primary" id="btn-descargar-adsg" style="width:auto; padding:0 30px; background:#10b981; color:white; font-weight:bold;">${Icons.exportar()} DESCARGAR O ENVIAR</button>
-              <button class="btn btn-secondary" onclick="document.getElementById('pedido-pdf-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
+          <div style="flex:1;">
+            <h4 style="border-bottom:1px solid #ddd;padding-bottom:5px;margin-top:0;">DATOS DE LA EXPLOTACIÓN</h4>
+            <p><strong>Nombre Finca:</strong> ${finca.nombre}<br>
+            <strong>Código REGA:</strong> ${finca.codigo_REGA || finca.rega || 'No especificado'}<br>
+            <strong>Dirigido a (ADSG/OCA):</strong> ${data.adsg_nombre}</p>
           </div>
-    `;
-    document.body.appendChild(overlay);
-
-    overlay.querySelector("#btn-descargar-adsg").onclick = async () => {
-      let loader;
-      try {
-        // Crear overlay de carga con barra de proceso
-        loader = document.createElement('div');
-        loader.id = 'pdf-loader-overlay';
-        loader.style.cssText = `
-          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
-          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
-          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
-        `;
-        loader.innerHTML = `
-          <div class="pdf-loader">
-            <div class="pdf-loader-emoji">⏳</div>
-            <div class="pdf-loader-title">Generando Solicitud</div>
-            <div class="pdf-loader-desc">Pedido de Crotales</div>
-            <div class="pdf-loader-bar">
-              <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
-            </div>
-            <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
+        </div>
+        ${data.adsg_codigo || data.adsg_veterinario ? `
+        <div style="margin-bottom:20px;font-size:0.9rem;">
+          <h4 style="border-bottom:1px solid #ddd;padding-bottom:5px;">DATOS ADSG / VETERINARIO</h4>
+          <p>${data.adsg_codigo ? `<strong>Código ADSG:</strong> ${data.adsg_codigo}<br>` : ''}
+          ${data.adsg_veterinario ? `<strong>Veterinario:</strong> ${data.adsg_veterinario}<br>` : ''}
+          ${data.adsg_vet_colegiado ? `<strong>Nº Colegiado:</strong> ${data.adsg_vet_colegiado}<br>` : ''}
+          ${data.adsg_vet_nif ? `<strong>NIF Vet.:</strong> ${data.adsg_vet_nif}` : ''}</p>
+        </div>` : ''}
+        <div style="margin-bottom:30px;">
+          <h4 style="border-bottom:1px solid #ddd;padding-bottom:5px;">MATERIAL SOLICITADO</h4>
+          <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+            <thead><tr style="background:#eee;">
+              <th style="padding:10px;border:1px solid #ccc;text-align:left;">Tipo de Dispositivo</th>
+              <th style="padding:10px;border:1px solid #ccc;text-align:center;">Cantidad (Pares)</th>
+            </tr></thead>
+            <tbody><tr>
+              <td style="padding:10px;border:1px solid #ccc;">${data.tipo}${data.especie ? ` · ${data.especie}` : ''}</td>
+              <td style="padding:10px;border:1px solid #ccc;text-align:center;font-weight:bold;font-size:1.2rem;">${data.cantidad}</td>
+            </tr></tbody>
+          </table>
+        </div>
+        <div style="padding:20px;border:1px solid #ccc;background:#f9f9f9;font-size:0.85rem;">
+          <p style="margin-top:0;"><strong>DECLARACIÓN:</strong><br>
+          El titular declara conocer la normativa vigente en materia de identificación animal.</p>
+          <div style="display:flex;justify-content:space-between;margin-top:40px;">
+            <div style="text-align:center;border-top:1px solid #000;width:40%;">Firma del Titular</div>
+            <div style="text-align:center;border-top:1px solid #000;width:40%;">Fecha: ${new Date().toLocaleDateString()}</div>
           </div>
-        `;
-        document.body.appendChild(loader);
-
-        const updateProgress = (pct, text) => {
-          const bar = loader.querySelector('#pdf-progress-bar');
-          const txt = loader.querySelector('#pdf-progress-text');
-          if (bar) bar.style.width = pct + '%';
-          if (txt) txt.textContent = text.toUpperCase();
-        };
-
-        const el = document.getElementById(contentId);
-        if (!el) {
-          App.toastError("Error: contenido PDF no encontrado");
-          loader.remove();
-          return;
-        }
-
-        updateProgress(30, 'Preparando documento...');
-        const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = `position:fixed; left:0; top:0; width:800px; z-index:10; background:#fff; color:#000; padding:40px; font-family:serif; visibility:visible;`;
-        tempContainer.innerHTML = el.innerHTML;
-        document.body.appendChild(tempContainer);
-
-        const filename = `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}_${Date.now()}.pdf`;
-
-        const opt = {
-          margin: [12, 10, 12, 10],
-          filename: filename,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff'
-          },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        if (typeof html2pdf === 'undefined') {
-          document.body.removeChild(tempContainer);
-          loader.remove();
-          WizardCrotales._fallbackPDF(el, filename);
-          return;
-        }
-
-        updateProgress(70, 'Rasterizando PDF...');
-        const pdfBlob = await html2pdf().set(opt).from(tempContainer).toPdf().output('blob');
-        document.body.removeChild(tempContainer);
-
-        updateProgress(90, 'Compartiendo...');
-
-        // Compartir usando el sistema unificado de InformesView si está disponible,
-        // o implementar uno local robusto.
-        const shareTitle = 'Pedido de Crotales';
-        const shareText = `Solicitud de material de identificación para ${finca.codigo_REGA || finca.rega}`;
-
-        const fileObj = {
-          blob: pdfBlob,
-          fileName: filename,
-          mimeType: 'application/pdf',
-          titulo: 'Solicitud Crotales',
-          shareTitle,
-          shareText
-        };
-
-        if (window.InformesView && typeof InformesView._ejecutarShare === 'function') {
-          await InformesView._ejecutarShare(fileObj);
-        } else {
-          // Implementación local de share si no hay InformesView
-          const cap = window.Capacitor;
-          if (cap?.Plugins?.Share) {
-            const reader = new FileReader();
-            const dataUri = await new Promise((resolve, reject) => {
-              reader.onload = () => resolve(reader.result);
-              reader.onerror = reject;
-              reader.readAsDataURL(pdfBlob);
-            });
-            const result = await cap.Plugins.Filesystem.writeFile({
-              path: filename,
-              data: dataUri.split(',')[1],
-              directory: 'CACHE'
-            });
-            await cap.Plugins.Share.share({
-              title: shareTitle,
-              text: shareText,
-              url: result.uri,
-              files: [result.uri],
-              dialogTitle: 'Compartir Solicitud con…'
-            });
-          } else if (navigator.share) {
-            const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-            await navigator.share({ title: shareTitle, text: shareText, files: [file] });
-          } else {
-            html2pdf().set(opt).from(el).save(filename);
-          }
-        }
-
-        updateProgress(100, '¡Listo!');
-        await new Promise(r => setTimeout(r, 400));
-        loader.remove();
-        App.toast("Documento enviado ✅");
-
-      } catch (e) {
-        console.error("Error en generación PDF Crotales:", e);
-        if (loader) loader.remove();
-        App.toastError("Error al generar PDF: " + e.message);
-      }
-    };
+        </div>
+      </div>`;
   },
 
-  _fallbackPDF(element, filename) {
-    App.toast("Usando método alternativo de impresión...");
-    try {
+  async _mostrarPDF(html, baseName, titulo) {
+    const overlay = document.createElement('div');
+    overlay.id = 'pdf-viewer-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:#fff;display:flex;flex-direction:column;';
+    overlay.innerHTML = `
+      <div id="pdf-viewer-content" style="flex:1;overflow:auto;background:#fff;">${html}</div>
+      <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;">
+        <button class="btn btn-primary" id="btn-pdf-share" style="width:auto;padding:0 30px;background:#10b981;color:#fff;font-weight:bold;">${Icons.exportar()} COMPARTIR</button>
+        <button class="btn btn-primary" id="btn-pdf-print" style="width:auto;padding:0 30px;background:#3b82f6;color:#fff;font-weight:bold;">${Icons.documento()} IMPRIMIR</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('pdf-viewer-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const filename = `${baseName}_${Date.now()}.html`;
+
+    overlay.querySelector('#btn-pdf-share').onclick = async () => {
+      try {
+        const blob = new Blob([html], { type: 'text/html' });
+        const cap = window.Capacitor;
+        if (cap?.Plugins?.Share) {
+          const reader = new FileReader();
+          const dataUri = await new Promise((res, rej) => { reader.onload = () => res(reader.result); reader.onerror = rej; reader.readAsDataURL(blob); });
+          const result = await cap.Plugins.Filesystem.writeFile({ path: filename, data: dataUri.split(',')[1], directory: 'CACHE' });
+          await cap.Plugins.Share.share({ title: titulo, files: [result.uri], dialogTitle: 'Compartir con…' });
+        } else if (navigator.share) {
+          await navigator.share({ title: titulo, files: [new File([blob], filename, { type: 'text/html' })] });
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+          URL.revokeObjectURL(url);
+        }
+        App.toast("Documento compartido ✅");
+      } catch (e) { App.toastError("Error: " + e.message); }
+    };
+
+    overlay.querySelector('#btn-pdf-print').onclick = () => {
       const win = window.open('', '_blank');
-      if (win) {
-        win.document.write('<html><head><title>' + filename + '</title>');
-        win.document.write('<style>body{font-family:serif;padding:40px;color:#000;background:#fff;}</style>');
-        win.document.write('</head><body>');
-        win.document.write(element.innerHTML);
-        win.document.write('</body></html>');
-        win.document.close();
-        win.focus();
-        win.print();
-      } else {
-        const blob = new Blob([element.innerHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename.replace('.pdf', '.html');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-    } catch (e) {
-      App.toastError("No se pudo generar el documento. Verifica tu conexión.");
-    }
+      if (win) { win.document.write('<html><head><title>' + baseName + '</title></head><body>' + html + '</body></html>'); win.document.close(); win.print(); }
+      else App.toastError("Abre el documento y usa imprimir desde el menú del navegador");
+    };
   },
 
   async _onSelectADSG(adsgId) {
