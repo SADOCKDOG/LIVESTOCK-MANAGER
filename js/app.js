@@ -1,6 +1,6 @@
 /**
- * Livestock Manager - Application Controller v4.8.7
- * UI validada v4.8.7 + flujo Industrial Animals v4.8.7 integrado correctamente
+ * Livestock Manager - Application Controller v4.8.8
+ * UI validada v4.8.8 + flujo Industrial Animals v4.8.8 integrado correctamente
  * Fix: rebanoId preservado en _guardarAnimalDetalle (bug invisible en lista)
  */
 
@@ -731,7 +731,7 @@ const App = {
                     </table>
                 </div>
                 <div style="margin-top:40px; text-align:center; font-size:0.8rem; border-top:1px solid #eee; padding-top:20px;">
-                    <p>Documento generado electrónicamente por Livestock Manager Premium v3.3.9</p>
+                    <p>Documento generado electrónicamente por Livestock Manager Premium v4.8.8</p>
                 </div>
             </div>
             <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
