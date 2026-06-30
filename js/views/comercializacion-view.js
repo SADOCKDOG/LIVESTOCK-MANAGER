@@ -8,6 +8,185 @@
 const ComercializacionView = {
   _currentTab: 'leche',
   _cachedData: null,
+  _cachedFincaId: null,
+  _needsDataRefresh: false,
+  _loadingPromise: null,
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+  _filters: {
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  },
+
+  async _ensureData(fincaId, force = false) {
+    if (!fincaId) {
+      this._cachedData = { ventas: [], entregas: [], gastosRecords: [], kpis: { carne: [], leche: [], gastos: [] } };
+      this._cachedFincaId = null;
+      this._needsDataRefresh = false;
+      return this._cachedData;
+    }
+
+    if (!force && !this._needsDataRefresh && this._cachedData && this._cachedFincaId === fincaId) {
+      return this._cachedData;
+    }
+
+    if (this._loadingPromise) {
+      await this._loadingPromise;
+      return this._cachedData;
+    }
+
+    this._loadingPromise = (async () => {
+      const [ventas, entregas, gastosRecords] = await Promise.all([
+        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
+        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+        Gastos.list(fincaId).catch(() => [])
+      ]);
+
+      ventas.sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0));
+      entregas.sort((a, b) => new Date(b.fechaRecogida || 0) - new Date(a.fechaRecogida || 0));
+      gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+      const pesoTotal = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
+      const rendProm = ventas.length > 0 ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length : 0;
+      const ingresoTotal = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
+      const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
+      const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
+      const gastoTotal = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
+
+      this._cachedData = {
+        ventas,
+        entregas,
+        gastosRecords,
+        kpis: {
+          carne: [
+            { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
+            { label: 'Animales', value: ventas.length },
+            { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' },
+            { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
+          ],
+          leche: [
+            { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
+            { label: 'Entregas', value: entregas.length },
+            { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
+            { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
+          ],
+          gastos: [
+            { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
+            { label: 'Registros', value: gastosRecords.length },
+            { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
+          ]
+        }
+      };
+
+      this._cachedFincaId = fincaId;
+      this._needsDataRefresh = false;
+      return this._cachedData;
+    })();
+
+    try {
+      return await this._loadingPromise;
+    } finally {
+      this._loadingPromise = null;
+    }
+  },
+
+  invalidateCache() {
+    this._needsDataRefresh = true;
+  },
 
   async render(params) {
     const main = document.getElementById('app-content');
@@ -15,51 +194,30 @@ const ComercializacionView = {
     this._currentTab = tab;
 
     const fincaId = await Fincas.getActiveId();
-    const [ventas, entregas, gastosRecords] = await Promise.all([
-      window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
-      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-      Gastos.list(fincaId).catch(() => [])
-    ]);
+    if (!fincaId) {
+      main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">No hay ninguna finca seleccionada.</p></div>`;
+      return;
+    }
 
-    ventas.sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0));
-    entregas.sort((a, b) => new Date(b.fechaRecogida || 0) - new Date(a.fechaRecogida || 0));
-    gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+    const data = await this._ensureData(fincaId, this._needsDataRefresh);
 
-    const pesoTotal = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
-    const rendProm = ventas.length > 0 ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length : 0;
-    const ingresoTotal = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
-    const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
-    const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
-    const gastoTotal = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
+    const ventas = data.ventas;
+    const entregas = data.entregas;
+    const gastosRecords = data.gastosRecords;
     let pipelineInfo = null;
     try {
       pipelineInfo = JSON.parse(sessionStorage.getItem('lm.explotacion_pipeline') || 'null');
     } catch (_) {
       pipelineInfo = null;
     }
-
-    this._cachedData = {
-      ventas, entregas, gastosRecords,
-      kpis: {
-        carne: [
-          { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
-          { label: 'Animales', value: ventas.length },
-          { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' },
-          { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
-        ],
-        leche: [
-          { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
-          { label: 'Entregas', value: entregas.length },
-          { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
-          { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
-        ],
-        gastos: [
-          { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
-          { label: 'Registros', value: gastosRecords.length },
-          { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
-        ]
+    if (pipelineInfo) {
+      const maxAgeMs = 5 * 60 * 1000; // 5 minutos
+      const createdAt = Date.parse(pipelineInfo.fecha || pipelineInfo.timestamp || '');
+      if (!createdAt || (Date.now() - createdAt) > maxAgeMs) {
+        pipelineInfo = null;
       }
-    };
+      try { sessionStorage.removeItem('lm.explotacion_pipeline'); } catch (_) {}
+    }
 
     const meta = this._getTabMeta(this._currentTab);
 
@@ -483,6 +641,13 @@ const ComercializacionView = {
     return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
   }
 };
+
+if (window.EventBus) {
+  const dirty = () => ComercializacionView.invalidateCache();
+  ['venta:created', 'venta:deleted', 'leche:entrega', 'gasto:created', 'gasto:deleted', 'gasto:updated', 'data:imported'].forEach(evt => {
+    EventBus.on(evt, dirty);
+  });
+}
 
 window.ComercializacionView = ComercializacionView;
 
