@@ -406,7 +406,7 @@ window.WizardGuiaMovimiento = {
       ov.innerHTML = '<div style="flex:1;overflow:auto;background:#fff;">' + html + '</div><div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;"><button class="btn btn-primary" onclick="var w=window.open(\'\',\'_blank\');if(w){w.document.write(document.getElementById(\'pdf-fb\').innerHTML);w.document.close();w.print();}" style="width:auto;padding:0 30px;background:#10b981;color:#fff;">IMPRIMIR</button><button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()" style="width:auto;padding:0 30px;">CERRAR</button><div id="pdf-fb" style="display:none;">' + html.replace(/"/g, '&quot;') + '</div></div>';
       document.body.appendChild(ov);
     }
-  },,
+  },
 
   async _onSelectTransportista(transportistaId) {
     console.log("[WizardGuiaMovimiento] _onSelectTransportista seleccionado:", transportistaId);
