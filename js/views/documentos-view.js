@@ -129,12 +129,10 @@ const DocumentosView = {
         <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
       </div>
 
-      <div class="card p-14 border-222">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Últimos documentos generados (${docsRecientes.length})
-        </div>
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} ÚLTIMOS DOCUMENTOS</div>
         <div id="docs-lista">${this._renderLista(docsRecientes, ventaMap)}</div>
-        ${docs.length > 5 ? `<div class="text-center mt-8"><span class="text-xs text-gray-600 font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa los filtros para ver todos</span></div>` : ''}
+        ${docs.length > 5 ? `<div class="text-center mt-6 pt-6 border-top-222"><span class="text-[0.6rem] text-gray font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa "Consultar / Imprimir" para ver todos</span></div>` : ''}
       </div>
     `;
   },
