@@ -8,10 +8,6 @@ const ExplotacionView = {
   _activeMode: 'leche', // default
   _activeSubModule: 'explotacion', // default
   _cachedData: null,
-  _cachedFincaId: null,
-  _lastLoadedAt: 0,
-  _needsDataRefresh: false,
-  _loadingPromise: null,
 
   _cambiarSubModulo(subModulo) {
     this._activeSubModule = subModulo;
@@ -31,209 +27,166 @@ const ExplotacionView = {
     return Number(val).toLocaleString(undefined, { maximumFractionDigits: 1 });
   },
 
-  async _ensureData(fincaId, force = false) {
-    if (!fincaId) {
-      this._cachedData = null;
-      this._cachedFincaId = null;
-      this._needsDataRefresh = false;
-      return;
-    }
-
-    if (!force && !this._needsDataRefresh && this._cachedData && this._cachedFincaId === fincaId) {
-      return;
-    }
-
-    if (this._loadingPromise) {
-      await this._loadingPromise;
-      return;
-    }
-
-    this._loadingPromise = (async () => {
-      const finca = await Fincas.getActive();
-
-      const [rebanos, animales, eventosRaw, todosGastos, entregasLeche, ventasCarne] = await Promise.all([
-        window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
-        window.db.getAll('animales').catch(() => []),
-        window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
-        window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
-        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => [])
-      ]);
-
-      const eventos = (eventosRaw || []).filter(e => !e?.anulado);
-
-      const savedMode = window.ModoContextoHelper
-        ? ModoContextoHelper.getModeForBlock('explotacion', rebanos)
-        : 'leche';
-
-      this._activeMode = this._activeMode || savedMode;
-
-      const rebanosIds = rebanos.map(r => r.id);
-      const rebanosCarne = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'carne') : rebanos;
-      const rebanosLeche = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'leche') : rebanos;
-      const rebanosHibrido = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'hibrido') : rebanos;
-      const rebCarneIds = new Set(rebanosCarne.map(r => r.id));
-      const rebLecheIds = new Set(rebanosLeche.map(r => r.id));
-      const rebHibridoIds = new Set(rebanosHibrido.map(r => r.id));
-      const animalesFinca = animales.filter(a => rebanosIds.includes(a.rebanoId));
-      const siloEventos = eventos.filter(e => e.tipo_entidad === 'silo_pienso');
-
-      // Gastos por categoría operativa
-      const gastosAlim = todosGastos.filter(g =>
-        (g.categoria || '').toLowerCase() === 'alimentacion' ||
-        (g.categoria || '').toLowerCase() === 'alimentación' ||
-        (g.concepto || '').toLowerCase().includes('pienso') ||
-        (g.concepto || '').toLowerCase().includes('forraje') ||
-        (g.concepto || '').toLowerCase().includes('pasto')
-      );
-      const gastosEnergia = todosGastos.filter(g => (g.categoria || '').toLowerCase() === 'electricidad');
-      const gastosFito = todosGastos.filter(g => (g.categoria || '').toLowerCase() === 'fitosanitarios');
-      const totalGastosAlim = gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
-      const totalGastosEnergia = gastosEnergia.reduce((s, g) => s + (g.monto || 0), 0);
-      const totalGastosFito = gastosFito.reduce((s, g) => s + (g.monto || 0), 0);
-
-      // Datos de Carne
-      const pesajes = eventos.filter(e => {
-        if (!(e.unidad === 'kg' && (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano'))) return false;
-        const rebanoOk = rebCarneIds.has(e.rebanoId);
-        const snap = (e.snap_tipo || '').toLowerCase();
-        const snapOk = snap.includes('carne') || snap.includes('cárn') || snap.includes('mixt') || snap.includes('híbr') || snap.includes('doble');
-        return rebanoOk || snapOk;
-      });
-      pesajes.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
-      const pesajesPorAnimal = {};
-      pesajes.forEach(p => {
-        if (p.tipo_entidad === 'animal' && p.entidad_id) {
-          if (!pesajesPorAnimal[p.entidad_id]) pesajesPorAnimal[p.entidad_id] = [];
-          pesajesPorAnimal[p.entidad_id].push(p);
-        }
-      });
-      let gmdAcumulado = 0;
-      let countGmd = 0;
-      const gmdList = [];
-      for (const animId in pesajesPorAnimal) {
-        const pts = pesajesPorAnimal[animId].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-        if (pts.length >= 2) {
-          const pIni = pts[0].valor_neto || 0;
-          const pFin = pts[pts.length - 1].valor_neto || 0;
-          const fIni = new Date(pts[0].fecha);
-          const fFin = new Date(pts[pts.length - 1].fecha);
-          const dias = (fFin - fIni) / (1000 * 60 * 60 * 24);
-          if (dias > 0) {
-            const gmd = (pFin - pIni) / dias;
-            gmdAcumulado += gmd;
-            countGmd++;
-            gmdList.push({
-              animalId: animId,
-              crotal: pts[0].snap_identificacion || 'Crotal #' + animId,
-              gmd,
-              ultimoPeso: pFin,
-              primerPeso: pIni,
-              dias,
-              fechaUltimo: pts[pts.length - 1].fecha,
-              rebano: pts[0].snap_tipo || 'Carne'
-            });
-          }
-        }
-      }
-      const gmdMedio = countGmd > 0 ? gmdAcumulado / countGmd : 0;
-      gmdList.sort((a, b) => b.gmd - a.gmd);
-
-      // Datos de Leche
-      const ordeños = eventos.filter(e => {
-        if (!((e.unidad === 'L' || e.unidad === 'Litros') && (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero'))) return false;
-        const rebanoOk = rebLecheIds.has(e.rebanoId);
-        const snap = (e.snap_tipo || '').toLowerCase();
-        const snapOk = snap.includes('leche') || snap.includes('láct') || snap.includes('mixt') || snap.includes('híbr') || snap.includes('doble');
-        return rebanoOk || snapOk;
-      });
-      ordeños.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
-      const totalLitros = ordeños.reduce((sum, o) => sum + (o.valor_neto || 0), 0);
-      const conLab = entregasLeche.filter(e => e.laboratorio?.grasa != null);
-      const esTotal = conLab.reduce((s, e) => s + (e.laboratorio.extracto_seco || (e.laboratorio.grasa || 0) + (e.laboratorio.proteina || 0)), 0);
-      const esMedia = conLab.length > 0 ? esTotal / conLab.length : 0;
-
-      const totalIngresosLeche = entregasLeche.reduce((s, e) => s + (e.importe_total || (e.cantidad || 0) * (e.precioBase || 0)), 0);
-      const mofaLeche = totalIngresosLeche - totalGastosAlim;
-
-      // Híbrido consolidado
-      const proConsolidada = eventos.filter(e =>
-        (e.unidad === 'kg' || e.unidad === 'L' || e.unidad === 'Litros') &&
-        (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano') &&
-        (rebHibridoIds.has(e.rebanoId) || !e.rebanoId)
-      );
-      proConsolidada.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
-      const totalVentasCarne = ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
-      const mofaHibrido = (totalVentasCarne + totalIngresosLeche) - totalGastosAlim;
-      const ratioMofaHibrido = (totalVentasCarne + totalIngresosLeche) > 0 ? (mofaHibrido / (totalVentasCarne + totalIngresosLeche)) * 100 : 0;
-
-      this._cachedData = {
-        fincaId,
-        finca,
-        rebanos,
-        rebCarneIds,
-        rebLecheIds,
-        rebHibridoIds,
-        animalesFinca,
-        todosGastos,
-        siloEventos,
-        gastosAlim,
-        gastosEnergia,
-        gastosFito,
-        totalGastosAlim,
-        totalGastosEnergia,
-        totalGastosFito,
-        pesajes,
-        gmdList,
-        gmdMedio,
-        ordeños,
-        totalLitros,
-        entregasLeche,
-        extractoSecoMedio: esMedia,
-        mofaLeche,
-        mofaHibrido,
-        ratioMofaHibrido,
-        proConsolidada
-      };
-
-      this._cachedFincaId = fincaId;
-      this._lastLoadedAt = Date.now();
-      this._needsDataRefresh = false;
-    })();
-
-    try {
-      await this._loadingPromise;
-    } finally {
-      this._loadingPromise = null;
-    }
-  },
-
-  invalidateCache() {
-    this._needsDataRefresh = true;
-  },
-
-  async render(options) {
-    const force = typeof options === 'boolean' ? options : !!options?.force;
+  async render() {
     const main = document.getElementById('app-content');
     const fincaId = await Fincas.getActiveId();
+    const finca = await Fincas.getActive();
 
     if (!fincaId) {
       main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">No hay ninguna finca seleccionada.</p></div>`;
       return;
     }
 
-    await this._ensureData(fincaId, force || this._needsDataRefresh);
+    // Cargar datos comunes
+    const [rebanos, animales, eventosRaw, todosGastos, entregasLeche, ventasCarne] = await Promise.all([
+      window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
+      window.db.getAll('animales').catch(() => []),
+      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => [])
+    ]);
+    const eventos = (eventosRaw || []).filter(e => !e?.anulado);
 
-    const d = this._cachedData;
-    const finca = d?.finca;
+    const savedMode = window.ModoContextoHelper
+      ? ModoContextoHelper.getModeForBlock('explotacion', rebanos)
+      : 'leche';
 
-    if (!d) {
-      main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">No se pudieron cargar los datos de la explotación.</p></div>`;
-      return;
+    this._activeMode = this._activeMode || savedMode;
+
+    const rebanosIds = rebanos.map(r => r.id);
+    const rebanosCarne = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'carne') : rebanos;
+    const rebanosLeche = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'leche') : rebanos;
+    const rebanosHibrido = window.ModoContextoHelper ? ModoContextoHelper.filterRebanosByMode(rebanos, 'hibrido') : rebanos;
+    const rebCarneIds = new Set(rebanosCarne.map(r => r.id));
+    const rebLecheIds = new Set(rebanosLeche.map(r => r.id));
+    const rebHibridoIds = new Set(rebanosHibrido.map(r => r.id));
+    const animalesFinca = animales.filter(a => rebanosIds.includes(a.rebanoId));
+    const siloEventos = eventos.filter(e => e.tipo_entidad === 'silo_pienso');
+
+    // Gastos por categoría operativa
+    const gastosAlim = todosGastos.filter(g => 
+      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+      (g.categoria || '').toLowerCase() === 'alimentación' ||
+      (g.concepto || '').toLowerCase().includes('pienso') ||
+      (g.concepto || '').toLowerCase().includes('forraje') ||
+      (g.concepto || '').toLowerCase().includes('pasto')
+    );
+    const gastosEnergia = todosGastos.filter(g => (g.categoria || '').toLowerCase() === 'electricidad');
+    const gastosFito = todosGastos.filter(g => (g.categoria || '').toLowerCase() === 'fitosanitarios');
+    const totalGastosAlim = gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
+    const totalGastosEnergia = gastosEnergia.reduce((s, g) => s + (g.monto || 0), 0);
+    const totalGastosFito = gastosFito.reduce((s, g) => s + (g.monto || 0), 0);
+
+    // Datos de Carne
+    const pesajes = eventos.filter(e => {
+      if (!(e.unidad === 'kg' && (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano'))) return false;
+      const rebanoOk = rebCarneIds.has(e.rebanoId);
+      const snap = (e.snap_tipo || '').toLowerCase();
+      const snapOk = snap.includes('carne') || snap.includes('cárn') || snap.includes('mixt') || snap.includes('híbr') || snap.includes('doble');
+      return rebanoOk || snapOk;
+    });
+    pesajes.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+    // GMD cálculo
+    const pesajesPorAnimal = {};
+    pesajes.forEach(p => {
+      if (p.tipo_entidad === 'animal' && p.entidad_id) {
+        if (!pesajesPorAnimal[p.entidad_id]) pesajesPorAnimal[p.entidad_id] = [];
+        pesajesPorAnimal[p.entidad_id].push(p);
+      }
+    });
+    let gmdAcumulado = 0;
+    let countGmd = 0;
+    const gmdList = [];
+    for (const animId in pesajesPorAnimal) {
+      const pts = pesajesPorAnimal[animId].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      if (pts.length >= 2) {
+        const pIni = pts[0].valor_neto || 0;
+        const pFin = pts[pts.length - 1].valor_neto || 0;
+        const fIni = new Date(pts[0].fecha);
+        const fFin = new Date(pts[pts.length - 1].fecha);
+        const dias = (fFin - fIni) / (1000 * 60 * 60 * 24);
+        if (dias > 0) {
+          const gmd = (pFin - pIni) / dias;
+          gmdAcumulado += gmd;
+          countGmd++;
+          gmdList.push({
+            animalId: animId,
+            crotal: pts[0].snap_identificacion || 'Crotal #' + animId,
+            gmd,
+            ultimoPeso: pFin,
+            primerPeso: pIni,
+            dias,
+            fechaUltimo: pts[pts.length - 1].fecha,
+            rebano: pts[0].snap_tipo || 'Carne'
+          });
+        }
+      }
     }
+    const gmdMedio = countGmd > 0 ? gmdAcumulado / countGmd : 0;
+    gmdList.sort((a, b) => b.gmd - a.gmd);
+
+    // Datos de Leche
+    const ordeños = eventos.filter(e => {
+      if (!((e.unidad === 'L' || e.unidad === 'Litros') && (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero'))) return false;
+      const rebanoOk = rebLecheIds.has(e.rebanoId);
+      const snap = (e.snap_tipo || '').toLowerCase();
+      const snapOk = snap.includes('leche') || snap.includes('láct') || snap.includes('mixt') || snap.includes('híbr') || snap.includes('doble');
+      return rebanoOk || snapOk;
+    });
+    ordeños.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+    const totalLitros = ordeños.reduce((sum, o) => sum + (o.valor_neto || 0), 0);
+    const conLab = entregasLeche.filter(e => e.laboratorio?.grasa != null);
+    const esTotal = conLab.reduce((s, e) => s + (e.laboratorio.extracto_seco || (e.laboratorio.grasa || 0) + (e.laboratorio.proteina || 0)), 0);
+    const esMedia = conLab.length > 0 ? esTotal / conLab.length : 0;
+
+    // MOFA Lácteo
+    const totalIngresosLeche = entregasLeche.reduce((s, e) => s + (e.importe_total || (e.cantidad || 0) * (e.precioBase || 0)), 0);
+    const mofaLeche = totalIngresosLeche - totalGastosAlim;
+
+    // Híbrido consolidado
+    const proConsolidada = eventos.filter(e => 
+      (e.unidad === 'kg' || e.unidad === 'L' || e.unidad === 'Litros') &&
+      (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano') &&
+      (rebHibridoIds.has(e.rebanoId) || !e.rebanoId)
+    );
+    proConsolidada.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+    const totalVentasCarne = ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
+    const mofaHibrido = (totalVentasCarne + totalIngresosLeche) - totalGastosAlim;
+    const ratioMofaHibrido = (totalVentasCarne + totalIngresosLeche) > 0 ? (mofaHibrido / (totalVentasCarne + totalIngresosLeche)) * 100 : 0;
+
+    // Cachear datos
+    this._cachedData = {
+      fincaId,
+      finca,
+      rebanos,
+      rebCarneIds,
+      rebLecheIds,
+      rebHibridoIds,
+      animalesFinca,
+      todosGastos,
+      siloEventos,
+      gastosAlim,
+      gastosEnergia,
+      gastosFito,
+      totalGastosAlim,
+      totalGastosEnergia,
+      totalGastosFito,
+      pesajes,
+      gmdList,
+      gmdMedio,
+      ordeños,
+      totalLitros,
+      entregasLeche,
+      extractoSecoMedio: esMedia,
+      mofaLeche,
+      mofaHibrido,
+      ratioMofaHibrido,
+      proConsolidada
+    };
 
     // Sincronizar color de cabecera con el modo activo
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
@@ -304,12 +257,12 @@ const ExplotacionView = {
     } else if (this._activeSubModule === 'gastos') {
       this._renderGastosView();
     } else if (this._activeSubModule === 'almacen') {
-      await this._renderAlmacenView();
+      this._renderAlmacenView();
     }
 
-if (window.enableScrollShadows) {
-  document.querySelectorAll('.scroll-shadow-container').forEach(el => window.enableScrollShadows(el));
-}
+    if (window.enableScrollShadows) {
+      document.querySelectorAll('.scroll-shadow-container').forEach(el => window.enableScrollShadows(el));
+    }
   },
 
   _cambiarModo(modo) {
@@ -658,55 +611,33 @@ if (window.enableScrollShadows) {
   },
 
   // ==========================================
-  //  MÉTODO COMÚN: STOCK DE SILOS (PERSISTENTE)
+  //  MÉTODO COMÚN: STOCK DE SILOS
   // ==========================================
-  async _renderSilosHtml(fincaId, siloEventos, modo) {
+  _renderSilosHtml(fincaId, siloEventos, modo) {
     let silos = [];
     let borderStyleColor = '#ef4444'; // Rojo por defecto
 
-    // Intentar cargar silos configurados
-    try {
-      silos = await window.db.getAllFromIndex('config_silos', 'fincaId', fincaId).catch(() => []);
-      // Filtrar por tipo si es necesario (carne/leche/hibrido)
-      if (silos.length > 0) {
-        silos = silos.filter(s => s.tipo === modo || s.tipo === 'todos');
-      }
-    } catch (e) {
-      console.warn('[ExPro] Error cargando silos:', e);
-    }
-
-    // Si no hay silos configurados, usar defaults por modo (Seed)
-    if (silos.length === 0) {
-      if (modo === 'leche') {
-        silos = [
-          { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño', capacidad: 10000, inicial: 6000, tipo: 'leche' },
-          { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia', capacidad: 5000, inicial: 3000, tipo: 'leche' }
-        ];
-        borderStyleColor = '#3b82f6';
-      } else if (modo === 'hibrido') {
-        silos = [
-          { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000, tipo: 'hibrido' },
-          { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000, tipo: 'hibrido' },
-          { id: 3, nombre: 'Silo C: Concentrado Ordeño', capacidad: 10000, inicial: 5000, tipo: 'hibrido' },
-          { id: 4, nombre: 'Silo D: Unifeed Lactancia', capacidad: 6000, inicial: 3000, tipo: 'hibrido' }
-        ];
-        borderStyleColor = '#10b981';
-      } else {
-        // carne
-        silos = [
-          { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000, tipo: 'carne' },
-          { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000, tipo: 'carne' }
-        ];
-        borderStyleColor = '#ef4444';
-      }
-      
-      // Guardar defaults en DB para la próxima vez
-      try {
-        for (const s of silos) {
-          s.fincaId = fincaId;
-          await window.db.add('config_silos', s).catch(() => {});
-        }
-      } catch (e) {}
+    if (modo === 'leche') {
+      silos = [
+        { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño', capacidad: 10000, inicial: 6000 },
+        { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia', capacidad: 5000, inicial: 3000 }
+      ];
+      borderStyleColor = '#3b82f6';
+    } else if (modo === 'hibrido') {
+      silos = [
+        { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000 },
+        { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000 },
+        { id: 3, nombre: 'Silo C: Concentrado Ordeño', capacidad: 10000, inicial: 5000 },
+        { id: 4, nombre: 'Silo D: Unifeed Lactancia', capacidad: 6000, inicial: 3000 }
+      ];
+      borderStyleColor = '#10b981';
+    } else {
+      // carne
+      silos = [
+        { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000 },
+        { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000 }
+      ];
+      borderStyleColor = '#ef4444';
     }
 
     let html = `
@@ -896,10 +827,7 @@ if (window.enableScrollShadows) {
         modo_explotacion: modo,
         returnTo: 'explotacion'
       });
-      setTimeout(() => {
-        ExplotacionView.invalidateCache();
-        ExplotacionView.render();
-      }, 600);
+      setTimeout(() => ExplotacionView.render(), 600);
     };
   },
 
@@ -941,34 +869,11 @@ if (window.enableScrollShadows) {
   async _abrirAsistenteSilo(modo) {
     const fincaId = this._cachedData.fincaId;
     
-    // Cargar silos dinámicamente
-    let silosList = [];
-    try {
-      const silosDb = await window.db.getAllFromIndex('config_silos', 'fincaId', fincaId).catch(() => []);
-      silosList = silosDb.filter(s => s.tipo === modo || s.tipo === 'todos');
-    } catch (e) {}
-
-    // Fallback si no hay silos
-    if (silosList.length === 0) {
-      if (modo === 'leche') {
-        silosList = [
-          { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño' },
-          { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia' }
-        ];
-      } else if (modo === 'hibrido') {
-        silosList = [
-          { id: 1, nombre: 'Silo A: Concentrado Terneros' },
-          { id: 2, nombre: 'Silo B: Mezcla Forrajera' },
-          { id: 3, nombre: 'Silo C: Concentrado Ordeño' },
-          { id: 4, nombre: 'Silo D: Unifeed Lactancia' }
-        ];
-      } else {
-        silosList = [
-          { id: 1, nombre: 'Silo A: Concentrado Terneros' },
-          { id: 2, nombre: 'Silo B: Mezcla Forrajera' }
-        ];
-      }
-    }
+    const silos = modo === 'leche'
+      ? [{ v: '1', l: 'Silo A: Pienso Concentrado Ordeño' }, { v: '2', l: 'Silo B: Mezcla Unifeed Lactancia' }]
+      : modo === 'hibrido'
+        ? [{ v: '1', l: 'Silo A: Concentrado Terneros' }, { v: '2', l: 'Silo B: Mezcla Forrajera' }, { v: '3', l: 'Silo C: Concentrado Ordeño' }, { v: '4', l: 'Silo D: Unifeed Lactancia' }]
+        : [{ v: '1', l: 'Silo A: Concentrado Terneros' }, { v: '2', l: 'Silo B: Mezcla Forrajera' }];
 
     const modeClass = 'silo-card--' + modo;
 
@@ -982,7 +887,7 @@ if (window.enableScrollShadows) {
         <div class="wizard-input-group">
           <label class="wizard-label">Seleccionar Silo</label>
           <select id="ws-silo-id" class="wizard-input wizard-select">
-            ${silosList.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('')}
+            ${silos.map(s => `<option value="${s.v}">${s.l}</option>`).join('')}
           </select>
         </div>
 
@@ -1044,7 +949,6 @@ if (window.enableScrollShadows) {
       App.toast("Movimiento de almacén registrado");
       overlay.remove();
       
-      ExplotacionView.invalidateCache();
       await ExplotacionView.render();
     };
   },
@@ -1141,7 +1045,6 @@ if (window.enableScrollShadows) {
         });
         App.toast("Registro actualizado");
         overlay.remove();
-        ExplotacionView.invalidateCache();
         await ExplotacionView.render();
       };
 
@@ -1171,7 +1074,6 @@ if (window.enableScrollShadows) {
         });
         App.toast("Registro anulado");
         overlay.remove();
-        ExplotacionView.invalidateCache();
         await ExplotacionView.render();
       };
     } catch (e) {
@@ -1296,7 +1198,7 @@ if (window.enableScrollShadows) {
     container.innerHTML = html;
   },
 
-  async _renderAlmacenView() {
+  _renderAlmacenView() {
     const d = this._cachedData;
     const container = document.getElementById('explotacion-submodule-content');
     if (!container) return;
@@ -1304,13 +1206,10 @@ if (window.enableScrollShadows) {
     // Historial de movimientos de almacén / silos ordenado por fecha desc
     const movimientosAlmacen = (d.siloEventos || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    // Renderizar silos (ahora async)
-    const silosHtml = await this._renderSilosHtml(d.fincaId, d.siloEventos, this._activeMode);
-
     let html = `
       <div style="--theme-color: #3b82f6; --neon-glow: #3b82f6B0; --neon-inner: #3b82f640">
         <!-- Niveles de llenado de silos -->
-        ${silosHtml}
+        ${this._renderSilosHtml(d.fincaId, d.siloEventos, this._activeMode)}
 
         <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
@@ -1379,13 +1278,6 @@ if (window.enableScrollShadows) {
     } catch (e) { App.toastError("Error al eliminar movimiento: " + e.message); }
   }
 };
-
-if (window.EventBus) {
-  const markDirty = () => ExplotacionView.invalidateCache();
-  ['gasto:created', 'gasto:deleted', 'gasto:updated', 'venta:created', 'venta:deleted', 'leche:entrega', 'pesaje:registrado', 'tratamiento:added', 'tratamiento:deleted', 'animal:created', 'animal:updated', 'animal:deleted', 'data:imported'].forEach(evt => {
-    EventBus.on(evt, markDirty);
-  });
-}
 
 window.ExplotacionView = ExplotacionView;
 

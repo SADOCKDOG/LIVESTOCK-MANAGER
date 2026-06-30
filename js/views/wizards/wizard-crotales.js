@@ -181,9 +181,6 @@ window.WizardCrotales = {
           const pdfData = { ...data, especie, tipo, cantidad, adsg_nombre, adsg_codigo, adsg_veterinario, adsg_vet_colegiado, adsg_vet_nif };
           App.toast(`✅ Pedido guardado (nº ${pedidoId})`);
           await WizardCrotales.generarPDF(finca, pdfData, pedidoId);
-          if (document.getElementById('docs-lista')) {
-            try { await DocumentosView.render(); } catch (_) { /* noop */ }
-          }
         } catch (e) {
           console.error('[wizard-crotales] Error:', e);
           await Confirm.alert("Error", "Error al procesar el pedido: " + e.message);

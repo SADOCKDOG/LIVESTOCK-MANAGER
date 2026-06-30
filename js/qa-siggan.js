@@ -1340,55 +1340,6 @@ const SigganQA = {
     }
   },
 
-  async testModoInterno() {
-    const M = 'MODO INTERNO';
-    this._log('RUN', M, 'Verificando ayudas del modo interno y registro de acuses');
-
-    if (!this._assert(window.DocumentosView, M, 'DocumentosView disponible', 'PRE-REQ')) return false;
-    if (!this._assert(typeof DocumentosView._registrarAcuse === 'function', M, 'Acción registrar acuse disponible', 'PRE-REQ')) return false;
-
-    const hashOriginal = window.location.hash;
-    try {
-      if (!document.querySelector('.modo-interno-banner')) {
-        window.location.hash = '#/documentos';
-        for (let i = 0; i < 6; i++) {
-          await this._wait(300);
-          if (document.querySelector('.modo-interno-banner')) break;
-          if (i === 2 && window.DocumentosView && typeof DocumentosView.render === 'function') {
-            try { await DocumentosView.render(); } catch (_) { /* ignore */ }
-          }
-        }
-      }
-
-      const banner = document.querySelector('.modo-interno-banner');
-      this._assert(!!banner, M, 'Banner recordatorio de modo interno visible', 'UI');
-
-      const movimientos = await Movimientos.list({ includeAnulados: true });
-      if (movimientos.length > 0) {
-        this._assert(Object.prototype.hasOwnProperty.call(movimientos[0], 'acuse_manual'), M, 'Movimientos guardan acuse_manual', 'DATOS');
-      } else {
-        this._log('WARN', M, 'Sin movimientos disponibles para validar acuse_manual', 'DATOS');
-      }
-
-      if (window.PedidosCrotales && typeof window.PedidosCrotales.list === 'function') {
-        const pedidos = await window.PedidosCrotales.list().catch(() => []);
-        if (pedidos.length > 0) {
-          this._assert(Object.prototype.hasOwnProperty.call(pedidos[0], 'acuse_manual'), M, 'Pedidos de crotales incluyen acuse_manual', 'DATOS');
-        }
-      }
-
-      this._log('PASS', M, '✅ COMPLETADO — Modo interno verificado');
-      return !this._hasFail(M);
-    } catch (e) {
-      this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
-      return false;
-    } finally {
-      if (hashOriginal && window.location.hash !== hashOriginal) {
-        window.location.hash = hashOriginal;
-      }
-    }
-  },
-
   // ============================================================
   // EJECUCIÓN PRINCIPAL
   // ============================================================
@@ -1424,7 +1375,6 @@ const SigganQA = {
       { name: 'Libro de Saneamientos', fn: () => this.testLibroSaneamientos() },
       { name: 'Libro de Tratamientos', fn: () => this.testLibroTratamientos() },
       { name: 'Exportación REGA/SIA', fn: () => this.testExportacion() },
-      { name: 'Modo Interno', fn: () => this.testModoInterno() },
       { name: 'Cuaderno Digital', fn: () => this.testCuadernoView() },
       { name: 'Validación Crotal', fn: () => this.testValidacionCrotal() },
       { name: 'Traslado Interno y Aforo', fn: () => this.testTrasladoInterno() },
@@ -1511,7 +1461,6 @@ const SigganQA = {
       'leche': () => this.testVentaLecheBlocking(),
       'sandach': () => this.testSANDACHClassificacion(),
       'notificaciones': () => this.testNotificacionesREGA(),
-      'interno': () => this.testModoInterno(),
       'coverage': () => this.testCoberturaDemo(),
       'cobertura': () => this.testCoberturaDemo(),
       'rendimiento': () => this.testRendimiento(),
