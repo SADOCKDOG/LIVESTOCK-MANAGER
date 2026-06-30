@@ -388,13 +388,28 @@ const AjustesView = {
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.documento()} Historial de Documentos</h3>
         <p class="text-gray mt-5 text-sm">Últimos eventos de tramitación oficial registrados en la base de datos.</p>
         <div class="mt-15">
-          ${tramitesFinca.slice(-5).reverse().map(d => `
-            <div class="p-10 border border-222 bg-black rounded-sm mb-8">
-              <div class="text-white text-xs font-900 uppercase">${d.tipo || 'documento'} · ${d.numero || 'S/N'}</div>
-              <div class="text-aaa text-[0.62rem] mt-4 uppercase font-800">${d.fecha_emision || d.created_at || ''}</div>
-              ${d.estado_tramite ? `<div class="text-green text-[0.6rem] mt-6 font-900 uppercase">ESTADO: ${d.estado_tramite}</div>` : ''}
-            </div>
-          `).join('') || '<div class="text-gray text-center p-10 uppercase font-800 text-xs">Sin trámites recientes</div>'}
+          ${tramitesFinca.length > 0 ? `
+          <div class="grid gap-6">
+            ${tramitesFinca.slice(-5).reverse().map(d => `
+              <div class="flex items-center gap-6 p-10 bg-dark rounded-lg border border-222">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:${d.estado_tramite === 'presentado' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'};">
+                  ${Icons.documento()}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-white text-xs font-900 uppercase overflow-hidden text-ellipsis" style="white-space:nowrap;">${d.tipo || 'Documento'} · ${d.numero || 'S/N'}</div>
+                  <div class="text-aaa text-[0.55rem] mt-2 uppercase font-800">${d.fecha_emision || d.created_at || ''}</div>
+                </div>
+                ${d.estado_tramite ? `<span class="badge badge-sm uppercase font-900 flex-shrink-0" style="background:${d.estado_tramite === 'presentado' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)'}; color:${d.estado_tramite === 'presentado' ? 'var(--c-success)' : 'var(--c-warning)'};">${d.estado_tramite}</span>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          <div class="mt-14">
+            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='#/documentos'" style="width:100%;">
+              ${Icons.documento()}
+              <span class="widget-link-label">Ver Todos los Documentos</span>
+            </button>
+          </div>` 
+          : '<div class="text-gray text-center p-10 uppercase font-800 text-xs">Sin trámites recientes</div>'}
         </div>
       </div>
 
