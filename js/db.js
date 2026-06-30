@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 14;
+const DB_VERSION = 13;
 
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
@@ -33,15 +33,6 @@ async function initDB() {
                     const store = db.createObjectStore('config_costes_referencia', { keyPath: 'id', autoIncrement: true });
                     store.createIndex('fincaId', 'fincaId');
                     store.createIndex('especie', 'especie');
-                }
-            }
-
-            // v14: Silos Persistentes (Configuración de Almacén)
-            if (oldVersion < 14) {
-                if (!db.objectStoreNames.contains('config_silos')) {
-                    const store = db.createObjectStore('config_silos', { keyPath: 'id', autoIncrement: true });
-                    store.createIndex('fincaId', 'fincaId');
-                    store.createIndex('tipo', 'tipo'); // carne, leche, hibrido
                 }
             }
 
