@@ -1,5 +1,0 @@
-package com.livestockmanager.app.manual;
-
-import com.getcapacitor.BridgeActivity;
-
-public class MainActivity extends BridgeActivity {}
