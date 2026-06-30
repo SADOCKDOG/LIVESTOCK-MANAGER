@@ -2,8 +2,8 @@
 node_modules/
 dist/
 
-# Build output — www se regenera desde raíz
-www/
+# Build output
+# www/ se trackea ahora para preservar el código fuente web
 
 # Android — regenerar con npx cap copy android
 android/
@@ -16,10 +16,24 @@ Private/
 # Claude Code — configuración personal del asistente
 .claude/
 
-# IDEs — configuración personal del editor
+# IDEs and AI Assistants — configuración personal del editor y agentes
 .idea/
 .vscode/
-
+.agent/
+.artifacts/
+.claude/
+.codebuddy/
+.codex/
+.continue/
+.cursor/
+.gemini/
+.impeccable/
+.kiro/
+.opencode/
+.qoder/
+.roo/
+.trae/
+.windsurf/
 # Sistema
 .DS_Store
 Thumbs.db
