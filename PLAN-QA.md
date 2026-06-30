@@ -192,6 +192,14 @@ await SigganQA.cleanup();          // eliminar datos de prueba
 ### 8.8 Rendimiento (`rendimiento`)
 - Inserta 50 movimientos y mide la consulta filtrada (< 1500 ms)
 
+### 8.9 Modo Interno (`interno`)
+- Verifica que el banner "Modo interno" aparece en Documentos cuando no hay
+  integración directa con SIGGAN/BADIGEX.
+- Comprueba que los movimientos y pedidos de crotales guardan el campo
+  `acuse_manual` tras registrar la referencia.
+- Garantiza que los botones `📎 Guardar acuse` y el modal funcionan tanto en la
+  lista como en el detalle del documento.
+
 ---
 
 ## NIVEL 7 — Performance
