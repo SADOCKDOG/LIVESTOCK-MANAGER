@@ -85,29 +85,57 @@ const DocumentosView = {
     const porTipo = {};
     docs.forEach(d => { porTipo[d.tipo] = (porTipo[d.tipo] || 0) + 1; });
 
+    const docsRecientes = docs.slice(0, 5);
+
     return `
-      <div class="grid grid-cols-5 gap-6 mb-14">
-        <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${totalDocs}</div></div>
-        <div class="info-box-center border-left-green"><small class="s-lbl">DIMOE</small><div class="inf-val-lg text-green">${porTipo.dimoe || 0}</div></div>
-        <div class="info-box-center border-left-amber"><small class="s-lbl">FACTURAS</small><div class="inf-val-lg text-amber">${porTipo.factura || 0}</div></div>
-        <div class="info-box-center border-left-violet"><small class="s-lbl">DIB/REGA</small><div class="inf-val-lg text-purple">${porTipo.dib || 0}</div></div>
-        <div class="info-box-center border-left-gold"><small class="s-lbl">CROTALES</small><div class="inf-val-lg text-gold">${porTipo.crotales || 0}</div></div>
-      </div>
-      <div class="mb-16">
-        <div class="flex gap-6 mb-10">
-          <div class="tabs-scroll scroll-shadow-container flex-1 nowrap">
-            ${tiposDoc.map(t => `
-              <button class="filter-pill filter-pill-gold font-800 uppercase inline-flex gap-4 ${this._currentTab === t ? 'active' : ''}"
-                onclick="DocumentosView._cambiarTab('${t}')"
-                style="letter-spacing:0.3px;">
-                ${labels[t] || t}
-              </button>
-            `).join('')}
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} DOCUMENTOS</div>
+        <div class="grid grid-cols-5 gap-4 mb-6">
+          <div class="bg-dark rounded-lg p-6 text-center border border-222">
+            <div class="text-[0.5rem] text-gray uppercase font-800 tracking-wider">TOTAL</div>
+            <div class="text-base font-black text-blue">${totalDocs}</div>
           </div>
-          <button class="btn btn-primary btn-sm nowrap" onclick="DocumentosView._exportDocs()">${Icons.exportar()} Exportar</button>
+          <div class="bg-dark rounded-lg p-6 text-center border border-222">
+            <div class="text-[0.5rem] text-gray uppercase font-800 tracking-wider">DIMOE</div>
+            <div class="text-base font-black text-green">${porTipo.dimoe || 0}</div>
+          </div>
+          <div class="bg-dark rounded-lg p-6 text-center border border-222">
+            <div class="text-[0.5rem] text-gray uppercase font-800 tracking-wider">FACTURAS</div>
+            <div class="text-base font-black text-amber">${porTipo.factura || 0}</div>
+          </div>
+          <div class="bg-dark rounded-lg p-6 text-center border border-222">
+            <div class="text-[0.5rem] text-gray uppercase font-800 tracking-wider">DIB/REGA</div>
+            <div class="text-base font-black text-purple">${porTipo.dib || 0}</div>
+          </div>
+          <div class="bg-dark rounded-lg p-6 text-center border border-222">
+            <div class="text-[0.5rem] text-gray uppercase font-800 tracking-wider">CROTALES</div>
+            <div class="text-base font-black text-gold">${porTipo.crotales || 0}</div>
+          </div>
         </div>
       </div>
-      <div id="docs-lista">${this._renderLista(docs, ventaMap)}</div>
+
+      <div class="card p-12 mb-14 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+        <div class="section-header-theme">ACCIONES</div>
+        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="DocumentosView._abrirAsistenteConsulta()">
+            ${Icons.buscar()}
+            <span class="widget-link-label">Consultar / Imprimir</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="DocumentosView._exportDocs()">
+            ${Icons.exportar()}
+            <span class="widget-link-label">Exportar Todo</span>
+          </button>
+        </div>
+        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
+      </div>
+
+      <div class="card p-14 border-222">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
+          ${Icons.documento()} Últimos documentos generados (${docsRecientes.length})
+        </div>
+        <div id="docs-lista">${this._renderLista(docsRecientes, ventaMap)}</div>
+        ${docs.length > 5 ? `<div class="text-center mt-8"><span class="text-xs text-gray-600 font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa los filtros para ver todos</span></div>` : ''}
+      </div>
     `;
   },
 
@@ -195,6 +223,58 @@ const DocumentosView = {
       const d = new Date(dateStr);
       return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('es-ES');
     } catch { return dateStr; }
+  },
+
+  async _abrirAsistenteConsulta() {
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
+    overlay.style.zIndex = '7000';
+    overlay.innerHTML = `
+      <div class="wizard-header-fixed text-center">
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-pesaje-close">${Icons.cerrar()}</button>
+        <h2 class="pesaje-titulo-h2">${Icons.buscar()} CONSULTAR / IMPRIMIR</h2>
+      </div>
+      <div class="wizard-content-scrollable">
+        <div class="card p-16 mb-16 border-222 card-dark-gradient">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 text-center">SELECCIONA TIPO DE DOCUMENTO</div>
+          <div class="grid grid-cols-2 gap-8">
+            ${[
+              { id: 'dimoe', label: 'DIMOE (Guías)', icon: Icons.exportar(), color: '#10b981' },
+              { id: 'factura', label: 'Facturas', icon: Icons.libroVentas(), color: '#3b82f6' },
+              { id: 'certificado', label: 'Certificados', icon: Icons.contratos(), color: '#f59e0b' },
+              { id: 'dib', label: 'DIB / Identificación', icon: Icons.informeRega(), color: '#8b5cf6' },
+              { id: 'crotales', label: 'Pedidos Crotales', icon: Icons.animales(), color: '#d97706' },
+              { id: 'guias', label: 'Guías Movimiento', icon: Icons.exportar(), color: '#10b981' },
+              { id: 'libro', label: 'Libro Registro', icon: Icons.libroVentas(), color: '#3b82f6' },
+              { id: 'contratos', label: 'Contratos', icon: Icons.contratos(), color: '#8b5cf6' },
+              { id: 'cierres', label: 'Cierres / Borradores', icon: Icons.documento(), color: '#f59e0b' },
+              { id: 'todos', label: 'Todos los documentos', icon: Icons.documento(), color: '#888' },
+            ].map(t => `
+              <button class="widget-link-btn widget-link-btn--neon" style="--neon-color:${t.color};--neon-glow:${t.color}B0;--neon-inner:${t.color}40;"
+                onclick="DocumentosView._filtrarYMostrar('${t.id}');this.closest('.wizard-full-screen').remove()">
+                ${t.icon}
+                <span class="widget-link-label">${t.label}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  },
+
+  _filtrarYMostrar(tipo) {
+    const docs = this._cachedDocs || [];
+    const filtrados = tipo === 'todos' ? docs : docs.filter(d => {
+      if (tipo === 'guias') return d.tipo === 'dimoe' || d.isMovimiento;
+      if (tipo === 'libro') return d.tipo === 'dib' || d.tipo === 'certificado';
+      if (tipo === 'contratos') return d.tipo === 'factura' || d.tipo === 'certificado';
+      if (tipo === 'cierres') return d.estado === 'borrador';
+      return (d.tipo || '') === tipo;
+    });
+    const lista = document.getElementById('docs-lista');
+    if (lista) {
+      lista.innerHTML = this._renderLista(filtrados, this._ventaMap || {});
+    }
   },
 
   _setupFilters() {

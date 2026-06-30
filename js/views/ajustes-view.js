@@ -34,8 +34,10 @@ const AjustesView = {
     const costesRef = activeId ? await window.db.getAllFromIndex('config_costes_referencia', 'fincaId', Number(activeId)) : [];
     const config = await this._loadConfig();
     const lastBackup = localStorage.getItem('last_backup_date');
-    const catalogoTiposREGA = window.ComunidadesService?.getTiposExplotacionREGA ? window.ComunidadesService.getTiposExplotacionREGA().slice(0, 5) : [];
+    const catalogoTiposREGA = window.ComunidadesService?.getTiposExplotacionREGA ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const catalogoEspeciesREGA = window.ComunidadesService?.getEspeciesAutorizables ? window.ComunidadesService.getEspeciesAutorizables() : [];
+    const catalogoTiposResumen = catalogoTiposREGA.slice(0, 5);
+    const catalogoTiposResto = catalogoTiposREGA.slice(5);
 
     main.innerHTML = `
       <!-- ===================== GESTOR DE FINCA ===================== -->
@@ -359,14 +361,22 @@ const AjustesView = {
       </div>
 
       <!-- ===================== CATÁLOGOS REGA ===================== -->
-      <div class="card card-accent card-accent-blue mb-25 p-20">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.libroVentas()} Catálogos REGA</h3>
-        <p class="text-gray mt-5 text-sm">Consulta de catálogos normativos oficiales para configuración de explotación.</p>
-        <div class="info-box mt-15">
-          <div class="text-xs text-gray uppercase font-800 mb-6">Tipos Explotación:</div>
-          <div class="text-white text-xs leading-relaxed">${catalogoTiposREGA.join(' · ')}</div>
-          <div class="text-xs text-gray uppercase font-800 mt-12 mb-6">Especies Autorizables:</div>
-          <div class="text-white text-xs leading-relaxed">${catalogoEspeciesREGA.join(' · ')}</div>
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-info); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.libroVentas()} CATÁLOGOS REGA</div>
+        <div class="grid gap-6">
+          <div class="bg-dark rounded-lg p-10 border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 flex items-center gap-4">${Icons.documento()} Tipos Explotación (${catalogoTiposREGA.length})</div>
+            <div class="flex flex-wrap gap-2">
+              ${catalogoTiposResumen.map(t => `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222">${t}</span>`).join('')}
+              ${catalogoTiposResto.length > 0 ? `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222" id="rega-tipos-mas" style="cursor:pointer;color:var(--c-info) !important;" onclick="AjustesView._verCatalogoCompleto('tipos')">+${catalogoTiposResto.length} más</span>` : ''}
+            </div>
+          </div>
+          <div class="bg-dark rounded-lg p-10 border border-222">
+            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 flex items-center gap-4">${Icons.animales()} Especies Autorizables (${catalogoEspeciesREGA.length})</div>
+            <div class="flex flex-wrap gap-2">
+              ${catalogoEspeciesREGA.map(e => `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222">${e}</span>`).join('')}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -425,6 +435,28 @@ const AjustesView = {
   },
 
   // ===================== HELPER: CONFIG =====================
+
+  async _verCatalogoCompleto(tipo) {
+    const items = tipo === 'tipos'
+      ? (window.ComunidadesService?.getTiposExplotacionREGA?.() || [])
+      : (window.ComunidadesService?.getEspeciesAutorizables?.() || []);
+    const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
+    overlay.style.zIndex = '7000';
+    overlay.innerHTML = `
+      <div class="wizard-header-fixed text-center">
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-pesaje-close">${Icons.cerrar()}</button>
+        <h2 class="pesaje-titulo-h2">${tipo === 'tipos' ? Icons.documento() : Icons.animales()} CATÁLOGO ${tipo === 'tipos' ? 'TIPOS EXPLOTACIÓN' : 'ESPECIES'}</h2>
+      </div>
+      <div class="wizard-content-scrollable">
+        <div class="card p-16 border-222">
+          <div class="flex flex-wrap gap-3">
+            ${items.map(i => `<span class="text-xs text-white font-700 uppercase bg-dark px-10 py-4 rounded-sm border border-222">${i}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  },
 
   async _loadConfig() {
     const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: false, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
