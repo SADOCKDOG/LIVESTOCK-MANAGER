@@ -128,7 +128,7 @@ const DashboardView = {
           <div class="text-white text-xs font-900 uppercase tracking-wider">Versi&oacute;n Gratuita</div>
           <div class="text-gray text-[0.6rem] mt-2">Actualiza a Premium para desbloquear todas las funciones</div>
         </div>
-        <button onclick="App.toast('Disponible pr&oacute;ximamente en Google Play')" style="flex-shrink:0;background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
+        <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
       </div>
       ` : ''}
       <!-- Resumen General -->
