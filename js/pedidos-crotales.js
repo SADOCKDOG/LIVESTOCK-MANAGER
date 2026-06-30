@@ -108,11 +108,13 @@ window.PedidosCrotales = (() => {
         const req = index.getAll(activeFincaId);
         req.onsuccess = () => {
           const pedidos = req.result || [];
-          // Ordenar por fecha descendente (más recientes primero)
           pedidos.sort((a, b) => new Date(b.fecha_pedido) - new Date(a.fecha_pedido));
           resolve(pedidos);
         };
-        req.onerror = () => reject(req.error);
+        req.onerror = () => {
+          console.warn('[PedidosCrotales] Error en list():', req.error);
+          resolve([]);
+        };
       });
     } catch (e) {
       console.error('[PedidosCrotales] Error al listar:', e.message);

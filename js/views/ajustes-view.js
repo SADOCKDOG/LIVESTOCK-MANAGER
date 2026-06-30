@@ -71,9 +71,10 @@ const AjustesView = {
             <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> Editar registros demo</div>
             <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> L&iacute;mite 15 animales / 30 gastos</div>
           </div>
-          <button class="btn w-full" style="background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:14px 32px;font-weight:900;font-size:0.85rem;border-radius:12px;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(217,119,6,0.25);" onclick="App.toast('Disponible pr&oacute;ximamente en Google Play')">
+          <button class="btn w-full" style="background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:14px 32px;font-weight:900;font-size:0.85rem;border-radius:12px;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(217,119,6,0.25);" onclick="window.PurchaseManager && window.PurchaseManager.purchase()">
             ${Icons.estrella()} Actualizar a Premium
           </button>
+          <div class="text-center mt-10"><a href="#" onclick="window.PurchaseManager && window.PurchaseManager.restorePurchases();return false;" style="color:rgba(217,119,6,0.7);font-size:0.65rem;text-decoration:none;">Restaurar compras</a></div>
         </div>
       </div>
       ` : ''}

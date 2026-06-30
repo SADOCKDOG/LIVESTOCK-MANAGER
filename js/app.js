@@ -91,13 +91,8 @@ const App = {
 
       const fincas = await Fincas.list();
       if (fincas.length === 0 || !(await Fincas.getActiveId())) {
-        if (window.PremiumManager && window.PremiumManager.isFree()) {
-          console.log("[FREE] Auto-cargando demo CHAMORRO...");
-          await window.SeedData.run(true);
-        } else {
-          await AsistenteConfiguracion.mostrarAsistente();
-          return;
-        }
+        await AsistenteConfiguracion.mostrarAsistente();
+        return;
       }
 
       await App.updateHeader();
