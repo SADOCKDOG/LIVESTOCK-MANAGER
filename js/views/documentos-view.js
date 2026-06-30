@@ -316,14 +316,64 @@ const DocumentosView = {
         if (p) {
           await window.WizardCrotales.generarPDF(finca, p, p.id);
         } else { App.toastError("Pedido no encontrado"); }
-      } else if (tipo === 'dimoe') {
+        return;
+      }
+      if (tipo === 'dimoe') {
         const m = await window.db.get('movimientos_ganado', Number(id));
         if (m) {
           window.WizardGuiaMovimiento.generarDocumento(finca, m);
         } else { App.toastError("Movimiento no encontrado"); }
-      } else {
-        App.toast("Impresión nativa disponible en detalles de venta");
+        return;
       }
+
+      // Para el resto de tipos (factura, certificado, dib), generar PDF genérico
+      const doc = (this._cachedDocs || []).find(d => d.id === id && d.tipo === tipo);
+      if (!doc) { App.toastError("Documento no encontrado"); return; }
+
+      const color = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#d97706' }[tipo] || '#666';
+      const label = { dimoe: 'DIMOE (Guía)', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido Crotales' }[tipo] || tipo;
+
+      const overlay = document.createElement('div');
+      overlay.id = 'doc-pdf-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:#fff;color:#000;display:flex;flex-direction:column;';
+      overlay.innerHTML = `
+        <div id="doc-pdf-content" style="flex:1;padding:40px;font-family:serif;overflow-y:auto;">
+          <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:20px;margin-bottom:30px;">
+            <h1 style="margin:0;font-size:1.4rem;text-transform:uppercase;">${label}</h1>
+            <p style="color:#555;margin:5px 0 0 0;">${finca.nombre} · ${finca.codigo_REGA || finca.rega || ''}</p>
+          </div>
+          <div style="margin-bottom:20px;font-size:0.9rem;">
+            <p><strong>Número:</strong> ${doc.numero || 'S/N'}</p>
+            <p><strong>Fecha:</strong> ${this._fmtFecha(doc.createdAt || doc.fecha)}</p>
+            <p><strong>Estado:</strong> ${(doc.estado || '').toUpperCase()}</p>
+            ${doc.isPedidoCrotales ? `<p><strong>Especie:</strong> ${doc.dataRaw.especie} · <strong>Cantidad:</strong> ${doc.dataRaw.cantidad} pares · <strong>Material:</strong> ${doc.dataRaw.tipo}</p>` : ''}
+            ${doc.isMovimiento ? `<p><strong>Tipo:</strong> ${doc.dataRaw.tipo} · <strong>Animales:</strong> ${doc.dataRaw.num_animales}</p>` : ''}
+          </div>
+          <div style="padding:20px;border:1px solid #ccc;background:#f9f9f9;font-size:0.85rem;margin-top:40px;">
+            <p style="margin:0;"><strong>Documento generado por Livestock Manager Premium</strong></p>
+            <p style="margin:5px 0 0 0;color:#555;">Plataforma profesional de gestión ganadera y trazabilidad industrial.</p>
+          </div>
+        </div>
+        <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;">
+          <button class="btn btn-primary" id="btn-doc-descargar" style="width:auto;padding:0 30px;background:${color};color:#fff;font-weight:bold;">${Icons.exportar()} DESCARGAR</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('doc-pdf-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('#btn-doc-descargar').onclick = async () => {
+        try {
+          const el = document.getElementById('doc-pdf-content');
+          if (!el) return App.toastError("Contenido no disponible");
+          const filename = `${label.replace(/\s+/g, '_')}_${doc.numero || doc.id}_${Date.now()}.pdf`;
+          if (typeof html2pdf !== 'undefined') {
+            await html2pdf().set({ margin: 10, filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save(filename);
+          } else {
+            const win = window.open('', '_blank');
+            if (win) { win.document.write('<html><head><title>' + filename + '</title><style>body{font-family:serif;padding:40px;color:#000;background:#fff;}</style></head><body>' + el.innerHTML + '</body></html>'); win.document.close(); win.print(); }
+          }
+          App.toast("Documento descargado ✅");
+        } catch (e) { App.toastError("Error: " + e.message); }
+      };
     } catch (e) {
       App.toastError("Error al imprimir: " + e.message);
     }
