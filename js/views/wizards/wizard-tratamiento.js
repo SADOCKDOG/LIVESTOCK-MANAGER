@@ -272,10 +272,7 @@ window.WizardTratamiento = {
           await window.Sanitarios.save(finalData);
           App.toast("Tratamiento registrado correctamente.");
           if (options.returnTo === 'explotacion') {
-            if (window.ExplotacionView) {
-              ExplotacionView.invalidateCache?.();
-              await ExplotacionView.render();
-            }
+            await ExplotacionView.render();
           } else {
             App.renderDetalleRebano(new URLSearchParams(`id=${rebanoId}`));
           }
