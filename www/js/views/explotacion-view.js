@@ -304,7 +304,7 @@ const ExplotacionView = {
     } else if (this._activeSubModule === 'gastos') {
       this._renderGastosView();
     } else if (this._activeSubModule === 'almacen') {
-      this._renderAlmacenView();
+      await this._renderAlmacenView();
     }
 
 if (window.enableScrollShadows) {
@@ -658,33 +658,55 @@ if (window.enableScrollShadows) {
   },
 
   // ==========================================
-  //  MÉTODO COMÚN: STOCK DE SILOS
+  //  MÉTODO COMÚN: STOCK DE SILOS (PERSISTENTE)
   // ==========================================
-  _renderSilosHtml(fincaId, siloEventos, modo) {
+  async _renderSilosHtml(fincaId, siloEventos, modo) {
     let silos = [];
     let borderStyleColor = '#ef4444'; // Rojo por defecto
 
-    if (modo === 'leche') {
-      silos = [
-        { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño', capacidad: 10000, inicial: 6000 },
-        { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia', capacidad: 5000, inicial: 3000 }
-      ];
-      borderStyleColor = '#3b82f6';
-    } else if (modo === 'hibrido') {
-      silos = [
-        { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000 },
-        { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000 },
-        { id: 3, nombre: 'Silo C: Concentrado Ordeño', capacidad: 10000, inicial: 5000 },
-        { id: 4, nombre: 'Silo D: Unifeed Lactancia', capacidad: 6000, inicial: 3000 }
-      ];
-      borderStyleColor = '#10b981';
-    } else {
-      // carne
-      silos = [
-        { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000 },
-        { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000 }
-      ];
-      borderStyleColor = '#ef4444';
+    // Intentar cargar silos configurados
+    try {
+      silos = await window.db.getAllFromIndex('config_silos', 'fincaId', fincaId).catch(() => []);
+      // Filtrar por tipo si es necesario (carne/leche/hibrido)
+      if (silos.length > 0) {
+        silos = silos.filter(s => s.tipo === modo || s.tipo === 'todos');
+      }
+    } catch (e) {
+      console.warn('[ExPro] Error cargando silos:', e);
+    }
+
+    // Si no hay silos configurados, usar defaults por modo (Seed)
+    if (silos.length === 0) {
+      if (modo === 'leche') {
+        silos = [
+          { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño', capacidad: 10000, inicial: 6000, tipo: 'leche' },
+          { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia', capacidad: 5000, inicial: 3000, tipo: 'leche' }
+        ];
+        borderStyleColor = '#3b82f6';
+      } else if (modo === 'hibrido') {
+        silos = [
+          { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000, tipo: 'hibrido' },
+          { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000, tipo: 'hibrido' },
+          { id: 3, nombre: 'Silo C: Concentrado Ordeño', capacidad: 10000, inicial: 5000, tipo: 'hibrido' },
+          { id: 4, nombre: 'Silo D: Unifeed Lactancia', capacidad: 6000, inicial: 3000, tipo: 'hibrido' }
+        ];
+        borderStyleColor = '#10b981';
+      } else {
+        // carne
+        silos = [
+          { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000, tipo: 'carne' },
+          { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000, tipo: 'carne' }
+        ];
+        borderStyleColor = '#ef4444';
+      }
+      
+      // Guardar defaults en DB para la próxima vez
+      try {
+        for (const s of silos) {
+          s.fincaId = fincaId;
+          await window.db.add('config_silos', s).catch(() => {});
+        }
+      } catch (e) {}
     }
 
     let html = `
@@ -919,11 +941,34 @@ if (window.enableScrollShadows) {
   async _abrirAsistenteSilo(modo) {
     const fincaId = this._cachedData.fincaId;
     
-    const silos = modo === 'leche'
-      ? [{ v: '1', l: 'Silo A: Pienso Concentrado Ordeño' }, { v: '2', l: 'Silo B: Mezcla Unifeed Lactancia' }]
-      : modo === 'hibrido'
-        ? [{ v: '1', l: 'Silo A: Concentrado Terneros' }, { v: '2', l: 'Silo B: Mezcla Forrajera' }, { v: '3', l: 'Silo C: Concentrado Ordeño' }, { v: '4', l: 'Silo D: Unifeed Lactancia' }]
-        : [{ v: '1', l: 'Silo A: Concentrado Terneros' }, { v: '2', l: 'Silo B: Mezcla Forrajera' }];
+    // Cargar silos dinámicamente
+    let silosList = [];
+    try {
+      const silosDb = await window.db.getAllFromIndex('config_silos', 'fincaId', fincaId).catch(() => []);
+      silosList = silosDb.filter(s => s.tipo === modo || s.tipo === 'todos');
+    } catch (e) {}
+
+    // Fallback si no hay silos
+    if (silosList.length === 0) {
+      if (modo === 'leche') {
+        silosList = [
+          { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño' },
+          { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia' }
+        ];
+      } else if (modo === 'hibrido') {
+        silosList = [
+          { id: 1, nombre: 'Silo A: Concentrado Terneros' },
+          { id: 2, nombre: 'Silo B: Mezcla Forrajera' },
+          { id: 3, nombre: 'Silo C: Concentrado Ordeño' },
+          { id: 4, nombre: 'Silo D: Unifeed Lactancia' }
+        ];
+      } else {
+        silosList = [
+          { id: 1, nombre: 'Silo A: Concentrado Terneros' },
+          { id: 2, nombre: 'Silo B: Mezcla Forrajera' }
+        ];
+      }
+    }
 
     const modeClass = 'silo-card--' + modo;
 
@@ -937,7 +982,7 @@ if (window.enableScrollShadows) {
         <div class="wizard-input-group">
           <label class="wizard-label">Seleccionar Silo</label>
           <select id="ws-silo-id" class="wizard-input wizard-select">
-            ${silos.map(s => `<option value="${s.v}">${s.l}</option>`).join('')}
+            ${silosList.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('')}
           </select>
         </div>
 
@@ -1251,7 +1296,7 @@ if (window.enableScrollShadows) {
     container.innerHTML = html;
   },
 
-  _renderAlmacenView() {
+  async _renderAlmacenView() {
     const d = this._cachedData;
     const container = document.getElementById('explotacion-submodule-content');
     if (!container) return;
@@ -1259,10 +1304,13 @@ if (window.enableScrollShadows) {
     // Historial de movimientos de almacén / silos ordenado por fecha desc
     const movimientosAlmacen = (d.siloEventos || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+    // Renderizar silos (ahora async)
+    const silosHtml = await this._renderSilosHtml(d.fincaId, d.siloEventos, this._activeMode);
+
     let html = `
       <div style="--theme-color: #3b82f6; --neon-glow: #3b82f6B0; --neon-inner: #3b82f640">
         <!-- Niveles de llenado de silos -->
-        ${this._renderSilosHtml(d.fincaId, d.siloEventos, this._activeMode)}
+        ${silosHtml}
 
         <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
