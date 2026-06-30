@@ -33,6 +33,9 @@ Private/
 .roo/
 .trae/
 .windsurf/
+# Modo de publicación (generado por build:free / build:premium)
+js/mode-config.js
+
 # Sistema
 .DS_Store
 Thumbs.db

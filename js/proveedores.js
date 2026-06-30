@@ -49,6 +49,13 @@ const Proveedores = {
         return await ErrorHandler.tryAsync(async () => {
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+                const existente = await this.get(data.id);
+                if (existente && existente.demo) {
+                    throw new Error('No puedes modificar proveedores de demostración en la versión gratuita');
+                }
+            }
+
             ErrorHandler.validateRequired('nombre', data.nombre, 'Nombre o razón social es obligatorio');
             const nifVal = ErrorHandler.validateNifCif(data.nif_cif, { required: true });
             const regaVal = ErrorHandler.validateREGA(data.rega || '', data.comunidad_autonoma || null, { required: false });
@@ -97,6 +104,13 @@ const Proveedores = {
 
     async delete(id) {
         return await ErrorHandler.tryAsync(async () => {
+            if (window.PremiumManager && window.PremiumManager.isFree()) {
+                const record = await this.get(id);
+                if (record && record.demo) {
+                    throw new Error('No puedes eliminar proveedores de demostración en la versión gratuita');
+                }
+            }
+
             const gastos = await this.getGastos(id);
             if (gastos.length > 0) {
                 throw new Error(`No se puede eliminar: el proveedor tiene ${gastos.length} gasto(s) asociado(s).`);

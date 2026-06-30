@@ -417,7 +417,11 @@ const ExportService = {
    * @param {string} filename - nombre del fichero
    * @param {string} mime - tipo MIME
    */
-  async descargar(content, filename, mime = 'text/csv;charset=utf-8') {
+   async descargar(content, filename, mime = 'text/csv;charset=utf-8') {
+    if (window.PremiumManager && window.PremiumManager.isFree()) {
+      if (window.App?.toast) App.toast('❌ La exportación solo está disponible en Premium');
+      return;
+    }
     // 1️⃣ Capacitor Filesystem + Share (funciona en Android nativo)
     try {
       const cap = window.Capacitor;

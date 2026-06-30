@@ -44,6 +44,13 @@ const Reproduccion = {
 
             const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
+            if (esEdicion && window.PremiumManager && window.PremiumManager.isFree()) {
+                const existente = await this.getEvento(data.id);
+                if (existente && existente.demo) {
+                    throw new Error('No puedes modificar eventos de reproducción de demostración en la versión gratuita');
+                }
+            }
+
             // Obtener el animal para enriquecer datos y el snapshot
             const animal = await Animales.get(data.animalId);
             if (!animal) throw new Error("El animal referenciado no existe.");
@@ -113,6 +120,13 @@ const Reproduccion = {
     },
 
     async deleteEvento(id) {
+        if (window.PremiumManager && window.PremiumManager.isFree()) {
+            const record = await this.getEvento(id);
+            if (record && record.demo) {
+                throw new Error('No puedes eliminar eventos de reproducción de demostración en la versión gratuita');
+            }
+        }
+
         return await window.db.delete('reproduccion_eventos', Number(id));
     },
 
