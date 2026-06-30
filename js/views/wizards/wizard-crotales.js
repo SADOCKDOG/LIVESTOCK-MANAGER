@@ -38,30 +38,20 @@ window.WizardCrotales = {
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO DE CROTAL / MATERIAL</label>
               <select id="w-pd-tipo" class="wizard-input font-800">
-                <option value="Botón + Botón (EID)" ${data.tipo === "Botón + Botón (EID)" ? "selected" : ""}>BOTÓN + BOTÓN (ELECTRÓNICO)</option>
                 <option value="Bandera + Botón (EID)" ${data.tipo === "Bandera + Botón (EID)" ? "selected" : ""}>BANDERA + BOTÓN (ELECTRÓNICO)</option>
+                <option value="Botón + Botón (EID)" ${data.tipo === "Botón + Botón (EID)" ? "selected" : ""}>BOTÓN + BOTÓN (ELECTRÓNICO)</option>
                 <option value="Bolo Ruminal + Botón Visual" ${data.tipo === "Bolo Ruminal + Botón Visual" ? "selected" : ""}>BOLO RUMINAL + BOTÓN VISUAL</option>
-              </select>
-            </div>
-          <div class="card card-accent card-accent-gold p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.animales()} DATOS DEL PEDIDO</div>
-            <div class="wizard-input-group mb-12">
-              <label class="wizard-label">TIPO DE CROTAL</label>
-              <select id="w-pd-tipo" class="wizard-input">
-                <option value="Bandera + Botón (EID)" ${data.tipo === 'Bandera + Botón (EID)' ? 'selected' : ''}>Bandera + Botón (EID)</option>
-                <option value="Bolo Ruminal (EID)" ${data.tipo === 'Bolo Ruminal (EID)' ? 'selected' : ''}>Bolo Ruminal (EID)</option>
-                <option value="Crotal Visual Clásico" ${data.tipo === 'Crotal Visual Clásico' ? 'selected' : ''}>Crotal Visual Clásico</option>
-              </select>
-            </div>
-            <div class="wizard-input-group mb-12">
-              <label class="wizard-label">ESPECIE DESTINO</label>
-              <select id="w-pd-especie" class="wizard-input">
-                ${especiesPedido.map(esp => `<option value="${esp}" ${data.especie === esp ? 'selected' : ''}>${esp}</option>`).join('')}
+                <option value="Crotal Visual Clásico" ${data.tipo === 'Crotal Visual Clásico' ? 'selected' : ''}>CROTAL VISUAL CLÁSICO</option>
               </select>
             </div>
             <div class="wizard-input-group mb-10">
               <label class="wizard-label">CANTIDAD DE PARES</label>
               <input type="number" id="w-pd-cant" value="${data.cantidad}" class="wizard-input font-900" min="1" step="1">
+            </div>
+            <div class="p-10 bg-black-opacity-30 rounded-sm">
+                <p class="text-[0.6rem] text-aaa uppercase font-700 m-0 text-center">
+                    Los crotales electrónicos (EID) son obligatorios para nuevas incorporaciones según RD 787/2023.
+                </p>
             </div>
           </div>
         `,
@@ -165,34 +155,37 @@ window.WizardCrotales = {
              return;
           }
 
-          App.toast("Guardando pedido...");
-          // Guardar pedido en BD ANTES de generar PDF
-          const pedidoId = await PedidosCrotales.save({
+          // Leer valores directamente del DOM como fallback
+          const especie = document.getElementById('w-pd-especie')?.value || data.especie;
+          const tipo = document.getElementById('w-pd-tipo')?.value || data.tipo;
+          const cantidad = parseInt(document.getElementById('w-pd-cant')?.value) || data.cantidad || 0;
+          const adsg_nombre = document.getElementById('w-pd-adsg')?.value.trim() || data.adsg_nombre || '';
+          const adsg_codigo = document.getElementById('w-pd-adsg-cod')?.value.trim() || data.adsg_codigo || '';
+          const adsg_veterinario = document.getElementById('w-pd-vet')?.value.trim() || data.adsg_veterinario || '';
+          const adsg_vet_colegiado = document.getElementById('w-pd-vet-col')?.value.trim() || data.adsg_vet_colegiado || '';
+          const adsg_vet_nif = document.getElementById('w-pd-vet-nif')?.value.trim() || data.adsg_vet_nif || '';
+
+          const payload = {
             id: data.id || undefined,
             fincaId: finca.id,
-            especie: data.especie,
-            tipo: data.tipo,
-            cantidad: data.cantidad,
-            adsg_nombre: data.adsg_nombre,
-            adsg_codigo: data.adsg_codigo || '',
-            adsg_veterinario: data.adsg_veterinario || '',
-            adsg_vet_colegiado: data.adsg_vet_colegiado || '',
-            adsg_vet_nif: data.adsg_vet_nif || '',
-            estado: 'pendiente',  // Al finalizar pasa a pendiente
+            especie, tipo, cantidad,
+            adsg_nombre, adsg_codigo, adsg_veterinario, adsg_vet_colegiado, adsg_vet_nif,
+            estado: 'pendiente',
             fecha_pedido: borrador ? borrador.fecha_pedido : new Date().toISOString(),
-          });
+          };
 
+          App.toast("Guardando pedido...");
+          const pedidoId = await PedidosCrotales.save(payload);
           console.log(`[wizard-crotales] Pedido guardado en BD: id=${pedidoId}`);
-          App.toast(`✅ Pedido guardado (nº ${pedidoId})`);
-          
-          // Generar PDF DESPUÉS de persistir
-          await WizardCrotales.generarPDF(finca, data, pedidoId);
-        } catch (e) {
-          console.error('[wizard-crotales] Error al completar pedido:', e);
-          await Confirm.alert("Error", "Error al procesar el pedido: " + e.message);
 
-          // Fallback: Si el guardado falla, intentar al menos generar el PDF para que no se pierda el trámite
-          await WizardCrotales.generarPDF(finca, data, "TEMP-" + Date.now());
+          const pdfData = { ...data, especie, tipo, cantidad, adsg_nombre, adsg_codigo, adsg_veterinario, adsg_vet_colegiado, adsg_vet_nif };
+          App.toast(`✅ Pedido guardado (nº ${pedidoId})`);
+          await WizardCrotales.generarPDF(finca, pdfData, pedidoId);
+        } catch (e) {
+          console.error('[wizard-crotales] Error:', e);
+          await Confirm.alert("Error", "Error al procesar el pedido: " + e.message);
+          const fbData = { ...data, especie: data.especie || document.getElementById('w-pd-especie')?.value, tipo: data.tipo || document.getElementById('w-pd-tipo')?.value, cantidad: data.cantidad || parseInt(document.getElementById('w-pd-cant')?.value) || 0 };
+          await WizardCrotales.generarPDF(finca, fbData, "TEMP-" + Date.now());
         }
       }
     });
@@ -202,15 +195,15 @@ window.WizardCrotales = {
     App.toast("Generando documento oficial...");
     const overlay = document.createElement('div');
     overlay.id = "pedido-pdf-overlay";
-    overlay.className = "wizard-full-screen";
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:4000;background:white;color:black;display:flex;flex-direction:column;';
+    overlay.className = "wizard-full-screen animate-in";
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:white;color:black;display:flex;flex-direction:column;';
 
     const ccaa = finca.comunidad_autonoma;
     const ccaaLabel = ccaa === 'andalucia' ? 'Andalucía' : ccaa === 'extremadura' ? 'Extremadura' : '—';
     const plataforma = ccaa === 'andalucia' ? 'SIGGAN' : ccaa === 'extremadura' ? 'BADIGEX' : 'SIA/PIGGAN';
     const contentId = `pdf-content-${Date.now()}`;
     overlay.innerHTML = `
-          <div style="flex:1; width:100%; min-height:500px; margin:0; background:white; color:black; padding:40px; font-family:serif; box-sizing:border-box;" id="${contentId}">
+          <div style="flex:1; width:100%; min-height:500px; margin:0; background:white; color:black; padding:40px; font-family:serif; box-sizing:border-box; overflow-y:auto;" id="${contentId}">
               <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:20px; margin-bottom:30px;">
                   <h1 style="margin:0; font-size:1.5rem; text-transform:uppercase;">SOLICITUD DE MATERIAL DE IDENTIFICACIÓN ANIMAL</h1>
                   <h3 style="margin:5px 0 0 0; color:#555; font-weight:normal;">Documento de delegación para ADSG / Autoridad Competente</h3>
@@ -222,7 +215,7 @@ window.WizardCrotales = {
                       <p><strong>Nombre/Razón Social:</strong> ${finca.propietario || finca.nombre}<br>
                       <strong>NIF/CIF:</strong> ${finca.nif_cif || 'No especificado'}<br>
                       <strong>Dirección:</strong> ${finca.direccion || 'No especificada'}<br>
-                      <strong>Teléfono:</strong> ${finca.telefonoContacto || 'No especificado'}<br>
+                      <strong>Teléfono:</strong> ${finca.telefonoContacto || finca.telefono || 'No especificado'}<br>
                       <strong>Email:</strong> ${finca.email || 'No especificado'}</p>
                   </div>
                   <div>
@@ -279,7 +272,7 @@ window.WizardCrotales = {
               </div>
           </div>
           <div style="text-align:center; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-              <button class="btn btn-primary" id="btn-descargar-adsg" style="width:auto; padding:0 30px; background:#10b981;">${Icons.exportar()} DESCARGAR O ENVIAR</button>
+              <button class="btn btn-primary" id="btn-descargar-adsg" style="width:auto; padding:0 30px; background:#10b981; color:white; font-weight:bold;">${Icons.exportar()} DESCARGAR O ENVIAR</button>
               <button class="btn btn-secondary" onclick="document.getElementById('pedido-pdf-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
           </div>
     `;
@@ -298,7 +291,7 @@ window.WizardCrotales = {
         `;
         loader.innerHTML = `
           <div class="pdf-loader">
-            <div class="pdf-loader-emoji">${Icons.paquete()}</div>
+            <div class="pdf-loader-emoji">⏳</div>
             <div class="pdf-loader-title">Generando Solicitud</div>
             <div class="pdf-loader-desc">Pedido de Crotales</div>
             <div class="pdf-loader-bar">
@@ -324,97 +317,95 @@ window.WizardCrotales = {
         }
 
         updateProgress(30, 'Preparando documento...');
-        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
         const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; z-index:9990; background:#fff; color:#000; padding:40px; font-family:serif;`;
+        tempContainer.style.cssText = `position:fixed; left:0; top:0; width:800px; z-index:10; background:#fff; color:#000; padding:40px; font-family:serif; visibility:visible;`;
         tempContainer.innerHTML = el.innerHTML;
         document.body.appendChild(tempContainer);
 
+        const filename = `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}_${Date.now()}.pdf`;
+
         const opt = {
           margin: [12, 10, 12, 10],
-          filename: `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}.pdf`,
+          filename: filename,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
             logging: false,
-            backgroundColor: '#ffffff',
-            width: 800,
-            scrollX: 0,
-            scrollY: currentScroll,
-            height: tempContainer.scrollHeight,
-            windowHeight: tempContainer.scrollHeight
+            backgroundColor: '#ffffff'
           },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         if (typeof html2pdf === 'undefined') {
+          document.body.removeChild(tempContainer);
           loader.remove();
-          WizardCrotales._fallbackPDF(el, opt.filename);
+          WizardCrotales._fallbackPDF(el, filename);
           return;
         }
 
         updateProgress(70, 'Rasterizando PDF...');
-        const pdfBlob = await html2pdf().set(opt).from(tempContainer).output('blob');
+        const pdfBlob = await html2pdf().set(opt).from(tempContainer).toPdf().output('blob');
         document.body.removeChild(tempContainer);
-        updateProgress(100, '¡Listo!');
-        await new Promise(r => setTimeout(r, 400));
-        loader.remove();
 
-        App.toast("Documento listo ✅");
+        updateProgress(90, 'Compartiendo...');
 
-        // 1️⃣ Capacitor Native Share
-        try {
+        // Compartir usando el sistema unificado de InformesView si está disponible,
+        // o implementar uno local robusto.
+        const shareTitle = 'Pedido de Crotales';
+        const shareText = `Solicitud de material de identificación para ${finca.codigo_REGA || finca.rega}`;
+
+        const fileObj = {
+          blob: pdfBlob,
+          fileName: filename,
+          mimeType: 'application/pdf',
+          titulo: 'Solicitud Crotales',
+          shareTitle,
+          shareText
+        };
+
+        if (window.InformesView && typeof InformesView._ejecutarShare === 'function') {
+          await InformesView._ejecutarShare(fileObj);
+        } else {
+          // Implementación local de share si no hay InformesView
           const cap = window.Capacitor;
-          const fsPlugin = cap?.Plugins?.Filesystem;
-          const sharePlugin = cap?.Plugins?.Share;
-          if (fsPlugin && sharePlugin) {
+          if (cap?.Plugins?.Share) {
             const reader = new FileReader();
             const dataUri = await new Promise((resolve, reject) => {
               reader.onload = () => resolve(reader.result);
               reader.onerror = reject;
               reader.readAsDataURL(pdfBlob);
             });
-            const result = await fsPlugin.writeFile({
-              path: opt.filename,
+            const result = await cap.Plugins.Filesystem.writeFile({
+              path: filename,
               data: dataUri.split(',')[1],
               directory: 'CACHE'
             });
-            await sharePlugin.share({
-              title: 'Pedido de Crotales',
-              text: `Solicitud de material de identificación para ${finca.codigo_REGA || finca.rega}`,
+            await cap.Plugins.Share.share({
+              title: shareTitle,
+              text: shareText,
               url: result.uri,
               files: [result.uri],
-              dialogTitle: 'Compartir Pedido de Crotales con…'
+              dialogTitle: 'Compartir Solicitud con…'
             });
-            return;
+          } else if (navigator.share) {
+            const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+            await navigator.share({ title: shareTitle, text: shareText, files: [file] });
+          } else {
+            html2pdf().set(opt).from(el).save(filename);
           }
-        } catch (capErr) {
-          console.warn("[Capacitor Share Crotales]", capErr?.message || capErr);
         }
 
-        // 2️⃣ navigator.share con File
-        try {
-          if (navigator.share) {
-            const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
-            await navigator.share({
-              title: 'Pedido de Crotales',
-              text: `Solicitud de material de identificación para ${finca.codigo_REGA || finca.rega}`,
-              files: [file]
-            });
-            return;
-          }
-        } catch (shareErr) {
-          if (shareErr.name !== 'AbortError') console.warn("[navigator.share Crotales]", shareErr);
-        }
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 400));
+        loader.remove();
+        App.toast("Documento enviado ✅");
 
-        // 3️⃣ Fallback descarga
-        html2pdf().set(opt).from(el).save(opt.filename);
       } catch (e) {
-        console.warn("Error en generación PDF Crotales:", e);
+        console.error("Error en generación PDF Crotales:", e);
         if (loader) loader.remove();
-        WizardCrotales._fallbackPDF(document.getElementById(contentId), `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}.pdf`);
+        App.toastError("Error al generar PDF: " + e.message);
       }
     };
   },
