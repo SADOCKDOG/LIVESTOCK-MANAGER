@@ -2,9 +2,8 @@
 node_modules/
 dist/
 
-# Build output
-# www/ se trackea ahora para preservar el código fuente web
-
+# Build output (generado por npm run build copiando desde la raíz)
+www/
 # Android — regenerar con npx cap copy android
 android/
 
