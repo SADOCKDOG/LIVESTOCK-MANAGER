@@ -358,32 +358,34 @@ window.WizardGuiaMovimiento = {
     const plataforma = conf ? conf.sistema_movimiento : 'SIA';
     const overlay = document.createElement('div');
     overlay.id = 'guia-mov-overlay';
-    overlay.className = 'wizard-full-screen';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:4000;background:white;color:black;display:flex;flex-direction:column;';
+    overlay.className = 'wizard-full-screen animate-in';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:white;color:black;display:flex;flex-direction:column;';
     const contentId = `guia-content-${Date.now()}`;
     const crotalesHtml = (mov.crotales || []).length
       ? `<div style="margin-top:8px;font-size:0.8rem;"><strong>Crotales:</strong> ${mov.crotales.join(', ')}</div>` : '';
     overlay.innerHTML = `
       <div id="${contentId}" style="flex:1;width:100%;background:white;color:black;padding:40px;font-family:serif;box-sizing:border-box;overflow:auto;">
         <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:16px;margin-bottom:24px;">
-          <h1 style="margin:0;font-size:1.4rem;text-transform:uppercase;">Guía de Origen y Sanidad Pecuaria</h1>
+          <h1 style="margin:0;font-size:1.4rem;text-transform:uppercase;color:black;">Guía de Origen y Sanidad Pecuaria</h1>
           <h3 style="margin:5px 0 0;color:#555;font-weight:normal;">Movimiento de ${mov.tipo === 'salida' ? 'Salida' : 'Entrada'} · Plataforma ${plataforma}</h3>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;font-size:0.9rem;margin-bottom:20px;">
-          <div>
-            <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:0;">EXPLOTACIÓN ORIGEN</h4>
-            <p><strong>REGA:</strong> ${mov.rega_origen || '—'}<br>
+
+        <div style="display:flex; justify-content:space-between; gap:30px; font-size:0.9rem; margin-bottom:20px;">
+          <div style="flex:1;">
+            <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:0;color:black;">EXPLOTACIÓN ORIGEN</h4>
+            <p style="color:black;"><strong>REGA:</strong> ${mov.rega_origen || '—'}<br>
             ${mov.tipo === 'salida' ? `<strong>Titular:</strong> ${finca.propietario || finca.nombre}` : `<strong>Explotación:</strong> ${mov.explotacion_contraparte || '—'}`}</p>
           </div>
-          <div>
-            <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:0;">EXPLOTACIÓN DESTINO</h4>
-            <p><strong>REGA:</strong> ${mov.rega_destino || '—'}<br>
+          <div style="flex:1;">
+            <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:0;color:black;">EXPLOTACIÓN DESTINO</h4>
+            <p style="color:black;"><strong>REGA:</strong> ${mov.rega_destino || '—'}<br>
             ${mov.tipo === 'entrada' ? `<strong>Titular:</strong> ${finca.propietario || finca.nombre}` : `<strong>Explotación:</strong> ${mov.explotacion_contraparte || '—'}`}</p>
           </div>
         </div>
+
         <div style="margin-bottom:20px;font-size:0.9rem;">
-          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">DATOS DEL MOVIMIENTO</h4>
-          <p style="margin:0;">
+          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;color:black;">DATOS DEL MOVIMIENTO</h4>
+          <p style="margin:0;color:black;">
             <strong>Nº Guía:</strong> ${mov.numero_guia} &nbsp;·&nbsp;
             <strong>Fecha:</strong> ${mov.fecha} &nbsp;·&nbsp;
             <strong>Motivo:</strong> ${mov.motivo || '—'}<br>
@@ -393,68 +395,168 @@ window.WizardGuiaMovimiento = {
           ${crotalesHtml}
         </div>
         <div style="margin-bottom:20px;font-size:0.9rem;">
-          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">TRANSPORTE</h4>
-          <p style="margin:0;"><strong>Transportista:</strong> ${mov.transportista_nombre || '—'} &nbsp;·&nbsp;
+          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;color:black;">TRANSPORTE</h4>
+          <p style="margin:0;color:black;"><strong>Transportista:</strong> ${mov.transportista_nombre || '—'} &nbsp;·&nbsp;
           <strong>Matrícula:</strong> ${mov.matricula || '—'}<br>
           <strong>Desinsectación certificada:</strong> ${mov.desinsectacion_certificada ? 'Sí' : 'No'}</p>
         </div>
         <div style="margin-bottom:20px;font-size:0.9rem;">
-          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">TRAMITACIÓN ADMINISTRATIVA</h4>
-          <p style="margin:0;">
+          <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;color:black;">TRAMITACIÓN ADMINISTRATIVA</h4>
+          <p style="margin:0;color:black;">
             <strong>Estado:</strong> ${(mov.estado_tramite || 'borrador').toUpperCase()}<br>
             <strong>Fecha presentación:</strong> ${mov.fecha_presentacion || '—'}<br>
             <strong>Nº registro oficial:</strong> ${mov.numero_registro_oficial || '—'}<br>
             <strong>Acuse:</strong> ${mov.acuse_recibo || '—'}
           </p>
         </div>
-        <div style="padding:16px;border:1px solid #ccc;background:#f9f9f9;font-size:0.82rem;">
+        <div style="padding:16px;border:1px solid #ccc;background:#f9f9f9;font-size:0.82rem;color:black;">
           Documento generado para su tramitación en <strong>${plataforma}</strong>. El titular se responsabiliza de la
           veracidad de los datos y de su comunicación a la base de datos oficial en los plazos legales.
         </div>
         <div style="margin-top:48px;display:flex;justify-content:space-between;align-items:flex-end;">
           <div style="text-align:center;width:240px;">
             <p style="margin-bottom:50px;color:#555;">Firma del Titular:</p>
-            <div style="border-top:1px solid #000;padding-top:4px;font-weight:bold;">${finca.propietario || finca.nombre}</div>
+            <div style="border-top:1px solid #000;padding-top:4px;font-weight:bold;color:black;">${finca.propietario || finca.nombre}</div>
           </div>
-          <div style="text-align:right;"><p>Emitida: <strong>${new Date().toLocaleDateString()}</strong></p></div>
+          <div style="text-align:right;color:black;"><p>Emitida: <strong>${new Date().toLocaleDateString()}</strong></p></div>
         </div>
       </div>
       <div style="text-align:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;flex-shrink:0;">
-        <button class="btn btn-primary" id="btn-guia-print" style="width:auto;padding:0 30px;background:#10b981;">${Icons.exportar()} IMPRIMIR / GUARDAR PDF</button>
+        <button class="btn btn-primary" id="btn-guia-print" style="width:auto;padding:0 30px;background:#10b981;color:white;font-weight:bold;">${Icons.exportar()} IMPRIMIR / COMPARTIR</button>
         <button class="btn btn-secondary" onclick="document.getElementById('guia-mov-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
       </div>`;
-    document.body.appendChild(overlay);    overlay.querySelector('#btn-guia-print').onclick = async () => {
-      const el = document.getElementById(contentId);
-      const filename = `Guia_Movimiento_${mov.numero_guia}.pdf`;
+    document.body.appendChild(overlay);
 
-      if (window.InformesView && window.InformesView._exportarConCompartir) {
-          await window.InformesView._exportarConCompartir(
-            async () => {
-              const opt = {
-                margin: [12, 10, 12, 10], filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-              };
-              return await html2pdf().set(opt).from(el).toPdf().output('blob');
-            },
-            'Guía de Movimiento', filename, 'application/pdf', 'guia_movimiento'
-          );
-          return;
-      }
+    overlay.querySelector('#btn-guia-print').onclick = async () => {
+      let loader;
+      try {
+        loader = document.createElement('div');
+        loader.id = 'pdf-loader-overlay';
+        loader.style.cssText = `
+          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
+          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
+          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
+        `;
+        loader.innerHTML = `
+          <div class="pdf-loader">
+            <div class="pdf-loader-emoji">⏳</div>
+            <div class="pdf-loader-title">Generando Guía</div>
+            <div class="pdf-loader-desc">Documento de Movimiento</div>
+            <div class="pdf-loader-bar">
+              <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
+            </div>
+            <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
+          </div>
+        `;
+        document.body.appendChild(loader);
 
-      if (typeof html2pdf !== 'undefined') {
-        const opt = {
-          margin: [12, 10, 12, 10], filename,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        const updateProgress = (pct, text) => {
+          const bar = loader.querySelector('#pdf-progress-bar');
+          const txt = loader.querySelector('#pdf-progress-text');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = text.toUpperCase();
         };
-        html2pdf().set(opt).from(el).save(filename);
-      } else if (window.WizardCrotales && WizardCrotales._fallbackPDF) {
-        WizardCrotales._fallbackPDF(el, filename);
-      } else {
-        window.print();
+
+        const el = document.getElementById(contentId);
+        if (!el) {
+          App.toastError("Error: contenido no encontrado");
+          loader.remove();
+          return;
+        }
+
+        updateProgress(30, 'Preparando documento...');
+        const tempContainer = document.createElement('div');
+        // Usar un posicionamiento absoluto pero NO tan lejano para evitar problemas de renderizado en WebView
+        tempContainer.style.cssText = `position:fixed; left:0; top:0; width:800px; z-index:10; background:#fff; color:#000; padding:40px; font-family:serif; visibility:visible;`;
+        tempContainer.innerHTML = el.innerHTML;
+        document.body.appendChild(tempContainer);
+
+        const filename = `Guia_Movimiento_${mov.numero_guia}.pdf`;
+
+        const opt = {
+          margin: [12, 10, 12, 10],
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        if (typeof html2pdf === 'undefined') {
+          document.body.removeChild(tempContainer);
+          loader.remove();
+          if (window.WizardCrotales && WizardCrotales._fallbackPDF) {
+            WizardCrotales._fallbackPDF(el, filename);
+          } else {
+            window.print();
+          }
+          return;
+        }
+
+        updateProgress(70, 'Rasterizando PDF...');
+        const pdfBlob = await html2pdf().set(opt).from(tempContainer).toPdf().output('blob');
+        document.body.removeChild(tempContainer);
+
+        updateProgress(90, 'Compartiendo...');
+
+        const shareTitle = 'Guía de Movimiento';
+        const shareText = `Guía de Origen y Sanidad Pecuaria nº ${mov.numero_guia}`;
+
+        const fileObj = {
+          blob: pdfBlob,
+          fileName: filename,
+          mimeType: 'application/pdf',
+          titulo: 'Guía Movimiento',
+          shareTitle,
+          shareText
+        };
+
+        if (window.InformesView && typeof InformesView._ejecutarShare === 'function') {
+          await InformesView._ejecutarShare(fileObj);
+        } else {
+          // Implementación local de share
+          const cap = window.Capacitor;
+          if (cap?.Plugins?.Share) {
+            const reader = new FileReader();
+            const dataUri = await new Promise((resolve, reject) => {
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(pdfBlob);
+            });
+            const result = await cap.Plugins.Filesystem.writeFile({
+              path: filename,
+              data: dataUri.split(',')[1],
+              directory: 'CACHE'
+            });
+            await cap.Plugins.Share.share({
+              title: shareTitle,
+              text: shareText,
+              url: result.uri,
+              files: [result.uri],
+              dialogTitle: 'Compartir Guía con…'
+            });
+          } else if (navigator.share) {
+            const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+            await navigator.share({ title: shareTitle, text: shareText, files: [file] });
+          } else {
+            html2pdf().set(opt).from(el).save(filename);
+          }
+        }
+
+        updateProgress(100, '¡Listo!');
+        await new Promise(r => setTimeout(r, 400));
+        loader.remove();
+        App.toast("Guía enviada ✅");
+
+      } catch (e) {
+        console.error("Error en generación PDF Guía:", e);
+        if (loader) loader.remove();
+        App.toastError("Error al generar PDF: " + e.message);
       }
     };
   },
