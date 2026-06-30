@@ -191,7 +191,7 @@ window.WizardCrotales = {
     });
   },
 
-  async   async generarPDF(finca, data, pedidoId = null) {
+  async generarPDF(finca, data, pedidoId = null) {
     App.toast("Generando documento oficial...");
     const html = this._buildPDFHtml(finca, data, pedidoId);
     await this._mostrarPDF(html, `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}`, 'Solicitud Crotales');
