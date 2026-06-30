@@ -361,21 +361,24 @@ const AjustesView = {
       </div>
 
       <!-- ===================== CATÁLOGOS REGA ===================== -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-info); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.libroVentas()} CATÁLOGOS REGA</div>
-        <div class="grid gap-6">
-          <div class="bg-dark rounded-lg p-10 border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 flex items-center gap-4">${Icons.documento()} Tipos Explotación (${catalogoTiposREGA.length})</div>
-            <div class="flex flex-wrap gap-2">
-              ${catalogoTiposResumen.map(t => `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222">${t}</span>`).join('')}
-              ${catalogoTiposResto.length > 0 ? `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222" id="rega-tipos-mas" style="cursor:pointer;color:var(--c-info) !important;" onclick="AjustesView._verCatalogoCompleto('tipos')">+${catalogoTiposResto.length} más</span>` : ''}
-            </div>
+      <div class="card card-accent card-accent-blue mb-25 p-20">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.libroVentas()} Catálogos REGA</h3>
+        <p class="text-gray mt-5 text-sm">Catálogos normativos oficiales con detalle completo y acceso a contenido.</p>
+        <div class="info-box mt-15">
+          <div class="text-xs text-gray uppercase font-800 mb-6 flex items-center gap-4">${Icons.documento()} Tipos Explotación (${catalogoTiposREGA.length})</div>
+          <div class="flex flex-wrap gap-2">
+            ${catalogoTiposResumen.map(t => `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222">${t}</span>`).join('')}
+            ${catalogoTiposResto.length > 0 ? `<span class="text-[0.6rem] uppercase font-900 px-6 py-2 rounded-sm" style="cursor:pointer;color:var(--c-info);border:1px solid var(--c-info);" onclick="AjustesView._verCatalogoCompleto('tipos')">+${catalogoTiposResto.length} más</span>` : ''}
           </div>
-          <div class="bg-dark rounded-lg p-10 border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 flex items-center gap-4">${Icons.animales()} Especies Autorizables (${catalogoEspeciesREGA.length})</div>
-            <div class="flex flex-wrap gap-2">
-              ${catalogoEspeciesREGA.map(e => `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222">${e}</span>`).join('')}
-            </div>
+          <div class="text-xs text-gray uppercase font-800 mt-12 mb-6 flex items-center gap-4">${Icons.animales()} Especies Autorizables (${catalogoEspeciesREGA.length})</div>
+          <div class="flex flex-wrap gap-2">
+            ${catalogoEspeciesREGA.map(e => `<span class="text-[0.6rem] text-white font-700 uppercase bg-black px-6 py-2 rounded-sm border border-222">${e}</span>`).join('')}
+          </div>
+          <div class="mt-14">
+            <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="AjustesView._verCatalogoCompleto('tipos')" style="width:100%;">
+              ${Icons.documento()}
+              <span class="widget-link-label">Ver Catálogo Completo</span>
+            </button>
           </div>
         </div>
       </div>
