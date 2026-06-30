@@ -45,9 +45,7 @@ window.PedidosCrotales = (() => {
       // Estado del trámite
       estado: pedido.estado || 'pendiente',  // pendiente, enviado, confirmado, entregado
       // Registro de eventos
-      eventos: pedido.eventos || [],
-      acuse_manual: pedido.acuse_manual || pedido.acuseManual || '',
-      actualizadoEn: new Date().toISOString()
+      eventos: pedido.eventos || []
     };
 
     if (pedidoData.id === null || pedidoData.id === undefined) {
