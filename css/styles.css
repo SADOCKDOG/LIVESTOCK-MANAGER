@@ -374,8 +374,8 @@ nav.bottom-nav {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
-    border-top: 1px solid var(--header-neon-color, #333333);
-    box-shadow: inset 0 6px 10px -6px var(--header-neon-color, transparent);
+    border-top: 1px solid #222;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
     padding-bottom: var(--safe-bottom);
     z-index: 1500;
     transition: all 0.3s ease;
