@@ -577,28 +577,58 @@ const App = {
 
     await this.updateNavigationMenu();
 
+    let activeSvg = null;
+    
+    // 1. Check main nav items
     document.querySelectorAll(".nav-item").forEach((el) => {
       const href = el.getAttribute("href");
       if (!href) return;
       const isActive = path === '/' ? href === '#/' : href.startsWith(`#${path}`);
       el.classList.toggle("active", isActive);
-      
       if (isActive) {
-        const headerRouteIcon = document.getElementById('header-route-icon');
-        if (headerRouteIcon) {
-          const svg = el.querySelector('svg');
-          if (svg) {
-            headerRouteIcon.innerHTML = '';
-            const clonedSvg = svg.cloneNode(true);
-            // Asegurarnos de que el SVG clonado se vea en el header y con el tamaño correcto
-            clonedSvg.style.display = 'block';
-            clonedSvg.setAttribute('width', '16');
-            clonedSvg.setAttribute('height', '16');
-            headerRouteIcon.appendChild(clonedSvg);
-          }
-        }
+        const svg = el.querySelector('svg');
+        if (svg) activeSvg = svg;
       }
     });
+
+    // 2. Check "Más" items
+    let moreActiveText = null;
+    document.querySelectorAll(".more-sheet-item").forEach((el) => {
+      const href = el.getAttribute("href");
+      if (!href) return;
+      const isActive = path === '/' ? href === '#/' : href.startsWith(`#${path}`);
+      if (isActive) {
+        moreActiveText = el.textContent.trim();
+        const svg = el.querySelector('svg');
+        if (svg) activeSvg = svg;
+      }
+    });
+
+    // 3. Update "Más" button
+    const navMore = document.getElementById('nav-more');
+    if (navMore) {
+      const navMoreLabel = navMore.querySelector('.label');
+      if (moreActiveText) {
+        navMore.classList.add('active');
+        if (navMoreLabel) navMoreLabel.textContent = moreActiveText;
+      } else {
+        navMore.classList.remove('active');
+        if (navMoreLabel) navMoreLabel.textContent = 'Más';
+      }
+    }
+
+    // 4. Update Header Icon
+    if (activeSvg) {
+      const headerRouteIcon = document.getElementById('header-route-icon');
+      if (headerRouteIcon) {
+        headerRouteIcon.innerHTML = '';
+        const clonedSvg = activeSvg.cloneNode(true);
+        clonedSvg.style.display = 'block';
+        clonedSvg.setAttribute('width', '20');
+        clonedSvg.setAttribute('height', '20');
+        headerRouteIcon.appendChild(clonedSvg);
+      }
+    }
 
     // Cerrar menú "Más" al navegar
     const sheet = document.getElementById("nav-more-sheet");
