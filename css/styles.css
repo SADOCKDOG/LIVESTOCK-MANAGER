@@ -487,13 +487,24 @@ nav.bottom-nav {
 }
 
 .btn-primary, .btn--primary, .wizard-btn-primary, .error-dialog-btn.primary {
-    background: linear-gradient(135deg, var(--p-gold-dark) 0%, #b45309 100%);
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.3);
+    background: var(--header-neon-color, var(--c-success));
+    color: #000;
+    font-weight: 900;
+    border: none;
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--header-neon-color, var(--c-success)) 40%, transparent);
+    transition: all 0.2s ease;
 }
 
 .btn-secondary, .btn--secondary, .wizard-btn-secondary, .error-dialog-btn.secondary {
-    background: var(--surface-input); color: #fff; border: 1px solid var(--border-input);
+    background: color-mix(in srgb, var(--header-neon-color, #94A3B8) 15%, transparent);
+    color: var(--header-neon-color, #FFF);
+    border: 1px solid color-mix(in srgb, var(--header-neon-color, #94A3B8) 40%, transparent);
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.btn-secondary:hover, .btn--secondary:hover, .wizard-btn-secondary:hover {
+    background: color-mix(in srgb, var(--header-neon-color, #94A3B8) 25%, transparent);
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--header-neon-color, #94A3B8) 20%, transparent);
 }
 
 /* UTILS */
@@ -1378,19 +1389,21 @@ label {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    background: #1a1a1a;
-    border: 1px solid #333;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
     font-size: 0.95rem;
     margin-top: 5px;
     min-height: 48px;
-    transition: border-color 0.2s, background 0.2s;
+    transition: all 0.3s ease;
     box-sizing: border-box;
+    backdrop-filter: blur(8px);
 }
 .form-input:focus, .premium-input:focus, .wizard-input:focus {
     outline: none;
-    border-color: var(--p-cork);
-    background: #222;
+    border-color: var(--header-neon-color, var(--p-cork));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--header-neon-color, var(--p-cork)) 40%, transparent), inset 0 0 8px color-mix(in srgb, var(--header-neon-color, var(--p-cork)) 20%, transparent);
+    background: rgba(0, 0, 0, 0.4);
 }
 .form-input::placeholder, .premium-input::placeholder, .wizard-input::placeholder { color: #555; }
 
@@ -1403,14 +1416,20 @@ label {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    background: #1a1a1a;
-    border: 1px solid #333;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
     font-size: 0.95rem;
-    margin-top: 5px;
-    min-height: 48px;
-    appearance: auto;
-    transition: border-color 0.2s;
+    font-weight: 600;
+    user-select: none;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+.form-select:focus {
+    outline: none;
+    border-color: var(--header-neon-color, var(--p-cork));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--header-neon-color, var(--p-cork)) 40%, transparent), inset 0 0 8px color-mix(in srgb, var(--header-neon-color, var(--p-cork)) 20%, transparent);
+    background: rgba(0, 0, 0, 0.4);
 }
 .form-select:focus {
     outline: none;
@@ -1715,7 +1734,7 @@ label {
 .tour-btn-fin:not(:disabled):hover { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 25px rgba(5,150,105,0.5); }
 .tour-dots { display: flex; gap: 8px; align-items: center; }
 .tour-dot  { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; cursor: pointer; }
-.tour-dot.activo { background: var(--p-gold-dark); box-shadow: 0 0 8px rgba(217,119,6,0.5); transform: scale(1.3); }
+.tour-dot.activo { background: var(--header-neon-color, #FFF); box-shadow: 0 0 12px var(--header-neon-color, #FFF); transform: scale(1.3); }
 @media (max-width: 480px) {
     .tour-flotante-card { width: 94%; border-radius: 20px; }
     .tour-body  { padding: 32px 20px 16px; }
