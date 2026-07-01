@@ -1045,13 +1045,13 @@ label {
 
 /* ── Border Top ── */
 .border-top-3px { border-top: 3px solid; }
-.border-top-3px-red { border-top-color: #ef4444; }
-.border-top-3px-green { border-top-color: #10b981; }
-.border-top-3px-blue { border-top-color: #3b82f6; }
-.border-top-3px-purple { border-top-color: #8b5cf6; }
-.border-top-3px-orange { border-top-color: #f59e0b; }
-.border-top-3px-amber { border-top-color: var(--p-gold); }
-.border-top-3px-gold { border-top-color: var(--p-cork); }
+.border-left-3px-red { border-left-color: #; border-top: none !important;ef4444; }
+.border-left-3px-green { border-left-color: #; border-top: none !important;10b981; }
+.border-left-3px-blue { border-left-color: #; border-top: none !important;3b82f6; }
+.border-left-3px-purple { border-left-color: #; border-top: none !important;8b5cf6; }
+.border-left-3px-orange { border-left-color: #; border-top: none !important;f59e0b; }
+.border-left-3px-amber { border-left-color: v; border-top: none !important;ar(--p-gold); }
+.border-left-3px-gold { border-left-color: v; border-top: none !important;ar(--p-cork); }
 .border-bottom-222 { border-bottom: 1px solid #222; }
 
 /* ── Text utilities ── */
@@ -1121,16 +1121,16 @@ label {
 
 /* ── Cards con acento superior ── */
 .card-accent {
-    border-top: 5px solid var(--p-cork);
+    border-left: 4px solid var(--p-cork); border-top: none !important;
     padding: 25px;
     margin-bottom: 25px;
 }
-.card-accent-green  { border-top-color: #10b981; }
-.card-accent-blue   { border-top-color: #3b82f6; }
-.card-accent-red    { border-top-color: #ef4444; }
-.card-accent-orange { border-top-color: #f97316; }
-.card-accent-purple { border-top-color: #8b5cf6; }
-.card-accent-amber  { border-top-color: #f59e0b; }
+.card-accent-green  { border-left-color: #; border-top: none !important;10b981; }
+.card-accent-blue   { border-left-color: #; border-top: none !important;3b82f6; }
+.card-accent-red    { border-left-color: #; border-top: none !important;ef4444; }
+.card-accent-orange { border-left-color: #; border-top: none !important;f97316; }
+.card-accent-purple { border-left-color: #; border-top: none !important;8b5cf6; }
+.card-accent-amber  { border-left-color: #; border-top: none !important;f59e0b; }
 
 /* ── Card de animal (lista) ── */
 .card-animal {
@@ -2747,7 +2747,7 @@ label {
 }
 .ganaderia-kpi {
   background: #1e1e1e; border: 1px solid #2e2e2e; border-radius: 12px;
-  text-align: center; padding: 10px 8px; border-top: 3px solid var(--kpi-color);
+  text-align: center; padding: 10px 8px; border-top: none !important; border-left: none !important;
   min-width: 100px;
   max-width: 160px;
   flex: 1 1 140px;
@@ -2947,7 +2947,7 @@ label {
 /* === Clases de componente — Fase 4 refactor === */
 .row-border-dark     { border-bottom: 1px solid #1a1a1a; }
 .row-sep-222         { border-top: 1px solid #222; padding-top: 8px; }
-.border-top-5-danger { border-top: 5px solid var(--c-danger); }
+.border-top-5-danger { border-left: 4px solid var(--c-danger); border-top: none !important; }
 .border-top-4-violet { border-top: 4px solid #a78bfa; }
 .btn--dark-red       { background: #450a0a !important; color: #fff !important; border: none !important; }
 .msg-feedback        { margin-top: 6px; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; }
@@ -3033,9 +3033,9 @@ label {
 
 /* Silo/Asistente card */
 .silo-card          { max-width: 380px; width: 100%; margin: 16px; }
-.silo-card--carne   { border-top: 5px solid var(--c-danger); }
-.silo-card--leche   { border-top: 5px solid var(--c-info); }
-.silo-card--hibrido { border-top: 5px solid var(--c-success); }
+.silo-card--carne   { border-left: 4px solid var(--c-danger); border-top: none !important; }
+.silo-card--leche   { border-left: 4px solid var(--c-info); border-top: none !important; }
+.silo-card--hibrido { border-left: 4px solid var(--c-success); border-top: none !important; }
 
 /* Pesaje close button SVG icon */
 .btn-pesaje-close   { display: flex; align-items: center; justify-content: center; }
@@ -3047,7 +3047,7 @@ label {
 .about-desc   { max-width: 320px; margin: 20px auto; font-size: 0.9rem; line-height: 1.6; }
 .about-footer { border-top: 1px solid #111; padding-top: 25px; }
 .max-w-340    { max-width: 340px; }
-.border-top-5-amber { border-top: 5px solid var(--c-warning); }
+.border-top-5-amber { border-left: 4px solid var(--c-warning); border-top: none !important; }
 .manual-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #1a1a1a; color: #fff; }
 .manual-iframe { flex: 1; width: 100%; border: none; background: #fff; }
 
@@ -3068,9 +3068,9 @@ label {
 .border-top-222 { border-top: 1px solid #222; }
 
 /* === Batch 4 — border-top utilities === */
-.border-top-5-gold    { border-top: 5px solid var(--p-gold); }
-.border-top-4-blue    { border-top: 4px solid var(--c-info); }
-.border-top-5-success { border-top: 5px solid var(--c-success); }
+.border-top-5-gold    { border-left: 4px solid var(--p-gold); border-top: none !important; }
+.border-top-4-blue    { border-left: 4px solid var(--c-info); border-top: none !important; }
+.border-top-5-success { border-left: 4px solid var(--c-success); border-top: none !important; }
 .border-top-5-violet  { border-top: 5px solid #8b5cf6; }
 .border-left-333      { border-left: 3px solid #333; }
 
@@ -3098,7 +3098,7 @@ label {
 
 /* === Batch 5 — misc === */
 .bg-222              { background: #222; }
-.border-top-5-blue   { border-top: 5px solid var(--c-info); }
+.border-top-5-blue   { border-left: 4px solid var(--c-info); border-top: none !important; }
 .wizard-sel-icon     { font-size: 1.8rem; margin-right: 15px; }
 .wizard-sel-icon--sm { font-size: 1.5rem; margin-right: 12px; }
 .error-dialog--gold    { border-color: var(--p-gold); margin: 16px; box-sizing: border-box; }
@@ -3152,14 +3152,14 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 .wizard-btn-mode--carne   { background: linear-gradient(135deg, var(--c-danger) 0%, #991b1b 100%) !important; color: #fff !important; border-color: transparent !important; }
 .wizard-btn-mode--leche   { background: linear-gradient(135deg, var(--c-info) 0%, #1d4ed8 100%) !important; color: #fff !important; border-color: transparent !important; }
 .wizard-btn-mode--hibrido { background: linear-gradient(135deg, var(--c-success) 0%, #059669 100%) !important; color: #fff !important; border-color: transparent !important; }
-.border-top-mode--carne   { border-top: 5px solid var(--c-danger); }
-.border-top-mode--leche   { border-top: 5px solid var(--c-info); }
-.border-top-mode--hibrido { border-top: 5px solid var(--c-success); }
+.border-top-mode--carne   { border-left: 4px solid var(--c-danger); border-top: none !important; }
+.border-top-mode--leche   { border-left: 4px solid var(--c-info); border-top: none !important; }
+.border-top-mode--hibrido { border-left: 4px solid var(--c-success); border-top: none !important; }
 
 /* === UI/UX fixes for GanaderiaView === */
 .section-header-neon--modules { --neon-color: #facc15; }
 .max-w-360 { max-width: 360px; }
-.border-top-mode { border-top: 3px solid var(--mode-color); }
+.border-top-mode { border-left: 4px solid var(--mode-color); border-top: none !important; }
 .border-left-3-mode { border-left: 3px solid var(--mode-color); }
 .border-left-4-mode { border-left: 4px solid var(--mode-color); }
 .bg-white-5 { background: rgba(255,255,255,0.02); }
@@ -3182,4 +3182,12 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 }
 .marquee-text {
     animation: marquee 6s linear infinite alternate;
+}
+
+/* =========================================================================
+   REGLA ESTRICTA DE DISEÑO: NO LÍNEAS SUPERIORES EN LAS CARDS
+   Las cards de registro/acción usarán el borde lateral izquierdo.
+   ========================================================================= */
+.card, .dashboard-card, .list-card, .silo-card, .entity-card, .ganaderia-kpi, .report-card, .report-section, .inf-report, .card-accent, .card-dark-gradient, [class*="card-accent"], [class*="border-top"] {
+    border-top: none !important;
 }
