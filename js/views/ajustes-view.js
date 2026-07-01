@@ -323,6 +323,15 @@ const AjustesView = {
             <input type="checkbox" ${config.mostrarContextos !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleContextos(this.checked)"> MOSTRAR DESCRIPCIONES DE CONTEXTO
           </label>
           <div class="flex flex-col gap-4">
+            <label class="text-xs text-gray uppercase font-800 ml-4">Retroiluminación y Haz de Luz</label>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
+              <input type="checkbox" ${config.glowMarco !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleGlowMarco(this.checked)"> MARCO PRINCIPAL DE PANTALLA
+            </label>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
+              <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleGlowBotones(this.checked)"> BOTONES DE LA APLICACIÓN
+            </label>
+          </div>
+          <div class="flex flex-col gap-4">
             <label class="text-xs text-gray uppercase font-800 ml-4">Formato Fecha</label>
             <select class="wizard-input" onchange="AjustesView._guardarPreferencia('formatoFecha', this.value)">
               <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (España)</option>
@@ -528,7 +537,7 @@ const AjustesView = {
   },
 
   async _loadConfig() {
-    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: false, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
+    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: false, glowMarco: true, glowBotones: true, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
     try {
       const stored = await window.db.get('meta', 'appConfig');
       return stored?.value ? { ...defaults, ...stored.value } : defaults;
@@ -564,6 +573,18 @@ const AjustesView = {
     await this._saveConfig({ temaOscuro: checked });
     document.documentElement.style.colorScheme = checked ? 'dark' : 'light';
     App.toast(checked ? 'Modo oscuro' : 'Modo claro');
+  },
+
+  async _toggleGlowMarco(checked) {
+    await this._saveConfig({ glowMarco: checked });
+    document.body.classList.toggle('glow-marco-off', !checked);
+    App.toast(checked ? 'Marco principal iluminado' : 'Marco principal sin iluminación');
+  },
+
+  async _toggleGlowBotones(checked) {
+    await this._saveConfig({ glowBotones: checked });
+    document.body.classList.toggle('glow-botones-off', !checked);
+    App.toast(checked ? 'Retroiluminación de botones activada' : 'Retroiluminación de botones desactivada');
   },
 
   async _toggleContextos(checked) {

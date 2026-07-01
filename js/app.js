@@ -112,6 +112,8 @@ const App = {
         if (cfg?.value?.colorTema && cfg.value.colorTema !== 'gold') {
           document.body.setAttribute('data-tema', cfg.value.colorTema);
         }
+        if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
+        if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
       } catch (_) {}
       await App.route();
     } catch (error) {
