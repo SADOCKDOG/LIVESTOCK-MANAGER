@@ -582,6 +582,22 @@ const App = {
       if (!href) return;
       const isActive = path === '/' ? href === '#/' : href.startsWith(`#${path}`);
       el.classList.toggle("active", isActive);
+      
+      if (isActive) {
+        const headerRouteIcon = document.getElementById('header-route-icon');
+        if (headerRouteIcon) {
+          const svg = el.querySelector('svg');
+          if (svg) {
+            headerRouteIcon.innerHTML = '';
+            const clonedSvg = svg.cloneNode(true);
+            // Asegurarnos de que el SVG clonado se vea en el header y con el tamaño correcto
+            clonedSvg.style.display = 'block';
+            clonedSvg.setAttribute('width', '16');
+            clonedSvg.setAttribute('height', '16');
+            headerRouteIcon.appendChild(clonedSvg);
+          }
+        }
+      }
     });
 
     // Cerrar menú "Más" al navegar
