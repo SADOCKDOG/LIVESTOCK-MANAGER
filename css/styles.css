@@ -393,8 +393,8 @@ nav.bottom-nav {
 }
 
 .nav-item svg { width: 26px; height: 26px; stroke-width: 2.5; }
-.nav-item.active { display: none !important; }
-.nav-item.active svg { stroke: var(--p-cork); filter: drop-shadow(0 0 10px rgba(212, 163, 115, 0.3)); }
+.nav-item.active svg { display: none; }
+.nav-item.active { color: var(--header-neon-color, #CCFF00); font-size: 12px; }
 
 /* (Scroll shadows de nav eliminados — ahora es fijo con 5 items) */
 
