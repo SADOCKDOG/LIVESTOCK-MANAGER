@@ -3170,3 +3170,12 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 .pb-8 { padding-bottom: 8px; }
 .bg-green-subtle { background: rgba(16,185,129,0.03); }
 .cursor-pointer { cursor: pointer; }
+
+/* Animación de marquesina para la finca activa */
+@keyframes marquee {
+    0%, 20% { transform: translateX(0); }
+    80%, 100% { transform: translateX(calc(-100% + 90px)); }
+}
+.marquee-text {
+    animation: marquee 6s linear infinite alternate;
+}
