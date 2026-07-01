@@ -4,11 +4,11 @@ Este documento define el Estándar Corporativo y el Sistema de Diseño (UI/UX) �
 
 ## 1. Identidad Visual y Paleta de Colores
 - **Fondo Global (Dark Pro)**: Fondo principal `#000000` o `#121212`. Superficies de tarjetas en `#1E1E1E` y sub-superficies en `#1A1A1A` o `#2A2A2A`. Bordes sutiles en `#27272a` a `#333333`.
-- **Colores Semánticos Neón**:
-  - **Success / Zonas / Híbrido**: `#CCFF00` (Verde Lima Neón) o `#10b981`.
+- **Colores Semánticos Neón (Mapeo estricto)**:
+  - **Success / Zonas / Híbrido**: `#CCFF00` (Verde Lima Neón).
   - **Warning / Alertas**: `#FFD600` (Amarillo Neón).
-  - **Danger / Carne**: `#FF4444` (Rojo/Naranja Neón).
-  - **Info / Leche / Listas**: `#3b82f6` (Azul Neón) o `#4FACFE`.
+  - **Danger / Carne**: `#FF4444` (Rojo Neón).
+  - **Info / Leche / Listas**: `#3b82f6` (Azul Neón).
 - **Textos**: Principal `#FFFFFF` (Blanco puro). Textos secundarios y etiquetas (ej. "cab.", "kg") en Gris Acero (`#94A3B8`) sin resplandor para dar protagonismo a los datos.
 
 ## 2. Componentes y Botones (El Efecto Neón)
@@ -21,7 +21,7 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 
 ### A. Dashboards y KPIs (Bento Grid)
 - Uso de cuadrículas modulares (CSS Grid).
-- **Tarjetas de Datos y Bordes**: Las tarjetas (cards) que contienen datos calculados globales, resúmenes o accesos rápidos **NO** llevan línea de color en su borde (usan el fondo base `#1E1E1E`). La línea gruesa de color en el borde (superior o lateral de `3px` a `5px`) con su respectivo color semántico se reserva ÚNICAMENTE para las tarjetas que exponen **registros generados mediante acción o alertas** (ej. Alertas Sanitarias, PAC, etc.).
+- **Tarjetas de Datos y Bordes (REGLA ESTRICTA)**: Las tarjetas (cards) **NUNCA** llevan borde superior iluminado. Las tarjetas de datos calculados globales, resúmenes o accesos rápidos **NO** llevan ninguna línea de color (usan el fondo base `#1E1E1E`). La línea gruesa de color se aplica **ÚNICAMENTE EN EL LATERAL IZQUIERDO** (`border-left` de 3px a 5px) y está reservada exclusivamente para las tarjetas que exponen **registros generados mediante acción o alertas** (ej. Fichas de animales, Alertas Sanitarias, PAC, etc.).
 - **Glassmorphism Neón**: El fondo de las celdas numéricas o KPIs debe estar difuminado con el mismo color del borde al 10% de opacidad (ej. `rgba(204, 255, 0, 0.1)`).
 
 ### B. Vistas de Listas (Animales, Rebaños, Fincas)
@@ -31,11 +31,12 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 - Alineación: Información principal a la izquierda, acciones o KPIs clave a la derecha.
 
 ### C. Formularios, Inputs y Wizards
-- **Inputs**: Fondos cristalinos (`rgba(255,255,255,0.03)`). Sin bordes genéricos azules. Al recibir foco, se iluminan con el color neón correspondiente del módulo.
-- **Wizards (Asistentes paso a paso)**: Se presentan en modales oscuros a pantalla completa o centrados con fondo oscurecido (`rgba(0,0,0,0.8)`). Los pasos se indican con puntos luminosos (`.tour-dot.active`).
+- **Inputs**: Fondos ultra cristalinos (`rgba(255,255,255,0.03)`) con `backdrop-filter: blur(8px)`. Sin bordes de color por defecto. Al recibir foco, el contorno se ilumina intensamente con el color neón del módulo y el fondo se oscurece ligeramente para máximo contraste.
+- **Wizards (Asistentes paso a paso)**: Se presentan en modales oscuros a pantalla completa o centrados con fondo oscurecido (`rgba(0,0,0,0.85)`). Los pasos se indican con puntos luminosos (`.tour-dot.active`) que **siempre** heredan el color neón del módulo y emiten resplandor semántico.
 
-### D. Cabeceras y Navegación
+### D. Cabeceras, Navegación y Marco Galáctico
 - **Header**: Píldora de navegación central con ícono identificativo. Glow inferior en la cabecera que hereda el color del módulo actual.
+- **Marco Galáctico (Túnel de Luz)**: El contenedor principal (`#app-content`) y el banner inferior (`.bottom-nav`) se enmarcan mutuamente usando sombras interiores (`box-shadow: inset`) sutiles a los lados y por encima del menú inferior. Este efecto hereda el color del módulo, creando profundidad sin sobrecargar.
 - **Menús Desplegables**: Formato lista vertical estilizada (`max-height: 70vh`, `overflow-y: auto`), alineación a la izquierda, fondo `#1E1E1E`. Cada ítem tiene su SVG coloreado según su semántica.
 - **Titulares de Sección**: Uso de separadores visuales (pipes) coloreados. Ej: `<span style="color: var(--neon);">|</span> TÍTULO`. Tipografía gruesa (`font-weight: 900`), uppercase y tracking amplio.
 
@@ -44,9 +45,9 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 - **Loaders**: Spinners circulares con el borde superior en el color neón activo (`border-top-color: var(--neon)`).
 
 ## 5. Excepciones y Botones Específicos
-- **Botones Primarios de Guardar (Formularios)**: EXCEPCIÓN a la regla de botones huecos. Estos botones (ej. "Guardar", "Aceptar") SÍ pueden llevar fondo de color sólido (ej. amarillo o verde) y texto oscuro para destacar la acción principal que cierra un proceso o modal.
-- **Botones de Acción Secundaria (ej. Exportar a PDF / EXCEL)**: Usan fondos semitransparentes (ej. `rgba(color, 0.15)`) con un borde fino del mismo color al 40% de opacidad (`rgba(color, 0.4)`), y el texto con el color sólido. Son ideales para acciones auxiliares dentro de una tarjeta.
-- **Pastillas Semánticas de Datos (Pills)**: Para desgloses de métricas (ej. separar totales por calidades como 1ª Cal, Bornizo, etc.), los valores numéricos deben ir encapsulados en recuadros o pastillas con fondo sólido del color semántico que les corresponda (según la lógica de negocio), y NO como texto blanco plano.
+- **Botones Primarios de Guardar (Formularios)**: EXCEPCIÓN a la regla de botones huecos. Estos botones (ej. "Guardar", "Aceptar") llevan fondo de **color neón sólido** (heredado del módulo) y texto oscuro para destacar masivamente la acción principal.
+- **Botones de Acción Secundaria**: Botones auxiliares con fondo "Glassmorphism" suave (`color-mix` al 15% del neón) y borde fino del mismo color al 40%.
+- **Pastillas Semánticas de Datos (Pills)**: Para desgloses de métricas, los valores numéricos deben ir encapsulados en recuadros sólidos del color semántico.
 
 ## 6. Procedimiento de Trabajo (TQM)
-- **Auditoría Semántica Previa**: ANTES de modificar o crear componentes, DEBO analizar semánticamente los datos involucrados: ¿es un dato calculado o un registro de acción? ¿tiene un color semántico asignado por negocio? Sólo después de este análisis aplicaré las plantillas correspondientes para evitar fallos de concepto.
+- **Auditoría Semántica Previa**: ANTES de modificar o crear componentes, DEBO analizar semánticamente los datos involucrados. Sólo después de este análisis aplicaré las plantillas correspondientes para evitar fallos de concepto.
