@@ -28,22 +28,21 @@
     <script src="capacitor.js"></script>
   </head>
   <body>
-    <header id="main-header" style="padding: 10px 15px; background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--header-neon-color, #333333); box-shadow: 0 4px 20px var(--header-neon-color, rgba(0,0,0,0)); transition: all 0.3s ease;">
+    <header id="main-header" style="padding: 10px 15px; background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--header-neon-color, #333333); box-shadow: 0 4px 20px var(--header-neon-color, transparent), inset 0 -4px 20px var(--header-neon-color, transparent); transition: all 0.3s ease;">
       <!-- Left: Logo without glow -->
       <div style="position: relative; cursor: pointer; display: flex; align-items: center; flex-shrink: 0;" onclick="App.route('/')">
           <img src="icons/Logo aplicación.png" alt="Livestock Manager" id="app-logo" style="height: 32px; width: auto; position: relative; z-index: 1; filter: drop-shadow(0 0 6px var(--header-neon-color, rgba(204, 255, 0, 0.5)));" />
       </div>
 
-      <!-- Center: Interactive Route Pill -->
-      <div id="header-context" style="cursor: pointer; background: #1E1E1E; border: 1px solid #444; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px;">
-          <span id="header-route-icon" style="color: #94A3B8; display:flex; align-items:center;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-      </div>
+        <!-- Center: Interactive Route Pill -->
+        <div id="header-context" style="cursor: pointer; background: rgba(255,255,255,0.02); border: 1px solid #444; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 8px -2px var(--header-neon-color, transparent); transition: box-shadow 0.3s ease;">
+            <span id="header-route-icon" style="color: var(--header-neon-color, #94A3B8); display:flex; align-items:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </span>
+        </div>
 
-      <!-- Right: Active Farm Indicator -->
-      <div id="finca-badge" style="cursor: pointer; background: #1E1E1E; border: 1px solid #444; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; max-width: 120px;" onclick="App.route('/fincas')">
+        <!-- Right: Active Farm Indicator -->
+        <div id="finca-badge" style="cursor: pointer; background: #1E1E1E; border: 1px solid #444; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; max-width: 120px; filter: drop-shadow(0 0 6px var(--header-neon-color, rgba(204, 255, 0, 0.5))); transition: filter 0.3s ease;" onclick="App.route('/fincas')">
           <div style="width: 8px; height: 8px; background: #CCFF00; border-radius: 50%;"></div>
           <span id="nombre-finca-header" style="color: #FFF; font-size: 0.75rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 0.5px;">Cargando...</span>
       </div>
