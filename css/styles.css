@@ -384,7 +384,8 @@ nav.bottom-nav {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: var(--text-s);
+    color: #FFFFFF;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
     font-size: 10px;
     font-weight: 700;
     gap: 3px;
@@ -392,10 +393,10 @@ nav.bottom-nav {
     -webkit-tap-highlight-color: transparent;
 }
 
-.nav-item svg { width: 26px; height: 26px; stroke-width: 2.5; }
+.nav-item svg { width: 26px; height: 26px; stroke-width: 2.5; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); transition: all 0.3s ease; }
 .nav-item.active svg { display: none; }
-#nav-more.active svg { display: block; stroke: currentColor; filter: none; }
-.nav-item.active { color: var(--header-neon-color, #CCFF00); font-size: 12px; }
+#nav-more.active svg { display: block; stroke: currentColor; filter: drop-shadow(0 0 8px var(--header-neon-color, rgba(204,255,0,0.5))); }
+.nav-item.active { color: var(--header-neon-color, #CCFF00); text-shadow: 0 0 8px var(--header-neon-color, rgba(204,255,0,0.5)); font-size: 12px; }
 
 /* (Scroll shadows de nav eliminados — ahora es fijo con 5 items) */
 
