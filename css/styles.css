@@ -5,25 +5,25 @@
 
 :root {
     /* ── MARCA ── */
-    --p-cork: #d4a373;        /* Oro Corcho */
-    --p-cork-dark: #a0673a;
-    --p-gold: #fbbf24;        /* Dorado de acento (títulos, badges) */
-    --p-gold-dark: #d97706;   /* Dorado oscuro (botón primario) */
+    --p-cork: #CCFF00;        /* Neon Lime */
+    --p-cork-dark: #AACC00;
+    --p-gold: #FFD600;        /* Amarillo Neón */
+    --p-gold-dark: #B89900;   
     /* ── BASE OLED ── */
-    --bg: #000000;            /* Negro Puro */
-    --surface: #121212;       /* Gris Antracita */
-    --surface-light: #1e1e1e; /* Elevación */
-    --surface-input: #1a1a1a; /* Fondo de inputs/celdas */
-    --border: #2a2a2a;        /* Borde sutil */
-    --border-input: #333333;  /* Borde de inputs */
+    --bg: #121212;            /* Carbon Black */
+    --surface: #1E1E1E;       /* Deep Grey */
+    --surface-light: #2A2A2A; /* Elevación */
+    --surface-input: #1a1a1a; 
+    --border: #333333;        /* Border Grey */
+    --border-input: #333333;  
 
     /* ── TEXTO ── */
-    --text-p: #f8f9fa;        /* Blanco hueso */
-    --text-s: #a0a0a0;        /* Gris suave */
+    --text-p: #FFFFFF;        /* Pure White */
+    --text-s: #94A3B8;        /* Steel Grey */
     --text-d: #666666;        /* Deshabilitado / placeholder */
 
     /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
-    --c-success: #10b981;
+    --c-success: #CCFF00;
     --c-warning: #FFD600;
     --c-danger:  #FF4444;
     --c-info:    #3b82f6;
