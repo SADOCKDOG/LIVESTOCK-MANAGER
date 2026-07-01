@@ -372,11 +372,14 @@ const App = {
   /** Actualiza el color neon de la cabecera según el modo de explotación */
   updateHeaderColor(mode) {
     const colorMap = {
-      carne: '#ef4444',
+      carne: '#f97316',
       leche: '#3b82f6',
-      hibrido: '#10b981'
+      hibrido: '#CCFF00',
+      animales: '#f97316',
+      rebanos: '#3b82f6',
+      zonas: '#CCFF00'
     };
-    const color = colorMap[mode] || '#f3c14b'; // Oro por defecto
+    const color = colorMap[mode] || '#CCFF00'; // Verde neón por defecto
     document.documentElement.style.setProperty('--header-neon-color', color);
   },
 
@@ -529,7 +532,7 @@ const App = {
         const svgEl = navProduccion.querySelector('svg');
         if (labelEl) labelEl.textContent = 'Ganadería';
         navProduccion.setAttribute('href', '#/ganaderia');
-        if (svgEl) {
+        if (false) {
           svgEl.innerHTML = `
             <path d="M4 20h16"></path>
             <path d="M6 20V8l6-4 6 4v12"></path>
@@ -577,10 +580,8 @@ const App = {
     document.querySelectorAll(".nav-item").forEach((el) => {
       const href = el.getAttribute("href");
       if (!href) return;
-      el.classList.toggle(
-        "active",
-        href.startsWith(`#${path}`)
-      );
+      const isActive = path === '/' ? href === '#/' : href.startsWith(`#${path}`);
+      el.classList.toggle("active", isActive);
     });
 
     // Cerrar menú "Más" al navegar
@@ -1059,7 +1060,7 @@ const App = {
         const cancelBtn = document.createElement('button');
         cancelBtn.id = 'scanner-cancel-btn';
         cancelBtn.textContent = '✕ Cancelar Escaneo';
-        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#ef4444; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
+        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#f97316; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
 
         const cleanupScanner = async () => {
           document.body.classList.remove('scanner-active');
@@ -1351,8 +1352,8 @@ const App = {
     if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
     const ok = tipo === 'ok';
     el.style.background = ok ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
-    el.style.color = ok ? '#10b981' : '#ef4444';
-    el.style.border = `1px solid ${ok ? '#10b981' : '#ef4444'}`;
+    el.style.color = ok ? '#CCFF00' : '#f97316';
+    el.style.border = `1px solid ${ok ? '#CCFF00' : '#f97316'}`;
     el.innerHTML = `<div class="flex items-center gap-8 font-900 uppercase text-[0.65rem] tracking-wider">${ok ? Icons.check() : Icons.alerta()} ${msg}</div>`;
     el.style.display = 'block';
   },
@@ -1389,12 +1390,12 @@ const App = {
           const sexo = row.querySelector('.cria-sexo')?.value || 'H';
           if (input) input.style.border = '';
           if (!crotal) {
-            if (input) { input.style.border = '2px solid #ef4444'; input.focus(); }
+            if (input) { input.style.border = '2px solid #f97316'; input.focus(); }
             this._reproMsg('Indica el crotal de todas las crías vivas', 'error');
             return;
           }
           if (window.ErrorHandler && !window.ErrorHandler.isCrotalValido(crotal)) {
-            if (input) { input.style.border = '2px solid #ef4444'; input.focus(); }
+            if (input) { input.style.border = '2px solid #f97316'; input.focus(); }
             this._reproMsg(`Crotal inválido: ${crotal}. Formato: ES + 12 dígitos (ej: ES123456789012)`, 'error');
             return;
           }

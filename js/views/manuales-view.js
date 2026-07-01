@@ -214,7 +214,7 @@ const ManualesView = {
       </iframe>
       <div style="display:flex; align-items:center; justify-content:space-between;
                   background:#1a1a2e; padding:8px 14px; padding-bottom:calc(8px + env(safe-area-inset-bottom)); flex-shrink:0; min-height:48px;
-                  border-top:1px solid rgba(255,255,255,0.1);">
+                  ">
         <span style="color:#fff; font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%;">
           <span style="color:#e0a83a; display:flex; align-items:center;">${Icons.libro()}</span>
           ${titulo || 'Manual'}

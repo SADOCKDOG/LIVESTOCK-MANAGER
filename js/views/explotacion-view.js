@@ -240,30 +240,26 @@ const ExplotacionView = {
 
     // Conmutador superior de Sub-módulos (Explotación, Gastos, Almacén)
     main.innerHTML = `
-      <div class="card p-14 mb-14 border-222">
-        <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: #10b981; max-width: 480px; margin: 0 auto;">${Icons.finca()} EXPLOTACIÓN ${Icons.paquete()}</div>
-          <div class="comer-mode-switch" style="display: flex; gap: 8px;">
-            <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
-              style="--mode-color:#10b981; flex: 1; padding: 10px;" 
-              onclick="ExplotacionView._cambiarSubModulo('explotacion')">
-              ${Icons.finca()} Explotación
-            </button>
-            <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" 
-              style="--mode-color:#ef4444; flex: 1; padding: 10px;" 
-              onclick="ExplotacionView._cambiarSubModulo('gastos')">
-              ${Icons.dinero()} Gastos
-            </button>
-            <button class="comer-mode-btn ${this._activeSubModule === 'almacen' ? 'active' : ''}" 
-              style="--mode-color:#3b82f6; flex: 1; padding: 10px;" 
-              onclick="ExplotacionView._cambiarSubModulo('almacen')">
-              ${Icons.paquete()} Almacén
-            </button>
-          </div>
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: #10b981; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
         </div>
-        <div class="pt-8 border-top-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.finca()} Contexto: Submódulos</div>
-          <div class="text-xs text-aaa mt-4 leading-relaxed">KPIs de producción, costes operativos y gestión de stock de silos y almacén.</div>
+        <div class="comer-mode-switch" style="display: flex; gap: 8px;">
+          <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
+            style="--mode-color:#10b981; color: ${this._activeSubModule === 'explotacion' ? '#000' : '#10b981'}; flex: 1; padding: 10px;" 
+            onclick="ExplotacionView._cambiarSubModulo('explotacion')">
+            ${Icons.finca()} Explotación
+          </button>
+          <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" 
+            style="--mode-color:#f97316; color: ${this._activeSubModule === 'gastos' ? '#000' : '#f97316'}; flex: 1; padding: 10px;" 
+            onclick="ExplotacionView._cambiarSubModulo('gastos')">
+            ${Icons.dinero()} Gastos
+          </button>
+          <button class="comer-mode-btn ${this._activeSubModule === 'almacen' ? 'active' : ''}" 
+            style="--mode-color:#3b82f6; color: ${this._activeSubModule === 'almacen' ? '#000' : '#3b82f6'}; flex: 1; padding: 10px;" 
+            onclick="ExplotacionView._cambiarSubModulo('almacen')">
+            ${Icons.paquete()} Almacén
+          </button>
         </div>
       </div>
       
@@ -273,21 +269,17 @@ const ExplotacionView = {
     const subContainer = document.getElementById('explotacion-submodule-content');
 
     if (this._activeSubModule === 'explotacion') {
-      const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#10b981' : '#ef4444');
+      const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#CCFF00' : '#f97316');
       subContainer.innerHTML = `
         <!-- Selector de Modo ExPro Superior -->
-        <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${_headerColor};">
-          <div class="text-center mb-10">
-            <div class="section-header-neon" style="--neon-color: ${_headerColor}; max-width: 480px; margin: 0 auto;">EXPLOTACIÓN</div>
-            <div class="expro-mode-switch">
-              <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
-              <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
-              <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
-            </div>
+        <div class="mb-14">
+          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+            <span style="color: ${_headerColor}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> EXPLOTACIÓN
           </div>
-          <div class="pt-8 border-top-222">
-            <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${_headerColor === '#ef4444' ? Icons.carne() : _headerColor === '#3b82f6' ? Icons.leche() : Icons.rotacion()} Contexto: ${_headerColor === '#ef4444' ? 'Cárnico' : _headerColor === '#3b82f6' ? 'Lácteo' : 'Híbrido'}</div>
-            <div class="text-xs text-aaa mt-4 leading-relaxed">Panel de control por modo con KPIS, registros de producción, acciones rápidas y acceso a comercialización.</div>
+          <div class="expro-mode-switch">
+            <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
+            <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
+            <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#CCFF00; color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
           </div>
         </div>
         <div id="expro-mode-content"></div>
@@ -328,7 +320,7 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #ef4444; width:100%;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.tendencia()} RENDIMIENTO Y EFICIENCIA DE CARNE
           </div>
@@ -420,7 +412,7 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #3b82f6; width:100%;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.leche()} RENDIMIENTO Y EFICIENCIA DE LECHE
           </div>
@@ -461,7 +453,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" >
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.grafico()} CALIDAD DE TANQUE</div>
           <div class="scroll-shadow-container overflow-x-auto">
             <table class="premium-table">
@@ -503,7 +495,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- Controles Ordeño Recientes -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid #3b82f6;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" >
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.leche()} ORDEÑOS Y CONTROLES DIARIOS</div>
           <div class="grid gap-6">
             ${d.ordeños.length > 0
@@ -539,7 +531,7 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #10b981; width:100%;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.rotacion()} RENDIMIENTO Y EFICIENCIA HÍBRIDA
           </div>
@@ -567,7 +559,7 @@ if (window.enableScrollShadows) {
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
           <div class="section-header-theme">ACCIONES DE REGISTRO</div>
           <div class="grid grid-cols-3 gap-10">
-            <button class="widget-link-btn widget-link-btn--neon neon-danger" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+            <button class="widget-link-btn widget-link-btn--neon neon-orange" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
               ${Icons.agregar()}
               <span class="widget-link-label">Peso (kg)</span>
             </button>
@@ -710,7 +702,7 @@ if (window.enableScrollShadows) {
     }
 
     let html = `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.paquete()} BALANCE DE STOCK Y LLENADO DE SILOS
         </div>
@@ -746,7 +738,9 @@ if (window.enableScrollShadows) {
     html += `
         </div>
         <div class="mt-20 py-24 flex flex-col items-center gap-15 border-top-222">
-          <div class="section-header-neon" style="--neon-color: ${borderStyleColor}; width: 100%; padding:0; margin-bottom: 5px; letter-spacing: 2px;">ALMACÉN</div>
+          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+            <span style="color: ${borderStyleColor}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> ALMACÉN
+          </div>
           <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${borderStyleColor}; --neon-glow: ${borderStyleColor}B0; --neon-inner: ${borderStyleColor}40; width: 100%; max-width: 220px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
             ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">CARGA / CONSUMO</span>
           </button>
@@ -763,7 +757,7 @@ if (window.enableScrollShadows) {
     const fitoConControl = (d.gastosFito || []).filter(g => g.control_normativo?.registroProducto && g.control_normativo?.dosisAplicada).length;
 
     return `
-      <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${color};">
+      <div class="mt-16 p-12 rounded bg-darker border border-222" >
         <div class="flex justify-between items-center mb-12">
           <div class="text-[0.65rem] text-white font-black uppercase flex items-center gap-6 tracking-widest">${Icons.dinero()} COSTES + CUMPLIMIENTO NORMATIVO</div>
         </div>
@@ -783,7 +777,9 @@ if (window.enableScrollShadows) {
         </div>
 
         <div class="py-32 border-y border-222 mb-32 bg-black-opacity-50 flex flex-col items-center">
-            <div class="section-header-neon mb-20" style="--neon-color: ${color}; padding:0; letter-spacing: 3px;">GASTOS</div>
+            <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+              <span style="color: ${color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GASTOS
+            </div>
             <div class="grid grid-cols-3 gap-12 px-6 w-full">
               <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ExplotacionView._abrirWizardGastoModo('Alimentacion', '${modo}')" style="padding: 16px 5px; min-height: 85px;">
                 ${Icons.agregar()}
@@ -816,7 +812,7 @@ if (window.enableScrollShadows) {
       : `Ir a Comercialización (${modo === 'leche' ? 'Leche' : 'Carne'})`;
 
     return `
-      <div class="mt-16 p-12 rounded bg-darker border border-222" style="border-top: 3px solid ${color};">
+      <div class="mt-16 p-12 rounded bg-darker border border-222" >
         <div class="text-xs text-white font-black uppercase mb-8 flex items-center gap-6">${Icons.rotacion()} CIERRE OPERATIVO → COMERCIALIZACIÓN/VENTA</div>
         <div class="text-xs text-aaa mb-10">
           Finaliza primero los registros de Explotación (producción, costes y cumplimiento). Después continúa el flujo comercial.
@@ -874,7 +870,7 @@ if (window.enableScrollShadows) {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; border-top:5px solid ${color}; width:100%; margin:16px;">
+      <div class="card p-25" style="max-width:380px;  width:100%; margin:16px;">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Tratamiento ${modo.toUpperCase()}</h3>
         <label class="wizard-label mb-10">Selecciona rebaño para tratamiento:</label>
         <select id="w-expro-trat-reb" class="wizard-input wizard-select mb-15">
@@ -1066,7 +1062,7 @@ if (window.enableScrollShadows) {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px; border-top:5px solid ${themeColor}; margin:16px; width:100%;">
+          <div class="card p-25" style="max-width:420px;  margin:16px; width:100%;">
               <h3 class="mt-0 text-white font-900">Rectificar / Anular Registro Físico</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -1218,7 +1214,7 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: #ef4444; --neon-glow: #ef4444B0; --neon-inner: #ef444440">
         <!-- KPIs GASTOS -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #ef4444; width:100%;">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.dinero()} BALANCE DE COSTES
           </div>

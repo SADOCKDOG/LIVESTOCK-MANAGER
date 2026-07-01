@@ -103,7 +103,7 @@ const DocumentosView = {
     const docsRecientes = docs.slice(0, 5);
 
     const bannerInterno = `
-      <div class="card card-dark-gradient border-222 modo-interno-banner mb-14" style="border-top:5px solid var(--c-warning);">
+      <div class="card card-dark-gradient border-222 modo-interno-banner mb-14" >
         <div class="section-header-theme" style="--theme-color: var(--c-warning);">${Icons.alerta()} MODO INTERNO SIGGAN</div>
         <p class="text-xs text-aaa mt-6">
           Genera la documentación desde Livestock Manager y sube los ficheros a SIGGAN/BADIGEX de forma manual. Registra aquí el número de acuse o el justificante recibido para mantener la trazabilidad interna.
@@ -112,7 +112,7 @@ const DocumentosView = {
 
     return `
       ${bannerInterno}
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} DOCUMENTOS</div>
         <div class="grid grid-cols-5 gap-4 mb-6">
           <div class="bg-dark rounded-lg p-6 text-center border border-222">
@@ -153,7 +153,7 @@ const DocumentosView = {
         <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
       </div>
 
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} ÚLTIMOS DOCUMENTOS</div>
         <div id="docs-lista">${this._renderLista(docsRecientes, ventaMap)}</div>
         ${docs.length > 5 ? `<div class="text-center mt-6 pt-6 border-top-222"><span class="text-[0.6rem] text-gray font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa "Consultar / Imprimir" para ver todos</span></div>` : ''}
@@ -384,7 +384,7 @@ const DocumentosView = {
             <p style="margin:5px 0 0 0;color:#555;">Plataforma profesional de gestión ganadera y trazabilidad industrial.</p>
           </div>
         </div>
-        <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;">
+        <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;">
           <button class="btn btn-primary" id="btn-doc-descargar" style="width:auto;padding:0 30px;background:${color};color:#fff;font-weight:bold;">${Icons.exportar()} DESCARGAR</button>
           <button class="btn btn-secondary" onclick="document.getElementById('doc-pdf-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
         </div>`;
@@ -446,7 +446,7 @@ const DocumentosView = {
       : '<span class="text-red">📎 Acuse manual pendiente</span>';
 
     overlay.innerHTML = `
-      <div class="card" style="max-width:520px;width:100%;border-top:4px solid ${color};padding:24px;">
+      <div class="card" style="max-width:520px;width:100%;padding:24px;">
         <div class="flex justify-between items-start mb-10">
           <div>
             <div class="font-800 text-sm" style="color:${color};">${label}</div>
@@ -513,7 +513,7 @@ const DocumentosView = {
 
     const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : 'Guía DIMOE';
     overlay.innerHTML = `
-      <div class="card" style="max-width:520px;width:100%;border-top:4px solid var(--c-warning);padding:24px;">
+      <div class="card" style="max-width:520px;width:100%;padding:24px;">
         <div class="flex justify-between items-center mb-8">
           <div>
             <div class="font-900 text-sm" style="color:var(--c-warning);">${docLabel}</div>

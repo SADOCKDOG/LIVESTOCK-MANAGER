@@ -133,18 +133,14 @@ const ComercializacionView = {
 
     main.innerHTML = `
       <!-- Selector de Modo Comercial Superior -->
-      <div class="card p-14 mb-14 border-222">
-        <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">${Icons.transportistas()} COMERCIALIZACIÓN ${Icons.dinero()}</div>
-          <div class="comer-mode-switch">
-            <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-            <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-            <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6;" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
-          </div>
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMERCIALIZACIÓN
         </div>
-        <div class="pt-8 border-top-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${meta.color === '#ef4444' ? Icons.carne() : meta.color === '#3b82f6' ? Icons.leche() : Icons.gastos()} Contexto: ${meta.label}</div>
-          <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de ventas, entregas y gastos comerciales con registro rápido y acceso a documentación.</div>
+        <div class="comer-mode-switch">
+          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6; color: var(--mode-color);" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
         </div>
       </div>
 
@@ -210,7 +206,7 @@ const ComercializacionView = {
     const headerLabels = { carne: 'Balance Cárnico', leche: 'Balance Lácteo', gastos: 'Resumen Gastos' };
 
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${meta.color}; width:100%;">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${headerIcons[tab] || Icons.info()} ${headerLabels[tab] || 'Resumen'}
         </div>
@@ -227,26 +223,7 @@ const ComercializacionView = {
 
   _cambiarTab(tab) {
     this._currentTab = tab;
-    document.querySelectorAll('.comer-mode-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-    });
-
-    const meta = this._getTabMeta(tab);
-    const headerNeon = document.querySelector('.section-header-neon');
-    if (headerNeon) headerNeon.style.setProperty('--neon-color', meta.color);
-
-    // Sincronizar color de cabecera
-    if (window.App && App.updateHeaderColor) {
-      const mode = (tab === 'leche') ? 'leche' : (tab === 'carne' ? 'carne' : null);
-      App.updateHeaderColor(mode);
-    }
-
-    // Re-renderizar KPIs con el tab activo
-    const kpisContainer = document.querySelector('.explotacion-kpis');
-    if (kpisContainer) kpisContainer.innerHTML = this._renderKPIsTab();
-
-    this._renderTabActual();
-    window.scrollTo(0, 0);
+    this.render();
   },
 
   _renderTabActual() {

@@ -9,8 +9,10 @@ const ProveedoresView = {
     async render() {
         const main = document.getElementById("app-content");
         main.innerHTML = `
-          <div class="mb-16 text-center">
-            <div class="section-header-neon" style="--neon-color: #10b981; max-width: 520px; margin: 0 auto;">PROVEEDORES</div>
+          <div class="mb-14">
+            <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+              <span style="color: #10b981; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> PROVEEDORES
+            </div>
           </div>
 
           <div class="mb-16">
@@ -46,8 +48,8 @@ const ProveedoresView = {
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
-                <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
+              <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
+                <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
                 <div class="flex flex-col">
                   <div class="py-8 flex justify-between items-center border-bottom-222">
                     <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.proveedores()} Proveedores</span>

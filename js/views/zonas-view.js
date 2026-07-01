@@ -6,6 +6,7 @@
 
 const ZonasView = {
   async render() {
+    if (window.App) App.updateHeaderColor('zonas');
     const main = document.getElementById("app-content");
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
@@ -13,7 +14,7 @@ const ZonasView = {
       .map((zona, realIndex) => ({ zona, realIndex }))
       .filter(({ zona }) => !zona?.anulada);
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-success);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ZonasView._crearZona()">
@@ -76,7 +77,7 @@ const ZonasView = {
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
         html += `
-          <div class="card no-underline" style="border-top:3px solid ${colorCenso}; cursor:pointer; padding:15px; margin-bottom:12px;" onclick="location.hash='/zona?index=${item.realIndex}'">
+          <div class="card no-underline" style=" cursor:pointer; padding:15px; margin-bottom:12px;" onclick="location.hash='/zona?index=${item.realIndex}'">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">

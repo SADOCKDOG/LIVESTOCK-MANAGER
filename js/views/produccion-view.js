@@ -128,7 +128,7 @@ const ProduccionView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
+      <div class="card report-section p-16 mb-14" >
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${icon}</span>
@@ -282,7 +282,7 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px; border-top:5px solid #d97706; overflow-y:auto; max-height:90vh;">
+          <div class="card p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;">
               <h3 class="mt-0 text-gold">Editar Registro</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -386,7 +386,7 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-        <div class="card p-25" style="max-width:400px; border-top:5px solid #8b5cf6;">
+        <div class="card p-25" style="max-width:400px; ">
           <h3 class="mt-0 text-gold text-md">🧾 Editar Gasto</h3>
 
           <div class="wizard-input-group mt-15">

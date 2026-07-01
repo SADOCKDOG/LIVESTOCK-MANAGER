@@ -22,18 +22,14 @@ const TransportistasView = {
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
         main.innerHTML = `
-            <div class="card p-14 mb-14 border-222">
-              <div class="text-center mb-10">
-                <div class="section-header-neon" style="--neon-color: #3b82f6; max-width: 520px; margin: 0 auto;">${Icons.transportistas()} LOGÍSTICA / TRANSPORTE ${Icons.paquete()}</div>
-                <div class="comer-mode-switch">
-                   <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa;" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
-                   <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
-                   <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
-                </div>
+            <div class="mb-14">
+              <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+                <span style="color: #3b82f6; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> LOGÍSTICA / TRANSPORTE
               </div>
-              <div class="pt-8 border-top-222">
-                <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.transportistas()} Contexto: Transporte</div>
-                <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de transportistas, vehículos y estado de actividad.</div>
+              <div class="comer-mode-switch">
+                 <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa; color: var(--mode-color);" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
+                 <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:#10b981; color: var(--mode-color);" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
+                 <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:#ef4444; color: var(--mode-color);" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
               </div>
             </div>
 
@@ -202,7 +198,7 @@ const TransportistasView = {
         overlay.style.zIndex = "6000";
 
         overlay.innerHTML = `
-            <div class="card" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px; border-top:5px solid #3b82f6; margin:16px;">
+            <div class="card" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px;  margin:16px;">
                 <h3 class="mt-0 text-sm text-blue-400">${isEdit ? `${Icons.editar()} EDITAR TRANSPORTISTA` : `${Icons.agregar()} NUEVO TRANSPORTISTA`}</h3>
 
                 <div class="wizard-input-group">

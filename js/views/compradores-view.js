@@ -16,25 +16,21 @@ const CompradoresView = {
         
         main.innerHTML = `
           <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
-          <div class="card p-14 mb-14 border-222">
-            <div class="text-center mb-10">
-              <div class="section-header-neon" style="--neon-color: #8b5cf6; max-width: 420px; margin: 0 auto;">${Icons.compradores()} GESTIÓN COMERCIAL ${Icons.contratos()}</div>
-              <div class="comer-mode-switch" style="display: flex; gap: 8px;">
-                <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
-                  style="--mode-color:#8b5cf6; flex: 1; padding: 10px;" 
-                  onclick="CompradoresView._cambiarModulo('compradores')">
-                  ${Icons.compradores()} Compradores
-                </button>
-                <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
-                  style="--mode-color:#10b981; flex: 1; padding: 10px;" 
-                  onclick="CompradoresView._cambiarModulo('contratos')">
-                  ${Icons.contratos()} Contratos
-                </button>
-              </div>
+          <div class="mb-14">
+            <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+              <span style="color: #8b5cf6; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GESTIÓN COMERCIAL
             </div>
-            <div class="pt-8 border-top-222">
-              <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.compradores()} Contexto: Comercial</div>
-              <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de compradores por tipo de explotación y contratos comerciales.</div>
+            <div class="comer-mode-switch" style="display: flex; gap: 8px;">
+              <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
+                style="--mode-color:#8b5cf6; color: ${this._activeModule === 'compradores' ? '#000' : '#8b5cf6'}; flex: 1; padding: 10px;" 
+                onclick="CompradoresView._cambiarModulo('compradores')">
+                ${Icons.compradores()} Compradores
+              </button>
+              <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
+                style="--mode-color:#10b981; color: ${this._activeModule === 'contratos' ? '#000' : '#10b981'}; flex: 1; padding: 10px;" 
+                onclick="CompradoresView._cambiarModulo('contratos')">
+                ${Icons.contratos()} Contratos
+              </button>
             </div>
           </div>
 
@@ -64,12 +60,6 @@ const CompradoresView = {
     _cambiarModulo(modulo) {
         this._activeModule = modulo;
         this._searchQuery = '';
-        
-        // Actualizar estado de los botones superiores
-        document.querySelectorAll('.comer-mode-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(modulo.slice(0, -1)));
-        });
-
         this.render();
     },
 
@@ -80,19 +70,15 @@ const CompradoresView = {
         if (this._activeModule === 'compradores') {
             const meta = this._getTabMeta(this._currentTab);
             container.innerHTML = `
-              <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
-                <div class="text-center mb-10">
-                  <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 520px; margin: 0 auto;">COMPRADORES</div>
-                  <div class="comer-mode-switch">
-                    <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
-                    <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#ef4444;" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
-                    <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6;" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
-                    <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#10b981;" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
-                  </div>
+              <div class="mb-14">
+                <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+                  <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMPRADORES
                 </div>
-                <div class="pt-8 border-top-222">
-                  <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.compradores()} Contexto: Filtros</div>
-                  <div class="text-xs text-aaa mt-4 leading-relaxed">Filtrar compradores por tipo de producción cárnica, láctea o híbrida.</div>
+                <div class="comer-mode-switch">
+                  <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold); color: var(--mode-color);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#CCFF00; color: var(--mode-color);" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
                 </div>
               </div>
 
@@ -120,8 +106,10 @@ const CompradoresView = {
         } else {
             // Módulo de Contratos
             container.innerHTML = `
-              <div class="mb-16 text-center">
-                <div class="section-header-neon" style="--neon-color: #10b981; max-width: 520px; margin: 0 auto;">CONTRATOS COMERCIALES</div>
+              <div class="mb-14">
+                <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+                  <span style="color: #10b981; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> CONTRATOS COMERCIALES
+                </div>
               </div>
 
               <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #10b981;">
@@ -160,15 +148,7 @@ const CompradoresView = {
 
     _cambiarFiltro(tab) {
         this._currentTab = tab;
-        document.querySelectorAll('.comer-mode-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.tab === tab);
-        });
-
-        const meta = this._getTabMeta(tab);
-        const headerNeon = document.querySelector('.section-header-neon');
-        if (headerNeon) headerNeon.style.setProperty('--neon-color', meta.color);
-
-        this._aplicarFiltrosCompradores();
+        this.render();
     },
 
     _filtrarCompradores(value) {
@@ -254,7 +234,7 @@ const CompradoresView = {
               </div>
               
               <!-- Contratos asociados al comprador -->
-              <div class="mt-6 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter style-border-top" style="border-top:1px solid #222; padding-top:10px;">
+              <div class="mt-6 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter style-border-top" style=" padding-top:10px;">
                 <span class="text-gray-600 font-900 mr-6">CONTRATOS VINCULADOS:</span>
                 ${cContratos.length === 0 ? '<span class="text-gray-700 italic">SIN CONTRATOS ASIGNADOS</span>' :
                   cContratos.map(ct => `
