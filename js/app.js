@@ -372,10 +372,10 @@ const App = {
   /** Actualiza el color neon de la cabecera según el modo de explotación */
   updateHeaderColor(mode) {
     const colorMap = {
-      carne: '#f97316',
+      carne: '#FF4444',
       leche: '#3b82f6',
       hibrido: '#CCFF00',
-      animales: '#f97316',
+      animales: '#FF4444',
       rebanos: '#3b82f6',
       zonas: '#CCFF00'
     };
