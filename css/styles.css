@@ -111,9 +111,10 @@ header {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 2000;
-    border-bottom: 2px solid var(--header-neon-color, #333333);
-    
-    transition: background 0.3s ease;
+    /* Formato Cork Manager: línea fina nítida + haz de luz difuso hacia abajo */
+    border-bottom: 1px solid var(--header-neon-color, #333333);
+    box-shadow: 0 5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent);
+    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .header-logo-container {
@@ -336,8 +337,6 @@ main#app-content {
     box-sizing: border-box;
     overflow-x: hidden;
     min-height: 100vh;
-    box-shadow: inset 8px 0 15px -8px var(--header-neon-color, rgba(204,255,0,0.1)), inset -8px 0 15px -8px var(--header-neon-color, rgba(204,255,0,0.1));
-    transition: box-shadow 0.3s ease;
 }
 
 /* CARTAS */
@@ -3210,3 +3209,29 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 .card, .dashboard-card, .list-card, .silo-card, .entity-card, .ganaderia-kpi, .report-card, .report-section, .inf-report, .card-accent, .card-dark-gradient, [class*="card-accent"], [class*="border-top"] {
     border-top: none !important;
 }
+
+/* =========================================================================
+   RETROILUMINACIÓN Y HAZ DE LUZ (Ajustes → Preferencias de Aplicación)
+   body.glow-marco-off   → desactiva la línea neón y el haz del marco principal
+   body.glow-botones-off → desactiva la retroiluminación de los botones
+   ========================================================================= */
+body.glow-marco-off header {
+    border-bottom-color: #333333;
+    box-shadow: none;
+}
+
+body.glow-botones-off .nav-item { text-shadow: none; }
+body.glow-botones-off .nav-item svg { filter: none; }
+body.glow-botones-off .nav-item.active { text-shadow: none; }
+body.glow-botones-off #nav-more.active svg { filter: none; }
+body.glow-botones-off .btn-primary,
+body.glow-botones-off .btn--primary,
+body.glow-botones-off .wizard-btn-primary,
+body.glow-botones-off .error-dialog-btn.primary { box-shadow: none; }
+body.glow-botones-off .btn-secondary:hover,
+body.glow-botones-off .btn--secondary:hover,
+body.glow-botones-off .wizard-btn-secondary:hover { box-shadow: none; }
+body.glow-botones-off .widget-link-btn--neon { box-shadow: none; }
+body.glow-botones-off .widget-link-btn--neon svg { filter: none; }
+body.glow-botones-off .more-sheet-item svg { filter: none; }
+body.glow-botones-off .more-sheet-item:active { box-shadow: none; }
