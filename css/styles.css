@@ -394,6 +394,7 @@ nav.bottom-nav {
 
 .nav-item svg { width: 26px; height: 26px; stroke-width: 2.5; }
 .nav-item.active svg { display: none; }
+#nav-more.active svg { display: block; stroke: currentColor; filter: none; }
 .nav-item.active { color: var(--header-neon-color, #CCFF00); font-size: 12px; }
 
 /* (Scroll shadows de nav eliminados — ahora es fijo con 5 items) */
