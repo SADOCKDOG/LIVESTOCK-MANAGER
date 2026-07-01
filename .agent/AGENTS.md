@@ -42,3 +42,11 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 ## 4. Estilos Especializados
 - **Tablas de Datos Densos**: Si es obligatorio usar tablas (ej. Informes), usar diseño minimalista: `border-bottom: 1px solid #27272a`, `padding: 10px`, y fondos alternos `rgba(255,255,255,0.02)` en filas.
 - **Loaders**: Spinners circulares con el borde superior en el color neón activo (`border-top-color: var(--neon)`).
+
+## 5. Excepciones y Botones Específicos
+- **Botones Primarios de Guardar (Formularios)**: EXCEPCIÓN a la regla de botones huecos. Estos botones (ej. "Guardar", "Aceptar") SÍ pueden llevar fondo de color sólido (ej. amarillo o verde) y texto oscuro para destacar la acción principal que cierra un proceso o modal.
+- **Botones de Acción Secundaria (ej. Exportar a PDF / EXCEL)**: Usan fondos semitransparentes (ej. `rgba(color, 0.15)`) con un borde fino del mismo color al 40% de opacidad (`rgba(color, 0.4)`), y el texto con el color sólido. Son ideales para acciones auxiliares dentro de una tarjeta.
+- **Pastillas Semánticas de Datos (Pills)**: Para desgloses de métricas (ej. separar totales por calidades como 1ª Cal, Bornizo, etc.), los valores numéricos deben ir encapsulados en recuadros o pastillas con fondo sólido del color semántico que les corresponda (según la lógica de negocio), y NO como texto blanco plano.
+
+## 6. Procedimiento de Trabajo (TQM)
+- **Auditoría Semántica Previa**: ANTES de modificar o crear componentes, DEBO analizar semánticamente los datos involucrados: ¿es un dato calculado o un registro de acción? ¿tiene un color semántico asignado por negocio? Sólo después de este análisis aplicaré las plantillas correspondientes para evitar fallos de concepto.
