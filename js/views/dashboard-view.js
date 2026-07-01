@@ -133,7 +133,7 @@ const DashboardView = {
       ` : ''}
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
       <!-- Resumen General -->
-      <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
+      <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
         <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
         <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: #94A3B8; text-shadow: none;">cab.</span></div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
@@ -154,7 +154,7 @@ const DashboardView = {
 
       <!-- Balance Económico -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> BALANCE ECONÓMICO</h3>
           <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
@@ -169,7 +169,7 @@ const DashboardView = {
 
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
           ${alertaEpoca.sugerencias?.length > 0 ? `
           <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
@@ -183,7 +183,7 @@ const DashboardView = {
 
       <!-- Accesos Rápidos -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ACCESOS RÁPIDOS</h3>
           <div class="grid grid-cols-2 gap-8">
             <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px;">
@@ -212,8 +212,8 @@ const DashboardView = {
     if (!alertas.length) return '';
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
-          <h3 style="color: #FF4444; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #FF4444; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: #FF4444; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
@@ -239,8 +239,8 @@ const DashboardView = {
     if (!alertas.length) return '';
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
-          <h3 style="color: #FF9800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #FF9800; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: #FF9800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
@@ -263,8 +263,8 @@ const DashboardView = {
     if (!alertas.length) return '';
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
-          <h3 style="color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #a855f7; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 4).map(a => {
               let iconoSVG = Icons.info();
@@ -333,7 +333,7 @@ const DashboardView = {
     const { numEntregas, litrosTotal, precioFinalMedio, mofaTotal, mofaRatio, conLab, esMedia, meses } = indicadores;
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
@@ -439,8 +439,8 @@ const DashboardView = {
     if (!kpis || (!kpis.litrosPorOveja && !kpis.eficienciaPienso && !kpis.pctBajas)) {
       return `
         <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-          <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
-            <h3 style="color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> KPIs Diarios</h3>
+          <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #a855f7; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> KPIs Diarios</h3>
             <div style="color: #94A3B8; font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
           </div>
         </div>`;
@@ -454,7 +454,7 @@ const DashboardView = {
 
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center; border-top: 3px solid var(--header-neon-color, #CCFF00); background: rgba(255,255,255,0.02);">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
@@ -463,7 +463,7 @@ const DashboardView = {
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${totalHembras} ♀</div>
             </div>
               <div>
-                <div style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px; color: var(--header-neon-color, var(--p-gold));">PIENSO (g/L)</div>
+                <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PIENSO (g/L)</div>
                 <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: ${App._hexToRgba(piensoColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}</div>
                 <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Eficiencia</div>
               </div>
