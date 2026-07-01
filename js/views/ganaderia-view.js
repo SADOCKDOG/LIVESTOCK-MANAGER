@@ -39,54 +39,45 @@ const GanaderiaView = {
     const especies = new Set(animalesModo.map(a => (a.especie || '').toLowerCase()).filter(Boolean));
 
     this._cache = { rebanos, animales, zonas, rebanosModo, animalesModo };
-    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: '#ef4444' };
+    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: '#f97316' };
 
     // Sincronizar color de cabecera con el modo activo
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
     main.innerHTML = `
-      <div class="card p-14 mb-14 border-222">
-        <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: #facc15; max-width: 360px; margin: 0 auto;">${Icons.animales()} MÓDULOS ${Icons.zonas()}</div>
-          <div class="grid grid-cols-3 gap-10">
-            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
-              ${Icons.animales()}
-              <span class="widget-link-label">Animales</span>
-            </a>
-            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
-              ${Icons.rebanos()}
-              <span class="widget-link-label">Rebaños</span>
-            </a>
-            <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">
-              ${Icons.zonas()}
-              <span class="widget-link-label">Zonas</span>
-            </a>
-          </div>
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: #CCFF00; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
         </div>
-        <div class="pt-8 border-top-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${Icons.animales()} Contexto: Módulos</div>
-          <div class="text-xs text-aaa mt-4 leading-relaxed">Gestión de censo, identificación, lotes y parcelas de la explotación.</div>
+        <div class="grid grid-cols-3 gap-10">
+          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-orange">
+            ${Icons.animales()}
+            <span class="widget-link-label">Animales</span>
+          </a>
+          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
+            ${Icons.rebanos()}
+            <span class="widget-link-label">Rebaños</span>
+          </a>
+          <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">
+            ${Icons.zonas()}
+            <span class="widget-link-label">Zonas</span>
+          </a>
         </div>
       </div>
 
-      <div class="card p-14 mb-14 border-222" style="border-top:3px solid ${meta.color};">
-        <div class="text-center mb-10">
-          <div class="section-header-neon" style="--neon-color: ${meta.color}; max-width: 360px; margin: 0 auto;">EXPLOTACIÓN</div>
-          <div class="ganaderia-mode-switch">
-            <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#ef4444;" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
-            <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
-            <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#10b981;" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
-          </div>
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> EXPLOTACIÓN
         </div>
-        <div class="pt-8 border-top-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider flex items-center gap-4">${meta.icon} Contexto: ${meta.label}</div>
-          <div class="text-xs text-aaa mt-4 leading-relaxed">Vista independiente por modo para patrimonio, censo, lotes y zonas.</div>
+        <div class="ganaderia-mode-switch" style="max-width: 100%;">
+          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#CCFF00; color: var(--mode-color);" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
         </div>
       </div>
 
-      <!-- KPIs Ganadería Unificados en Filas -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${meta.color}; width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
+      <div class="mb-14 border-bottom-222 pb-10">
+        <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
         <div class="flex flex-col">

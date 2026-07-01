@@ -131,36 +131,17 @@ const DashboardView = {
         <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
       </div>
       ` : ''}
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
       <!-- Resumen General -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'RESUMEN GANADERO'}</div>
-        <div class="flex flex-col">
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.zonas()} Zonas</span>
-            <strong class="text-xl font-950" style="color:var(--p-gold);">${(finca.zonas || []).length}</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rebanos()} Rebaños</span>
-            <strong class="text-xl font-950" style="color:var(--p-gold);">${rebanos.length}</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Censo</span>
-            <strong class="text-xl font-950" style="color:var(--p-gold);">${totalCenso || animales.length}</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.check()} Activos</span>
-            <strong class="text-xl font-950 text-green">${totalActivos || activos}</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Vendidos</span>
-            <strong class="text-xl font-950 text-red">${totalVendidos}</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Rentabilidad</span>
-            <strong class="text-xl font-950 ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</strong>
-          </div>
+      <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
+        <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;">${finca.nombre || 'RESUMEN GANADERO'}</h3>
+        <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: #94A3B8; text-shadow: none;">cab.</span></div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid #FFD700; color: #FFD700; background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
+          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">ACTIVOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid #CCFF00; color: #CCFF00; background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalActivos || activos}</div></div>
+          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">VENDIDOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid #FF4444; color: #FF4444; background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalVendidos}</div></div>
         </div>
-      </div>
+      </div> </div>
 
       ${this._renderKPIsDiariosCard(kpisDiarios)}
 
@@ -172,67 +153,56 @@ const DashboardView = {
       </div>
 
       <!-- Balance Económico -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-success); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.dinero()} BALANCE ECONÓMICO</div>
-        <div class="grid grid-cols-2 gap-8 mb-8">
-          <div class="bg-dark rounded-lg p-10 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">INGRESOS</div>
-            <div class="text-xl font-black text-amber">${(rent?.ingresos || 0).toLocaleString()}€</div>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;">BALANCE ECONÓMICO</h3>
+          <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">INGRESOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid #CCFF00; color: #CCFF00; background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.ingresos || 0).toLocaleString()}€</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">GASTOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid #FF4444; color: #FF4444; background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">RENT.</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid ${parseFloat(pctRent) > 0 ? '#CCFF00' : '#FF4444'}; color: ${parseFloat(pctRent) > 0 ? '#CCFF00' : '#FF4444'}; background: ${parseFloat(pctRent) > 0 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 68, 68, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctRent}%</div></div>
           </div>
-          <div class="bg-dark rounded-lg p-10 text-center border border-222">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4">GASTOS</div>
-            <div class="text-base font-950 text-red" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(rent?.gastos || 0).toLocaleString()}€</div>
-          </div>
-        </div>
-        <div class="flex justify-between items-center p-10 bg-dark rounded-lg border border-222">
-          <div>
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider">Beneficio Neto</div>
-            <div class="text-lg font-black ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €</div>
-          </div>
-          <div class="text-right">
-            <div class="text-[0.55rem] text-gray uppercase font-800 tracking-wider">Rentabilidad</div>
-            <div class="text-lg font-black ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div>
-          </div>
-        </div>
-        <div class="text-center mt-8">
-          <a href="#/informes" class="text-green no-underline text-xs font-900 uppercase tracking-wider">Ver Informes Detallados ${Icons.siguiente()}</a>
         </div>
       </div>
 
       ${this._renderIndicadoresLacteos(indicadoresLeche)}
 
       <!-- Calendario Preventivo -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-info); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.calendar()} ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</div>
-        ${alertaEpoca.sugerencias?.length > 0 ? `
-        <ul class="text-xs text-gray m-0 leading-relaxed mt-6 pl-16">
-          ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
-        </ul>` : '<div class="text-xs text-gray mt-6">Sin sugerencias para esta temporada.</div>'}
-        <div class="text-center mt-8">
-          <a href="#/informes?tab=alertas" class="text-blue no-underline text-xs font-900 uppercase tracking-wider">Ver Alertas Completas ${Icons.siguiente()}</a>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;">${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
+          ${alertaEpoca.sugerencias?.length > 0 ? `
+          <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
+            ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
+          </ul>` : '<div class="text-grey" style="font-size: 0.8rem; margin-bottom: 20px;">Sin sugerencias para esta temporada.</div>'}
+          <div class="text-center" style="border-top: 1px solid #2a2a2a; padding-top: 20px;">
+            <a href="#/informes?tab=alertas" class="text-blue no-underline" style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Ver Alertas Completas ${Icons.siguiente()}</a>
+          </div>
         </div>
       </div>
 
       <!-- Accesos Rápidos -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--p-gold); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.rayo()} ACCESOS RÁPIDOS</div>
-        <div class="grid grid-cols-2 gap-8">
-          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger">
-            ${Icons.animales()}
-            <span class="widget-link-label">Animales</span>
-          </a>
-          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">
-            ${Icons.rebanos()}
-            <span class="widget-link-label">Rebaños</span>
-          </a>
-          <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40;">
-            ${modoIcon}
-            <span class="widget-link-label">${modoLabel}</span>
-          </a>
-          <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success">
-            ${Icons.tendencia()}
-            <span class="widget-link-label">Informes</span>
-          </a>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;">ACCESOS RÁPIDOS</h3>
+          <div class="grid grid-cols-2 gap-8">
+            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="background: #111; border: 1px solid #333; height: 60px;">
+              ${Icons.animales()}
+              <span class="widget-link-label">Animales</span>
+            </a>
+            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info" style="background: #111; border: 1px solid #333; height: 60px;">
+              ${Icons.rebanos()}
+              <span class="widget-link-label">Rebaños</span>
+            </a>
+            <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40; background: #111; border: 1px solid #333; height: 60px;">
+              ${modoIcon}
+              <span class="widget-link-label">${modoLabel}</span>
+            </a>
+            <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success" style="background: #111; border: 1px solid #333; height: 60px;">
+              ${Icons.tendencia()}
+              <span class="widget-link-label">Informes</span>
+            </a>
+          </div>
         </div>
       </div>
     `;
@@ -241,26 +211,26 @@ const DashboardView = {
   _renderAlertasSanitarias(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-danger); width:100%">
-        <h3 class="mt-0 text-red flex items-center gap-8">
-          ${Icons.alerta()} Alertas Sanitarias <span class="badge rounded-xl badge-solid-danger">${alertas.length}</span>
-        </h3>
-        <div class="flex flex-column gap-10 mt-15">
-          ${alertas.slice(0, 3).map(a => `
-            <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : 'amber'}">
-              <div class="flex justify-between items-start">
-                <div>
-                  <div class="text-white font-bold text-base uppercase">${a.medicamento}</div>
-                  <div class="text-gray text-[0.6rem] mt-4 uppercase font-800 tracking-wider">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-red font-950 text-xl">${a.diasRestantes}D</div>
-                  <div class="text-gray-500 text-[0.55rem] uppercase font-900 tracking-widest">Supresión</div>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;">
+          <h3 style="color: #FF4444; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;">ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+          <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+            ${alertas.slice(0, 3).map(a => `
+              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div>
+                    <div style="color: #FFF; font-weight: 700; font-size: 0.9rem; text-transform: uppercase;">${a.medicamento}</div>
+                    <div style="color: #94A3B8; font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="color: #ef4444; font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
+                    <div style="color: #64748B; font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Supresión</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          `).join('')}
-          ${alertas.length > 3 ? `<div class="text-center text-gray text-xs mt-5">+${alertas.length - 3} alertas más activas</div>` : ''}
+            `).join('')}
+            ${alertas.length > 3 ? `<div style="text-align: center; color: #94A3B8; font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más activas</div>` : ''}
+          </div>
         </div>
       </div>`;
   },
@@ -268,23 +238,23 @@ const DashboardView = {
   _renderAlertasTrazabilidad(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-warning); width:100%">
-        <h3 class="mt-0 flex items-center gap-8 text-orange">
-          ${Icons.alerta()} Alertas Trazabilidad (SIA) <span class="badge rounded-xl badge-solid-orange">${alertas.length}</span>
-        </h3>
-        <div class="flex flex-column gap-10 mt-15">
-          ${alertas.slice(0, 3).map(a => `
-            <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : 'amber'}">
-              <div class="flex justify-between items-center">
-                <div>
-                  <div class="text-white font-950 text-base uppercase tracking-tight">${a.crotal}</div>
-                  <div class="text-gray text-[0.6rem] mt-4 uppercase font-800 tracking-wider">${a.mensaje}</div>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;">
+          <h3 style="color: #FF9800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;">ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+          <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+            ${alertas.slice(0, 3).map(a => `
+              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="color: #FFF; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">${a.crotal}</div>
+                    <div style="color: #94A3B8; font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${a.mensaje}</div>
+                  </div>
+                  <div style="color: ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
                 </div>
-                <div class="text-xl" style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
               </div>
-            </div>
-          `).join('')}
-          ${alertas.length > 3 ? `<div class="text-center text-gray text-xs mt-5">+${alertas.length - 3} alertas más</div>` : ''}
+            `).join('')}
+            ${alertas.length > 3 ? `<div style="text-align: center; color: #94A3B8; font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más</div>` : ''}
+          </div>
         </div>
       </div>`;
   },
@@ -292,36 +262,38 @@ const DashboardView = {
   _renderAlertasAdministrativas(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-accent); width:100%">
-        <h3 class="mt-0 text-purple flex items-center gap-8">
-          ${Icons.documento()} Gestión / PAC <span class="badge rounded-xl badge-solid-purple">${alertas.length}</span>
-        </h3>
-        <div class="flex flex-column gap-10 mt-15">
-          ${alertas.slice(0, 4).map(a => {
-            let iconoSVG = Icons.info();
-            if (a.seccion === 'contrato_lacteo') iconoSVG = Icons.contratos();
-            else if (a.seccion === 'infolac') iconoSVG = Icons.grafico();
-            else if (a.seccion === 'pac') iconoSVG = Icons.pac();
-            else if (a.seccion === 'adsg') iconoSVG = Icons.veterinario();
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;">
+          <h3 style="color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;">GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+          <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+            ${alertas.slice(0, 4).map(a => {
+              let iconoSVG = Icons.info();
+              if (a.seccion === 'contrato_lacteo') iconoSVG = Icons.contratos();
+              else if (a.seccion === 'infolac') iconoSVG = Icons.grafico();
+              else if (a.seccion === 'pac') iconoSVG = Icons.pac();
+              else if (a.seccion === 'adsg') iconoSVG = Icons.veterinario();
+              
+              const bColor = a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#10b981';
 
-            return `
-            <div class="info-box border-left-${a.urgencia === 'rojo' ? 'red' : a.urgencia === 'amarillo' ? 'amber' : 'green'}">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-8">
-                  <span class="text-purple">${iconoSVG}</span>
-                  <div>
-                    <div class="text-white font-bold text-base uppercase">${a.mensaje}</div>
-                    ${a.accion ? `<div class="text-violet text-[0.65rem] mt-4 uppercase font-800 tracking-wider flex items-center gap-4">${Icons.info()} ${a.accion}</div>` : ''}
+              return `
+              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${bColor};">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #a855f7;">${iconoSVG}</span>
+                    <div>
+                      <div style="color: #FFF; font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">${a.mensaje}</div>
+                      ${a.accion ? `<div style="color: #c084fc; font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">${Icons.info()} ${a.accion}</div>` : ''}
+                    </div>
                   </div>
+                  ${a.diasRestantes != null ? `<div style="text-align: right;">
+                    <div style="color: #ef4444; font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
+                    <div style="color: #64748B; font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Restantes</div>
+                  </div>` : `<div style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
                 </div>
-                ${a.diasRestantes != null ? `<div class="text-right">
-                  <div class="text-red font-950 text-xl">${a.diasRestantes}D</div>
-                  <div class="text-gray-500 text-[0.55rem] uppercase font-900 tracking-widest">Restantes</div>
-                </div>` : `<div class="text-xl" style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
-              </div>
-            </div>`;
-          }).join('')}
-          ${alertas.length > 4 ? `<div class="text-center text-gray text-xs mt-5">+${alertas.length - 4} alertas más</div>` : ''}
+              </div>`;
+            }).join('')}
+            ${alertas.length > 4 ? `<div style="text-align: center; color: #94A3B8; font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 4} alertas más</div>` : ''}
+          </div>
         </div>
       </div>`;
   },
@@ -360,29 +332,29 @@ const DashboardView = {
     if (!indicadores) return '';
     const { numEntregas, litrosTotal, precioFinalMedio, mofaTotal, mofaRatio, conLab, esMedia, meses } = indicadores;
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-warning); width:100%">
-        <h3 class="mt-0 flex items-center gap-8 text-yellow">
-          ${Icons.leche()} Indicadores Lácteos <span class="text-xs text-gray font-normal">(últimos 12 meses)</span>
-        </h3>
-        <div class="hscroll-cards">
-          <div class="info-box border-left-amber kpi-card-fixed min-w-0">
-            <div class="kpi-label">MOFA Mensual</div>
-            <div class="text-xl sm:text-2xl font-black ${mofaRatio >= 20 ? 'text-green' : 'text-amber'} truncate" title="${Math.round(mofaTotal / meses).toLocaleString()} €">${Math.round(mofaTotal / meses).toLocaleString()} €</div>
-            <div class="kpi-sub">${mofaRatio.toFixed(1)}% ingresos</div>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;">INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+            <div>
+              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">MOFA</div>
+              <div style="font-weight: 800; border: 1px solid ${mofaRatio >= 20 ? '#CCFF00' : '#FFD700'}; color: ${mofaRatio >= 20 ? '#CCFF00' : '#FFD700'}; background: ${mofaRatio >= 20 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${Math.round(mofaTotal / meses).toLocaleString()}€</div>
+              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${mofaRatio.toFixed(1)}%</div>
+            </div>
+            <div>
+              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PRECIO</div>
+              <div style="font-weight: 800; border: 1px solid #4FACFE; color: #4FACFE; background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toFixed(3)}</div>
+              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">€/L</div>
+            </div>
+            <div>
+              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">EXT. SECO</div>
+              <div style="font-weight: 800; border: 1px solid #c084fc; color: #c084fc; background: rgba(192, 132, 252, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${esMedia.toFixed(2)}%</div>
+              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${conLab.length} anal.</div>
+            </div>
           </div>
-          <div class="info-box border-left-blue kpi-card-fixed min-w-0">
-            <div class="kpi-label">Precio Medio</div>
-            <div class="text-white font-black text-xl sm:text-2xl truncate" title="${precioFinalMedio.toFixed(3)} €/L">${precioFinalMedio.toFixed(3)} €/L</div>
-            <div class="kpi-sub">${(litrosTotal / Math.max(1, numEntregas)).toFixed(0)} L/entrega</div>
+          <div class="text-center" style="border-top: 1px solid #2a2a2a; padding-top: 20px; margin-top: 20px;">
+            <a href="#/leche" class="text-gold no-underline" style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Control Lechero Detallado ${Icons.siguiente()}</a>
           </div>
-          <div class="info-box border-left-purple kpi-card-fixed min-w-0">
-            <div class="kpi-label">Extracto Seco</div>
-            <div class="text-white font-black text-xl sm:text-2xl truncate" title="${esMedia.toFixed(2)}%">${esMedia.toFixed(2)}%</div>
-            <div class="kpi-sub">${conLab.length} analíticas · ${litrosTotal.toLocaleString()} L</div>
-          </div>
-        </div>
-        <div class="text-center mt-12">
-          <a href="#/leche" class="text-gold no-underline text-sm font-bold">Ver Control Lechero Detallado →</a>
         </div>
       </div>`;
   },
@@ -466,71 +438,41 @@ const DashboardView = {
   _renderKPIsDiariosCard(kpis) {
     if (!kpis || (!kpis.litrosPorOveja && !kpis.eficienciaPienso && !kpis.pctBajas)) {
       return `
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-accent); width:100%">
-          <h3 class="mt-0 flex items-center gap-8 text-violet">
-            ${Icons.grafico()} KPIs Diarios
-          </h3>
-          <div class="empty-state p-15">
-            <p class="empty-state-text">No hay suficientes datos para calcular KPIs diarios.</p>
-            <p class="text-xs text-gray">Registra entregas de leche y animales para ver métricas.</p>
+        <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+          <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;">
+            <h3 style="color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;">KPIs Diarios</h3>
+            <div style="color: #94A3B8; font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
           </div>
         </div>`;
     }
 
     const { litrosPorOveja, eficienciaPienso, pctBajas, totalHembras, litros7d, tratamientosMamitis } = kpis;
 
-    const kpiColor = litrosPorOveja != null
-      ? (litrosPorOveja >= 1.0 ? '#10b981' : litrosPorOveja >= 0.5 ? '#f59e0b' : '#ef4444')
-      : '#888';
-
-    const piensoColor = eficienciaPienso != null
-      ? (eficienciaPienso <= 600 ? '#10b981' : eficienciaPienso <= 900 ? '#f59e0b' : '#ef4444')
-      : '#888';
-
-    const bajasColor = pctBajas != null
-      ? (pctBajas <= 3 ? '#10b981' : pctBajas <= 8 ? '#f59e0b' : '#ef4444')
-      : '#888';
+    const kpiColorHex = litrosPorOveja != null ? (litrosPorOveja >= 1.0 ? '#CCFF00' : litrosPorOveja >= 0.5 ? '#FFD700' : '#FF4444') : '#94A3B8';
+    const piensoColorHex = eficienciaPienso != null ? (eficienciaPienso <= 600 ? '#CCFF00' : eficienciaPienso <= 900 ? '#FFD700' : '#FF4444') : '#94A3B8';
+    const bajasColorHex = pctBajas != null ? (pctBajas <= 3 ? '#CCFF00' : pctBajas <= 8 ? '#FFD700' : '#FF4444') : '#94A3B8';
 
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top:5px solid var(--c-accent); width:100%">
-        <h3 class="mt-0 flex items-center gap-8 text-violet">
-          ${Icons.grafico()} KPIs Diarios <span class="text-xs text-gray font-normal">(últimos 7-30 días)</span>
-        </h3>
-        <div class="hscroll-cards">
-
-          <div class="info-box kpi-card-fixed" style="border-left:3px solid ${kpiColor};">
-            <div class="kpi-label flex items-center gap-4">${Icons.leche()} L/Oveja/Día</div>
-            <div class="text-2xl font-black" style="color:${kpiColor};">
-              ${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;">KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+            <div>
+              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">L/DÍA</div>
+              <div style="font-weight: 800; border: 1px solid ${kpiColorHex}; color: ${kpiColorHex}; background: ${App._hexToRgba(kpiColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}</div>
+              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${totalHembras} ♀</div>
             </div>
-            <div class="kpi-sub uppercase font-800 text-[0.55rem] tracking-tighter">
-              ${totalHembras} ♀ · <span class="text-white">${litros7d.toFixed(0)} L/7d</span>
-              ${litrosPorOveja != null && litrosPorOveja < 1.0 ? '<span class="text-amber"> · BAJO</span>' : ''}
-              ${litrosPorOveja != null && litrosPorOveja >= 1.5 ? `<span class="text-green flex items-center gap-4"> · ÓPTIMO ${Icons.check()}</span>` : ''}
-            </div>
-          </div>
-
-          <div class="info-box kpi-card-fixed" style="border-left:3px solid ${piensoColor};">
-            <div class="kpi-label flex items-center gap-4">${Icons.pac()} Ef. Pienso</div>
-            <div class="text-2xl font-black" style="color:${piensoColor};">
-              ${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}
-            </div>
-            <div class="kpi-sub uppercase font-800 text-[0.55rem] tracking-tighter">
-              ${eficienciaPienso != null ? 'g/L · ' + (eficienciaPienso <= 600 ? `<span class="text-green">EXCELENTE ${Icons.check()}</span>` : 'Revisar') : 'Sin datos pienso'}
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px; color: var(--header-neon-color, var(--p-gold));">PIENSO (g/L)</div>
+                <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: ${App._hexToRgba(piensoColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}</div>
+                <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Eficiencia</div>
+              </div>
+            <div>
+              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">BAJAS</div>
+              <div style="font-weight: 800; border: 1px solid ${bajasColorHex}; color: ${bajasColorHex}; background: ${App._hexToRgba(bajasColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctBajas != null ? pctBajas + '%' : '—'}</div>
+              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Mamitis</div>
             </div>
           </div>
-
-          <div class="info-box kpi-card-fixed" style="border-left:3px solid ${bajasColor};">
-            <div class="kpi-label flex items-center gap-4">${Icons.sanidad()} % Bajas</div>
-            <div class="text-2xl font-black" style="color:${bajasColor};">
-              ${pctBajas != null ? pctBajas + '%' : '—'}
-            </div>
-            <div class="kpi-sub">
-              ${tratamientosMamitis > 0 ? tratamientosMamitis + ' trat. últimos 30d' : 'Sin registros sanitarios'}
-              ${pctBajas != null && pctBajas > 5 ? '<span class="text-red"> · alerta sanitaria</span>' : ''}
-            </div>
-          </div>
-
         </div>
       </div>`;
   }

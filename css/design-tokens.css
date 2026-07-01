@@ -4,51 +4,47 @@
  */
 
 :root {
-    /* COLORES PRINCIPALES (SÍGGAN Identity) */
-    --p-cork: #d4a373;        /* Oro Corcho - Primario */
+    /* COLORES PRINCIPALES (Industrial Dark Mode) */
+    --p-cork: #d4a373;        /* Mantenido por legado, pero preferimos los semánticos */
     --p-cork-dark: #a0673a;
-    --p-accent: #7fb069;      /* Verde Alcornoque */
-    --gradient-gold: linear-gradient(135deg, var(--p-cork) 0%, var(--p-cork-dark) 100%);
-
-    /* COLORES DE ESTADO */
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-info: #3b82f6;
+    --accent: #CCFF00;        /* Verde Lima Neon (Nuevo Primario) */
+    
+    /* COLORES SEMÁNTICOS (Bento Grid Style) */
+    --color-lime: #CCFF00;
+    --color-gold: #FFD700;
+    --color-red: #FF4444;
+    --color-blue: #4FACFE;
+    --color-orange: #F97316;
+    --color-grey: #94A3B8;
 
     /* SUPERFICIES Y FONDOS */
-    --bg-black: #000000;
-    --surface: #121212;
-    --surface-light: #1e1e1e;
-    --border-dim: #2a2a2a;
-    --border-muted: #333333;
+    --bg-base: #121212;       /* Fondo Base */
+    --bg-card: #1E1E1E;       /* Superficies */
+    --border: #333333;        /* Lineas */
 
     /* TEXTO */
-    --text-primary: #f8f9fa;
-    --text-secondary: #a0a0a0;
-    --text-muted: #666666;
+    --text-p: #FFFFFF;        /* Principal */
+    --text-s: #94A3B8;        /* Secundario / Labels */
+    
+    /* BOTONES - TAMAÑOS ESTÁNDAR */
+    --btn-h-lg: 58px;    
+    --btn-h-md: 48px;    
+    --btn-h-sm: 40px;    
 
-    /* BOTONES - TAMAÑOS ESTÁNDAR (Touch Targets) */
-    --btn-h-lg: 58px;    /* Acciones primarias (CTA) */
-    --btn-h-md: 48px;    /* Acciones secundarias / Wizard */
-    --btn-h-sm: 40px;    /* Acciones terciarias / Inline */
-
-    /* INTERACCIÓN (Standardized in Audit) */
-    --transition-main: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    /* INTERACCIÓN */
+    --transition-main: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --active-scale: 0.96;
     --active-brightness: 0.9;
 
     /* RADIOS Y SOMBRAS */
-    --radius-lg: 16px;
-    --radius-md: 12px;
+    --radius-lg: 24px;   /* Más redondeado para Bento */
+    --radius-md: 16px;
     --radius-sm: 8px;
     --radius-full: 9999px;
 
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
-    --shadow-premium: var(--shadow-lg), inset 0 1px 0 rgba(212, 163, 115, 0.1);
-    --shadow-accent: 0 6px 20px rgba(212, 163, 115, 0.2);
+    --shadow-neon: 0 0 10px rgba(204, 255, 0, 0.3);
 
     /* SISTEMA DE ESPACIADO */
     --space-2xs: 4px;
@@ -57,9 +53,8 @@
     --space-md: 16px;
     --space-lg: 24px;
     --space-xl: 32px;
-    /* ICONOGRAFÍA */
-    --icon-size-sm: 20px;
-    --icon-size-md: 24px;
-    --icon-size-lg: 28px;
-    --icon-stroke: 2px;
+    
+    /* SAFE AREA PARA MOVILES */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
 }

@@ -262,7 +262,7 @@ const AlbaranesVentasView = {
       }
 
       overlay.innerHTML = `
-        <div class="card" style="max-width:550px;width:100%;border-top:4px solid ${color};padding:24px;">
+        <div class="card" style="max-width:550px;width:100%;padding:24px;">
           <div class="flex justify-between items-center mb-14">
             <div>
               <div class="font-800 text-sm" style="color:${color};">${tipo === 'leche' ? 'ENTREGA DE LECHE' : 'VENTA DE CARNE'}</div>

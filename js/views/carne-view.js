@@ -434,7 +434,7 @@ const CarneView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px; border-top:5px solid #ef4444; overflow-y:auto; max-height:90vh;">
+          <div class="card p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;">
               <h3 class="mt-0 text-gold">Editar Registro Cárnico</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -522,7 +522,7 @@ const CarneView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; border-top:5px solid #ef4444;">
+      <div class="card p-25" style="max-width:380px; ">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Cárnico</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño de carne a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">

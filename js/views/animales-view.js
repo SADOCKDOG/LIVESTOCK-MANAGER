@@ -8,6 +8,7 @@ const AnimalesView = {
   _filtroActivo: { especie: '', sexo: '', estado: '' },
 
   async render() {
+    if (window.App) App.updateHeaderColor('animales');
     const main = document.getElementById("app-content");
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
@@ -21,7 +22,7 @@ const AnimalesView = {
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
 
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #f97316;">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
@@ -34,9 +35,9 @@ const AnimalesView = {
 
     if (animales.length === 0) {
       html += `<div class="empty-state">
-        <div class="empty-state-icon" style="color:var(--p-gold);">${Icons.animales()}</div>
+        <div class="empty-state-icon" style="color:#f97316;">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #f97316;">
           <div class="section-header-theme">ACCIONES</div>
           <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
             <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
@@ -253,14 +254,14 @@ const AnimalesView = {
                    value="${a.numero_identificacion}"
                    placeholder="ES000000000000" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
-                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid var(--p-gold) !important;">
+                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid #f97316 !important;">
             <div class="text-aaa text-[0.6rem] uppercase font-800 mt-6 tracking-wide">
               REQUISITO REGA: ES + 12 DÍGITOS · <span class="text-gold" id="crotal-length-counter">0/14</span>
             </div>
           </div>
 
           <div class="card card-accent card-accent-amber p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.info()} DATOS GENERALES</div>
+            <div class="section-header-theme mb-12" style="--theme-color: #f97316">${Icons.info()} DATOS GENERALES</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPECIE</label>
@@ -394,13 +395,13 @@ const AnimalesView = {
           </div>
 
           <div class="card card-accent card-accent-gold p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">${Icons.documento()} OBSERVACIONES</div>
+            <div class="section-header-theme mb-12" style="--theme-color: #f97316">${Icons.documento()} OBSERVACIONES</div>
             <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
             <div class="card card-accent card-accent-amber p-16 mb-20">
-               <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">COMPAÑEROS LOTE</div>
+               <div class="section-header-theme mb-12" style="--theme-color: #f97316">COMPAÑEROS LOTE</div>
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="card card-accent card-accent-purple p-16 mb-20">

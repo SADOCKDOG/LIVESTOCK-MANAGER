@@ -6,13 +6,14 @@
 
 const RebanosView = {
   async render() {
+    if (window.App) App.updateHeaderColor('rebanos');
     const main = document.getElementById("app-content");
     const rebanos = await Rebanos.list();
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const totalRebanos = rebanos.length;
     const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-info);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="RebanosView._crearRebano()">
@@ -24,7 +25,7 @@ const RebanosView = {
       </div>`;
 
     if (rebanos.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--p-gold);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-info);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
     else {
       // Barra de resumen de Rebaños
       const carneCount = rebanos.filter(r => r.tipo.toLowerCase().includes('carne') || r.tipo.toLowerCase().includes('cárn')).length;
@@ -285,7 +286,7 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-amber p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">IDENTIFICACIÓN</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">IDENTIFICACIÓN</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">NOMBRE DEL REBAÑO / LOTE</label>
               <input type="text" id="w-reb-nombre" value="${data.nombre}" placeholder="EJ: LOTE ENGORDE A..." class="wizard-input uppercase font-800">
@@ -355,7 +356,7 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-gold p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">CAPACIDAD Y TRAZABILIDAD</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">CAPACIDAD Y TRAZABILIDAD</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CAPACIDAD / AFORO MÁXIMO</label>
               <input type="number" id="w-reb-capacidad" value="${data.capacidad_total || ''}" placeholder="EJ: 100" class="wizard-input font-800">
@@ -374,7 +375,7 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-amber p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--p-gold)">FECHA Y NOTAS</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">FECHA Y NOTAS</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">FECHA DE CONSTITUCIÓN</label>
               <input type="date" id="w-reb-fecha" value="${data.fecha_constitucion}" class="wizard-input font-800">

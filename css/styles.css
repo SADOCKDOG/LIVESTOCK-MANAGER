@@ -24,8 +24,8 @@
 
     /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
     --c-success: #10b981;
-    --c-warning: #f59e0b;
-    --c-danger:  #ef4444;
+    --c-warning: #FFD600;
+    --c-danger:  #FF4444;
     --c-info:    #3b82f6;
     --c-accent:  #8b5cf6;  /* reproducción / violeta */
 
@@ -103,7 +103,7 @@ body.scanner-active {
    HEADER COMPACTO (toolbar móvil)
    ============================================ */
 header {
-    background: #000000;
+    background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     height: calc(62px + var(--safe-top));
     padding: calc(4px + var(--safe-top)) 12px 0;
     display: flex;
@@ -111,9 +111,9 @@ header {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 2000;
-    border-bottom: 2px solid var(--header-neon-color, #f3c14b);
-    box-shadow: 0 4px 12px -2px var(--header-neon-color, rgba(243,193,75,0.6));
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border-bottom: 2px solid var(--header-neon-color, #333333);
+    
+    transition: background 0.3s ease;
 }
 
 .header-logo-container {
@@ -321,7 +321,7 @@ header {
 
 /* CONTENIDO CON MARGEN COMPACTO */
 main#app-content {
-    margin-top: calc(56px + var(--safe-top) + 4px);
+    margin-top: 12px;
     padding: 12px 12px calc(100px + var(--safe-bottom));
     max-width: 100%;
     box-sizing: border-box;
@@ -384,7 +384,7 @@ nav.bottom-nav {
 }
 
 .nav-item svg { width: 26px; height: 26px; stroke-width: 2.5; }
-.nav-item.active { color: var(--p-cork); }
+.nav-item.active { display: none !important; }
 .nav-item.active svg { stroke: var(--p-cork); filter: drop-shadow(0 0 10px rgba(212, 163, 115, 0.3)); }
 
 /* (Scroll shadows de nav eliminados — ahora es fijo con 5 items) */
@@ -844,6 +844,18 @@ label {
     height: 28px;
     color: var(--p-cork);
 }
+.more-sheet-item[href="#/zonas"] svg { color: #10b981; }
+.more-sheet-item[href="#/leche"] svg { color: #3b82f6; }
+.more-sheet-item[href="#/comercializacion"] svg { color: #CCFF00; }
+.more-sheet-item[href="#/compradores"] svg { color: #d97706; }
+.more-sheet-item[href="#/proveedores"] svg { color: #8b5cf6; }
+.more-sheet-item[href="#/transportistas"] svg { color: #ec4899; }
+.more-sheet-item[href="#/gastos"] svg { color: #ef4444; }
+.more-sheet-item[href="#/informes"] svg { color: #eab308; }
+.more-sheet-item[href="#/cuaderno"] svg { color: #d97706; }
+.more-sheet-item[href="#/documentos"] svg { color: #10b981; }
+.more-sheet-item[href="#/manuales"] svg { color: #9333ea; }
+.more-sheet-item[href="#/ajustes"] svg { color: #94a3b8; }
 
 /* ============================================
    SISTEMA DE CLASES UTILITARIAS v5.0
@@ -1549,7 +1561,7 @@ label {
    ============================================ */
 #asistente-configuracion-contenedor {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: #000000; display: flex; align-items: center;
+    background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center;
     justify-content: center; z-index: 3000;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -2677,33 +2689,33 @@ label {
 .premium-table td { padding: 10px 8px; font-size: 0.72rem; color: #e4e4e7; border-bottom: 1px solid #27272a; }
 .premium-table tr:hover { background: rgba(255,255,255,0.02); }
 .expro-mode-btn {
-  flex: 1; padding: 9px 12px; border: none; border-radius: 20px;
-  background: transparent; color: #ffffff; /* Blanco */
+  flex: 1; padding: 9px 12px; border: 1px solid transparent; border-radius: 20px;
+  background: transparent; color: var(--mode-color) !important; 
   font-size: 0.72rem; font-weight: 800;
   cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
   display: flex; align-items: center; justify-content: center; gap: 4px;
 }
-.expro-mode-btn.active { background: var(--mode-color); color: #fff; box-shadow: 0 0 12px var(--mode-color); }
+.expro-mode-btn.active { background: transparent; color: var(--mode-color) !important; border-color: var(--mode-color); box-shadow: 0 0 12px var(--mode-color), inset 0 0 8px rgba(255,255,255,0.1); }
 .expro-mode-btn:active { transform: scale(0.95); }
 .ganaderia-mode-switch { display: inline-flex; background: #18181b; padding: 4px; border-radius: 24px; border: 1px solid #27272a; width: 100%; max-width: 520px; box-sizing: border-box; }
 .ganaderia-mode-btn {
-  flex: 1; padding: 9px 12px; border: none; border-radius: 20px;
-  background: transparent; color: #ffffff; /* Blanco */
+  flex: 1; padding: 9px 12px; border: 1px solid transparent; border-radius: 20px;
+  background: transparent; color: var(--mode-color) !important; 
   font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
   text-transform: uppercase; letter-spacing: 0.3px;
   display: flex; align-items: center; justify-content: center; gap: 4px;
 }
-.ganaderia-mode-btn.active { background: var(--mode-color); color: #fff; box-shadow: 0 0 12px var(--mode-color); }
+.ganaderia-mode-btn.active { background: transparent; color: var(--mode-color) !important; border-color: var(--mode-color); box-shadow: 0 0 12px var(--mode-color), inset 0 0 8px rgba(255,255,255,0.1); }
 .ganaderia-mode-btn:active { transform: scale(0.95); }
 .comer-mode-switch { display: inline-flex; background: #18181b; padding: 4px; border-radius: 24px; border: 1px solid #27272a; width: 100%; max-width: 520px; box-sizing: border-box; }
 .comer-mode-btn {
-  flex: 1; padding: 9px 12px; border: none; border-radius: 20px;
-  background: transparent; color: #ffffff !important;
+  flex: 1; padding: 9px 12px; border: 1px solid transparent; border-radius: 20px;
+  background: transparent; color: var(--mode-color) !important;
   font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
   text-transform: uppercase; letter-spacing: 0.3px;
   display: flex; align-items: center; justify-content: center; gap: 4px;
 }
-.comer-mode-btn.active { background: var(--mode-color); color: #fff; box-shadow: 0 0 12px var(--mode-color); }
+.comer-mode-btn.active { background: transparent; color: var(--mode-color) !important; border-color: var(--mode-color); box-shadow: 0 0 12px var(--mode-color), inset 0 0 8px rgba(255,255,255,0.1); }
 .comer-mode-btn:active { transform: scale(0.95); }
 .ganaderia-kpis {
   display: flex;
@@ -2824,14 +2836,15 @@ label {
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 4px var(--neon-color, rgba(255,255,255,0.3)));
+    color: var(--neon-color) !important; stroke: var(--neon-color) !important; filter: drop-shadow(0 0 8px var(--neon-color, rgba(255,255,255,0.8)));
 }
 
 /* variantes de color neon */
-.neon-danger  { --neon-color: var(--c-danger);  --neon-glow: rgba(239,68,68,0.69);  --neon-inner: rgba(239,68,68,0.25); }
+.neon-danger  { --neon-color: var(--c-danger);  --neon-glow: rgba(255,68,68,0.69);  --neon-inner: rgba(255,68,68,0.25); }
 .neon-info    { --neon-color: var(--c-info);    --neon-glow: rgba(59,130,246,0.69); --neon-inner: rgba(59,130,246,0.25); }
 .neon-success { --neon-color: var(--c-success); --neon-glow: rgba(16,185,129,0.69); --neon-inner: rgba(16,185,129,0.25); }
-.neon-warning { --neon-color: var(--c-warning); --neon-glow: rgba(245,158,11,0.69);  --neon-inner: rgba(245,158,11,0.25); }
+.neon-orange { --neon-color: #f97316; --neon-glow: rgba(249,115,22,0.69); --neon-inner: rgba(249,115,22,0.25); }
+.neon-warning { --neon-color: var(--c-warning); --neon-glow: rgba(255,214,0,0.69);  --neon-inner: rgba(255,214,0,0.25); }
 .neon-accent  { --neon-color: #a855f7; --neon-glow: rgba(168,85,247,0.69); --neon-inner: rgba(168,85,247,0.25); }
 .neon-theme   { --neon-color: var(--theme-color); }
 

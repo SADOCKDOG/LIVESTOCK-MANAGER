@@ -74,7 +74,7 @@ const GastosView = {
       </div>
 
       <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid #ef4444; background: rgba(239, 68, 68, 0.015);">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(239, 68, 68, 0.015);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
         </div>
@@ -179,7 +179,7 @@ const GastosView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card report-section p-16 mb-14" style="border-top:3px solid ${color};">
+      <div class="card report-section p-16 mb-14" >
         <div class="flex items-center gap-12 mb-12">
           <span class="text-3xl">${icon}</span>
           <div>
@@ -189,7 +189,7 @@ const GastosView = {
         </div>
         ${kpis ? `
         <!-- KPIs Gastos Unificados en Filas -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style="border-top: 5px solid ${color}; background: rgba(255, 255, 255, 0.02);">
+        <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.dinero()} BALANCE DE GASTOS
           </div>

@@ -3093,7 +3093,7 @@ const InformesView = {
           </div>
         </div>
         <div style="width:100%;">${seccionesHtml}</div>
-        <div style="margin-top:30px; padding-top:12px; border-top:1px solid #ddd; text-align:center; font-size:0.65rem; color:#999; width:100%;">
+        <div style="margin-top:30px; padding-top:12px;  text-align:center; font-size:0.65rem; color:#999; width:100%;">
           Informe generado por Livestock Manager Premium — ${fecha}
         </div>
       `;
