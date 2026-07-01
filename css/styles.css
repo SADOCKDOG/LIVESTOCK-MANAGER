@@ -789,11 +789,13 @@ label {
 .more-sheet {
     width: 100%;
     max-width: 600px;
-    background: #0a0a0a;
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 24px 24px 0 0;
     padding: 8px 20px max(20px, var(--safe-bottom)) 20px;
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.8);
-    border-top: 1px solid #222;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.8), inset 0 2px 10px rgba(255,255,255,0.05);
+    border-top: 1px solid #333;
     animation: sheetSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -813,7 +815,8 @@ label {
 .more-sheet-title {
     font-size: 1rem;
     font-weight: 900;
-    color: var(--p-cork);
+    color: #FFFFFF;
+    text-shadow: 0 0 10px rgba(255,255,255,0.4);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 16px;
@@ -832,41 +835,42 @@ label {
     align-items: center;
     gap: 6px;
     padding: 16px 8px;
-    background: #18181b;
+    background: rgba(255,255,255,0.03);
     border-radius: 16px;
     text-decoration: none;
-    color: var(--text-s);
     font-size: 0.75rem;
     font-weight: 700;
-    border: 1px solid #222;
+    border: 1px solid transparent;
     transition: all 0.2s ease;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
 
 .more-sheet-item:active {
-    background: #222;
+    background: transparent;
     transform: scale(0.96);
-    border-color: var(--p-cork);
+    border-color: currentColor;
+    box-shadow: 0 0 12px currentColor, inset 0 0 12px currentColor;
 }
 
 .more-sheet-item svg {
     width: 28px;
     height: 28px;
-    color: var(--p-cork);
+    color: inherit;
+    filter: drop-shadow(0 0 6px currentColor);
 }
-.more-sheet-item[href="#/zonas"] svg { color: #10b981; }
-.more-sheet-item[href="#/leche"] svg { color: #3b82f6; }
-.more-sheet-item[href="#/comercializacion"] svg { color: #CCFF00; }
-.more-sheet-item[href="#/compradores"] svg { color: #d97706; }
-.more-sheet-item[href="#/proveedores"] svg { color: #8b5cf6; }
-.more-sheet-item[href="#/transportistas"] svg { color: #ec4899; }
-.more-sheet-item[href="#/gastos"] svg { color: #ef4444; }
-.more-sheet-item[href="#/informes"] svg { color: #eab308; }
-.more-sheet-item[href="#/cuaderno"] svg { color: #d97706; }
-.more-sheet-item[href="#/documentos"] svg { color: #10b981; }
-.more-sheet-item[href="#/manuales"] svg { color: #9333ea; }
-.more-sheet-item[href="#/ajustes"] svg { color: #94a3b8; }
+.more-sheet-item[href="#/zonas"] { color: #10b981; }
+.more-sheet-item[href="#/leche"] { color: #3b82f6; }
+.more-sheet-item[href="#/comercializacion"] { color: #CCFF00; }
+.more-sheet-item[href="#/compradores"] { color: #d97706; }
+.more-sheet-item[href="#/proveedores"] { color: #8b5cf6; }
+.more-sheet-item[href="#/transportistas"] { color: #ec4899; }
+.more-sheet-item[href="#/gastos"] { color: #ef4444; }
+.more-sheet-item[href="#/informes"] { color: #eab308; }
+.more-sheet-item[href="#/cuaderno"] { color: #d97706; }
+.more-sheet-item[href="#/documentos"] { color: #10b981; }
+.more-sheet-item[href="#/manuales"] { color: #9333ea; }
+.more-sheet-item[href="#/ajustes"] { color: #94a3b8; }
 
 /* ============================================
    SISTEMA DE CLASES UTILITARIAS v5.0
