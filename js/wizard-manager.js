@@ -76,7 +76,12 @@ const WizardManager = {
             }
 
             if (cancelBtn) {
-                cancelBtn.onclick = () => {
+                cancelBtn.onclick = async () => {
+                    // Con pasos avanzados hay datos introducidos: confirmar el descarte
+                    if (currentStepIndex > 0) {
+                        const ok = await Confirm.confirm('Cancelar asistente', 'Se perderán los datos introducidos. ¿Deseas salir?', true, 'Salir', 'Continuar aquí');
+                        if (!ok) return;
+                    }
                     if (onCancel) onCancel();
                     overlay.remove();
                 };

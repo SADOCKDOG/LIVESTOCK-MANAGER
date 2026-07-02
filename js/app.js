@@ -197,6 +197,7 @@ const App = {
     '/rebano', '/zona', '/animal', '/animales',
     '/albaran-leche', '/gasto', '/comprador',
     '/proveedor', '/contrato', '/trazabilidad',
+    '/venta-carne',
   ]),
 
   _setupHeaderBackButton() {
@@ -277,21 +278,40 @@ const App = {
     if (!AppPlugin) return;
 
     AppPlugin.addListener('backButton', () => {
-      // 0. Cerrar dropdown del header si está abierto
+      // 0. Modal/Confirm superior abierto → equivale a pulsar Cancelar
+      if (window.ModalManager && ModalManager._activeModals.length > 0) {
+        const top = ModalManager._activeModals[ModalManager._activeModals.length - 1];
+        const cancel = top.element && top.element.querySelector('#' + top.id + '-cancel');
+        if (cancel) { cancel.click(); } else { ModalManager.close(top.id); }
+        return;
+      }
+
+      // 1. Cerrar dropdown del header si está abierto
       const dropdown = document.getElementById('header-dropdown-menu');
       if (dropdown && dropdown.classList.contains('open')) {
         dropdown.classList.remove('open');
         return;
       }
 
-      // 1. Cerrar wizard/overlay si hay alguno abierto
-      const wizard = document.querySelector('.wizard-full-screen');
-      if (wizard) { wizard.remove(); return; }
+      // 2. Cerrar sheet "Más" de navegación si está abierto
+      const moreSheet = document.getElementById('nav-more-sheet');
+      if (moreSheet && moreSheet.classList.contains('open')) {
+        moreSheet.classList.remove('open');
+        return;
+      }
 
-      // 2. Obtener ruta actual del hash
+      // 3. Wizard/overlay abierto → pasar por Cancelar (confirmación de descarte + onCancel)
+      const wizard = document.querySelector('.wizard-full-screen');
+      if (wizard) {
+        const cancelBtn = wizard.querySelector('#wizard-btn-cancel');
+        if (cancelBtn) { cancelBtn.click(); } else { wizard.remove(); }
+        return;
+      }
+
+      // 4. Obtener ruta actual del hash
       const hash = window.location.hash.slice(1) || '/';
 
-      // 3. Si es el Dashboard principal → preguntar si desea salir
+      // 5. Si es el Dashboard principal → preguntar si desea salir
       if (hash === '/') {
         const doExit = () => { if (AppPlugin.exitApp) AppPlugin.exitApp(); };
         Confirm.confirm('Salir', '¿Deseas salir de la aplicación?', false)
@@ -299,7 +319,7 @@ const App = {
         return;
       }
 
-      // 4. Cualquier otra ruta → retroceder en el historial
+      // 6. Cualquier otra ruta → retroceder en el historial
       //    Si no hay historial, volver al Dashboard
       if (window.history.length > 1) {
         window.history.back();
