@@ -39,7 +39,7 @@ const GanaderiaView = {
     const especies = new Set(animalesModo.map(a => (a.especie || '').toLowerCase()).filter(Boolean));
 
     this._cache = { rebanos, animales, zonas, rebanosModo, animalesModo };
-    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: '#f97316' };
+    const meta = window.ModoContextoHelper ? ModoContextoHelper.getModeMeta(this._activeMode) : { icon: Icons.carne(), label: 'Cárnico', color: 'var(--c-danger)' };
 
     // Sincronizar color de cabecera con el modo activo
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
@@ -47,7 +47,7 @@ const GanaderiaView = {
     main.innerHTML = `
       <div class="mb-14">
         <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: #CCFF00; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
+          <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
         </div>
         <div class="grid grid-cols-3 gap-10">
           <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-orange">
@@ -70,9 +70,9 @@ const GanaderiaView = {
           <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> EXPLOTACIÓN
         </div>
         <div class="ganaderia-mode-switch" style="max-width: 100%;">
-          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
-          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
-          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#CCFF00; color: var(--mode-color);" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
+          <button class="ganaderia-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:var(--c-success); color: var(--mode-color);" onclick="GanaderiaView._changeMode('hibrido')">${Icons.rotacion()} Híbrido</button>
         </div>
       </div>
 
