@@ -35,7 +35,7 @@ const ManualesView = {
       descripcion: 'Todos los flujos de producción cárnica y láctea: pesajes, GMD, control lechero, analíticas, liquidaciones y MOFA.',
       icono: 'grafico',
       archivo: 'manual/registros-produccion.html',
-      color: '#9333ea',
+      color: 'var(--c-purple)',
     },
     {
       id: 'comercializacion',
@@ -67,7 +67,7 @@ const ManualesView = {
       descripcion: 'Control de costes analítico: categorías contables (alimentación, sanidad, electricidad, personal), imputación a rebaño/zona y rentabilidad.',
       icono: 'gastos',
       archivo: 'manual/manual-gastos.html',
-      color: '#f59e0b',
+      color: 'var(--c-warning)',
     },
     {
       id: 'compradores',
@@ -75,7 +75,7 @@ const ManualesView = {
       descripcion: 'Alta y gestión de compradores (cárnico, láctico, híbrido), contratos, historial de ventas y entregas de leche. Cómo aparece en Venta Masiva y Albarán de Leche.',
       icono: 'compradores',
       archivo: 'manual/manual-compradores.html',
-      color: '#ef4444',
+      color: 'var(--c-danger)',
     },
     {
       id: 'proveedores',
@@ -83,7 +83,7 @@ const ManualesView = {
       descripcion: 'Alta y gestión de proveedores, categorías de suministro, asociación a gastos analíticos e historial de gasto por proveedor.',
       icono: 'proveedores',
       archivo: 'manual/manual-proveedores.html',
-      color: '#10b981',
+      color: 'var(--c-success)',
     },
     {
       id: 'transportistas',
@@ -91,7 +91,7 @@ const ManualesView = {
       descripcion: 'Alta de transportistas, tipos de vehículo, certificado de bienestar animal, uso en DIMOE de Venta Masiva e historial de expediciones.',
       icono: 'transportistas',
       archivo: 'manual/manual-transportistas.html',
-      color: '#3b82f6',
+      color: 'var(--c-info)',
     },
     {
       id: 'animales-rebanos',
@@ -107,7 +107,7 @@ const ManualesView = {
       descripcion: 'Registro de contratos con compradores: tipos (carne/leche/mixto), vigencia, IVA, tabla de precios pactados y su integración en liquidaciones.',
       icono: 'contratos',
       archivo: 'manual/manual-contratos.html',
-      color: '#8b5cf6',
+      color: 'var(--c-purple)',
     },
     {
       id: 'sanitarios',
@@ -115,7 +115,7 @@ const ManualesView = {
       descripcion: 'Registro de tratamientos veterinarios, tipos de medicamento, tiempos de espera para carne y leche, alertas de restricción y catálogo sanitario.',
       icono: 'sanidad',
       archivo: 'manual/manual-sanitarios.html',
-      color: '#ef4444',
+      color: 'var(--c-danger)',
     },
     {
       id: 'reproduccion',
@@ -123,7 +123,7 @@ const ManualesView = {
       descripcion: 'Ciclo reproductivo completo (celo→IA→diagnóstico→parto), genealogía, trazabilidad madre-cría, historial por animal e indicadores de fertilidad.',
       icono: 'reproduccion',
       archivo: 'manual/manual-reproduccion.html',
-      color: '#ec4899',
+      color: 'var(--c-pink)',
     },
     {
       id: 'cuaderno-digital',
@@ -131,7 +131,7 @@ const ManualesView = {
       descripcion: 'Generación del Cuaderno Digital de Explotación Ganadera: censo, movimientos, libro de tratamientos sanitarios y exportación oficial.',
       icono: 'contratos',
       archivo: 'manual/manual-cuaderno-digital.html',
-      color: '#10b981',
+      color: 'var(--c-success)',
     },
     {
       id: 'trazabilidad',
@@ -139,7 +139,7 @@ const ManualesView = {
       descripcion: 'Línea de tiempo cronológica con la vida completa del animal: nacimiento, pesajes, tratamientos, reproducción y venta final.',
       icono: 'trazabilidad',
       archivo: 'manual/manual-trazabilidad.html',
-      color: '#9333ea',
+      color: 'var(--c-purple)',
     },
     {
       id: 'informes-analitica',
@@ -155,7 +155,7 @@ const ManualesView = {
       descripcion: 'Gestión y archivo oficial de documentos de movimiento de ganado, guías DIMOE y cadena alimentaria (ICA).',
       icono: 'documento',
       archivo: 'manual/manual-gestion-documental.html',
-      color: '#3b82f6',
+      color: 'var(--c-info)',
     },
   ],
 
