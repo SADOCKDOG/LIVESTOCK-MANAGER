@@ -242,21 +242,21 @@ const ExplotacionView = {
     main.innerHTML = `
       <div class="mb-14">
         <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: #10b981; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
+          <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
         </div>
         <div class="comer-mode-switch" style="display: flex; gap: 8px;">
           <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" 
-            style="--mode-color:#10b981; color: ${this._activeSubModule === 'explotacion' ? '#000' : '#10b981'}; flex: 1; padding: 10px;" 
+            style="--mode-color:var(--c-success); color: ${this._activeSubModule === 'explotacion' ? '#000' : 'var(--c-success)'}; flex: 1; padding: 10px;" 
             onclick="ExplotacionView._cambiarSubModulo('explotacion')">
             ${Icons.finca()} Explotación
           </button>
           <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" 
-            style="--mode-color:#f97316; color: ${this._activeSubModule === 'gastos' ? '#000' : '#f97316'}; flex: 1; padding: 10px;" 
+            style="--mode-color:var(--c-danger); color: ${this._activeSubModule === 'gastos' ? '#000' : 'var(--c-danger)'}; flex: 1; padding: 10px;" 
             onclick="ExplotacionView._cambiarSubModulo('gastos')">
             ${Icons.dinero()} Gastos
           </button>
           <button class="comer-mode-btn ${this._activeSubModule === 'almacen' ? 'active' : ''}" 
-            style="--mode-color:#3b82f6; color: ${this._activeSubModule === 'almacen' ? '#000' : '#3b82f6'}; flex: 1; padding: 10px;" 
+            style="--mode-color:var(--c-info); color: ${this._activeSubModule === 'almacen' ? '#000' : 'var(--c-info)'}; flex: 1; padding: 10px;" 
             onclick="ExplotacionView._cambiarSubModulo('almacen')">
             ${Icons.paquete()} Almacén
           </button>
@@ -269,7 +269,7 @@ const ExplotacionView = {
     const subContainer = document.getElementById('explotacion-submodule-content');
 
     if (this._activeSubModule === 'explotacion') {
-      const _headerColor = this._activeMode === 'leche' ? '#3b82f6' : (this._activeMode === 'hibrido' ? '#CCFF00' : '#f97316');
+      const _headerColor = this._activeMode === 'leche' ? 'var(--c-info)' : (this._activeMode === 'hibrido' ? 'var(--c-success)' : 'var(--c-danger)');
       subContainer.innerHTML = `
         <!-- Selector de Modo ExPro Superior -->
         <div class="mb-14">
@@ -277,9 +277,9 @@ const ExplotacionView = {
             <span style="color: ${_headerColor}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> EXPLOTACIÓN
           </div>
           <div class="expro-mode-switch">
-            <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
-            <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
-            <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:#CCFF00; color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
+            <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
+            <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
+            <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:var(--c-success); color: var(--mode-color);" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} Híbrido</button>
           </div>
         </div>
         <div id="expro-mode-content"></div>
@@ -315,7 +315,7 @@ if (window.enableScrollShadows) {
   // ==========================================
   _renderCarne(container) {
     const d = this._cachedData;
-    const themeColor = '#ef4444'; // Rojo
+    const themeColor = 'var(--c-danger)'; // Rojo
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
@@ -381,7 +381,7 @@ if (window.enableScrollShadows) {
           <div class="grid gap-8 mh-350">
             ${d.pesajes.length > 0
               ? d.pesajes.slice(0, 15).map(e => `
-                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="border-left:4px solid ${e.tipo_entidad === 'animal' ? '#ef4444' : '#f59e0b'}; padding:10px; margin:0;">
+                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="border-left:4px solid ${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'}; padding:10px; margin:0;">
                     <div class="flex justify-between items-center">
                       <div class="text-xs">
                         <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Animal/Lote'}</div>
@@ -407,7 +407,7 @@ if (window.enableScrollShadows) {
   // ==========================================
   _renderLeche(container) {
     const d = this._cachedData;
-    const themeColor = '#3b82f6'; // Azul
+    const themeColor = 'var(--c-info)'; // Azul
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
@@ -500,7 +500,7 @@ if (window.enableScrollShadows) {
           <div class="grid gap-6">
             ${d.ordeños.length > 0
               ? d.ordeños.slice(0, 10).map(o => `
-                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? '#3b82f6' : '#8b5cf6'}; padding:10px; margin:0; width:100%;">
+                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'}; padding:10px; margin:0; width:100%;">
                     <div class="flex justify-between items-center gap-6" style="width:100%;">
                       <div class="min-w-0 flex-1">
                         <div class="font-bold text-white uppercase text-sm overflow-hidden text-ellipsis" style="white-space:nowrap;">${o.snap_identificacion || 'Control Lote/Animal'}</div>
@@ -526,7 +526,7 @@ if (window.enableScrollShadows) {
   // ==========================================
   _renderHibrido(container) {
     const d = this._cachedData;
-    const themeColor = '#10b981'; // Verde
+    const themeColor = 'var(--c-success)'; // Verde
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
@@ -625,7 +625,7 @@ if (window.enableScrollShadows) {
             ${d.proConsolidada.length > 0
               ? d.proConsolidada.slice(0, 12).map(e => {
                   const esPeso = e.unidad === 'kg';
-                  const color = esPeso ? '#ef4444' : '#3b82f6';
+                  const color = esPeso ? 'var(--c-danger)' : 'var(--c-info)';
                   return `
                     <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${esPeso ? 'carne' : 'leche'}')" style="border-left:4px solid ${color}; padding:10px; margin:0;">
                       <div class="flex justify-between items-center">
@@ -654,7 +654,7 @@ if (window.enableScrollShadows) {
   // ==========================================
   async _renderSilosHtml(fincaId, siloEventos, modo) {
     let silos = [];
-    let borderStyleColor = '#ef4444'; // Rojo por defecto
+    let borderStyleColor = 'var(--c-danger)'; // Rojo por defecto
 
     // Intentar cargar silos configurados
     try {
@@ -674,7 +674,7 @@ if (window.enableScrollShadows) {
           { id: 1, nombre: 'Silo A: Pienso Concentrado Ordeño', capacidad: 10000, inicial: 6000, tipo: 'leche' },
           { id: 2, nombre: 'Silo B: Mezcla Unifeed Lactancia', capacidad: 5000, inicial: 3000, tipo: 'leche' }
         ];
-        borderStyleColor = '#3b82f6';
+        borderStyleColor = 'var(--c-info)';
       } else if (modo === 'hibrido') {
         silos = [
           { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000, tipo: 'hibrido' },
@@ -682,14 +682,14 @@ if (window.enableScrollShadows) {
           { id: 3, nombre: 'Silo C: Concentrado Ordeño', capacidad: 10000, inicial: 5000, tipo: 'hibrido' },
           { id: 4, nombre: 'Silo D: Unifeed Lactancia', capacidad: 6000, inicial: 3000, tipo: 'hibrido' }
         ];
-        borderStyleColor = '#10b981';
+        borderStyleColor = 'var(--c-success)';
       } else {
         // carne
         silos = [
           { id: 1, nombre: 'Silo A: Concentrado Terneros', capacidad: 10000, inicial: 6000, tipo: 'carne' },
           { id: 2, nombre: 'Silo B: Mezcla Forrajera', capacidad: 5000, inicial: 3000, tipo: 'carne' }
         ];
-        borderStyleColor = '#ef4444';
+        borderStyleColor = 'var(--c-danger)';
       }
       
       // Guardar defaults en DB para la próxima vez
@@ -715,8 +715,8 @@ if (window.enableScrollShadows) {
       const actual = Math.max(0, s.inicial + cargas - consumos);
       const pct = Math.min(100, Math.round((actual / s.capacidad) * 100));
       let colorBar = borderStyleColor;
-      if (pct < 20) colorBar = '#ef4444'; // Rojo crítico
-      else if (pct < 50) colorBar = '#f59e0b'; // Naranja/Aviso
+      if (pct < 20) colorBar = 'var(--c-danger)'; // Rojo crítico
+      else if (pct < 50) colorBar = 'var(--c-warning)'; // Naranja/Aviso
 
       html += `
         <div class="py-12 ${index < silos.length - 1 ? 'border-bottom-222' : ''} flex flex-col gap-6">
@@ -752,7 +752,7 @@ if (window.enableScrollShadows) {
 
   _renderCostesCumplimientoHtml(modo) {
     const d = this._cachedData || {};
-    const color = modo === 'leche' ? '#3b82f6' : (modo === 'hibrido' ? '#10b981' : '#ef4444');
+    const color = modo === 'leche' ? 'var(--c-info)' : (modo === 'hibrido' ? 'var(--c-success)' : 'var(--c-danger)');
     const fitoPendientes = (d.gastosFito || []).filter(g => g.control_normativo?.aptoComercializacion === false).length;
     const fitoConControl = (d.gastosFito || []).filter(g => g.control_normativo?.registroProducto && g.control_normativo?.dosisAplicada).length;
 
@@ -798,14 +798,14 @@ if (window.enableScrollShadows) {
 
         <div class="mt-15 text-[0.65rem] text-aaa uppercase font-900 text-center leading-relaxed px-20 opacity-80">
           CONTROL COMPLETO: <strong class="text-white">${fitoConControl}</strong><br>
-          NO APTOS COMERCIALIZACIÓN: <strong style="color:${fitoPendientes > 0 ? '#ef4444' : '#10b981'}">${fitoPendientes}</strong>
+          NO APTOS COMERCIALIZACIÓN: <strong style="color:${fitoPendientes > 0 ? 'var(--c-danger)' : 'var(--c-success)'}">${fitoPendientes}</strong>
         </div>
       </div>
     `;
   },
 
   _renderPipelineComercialHtml(modo) {
-    const color = modo === 'leche' ? '#3b82f6' : (modo === 'hibrido' ? '#10b981' : '#ef4444');
+    const color = modo === 'leche' ? 'var(--c-info)' : (modo === 'hibrido' ? 'var(--c-success)' : 'var(--c-danger)');
     const tab = modo === 'leche' ? 'leche' : 'carne';
     const labelBoton = modo === 'hibrido'
       ? 'Ir a Comercialización Leche, carne e híbrido'
@@ -863,7 +863,7 @@ if (window.enableScrollShadows) {
       return;
     }
 
-    const color = modo === 'leche' ? '#3b82f6' : (modo === 'hibrido' ? '#10b981' : '#ef4444');
+    const color = modo === 'leche' ? 'var(--c-info)' : (modo === 'hibrido' ? 'var(--c-success)' : 'var(--c-danger)');
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
     overlay.style.justifyContent = "center";
@@ -1053,7 +1053,7 @@ if (window.enableScrollShadows) {
       const evento = await window.db.get('registro_eventos', id);
       if (!evento) return;
 
-      const themeColor = tipo === 'leche' ? '#3b82f6' : '#ef4444';
+      const themeColor = tipo === 'leche' ? 'var(--c-info)' : 'var(--c-danger)';
       const labelValor = tipo === 'leche' ? 'Litros (L)' : 'Valor (kg)';
 
       const overlay = document.createElement("div");
@@ -1192,7 +1192,7 @@ if (window.enableScrollShadows) {
       { key: 'Sanidad',      icon: Icons.sanidad(),   label: 'Sanidad',        color: 'var(--c-danger)' },
       { key: 'Fitosanitarios', icon: Icons.sanidad(), label: 'Fitosanitarios', color: 'var(--c-success)' },
       { key: 'Electricidad', icon: Icons.rayo(),      label: 'Electricidad',   color: 'var(--c-info)' },
-      { key: 'Personal',     icon: Icons.compradores(), label: 'Personal',      color: '#f97316' },
+      { key: 'Personal',     icon: Icons.compradores(), label: 'Personal',      color: 'var(--c-orange)' },
       { key: 'Amortizacion', icon: Icons.transportistas(), label: 'Amortización', color: 'var(--c-accent)' },
     ];
     // Calcular total por categoría o concepto
@@ -1212,7 +1212,7 @@ if (window.enableScrollShadows) {
     const fmt = n => Number(n).toLocaleString();
 
     let html = `
-      <div style="--theme-color: #ef4444; --neon-glow: #ef4444B0; --neon-inner: #ef444440">
+      <div style="--theme-color: var(--c-danger); --neon-glow: var(--c-danger)B0; --neon-inner: var(--c-danger)40">
         <!-- KPIs GASTOS -->
         <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
@@ -1238,7 +1238,7 @@ if (window.enableScrollShadows) {
 
         <!-- ACCIONES RÁPIDAS DE GASTOS -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme" style="--theme-color: #ef4444">${Icons.dinero()} GESTIÓN DE COSTOS</div>
+          <div class="section-header-theme" style="--theme-color: var(--c-danger)">${Icons.dinero()} GESTIÓN DE COSTOS</div>
           <div class="flex justify-center mt-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
               ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">REGISTRAR GASTO</span>
@@ -1248,12 +1248,12 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- CONTROL NORMATIVO FITOSANITARIOS -->
-        <div class="card p-12 mb-16 border-222" style="border-left:4px solid #10b981;">
+        <div class="card p-12 mb-16 border-222" style="border-left:4px solid var(--c-success);">
           <div class="text-xs text-white font-black uppercase flex items-center gap-6 mb-8">${Icons.sanidad()} CUMPLIMIENTO REGISTRO FITOSANITARIO</div>
           <div class="text-[0.65rem] text-aaa uppercase font-900 leading-relaxed">
             Aplicaciones con control completo: <strong class="text-white">${fitoConControl}</strong><br>
             Lotes no aptos para comercialización por periodo de supresión: 
-            <strong style="color:${fitoPendientes > 0 ? '#ef4444' : '#10b981'}">${fitoPendientes}</strong>
+            <strong style="color:${fitoPendientes > 0 ? 'var(--c-danger)' : 'var(--c-success)'}">${fitoPendientes}</strong>
           </div>
         </div>
 
@@ -1265,7 +1265,7 @@ if (window.enableScrollShadows) {
           <div class="grid gap-8 mh-350" style="overflow-y:auto; max-height:400px;">
             ${listaGastos.length > 0
               ? listaGastos.map(g => {
-                  const catMap = { 'Alimentacion': '#f59e0b', 'Alimentación': '#f59e0b', 'Sanidad': '#ef4444', 'Fitosanitarios': '#10b981', 'Electricidad': '#3b82f6', 'Personal': '#f97316', 'Amortizacion': '#a855f7', 'Amortización': '#a855f7' };
+                  const catMap = { 'Alimentacion': 'var(--c-warning)', 'Alimentación': 'var(--c-warning)', 'Sanidad': 'var(--c-danger)', 'Fitosanitarios': 'var(--c-success)', 'Electricidad': 'var(--c-info)', 'Personal': 'var(--c-orange)', 'Amortizacion': 'var(--c-purple)', 'Amortización': 'var(--c-purple)' };
                   const catColor = catMap[g.categoria] || '#888';
                   return `
                     <div class="card card-animal" style="border-left:4px solid ${catColor}; padding:12px; margin:0;">
@@ -1304,13 +1304,13 @@ if (window.enableScrollShadows) {
     const silosHtml = await this._renderSilosHtml(d.fincaId, d.siloEventos, this._activeMode);
 
     let html = `
-      <div style="--theme-color: #3b82f6; --neon-glow: #3b82f6B0; --neon-inner: #3b82f640">
+      <div style="--theme-color: var(--c-info); --neon-glow: var(--c-info)B0; --neon-inner: var(--c-info)40">
         <!-- Niveles de llenado de silos -->
         ${silosHtml}
 
         <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
         <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme" style="--theme-color: #3b82f6">${Icons.paquete()} GESTIÓN DE STOCK</div>
+          <div class="section-header-theme" style="--theme-color: var(--c-info)">${Icons.paquete()} GESTIÓN DE STOCK</div>
           <div class="flex justify-center mt-10">
             <button class="widget-link-btn widget-link-btn--neon neon-info" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${this._activeMode}')">
               ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">CARGA / CONSUMO</span>
@@ -1328,7 +1328,7 @@ if (window.enableScrollShadows) {
             ${movimientosAlmacen.length > 0
               ? movimientosAlmacen.map(ev => {
                   const esCompra = ev.rol_contable === 'COMPRA';
-                  const badgeColor = esCompra ? '#10b981' : '#ef4444';
+                  const badgeColor = esCompra ? 'var(--c-success)' : 'var(--c-danger)';
                   const labelMov = esCompra ? 'CARGA' : 'CONSUMO';
                   return `
                     <div class="card card-animal" style="border-left:4px solid ${badgeColor}; padding:12px; margin:0;">

@@ -7,9 +7,9 @@ const ModoContextoHelper = {
 
   getModeMeta(mode) {
     const map = {
-      carne: { icon: Icons.carne(), label: 'Cárnico', color: '#ef4444' },
-      leche: { icon: Icons.leche(), label: 'Lácteo', color: '#3b82f6' },
-      hibrido: { icon: Icons.rotacion(), label: 'Híbrido', color: '#10b981' }
+      carne: { icon: Icons.carne(), label: 'Cárnico', color: 'var(--c-danger)' },
+      leche: { icon: Icons.leche(), label: 'Lácteo', color: 'var(--c-info)' },
+      hibrido: { icon: Icons.rotacion(), label: 'Híbrido', color: 'var(--c-success)' }
     };
     return map[mode] || map.leche;
   },
@@ -71,10 +71,10 @@ const ModoContextoHelper = {
   getEspecieColor(especie) {
     if (!especie) return '#6b7280'; // Gray
     const e = especie.toLowerCase();
-    if (e.includes('vaca') || e.includes('bovin')) return '#ef4444'; // Red
-    if (e.includes('oveja') || e.includes('ovin')) return '#3b82f6'; // Blue
+    if (e.includes('vaca') || e.includes('bovin')) return 'var(--c-danger)'; // Red
+    if (e.includes('oveja') || e.includes('ovin')) return 'var(--c-info)'; // Blue
     if (e.includes('cabra') || e.includes('caprin')) return '#a855f7'; // Purple
-    if (e.includes('cerdo') || e.includes('porcin')) return '#10b981'; // Green
+    if (e.includes('cerdo') || e.includes('porcin')) return 'var(--c-success)'; // Green
     if (e.includes('equin') || e.includes('caball')) return '#f59e0b'; // Orange
     if (e.includes('avicol') || e.includes('ave')) return '#fbbf24'; // Amber
     return '#6b7280'; // Default

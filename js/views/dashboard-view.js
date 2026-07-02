@@ -113,7 +113,7 @@ const DashboardView = {
       if (tieneLeche) return 'leche';
       return 'carne';
     })();
-    const modoColor = modoAuto === 'carne' ? '#ef4444' : modoAuto === 'leche' ? '#3b82f6' : '#10b981';
+    const modoColor = modoAuto === 'carne' ? 'var(--c-danger)' : modoAuto === 'leche' ? 'var(--c-info)' : 'var(--c-success)';
     const modoLabel = modoAuto === 'hibrido' ? 'Híbrido' : modoAuto === 'leche' ? 'Leche' : 'Carne';
     const modoIcon = modoAuto === 'hibrido' ? Icons.rotacion() : modoAuto === 'leche' ? Icons.leche() : Icons.carne();
     const isFreeDashboard = window.PremiumManager && window.PremiumManager.isFree();
@@ -121,25 +121,25 @@ const DashboardView = {
     return `
       ${isFreeDashboard ? `
       <div class="mb-14 p-14" style="background:linear-gradient(135deg,rgba(217,119,6,0.08),rgba(180,83,9,0.04));border:1px solid rgba(217,119,6,0.2);border-radius:14px;display:flex;align-items:center;gap:12px;">
-        <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;">
+        <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--c-warning),var(--c-warning));display:flex;align-items:center;justify-content:center;">
           ${Icons.premium()}
         </div>
         <div class="flex-1" style="line-height:1.4;">
           <div class="text-white text-xs font-900 uppercase tracking-wider">Versi&oacute;n Gratuita</div>
           <div class="text-gray text-[0.6rem] mt-2">Actualiza a Premium para desbloquear todas las funciones</div>
         </div>
-        <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
+        <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,var(--c-warning),var(--c-warning));border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
       </div>
       ` : ''}
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
       <!-- Resumen General -->
       <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-        <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
-        <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: #94A3B8; text-shadow: none;">cab.</span></div>
+        <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
+        <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: var(--text-s); text-shadow: none;">cab.</span></div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
-          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid #FFD700; color: #FFD700; background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
-          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">ACTIVOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid #CCFF00; color: #CCFF00; background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalActivos || activos}</div></div>
-          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">VENDIDOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid #FF4444; color: #FF4444; background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalVendidos}</div></div>
+          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
+          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">ACTIVOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalActivos || activos}</div></div>
+          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">VENDIDOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-danger); color: var(--c-danger); background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalVendidos}</div></div>
         </div>
       </div> </div>
 
@@ -155,12 +155,12 @@ const DashboardView = {
       <!-- Balance Económico -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> BALANCE ECONÓMICO</h3>
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> BALANCE ECONÓMICO</h3>
           <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">INGRESOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid #CCFF00; color: #CCFF00; background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.ingresos || 0).toLocaleString()}€</div></div>
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">GASTOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid #FF4444; color: #FF4444; background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">RENT.</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid ${parseFloat(pctRent) > 0 ? '#CCFF00' : '#FF4444'}; color: ${parseFloat(pctRent) > 0 ? '#CCFF00' : '#FF4444'}; background: ${parseFloat(pctRent) > 0 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 68, 68, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctRent}%</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">INGRESOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.ingresos || 0).toLocaleString()}€</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">GASTOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid var(--c-danger); color: var(--c-danger); background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">RENT.</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid ${parseFloat(pctRent) > 0 ? 'var(--c-success)' : 'var(--c-danger)'}; color: ${parseFloat(pctRent) > 0 ? 'var(--c-success)' : 'var(--c-danger)'}; background: ${parseFloat(pctRent) > 0 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 68, 68, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctRent}%</div></div>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@ const DashboardView = {
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
           ${alertaEpoca.sugerencias?.length > 0 ? `
           <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
             ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
@@ -184,7 +184,7 @@ const DashboardView = {
       <!-- Accesos Rápidos -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ACCESOS RÁPIDOS</h3>
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ACCESOS RÁPIDOS</h3>
           <div class="grid grid-cols-2 gap-8">
             <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px;">
               ${Icons.animales()}
@@ -212,24 +212,24 @@ const DashboardView = {
     if (!alertas.length) return '';
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #FF4444; background: rgba(255,255,255,0.02);\">
-          <h3 style=\"color: #FF4444; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-left: 4px solid var(--c-danger); border-top: none !important; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: var(--c-danger); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
-              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                   <div>
                     <div style="color: #FFF; font-weight: 700; font-size: 0.9rem; text-transform: uppercase;">${a.medicamento}</div>
-                    <div style="color: #94A3B8; font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
+                    <div style="color: var(--text-s); font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
                   </div>
                   <div style="text-align: right;">
-                    <div style="color: #ef4444; font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
-                    <div style="color: #64748B; font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Supresión</div>
+                    <div style="color: var(--c-danger); font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
+                    <div style="color: var(--text-s); font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Supresión</div>
                   </div>
                 </div>
               </div>
             `).join('')}
-            ${alertas.length > 3 ? `<div style="text-align: center; color: #94A3B8; font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más activas</div>` : ''}
+            ${alertas.length > 3 ? `<div style="text-align: center; color: var(--text-s); font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más activas</div>` : ''}
           </div>
         </div>
       </div>`;
@@ -239,21 +239,21 @@ const DashboardView = {
     if (!alertas.length) return '';
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #FF9800; background: rgba(255,255,255,0.02);\">
-          <h3 style=\"color: #FF9800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: var(--c-orange); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
-              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+              <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="color: #FFF; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">${a.crotal}</div>
-                    <div style="color: #94A3B8; font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${a.mensaje}</div>
+                    <div style="color: var(--text-s); font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${a.mensaje}</div>
                   </div>
-                  <div style="color: ${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
+                  <div style="color: ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
                 </div>
               </div>
             `).join('')}
-            ${alertas.length > 3 ? `<div style="text-align: center; color: #94A3B8; font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más</div>` : ''}
+            ${alertas.length > 3 ? `<div style="text-align: center; color: var(--text-s); font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más</div>` : ''}
           </div>
         </div>
       </div>`;
@@ -263,8 +263,8 @@ const DashboardView = {
     if (!alertas.length) return '';
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #a855f7; background: rgba(255,255,255,0.02);\">
-          <h3 style=\"color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+        <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: var(--c-purple); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 4).map(a => {
               let iconoSVG = Icons.info();
@@ -273,26 +273,26 @@ const DashboardView = {
               else if (a.seccion === 'pac') iconoSVG = Icons.pac();
               else if (a.seccion === 'adsg') iconoSVG = Icons.veterinario();
               
-              const bColor = a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#10b981';
+              const bColor = a.urgencia === 'rojo' ? 'var(--c-danger)' : a.urgencia === 'amarillo' ? 'var(--c-warning)' : 'var(--c-success)';
 
               return `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${bColor};">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                   <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #a855f7;">${iconoSVG}</span>
+                    <span style="color: var(--c-purple);">${iconoSVG}</span>
                     <div>
                       <div style="color: #FFF; font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">${a.mensaje}</div>
-                      ${a.accion ? `<div style="color: #c084fc; font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">${Icons.info()} ${a.accion}</div>` : ''}
+                      ${a.accion ? `<div style="color: var(--c-purple); font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">${Icons.info()} ${a.accion}</div>` : ''}
                     </div>
                   </div>
                   ${a.diasRestantes != null ? `<div style="text-align: right;">
-                    <div style="color: #ef4444; font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
+                    <div style="color: var(--c-danger); font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
                     <div style="color: #64748B; font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Restantes</div>
-                  </div>` : `<div style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
+                  </div>` : `<div style="color:${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
                 </div>
               </div>`;
             }).join('')}
-            ${alertas.length > 4 ? `<div style="text-align: center; color: #94A3B8; font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 4} alertas más</div>` : ''}
+            ${alertas.length > 4 ? `<div style="text-align: center; color: var(--text-s); font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 4} alertas más</div>` : ''}
           </div>
         </div>
       </div>`;
@@ -334,21 +334,21 @@ const DashboardView = {
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">MOFA</div>
-              <div style="font-weight: 800; border: 1px solid ${mofaRatio >= 20 ? '#CCFF00' : '#FFD700'}; color: ${mofaRatio >= 20 ? '#CCFF00' : '#FFD700'}; background: ${mofaRatio >= 20 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${Math.round(mofaTotal / meses).toLocaleString()}€</div>
+              <div style="font-weight: 800; border: 1px solid ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; color: ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; background: ${mofaRatio >= 20 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${Math.round(mofaTotal / meses).toLocaleString()}€</div>
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${mofaRatio.toFixed(1)}%</div>
             </div>
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PRECIO</div>
-              <div style="font-weight: 800; border: 1px solid #4FACFE; color: #4FACFE; background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toFixed(3)}</div>
+              <div style="font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toFixed(3)}</div>
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">€/L</div>
             </div>
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">EXT. SECO</div>
-              <div style="font-weight: 800; border: 1px solid #c084fc; color: #c084fc; background: rgba(192, 132, 252, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${esMedia.toFixed(2)}%</div>
+              <div style="font-weight: 800; border: 1px solid var(--c-purple); color: var(--c-purple); background: rgba(192, 132, 252, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${esMedia.toFixed(2)}%</div>
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${conLab.length} anal.</div>
             </div>
           </div>
@@ -439,37 +439,37 @@ const DashboardView = {
     if (!kpis || (!kpis.litrosPorOveja && !kpis.eficienciaPienso && !kpis.pctBajas)) {
       return `
         <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-          <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #a855f7; background: rgba(255,255,255,0.02);\">
-          <h3 style=\"color: #a855f7; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> KPIs Diarios</h3>
-            <div style="color: #94A3B8; font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
+          <div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);\">
+          <h3 style=\"color: var(--c-purple); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> KPIs Diarios</h3>
+            <div style="color: var(--text-s); font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
           </div>
         </div>`;
     }
 
     const { litrosPorOveja, eficienciaPienso, pctBajas, totalHembras, litros7d, tratamientosMamitis } = kpis;
 
-    const kpiColorHex = litrosPorOveja != null ? (litrosPorOveja >= 1.0 ? '#CCFF00' : litrosPorOveja >= 0.5 ? '#FFD700' : '#FF4444') : '#94A3B8';
-    const piensoColorHex = eficienciaPienso != null ? (eficienciaPienso <= 600 ? '#CCFF00' : eficienciaPienso <= 900 ? '#FFD700' : '#FF4444') : '#94A3B8';
-    const bajasColorHex = pctBajas != null ? (pctBajas <= 3 ? '#CCFF00' : pctBajas <= 8 ? '#FFD700' : '#FF4444') : '#94A3B8';
+    const kpiColorHex = litrosPorOveja != null ? (litrosPorOveja >= 1.0 ? 'var(--c-success)' : litrosPorOveja >= 0.5 ? 'var(--c-warning)' : 'var(--c-danger)') : 'var(--text-s)';
+    const piensoColorHex = eficienciaPienso != null ? (eficienciaPienso <= 600 ? 'var(--c-success)' : eficienciaPienso <= 900 ? 'var(--c-warning)' : 'var(--c-danger)') : 'var(--text-s)';
+    const bajasColorHex = pctBajas != null ? (pctBajas <= 3 ? 'var(--c-success)' : pctBajas <= 8 ? 'var(--c-warning)' : 'var(--c-danger)') : 'var(--text-s)';
 
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: #94A3B8; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, #CCFF00); margin-right: 4px;\">|</span> KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">L/DÍA</div>
-              <div style="font-weight: 800; border: 1px solid ${kpiColorHex}; color: ${kpiColorHex}; background: ${App._hexToRgba(kpiColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}</div>
+              <div style="font-weight: 800; border: 1px solid ${kpiColorHex}; color: ${kpiColorHex}; background: color-mix(in srgb, ${kpiColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}</div>
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${totalHembras} ♀</div>
             </div>
               <div>
                 <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PIENSO (g/L)</div>
-                <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: ${App._hexToRgba(piensoColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}</div>
+                <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: color-mix(in srgb, ${piensoColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}</div>
                 <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Eficiencia</div>
               </div>
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">BAJAS</div>
-              <div style="font-weight: 800; border: 1px solid ${bajasColorHex}; color: ${bajasColorHex}; background: ${App._hexToRgba(bajasColorHex, 0.1)}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctBajas != null ? pctBajas + '%' : '—'}</div>
+              <div style="font-weight: 800; border: 1px solid ${bajasColorHex}; color: ${bajasColorHex}; background: color-mix(in srgb, ${bajasColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctBajas != null ? pctBajas + '%' : '—'}</div>
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Mamitis</div>
             </div>
           </div>
