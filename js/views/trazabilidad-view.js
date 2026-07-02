@@ -449,12 +449,12 @@ const TrazabilidadView = {
 
   _renderTimelineItem(item) {
     const colors = {
-      nacimiento: { bg: 'rgba(16,185,129,0.1)', border: '#10b981', dot: '#10b981' },
-      sanitario: { bg: 'rgba(59,130,246,0.1)', border: '#3b82f6', dot: '#3b82f6' },
+      nacimiento: { bg: 'rgba(204,255,0,0.1)', border: 'var(--c-success)', dot: 'var(--c-success)' },
+      sanitario: { bg: 'rgba(59,130,246,0.1)', border: 'var(--c-info)', dot: 'var(--c-info)' },
       reproduccion: { bg: 'rgba(167,139,250,0.1)', border: '#a78bfa', dot: '#a78bfa' },
-      pesaje: { bg: 'rgba(251,191,36,0.1)', border: '#f59e0b', dot: '#f59e0b' },
-      evento: { bg: 'rgba(236,72,153,0.1)', border: '#ec4899', dot: '#ec4899' },
-      venta: { bg: 'rgba(239,68,68,0.1)', border: '#ef4444', dot: '#ef4444' },
+      pesaje: { bg: 'rgba(255,214,0,0.1)', border: 'var(--c-warning)', dot: 'var(--c-warning)' },
+      evento: { bg: 'rgba(236,72,153,0.1)', border: 'var(--c-pink)', dot: 'var(--c-pink)' },
+      venta: { bg: 'rgba(255,68,68,0.1)', border: 'var(--c-danger)', dot: 'var(--c-danger)' },
     };
     const c = colors[item.tipo] || { bg: '#1a1a1a', border: '#555', dot: '#555' };
 

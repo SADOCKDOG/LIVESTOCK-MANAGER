@@ -190,7 +190,7 @@ const DocumentosView = {
       return `<div class="empty-state"><div class="empty-state-icon">${Icons.documento()}</div><p class="empty-state-text">No hay documentos ${this._currentTab !== 'todos' ? 'de este tipo' : ''}.</p></div>`;
     }
 
-    const colors = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#d97706' };
+    const colors = { dimoe: 'var(--c-success)', factura: 'var(--c-info)', certificado: 'var(--c-warning)', dib: 'var(--c-purple)', crotales: 'var(--c-orange)' };
     const labels = { dimoe: 'DIMOE (Guía)', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido Crotales' };
 
     return `<div class="grid gap-10">
@@ -220,7 +220,7 @@ const DocumentosView = {
                 <div class="font-800 text-sm" style="color:${color}; display:flex; align-items:center; gap:6px;">
                   ${doc.tipo === 'crotales' ? Icons.animales() : Icons.documento()}
                   ${label} 
-                  ${esBorrador ? `<span class="badge badge-warning ml-6 uppercase font-900" style="background:#f59e0b; color:black; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Borrador</span>` : `<span class="badge badge-success ml-6 uppercase font-900" style="background:#10b981; color:white; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Presentado</span>`}
+                  ${esBorrador ? `<span class="badge badge-warning ml-6 uppercase font-900" style="background:var(--c-warning); color:black; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Borrador</span>` : `<span class="badge badge-success ml-6 uppercase font-900" style="background:var(--c-success); color:white; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Presentado</span>`}
                 </div>
                 <div class="font-900 text-white mt-4">${doc.numero || 'S/N'}</div>
               </div>
@@ -232,7 +232,7 @@ const DocumentosView = {
             ${acuseHtml}
             <div class="mt-8 flex gap-6 flex-wrap">
               ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:#f59e0b; border-color:#f59e0b;" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">✏️ Editar Borrador</button>
+                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">✏️ Editar Borrador</button>
               ` : `
                 <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">🖨 Imprimir PDF</button>
               `}
@@ -267,15 +267,15 @@ const DocumentosView = {
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 text-center">SELECCIONA TIPO DE DOCUMENTO</div>
           <div class="grid grid-cols-2 gap-8">
             ${[
-              { id: 'dimoe', label: 'DIMOE (Guías)', icon: Icons.exportar(), color: '#10b981' },
-              { id: 'factura', label: 'Facturas', icon: Icons.libroVentas(), color: '#3b82f6' },
-              { id: 'certificado', label: 'Certificados', icon: Icons.contratos(), color: '#f59e0b' },
-              { id: 'dib', label: 'DIB / Identificación', icon: Icons.informeRega(), color: '#8b5cf6' },
-              { id: 'crotales', label: 'Pedidos Crotales', icon: Icons.animales(), color: '#d97706' },
-              { id: 'guias', label: 'Guías Movimiento', icon: Icons.exportar(), color: '#10b981' },
-              { id: 'libro', label: 'Libro Registro', icon: Icons.libroVentas(), color: '#3b82f6' },
-              { id: 'contratos', label: 'Contratos', icon: Icons.contratos(), color: '#8b5cf6' },
-              { id: 'cierres', label: 'Cierres / Borradores', icon: Icons.documento(), color: '#f59e0b' },
+              { id: 'dimoe', label: 'DIMOE (Guías)', icon: Icons.exportar(), color: 'var(--c-success)' },
+              { id: 'factura', label: 'Facturas', icon: Icons.libroVentas(), color: 'var(--c-info)' },
+              { id: 'certificado', label: 'Certificados', icon: Icons.contratos(), color: 'var(--c-warning)' },
+              { id: 'dib', label: 'DIB / Identificación', icon: Icons.informeRega(), color: 'var(--c-purple)' },
+              { id: 'crotales', label: 'Pedidos Crotales', icon: Icons.animales(), color: 'var(--c-orange)' },
+              { id: 'guias', label: 'Guías Movimiento', icon: Icons.exportar(), color: 'var(--c-success)' },
+              { id: 'libro', label: 'Libro Registro', icon: Icons.libroVentas(), color: 'var(--c-info)' },
+              { id: 'contratos', label: 'Contratos', icon: Icons.contratos(), color: 'var(--c-purple)' },
+              { id: 'cierres', label: 'Cierres / Borradores', icon: Icons.documento(), color: 'var(--c-warning)' },
               { id: 'todos', label: 'Todos los documentos', icon: Icons.documento(), color: '#888' },
             ].map(t => `
               <button class="widget-link-btn widget-link-btn--neon" style="--neon-color:${t.color};--neon-glow:${t.color}B0;--neon-inner:${t.color}40;"
@@ -360,7 +360,7 @@ const DocumentosView = {
       const doc = (this._cachedDocs || []).find(d => d.id === id && d.tipo === tipo);
       if (!doc) { App.toastError("Documento no encontrado"); return; }
 
-      const color = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#d97706' }[tipo] || '#666';
+      const color = { dimoe: 'var(--c-success)', factura: 'var(--c-info)', certificado: 'var(--c-warning)', dib: 'var(--c-purple)', crotales: 'var(--c-orange)' }[tipo] || '#666';
       const label = { dimoe: 'DIMOE (Guía)', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido Crotales' }[tipo] || tipo;
 
       const overlay = document.createElement('div');

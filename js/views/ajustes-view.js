@@ -47,13 +47,13 @@ const AjustesView = {
         <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(217,119,6,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
         <div style="position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(217,119,6,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
         <div class="flex items-center gap-15">
-          <div style="flex-shrink:0;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(217,119,6,0.3);">
+          <div style="flex-shrink:0;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--c-warning),#b45309);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(217,119,6,0.3);">
             ${Icons.premium()}
           </div>
           <div class="flex-1">
             <div class="text-white font-900 text-base uppercase tracking-wider" style="letter-spacing:0.5px;">Livestock Manager</div>
             <div class="flex items-center gap-6 mt-4">
-              <span style="display:inline-block;padding:2px 10px;border-radius:20px;background:rgba(217,119,6,0.15);color:#d97706;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">Free</span>
+              <span style="display:inline-block;padding:2px 10px;border-radius:20px;background:rgba(217,119,6,0.15);color:var(--c-warning);font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">Free</span>
               <span class="text-gray text-xs">Versi&oacute;n gratuita</span>
             </div>
           </div>
@@ -66,12 +66,12 @@ const AjustesView = {
           <div class="grid grid-cols-2 gap-8 text-xs mb-14">
             <div class="flex items-center gap-8 text-gray"><span style="color:#22c55e;font-weight:bold;">&#10003;</span> Datos demo precargados</div>
             <div class="flex items-center gap-8 text-gray"><span style="color:#22c55e;font-weight:bold;">&#10003;</span> Crear registros propios</div>
-            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> Exportar / Importar</div>
-            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> M&uacute;ltiples fincas</div>
-            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> Editar registros demo</div>
-            <div class="flex items-center gap-8 text-gray"><span style="color:#ef4444;font-weight:bold;">&#10007;</span> L&iacute;mite 15 animales / 30 gastos</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:var(--c-danger);font-weight:bold;">&#10007;</span> Exportar / Importar</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:var(--c-danger);font-weight:bold;">&#10007;</span> M&uacute;ltiples fincas</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:var(--c-danger);font-weight:bold;">&#10007;</span> Editar registros demo</div>
+            <div class="flex items-center gap-8 text-gray"><span style="color:var(--c-danger);font-weight:bold;">&#10007;</span> L&iacute;mite 15 animales / 30 gastos</div>
           </div>
-          <button class="btn w-full" style="background:linear-gradient(135deg,#d97706,#b45309);border:none;padding:14px 32px;font-weight:900;font-size:0.85rem;border-radius:12px;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(217,119,6,0.25);" onclick="window.PurchaseManager && window.PurchaseManager.purchase()">
+          <button class="btn w-full" style="background:linear-gradient(135deg,var(--c-warning),#b45309);border:none;padding:14px 32px;font-weight:900;font-size:0.85rem;border-radius:12px;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(217,119,6,0.25);" onclick="window.PurchaseManager && window.PurchaseManager.purchase()">
             ${Icons.estrella()} Actualizar a Premium
           </button>
           <div class="text-center mt-10"><a href="#" onclick="window.PurchaseManager && window.PurchaseManager.restorePurchases();return false;" style="color:rgba(217,119,6,0.7);font-size:0.65rem;text-decoration:none;">Restaurar compras</a></div>
@@ -111,7 +111,7 @@ const AjustesView = {
         <p class="text-gray mt-5 text-sm">Gestiona tus explotaciones ganaderas y cambia la finca activa del sistema.</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-15 mb-20">
           ${isFree ? `
-          <div class="info-box" style="background:#1a1a2e;border:1px solid #d97706;">
+          <div class="info-box" style="background:#1a1a2e;border:1px solid var(--c-warning);">
             <p class="text-center text-gray text-sm my-10">${Icons.alerta()} La creación de múltiples fincas está disponible en Premium.</p>
           </div>
           ` : `
@@ -138,7 +138,7 @@ const AjustesView = {
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.guardar()} Copias de Seguridad</h3>
         <p class="text-gray mt-5 text-sm">Exporta o importa todos los datos de la aplicación en formato JSON para seguridad.</p>
         ${isFree ? `
-        <div class="info-box mt-15" style="background:#1a1a2e;border:1px solid #d97706;">
+        <div class="info-box mt-15" style="background:#1a1a2e;border:1px solid var(--c-warning);">
           <p class="text-center text-gray text-sm my-10">${Icons.alerta()} Las copias de seguridad están disponibles en la versión Premium.</p>
         </div>
         ` : `
@@ -154,7 +154,7 @@ const AjustesView = {
         </div>
         <input type="file" id="import-backup-file" class="d-none" onchange="App.importBackup(event)">
         <label class="flex items-center gap-8 mt-10 text-xs text-gray cursor-pointer" onclick="const c=document.getElementById('auto-backup'); if(c){c.checked=!c.checked;AjustesView._toggleAutoBackup(c.checked)}">
-          <input type="checkbox" id="auto-backup" ${config.autoBackup ? 'checked' : ''} style="accent-color:#3b82f6;"> Backup automático al salir
+          <input type="checkbox" id="auto-backup" ${config.autoBackup ? 'checked' : ''} style="accent-color:var(--c-info);"> Backup automático al salir
         </label>
         `}
       </div>
@@ -306,7 +306,7 @@ const AjustesView = {
             { id: 'alertContratos', label: 'Alertas Contratos (vencim.)', def: false },
           ].map(a => `
             <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
-              <input type="checkbox" ${config[a.id] !== false ? 'checked' : ''} style="accent-color:#ef4444;" onchange="AjustesView._toggleAlerta('${a.id}', this.checked)"> ${a.label}
+              <input type="checkbox" ${config[a.id] !== false ? 'checked' : ''} style="accent-color:var(--c-danger);" onchange="AjustesView._toggleAlerta('${a.id}', this.checked)"> ${a.label}
             </label>`).join('')}
         </div>
       </div>
@@ -317,18 +317,18 @@ const AjustesView = {
         <p class="text-gray mt-5 text-sm">Configuración del comportamiento general y visual de la aplicación móvil.</p>
         <div class="grid gap-12 mt-15">
           <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
-            <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleTema(this.checked)"> MODO OSCURO (OLED)
+            <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleTema(this.checked)"> MODO OSCURO (OLED)
           </label>
           <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
-            <input type="checkbox" ${config.mostrarContextos !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleContextos(this.checked)"> MOSTRAR DESCRIPCIONES DE CONTEXTO
+            <input type="checkbox" ${config.mostrarContextos !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleContextos(this.checked)"> MOSTRAR DESCRIPCIONES DE CONTEXTO
           </label>
           <div class="flex flex-col gap-4">
             <label class="text-xs text-gray uppercase font-800 ml-4">Retroiluminación y Haz de Luz</label>
             <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
-              <input type="checkbox" ${config.glowMarco !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleGlowMarco(this.checked)"> MARCO PRINCIPAL DE PANTALLA
+              <input type="checkbox" ${config.glowMarco !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleGlowMarco(this.checked)"> MARCO PRINCIPAL DE PANTALLA
             </label>
             <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
-              <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} style="accent-color:#8b5cf6;" onchange="AjustesView._toggleGlowBotones(this.checked)"> BOTONES DE LA APLICACIÓN
+              <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleGlowBotones(this.checked)"> BOTONES DE LA APLICACIÓN
             </label>
           </div>
           <div class="flex flex-col gap-4">
