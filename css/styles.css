@@ -1158,12 +1158,13 @@ label {
     padding: 25px;
     margin-bottom: 25px;
 }
-.card-accent-green  { border-left-color: #; border-top: none !important;10b981; }
-.card-accent-blue   { border-left-color: #; border-top: none !important;3b82f6; }
-.card-accent-red    { border-left-color: #; border-top: none !important;ef4444; }
-.card-accent-orange { border-left-color: #; border-top: none !important;f97316; }
-.card-accent-purple { border-left-color: #; border-top: none !important;8b5cf6; }
-.card-accent-amber  { border-left-color: #; border-top: none !important;f59e0b; }
+.card-accent-green  { border-left-color: #10b981; }
+.card-accent-blue   { border-left-color: #3b82f6; }
+.card-accent-red    { border-left-color: #ef4444; }
+.card-accent-orange { border-left-color: #f97316; }
+.card-accent-purple { border-left-color: #8b5cf6; }
+.card-accent-amber  { border-left-color: #f59e0b; }
+.card-accent-gold   { border-left-color: var(--p-gold); }
 
 /* ── Card de animal (lista) ── */
 .card-animal {
