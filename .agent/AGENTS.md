@@ -35,8 +35,9 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 - **Wizards (Asistentes paso a paso)**: Se presentan en modales oscuros a pantalla completa o centrados con fondo oscurecido (`rgba(0,0,0,0.85)`). Los pasos se indican con puntos luminosos (`.tour-dot.active`) que **siempre** heredan el color neón del módulo y emiten resplandor semántico.
 
 ### D. Cabeceras, Navegación y Marco Galáctico
-- **Header**: Píldora de navegación central con ícono identificativo. Glow inferior en la cabecera que hereda el color del módulo actual.
-- **Marco Galáctico (Túnel de Luz)**: El contenedor principal (`#app-content`) y el banner inferior (`.bottom-nav`) se enmarcan mutuamente usando sombras interiores (`box-shadow: inset`) sutiles a los lados y por encima del menú inferior. Este efecto hereda el color del módulo, creando profundidad sin sobrecargar.
+- **Header**: Píldora de navegación central con ícono identificativo.
+- **Marco Principal (formato Cork Manager)**: La cabecera se remata con una **línea neón fina y nítida** (`border-bottom: 1px solid var(--header-neon-color)`) más un **haz de luz difuso hacia abajo** (`box-shadow: 0 5px 16px -3px` con el color del módulo al ~55%). El contenido (`#app-content`) NO lleva halos laterales ni túneles de luz difusos.
+- **Retroiluminación configurable**: El usuario puede desactivar el haz del marco y la retroiluminación de botones desde Ajustes → Preferencias (clases `body.glow-marco-off` y `body.glow-botones-off`); todo glow nuevo de marco/botones debe respetar estas clases.
 - **Menús Desplegables**: Formato lista vertical estilizada (`max-height: 70vh`, `overflow-y: auto`), alineación a la izquierda, fondo `#1E1E1E`. Cada ítem tiene su SVG coloreado según su semántica.
 - **Titulares de Sección**: Uso de separadores visuales (pipes) coloreados. Ej: `<span style="color: var(--neon);">|</span> TÍTULO`. Tipografía gruesa (`font-weight: 900`), uppercase y tracking amplio.
 
