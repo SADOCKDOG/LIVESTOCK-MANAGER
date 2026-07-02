@@ -28,7 +28,7 @@ window.WizardCrotales = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-green p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.paquete()} MATERIAL SOLICITADO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.paquete()} MATERIAL SOLICITADO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">ESPECIE</label>
               <select id="w-pd-especie" class="wizard-input font-800">
@@ -70,7 +70,7 @@ window.WizardCrotales = {
           const adsgs = await window.ADSGs.list().catch(() => []);
           return `
             <div class="card card-accent card-accent-blue p-16 mt-10">
-              <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.edificio()} DESTINO Y ADSG</div>
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.edificio()} DESTINO Y ADSG</div>
               
               ${adsgs.length > 0 ? `
               <div class="wizard-input-group mb-14">

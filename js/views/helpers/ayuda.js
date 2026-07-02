@@ -41,7 +41,7 @@ window.Ayuda = {
       { cat:'Antimicóticos', principio:'Natamicina', carne:'0 días', leche:'0 días', lecheCls:'safe' },
     ];
 
-    const lecheClsColor = { safe: '#10b981', warn: '#f59e0b', danger: '#ef4444' };
+    const lecheClsColor = { safe: 'var(--c-success)', warn: 'var(--c-warning)', danger: 'var(--c-danger)' };
 
     const overlay = document.createElement("div");
     overlay.id = "ayuda-med-overlay";
@@ -68,14 +68,14 @@ window.Ayuda = {
         <!-- Filtros rápidos -->
         <div id="med-filtros" class="flex gap-8 flex-wrap mb-15">
           ${['Todas','Antiparasitarios','Antibióticos','Antiinflamatorios','Anestésicos/Sedantes','Suplementos','Biológicos','Antimicóticos']
-            .map((c,i) => `<span data-cat="${c}" class="med-chip text-xs text-ccc bg-darker" style="cursor:pointer; padding:4px 14px; border:1px solid ${i===0?'#ef4444':'#333'}; border-radius:20px; transition:0.15s;">${c}</span>`).join('')}
+            .map((c,i) => `<span data-cat="${c}" class="med-chip text-xs text-ccc bg-darker" style="cursor:pointer; padding:4px 14px; border:1px solid ${i===0?'var(--c-danger)':'#333'}; border-radius:20px; transition:0.15s;">${c}</span>`).join('')}
         </div>
 
         <h3 class="text-red mt-0 mb-10">Tiempos de Retiro Promedio <span id="med-count" class="font-normal text-xs text-gray">— ${MEDICAMENTOS.length} fármacos</span></h3>
         <div class="mb-25 scroll-shadow-container" style="overflow-x: auto; flex-shrink:0;">
           <table class="ayuda-table" style="min-width: 500px;">
             <thead>
-              <tr style="background: #18181b; border-bottom: 2px solid #ef4444; position:sticky; top:0;">
+              <tr style="background: #18181b; border-bottom: 2px solid var(--c-danger); position:sticky; top:0;">
                 <th class="p-10">Categoría</th>
                 <th class="p-10">Principio Activo</th>
                 <th class="p-10">Retiro (Carne)</th>
@@ -172,7 +172,7 @@ window.Ayuda = {
     overlay.querySelectorAll('#med-filtros .med-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         overlay.querySelectorAll('.med-chip').forEach(c => { c.style.borderColor = '#333'; });
-        chip.style.borderColor = '#ef4444';
+        chip.style.borderColor = 'var(--c-danger)';
         const cat = chip.dataset.cat;
         searchInput.value = cat === 'Todas' ? '' : cat;
         searchInput.dispatchEvent(new Event('input'));
@@ -240,7 +240,7 @@ window.Ayuda = {
         <h3 class="text-blue mb-10" class="section-underline">Plazos de Identificación</h3>
         <table class="ayuda-table mb-25">
             <thead>
-                <tr style="background: #18181b; border-bottom: 2px solid #3b82f6;">
+                <tr style="background: #18181b; border-bottom: 2px solid var(--c-info);">
                     <th class="p-10">Sistema de Cría</th>
                     <th class="p-10">Plazo Máximo Legal</th>
                 </tr>

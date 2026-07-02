@@ -153,7 +153,7 @@ window.VentaMasivaWizard = {
 
           return `
               <div class="card card-accent card-accent-green p-16 mt-10">
-                <div class="section-header-theme mb-12" style="--theme-color: #10b981">ANÁLISIS DE APTITUD</div>
+                <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">ANÁLISIS DE APTITUD</div>
                 <div class="flex gap-15 mb-15">
                     <div class="text-center bg-black border border-222 p-12 rounded-sm flex-1"><small class="text-gray uppercase font-900 text-[0.6rem]">APTOS</small><div class="text-green font-950 text-2xl mt-4">${animalesActivos.length - totalBloqueados}</div></div>
                     <div class="text-center bg-black border border-222 p-12 rounded-sm flex-1"><small class="text-red uppercase font-900 text-[0.6rem]">BLOQUEADOS</small><div class="text-red font-950 text-2xl mt-4">${totalBloqueados}</div></div>
@@ -246,7 +246,7 @@ window.VentaMasivaWizard = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-green p-16 mt-10">
-              <div class="section-header-theme mb-12" style="--theme-color: #10b981">DATOS ECONÓMICOS</div>
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">DATOS ECONÓMICOS</div>
               <div class="grid grid-cols-2 gap-15 mb-12">
                   <div class="wizard-input-group">
                     <label class="wizard-label">PESO VIVO (KG)</label>
@@ -288,7 +288,7 @@ window.VentaMasivaWizard = {
           const compradores = data._compradores || [];
           return `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-              <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">LIQUIDACIÓN Y CLIENTE</div>
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">LIQUIDACIÓN Y CLIENTE</div>
               <div class="wizard-input-group mb-12">
                 <label class="wizard-label">COMPRADOR REGISTRADO</label>
                 <div class="flex gap-8 items-center">
@@ -445,7 +445,7 @@ window.VentaMasivaWizard = {
           data._transportistas = transportistas;
           return `
           <div class="card card-accent card-accent-purple p-16 mt-10">
-              <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">LOGÍSTICA Y AUTORIZACIÓN</div>
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">LOGÍSTICA Y AUTORIZACIÓN</div>
 
               <div class="wizard-input-group mb-12">
                 <label class="wizard-label">TRANSPORTISTA</label>
@@ -468,7 +468,7 @@ window.VentaMasivaWizard = {
                 <div class="text-aaa text-[0.65rem] font-800 uppercase" id="w-v-transportista-matricula">${Icons.transportistas()} ${data.matriculaTransportista || ''}</div>
               </div>
 
-              <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</div>
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">${Icons.veterinario()} AUTORIZACIÓN VETERINARIA</div>
               <div class="grid grid-cols-2 gap-12 mb-12">
                 <div class="wizard-input-group">
                   <label class="wizard-label">VETERINARIO</label>

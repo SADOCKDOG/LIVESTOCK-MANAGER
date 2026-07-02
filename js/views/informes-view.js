@@ -103,13 +103,13 @@ const InformesView = {
     const activeCatKey = this._obtenerCategoriaDeTab(this._currentTab);
     // Colores por categoría
     const catColors = {
-      general: '#f59e0b',
-      operaciones: '#10b981',
-      economico: '#3b82f6',
-      comercial: '#8b5cf6',
+      general: 'var(--c-warning)',
+      operaciones: 'var(--c-success)',
+      economico: 'var(--c-info)',
+      comercial: 'var(--c-purple)',
       exportar: '#6b7280'
     };
-    const activeColor = catColors[activeCatKey] || '#f59e0b';
+    const activeColor = catColors[activeCatKey] || 'var(--c-warning)';
 
     // 1. Nivel 1: Categorías
     let catsHtml = `
@@ -118,7 +118,7 @@ const InformesView = {
     `;
     for (const [catKey, cat] of Object.entries(this._categories)) {
       const isActive = catKey === activeCatKey;
-      const col = catColors[catKey] || '#f59e0b';
+      const col = catColors[catKey] || 'var(--c-warning)';
       catsHtml += `
         <button class="inf-cat-tab ${isActive ? 'active' : ''}" 
                 id="inf-cat-${catKey}"
@@ -379,7 +379,7 @@ const InformesView = {
       <!-- Rentabilidad -->
       <div class="card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title pb-8 flex items-center gap-6">${Icons.dinero()} Rentabilidad General</div>
-        <div class="card p-14 mb-2 border-222" style="border-left:5px solid #10b981; background:rgba(255,255,255,0.02);">
+        <div class="card p-14 mb-2 border-222" style="border-left:5px solid var(--c-success); background:rgba(255,255,255,0.02);">
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Ingresos Cárnica</span>
@@ -573,7 +573,7 @@ const InformesView = {
     // Render gráficos si hay datos
     setTimeout(() => {
       try {
-        if (margenA?.length > 0) this._renderScatter('chart-margen-animal-carne', margenA, '#f59e0b');
+        if (margenA?.length > 0) this._renderScatter('chart-margen-animal-carne', margenA, 'var(--c-warning)');
         if (rentZ?.length > 0) this._renderBarrasZonas('chart-rentabilidad-zonas-carne', rentZ);
       } catch (e) { console.error('[Carne charts]', e); }
     }, 50);
@@ -600,9 +600,9 @@ const InformesView = {
     const umbrales = window.ComunidadesService?.CALIDAD_LECHE_OVINO_UMBRALES || null;
     const semaforo = (valor, min, max) => {
       if (valor == null) return '#555';
-      if (min != null && valor < min) return '#ef4444';
-      if (max != null && valor > max) return '#ef4444';
-      return '#10b981';
+      if (min != null && valor < min) return 'var(--c-danger)';
+      if (max != null && valor > max) return 'var(--c-danger)';
+      return 'var(--c-success)';
     };
 
     content.innerHTML = this._sectionActionsHTML('leche', 'Lácteo') + `
@@ -709,7 +709,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('reproductivo', 'Reproductivo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} KPIs Reproductivos</div>
-        <div class="card p-14 mb-14 border-222" style="border-left:5px solid #8b5cf6; background:rgba(139,92,246,0.03);">
+        <div class="card p-14 mb-14 border-222" style="border-left:5px solid var(--c-purple); background:rgba(139,92,246,0.03);">
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Fertilidad</span>
@@ -756,7 +756,7 @@ const InformesView = {
       if (ctxR && kpisRepro.tasaFertilidadPct !== undefined) {
         new Chart(ctxR.getContext("2d"), {
           type: 'doughnut',
-          data: { labels: ['Éxito', 'Fallo'], datasets: [{ data: [kpisRepro.tasaFertilidadPct, 100 - kpisRepro.tasaFertilidadPct], backgroundColor: ['#8b5cf6', '#3730a3'], borderColor: '#111', borderWidth: 4 }] },
+          data: { labels: ['Éxito', 'Fallo'], datasets: [{ data: [kpisRepro.tasaFertilidadPct, 100 - kpisRepro.tasaFertilidadPct], backgroundColor: ['#A855F7', '#3730a3'], borderColor: '#111', borderWidth: 4 }] },
           options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
         });
       }
@@ -783,7 +783,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('sanidad', 'Sanidad') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.sanidad()} Sanidad y Tratamientos</div>
-        <div class="card p-14 mb-14 border-222" style="border-left:5px solid #ef4444; background:rgba(239,68,68,0.02);">
+        <div class="card p-14 mb-14 border-222" style="border-left:5px solid #FF4444; background:rgba(239,68,68,0.02);">
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Total Tratamientos</span>
@@ -833,7 +833,7 @@ const InformesView = {
           type: 'pie',
           data: {
             labels: estadisticasSanidad.porCategoria.map(c => c.categoria),
-            datasets: [{ data: estadisticasSanidad.porCategoria.map(c => c.cantidad), backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'], borderColor: '#111', borderWidth: 2 }]
+            datasets: [{ data: estadisticasSanidad.porCategoria.map(c => c.cantidad), backgroundColor: ['#FF4444', '#f97316', '#FFD600', '#CCFF00', '#3b82f6', '#A855F7'], borderColor: '#111', borderWidth: 2 }]
           },
           options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
@@ -1146,7 +1146,7 @@ const InformesView = {
                 datasets: [{
                   label: 'Ingresos (€)',
                   data: data.slice(0, 8).map(c => c.total),
-                  backgroundColor: ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#ec4899','#14b8a6','#f97316'],
+                  backgroundColor: ['#3b82f6','#CCFF00','#FFD600','#A855F7','#FF4444','#ec4899','#14b8a6','#f97316'],
                   borderRadius: 4
                 }]
               },
@@ -1257,7 +1257,7 @@ const InformesView = {
               type: 'doughnut',
               data: {
                 labels: entries.map(e => e[0]),
-                datasets: [{ data: entries.map(e => e[1]), backgroundColor: ['#f59e0b','#ef4444','#10b981','#3b82f6','#8b5cf6','#ec4899'], borderColor: '#111', borderWidth: 3 }]
+                datasets: [{ data: entries.map(e => e[1]), backgroundColor: ['#FFD600','#FF4444','#CCFF00','#3b82f6','#A855F7','#ec4899'], borderColor: '#111', borderWidth: 3 }]
               },
               options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#888', boxWidth: 12, font: { size: 9 } } } } }
             });
@@ -1373,7 +1373,7 @@ const InformesView = {
                   <td>${a.fecha || '-'}</td>
                   <td class="text-right font-black ${a.diasRestantes <= 7 ? 'text-red' : a.diasRestantes <= 15 ? 'text-amber' : 'text-green'}">${a.diasRestantes}D</td>
                   <td class="text-center">
-                    <span style="color:${a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#10b981'};">
+                    <span style="color:${a.urgencia === 'rojo' ? 'var(--c-danger)' : a.urgencia === 'amarillo' ? 'var(--c-warning)' : 'var(--c-success)'};">
                       ${a.urgencia === 'rojo' ? Icons.alerta() : (a.urgencia === 'amarillo' ? Icons.alerta() : Icons.check())}
                     </span>
                   </td>
@@ -1391,7 +1391,7 @@ const InformesView = {
                   <td class="font-900 uppercase">${a.crotal || '-'}</td>
                   <td class="text-xs uppercase font-700">${a.mensaje || '-'}</td>
                   <td class="text-center">
-                    <span style="color:${a.urgencia === 'rojo' ? '#ef4444' : '#f59e0b'};">
+                    <span style="color:${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
                       ${a.urgencia === 'rojo' ? Icons.alerta() : Icons.alerta()}
                     </span>
                   </td>
@@ -1409,7 +1409,7 @@ const InformesView = {
                   <td class="font-900 uppercase">${a.seccion || '-'}</td>
                   <td class="text-xs uppercase font-700">${a.mensaje || '-'}</td>
                   <td class="text-center">
-                    <span style="color:${a.urgencia === 'rojo' ? '#ef4444' : a.urgencia === 'amarillo' ? '#f59e0b' : '#10b981'};">
+                    <span style="color:${a.urgencia === 'rojo' ? 'var(--c-danger)' : a.urgencia === 'amarillo' ? 'var(--c-warning)' : 'var(--c-success)'};">
                       ${a.urgencia === 'rojo' ? Icons.alerta() : (a.urgencia === 'amarillo' ? Icons.alerta() : Icons.check())}
                     </span>
                   </td>
@@ -1425,7 +1425,7 @@ const InformesView = {
             </ul>
           </div>` : ''}
 
-          ${totalAlertas === 0 ? `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#10b981;">${Icons.check()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay alertas activas. Todo correcto.</p></div>` : ''}
+          ${totalAlertas === 0 ? `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:var(--c-success);">${Icons.check()}</div><p class="empty-state-text uppercase font-900 text-xs">No hay alertas activas. Todo correcto.</p></div>` : ''}
         </div>
       </div>
     `;
@@ -1482,7 +1482,7 @@ const InformesView = {
             <div><span class="text-gray">Nº Colegiado:</span> <strong>${finca.adsg_vet_colegiado || '21/1045'}</strong></div>
           </div>
           <!-- Datos del Paquete Lácteo Regulador -->
-          <div class="card p-10 bg-black border-272 text-sm mt-5" style="border-left: 3px solid #3b82f6;">
+          <div class="card p-10 bg-black border-272 text-sm mt-5" style="border-left: 3px solid var(--c-info);">
             <div class="text-white font-900 text-xs mb-6 uppercase flex items-center gap-4">${Icons.leche()} Regulaciones Paquete Lácteo (INFOLAC)</div>
             <div class="grid grid-cols-2 gap-6 text-[0.72rem]">
               <div><span class="text-gray">Nº Contrato Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_numero || 'CT-2026-002'}</strong></div>
@@ -1934,7 +1934,7 @@ const InformesView = {
   _renderEficiencia(content, d) {
     const { eficienciaData } = d;
     const data = eficienciaData || { kpis: [], activos: 0, totalLecheros: 0, numRebanos: 0, totalAnimales: 0 };
-    const semaforo = (s) => s === 'verde' ? '#10b981' : s === 'amarillo' ? '#f59e0b' : '#ef4444';
+    const semaforo = (s) => s === 'verde' ? 'var(--c-success)' : s === 'amarillo' ? 'var(--c-warning)' : 'var(--c-danger)';
     content.innerHTML = this._sectionActionsHTML('eficiencia', 'Eficiencia Técnica') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title">${Icons.grafico()} Panel de Eficiencia Técnica</div>
@@ -1976,7 +1976,7 @@ const InformesView = {
   _renderCargas(content, d) {
     const { cargasData } = d;
     const data = cargasData || { porZona: [], totalAforo: 0, totalOcupacion: 0, pctGlobal: '0', alertas: [], numAlertas: 0, numZonas: 0 };
-    const colorPct = (p) => p > 100 ? '#ef4444' : p >= 80 ? '#10b981' : p >= 50 ? '#f59e0b' : '#6b7280';
+    const colorPct = (p) => p > 100 ? 'var(--c-danger)' : p >= 80 ? 'var(--c-success)' : p >= 50 ? 'var(--c-warning)' : '#6b7280';
     
     // Calcular superficie total pastable y UGM globales
     const superficieTotal = data.porZona.reduce((sum, z) => sum + (Number(z.superficie) || 0), 0);
@@ -2422,7 +2422,7 @@ const InformesView = {
   _renderGraficosGeneral(d) {
     const { margenA, lecheStats, kpisRepro, estadisticasSanidad } = d;
     setTimeout(() => {
-      if (margenA?.length > 0) this._renderScatter('chart-margen-animal', margenA, '#10b981');
+      if (margenA?.length > 0) this._renderScatter('chart-margen-animal', margenA, 'var(--c-success)');
       if (lecheStats?.timeline?.length > 1) this._renderLecheTimeline('chart-leche-timeline', lecheStats.timeline);
     }, 50);
   },
@@ -2448,8 +2448,8 @@ const InformesView = {
       type: "bar",
       data: {
         labels: rentZ.map(z => z.zona), datasets: [
-          { label: "Ingresos", data: rentZ.map(z => z.ingresos), backgroundColor: "#10b981" },
-          { label: "Gastos", data: rentZ.map(z => z.gastos), backgroundColor: "#ef4444" }
+          { label: "Ingresos", data: rentZ.map(z => z.ingresos), backgroundColor: "#CCFF00" },
+          { label: "Gastos", data: rentZ.map(z => z.gastos), backgroundColor: "#FF4444" }
         ]
       },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { color: "#888", boxWidth: 12 } } } }
@@ -2463,7 +2463,7 @@ const InformesView = {
       type: 'line',
       data: {
         labels: timeline.map(r => { const d = r.fecha.split('-'); return d[1] + '/' + d[2]; }),
-        datasets: [{ label: 'Litros', data: timeline.map(r => r.litros), borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.1)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#fbbf24' }]
+        datasets: [{ label: 'Litros', data: timeline.map(r => r.litros), borderColor: '#FFD600', backgroundColor: 'rgba(255,214,0,0.1)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#FFD600' }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,

@@ -71,7 +71,7 @@ window.GastoWizard = {
 
            return `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.paquete()} IMPUTACIÓN DE COSTES</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.paquete()} IMPUTACIÓN DE COSTES</div>
 
             ${esAnimal ? `
             <div class="wizard-input-group mb-12">
@@ -85,7 +85,7 @@ window.GastoWizard = {
             ${esZona ? `
             <div class="wizard-input-group mb-12">
                 <label class="wizard-label text-green font-950 uppercase tracking-widest">${Icons.zonas()} ASOCIAR ZONA (OBLIGATORIO)</label>
-                <select id="w-g-zon" class="wizard-input wizard-select font-800" style="border-color: #10b981 !important;">
+                <select id="w-g-zon" class="wizard-input wizard-select font-800" style="border-color: var(--c-success) !important;">
                   <option value="">— SELECCIONAR ZONA —</option>
                   ${zonas.map((z) => `<option value="${z.nombre}" ${data.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre.toUpperCase()}</option>`).join("")}
                 </select>
@@ -96,7 +96,7 @@ window.GastoWizard = {
 
           ${esFito ? `
           <div id="w-g-cumplimiento-area" class="card card-accent card-accent-purple p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">${Icons.fitosanitario()} CONTROL NORMATIVO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">${Icons.fitosanitario()} CONTROL NORMATIVO</div>
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">REGISTRO PRODUCTO</label>
