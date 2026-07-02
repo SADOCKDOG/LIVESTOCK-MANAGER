@@ -3,65 +3,7 @@
  * Optimizado para pantallas OLED de Android y dispositivos móviles.
  */
 
-:root {
-    /* ── MARCA ── */
-    --p-cork: #CCFF00;        /* Neon Lime */
-    --p-cork-dark: #AACC00;
-    --p-gold: #FFD600;        /* Amarillo Neón */
-    --p-gold-dark: #B89900;   
-    /* ── BASE OLED ── */
-    --bg: #121212;            /* Carbon Black */
-    --surface: #1E1E1E;       /* Deep Grey */
-    --surface-light: #2A2A2A; /* Elevación */
-    --surface-input: #1a1a1a; 
-    --border: #333333;        /* Border Grey */
-    --border-input: #333333;  
-
-    /* ── TEXTO ── */
-    --text-p: #FFFFFF;        /* Pure White */
-    --text-s: #94A3B8;        /* Steel Grey */
-    --text-d: #666666;        /* Deshabilitado / placeholder */
-
-    /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
-    --c-success: #CCFF00;
-    --c-warning: #FFD600;
-    --c-danger:  #FF4444;
-    --c-info:    #3b82f6;
-    --c-accent:  #8b5cf6;  /* reproducción / violeta */
-
-    /* ── TIPOGRAFÍA (escala semántica única) ── */
-    --fs-display: 1.6rem;     /* KPI grande / cifra destacada */
-    --fs-h1:   1.25rem;       /* título de card */
-    --fs-h2:   1.05rem;       /* subtítulo de sección */
-    --fs-body: 0.95rem;       /* texto e inputs */
-    --fs-sm:   0.85rem;       /* secundario */
-    --fs-label:0.75rem;       /* labels (uppercase) */
-    --fs-tiny: 0.65rem;       /* metadatos */
-
-    /* ── ESPACIADO (escala base 4px) ── */
-    --sp-1: 4px;
-    --sp-2: 8px;
-    --sp-3: 12px;
-    --sp-4: 16px;
-    --sp-5: 20px;
-    --sp-6: 24px;
-    --touch-min: 50px;
-    --tap-gap: 8px;
-
-    /* ── RADIOS ── */
-    --r-sm:   8px;            /* chips / inputs internos */
-    --r-md:   14px;           /* inputs / botones */
-    --r-lg:   16px;           /* cards */
-    --r-pill: 28px;           /* botón principal / FAB */
-    --radius: 16px;           /* alias legacy = --r-lg */
-
-    /* ── SOMBRAS ── */
-    --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
-
-    /* ── SAFE AREAS (Android vertical) ── */
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-}
+/* Tokens de diseño (:root) → css/design-tokens.css (fuente única, cargada antes que este fichero) */
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -900,18 +842,19 @@ label {
     color: inherit;
     filter: drop-shadow(0 0 6px currentColor);
 }
-.more-sheet-item[href="#/zonas"] { color: #10b981; }
-.more-sheet-item[href="#/leche"] { color: #3b82f6; }
-.more-sheet-item[href="#/comercializacion"] { color: #CCFF00; }
-.more-sheet-item[href="#/compradores"] { color: #d97706; }
-.more-sheet-item[href="#/proveedores"] { color: #8b5cf6; }
-.more-sheet-item[href="#/transportistas"] { color: #ec4899; }
-.more-sheet-item[href="#/gastos"] { color: #ef4444; }
-.more-sheet-item[href="#/informes"] { color: #eab308; }
-.more-sheet-item[href="#/cuaderno"] { color: #d97706; }
-.more-sheet-item[href="#/documentos"] { color: #10b981; }
-.more-sheet-item[href="#/manuales"] { color: #9333ea; }
-.more-sheet-item[href="#/ajustes"] { color: #94a3b8; }
+/* Colores según MAPA ÚNICO de módulos (js/module-colors.js + design-tokens.css) */
+.more-sheet-item[href="#/zonas"] { color: var(--c-success); }
+.more-sheet-item[href="#/leche"] { color: var(--c-info); }
+.more-sheet-item[href="#/comercializacion"] { color: var(--c-success); }
+.more-sheet-item[href="#/compradores"] { color: var(--c-info); }
+.more-sheet-item[href="#/proveedores"] { color: var(--c-purple); }
+.more-sheet-item[href="#/transportistas"] { color: var(--c-pink); }
+.more-sheet-item[href="#/gastos"] { color: var(--c-danger); }
+.more-sheet-item[href="#/informes"] { color: var(--c-warning); }
+.more-sheet-item[href="#/cuaderno"] { color: var(--c-orange); }
+.more-sheet-item[href="#/documentos"] { color: var(--c-purple); }
+.more-sheet-item[href="#/manuales"] { color: var(--c-purple); }
+.more-sheet-item[href="#/ajustes"] { color: var(--text-s); }
 
 /* ============================================
    SISTEMA DE CLASES UTILITARIAS v5.0

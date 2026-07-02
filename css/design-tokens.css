@@ -1,60 +1,71 @@
 /**
- * design-tokens.css
- * Centralización de variables de diseño para LIVESTOCK-MANAGER
+ * design-tokens.css — FUENTE ÚNICA de tokens de diseño (estándar Cork Manager).
+ * Normativa: .agent/AGENTS.md · Se carga ANTES de styles.css en index.html.
+ * Mapa de colores de módulo en JS: js/module-colors.js (window.MODULE_COLORS).
  */
 
 :root {
-    /* COLORES PRINCIPALES (Industrial Dark Mode) */
-    --p-cork: #d4a373;        /* Mantenido por legado, pero preferimos los semánticos */
-    --p-cork-dark: #a0673a;
-    --accent: #CCFF00;        /* Verde Lima Neon (Nuevo Primario) */
-    
-    /* COLORES SEMÁNTICOS (Bento Grid Style) */
-    --color-lime: #CCFF00;
-    --color-gold: #FFD700;
-    --color-red: #FF4444;
-    --color-blue: #4FACFE;
-    --color-orange: #F97316;
-    --color-grey: #94A3B8;
+    /* ── MARCA ── */
+    --p-cork: #CCFF00;        /* Neon Lime */
+    --p-cork-dark: #AACC00;
+    --p-gold: #FFD600;        /* Amarillo Neón */
+    --p-gold-dark: #B89900;
 
-    /* SUPERFICIES Y FONDOS */
-    --bg-base: #121212;       /* Fondo Base */
-    --bg-card: #1E1E1E;       /* Superficies */
-    --border: #333333;        /* Lineas */
+    /* ── BASE OLED ── */
+    --bg: #121212;            /* Carbon Black */
+    --surface: #1E1E1E;       /* Deep Grey */
+    --surface-light: #2A2A2A; /* Elevación */
+    --surface-input: #1a1a1a;
+    --border: #333333;        /* Border Grey */
+    --border-input: #333333;
 
-    /* TEXTO */
-    --text-p: #FFFFFF;        /* Principal */
-    --text-s: #94A3B8;        /* Secundario / Labels */
-    
-    /* BOTONES - TAMAÑOS ESTÁNDAR */
-    --btn-h-lg: 58px;    
-    --btn-h-md: 48px;    
-    --btn-h-sm: 40px;    
+    /* ── TEXTO ── */
+    --text-p: #FFFFFF;        /* Pure White */
+    --text-s: #94A3B8;        /* Steel Grey */
+    --text-d: #666666;        /* Deshabilitado / placeholder */
 
-    /* INTERACCIÓN */
-    --transition-main: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --active-scale: 0.96;
-    --active-brightness: 0.9;
+    /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
+    --c-success: #CCFF00;     /* Éxito / Zonas / Híbrido */
+    --c-warning: #FFD600;     /* Aviso / Alertas / Informes */
+    --c-danger:  #FF4444;     /* Peligro / Carne / Gastos */
+    --c-info:    #3b82f6;     /* Info / Leche / Listas */
+    --c-accent:  #8b5cf6;     /* legado: reproducción */
 
-    /* RADIOS Y SOMBRAS */
-    --radius-lg: 24px;   /* Más redondeado para Bento */
-    --radius-md: 16px;
-    --radius-sm: 8px;
-    --radius-full: 9999px;
+    /* ── COLORES DE MÓDULO (ampliación oficial 2026-07) ── */
+    --c-orange: #F97316;      /* Animales / Cuaderno Digital */
+    --c-purple: #A855F7;      /* Proveedores / Manuales / Documentos-Trámites */
+    --c-pink:   #EC4899;      /* Transportistas / Logística */
 
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-neon: 0 0 10px rgba(204, 255, 0, 0.3);
+    /* ── TIPOGRAFÍA (escala semántica única) ── */
+    --fs-display: 1.6rem;     /* KPI grande / cifra destacada */
+    --fs-h1:   1.25rem;       /* título de card */
+    --fs-h2:   1.05rem;       /* subtítulo de sección */
+    --fs-body: 0.95rem;       /* texto e inputs */
+    --fs-sm:   0.85rem;       /* secundario */
+    --fs-label:0.75rem;       /* labels (uppercase) */
+    --fs-tiny: 0.65rem;       /* metadatos */
 
-    /* SISTEMA DE ESPACIADO */
-    --space-2xs: 4px;
-    --space-xs: 8px;
-    --space-sm: 12px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
-    
-    /* SAFE AREA PARA MOVILES */
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    /* ── ESPACIADO (escala base 4px) ── */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
+    --touch-min: 50px;
+    --tap-gap: 8px;
+
+    /* ── RADIOS ── */
+    --r-sm:   8px;            /* chips / inputs internos */
+    --r-md:   14px;           /* inputs / botones */
+    --r-lg:   16px;           /* cards */
+    --r-pill: 28px;           /* botón principal / FAB */
+    --radius: 16px;           /* alias legacy = --r-lg */
+
+    /* ── SOMBRAS ── */
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+
+    /* ── SAFE AREAS (Android vertical) ── */
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
 }
