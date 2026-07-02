@@ -237,28 +237,28 @@ const App = {
     if (!grid) return;
 
     const items = [
-      { path: '/', label: 'Inicio', icon: Icons.home(), color: '#CCFF00' },
-      { path: '/animales', label: 'Animales', icon: Icons.animales(), color: '#f97316' },
-      { path: '/rebanos', label: 'Rebaños', icon: Icons.rebanos(), color: '#3b82f6' },
-      { path: '/ganaderia', label: 'Cárnico', icon: Icons.carne(), color: '#FF4444' },
-      { path: '/leche', label: 'Leche', icon: Icons.leche(), color: '#3b82f6' },
-      { path: '/hibrido', label: 'Híbrido', icon: Icons.rotacion(), color: '#10b981' },
-      { path: '/explotacion', label: 'ExPro', icon: Icons.dashboard(), color: '#CCFF00' },
-      { path: '/comercializacion', label: 'CoMer', icon: Icons.carne(), color: '#f97316' },
-      { path: '/zonas', label: 'Zonas', icon: Icons.zonas(), color: '#FFD600' },
-      { path: '/compradores', label: 'Compradores', icon: Icons.documento(), color: '#3b82f6' },
-      { path: '/proveedores', label: 'Proveedores', icon: Icons.documento(), color: '#a855f7' },
-      { path: '/transportistas', label: 'Logística', icon: Icons.transportistas(), color: '#ec4899' },
-      { path: '/gastos', label: 'Gastos', icon: Icons.dinero(), color: '#FF4444' },
-      { path: '/informes', label: 'Informes', icon: Icons.libroVentas(), color: '#FFD600' },
-      { path: '/cuaderno', label: 'Cuaderno', icon: Icons.libro(), color: '#d97706' },
-      { path: '/manuales', label: 'Manuales', icon: Icons.libro(), color: '#9333ea' },
-      { path: '/ajustes', label: 'Ajustes', icon: Icons.ajustes(), color: '#94A3B8' },
+      { path: '/', label: 'Inicio', icon: Icons.home() },
+      { path: '/animales', label: 'Animales', icon: Icons.animales() },
+      { path: '/rebanos', label: 'Rebaños', icon: Icons.rebanos() },
+      { path: '/ganaderia', label: 'Cárnico', icon: Icons.carne() },
+      { path: '/leche', label: 'Leche', icon: Icons.leche() },
+      { path: '/hibrido', label: 'Híbrido', icon: Icons.rotacion() },
+      { path: '/explotacion', label: 'ExPro', icon: Icons.dashboard() },
+      { path: '/comercializacion', label: 'CoMer', icon: Icons.carne() },
+      { path: '/zonas', label: 'Zonas', icon: Icons.zonas() },
+      { path: '/compradores', label: 'Compradores', icon: Icons.documento() },
+      { path: '/proveedores', label: 'Proveedores', icon: Icons.documento() },
+      { path: '/transportistas', label: 'Logística', icon: Icons.transportistas() },
+      { path: '/gastos', label: 'Gastos', icon: Icons.dinero() },
+      { path: '/informes', label: 'Informes', icon: Icons.libroVentas() },
+      { path: '/cuaderno', label: 'Cuaderno', icon: Icons.libro() },
+      { path: '/manuales', label: 'Manuales', icon: Icons.libro() },
+      { path: '/ajustes', label: 'Ajustes', icon: Icons.ajustes() },
     ];
 
     grid.innerHTML = items.map(item => `
       <a href="#${item.path}" class="header-dropdown-item" onclick="App._toggleHeaderDropdown()">
-        <div class="icon" style="color: ${item.color}">${item.icon}</div>
+        <div class="icon" style="color: ${window.getModuleColor(item.path)}">${item.icon}</div>
         <span>${item.label}</span>
       </a>
     `).join('');
@@ -371,17 +371,9 @@ const App = {
     this.updateHeaderColor(null);
   },
 
-  /** Actualiza el color neon de la cabecera según el modo de explotación */
+  /** Actualiza el color neon de la cabecera según el modo de explotación (mapa único MODULE_COLORS) */
   updateHeaderColor(mode) {
-    const colorMap = {
-      carne: '#FF4444',
-      leche: '#3b82f6',
-      hibrido: '#CCFF00',
-      animales: '#FF4444',
-      rebanos: '#3b82f6',
-      zonas: '#CCFF00'
-    };
-    const color = colorMap[mode] || '#CCFF00'; // Verde neón por defecto
+    const color = window.getModuleColor(mode ? '/' + mode : '/');
     document.documentElement.style.setProperty('--header-neon-color', color);
   },
 

@@ -10,6 +10,12 @@ Este documento define el Estándar Corporativo y el Sistema de Diseño (UI/UX) �
   - **Danger / Carne**: `#FF4444` (Rojo Neón).
   - **Info / Leche / Listas**: `#3b82f6` (Azul Neón).
 - **Textos**: Principal `#FFFFFF` (Blanco puro). Textos secundarios y etiquetas (ej. "cab.", "kg") en Gris Acero (`#94A3B8`) sin resplandor para dar protagonismo a los datos.
+- **Colores de Módulo (ampliación oficial 2026-07)**:
+  - **Naranja Neón `#F97316`** (`--c-orange`): Animales, Cuaderno Digital.
+  - **Violeta Neón `#A855F7`** (`--c-purple`): Proveedores, Manuales, Documentos/Trámites.
+  - **Rosa Neón `#EC4899`** (`--c-pink`): Transportistas/Logística.
+  - Gris Acero `#94A3B8`: Ajustes.
+- **MAPA ÚNICO obligatorio**: los colores de módulo se consumen SIEMPRE de `js/module-colors.js` (`window.MODULE_COLORS` / `getModuleColor(ruta)`) en JS y de los tokens de `css/design-tokens.css` en CSS. PROHIBIDO duplicar mapas de color en menús o vistas.
 
 ## 2. Componentes y Botones (El Efecto Neón)
 - **Botones Selector (Módulos/Modos)**: Los textos y SVGs de los botones principales SIEMPRE heredan su color corporativo asignado, nunca blanco por defecto.

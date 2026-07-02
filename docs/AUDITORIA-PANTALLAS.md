@@ -13,9 +13,9 @@
 |---|:---:|---|:---:|
 | G1 | 🔴 | **CSS corrupto**: `.card-accent-green/blue/red/orange/purple/amber` tenían `border-top: none !important;` inyectado EN MITAD del valor hex (`border-left-color: #; …;10b981;`) — un reemplazo automático (fix_dash/strip_borders) rompió las 6 clases; todas las cards accent caían al marrón corcho. | ✅ corregido |
 | G2 | 🔴 | `.card-accent-gold` se usa 9× en vistas pero **no estaba definida** en el CSS. | ✅ corregido (→ `var(--p-gold)`) |
-| G3 | 🟠 | `css/design-tokens.css` es **código muerto** (no se carga en ningún HTML) y sus valores DIVERGEN del estándar: `--color-gold: #FFD700` (≠ `#FFD600`), `--color-blue: #4FACFE` (≠ `#3b82f6`). Trampa para futuras ediciones. | Decidir: borrar o alinear+importar |
+| G3 | 🟠 | `css/design-tokens.css` era código muerto con valores divergentes. **Resuelto**: ahora es la FUENTE ÚNICA de tokens (`:root` migrado desde styles.css + colores de módulo `--c-orange/--c-purple/--c-pink`), cargado antes de styles.css y precacheado en SW. | ✅ 2026-07-02 |
 | G4 | 🟠 | **Colores hardcodeados fuera de paleta** en vistas (conteo): `#10b981`×134, `#ef4444`×103, `#f59e0b`×64, `#8b5cf6`×58, `#d97706`×36, `#f97316`×20, `#cc0000`×11, `#fbbf24`×9, `#a855f7`×9, `#ec4899`×8, `#FFD700`×7… La paleta corporativa es: `#CCFF00`, `#FFD600`, `#FF4444`, `#3b82f6` (+ gris `#94A3B8`). | Fase 3 |
-| G5 | 🟠 | **Dos mapas de color de módulos contradictorios**: menú desplegable del header (`app.js _populateHeaderDropdown`) vs sheet "Más" (`styles.css .more-sheet-item`). Ej.: Zonas = `#FFD600` en dropdown y `#10b981` en sheet — y AGENTS dice que Zonas es **`#CCFF00`** (success/zonas). Híbrido = `#10b981` (debe ser `#CCFF00`). CoMer = `#f97316` vs `#CCFF00`. | Fase 2: mapa único en constante JS |
+| G5 | 🟠 | Dos mapas de color de módulos contradictorios (dropdown header vs sheet "Más", ambos violando AGENTS en Zonas/Híbrido). **Resuelto**: mapa único `js/module-colors.js` (`window.MODULE_COLORS`/`getModuleColor`) consumido por dropdown, `updateHeaderColor()` y sheet "Más" (vía tokens). Paleta ampliada oficialmente en AGENTS.md: naranja `#F97316` (Animales/Cuaderno), violeta `#A855F7` (Proveedores/Manuales/Documentos), rosa `#EC4899` (Logística). | ✅ 2026-07-02 |
 | G6 | 🟡 | `.neon-success` mezcla paletas: borde `var(--c-success)` (lima) pero glow `rgba(16,185,129,…)` (esmeralda). Gradiente con `#059669` hardcodeado (styles.css ~485). | Fase 3 |
 | G7 | 🟡 | `dashboard-view.js` conserva `border-top: 3px solid #FF4444/#FF9800/#a855f7` inline (neutralizados por el `!important` global → código muerto y 2 colores fuera de paleta). | Fase 3 |
 | G8 | 🟡 | **Estilos inline** en vistas: informes 222, dashboard 127, explotación 72, trazabilidad 42, ajustes 40, compradores 34, wizards-censo/guía/crotales ~31 c/u… (parte justificada: plantillas PDF). | Fase 3 (por lotes) |
@@ -41,7 +41,7 @@
 | Fase | Contenido | Estado |
 |---|---|:---:|
 | F1 | Quick-wins de bugs objetivos: G1, G2 | ✅ 2026-07-02 |
-| F2 | **Mapa único de colores de módulo** (constante `window.MODULE_COLORS` o similar) + migrar dropdown del header, sheet "Más" y `updateHeaderColor()` | ⬜ |
+| F2 | **Mapa único de colores de módulo** (constante `window.MODULE_COLORS` o similar) + migrar dropdown del header, sheet "Más" y `updateHeaderColor()` + design-tokens.css canónico + paleta ampliada en AGENTS.md | ✅ 2026-07-02 |
 | F3 | Migración de colores a tokens por lotes de vistas (orden: dashboard → ganadería → expro → comer → listas → informes → wizards) + G6, G7, G11 + decisión G3 | ⬜ |
 | F4 | Navegación: back físico cierra sheet "Más"; cancelar/back en wizard con confirmación de descarte (vía `onCancel` + `Confirm`); completar `_routesConVolver` | ⬜ |
 | F5 | **Pase visual por pantalla** (checklist §3): textos, encabezados, unidades (kg, L, €, cab., UGM), capitalización, glassmorphism de KPIs, pills | ⬜ |
@@ -87,3 +87,5 @@ Leyenda: 🤖 escaneo automático hecho · 👁 pase visual · ✅ conforme · �
 ## 4. Registro de cambios de la auditoría
 
 - **2026-07-02** — F1: reparadas `.card-accent-*` corruptas (G1) y añadida `.card-accent-gold` (G2). Documento creado.
+- **2026-07-02** — Marco: haz de luz interior en header y bottom-nav (efecto unión).
+- **2026-07-02** — F2: `design-tokens.css` = fuente única de tokens (G3); paleta ampliada en AGENTS.md (naranja/violeta/rosa de módulo); mapa único `js/module-colors.js` consumido por dropdown, header y sheet "Más" (G5). Cambio de color notable: Animales pasa de rojo a **naranja** en la cabecera (coherente con su color de módulo).
