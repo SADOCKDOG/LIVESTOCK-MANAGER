@@ -55,8 +55,8 @@ const CuadernoDigitalView = {
       const esp = a.especie || 'Sin especie';
       if (!censoPorEspecie[esp]) censoPorEspecie[esp] = { total: 0, hembras: 0, machos: 0, categorias: {} };
       censoPorEspecie[esp].total++;
-      if (a.sexo === 'hembra' || a.sexo === 'Hembra') censoPorEspecie[esp].hembras++;
-      if (a.sexo === 'macho' || a.sexo === 'Macho') censoPorEspecie[esp].machos++;
+      if (a.sexo === 'H' || (a.sexo || '').toLowerCase() === 'hembra') censoPorEspecie[esp].hembras++;
+      if (a.sexo === 'M' || (a.sexo || '').toLowerCase() === 'macho') censoPorEspecie[esp].machos++;
       const cat = a.categoria || 'Sin categoría';
       if (!censoPorEspecie[esp].categorias[cat]) censoPorEspecie[esp].categorias[cat] = 0;
       censoPorEspecie[esp].categorias[cat]++;
@@ -142,7 +142,7 @@ const CuadernoDigitalView = {
       <div class="grid grid-cols-4 gap-6 mb-14">
         <div class="info-box-center border-left-green"><small class="s-lbl">${Icons.rebanos()} CENSO</small><div class="inf-val-lg text-green">${d.totalActivos}</div></div>
         <div class="info-box-center border-left-blue"><small class="s-lbl">${Icons.reproduccion()} REPROD.</small><div class="inf-val-lg text-blue">${d.partos} partos</div></div>
-        <div class="info-box-center border-left-red"><small class="s-lbl">${Icons.sanidad()} SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} activos</div></div>
+        <div class="info-box-center border-left-red"><small class="s-lbl">${Icons.sanidad()} SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} ${d.tratamientosActivos.length === 1 ? "activo" : "activos"}</div></div>
         <div class="info-box-center border-left-amber"><small class="s-lbl">${Icons.comercial()} VENTAS</small><div class="inf-val-lg text-amber">${d.ventasCarne.length + d.ventasLeche.length}</div></div>
       </div>
 
@@ -173,9 +173,9 @@ const CuadernoDigitalView = {
           <div><span class="text-gray">NIF:</span> <strong class="text-white">${f.nif || '—'}</strong></div>
           <div><span class="text-gray">Provincia:</span> <strong class="text-white">${f.provincia || '—'}</strong></div>
           <div><span class="text-gray">Municipio:</span> <strong class="text-white">${f.municipio || '—'}</strong></div>
-          <div><span class="text-gray">CC.AA.:</span> <strong class="text-white">${f.comunidad_autonoma || '—'}</strong></div>
+          <div><span class="text-gray">CC.AA.:</span> <strong class="text-white">${(window.ComunidadesService && ComunidadesService.getConfiguracionCCAA(f.comunidad_autonoma)?.label) || f.comunidad_autonoma || '—'}</strong></div>
           <div><span class="text-gray">Tipo Explotación:</span> <strong class="text-white">${f.tipo_explotacion || '—'}</strong></div>
-          <div><span class="text-gray">Sistema:</span> <strong class="text-white">${f.sistema_explotacion || '—'}</strong></div>
+          <div><span class="text-gray">Sistema:</span> <strong class="text-white">${f.sistema_explotacion ? f.sistema_explotacion.charAt(0).toUpperCase() + f.sistema_explotacion.slice(1) : '—'}</strong></div>
           <div><span class="text-gray">ADSG:</span> <strong class="text-white">${f.adsg_nombre || '—'}</strong></div>
           <div><span class="text-gray">Veterinario:</span> <strong class="text-white">${f.adsg_veterinario || '—'}</strong></div>
           <div><span class="text-gray">Nº Colegiado:</span> <strong class="text-white">${f.adsg_vet_colegiado || '—'}</strong></div>
@@ -196,7 +196,7 @@ const CuadernoDigitalView = {
             <span>Total: ${info.total}</span>
           </div>
           <div class="text-gray text-82">
-            ♀ ${info.hembras} hembras · ♂ ${info.machos} machos
+            ♀ ${info.hembras} ${info.hembras === 1 ? "hembra" : "hembras"} · ♂ ${info.machos} ${info.machos === 1 ? "macho" : "machos"}
           </div>
           <div class="mt-4 text-gray-500 text-75">
             ${Object.entries(info.categorias).map(([cat, cnt]) =>
@@ -261,7 +261,7 @@ const CuadernoDigitalView = {
           ${d.eventos.slice(0, 30).map(e =>
             `<div class="flex justify-between cuaderno-row">
               <span class="text-gray">${e.fecha || '—'}</span>
-              <span class="text-ccc">${e.motivo_tarea || e.tipo || 'Evento'}</span>
+              <span class="text-ccc">${(e.motivo_tarea || e.tipo || 'Evento').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase())}</span>
               <span class="text-gray-500">${e.descripcion || e.notas || ''}</span>
             </div>`
           ).join('') || '<p class="empty-state-text mb-0">Sin eventos registrados.</p>'}
@@ -293,7 +293,7 @@ const CuadernoDigitalView = {
               <span class="text-gray">${t.fecha || '—'}</span>
               <span class="text-gold font-semibold">${t.medicamento || t.producto || '—'}</span>
               <span class="text-gray"> · ${rb?.nombre || ''}${motivo}${via}${vet}${receta}</span>
-              <span class="text-gray-500 float-right">Espera: ${t.tiempo_espera_carne_dias || '?'}d</span>
+              <span class="text-gray-500 float-right">Espera: ${t.tiempo_espera_carne_dias ? t.tiempo_espera_carne_dias + 'd' : '—'}</span>
             </div>`;
           }).join('') || '<p class="empty-state-text mb-0">Sin tratamientos registrados.</p>'}
         </div>
@@ -335,7 +335,7 @@ const CuadernoDigitalView = {
           ${d.reproduccion.slice(0, 15).map(e =>
             `<div class="flex justify-between cuaderno-row">
               <span class="text-gray">${e.fecha || '—'}</span>
-              <span class="text-ccc">${e.tipo || ''}</span>
+              <span class="text-ccc">${(e.tipo || '').replace(/_/g, ' ').replace(/^./, c => c.toUpperCase())}</span>
               <span class="text-gray-500">${e.resultado || e.notas || ''}</span>
             </div>`
           ).join('') || '<p class="empty-state-text mb-0">Sin eventos reproductivos.</p>'}
@@ -357,7 +357,7 @@ const CuadernoDigitalView = {
             <h4 class="text-gold mb-8 text-85 m-0">${Icons.carne()} Carne</h4>
             ${d.ventasCarne.length > 0 ? `
               <div class="text-white font-black text-lg">${d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0).toFixed(0)} kg</div>
-              <div class="text-gray text-2xs">${d.ventasCarne.length} expediciones</div>
+              <div class="text-gray text-2xs">${d.ventasCarne.length} ${d.ventasCarne.length === 1 ? "expedición" : "expediciones"}</div>
             ` : '<div class="empty-state mb-0"><p class="empty-state-text">Sin datos de producción cárnica.</p></div>'}
           </div>
         </div>
@@ -396,7 +396,7 @@ const CuadernoDigitalView = {
       <!-- Pie -->
       <div class="text-center p-20 text-555 mt-25 text-2xs border-top-222">
         Documento generado el ${new Date().toLocaleString('es-ES')} · Cuaderno Digital RD 787/2023<br>
-        Livestock Manager Premium — v4.3.0
+        Livestock Manager Premium — v${window.APP_INFO.version}
       </div>
     </div>`;
   },
@@ -747,7 +747,7 @@ const CuadernoDigitalView = {
       <tr><td width="30%"><b>Nombre</b></td><td>${f.nombre || '—'}</td><td width="30%"><b>REGA</b></td><td>${f.codigo_REGA || f.rega || '—'}</td></tr>
       <tr><td><b>CEA</b></td><td>${f.cea || '—'}</td><td><b>NIF</b></td><td>${f.nif || '—'}</td></tr>
       <tr><td><b>Provincia</b></td><td>${f.provincia || '—'}</td><td><b>Municipio</b></td><td>${f.municipio || '—'}</td></tr>
-      <tr><td><b>CC.AA.</b></td><td>${f.comunidad_autonoma || '—'}</td><td><b>Tipo/Sistema</b></td><td>${f.tipo_explotacion || '—'} / ${f.sistema_explotacion || '—'}</td></tr>
+      <tr><td><b>CC.AA.</b></td><td>${(window.ComunidadesService && ComunidadesService.getConfiguracionCCAA(f.comunidad_autonoma)?.label) || f.comunidad_autonoma || '—'}</td><td><b>Tipo/Sistema</b></td><td>${f.tipo_explotacion || '—'} / ${f.sistema_explotacion ? f.sistema_explotacion.charAt(0).toUpperCase() + f.sistema_explotacion.slice(1) : '—'}</td></tr>
       <tr><td><b>ADSG</b></td><td>${f.adsg_nombre || '—'}</td><td><b>Veterinario</b></td><td>${f.adsg_veterinario || '—'} (${f.adsg_vet_colegiado || '—'})</td></tr>
     </table>
 

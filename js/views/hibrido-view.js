@@ -221,7 +221,7 @@ const HibridoView = {
                   </div>
                 </div>
                 <div class="text-right flex-shrink-0 ml-8">
-                  <span class="badge badge-sm badge-gold" class="block mb-4">${r.cantidad_animales || 0} cabezas</span>
+                  <span class="badge badge-sm badge-gold" class="block mb-4">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
                 </div>
               </div>
             </div>`).join('')}

@@ -268,7 +268,7 @@ const CarneView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold block mb-4 font-950">${r.cantidad_animales || 0} CABEZAS</span>
+                      <span class="badge badge-sm badge-gold block mb-4 font-950">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesCarne.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
                       <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
                     </div>
                   </div>

@@ -31,7 +31,17 @@ window.MODULE_COLORS = Object.freeze({
   // Rosa de módulo: Logística
   '/transportistas': '#EC4899',
   // Neutro
-  '/ajustes': '#94A3B8'
+  '/ajustes': '#94A3B8',
+  // Alias de rutas de detalle (heredan el color de su módulo)
+  '/animal': '#F97316',
+  '/rebano': '#3b82f6',
+  '/zona': '#CCFF00',
+  '/comprador': '#3b82f6',
+  '/proveedor': '#A855F7',
+  '/gasto': '#FF4444',
+  '/venta-carne': '#FF4444',
+  '/albaran-leche': '#3b82f6',
+  '/contrato': '#3b82f6'
 });
 
 /** Color de un módulo por ruta (fallback: lima corporativo). */

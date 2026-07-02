@@ -140,7 +140,7 @@ const AnimalesView = {
             <div class="flex-1 min-w-0">
               <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
                 <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
-                ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} ${edad} AÑOS</div>` : ''}
+                ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} ${edad} ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
                 ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
               </div>
             </div>

@@ -356,7 +356,7 @@ const ComercializacionView = {
           date: e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-',
           zone: '',
           value: (e.cantidad || 0).toLocaleString() + ' L',
-          subvalue: (e.temperatura || '--') + 'ºC' + (es !== '--' ? ' · ES: ' + es + '%' : ''),
+          subvalue: (e.temperatura || '--') + '°C' + (es !== '--' ? ' · ES: ' + es + '%' : ''),
           badges: allBadges,
           onclick: "location.hash='/albaran-leche?id=" + e.id + "'"
         };

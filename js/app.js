@@ -391,9 +391,11 @@ const App = {
     this.updateHeaderColor(null);
   },
 
-  /** Actualiza el color neon de la cabecera según el modo de explotación (mapa único MODULE_COLORS) */
+  /** Actualiza el color neon de la cabecera según el mapa único MODULE_COLORS.
+   *  Con mode explícito (carne/leche/...) usa ese módulo; sin mode, el color de la ruta actual. */
   updateHeaderColor(mode) {
-    const color = window.getModuleColor(mode ? '/' + mode : '/');
+    const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
+    const color = window.getModuleColor(path);
     document.documentElement.style.setProperty('--header-neon-color', color);
   },
 

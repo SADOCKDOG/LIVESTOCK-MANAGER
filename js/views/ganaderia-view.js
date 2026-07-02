@@ -83,7 +83,7 @@ const GanaderiaView = {
         <div class="flex flex-col">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.rebanos()} Lotes / Rebaños</span>
-            <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} lotes</strong>
+            <strong class="text-xl font-950" style="color: ${meta.color};">${rebanosModo.length} ${rebanosModo.length === 1 ? "lote" : "lotes"}</strong>
           </div>
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Animales Activos</span>
@@ -122,7 +122,7 @@ const GanaderiaView = {
 
       <div class="card p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Censo reciente (${animalesModo.length} total · ${especies.size} especie(s))
+          ${Icons.documento()} Censo reciente (${animalesModo.length} total · ${especies.size} ${especies.size === 1 ? "especie" : "especies"})
         </div>
         ${animalesModo.length > 0 ? `
         <div class="flex flex-wrap gap-4 mb-12">
