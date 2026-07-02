@@ -11,7 +11,10 @@
 
   var PurchaseManager = {
     _initialized: false,
-    _purchased: false,
+    // Lectura síncrona: las vistas del primer render ya conocen el estado Premium
+    _purchased: (function () {
+      try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch (e) { return false; }
+    })(),
     _store: null,
 
     isPurchased: function () {
@@ -24,6 +27,10 @@
 
     purchase: function () {
       var self = this;
+      if (self._purchased) {
+        App.toast('✅ Ya eres Premium. Todas las funciones están desbloqueadas.');
+        return;
+      }
       if (!self._store) {
         App.toastError('El sistema de pago no está disponible. Inténtalo de nuevo.');
         return;
@@ -93,11 +100,12 @@
         .finished(function (transaction) {
           console.log('[PurchaseManager] finished:', transaction);
         })
-        .receiptsReady(function (receipts) {
-          console.log('[PurchaseManager] receiptsReady:', receipts);
+        .receiptsReady(function () {
+          // v13: el callback NO recibe argumentos; los recibos se leen del store
+          var receipts = (self._store && self._store.localReceipts) || [];
+          console.log('[PurchaseManager] receiptsReady, recibos locales:', receipts.length);
           for (var i = 0; i < receipts.length; i++) {
-            var receipt = receipts[i];
-            if (receiptHasProduct(receipt, PRODUCT_ID)) {
+            if (receiptHasProduct(receipts[i], PRODUCT_ID)) {
               self._markPurchased();
               break;
             }
@@ -105,7 +113,13 @@
         });
 
       store.error(function (err) {
-        console.error('[PurchaseManager] error:', err);
+        console.error('[PurchaseManager] error:', err && err.code, err && err.message);
+        // Autocuración: si Google responde "ya comprado", marcar Premium localmente
+        var msg = (err && err.message) || '';
+        if ((err && err.code === 6777003) || /already owned|ya has comprado/i.test(msg)) {
+          self._markPurchased();
+          App.toast('✅ Compra Premium restaurada.');
+        }
       });
 
       store.initialize([CdvPurchase.Platform.GOOGLE_PLAY])
@@ -132,10 +146,15 @@
     },
 
     _markPurchased: function () {
+      var yaEstaba = this._purchased;
       this._purchased = true;
       this._initialized = true;
       try { localStorage.setItem(STORAGE_KEY, 'true'); } catch (e) {}
       console.log('[PurchaseManager] Premium marcado como comprado');
+      // Repintar la vista actual para que desaparezcan los banners/candados Free
+      if (!yaEstaba && window.App && typeof App.route === 'function') {
+        try { App.route(); } catch (e) {}
+      }
     },
 
     _checkLocal: function () {
