@@ -42,7 +42,7 @@ const ZonasView = {
           censoTotal += n;
           especiesEnZona.add(r.especie);
           if (n > 0) {
-            const colorEspecie = r.especie === 'Vacas' ? '#3b82f6' : r.especie === 'Ovejas' ? '#10b981' : r.especie === 'Cabras' ? '#f59e0b' : '#ec4899';
+            const colorEspecie = r.especie === 'Vacas' ? 'var(--c-info)' : r.especie === 'Ovejas' ? 'var(--c-success)' : r.especie === 'Cabras' ? 'var(--c-warning)' : 'var(--c-pink)';
             rebanosHtml += `
               <div class="flex justify-between items-center mt-6" style="background:rgba(255,255,255,0.02); border-left:3px solid ${colorEspecie}; padding:8px 12px; border-radius:8px;">
                 <div class="flex items-center gap-8">
@@ -62,7 +62,7 @@ const ZonasView = {
         totalAforo += aforo;
         totalOcupacion += censoTotal;
         const pct = aforo > 0 ? Math.round((censoTotal / aforo) * 100) : 0;
-        const colorCenso = pct > 100 ? '#ef4444' : pct >= 80 ? '#f59e0b' : '#10b981';
+        const colorCenso = pct > 100 ? 'var(--c-danger)' : pct >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
         const estadoTexto = pct > 100 ? '🔴 Sobrecarga' : pct >= 80 ? '🟡 Óptimo' : pct >= 50 ? '🟢 Aceptable' : '⚪ Infrautilizada';
 
         const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
@@ -122,9 +122,9 @@ const ZonasView = {
       html += `</div>`;
       // Barra resumen global
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
-      const colorGlobal = pctGlobal > 100 ? '#ef4444' : pctGlobal >= 80 ? '#f59e0b' : '#10b981';
+      const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
       html += `
-        <div class="card mt-15" style="background:rgba(16,185,129,0.03);padding:15px;">
+        <div class="card mt-15" style="background:rgba(204,255,0,0.03);padding:15px;">
           <div class="flex justify-between items-center mb-6">
             <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
             <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>

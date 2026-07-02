@@ -164,7 +164,7 @@ const ProduccionView = {
   _renderCarne(content, d) {
     this._renderSeccion(content, {
       icon: Icons.carne(), title: 'Producción Cárnica (kg)', subtitle: 'Pesajes individuales y por lote',
-      color: '#ef4444', colorDark: '#b91c1c',
+      color: 'var(--c-danger)', colorDark: '#b91c1c',
       kpis: [
         { label: 'Total kg', value: this._fmt(d.kgTotal) + ' kg' },
         { label: 'Pesadas', value: d.kgCount }
@@ -180,7 +180,7 @@ const ProduccionView = {
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
           value: (e.valor_neto || 0) + ' kg',
-          typeColor: isInd ? '#ef4444' : '#f59e0b',
+          typeColor: isInd ? 'var(--c-danger)' : 'var(--c-warning)',
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
       }),
@@ -191,7 +191,7 @@ const ProduccionView = {
   _renderLeche(content, d) {
     this._renderSeccion(content, {
       icon: Icons.leche(), title: 'Producción Láctea (L)', subtitle: 'Control lechero individual y de lote',
-      color: '#3b82f6', colorDark: '#1d4ed8',
+      color: 'var(--c-info)', colorDark: '#1d4ed8',
       kpis: [
         { label: 'Total litros', value: this._fmt(d.litrosTotal) + ' L' },
         { label: 'Registros', value: d.litrosCount },
@@ -215,7 +215,7 @@ const ProduccionView = {
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
           value: (e.valor_neto || 0) + ' L',
-          typeColor: isInd ? '#3b82f6' : (isLote ? '#8b5cf6' : '#10b981'),
+          typeColor: isInd ? 'var(--c-info)' : (isLote ? 'var(--c-purple)' : 'var(--c-success)'),
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
       }),
@@ -226,7 +226,7 @@ const ProduccionView = {
   _renderVentas(content, d) {
     this._renderSeccion(content, {
       icon: Icons.comercial(), title: 'Venta Masiva / Matadero', subtitle: 'Expediciones y ventas de ganado',
-      color: '#f59e0b', colorDark: '#b45309',
+      color: 'var(--c-warning)', colorDark: 'var(--c-warning)',
       kpis: [
         { label: 'Total ventas', value: this._fmt(d.ventasTotal) + ' €' },
         { label: 'Expediciones', value: d.ventaEvents.length }
@@ -247,7 +247,7 @@ const ProduccionView = {
   _renderGastos(content, d) {
     this._renderSeccion(content, {
       icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
-      color: '#8b5cf6', colorDark: '#6d28d9',
+      color: 'var(--c-purple)', colorDark: '#6d28d9',
       kpis: [
         { label: 'Total gastos', value: this._fmt(d.gastosTotal) + ' €' },
         { label: 'Registros', value: d.gastosRecords.length }

@@ -18,16 +18,16 @@ const CompradoresView = {
           <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
           <div class="mb-14">
             <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-              <span style="color: #8b5cf6; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GESTIÓN COMERCIAL
+              <span style="color: var(--c-purple); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GESTIÓN COMERCIAL
             </div>
             <div class="comer-mode-switch" style="display: flex; gap: 8px;">
               <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}" 
-                style="--mode-color:#8b5cf6; color: ${this._activeModule === 'compradores' ? '#000' : '#8b5cf6'}; flex: 1; padding: 10px;" 
+                style="--mode-color:var(--c-purple); color: ${this._activeModule === 'compradores' ? '#000' : 'var(--c-purple)'}; flex: 1; padding: 10px;" 
                 onclick="CompradoresView._cambiarModulo('compradores')">
                 ${Icons.compradores()} Compradores
               </button>
               <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}" 
-                style="--mode-color:#10b981; color: ${this._activeModule === 'contratos' ? '#000' : '#10b981'}; flex: 1; padding: 10px;" 
+                style="--mode-color:var(--c-success); color: ${this._activeModule === 'contratos' ? '#000' : 'var(--c-success)'}; flex: 1; padding: 10px;" 
                 onclick="CompradoresView._cambiarModulo('contratos')">
                 ${Icons.contratos()} Contratos
               </button>
@@ -76,9 +76,9 @@ const CompradoresView = {
                 </div>
                 <div class="comer-mode-switch">
                   <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold); color: var(--mode-color);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:#CCFF00; color: var(--mode-color);" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:var(--c-orange); color: var(--mode-color);" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
+                  <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:var(--c-success); color: var(--mode-color);" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
                 </div>
               </div>
 
@@ -108,11 +108,11 @@ const CompradoresView = {
             container.innerHTML = `
               <div class="mb-14">
                 <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                  <span style="color: #10b981; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> CONTRATOS COMERCIALES
+                  <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> CONTRATOS COMERCIALES
                 </div>
               </div>
 
-              <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #10b981;">
+              <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-success);">
                 <div class="section-header-theme">ACCIONES</div>
                 <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                   <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContratoLibre()">
@@ -139,9 +139,9 @@ const CompradoresView = {
     _getTabMeta(tab) {
         const map = {
             'todos': { color: 'var(--p-gold)', label: 'Todos' },
-            'cárnico': { color: '#ef4444', label: 'Cárnico' },
-            'láctico': { color: '#3b82f6', label: 'Láctico' },
-            'híbrido': { color: '#10b981', label: 'Híbrido' }
+            'cárnico': { color: 'var(--c-danger)', label: 'Cárnico' },
+            'láctico': { color: 'var(--c-info)', label: 'Láctico' },
+            'híbrido': { color: 'var(--c-success)', label: 'Híbrido' }
         };
         return map[tab] || map.todos;
     },
@@ -238,7 +238,7 @@ const CompradoresView = {
                 <span class="text-gray-600 font-900 mr-6">CONTRATOS VINCULADOS:</span>
                 ${cContratos.length === 0 ? '<span class="text-gray-700 italic">SIN CONTRATOS ASIGNADOS</span>' :
                   cContratos.map(ct => `
-                    <span class="badge" style="margin-left:4px; font-size:0.6rem; background:${ct.activo ? '#10b98120' : '#222'}; color:${ct.activo ? '#10b981' : '#555'}; border:1px solid ${ct.activo ? '#10b98140' : '#333'}; padding:2px 8px; border-radius:30px; font-weight:900;">
+                    <span class="badge" style="margin-left:4px; font-size:0.6rem; background:${ct.activo ? 'var(--c-success)20' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'var(--c-success)40' : '#333'}; padding:2px 8px; border-radius:30px; font-weight:900;">
                       ${ct.numero_contrato}
                     </span>
                   `).join('')
@@ -281,7 +281,7 @@ const CompradoresView = {
               <div class="empty-state">
                 <div class="empty-state-icon">${Icons.contratos()}</div>
                 <p class="empty-state-text">Aún no hay contratos registrados.</p>
-                <button class="btn btn-create btn-sm" style="background:#10b981;" onclick="CompradoresView._nuevoContratoLibre()">${Icons.agregar()} Crear primer contrato</button>
+                <button class="btn btn-create btn-sm" style="background:var(--c-success);" onclick="CompradoresView._nuevoContratoLibre()">${Icons.agregar()} Crear primer contrato</button>
               </div>`;
             return;
         }
@@ -292,7 +292,7 @@ const CompradoresView = {
 
         contenedor.innerHTML = `<div class="grid gap-12">${lista.map(ct => {
           const comp = compradorMap[ct.compradorId];
-          const color = ct.tipo === 'leche' ? '#3b82f6' : (ct.tipo === 'carne' ? '#ef4444' : '#10b981');
+          const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
           
           return `
           <div class="card bg-black-opacity-50" style="border-left:4px solid ${color}; padding:16px; margin-bottom:10px; border-radius:12px;">
@@ -301,7 +301,7 @@ const CompradoresView = {
                 <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
                   ${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}
                   CONTRATO ${ct.tipo.toUpperCase()}
-                  <span class="badge" style="background:${ct.activo ? '#10b98120' : '#222'}; color:${ct.activo ? '#10b981' : '#555'}; border:1px solid ${ct.activo ? '#10b98140' : '#333'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
+                  <span class="badge" style="background:${ct.activo ? 'var(--c-success)20' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'var(--c-success)40' : '#333'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
                     ${ct.activo ? 'ACTIVO' : 'INACTIVO'}
                   </span>
                 </div>
@@ -348,9 +348,9 @@ const CompradoresView = {
 
     _colorTipo(tipo, bg = false, border = false) {
         const colores = {
-            'cárnico': { text: '#ef4444', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' },
-            'láctico': { text: '#3b82f6', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
-            'híbrido': { text: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' }
+            'cárnico': { text: 'var(--c-danger)', bg: 'rgba(255,68,68,0.1)', border: 'rgba(255,68,68,0.3)' },
+            'láctico': { text: 'var(--c-info)', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
+            'híbrido': { text: 'var(--c-success)', bg: 'rgba(204,255,0,0.1)', border: 'rgba(204,255,0,0.3)' }
         };
         const c = colores[tipo] || colores['híbrido'];
         if (bg) return c.bg;
@@ -453,10 +453,10 @@ const CompradoresView = {
             <div class="grid gap-8">
             ${contratos.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin contratos registrados.</p></div>' :
               contratos.map(c => `
-                <div class="info-box-sm mb-4 bg-dark border border-222" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:4px solid ${c.activo ? '#10b981' : '#444'};">
+                <div class="info-box-sm mb-4 bg-dark border border-222" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:4px solid ${c.activo ? 'var(--c-success)' : '#444'};">
                   <div class="flex justify-between items-center">
                     <span class="text-white font-950 text-md uppercase tracking-tight">${c.numero_contrato}</span>
-                    <span class="badge" style="font-size:0.55rem; background:${c.activo ? '#10b98120' : '#222'}; color:${c.activo ? '#10b981' : '#666'}; border:1px solid ${c.activo ? '#10b98140' : '#333'}; border-radius:30px; padding:2px 8px; font-weight:950; text-transform:uppercase;">${c.activo ? 'ACTIVO' : 'INACTIVO'}</span>
+                    <span class="badge" style="font-size:0.55rem; background:${c.activo ? 'var(--c-success)20' : '#222'}; color:${c.activo ? 'var(--c-success)' : '#666'}; border:1px solid ${c.activo ? 'var(--c-success)40' : '#333'}; border-radius:30px; padding:2px 8px; font-weight:950; text-transform:uppercase;">${c.activo ? 'ACTIVO' : 'INACTIVO'}</span>
                   </div>
                   <div class="text-aaa font-800 text-[0.62rem] uppercase mt-4 tracking-wide flex flex-wrap gap-x-10 gap-y-2">
                     <span class="flex items-center gap-4 text-blue">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()} ${c.tipo}</span>
@@ -538,7 +538,7 @@ const CompradoresView = {
             </button>
           </div>
           <div class="card card-accent card-accent-amber p-20 bg-black">
-            <div class="section-header-theme mb-20" style="--theme-color: #d97706">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
+            <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label uppercase font-900">Nombre / Razón Social *</label>
@@ -626,7 +626,7 @@ const CompradoresView = {
             </div>
 
             <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
-              <input type="checkbox" id="c-activo" ${c.activo !== false ? 'checked' : ''} style="accent-color:#d97706;">
+              <input type="checkbox" id="c-activo" ${c.activo !== false ? 'checked' : ''} style="accent-color:var(--c-warning);">
               <span class="uppercase font-950 tracking-widest text-[0.65rem]">Comprador activo en el sistema</span>
             </label>
 

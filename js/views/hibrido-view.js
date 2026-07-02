@@ -130,18 +130,18 @@ const HibridoView = {
           { label: 'Finca Activa', value: finca?.nombre || 'Mixta' }
         ],
         explotacion: [
-          { label: 'Margen Global', value: Math.round(mofaConsolidado).toLocaleString() + ' €', color: mofaConsolidado >= 0 ? '#10b981' : '#ef4444' },
-          { label: 'Coste Piensos', value: totalGastosAlim.toLocaleString() + ' €', color: '#ef4444' },
+          { label: 'Margen Global', value: Math.round(mofaConsolidado).toLocaleString() + ' €', color: mofaConsolidado >= 0 ? 'var(--c-success)' : 'var(--c-danger)' },
+          { label: 'Coste Piensos', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' },
           { label: 'Ratio MOFA', value: ratioMofaConsolidado.toFixed(1) + '%' }
         ],
         comercializacion: [
-          { label: 'Ingresos Totales', value: totalIngresosConsolidados.toLocaleString() + ' €', color: '#10b981' },
+          { label: 'Ingresos Totales', value: totalIngresosConsolidados.toLocaleString() + ' €', color: 'var(--c-success)' },
           { label: 'Ventas Leche', value: `${pctLeche.toFixed(0)}%` },
           { label: 'Ventas Carne', value: `${pctCarne.toFixed(0)}%` }
         ],
         legislacion: [
-          { label: 'Supresiones Carne', value: supresionesCarne.length, color: supresionesCarne.length > 0 ? '#ef4444' : '#10b981' },
-          { label: 'Supresiones Leche', value: supresionesLeche.length, color: supresionesLeche.length > 0 ? '#3b82f6' : '#10b981' }
+          { label: 'Supresiones Carne', value: supresionesCarne.length, color: supresionesCarne.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
+          { label: 'Supresiones Leche', value: supresionesLeche.length, color: supresionesLeche.length > 0 ? 'var(--c-info)' : 'var(--c-success)' }
         ]
       }
     };
@@ -195,7 +195,7 @@ const HibridoView = {
           </div>
         </div>
 
-        ${this._kpiGrid(d.kpis.patrimonio, '#d97706')}
+        ${this._kpiGrid(d.kpis.patrimonio, 'var(--c-warning)')}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -209,7 +209,7 @@ const HibridoView = {
         </div>
         <div class="grid gap-10">
           ${d.rebanos.map(r => `
-            <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid #d97706;">
+            <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-warning);">
               <div class="flex justify-between items-start">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-6">
@@ -281,7 +281,7 @@ const HibridoView = {
           </div>
         </div>
 
-        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
+        ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
 
         <!-- Accesos directos comerciales -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -295,7 +295,7 @@ const HibridoView = {
         </div>
         <div class="grid gap-10">
           ${lList.slice(0, 15).map(l => {
-            const color = l.tipo === 'carne' ? '#ef4444' : '#3b82f6';
+            const color = l.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
             return `
               <div class="card card-animal" onclick="${l.onclick}" style="border-left:4px solid ${color};">
                 <div class="flex justify-between items-start">
@@ -311,7 +311,7 @@ const HibridoView = {
                     </div>
                   </div>
                   <div class="text-right flex-shrink-0 ml-8">
-                    <span class="badge badge-sm text-green font-bold text-lg" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); display:block;">${Math.round(l.valor).toLocaleString()} €</span>
+                    <span class="badge badge-sm text-green font-bold text-lg" style="background:rgba(204,255,0,0.1); border:1px solid rgba(204,255,0,0.3); display:block;">${Math.round(l.valor).toLocaleString()} €</span>
                   </div>
                 </div>
               </div>`;
@@ -344,7 +344,7 @@ const HibridoView = {
 
     const html = `
       ${alertasHtml}
-      <div class="card report-section p-16 border-top-3px" style="border-top-color:#8b5cf6;">
+      <div class="card report-section p-16 border-top-3px" style="border-top-color:var(--c-purple);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.documento()}</span>
@@ -353,12 +353,12 @@ const HibridoView = {
               <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
             </div>
           </div>
-          <button class="btn btn-secondary btn-sm" style="background:#8b5cf6; border-color:#8b5cf6;" onclick="HibridoView._abrirAsistenteTratamientoMix()">
+          <button class="btn btn-secondary btn-sm" style="background:var(--c-purple); border-color:var(--c-purple);" onclick="HibridoView._abrirAsistenteTratamientoMix()">
             ${Icons.agregar()} Registrar Tratamiento
           </button>
         </div>
 
-        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
+        ${this._kpiGrid(d.kpis.legislacion, 'var(--c-purple)')}
 
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
@@ -374,7 +374,7 @@ const HibridoView = {
             ? d.sanitariosFinca.slice(0, 15).map(s => {
                 const enSupC = d.supresionesCarne.some(ts => ts.id === s.id);
                 const enSupL = d.supresionesLeche.some(ts => ts.id === s.id);
-                const color = (enSupC || enSupL) ? '#ef4444' : '#8b5cf6';
+                const color = (enSupC || enSupL) ? 'var(--c-danger)' : 'var(--c-purple)';
                 return `
                   <div class="card card-animal" style="border-left:4px solid ${color};">
                     <div class="flex justify-between items-start">
@@ -392,7 +392,7 @@ const HibridoView = {
                       <div class="text-right flex-shrink-0 ml-8">
                         ${enSupC ? `<span class="badge badge-sm badge-red block mb-2">SUP. CARNE</span>` : ''}
                         ${enSupL ? `<span class="badge badge-sm badge-blue block">SUP. LECHE</span>` : ''}
-                        ${!enSupC && !enSupL ? `<span class="badge badge-sm block" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid #8b5cf640;">LIBRE</span>` : ''}
+                        ${!enSupC && !enSupL ? `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid var(--c-purple)40;">LIBRE</span>` : ''}
                       </div>
                     </div>
                   </div>`;

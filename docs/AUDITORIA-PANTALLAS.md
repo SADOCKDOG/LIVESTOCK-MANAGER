@@ -42,7 +42,7 @@
 |---|---|:---:|
 | F1 | Quick-wins de bugs objetivos: G1, G2 | ✅ 2026-07-02 |
 | F2 | **Mapa único de colores de módulo** (constante `window.MODULE_COLORS` o similar) + migrar dropdown del header, sheet "Más" y `updateHeaderColor()` + design-tokens.css canónico + paleta ampliada en AGENTS.md | ✅ 2026-07-02 |
-| F3 | Migración de colores a tokens por lotes de vistas (orden: dashboard → ganadería → expro → comer → listas → informes → wizards) + G6, G7, G11 + decisión G3 | ⬜ |
+| F3 | Migración de colores a tokens por lotes de vistas (orden: dashboard → ganadería → expro → comer → listas → informes → wizards) + G6, G7, G11 + decisión G3 | 🟡 lotes 1-2 ✅ (15 vistas + styles.css); pendiente: ajustes, cuaderno, trazabilidad, documentos, manuales, informes (Chart.js/PDF con cuidado), wizards, app.js |
 | F4 | Navegación: back físico cierra sheet "Más"; cancelar/back en wizard con confirmación de descarte (vía `onCancel` + `Confirm`); completar `_routesConVolver` | ✅ 2026-07-02 |
 | F5 | **Pase visual por pantalla** (checklist §3): textos, encabezados, unidades (kg, L, €, cab., UGM), capitalización, glassmorphism de KPIs, pills | ⬜ |
 | F6 | Notificaciones (campana, mini-badge, vista alertas) + estandarización de toasts semánticos | ⬜ |
@@ -90,4 +90,5 @@ Leyenda: 🤖 escaneo automático hecho · 👁 pase visual · ✅ conforme · �
 - **2026-07-02** — Marco: haz de luz interior en header y bottom-nav (efecto unión).
 - **2026-07-02** — F2: `design-tokens.css` = fuente única de tokens (G3); paleta ampliada en AGENTS.md (naranja/violeta/rosa de módulo); mapa único `js/module-colors.js` consumido por dropdown, header y sheet "Más" (G5). Cambio de color notable: Animales pasa de rojo a **naranja** en la cabecera (coherente con su color de módulo).
 - **2026-07-02** — Header: punto de finca activa único y exterior; viñeta flexible (adiós max-width 90px legacy); componentes centrados en el mismo eje.
+- **2026-07-03** — F3 lotes 1-2: 15 vistas + styles.css migradas a tokens (verificado en dispositivo USB: dashboard, Ganadería, ExPro, CoMer). TQM aplicado: pestañas Carne/Cárnico y submódulo Gastos de ExPro → `--c-danger`. **Excepción documentada**: la pestaña GASTOS del conmutador de CoMer se mantiene violeta (`--c-purple`) para no chocar con CARNE (roja) en la misma barra — pendiente criterio de David. Los pares `colorDark` (sombras de gradiente en gastos/produccion) se conservan.
 - **2026-07-02** — F4: cascada del back físico (modal → dropdown → sheet Más → wizard vía Cancelar → confirmar salida en dashboard → history.back); confirmación de descarte en WizardManager con pasos avanzados (verificada en preview: aparece diálogo, Continuar mantiene, Salir cierra + onCancel); `/venta-carne` con botón volver (G10).
