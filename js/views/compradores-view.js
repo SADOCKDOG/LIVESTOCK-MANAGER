@@ -227,7 +227,7 @@ const CompradoresView = {
                 </div>
                 <div class="text-right">
                   <span class="badge badge-sm font-900 uppercase" style="background:${color}20; color:${color}; border:1px solid ${color}40;">
-                    ${c.tipo_comprador || 'híbrido'}
+                    ${(c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido'}
                   </span>
                   ${c.activo === false ? '<div class="text-red text-[0.55rem] font-950 mt-4 uppercase tracking-widest">INACTIVO</div>' : ''}
                 </div>
@@ -395,7 +395,7 @@ const CompradoresView = {
                 <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight" style="color:${colorComp} !important;">${comprador.nombre}</h2>
                 <div class="flex gap-8 flex-wrap">
                   <span class="badge badge-sm font-950 uppercase" style="background:${colorComp}20; color:${colorComp}; border:1px solid ${colorComp}40;">
-                    ${comprador.tipo_comprador || 'híbrido'}
+                    ${(comprador.tipo_comprador === 'láctico' ? 'lácteo' : comprador.tipo_comprador) || 'híbrido'}
                   </span>
                   ${comprador.activo === false ? '<span class="badge badge-sm font-950 uppercase bg-red-900 border-red-500 text-white">INACTIVO</span>' : '<span class="badge badge-sm font-950 uppercase bg-green-900 border-green-500 text-white">ACTIVO</span>'}
                 </div>
@@ -554,7 +554,7 @@ const CompradoresView = {
                 <label class="wizard-label uppercase font-900">Tipo Comprador *</label>
                 <select id="c-tipo" class="wizard-input wizard-select font-900 uppercase">
                   <option value="cárnico" ${c.tipo_comprador === 'cárnico' ? 'selected' : ''}>CÁRNICO</option>
-                  <option value="láctico" ${c.tipo_comprador === 'láctico' ? 'selected' : ''}>LÁCTICO</option>
+                  <option value="láctico" ${c.tipo_comprador === 'láctico' ? 'selected' : ''}>LÁCTEO</option>
                   <option value="híbrido" ${c.tipo_comprador === 'híbrido' || !c.tipo_comprador ? 'selected' : ''}>HÍBRIDO / MIXTO</option>
                 </select>
               </div>

@@ -238,7 +238,7 @@ const LecheView = {
                       </div>
                     </div>
                     <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm badge-gold block mb-4">${r.cantidad_animales || 0} cabezas</span>
+                      <span class="badge badge-sm badge-gold block mb-4">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesLeche.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
                       <span class="text-xs text-777">Ficha ➔</span>
                     </div>
                   </div>

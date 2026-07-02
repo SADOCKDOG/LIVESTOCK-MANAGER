@@ -131,7 +131,7 @@ const GastosView = {
     this._renderSeccion(content, {
       icon: catInfo.icon,
       title: `Gastos — ${catInfo.label}`,
-      subtitle: data.count > 0 ? `${data.count} registro(s) · ${this._fmt(data.total)} € total` : 'Sin registros en esta categoría',
+      subtitle: data.count > 0 ? `${data.count} ${data.count === 1 ? "registro" : "registros"} · ${this._fmt(data.total)} € total` : 'Sin registros en esta categoría',
       color: catInfo.color,
       colorDark: catInfo.colorDark,
       kpis: [

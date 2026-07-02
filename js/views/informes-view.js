@@ -372,7 +372,7 @@ const InformesView = {
       ${alertas ? `<div class="card inf-alert-red">
           <div class="flex items-center gap-12">
             <span class="text-3xl text-red">${Icons.alerta()}</span>
-            <div><strong class="text-red text-md uppercase font-950">${estadisticasSanidad.retencionesActivas} lotes</strong><span class="text-aaa text-xs uppercase font-800 tracking-wider block">con supresión de venta activa</span></div>
+            <div><strong class="text-red text-md uppercase font-950">${estadisticasSanidad.retencionesActivas} ${estadisticasSanidad.retencionesActivas === 1 ? "lote" : "lotes"}</strong><span class="text-aaa text-xs uppercase font-800 tracking-wider block">con supresión de venta activa</span></div>
           </div>
         </div>` : ''}
 
