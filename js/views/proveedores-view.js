@@ -11,7 +11,7 @@ const ProveedoresView = {
         main.innerHTML = `
           <div class="mb-14">
             <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-              <span style="color: #10b981; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> PROVEEDORES
+              <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> PROVEEDORES
             </div>
           </div>
 
@@ -117,7 +117,7 @@ const ProveedoresView = {
                 </div>` : ''}
               </div>
               <div class="flex flex-col items-end gap-3 flex-shrink-0">
-                ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:rgba(239,68,68,0.15); color:var(--c-danger); border:1px solid rgba(239,68,68,0.3);">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:rgba(16,185,129,0.15); color:var(--c-success); border:1px solid rgba(16,185,129,0.3);">ACTIVO</span>'}
+                ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:rgba(255,68,68,0.15); color:var(--c-danger); border:1px solid rgba(255,68,68,0.3);">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:rgba(204,255,0,0.15); color:var(--c-success); border:1px solid rgba(204,255,0,0.3);">ACTIVO</span>'}
               </div>
             </div>
           </div>
@@ -152,8 +152,8 @@ const ProveedoresView = {
                 <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
                 <div class="mt-4">
                   ${proveedor.activo === false
-                    ? '<span class="badge badge-sm font-950 uppercase" style="background:#ef444420; color:#ef4444; border:1px solid #ef444440;">INACTIVO</span>'
-                    : '<span class="badge badge-sm font-950 uppercase" style="background:#10b98120; color:#10b981; border:1px solid #10b98140;">ACTIVO</span>'}
+                    ? '<span class="badge badge-sm font-950 uppercase" style="background:var(--c-danger)20; color:var(--c-danger); border:1px solid var(--c-danger)40;">INACTIVO</span>'
+                    : '<span class="badge badge-sm font-950 uppercase" style="background:var(--c-success)20; color:var(--c-success); border:1px solid var(--c-success)40;">ACTIVO</span>'}
                 </div>
               </div>
               <div class="flex gap-8">
@@ -262,7 +262,7 @@ const ProveedoresView = {
             </button>
           </div>
           <div class="card card-accent card-accent-green p-20 bg-black">
-            <div class="section-header-theme mb-20" style="--theme-color: #10b981">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
+            <div class="section-header-theme mb-20" style="--theme-color: var(--c-success)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">NOMBRE / RAZÓN SOCIAL *</label>
@@ -331,13 +331,13 @@ const ProveedoresView = {
                    const isChecked = Array.isArray(p.categorias) && p.categorias.includes(cat);
                    return `
                   <label class="category-chip ${isChecked ? 'active' : ''}" style="display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:30px;
-                    background:${isChecked ? 'rgba(16,185,129,0.15)' : '#111'};
-                    border:1px solid ${isChecked ? '#10b981' : '#333'};
-                    cursor:pointer; font-size:0.65rem; font-weight:900; color:${isChecked ? '#10b981' : '#aaa'}; text-transform:uppercase; letter-spacing:0.5px;">
+                    background:${isChecked ? 'rgba(204,255,0,0.15)' : '#111'};
+                    border:1px solid ${isChecked ? 'var(--c-success)' : '#333'};
+                    cursor:pointer; font-size:0.65rem; font-weight:900; color:${isChecked ? 'var(--c-success)' : '#aaa'}; text-transform:uppercase; letter-spacing:0.5px;">
                     <input type="checkbox" value="${cat}" ${isChecked ? 'checked' : ''} class="d-none"
-                      onchange="this.parentElement.style.background=this.checked ? 'rgba(16,185,129,0.15)' : '#111';
-                               this.parentElement.style.borderColor=this.checked ? '#10b981' : '#333';
-                               this.parentElement.style.color=this.checked ? '#10b981' : '#aaa';">
+                      onchange="this.parentElement.style.background=this.checked ? 'rgba(204,255,0,0.15)' : '#111';
+                               this.parentElement.style.borderColor=this.checked ? 'var(--c-success)' : '#333';
+                               this.parentElement.style.color=this.checked ? 'var(--c-success)' : '#aaa';">
                     ${cat}
                   </label>`;
                 }).join('')}
@@ -360,7 +360,7 @@ const ProveedoresView = {
             </div>
 
             <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
-              <input type="checkbox" id="p-activo" ${p.activo !== false ? 'checked' : ''} style="accent-color:#10b981;">
+              <input type="checkbox" id="p-activo" ${p.activo !== false ? 'checked' : ''} style="accent-color:var(--c-success);">
               <span class="uppercase font-950 tracking-widest text-[0.65rem]">Proveedor activo en el sistema</span>
             </label>
 

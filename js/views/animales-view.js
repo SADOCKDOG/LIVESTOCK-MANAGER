@@ -22,7 +22,7 @@ const AnimalesView = {
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
 
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #f97316;">
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-orange);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
@@ -35,9 +35,9 @@ const AnimalesView = {
 
     if (animales.length === 0) {
       html += `<div class="empty-state">
-        <div class="empty-state-icon" style="color:#f97316;">${Icons.animales()}</div>
+        <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: #f97316;">
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-orange);">
           <div class="section-header-theme">ACCIONES</div>
           <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
             <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
@@ -117,7 +117,7 @@ const AnimalesView = {
   _renderCard(a, r) {
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
     const iconoSexo = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '⚤');
-    const colorEstado = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : a.estado === 'baja' ? '#ef4444' : '#888';
+    const colorEstado = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : a.estado === 'baja' ? 'var(--c-danger)' : '#888';
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
     return `
@@ -254,14 +254,14 @@ const AnimalesView = {
                    value="${a.numero_identificacion}"
                    placeholder="ES000000000000" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
-                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid #f97316 !important;">
+                   class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid var(--c-orange) !important;">
             <div class="text-aaa text-[0.6rem] uppercase font-800 mt-6 tracking-wide">
               REQUISITO REGA: ES + 12 DÍGITOS · <span class="text-gold" id="crotal-length-counter">0/14</span>
             </div>
           </div>
 
           <div class="card card-accent card-accent-amber p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: #f97316">${Icons.info()} DATOS GENERALES</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.info()} DATOS GENERALES</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPECIE</label>
@@ -306,7 +306,7 @@ const AnimalesView = {
           </div>
 
           <div class="card card-accent card-accent-blue p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
               <select id="a-categoria" class="wizard-input font-800">
@@ -332,14 +332,14 @@ const AnimalesView = {
               </select>
             </div>
             <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
-              <input type="checkbox" id="a-notificado" ${a.notificado_rega ? 'checked' : ''} style="accent-color:#3b82f6;">
+              <input type="checkbox" id="a-notificado" ${a.notificado_rega ? 'checked' : ''} style="accent-color:var(--c-info);">
               <span class="uppercase font-900 text-[0.65rem] tracking-tight">ALTA COMUNICADA OFICIALMENTE A PIGGAN/SIA</span>
             </label>
           </div>
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
           <div class="card card-accent card-accent-green p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">PAÍS DE NACIMIENTO</label>
@@ -395,17 +395,17 @@ const AnimalesView = {
           </div>
 
           <div class="card card-accent card-accent-gold p-16 mb-20">
-            <div class="section-header-theme mb-12" style="--theme-color: #f97316">${Icons.documento()} OBSERVACIONES</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.documento()} OBSERVACIONES</div>
             <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
             <div class="card card-accent card-accent-amber p-16 mb-20">
-               <div class="section-header-theme mb-12" style="--theme-color: #f97316">COMPAÑEROS LOTE</div>
+               <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">COMPAÑEROS LOTE</div>
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="card card-accent card-accent-purple p-16 mb-20">
-               <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">HISTORIAL REPRO</div>
+               <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">HISTORIAL REPRO</div>
                <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-20">
@@ -668,11 +668,11 @@ const AnimalesView = {
     if (len < 4) {
       input.style.color = "#888";
     } else if (len < 14) {
-      input.style.color = "#fbbf24"; // dorado mientras se escribe
+      input.style.color = "var(--c-warning)"; // dorado mientras se escribe
     } else if (pais === 'ES' && !cleanVal.startsWith("ES")) {
-      input.style.color = "#ef4444"; // rojo: español debe empezar por ES (SITRAN)
+      input.style.color = "var(--c-danger)"; // rojo: español debe empezar por ES (SITRAN)
     } else {
-      input.style.color = "#10b981"; // verde si está completo y correcto
+      input.style.color = "var(--c-success)"; // verde si está completo y correcto
     }
   },
 

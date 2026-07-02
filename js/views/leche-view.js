@@ -133,15 +133,15 @@ const LecheView = {
         explotacion: [
           { label: 'Litros Control', value: totalLitrosControles.toLocaleString() + ' L' },
           { label: 'Grasa Media', value: grasaMedia.toFixed(2) + '%' },
-          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: '#ef4444' }
+          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' }
         ],
         comercializacion: [
-          { label: 'Litros Entregados', value: litrosTotal.toLocaleString() + ' L', color: '#fbbf24' },
+          { label: 'Litros Entregados', value: litrosTotal.toLocaleString() + ' L', color: 'var(--c-warning)' },
           { label: 'Entregas', value: numEntregas },
-          { label: 'Facturación Leche', value: Math.round(importeTotal).toLocaleString() + ' €', color: '#10b981' }
+          { label: 'Facturación Leche', value: Math.round(importeTotal).toLocaleString() + ' €', color: 'var(--c-success)' }
         ],
         legislacion: [
-          { label: 'Alertas Lácteas', value: alertas + tratamientosSupresionLeche.length, color: alertas + tratamientosSupresionLeche.length > 0 ? '#ef4444' : '#10b981' },
+          { label: 'Alertas Lácteas', value: alertas + tratamientosSupresionLeche.length, color: alertas + tratamientosSupresionLeche.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
           { label: 'Tratamientos Act.', value: sanitariosLeche.length }
         ]
       }
@@ -209,7 +209,7 @@ const LecheView = {
             <div class="leche-report-title-sub">Gestión de censo y rebaños lácteos</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.patrimonio, '#d97706')}
+        ${this._kpiGrid(d.kpis.patrimonio, 'var(--c-warning)')}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -264,7 +264,7 @@ const LecheView = {
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
+        ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
 
         <div class="text-center mb-12">
           <button class="btn btn-create btn-sm" onclick="App._abrirWizardAlbaranLeche()">
@@ -303,7 +303,7 @@ const LecheView = {
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
+        ${this._kpiGrid(d.kpis.legislacion, 'var(--c-purple)')}
 
         <div class="text-center mb-12">
           <button class="btn btn-secondary btn-sm btn--purple w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
@@ -325,11 +325,11 @@ const LecheView = {
             ? d.sanitariosLeche.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresionLeche.some(ts => ts.id === s.id);
                 return `
-                  <div class="card card-animal" style="border-left:4px solid ${enSup ? '#ef4444' : '#8b5cf6'};">
+                  <div class="card card-animal" style="border-left:4px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">
-                          <span class="text-xl" style="color:${enSup ? '#ef4444' : '#3b82f6'}">${Icons.sanidad()}</span>
+                          <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-info)'}">${Icons.sanidad()}</span>
                           <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
                         <div class="flex flex-wrap gap-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
@@ -339,7 +339,7 @@ const LecheView = {
                         </div>
                       </div>
                       <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(239,68,68,0.2)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
                   </div>`;
@@ -357,14 +357,14 @@ const LecheView = {
     const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
 
     return `
-      <div class="leche-entrega-card" style="--entrega-border-color:${esAlerta ? '#ef4444' : semaforo.color};" onclick="location.hash='/albaran-leche?id=${e.id}'">
+      <div class="leche-entrega-card" style="--entrega-border-color:${esAlerta ? 'var(--c-danger)' : semaforo.color};" onclick="location.hash='/albaran-leche?id=${e.id}'">
         <div class="leche-entrega-content">
           <div class="leche-entrega-left">
             <div class="text-white font-900 uppercase text-sm flex items-center gap-6">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — <span class="text-gold" style="font-size:1.1rem;">${(e.cantidad || 0).toLocaleString()}</span> <small class="text-aaa">L</small></div>
             <div class="text-[0.65rem] text-gray uppercase font-800 mt-2 tracking-widest">Cisterna: <span class="text-white">${e.matriculaCisterna || '—'}</span></div>
           </div>
           <div class="text-right">
-            <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.15)'}; color:${esAlerta ? '#ef4444' : '#10b981'}; border: 1px solid ${esAlerta ? '#ef4444' : '#10b981'}40;">${e.estadoAnalitica || 'PENDIENTE'}</span>
+            <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(255,68,68,0.2)' : 'rgba(204,255,0,0.15)'}; color:${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}; border: 1px solid ${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}40;">${e.estadoAnalitica || 'PENDIENTE'}</span>
           </div>
         </div>
       </div>`;

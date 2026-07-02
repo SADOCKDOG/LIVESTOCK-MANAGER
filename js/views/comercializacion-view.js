@@ -138,14 +138,14 @@ const ComercializacionView = {
           <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMERCIALIZACIÓN
         </div>
         <div class="comer-mode-switch">
-          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#f97316; color: var(--mode-color);" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6; color: var(--mode-color);" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#8b5cf6; color: var(--mode-color);" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple); color: var(--mode-color);" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
         </div>
       </div>
 
       ${pipelineInfo ? `
-      <div class="card p-12 mb-14 border-222" style="border-left:4px solid #10b981; background: rgba(16,185,129,0.05);">
+      <div class="card p-12 mb-14 border-222" style="border-left:4px solid var(--c-success); background: rgba(204,255,0,0.05);">
         <div class="text-[0.65rem] text-gray uppercase font-extrabold tracking-wider">Flujo activo</div>
         <div class="text-sm text-white mt-4 font-700">Procedente de <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
         <div class="text-[0.62rem] text-aaa mt-4">Fitosanitarios pendientes: <strong class="${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? 'text-red' : 'text-green'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong></div>
@@ -163,9 +163,9 @@ const ComercializacionView = {
 
   _getTabMeta(tab) {
     const map = {
-      carne: { color: '#ef4444', label: 'Cárnico' },
-      leche: { color: '#3b82f6', label: 'Lácteo' },
-      gastos: { color: '#8b5cf6', label: 'Gastos' }
+      carne: { color: 'var(--c-danger)', label: 'Cárnico' },
+      leche: { color: 'var(--c-info)', label: 'Lácteo' },
+      gastos: { color: 'var(--c-purple)', label: 'Gastos' }
     };
     return map[tab] || map.carne;
   },
@@ -291,12 +291,12 @@ const ComercializacionView = {
   _renderCarne(content, d) {
     const badgeHtml = (v) => {
       let cls = (v.clasificacion?.seurop || "S/C").toUpperCase();
-      return `<span class="badge badge-red" style="font-size:0.62rem; border:1px solid rgba(239,68,68,0.2);">${cls}</span>`;
+      return `<span class="badge badge-red" style="font-size:0.62rem; border:1px solid rgba(255,68,68,0.2);">${cls}</span>`;
     };
 
     this._renderSeccion(content, {
       icon: Icons.carne(), title: 'Ventas de Carne', subtitle: 'Expediciones a matadero y venta directa',
-      color: '#ef4444',
+      color: 'var(--c-danger)',
       registrarLabel: 'REGISTRAR VENTA',
       listName: 'Lista de Ventas',
       registrarHandler: "App._abrirWizardVentaMasiva()",
@@ -324,7 +324,7 @@ const ComercializacionView = {
   _renderLeche(content, d) {
     this._renderSeccion(content, {
       icon: Icons.leche(), title: 'Entregas de Leche', subtitle: 'Retiradas de tanque y albaranes',
-      color: '#3b82f6', // Azul Lácteo consistente
+      color: 'var(--c-info)', // Azul Lácteo consistente
       registrarLabel: 'REGISTRAR RETIRADA',
       listName: 'Lista de Entregas',
       registrarHandler: "App._abrirWizardAlbaranLeche()",
@@ -370,7 +370,7 @@ const ComercializacionView = {
   _renderGastos(content, d) {
     this._renderSeccion(content, {
       icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
-      color: '#8b5cf6',
+      color: 'var(--c-purple)',
       registrarLabel: 'REGISTRAR GASTO',
       listName: 'Lista de Gastos',
       registrarHandler: "App._abrirFormularioGasto()",

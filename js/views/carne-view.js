@@ -169,20 +169,20 @@ const CarneView = {
         patrimonio: [
           { label: 'Censo Cárnico', value: animalesCarne.length + ' cabezas' },
           { label: 'Lotes/Rebaños', value: rebanosCarne.length },
-          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: '#10b981' }
+          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: 'var(--c-success)' }
         ],
         explotacion: [
           { label: 'Pesajes', value: numPesajes },
           { label: 'GMD Medio', value: gmdMedio.toFixed(2) + ' kg/d' },
-          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: '#ef4444' }
+          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' }
         ],
         comercializacion: [
-          { label: 'Ventas Matadero', value: totalVentasEuros.toLocaleString() + ' €', color: '#10b981' },
+          { label: 'Ventas Matadero', value: totalVentasEuros.toLocaleString() + ' €', color: 'var(--c-success)' },
           { label: 'Total kg Sacrificados', value: totalKgMatadero.toLocaleString() + ' kg' },
           { label: 'Rendimiento Canal', value: rendimientoMedio.toFixed(1) + '%' }
         ],
         legislacion: [
-          { label: 'Alertas Supresión', value: tratamientosSupresion.length, color: tratamientosSupresion.length > 0 ? '#ef4444' : '#10b981' },
+          { label: 'Alertas Supresión', value: tratamientosSupresion.length, color: tratamientosSupresion.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
           { label: 'Controles Sanitarios', value: sanitariosCarne.length }
         ]
       }
@@ -239,7 +239,7 @@ const CarneView = {
           </div>
         </div>
 
-        ${this._kpiGrid(d.kpis.patrimonio, '#d97706')}
+        ${this._kpiGrid(d.kpis.patrimonio, 'var(--c-warning)')}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -298,7 +298,7 @@ const CarneView = {
           </button>
         </div>
 
-        ${this._kpiGrid(d.kpis.comercializacion, '#10b981')}
+        ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
 
         <!-- Accesos directos comerciales -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -374,7 +374,7 @@ const CarneView = {
           </div>
         </div>
 
-        ${this._kpiGrid(d.kpis.legislacion, '#8b5cf6')}
+        ${this._kpiGrid(d.kpis.legislacion, 'var(--c-purple)')}
 
         <!-- Accesos directos de legislación -->
         <div class="grid grid-cols-2 gap-8 mb-16">
@@ -390,11 +390,11 @@ const CarneView = {
             ? d.sanitariosCarne.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresion.some(ts => ts.id === s.id);
                 return `
-                  <div class="card card-animal" style="border-left:4px solid ${enSup ? '#ef4444' : '#8b5cf6'};">
+                  <div class="card card-animal" style="border-left:4px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">
-                          <span class="text-xl" style="color:${enSup ? '#ef4444' : '#8b5cf6'}">${Icons.sanidad()}</span>
+                          <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}">${Icons.sanidad()}</span>
                           <h3 class="section-h3 m-0 text-ellipsis uppercase font-900">${s.medicamento || s.tipo_tratamiento}</h3>
                         </div>
                         <div class="flex wrap gap-6 mt-6 text-[0.65rem] text-gray font-800 uppercase tracking-tight">
@@ -404,7 +404,7 @@ const CarneView = {
                         </div>
                       </div>
                       <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(239,68,68,0.2)' : 'rgba(139,92,246,0.15)'}; color:${enSup ? '#ef4444' : '#8b5cf6'}; border:1px solid ${enSup ? '#ef4444' : '#8b5cf6'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
                   </div>`;

@@ -38,7 +38,7 @@ const ContratosView = {
             </button>
           </div>
           <div class="card card-accent card-accent-purple p-20 bg-black">
-            <div class="section-header-theme mb-20" style="--theme-color: #8b5cf6">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR CONTRATO' : 'NUEVO CONTRATO'}</div>
+            <div class="section-header-theme mb-20" style="--theme-color: var(--c-purple)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR CONTRATO' : 'NUEVO CONTRATO'}</div>
 
             <div class="wizard-input-group mb-15">
               <label class="wizard-label uppercase font-900">COMPRADOR / CLIENTE *</label>
@@ -109,7 +109,7 @@ const ContratosView = {
             </div>
 
             <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
-              <input type="checkbox" id="ct-activo" ${contrato.activo !== false ? 'checked' : ''} style="accent-color:#8b5cf6;">
+              <input type="checkbox" id="ct-activo" ${contrato.activo !== false ? 'checked' : ''} style="accent-color:var(--c-purple);">
               <span class="uppercase font-950 tracking-widest text-[0.65rem]">Contrato vigente y activo</span>
             </label>
 

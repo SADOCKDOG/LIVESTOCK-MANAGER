@@ -132,8 +132,8 @@ const AlbaranesVentasView = {
       return `<div class="empty-state"><div class="empty-state-icon">${Icons.comercial()}</div><p class="empty-state-text">No hay registros de comercialización.</p></div>`;
     }
 
-    const colors = { leche: '#fbbf24', carne: '#f59e0b' };
-    const badgeColors = { borrador: '#f59e0b', presentado: '#10b981', validado: '#3b82f6' };
+    const colors = { leche: 'var(--c-warning)', carne: 'var(--c-warning)' };
+    const badgeColors = { borrador: 'var(--c-warning)', presentado: 'var(--c-success)', validado: 'var(--c-info)' };
 
     return `<div class="grid gap-10">
       ${filtrados.map(reg => {
@@ -164,7 +164,7 @@ const AlbaranesVentasView = {
             </div>
             <div class="mt-10 flex gap-6">
               ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:#f59e0b; border-color:#f59e0b;" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">${Icons.editar()} Editar Borrador</button>
+                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">${Icons.editar()} Editar Borrador</button>
               ` : `
                 <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id})">${Icons.exportar()} Imprimir Albarán</button>
               `}
@@ -232,7 +232,7 @@ const AlbaranesVentasView = {
       const reg = await window.db.get(tipo === 'leche' ? 'comercializacion_leche' : 'comercializacion_carne', Number(id));
       if (!reg) return App.toastError("Registro no encontrado");
 
-      const colors = { leche: '#fbbf24', carne: '#f59e0b' };
+      const colors = { leche: 'var(--c-warning)', carne: 'var(--c-warning)' };
       const color = colors[tipo] || '#666';
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -247,7 +247,7 @@ const AlbaranesVentasView = {
           <div><span class="text-gray">Proteína:</span> <span class="text-white">${reg.laboratorio?.proteina || 0} %</span></div>
           <div><span class="text-gray">Cél. Somáticas:</span> <span class="text-white">${reg.laboratorio?.somaticas || 0} k/mL</span></div>
           <div><span class="text-gray">Bacterias:</span> <span class="text-white">${reg.laboratorio?.germenes || 0} k/mL</span></div>
-          <div><span class="text-gray">Inhibidores/Antibi.:</span> <span class="text-white" style="color:${reg.antibioticos ? '#ef4444' : '#10b981'};">${reg.antibioticos ? 'POSITIVO' : 'NEGATIVO'}</span></div>
+          <div><span class="text-gray">Inhibidores/Antibi.:</span> <span class="text-white" style="color:${reg.antibioticos ? 'var(--c-danger)' : 'var(--c-success)'};">${reg.antibioticos ? 'POSITIVO' : 'NEGATIVO'}</span></div>
           <div><span class="text-gray">Cisterna:</span> <span class="text-white">${reg.matriculaCisterna || '—'}</span></div>
         `;
       } else {

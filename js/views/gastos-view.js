@@ -11,13 +11,13 @@ const GastosView = {
 
   // Definición de categorías contables con iconos SVG y colores
   _CATEGORIAS: [
-    { key: 'todos',        icon: Icons.documento(), label: 'Todos',          color: '#8b5cf6', colorDark: '#6d28d9' },
-    { key: 'Alimentacion', icon: Icons.paquete(),   label: 'Alimentación',   color: '#f59e0b', colorDark: '#b45309' },
-    { key: 'Sanidad',      icon: Icons.sanidad(),   label: 'Sanidad',        color: '#ef4444', colorDark: '#b91c1c' },
-    { key: 'Fitosanitarios', icon: Icons.sanidad(), label: 'Fitosanitarios', color: '#10b981', colorDark: '#047857' },
-    { key: 'Electricidad', icon: Icons.info(),      label: 'Electricidad',   color: '#3b82f6', colorDark: '#1d4ed8' },
-    { key: 'Personal',     icon: Icons.compradores(), label: 'Personal',      color: '#f97316', colorDark: '#c2410c' },
-    { key: 'Amortizacion', icon: Icons.transportistas(), label: 'Amortización', color: '#a855f7', colorDark: '#7e22ce' },
+    { key: 'todos',        icon: Icons.documento(), label: 'Todos',          color: 'var(--c-purple)', colorDark: '#6d28d9' },
+    { key: 'Alimentacion', icon: Icons.paquete(),   label: 'Alimentación',   color: 'var(--c-warning)', colorDark: 'var(--c-warning)' },
+    { key: 'Sanidad',      icon: Icons.sanidad(),   label: 'Sanidad',        color: 'var(--c-danger)', colorDark: '#b91c1c' },
+    { key: 'Fitosanitarios', icon: Icons.sanidad(), label: 'Fitosanitarios', color: 'var(--c-success)', colorDark: '#047857' },
+    { key: 'Electricidad', icon: Icons.info(),      label: 'Electricidad',   color: 'var(--c-info)', colorDark: '#1d4ed8' },
+    { key: 'Personal',     icon: Icons.compradores(), label: 'Personal',      color: 'var(--c-orange)', colorDark: '#c2410c' },
+    { key: 'Amortizacion', icon: Icons.transportistas(), label: 'Amortización', color: 'var(--c-purple)', colorDark: '#7e22ce' },
   ],
 
   async render() {
@@ -42,7 +42,7 @@ const GastosView = {
     const totalGeneral = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
     const mesesHtml = Object.values(porMes).reverse().map(m => {
       const pct = Math.min(100, m.total / (Math.max(1, Object.values(porMes).reduce((s,x) => Math.max(s, x.total), 0)) / 100));
-      const color = pct > 70 ? '#ef4444' : pct > 40 ? '#f59e0b' : '#10b981';
+      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
       return `<div class="flex-1 text-center min-w-0">
         <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
         <div class="gasto-bar-wrap">
@@ -65,7 +65,7 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card mb-14 p-12" style="background:rgba(239,68,68,0.03);">
+      <div class="card mb-14 p-12" style="background:rgba(255,68,68,0.03);">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
           <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
@@ -74,7 +74,7 @@ const GastosView = {
       </div>
 
       <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(239, 68, 68, 0.015);">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255,68,68, 0.015);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
         </div>
@@ -197,7 +197,7 @@ const GastosView = {
             ${kpis.map((k, index) => `
               <div class="py-12 flex justify-between items-center ${index < kpis.length - 1 ? 'border-bottom-222' : ''}">
                 <span class="text-xs text-gray uppercase font-900">${k.label}</span>
-                <strong class="text-xl font-950" style="color: ${k.label.includes('Total') ? '#ef4444' : '#3b82f6'};">${k.value}</strong>
+                <strong class="text-xl font-950" style="color: ${k.label.includes('Total') ? 'var(--c-danger)' : 'var(--c-info)'};">${k.value}</strong>
               </div>
             `).join('')}
           </div>

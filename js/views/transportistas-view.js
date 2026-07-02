@@ -24,12 +24,12 @@ const TransportistasView = {
         main.innerHTML = `
             <div class="mb-14">
               <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                <span style="color: #3b82f6; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> LOGÍSTICA / TRANSPORTE
+                <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> LOGÍSTICA / TRANSPORTE
               </div>
               <div class="comer-mode-switch">
                  <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa; color: var(--mode-color);" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
-                 <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:#10b981; color: var(--mode-color);" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
-                 <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:#ef4444; color: var(--mode-color);" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
+                 <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:var(--c-success); color: var(--mode-color);" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
+                 <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
               </div>
             </div>
 
@@ -77,11 +77,11 @@ const TransportistasView = {
 
         container.innerHTML = transportistas.map(t => `
             <div class="card card-animal no-underline mb-8" onclick="TransportistasView._verDetalle(${t.id})"
-                 style="border-left:4px solid ${t.activo ? '#10b981' : '#6b7280'}; padding:14px; margin:0; margin-bottom:10px;">
+                 style="border-left:4px solid ${t.activo ? 'var(--c-success)' : '#6b7280'}; padding:14px; margin:0; margin-bottom:10px;">
                 <div class="flex flex-col gap-10">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-10 min-w-0">
-                            <div class="text-xl" style="color:${t.activo ? '#10b981' : '#6b7280'}">${Icons.transportistas()}</div>
+                            <div class="text-xl" style="color:${t.activo ? 'var(--c-success)' : '#6b7280'}">${Icons.transportistas()}</div>
                             <div class="text-xs">
                                 <div class="font-bold text-white uppercase text-base tracking-tight">${t.nombre}</div>
                                 <div class="text-gray mt-2 font-700 uppercase">
@@ -90,7 +90,7 @@ const TransportistasView = {
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="badge badge-sm uppercase" style="background:${t.activo ? '#10b98115' : '#6b728015'}; color:${t.activo ? '#10b981' : '#9ca3af'}; border:1px solid ${t.activo ? '#10b98135' : '#6b728035'};">
+                            <span class="badge badge-sm uppercase" style="background:${t.activo ? 'var(--c-success)15' : '#6b728015'}; color:${t.activo ? 'var(--c-success)' : '#9ca3af'}; border:1px solid ${t.activo ? 'var(--c-success)35' : '#6b728035'};">
                                 ${t.activo ? 'Activo' : 'Inactivo'}
                             </span>
                         </div>
@@ -123,7 +123,7 @@ const TransportistasView = {
             <div class="p-16 max-w-800 mx-auto">
                 <div class="flex items-center gap-8 mb-14">
                     <button onclick="TransportistasView.render()" class="link-back" style="background:none; border:none; cursor:pointer; padding:4px 8px;">← Volver</button>
-                    <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,#3b82f6,#60a5fa);"></span>
+                    <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,var(--c-info),var(--c-info));"></span>
                     <h2 class="m-0 font-900 text-sm text-blue-400">${Icons.transportistas()} ${t.nombre}</h2>
                 </div>
 
@@ -131,11 +131,11 @@ const TransportistasView = {
                     <div class="flex justify-between items-start mb-16">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8 mb-4">
-                            <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,#3b82f6,#60a5fa);"></span>
+                            <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,var(--c-info),var(--c-info));"></span>
                             <h2 class="m-0 font-900 text-white uppercase text-xl">${t.nombre}</h2>
                         </div>
                         <div class="flex gap-8 flex-wrap">
-                          <span class="badge badge-sm uppercase" style="background:${t.activo ? '#10b98115' : '#ef444415'}; color:${t.activo ? '#10b981' : '#ef4444'}; border:1px solid ${t.activo ? '#10b98135' : '#ef444435'};">
+                          <span class="badge badge-sm uppercase" style="background:${t.activo ? 'var(--c-success)15' : 'var(--c-danger)15'}; color:${t.activo ? 'var(--c-success)' : 'var(--c-danger)'}; border:1px solid ${t.activo ? 'var(--c-success)35' : 'var(--c-danger)35'};">
                             ${t.activo ? 'Activo' : 'Inactivo'}
                           </span>
                         </div>
@@ -162,10 +162,10 @@ const TransportistasView = {
                         <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.animales()} Capacidad</small><div class="text-white mt-2">${t.capacidad_animales || '0'} animales</div></div>
                     </div>
                     <div class="mt-12 flex gap-8 flex-wrap">
-                        <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.certificado_bienestar ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; color:${t.certificado_bienestar ? '#10b981' : '#ef4444'};">
+                        <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.certificado_bienestar ? 'rgba(204,255,0,0.15)' : 'rgba(255,68,68,0.15)'}; color:${t.certificado_bienestar ? 'var(--c-success)' : 'var(--c-danger)'};">
                             ${t.certificado_bienestar ? '✅ Cert. Bienestar' : '❌ Sin Cert. Bienestar'}
                         </span>
-                        <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.condiciones_termoneutrales ? 'rgba(16,185,129,0.15)' : 'rgba(107,114,128,0.15)'}; color:${t.condiciones_termoneutrales ? '#10b981' : '#9ca3af'};">
+                        <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.condiciones_termoneutrales ? 'rgba(204,255,0,0.15)' : 'rgba(107,114,128,0.15)'}; color:${t.condiciones_termoneutrales ? 'var(--c-success)' : '#9ca3af'};">
                             ${t.condiciones_termoneutrales ? '🌡️ Termoneutral' : 'Sin control térmico'}
                         </span>
                     </div>

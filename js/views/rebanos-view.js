@@ -48,7 +48,7 @@ const RebanosView = {
         const eventosReb = eventos.filter(e => e.entidad_id === r.id || (e.tipo_entidad === 'rebano' && e.snap_identificacion === r.nombre));
         const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
         const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
-        const colorEstado = r.estado !== 'inactivo' ? '#10b981' : '#6b7280';
+        const colorEstado = r.estado !== 'inactivo' ? 'var(--c-success)' : '#6b7280';
         const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(r.especie) : colorEstado;
 
         html += `
@@ -180,7 +180,7 @@ const RebanosView = {
       </div>
       
       <!-- Sanidad -->
-      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24" style="--theme-color: #10b981;">
+      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24" style="--theme-color: var(--c-success);">
         <div class="section-header-theme">SANIDAD</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
@@ -193,7 +193,7 @@ const RebanosView = {
 
       <!-- Animales -->
       <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
-        <div class="section-header-theme" style="--theme-color: #3b82f6">ANIMALES (${animales.length})</div>
+        <div class="section-header-theme" style="--theme-color: var(--c-info)">ANIMALES (${animales.length})</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12">
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirSelectorAnimales(${id})">
             ${Icons.rotacion()}
@@ -204,7 +204,7 @@ const RebanosView = {
       <div class="grid gap-10">
         ${animales.map((a) => {
           const colorEsp = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#888';
-          const colorEst = a.estado === 'activo' ? '#10b981' : a.estado === 'vendido' ? '#f59e0b' : '#ef4444';
+          const colorEst = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)';
           return `<div class="card card-item" style="border-left:4px solid ${colorEsp}; background: rgba(0,0,0,0.2);" onclick="location.hash='/animal?id=${a.id}'">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-10">
@@ -314,7 +314,7 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-green p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">UBICACIÓN Y TIPO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">UBICACIÓN Y TIPO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO DE PRODUCCIÓN</label>
               <select id="w-reb-tipo" class="wizard-input font-800">
@@ -323,7 +323,7 @@ const RebanosView = {
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">ZONA / PARCELA INICIAL</label>
-              <select id="w-reb-zona" class="wizard-input font-800" style="border-color: #d97706;">
+              <select id="w-reb-zona" class="wizard-input font-800" style="border-color: var(--c-warning);">
                 <option value="">SIN ASIGNAR (FINCA GENERAL)</option>
                 ${zonas.map((z) => `<option value="${z.nombre}" ${data.zonaActual === z.nombre ? "selected" : ""}>${z.nombre.toUpperCase()}</option>`).join("")}
               </select>
@@ -338,10 +338,10 @@ const RebanosView = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">REQUISITOS REGA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">REQUISITOS REGA</div>
             <div class="wizard-input-group">
               <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
-              <select id="w-reb-tipo-explotacion" class="wizard-input font-800" style="border-color: #10b981;">
+              <select id="w-reb-tipo-explotacion" class="wizard-input font-800" style="border-color: var(--c-success);">
                 <option value="">— SELECCIONAR —</option>
                 ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_explotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
               </select>
