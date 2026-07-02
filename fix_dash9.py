@@ -1,6 +1,0 @@
-import re
-content = open("js/views/dashboard-view.js", encoding="utf-8").read()
-content = re.sub(r"<div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;\">\s*<h3 style=\"color: #FF4444;", r"<div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #FF4444; background: rgba(255,255,255,0.02);\">\n          <h3 style=\"color: #FF4444;", content, flags=re.DOTALL)
-content = re.sub(r"<div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;\">\s*<h3 style=\"color: #FF9800;", r"<div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #FF9800; background: rgba(255,255,255,0.02);\">\n          <h3 style=\"color: #FF9800;", content, flags=re.DOTALL)
-content = re.sub(r"<div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center;\">\s*<h3 style=\"color: #a855f7;", r"<div class=\"card\" style=\"grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: 3px solid #a855f7; background: rgba(255,255,255,0.02);\">\n          <h3 style=\"color: #a855f7;", content, flags=re.DOTALL)
-open("js/views/dashboard-view.js", "w", encoding="utf-8").write(content)

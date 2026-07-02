@@ -42,7 +42,7 @@ const App = {
 
   async init() {
     try {
-      console.log("App Livestock: Iniciando v4.6.0...");
+      console.log("App Livestock: Iniciando v" + window.APP_INFO.version + "...");
       this._injectGlobalStyles();
       window.addEventListener("hashchange", () => App.route());
       await window.dbPromise;
@@ -780,7 +780,7 @@ const App = {
                     </table>
                 </div>
                 <div style="margin-top:40px; text-align:center; font-size:0.8rem; border-top:1px solid #eee; padding-top:20px;">
-                    <p>Documento generado electrónicamente por Livestock Manager Premium v4.8.8</p>
+                    <p>Documento generado electrónicamente por Livestock Manager Premium v${window.APP_INFO.version}</p>
                 </div>
             </div>
             <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
@@ -1967,8 +1967,8 @@ const App = {
         }
       }
       backupData._meta = {
-        version: "4.5.0",
-        db_version: 9,
+        version: window.APP_INFO.version,
+        db_version: DB_VERSION,
         exportadoEn: new Date().toISOString(),
         totalRegistros,
       };
@@ -1992,7 +1992,7 @@ const App = {
 
           await sharePlugin.share({
             title: "Backup Livestock Manager",
-            text: `Copia de seguridad v4.6.0 — ${totalRegistros} registros`,
+            text: `Copia de seguridad v${window.APP_INFO.version} — ${totalRegistros} registros`,
             url: result.uri,
             files: [result.uri],
             dialogTitle: "Compartir copia de seguridad con…",

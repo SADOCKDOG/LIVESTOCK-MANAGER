@@ -370,8 +370,8 @@ const AjustesView = {
         <p class="text-gray mt-5 text-sm">Estado técnico de la base de datos local y versión actual de la aplicación.</p>
         <div class="info-box mt-15">
           <div class="grid grid-cols-2 gap-8 text-85">
-            <div><span class="text-gray">Versión:</span> <strong class="text-white">v4.8.8</strong></div>
-            <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IDB v10</strong></div>
+            <div><span class="text-gray">Versión:</span> <strong class="text-white">v${window.APP_INFO.version}</strong></div>
+            <div><span class="text-gray">Base Datos:</span> <strong class="text-white">IDB v${typeof DB_VERSION !== 'undefined' ? DB_VERSION : '—'}</strong></div>
             <div><span class="text-gray">Fincas:</span> <strong class="text-white">${fincas.length}</strong></div>
             <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
           </div>
@@ -506,7 +506,7 @@ const AjustesView = {
         <div class="mt-20"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-900 no-underline text-md uppercase">📩 soporte.sdogfarm@gmail.com</a></div>
         <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-900 no-underline text-md uppercase inline-flex items-center gap-6">🐙 GitHub</a></div>
         <div class="mt-40 text-[0.65rem] text-444 uppercase font-900 tracking-widest about-footer">
-          © 2026 Livestock Manager Premium · v4.8.8<br>
+          © 2026 Livestock Manager Premium · v${window.APP_INFO.version}<br>
           Todos los derechos reservados.
         </div>
       </div>`;

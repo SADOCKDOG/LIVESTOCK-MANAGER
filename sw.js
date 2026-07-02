@@ -1,9 +1,10 @@
-const CACHE_NAME = 'corcho-v6.10.4';
+const CACHE_NAME = 'corcho-v6.10.5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/styles.css',
+  './js/app-version.js',
   './js/app.js',
   './js/db.js',
   './js/mode-config.js',
