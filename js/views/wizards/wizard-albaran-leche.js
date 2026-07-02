@@ -77,7 +77,7 @@ window.AlbaranLecheWizard = {
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">TEMPERATURA (ºC)</label>
-                <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input font-950 text-xl" style="color:${data.temp <= 4 ? '#10b981' : '#ef4444'};">
+                <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input font-950 text-xl" style="color:${data.temp <= 4 ? 'var(--c-success)' : 'var(--c-danger)'};">
               </div>
             </div>
 
@@ -105,11 +105,11 @@ window.AlbaranLecheWizard = {
             
             <div class="p-10 bg-black border border-222 rounded-sm mb-12">
               <label class="flex items-center gap-10 text-xs text-white cursor-pointer mb-8">
-                <input type="checkbox" id="w-l-frio" ${data.cadena_frio_cumplida ? 'checked' : ''} style="accent-color:#3b82f6;">
+                <input type="checkbox" id="w-l-frio" ${data.cadena_frio_cumplida ? 'checked' : ''} style="accent-color:var(--c-info);">
                 <span class="uppercase font-900 text-[0.6rem] tracking-tight">CADENA DE FRÍO CUMPLIDA (< 4ºC)</span>
               </label>
               <label class="flex items-center gap-10 text-xs text-white cursor-pointer">
-                <input type="checkbox" id="w-l-inh" ${data.inh ? 'checked' : ''} style="accent-color:#3b82f6;">
+                <input type="checkbox" id="w-l-inh" ${data.inh ? 'checked' : ''} style="accent-color:var(--c-info);">
                 <span class="uppercase font-950 text-[0.6rem] tracking-tight text-green">AUSENCIA ABSOLUTA DE INHIBIDORES</span>
               </label>
             </div>
@@ -151,7 +151,7 @@ window.AlbaranLecheWizard = {
 
           return `
           <div class="card card-accent card-accent-purple p-16 mt-10 mb-16">
-            <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">2. ANALÍTICA Y LIQUIDACIÓN (OPCIONAL)</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">2. ANALÍTICA Y LIQUIDACIÓN (OPCIONAL)</div>
             <p class="text-[0.6rem] text-aaa uppercase font-800 text-center mb-12">Puedes dejar esto en blanco y rellenarlo más adelante cuando recibas los resultados del laboratorio.</p>
 
             <div class="grid grid-cols-2 gap-10 mb-12">

@@ -186,10 +186,10 @@ window.ComunidadesService = (() => {
 
   // Calificaciones sanitarias de la explotación (resultado de saneamiento)
   const CALIFICACIONES_SANITARIAS = Object.freeze([
-    { value: 'indemne', label: 'Oficialmente indemne (T3/M3/B4)', color: '#10b981' },
-    { value: 'calificada', label: 'Calificada', color: '#3b82f6' },
-    { value: 'en_proceso', label: 'En proceso de calificación', color: '#f59e0b' },
-    { value: 'positiva', label: 'Con positivos / inmovilizada', color: '#ef4444' },
+    { value: 'indemne', label: 'Oficialmente indemne (T3/M3/B4)', color: 'var(--c-success)' },
+    { value: 'calificada', label: 'Calificada', color: 'var(--c-info)' },
+    { value: 'en_proceso', label: 'En proceso de calificación', color: 'var(--c-warning)' },
+    { value: 'positiva', label: 'Con positivos / inmovilizada', color: 'var(--c-danger)' },
     { value: 'sin_calificar', label: 'Sin calificar', color: '#888888' },
   ]);
 
@@ -209,10 +209,10 @@ window.ComunidadesService = (() => {
   // 3. ESTADOS DE ANALÍTICA DE LECHE
   // ============================================================
   const ESTADOS_ANALITICA_LECHE = Object.freeze({
-    PENDIENTE:      Object.freeze({ label: 'Pendiente',      color: '#f59e0b', icon: null }),
-    EN_ANALISIS:    Object.freeze({ label: 'En Análisis',    color: '#3b82f6', icon: null }),
-    VALIDADO:       Object.freeze({ label: 'Validado',       color: '#10b981', icon: null }),
-    ALERTA_CRITICA: Object.freeze({ label: 'Alerta Crítica', color: '#ef4444', icon: null }),
+    PENDIENTE:      Object.freeze({ label: 'Pendiente',      color: 'var(--c-warning)', icon: null }),
+    EN_ANALISIS:    Object.freeze({ label: 'En Análisis',    color: 'var(--c-info)', icon: null }),
+    VALIDADO:       Object.freeze({ label: 'Validado',       color: 'var(--c-success)', icon: null }),
+    ALERTA_CRITICA: Object.freeze({ label: 'Alerta Crítica', color: 'var(--c-danger)', icon: null }),
     RECHAZADO:      Object.freeze({ label: 'Rechazado',      color: '#dc2626', icon: null }),
   });
 
@@ -554,29 +554,29 @@ window.ComunidadesService = (() => {
     if (lab.grasa != null) {
       if (lab.grasa < CALIDAD_LECHE_OVINO_UMBRALES.grasa.min) {
         alertas.push(`Grasa baja (${lab.grasa}% < ${CALIDAD_LECHE_OVINO_UMBRALES.grasa.min}%)`);
-        badges.push({ label: `Grasa ${lab.grasa}%`, color: '#f59e0b', tipo: 'alerta' });
+        badges.push({ label: `Grasa ${lab.grasa}%`, color: 'var(--c-warning)', tipo: 'alerta' });
       } else {
-        badges.push({ label: `Grasa ${lab.grasa}%`, color: '#10b981', tipo: 'ok' });
+        badges.push({ label: `Grasa ${lab.grasa}%`, color: 'var(--c-success)', tipo: 'ok' });
       }
     }
 
     if (lab.proteina != null) {
       if (lab.proteina < CALIDAD_LECHE_OVINO_UMBRALES.proteina.min) {
         alertas.push(`Proteína baja (${lab.proteina}% < ${CALIDAD_LECHE_OVINO_UMBRALES.proteina.min}%)`);
-        badges.push({ label: `Proteína ${lab.proteina}%`, color: '#f59e0b', tipo: 'alerta' });
+        badges.push({ label: `Proteína ${lab.proteina}%`, color: 'var(--c-warning)', tipo: 'alerta' });
       } else {
-        badges.push({ label: `Proteína ${lab.proteina}%`, color: '#10b981', tipo: 'ok' });
+        badges.push({ label: `Proteína ${lab.proteina}%`, color: 'var(--c-success)', tipo: 'ok' });
       }
     }
 
     if (lab.somaticas != null && lab.somaticas > CALIDAD_LECHE_OVINO_UMBRALES.somaticas.max) {
       alertas.push(`Células somáticas elevadas (${lab.somaticas.toLocaleString()} > ${CALIDAD_LECHE_OVINO_UMBRALES.somaticas.max.toLocaleString()})`);
-      badges.push({ label: `CS ${(lab.somaticas / 1000).toFixed(0)}k`, color: '#ef4444', tipo: 'alerta' });
+      badges.push({ label: `CS ${(lab.somaticas / 1000).toFixed(0)}k`, color: 'var(--c-danger)', tipo: 'alerta' });
     }
 
     if (lab.germenes != null && lab.germenes > CALIDAD_LECHE_OVINO_UMBRALES.bacterias.max) {
       alertas.push(`Carga bacteriana elevada (${lab.germenes.toLocaleString()} UFC)`);
-      badges.push({ label: `UFC ${(lab.germenes / 1000).toFixed(0)}k`, color: '#ef4444', tipo: 'alerta' });
+      badges.push({ label: `UFC ${(lab.germenes / 1000).toFixed(0)}k`, color: 'var(--c-danger)', tipo: 'alerta' });
     }
 
     const apto = alertas.length === 0 || !lab.antibioticos;

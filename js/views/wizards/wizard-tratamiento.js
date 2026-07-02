@@ -43,7 +43,7 @@ window.WizardTratamiento = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-green p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">DATOS DEL MEDICAMENTO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">DATOS DEL MEDICAMENTO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">SELECCIÓN DE CATÁLOGO</label>
               <select id="w-san-med" class="wizard-input font-800">
@@ -180,7 +180,7 @@ window.WizardTratamiento = {
         // PASO 2: Libro de Tratamientos Veterinarios (SIGGAN)
         content: (data) => `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">${Icons.libroVentas()} LIBRO DE TRATAMIENTOS</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.libroVentas()} LIBRO DE TRATAMIENTOS</div>
             <p class="text-aaa uppercase font-900 text-[0.55rem] tracking-widest mb-12 opacity-80 text-center">DATOS EXIGIDOS POR RD 1749/1998 Y SIGGAN</p>
 
             <div class="wizard-input-group mb-12">

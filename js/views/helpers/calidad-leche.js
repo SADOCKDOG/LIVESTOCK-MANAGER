@@ -16,7 +16,7 @@ window.CalidadLecheHelper = (() => {
    * @returns {string}
    */
   function badgeParametro(label, value, ok, iconSVG) {
-    const color = ok ? '#10b981' : '#ef4444';
+    const color = ok ? 'var(--c-success)' : 'var(--c-danger)';
     const stateIcon = ok ? Icons.check() : Icons.alerta();
     return `<span style="display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:0.68rem; font-weight:800;
              padding:4px 10px; border-radius:6px; background:${color}20; color:#ffffff !important;
@@ -94,12 +94,12 @@ window.CalidadLecheHelper = (() => {
     if (e.certificadoInhibidores === false) problemas.push('inhibidores');
 
     if (problemas.length === 0) {
-      return { color: '#10b981', label: 'Calidad Óptima', icon: Icons.check() };
+      return { color: 'var(--c-success)', label: 'Calidad Óptima', icon: Icons.check() };
     }
     if (problemas.length <= 2) {
-      return { color: '#f59e0b', label: 'Atención: ' + problemas.join(', '), icon: Icons.alerta() };
+      return { color: 'var(--c-warning)', label: 'Atención: ' + problemas.join(', '), icon: Icons.alerta() };
     }
-    return { color: '#ef4444', label: 'Alerta: ' + problemas.join(', '), icon: Icons.alerta() };
+    return { color: 'var(--c-danger)', label: 'Alerta: ' + problemas.join(', '), icon: Icons.alerta() };
   }
 
   /**

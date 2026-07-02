@@ -25,7 +25,7 @@ window.WizardGuiaMovimiento = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-green p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">TIPO DE MOVIMIENTO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">TIPO DE MOVIMIENTO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">DIRECCIÓN</label>
               <select id="w-mv-tipo" class="wizard-input font-900">
@@ -59,7 +59,7 @@ window.WizardGuiaMovimiento = {
           const esSalida = data.tipo === 'salida';
           return `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">EXPLOTACIONES Y CENSO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">EXPLOTACIONES Y CENSO</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">REGA ${esSalida ? 'ORIGEN (PROPIO)' : 'DESTINO (PROPIO)'}</label>
               <input type="text" id="w-mv-rega-propia" value="${esSalida ? data.rega_origen : data.rega_destino}" class="wizard-input font-900 input-rega-std" ${regaPropia ? 'readonly' : ''} maxlength="14">
@@ -224,7 +224,7 @@ window.WizardGuiaMovimiento = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-purple p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #8b5cf6">TRAMITACIÓN ADMINISTRATIVA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">TRAMITACIÓN ADMINISTRATIVA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">ESTADO DEL TRÁMITE</label>
               <select id="w-mv-estado" class="wizard-input font-950">

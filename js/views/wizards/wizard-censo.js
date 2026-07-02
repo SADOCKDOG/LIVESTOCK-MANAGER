@@ -40,7 +40,7 @@ window.WizardCenso = {
           const filas = Object.entries(censo.porEspecie);
           return `
           <div class="card card-accent card-accent-green p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #10b981">${Icons.animales()} CENSO CONSOLIDADO</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.animales()} CENSO CONSOLIDADO</div>
             <div class="text-center bg-black border border-222 p-16 rounded-sm mb-16">
               <div class="text-aaa uppercase font-900 text-[0.65rem] tracking-widest mb-4">TOTAL CABEZAS ACTIVAS</div>
               <div class="text-white font-950 text-3xl tracking-tighter">${censo.total} ANIMALES</div>
@@ -73,7 +73,7 @@ window.WizardCenso = {
       {
         content: (data) => `
           <div class="card card-accent card-accent-blue p-16 mt-10">
-            <div class="section-header-theme mb-12" style="--theme-color: #3b82f6">TRAMITACIÓN ADMINISTRATIVA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">TRAMITACIÓN ADMINISTRATIVA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">ESTADO DE TRÁMITE</label>
               <select id="w-cs-estado" class="wizard-input font-950">
