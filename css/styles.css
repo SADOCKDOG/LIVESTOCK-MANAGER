@@ -132,9 +132,11 @@ header {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 2000;
-    /* Formato Cork Manager: línea fina nítida + haz de luz difuso hacia abajo */
+    /* Formato Cork Manager: línea fina nítida + haz difuso hacia abajo y hacia el interior (efecto unión) */
     border-bottom: 1px solid var(--header-neon-color, #333333);
-    box-shadow: 0 5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent);
+    box-shadow:
+        0 5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent),
+        inset 0 -6px 14px -6px color-mix(in srgb, var(--header-neon-color, #CCFF00) 45%, transparent);
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -394,9 +396,11 @@ nav.bottom-nav {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
-    /* Formato Cork Manager: línea fina nítida + haz de luz difuso hacia arriba */
+    /* Formato Cork Manager: línea fina nítida + haz difuso hacia arriba y hacia el interior (efecto unión) */
     border-top: 1px solid var(--header-neon-color, #222);
-    box-shadow: 0 -5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent);
+    box-shadow:
+        0 -5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent),
+        inset 0 6px 14px -6px color-mix(in srgb, var(--header-neon-color, #CCFF00) 45%, transparent);
     padding-bottom: var(--safe-bottom);
     z-index: 1500;
     /* border-color fuera de la transición: transition+var() congela el color en el fallback (quirk Chromium) */
