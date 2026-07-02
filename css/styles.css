@@ -93,40 +93,19 @@ header {
 }
 
 #app-logo {
-    height: 35px;
+    height: 32px;
     width: auto;
     object-fit: contain;
     flex-shrink: 0;
-    margin-bottom: -2px; /* Ajuste para alinear con la base */
-    justify-self: start;
 }
 
+/* #finca-badge: estilos visuales inline en index.html.
+   El punto de finca activa es EXTERNO (#finca-active-dot); la viñeta no lleva punto interior
+   y crece flexible para dar el máximo espacio al nombre. */
 #finca-badge {
-    font-size: 0.7rem;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 3px 8px 3px 6px;
-    border-radius: 20px;
-    border: 1px solid var(--p-cork);
-    color: #ffffff;
-    font-weight: 800;
-    letter-spacing: 0.1px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    max-width: 90px;
-    overflow: hidden;
-    margin-bottom: 3px;
-    justify-self: end;
-}
-
-#finca-badge::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow: 0 0 6px #10b981;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 240px;
 }
 
 #nombre-finca-header {
