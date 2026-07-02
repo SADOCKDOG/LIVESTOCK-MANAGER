@@ -83,6 +83,26 @@ body.scanner-active {
     background-color: transparent !important;
 }
 
+/* ── MARCO PRINCIPAL: líneas laterales con haz de luz (formato Cork Manager) ──
+   Unen el borde inferior del header con el borde superior del bottom-nav. */
+body::after {
+    content: '';
+    position: fixed;
+    top: calc(62px + var(--safe-top));
+    bottom: calc(65px + var(--safe-bottom));
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 900; /* bajo header (1000) y bottom-nav (1500) */
+    border-left: 1px solid var(--header-neon-color, #333333);
+    border-right: 1px solid var(--header-neon-color, #333333);
+    box-shadow:
+        inset 6px 0 14px -4px color-mix(in srgb, var(--header-neon-color, #CCFF00) 45%, transparent),
+        inset -6px 0 14px -4px color-mix(in srgb, var(--header-neon-color, #CCFF00) 45%, transparent);
+    transition: box-shadow 0.3s ease;
+}
+body.scanner-active::after { display: none; }
+
 /* ============================================
    SISTEMA DE ICONOS (Icons.* → SVG)
    Hereda color vía currentColor. Tamaño con clases.
@@ -103,7 +123,8 @@ body.scanner-active {
    HEADER COMPACTO (toolbar móvil)
    ============================================ */
 header {
-    background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    /* Transparencia unificada del marco: misma en header y bottom-nav */
+    background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     height: calc(62px + var(--safe-top));
     padding: calc(4px + var(--safe-top)) 12px 0;
     display: flex;
@@ -114,7 +135,7 @@ header {
     /* Formato Cork Manager: línea fina nítida + haz de luz difuso hacia abajo */
     border-bottom: 1px solid var(--header-neon-color, #333333);
     box-shadow: 0 5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent);
-    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .header-logo-container {
@@ -373,11 +394,13 @@ nav.bottom-nav {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
-    border-top: 1px solid #222;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+    /* Formato Cork Manager: línea fina nítida + haz de luz difuso hacia arriba */
+    border-top: 1px solid var(--header-neon-color, #222);
+    box-shadow: 0 -5px 16px -3px color-mix(in srgb, var(--header-neon-color, #CCFF00) 55%, transparent);
     padding-bottom: var(--safe-bottom);
     z-index: 1500;
-    transition: all 0.3s ease;
+    /* border-color fuera de la transición: transition+var() congela el color en el fallback (quirk Chromium) */
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .nav-item {
@@ -3218,6 +3241,11 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 body.glow-marco-off header {
     border-bottom-color: #333333;
     box-shadow: none;
+}
+body.glow-marco-off::after { display: none; }
+body.glow-marco-off nav.bottom-nav {
+    border-top-color: #222;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
 }
 
 body.glow-botones-off .nav-item { text-shadow: none; }
