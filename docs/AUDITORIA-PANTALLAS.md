@@ -20,7 +20,7 @@
 | G7 | 🟡 | `dashboard-view.js` conserva `border-top: 3px solid #FF4444/#FF9800/#a855f7` inline (neutralizados por el `!important` global → código muerto y 2 colores fuera de paleta). | Fase 3 |
 | G8 | 🟡 | **Estilos inline** en vistas: informes 222, dashboard 127, explotación 72, trazabilidad 42, ajustes 40, compradores 34, wizards-censo/guía/crotales ~31 c/u… (parte justificada: plantillas PDF). | Fase 3 (por lotes) |
 | G9 | 🟡 | **Toasts**: 123× `App.toast()` + 233× `App.toastError()`; `App.toast` infiere la semántica por prefijo emoji (✅/❌/⚠️). Los `Toast.success/warning/info` casi no se usan (1×). Convención implícita frágil. | Fase 6: estandarizar |
-| G10 | 🔴 | **Navegación retroceder/cancelar**: (a) el botón físico Android NO cierra el sheet "Más" abierto (navega por debajo); (b) el back físico hace `wizard.remove()` directo → salta `onCancel` y no confirma descarte de datos; (c) "Cancelar" de `WizardManager` tampoco pide confirmación con datos rellenos; (d) `_routesConVolver` incompleta (p. ej. `/venta-carne`, `/documentos` sin botón volver). | Fase 4 |
+| G10 | 🔴 | Navegación retroceder/cancelar. **Resuelto**: (a) back físico cierra el sheet "Más"; (b) back físico con modal/Confirm abierto pulsa su Cancelar (resuelve promesas y callbacks); (c) back físico con wizard abierto pasa por el botón Cancelar; (d) Cancelar de `WizardManager` confirma el descarte cuando hay pasos avanzados ("Se perderán los datos introducidos", botones Salir/Continuar aquí) y respeta `onCancel`; (e) `/venta-carne` añadida a `_routesConVolver`. `/documentos` se deja sin volver (es módulo de nivel superior del menú Más). | ✅ 2026-07-02 |
 | G11 | 🟡 | `.page-title-blue/green/purple` usan `#60a5fa/#34d399/#a78bfa` — fuera de paleta. | Fase 3 |
 | G12 | 🟢 | Emojis funcionales en botones/tabs: **0** ✓ · `alert()/confirm()` nativos: **0** ✓ | OK |
 
@@ -43,7 +43,7 @@
 | F1 | Quick-wins de bugs objetivos: G1, G2 | ✅ 2026-07-02 |
 | F2 | **Mapa único de colores de módulo** (constante `window.MODULE_COLORS` o similar) + migrar dropdown del header, sheet "Más" y `updateHeaderColor()` + design-tokens.css canónico + paleta ampliada en AGENTS.md | ✅ 2026-07-02 |
 | F3 | Migración de colores a tokens por lotes de vistas (orden: dashboard → ganadería → expro → comer → listas → informes → wizards) + G6, G7, G11 + decisión G3 | ⬜ |
-| F4 | Navegación: back físico cierra sheet "Más"; cancelar/back en wizard con confirmación de descarte (vía `onCancel` + `Confirm`); completar `_routesConVolver` | ⬜ |
+| F4 | Navegación: back físico cierra sheet "Más"; cancelar/back en wizard con confirmación de descarte (vía `onCancel` + `Confirm`); completar `_routesConVolver` | ✅ 2026-07-02 |
 | F5 | **Pase visual por pantalla** (checklist §3): textos, encabezados, unidades (kg, L, €, cab., UGM), capitalización, glassmorphism de KPIs, pills | ⬜ |
 | F6 | Notificaciones (campana, mini-badge, vista alertas) + estandarización de toasts semánticos | ⬜ |
 
@@ -89,3 +89,5 @@ Leyenda: 🤖 escaneo automático hecho · 👁 pase visual · ✅ conforme · �
 - **2026-07-02** — F1: reparadas `.card-accent-*` corruptas (G1) y añadida `.card-accent-gold` (G2). Documento creado.
 - **2026-07-02** — Marco: haz de luz interior en header y bottom-nav (efecto unión).
 - **2026-07-02** — F2: `design-tokens.css` = fuente única de tokens (G3); paleta ampliada en AGENTS.md (naranja/violeta/rosa de módulo); mapa único `js/module-colors.js` consumido por dropdown, header y sheet "Más" (G5). Cambio de color notable: Animales pasa de rojo a **naranja** en la cabecera (coherente con su color de módulo).
+- **2026-07-02** — Header: punto de finca activa único y exterior; viñeta flexible (adiós max-width 90px legacy); componentes centrados en el mismo eje.
+- **2026-07-02** — F4: cascada del back físico (modal → dropdown → sheet Más → wizard vía Cancelar → confirmar salida en dashboard → history.back); confirmación de descarte en WizardManager con pasos avanzados (verificada en preview: aparece diálogo, Continuar mantiene, Salir cierra + onCancel); `/venta-carne` con botón volver (G10).
