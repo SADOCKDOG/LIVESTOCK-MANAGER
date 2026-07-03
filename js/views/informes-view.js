@@ -9,6 +9,11 @@ const InformesView = {
   _currentTab: 'general',
   _cachedData: null,
 
+  /** Formatea un número en es-ES con decimales fijos (auditoría F5: coherencia decimal). */
+  _fmt(n, dec = 0) {
+    return Number(n || 0).toLocaleString('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  },
+
   _categories: {
     general: {
       label: "Resumen",
@@ -477,9 +482,9 @@ const InformesView = {
       ${lecheStats.totalLitros > 0 ? `<div class="card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6 mb-12">${Icons.leche()} Producción Lechera</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-10">
-          <div class="info-box-center py-10"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-gold font-950">${lecheStats.totalLitros.toFixed(1)} L</div></div>
-          <div class="info-box-center py-10"><small class="s-lbl">PROM/DÍA</small><div class="inf-val-lg text-amber font-950">${lecheStats.promedioDiario.toFixed(1)} L</div></div>
-          <div class="info-box-center py-10"><small class="s-lbl">PRECIO</small><div class="inf-val-lg text-dark-gold font-950">${lecheStats.precioMedio.toFixed(3)}€</div></div>
+          <div class="info-box-center py-10"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-gold font-950">${this._fmt(lecheStats.totalLitros, 1)} L</div></div>
+          <div class="info-box-center py-10"><small class="s-lbl">PROM/DÍA</small><div class="inf-val-lg text-amber font-950">${this._fmt(lecheStats.promedioDiario, 1)} L</div></div>
+          <div class="info-box-center py-10"><small class="s-lbl">PRECIO</small><div class="inf-val-lg text-dark-gold font-950">${this._fmt(lecheStats.precioMedio, 3)}€</div></div>
         </div>
         ${lecheStats.timeline?.length > 1 ? '<div class="chart-wrap"><canvas id="chart-leche-timeline" class="chart-canvas-sm"></canvas></div>' : ''}
       </div>` : ''}
@@ -501,7 +506,7 @@ const InformesView = {
       const sorted = eventosCarne.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
       const primero = sorted[0], ultimo = sorted[sorted.length - 1];
       const dias = Math.max(1, (new Date(ultimo.fecha) - new Date(primero.fecha)) / (1000 * 60 * 60 * 24));
-      return ((ultimo.valor_neto - primero.valor_neto) / dias).toFixed(3);
+      return InformesView._fmt((ultimo.valor_neto - primero.valor_neto) / dias, 3);
     })() : null;
 
     content.innerHTML = this._sectionActionsHTML('carne', 'Cárnico') + `
@@ -518,11 +523,11 @@ const InformesView = {
               <span class="text-xl text-blue font-950">${totalVentas}</span>
             </div>
             <div class="info-box-center py-10">
-              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Kg Totales</small>
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">kg Totales</small>
               <span class="text-xl text-green font-950">${kgTotal.toFixed(1)} kg</span>
             </div>
             <div class="info-box-center py-10">
-              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Precio Medio Kg</small>
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Precio Medio kg</small>
               <span class="text-xl text-violet font-950">${precioMedioKg.toFixed(2)}€/kg</span>
             </div>
             <div class="info-box-center py-10">
@@ -548,7 +553,7 @@ const InformesView = {
         <div class="inf-section-title uppercase font-900">Últimas ventas</div>
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-amber">
-            <thead><tr><th>Fecha</th><th>Animales</th><th>Kg</th><th>Total</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Animales</th><th>kg</th><th>Total</th></tr></thead>
             <tbody>${ventasHist.slice(0, 10).map(v => `
               <tr><td>${v.fecha || '-'}</td><td class="font-900">${v.animales || 1}</td><td class="font-900">${v.kg || '-'}</td><td class="text-green font-950">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
           </table>
@@ -612,21 +617,21 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Litros</small>
-              <span class="text-xl text-gold font-950 truncate w-full px-4" title="${lecheStats.totalLitros.toFixed(1)} L">${lecheStats.totalLitros.toFixed(1)} L</span>
+              <span class="text-xl text-gold font-950 truncate w-full px-4" title="${this._fmt(lecheStats.totalLitros, 1)} L">${this._fmt(lecheStats.totalLitros, 1)} L</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Promedio/Día</small>
-              <span class="text-xl text-amber font-950">${lecheStats.promedioDiario.toFixed(1)} L</span>
+              <span class="text-xl text-amber font-950">${this._fmt(lecheStats.promedioDiario, 1)} L</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Precio Medio</small>
-              <span class="text-xl text-dark-gold font-950">${lecheStats.precioMedio.toFixed(3)}€/L</span>
+              <span class="text-xl text-dark-gold font-950">${this._fmt(lecheStats.precioMedio, 3)}€/L</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Rendimiento Medio</small>
               <span class="text-xl text-blue font-950">${(() => {
                 const censoActivo = (d.animales || []).filter(a => a.estado === 'activo' || a.estado === 'Activo').length;
-                return censoActivo > 0 ? (lecheStats.promedioDiario / censoActivo).toFixed(2) : '0.00';
+                return censoActivo > 0 ? InformesView._fmt(lecheStats.promedioDiario / censoActivo, 2) : '0,00';
               })()} L/cab</span>
             </div>
             <div class="info-box-center py-10">
@@ -674,7 +679,7 @@ const InformesView = {
             <div class="info-box-sm flex justify-between items-center bg-black border border-222">
               <span class="text-ccc text-sm uppercase font-900 flex items-center gap-6">${Icons.rebanos()} ${r.rebano}</span>
               <div class="text-right">
-                <span class="text-gold font-950 text-md">${r.litros.toFixed(1)} L</span>
+                <span class="text-gold font-950 text-md">${InformesView._fmt(r.litros, 1)} L</span>
                 <span class="text-green text-xs font-900 ml-8">${r.importe.toLocaleString()}€</span>
               </div>
             </div>`).join('')}
@@ -956,8 +961,8 @@ const InformesView = {
                 <th>ALBARÁN</th>
                 <th>COMPRADOR</th>
                 <th>NIF</th>
-                <th class="text-right">KG</th>
-                <th class="text-right">€/KG MEDIO</th>
+                <th class="text-right">kg</th>
+                <th class="text-right">€/kg MEDIO</th>
                 <th class="text-right">BASE</th>
                 <th class="text-right">IVA</th>
                 <th class="text-right">RET. IRPF</th>
@@ -1022,7 +1027,7 @@ const InformesView = {
           <div class="inf-card-title">${Icons.grafico()} Precio Medio por Comprador</div>
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm tbl-accent-green">
-              <thead><tr><th>Comprador</th><th class="text-center">Ventas</th><th class="text-right">Kg</th><th class="text-right">Total</th><th class="text-right">€/Kg</th></tr></thead>
+              <thead><tr><th>Comprador</th><th class="text-center">Ventas</th><th class="text-right">kg</th><th class="text-right">Total</th><th class="text-right">€/kg</th></tr></thead>
               <tbody>${comps.map(c => `
                 <tr>
                   <td><strong>${c.nombre}</strong></td>
@@ -1068,7 +1073,7 @@ const InformesView = {
               <span class="text-xl text-amber font-950">${totalVentas}</span>
             </div>
             <div class="info-box-center py-10">
-              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Kg Totales</small>
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">kg Totales</small>
               <span class="text-xl text-purple font-950">${totalKg.toFixed(1)}</span>
             </div>
           </div>
@@ -1089,7 +1094,7 @@ const InformesView = {
               <th>NIF</th>
               <th>Tipo</th>
               <th class="text-right">Ventas</th>
-              <th class="text-right">Kg</th>
+              <th class="text-right">kg</th>
               <th class="text-right">Precio Medio</th>
               <th class="text-right">Total €</th>
               <th class="text-center">% Ingresos</th>
@@ -2186,7 +2191,7 @@ const InformesView = {
         <div class="card p-12 mb-14 border-222" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
-              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Kg Total</small>
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">kg Total</small>
               <span class="font-950 text-amber" style="font-size:1.1rem;">${data.totalKg.toFixed(1)}</span>
             </div>
             <div class="info-box-center py-6">
@@ -2194,7 +2199,7 @@ const InformesView = {
               <span class="font-950 text-gold" style="font-size:1.1rem;">${data.totalLitros.toFixed(1)}</span>
             </div>
             <div class="info-box-center py-6">
-              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta Kg</small>
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta kg</small>
               <span class="font-950 text-green" style="font-size:1.1rem;">${Math.round(data.metaKg)}</span>
             </div>
             <div class="info-box-center py-6">
@@ -2216,7 +2221,7 @@ const InformesView = {
         ${data.porMes.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table inf-table-sm tbl-accent-blue">
-            <thead><tr><th>Mes</th><th class="text-right text-amber">Kg</th><th class="text-right text-gold">Litros</th><th class="text-right text-amber">Kg Acum</th><th class="text-right text-gold">L Acum</th><th class="text-right text-green">Ingresos</th></tr></thead>
+            <thead><tr><th>Mes</th><th class="text-right text-amber">kg</th><th class="text-right text-gold">Litros</th><th class="text-right text-amber">kg Acum</th><th class="text-right text-gold">L Acum</th><th class="text-right text-green">Ingresos</th></tr></thead>
             <tbody>${data.porMes.map(m => `
               <tr>
                 <td><strong>${m.mes}</strong></td>
@@ -2258,8 +2263,8 @@ const InformesView = {
           <div class="card p-14 card-tint-green">
             <div class="inf-card-title mb-10 text-base flex items-center gap-6">${Icons.carne()} Carne</div>
             <div class="grid grid-cols-2 gap-x-10 gap-y-12">
-              <div class="min-w-0"><small class="s-lbl">Precio Medio Kg</small><div class="inf-val-md text-amber truncate" title="${data.precioMedioKg.toFixed(2)}€">${data.precioMedioKg.toFixed(2)}€</div></div>
-              <div class="min-w-0"><small class="s-lbl">Coste Var. Kg</small><div class="inf-val-md text-red truncate" title="${data.costeVarKg.toFixed(2)}€">${data.costeVarKg.toFixed(2)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Precio Medio kg</small><div class="inf-val-md text-amber truncate" title="${this._fmt(data.precioMedioKg, 2)}€">${this._fmt(data.precioMedioKg, 2)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Coste Var. kg</small><div class="inf-val-md text-red truncate" title="${this._fmt(data.costeVarKg, 2)}€">${this._fmt(data.costeVarKg, 2)}€</div></div>
               <div class="min-w-0"><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoCarne ? 'text-green' : 'text-red'} truncate" title="${data.breakEvenKg} kg">${data.breakEvenKg} kg</div></div>
               <div class="min-w-0"><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue truncate" title="${data.margenSeguridadKg}">${data.margenSeguridadKg}</div></div>
             </div>
@@ -2267,8 +2272,8 @@ const InformesView = {
           <div class="card p-14 card-tint-amber">
             <div class="inf-card-title mb-10 text-base flex items-center gap-6">${Icons.leche()} Leche</div>
             <div class="grid grid-cols-2 gap-x-10 gap-y-12">
-              <div class="min-w-0"><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold truncate" title="${data.precioMedioLitro.toFixed(3)}€">${data.precioMedioLitro.toFixed(3)}€</div></div>
-              <div class="min-w-0"><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red truncate" title="${data.costeVarLitro.toFixed(3)}€">${data.costeVarLitro.toFixed(3)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold truncate" title="${this._fmt(data.precioMedioLitro, 3)}€">${this._fmt(data.precioMedioLitro, 3)}€</div></div>
+              <div class="min-w-0"><small class="s-lbl">Coste Var. L</small><div class="inf-val-md text-red truncate" title="${this._fmt(data.costeVarLitro, 3)}€">${this._fmt(data.costeVarLitro, 3)}€</div></div>
               <div class="min-w-0"><small class="s-lbl">Break-Even</small><div class="inf-val-md ${data.cubiertoLeche ? 'text-green' : 'text-red'} truncate" title="${data.breakEvenLitros} L">${data.breakEvenLitros} L</div></div>
               <div class="min-w-0"><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue truncate" title="${data.margenSeguridadLitros}">${data.margenSeguridadLitros}</div></div>
             </div>
@@ -2860,7 +2865,7 @@ const InformesView = {
       if (compradoresData.length > 0) {
         const data = compradoresData.map(c => ({
           Comprador: c.nombre, NIF: c.nif, Tipo: c.tipo,
-          Ventas: c.numVentas, Kg: c.kg,
+          Ventas: c.numVentas, kg: c.kg,
           'Total €': c.total, 'Última Venta': c.ultimaVenta
         }));
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Compradores');
@@ -3174,12 +3179,12 @@ const InformesView = {
       <table class="pdf-tbl pdf-tbl-md mb-12">
         <tr><td class="pdf-kv6">Ingresos Totales Carne</td><td class="pdf-kv6 pdf-r pdf-b">${total.toLocaleString()} €</td></tr>
         <tr><td class="pdf-kv6">Ventas Registradas</td><td class="pdf-kv6 pdf-r">${ventasHist.length}</td></tr>
-        <tr><td class="pdf-kv6">Kilos Totales</td><td class="pdf-kv6 pdf-r pdf-b">${kgTotal.toFixed(1)} kg</td></tr>
-        <tr><td class="pdf-kv6">Precio Medio por Kg</td><td class="pdf-kv6 pdf-r pdf-b">${kgTotal > 0 ? (total / kgTotal).toFixed(2) : '0.00'} €</td></tr>
+        <tr><td class="pdf-kv6">Kilos Totales</td><td class="pdf-kv6 pdf-r pdf-b">${this._fmt(kgTotal, 1)} kg</td></tr>
+        <tr><td class="pdf-kv6">Precio Medio por kg</td><td class="pdf-kv6 pdf-r pdf-b">${kgTotal > 0 ? this._fmt(total / kgTotal, 2) : '0,00'} €</td></tr>
       </table>
       ${ventasHist.length > 0 ? `
       <table class="pdf-tbl pdf-tbl-xs mt-10">
-        <thead><tr class="pdf-bg0"><th class="pdf-th" style="border-bottom-color:#ddd;">Fecha</th><th class="pdf-th pdf-c" style="border-bottom-color:#ddd;">Kg</th><th class="pdf-th pdf-r" style="border-bottom-color:#ddd;">Total</th></tr></thead>
+        <thead><tr class="pdf-bg0"><th class="pdf-th" style="border-bottom-color:#ddd;">Fecha</th><th class="pdf-th pdf-c" style="border-bottom-color:#ddd;">kg</th><th class="pdf-th pdf-r" style="border-bottom-color:#ddd;">Total</th></tr></thead>
         <tbody>${ventasHist.slice(0, 20).map(v => `<tr><td class="pdf-td4">${v.fecha}</td><td class="pdf-td4 pdf-c">${v.kg || '-'}</td><td class="pdf-td4 pdf-r">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
       </table>` : ''}
     `;
@@ -3191,9 +3196,9 @@ const InformesView = {
     return `
       <h3 class="pdf-sec" style="color:#fbbf24;">${Icons.leche({ class: 'icon' })} Informe Lácteo</h3>
       <table class="pdf-tbl pdf-tbl-md mb-12">
-        <tr><td class="pdf-kv6">Total Litros Producidos</td><td class="pdf-kv6 pdf-r pdf-b">${lecheStats.totalLitros.toFixed(1)} L</td></tr>
-        <tr><td class="pdf-kv6">Promedio Diario</td><td class="pdf-kv6 pdf-r">${lecheStats.promedioDiario.toFixed(1)} L/día</td></tr>
-        <tr><td class="pdf-kv6">Precio Medio</td><td class="pdf-kv6 pdf-r pdf-b">${lecheStats.precioMedio.toFixed(3)} €/L</td></tr>
+        <tr><td class="pdf-kv6">Total Litros Producidos</td><td class="pdf-kv6 pdf-r pdf-b">${this._fmt(lecheStats.totalLitros, 1)} L</td></tr>
+        <tr><td class="pdf-kv6">Promedio Diario</td><td class="pdf-kv6 pdf-r">${this._fmt(lecheStats.promedioDiario, 1)} L/día</td></tr>
+        <tr><td class="pdf-kv6">Precio Medio</td><td class="pdf-kv6 pdf-r pdf-b">${this._fmt(lecheStats.precioMedio, 3)} €/L</td></tr>
         <tr><td class="pdf-kv6">Registros</td><td class="pdf-kv6 pdf-r">${lecheStats.totalRegistros}</td></tr>
       </table>
     `;
@@ -3258,7 +3263,7 @@ const InformesView = {
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">Fecha</th>
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">Albarán</th>
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">Comprador</th>
-          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Kg</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">kg</th>
           <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Base</th>
           <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">IVA</th>
           <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Total</th>
@@ -3365,7 +3370,7 @@ const InformesView = {
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">Comprador</th>
           <th class="pdf-th" style="border-bottom-color:#3b82f6;">NIF</th>
           <th class="pdf-th pdf-c" style="border-bottom-color:#3b82f6;">Ventas</th>
-          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Kg</th>
+          <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">kg</th>
           <th class="pdf-th pdf-r" style="border-bottom-color:#3b82f6;">Total</th>
         </tr></thead>
         <tbody>${data.map(c => `
@@ -3616,9 +3621,9 @@ const InformesView = {
     return `
       <h3 class="pdf-sec" style="color:#3b82f6;">${Icons.leche({ class: 'icon' })} Curva de Producción</h3>
       <table class="pdf-tbl pdf-tbl-xs">
-        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Mes</th><th class="pdf-th-sm pdf-r">Kg</th><th class="pdf-th-sm pdf-r">Litros</th><th class="pdf-th-sm pdf-r">Kg Acum</th><th class="pdf-th-sm pdf-r">L Acum</th><th class="pdf-th-sm pdf-r">Ingresos</th></tr></thead>
-        <tbody>${curvaProdData.porMes.map(m => `<tr><td class="pdf-td"><strong>${m.mes}</strong></td><td class="pdf-td pdf-r">${m.kg.toFixed(1)}</td><td class="pdf-td pdf-r">${m.litros.toFixed(1)}</td><td class="pdf-td pdf-r">${m.kgAcum.toFixed(1)}</td><td class="pdf-td pdf-r">${m.litrosAcum.toFixed(1)}</td><td class="pdf-td pdf-r">${m.ingresos.toLocaleString()}€</td></tr>`).join('')}</tbody>
-        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalKg.toFixed(1)}</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalLitros.toFixed(1)}</td><td class="pdf-tot pdf-r pdf-b">—</td><td class="pdf-tot pdf-r pdf-b">—</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalIngresos.toLocaleString()}€</td></tr></tfoot>
+        <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Mes</th><th class="pdf-th-sm pdf-r">kg</th><th class="pdf-th-sm pdf-r">Litros</th><th class="pdf-th-sm pdf-r">kg Acum</th><th class="pdf-th-sm pdf-r">L Acum</th><th class="pdf-th-sm pdf-r">Ingresos</th></tr></thead>
+        <tbody>${curvaProdData.porMes.map(m => `<tr><td class="pdf-td"><strong>${m.mes}</strong></td><td class="pdf-td pdf-r">${InformesView._fmt(m.kg, 1)}</td><td class="pdf-td pdf-r">${InformesView._fmt(m.litros, 1)}</td><td class="pdf-td pdf-r">${InformesView._fmt(m.kgAcum, 1)}</td><td class="pdf-td pdf-r">${InformesView._fmt(m.litrosAcum, 1)}</td><td class="pdf-td pdf-r">${m.ingresos.toLocaleString()}€</td></tr>`).join('')}</tbody>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-r pdf-b">${this._fmt(curvaProdData.totalKg, 1)}</td><td class="pdf-tot pdf-r pdf-b">${this._fmt(curvaProdData.totalLitros, 1)}</td><td class="pdf-tot pdf-r pdf-b">—</td><td class="pdf-tot pdf-r pdf-b">—</td><td class="pdf-tot pdf-r pdf-b">${curvaProdData.totalIngresos.toLocaleString()}€</td></tr></tfoot>
       </table>
       <p class="pdf-tbl-xs pdf-muted">Meta kg: ${Math.round(curvaProdData.metaKg)} · Meta litros: ${Math.round(curvaProdData.metaLitros)} · Cumplimiento: ${curvaProdData.pctCumplimientoKg}% kg / ${curvaProdData.pctCumplimientoLitros}% L</p>
     `;

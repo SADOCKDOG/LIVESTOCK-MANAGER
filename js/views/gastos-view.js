@@ -146,7 +146,7 @@ const GastosView = {
         date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
         zone: g.snap_zona || '',
         categoria: g.categoria || '',
-        value: (g.monto || 0) + ' €',
+        value: GastosView._fmt(g.monto || 0) + ' €',
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),
       emptyMsg: `Sin gastos de ${catInfo.label.toLowerCase()}. Usa "Registrar Gasto" para añadir.`

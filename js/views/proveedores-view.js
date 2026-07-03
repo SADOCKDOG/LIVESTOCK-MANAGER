@@ -184,7 +184,7 @@ const ProveedoresView = {
             <div class="summary-cell summary-cell-kpi border-left-blue">
               <small class="s-lbl uppercase font-900">REGISTROS</small>
               <div class="s-val inf-val-lg text-blue font-950">${resumen.total_gastos}</div>
-              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">MEDIA: ${resumen.gasto_promedio.toFixed(1)}€</small>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">MEDIA: ${resumen.gasto_promedio.toLocaleString('es-ES', { maximumFractionDigits: 1 })}€</small>
             </div>
             <div class="summary-cell summary-cell-kpi border-left-red">
               <small class="s-lbl uppercase font-900">GASTO ANUAL</small>

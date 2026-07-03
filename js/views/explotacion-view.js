@@ -367,7 +367,7 @@ if (window.enableScrollShadows) {
             ${d.gmdList.slice(0, 4).map(g => `
               <div class="flex justify-between items-center text-xs text-white">
                 <span class="text-ccc">🐄 ${g.crotal} (${g.rebano})</span>
-                <strong class="text-green">+${g.gmd.toFixed(3)} kg/día</strong>
+                <strong class="text-green">+${g.gmd.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg/día</strong>
               </div>`).join('') || '<div class="text-xs text-555">Sin datos evaluados de GMD. Registra al menos dos pesajes para el mismo animal.</div>'}
           </div>
           <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">Registro mixto de pesajes, ordeños y tratamientos para explotación híbrida</span></div>

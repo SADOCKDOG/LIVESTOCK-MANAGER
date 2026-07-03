@@ -337,7 +337,7 @@ const ComercializacionView = {
         // Añadir precio final y MOFA como badges si existen
         const extraBadges = [];
         if (e.precio_final_unitario) {
-          extraBadges.push(window.CalidadLecheHelper.badgeParametro('Precio', e.precio_final_unitario.toFixed(3) + ' €/L', true, Icons.dinero()));
+          extraBadges.push(window.CalidadLecheHelper.badgeParametro('Precio', e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' €/L', true, Icons.dinero()));
         }
         if (e.mofa != null) {
           extraBadges.push(window.CalidadLecheHelper.badgeParametro('MOFA', Math.round(e.mofa) + ' €', e.mofa >= 0, Icons.grafico()));

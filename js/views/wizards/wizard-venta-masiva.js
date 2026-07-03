@@ -249,11 +249,11 @@ window.VentaMasivaWizard = {
               <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">DATOS ECONÓMICOS</div>
               <div class="grid grid-cols-2 gap-15 mb-12">
                   <div class="wizard-input-group">
-                    <label class="wizard-label">PESO VIVO (KG)</label>
+                    <label class="wizard-label">PESO VIVO (kg)</label>
                     <input type="number" id="w-v-pv" value="${data.pVivo}" class="wizard-input font-900 text-lg">
                   </div>
                   <div class="wizard-input-group">
-                    <label class="wizard-label">PESO CANAL (KG)</label>
+                    <label class="wizard-label">PESO CANAL (kg)</label>
                     <input type="number" id="w-v-pc" value="${data.pCanal}" class="wizard-input font-900 text-lg text-green">
                   </div>
               </div>

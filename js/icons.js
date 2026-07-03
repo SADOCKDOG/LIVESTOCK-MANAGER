@@ -229,6 +229,18 @@ const Icons = {
       '<line x1="16" y1="17" x2="8" y2="17"/>'
     );
   },
+  imprimir() {
+    return this._svg(
+      '<polyline points="6 9 6 2 18 2 18 9"/>' +
+      '<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>' +
+      '<rect x="6" y="14" width="12" height="8"/>'
+    );
+  },
+  adjuntar() {
+    return this._svg(
+      '<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>'
+    );
+  },
   foto() {
     return this._svg(
       '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>' +

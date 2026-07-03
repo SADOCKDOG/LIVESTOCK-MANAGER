@@ -25,7 +25,7 @@ const ProduccionUI = {
             <label class="wizard-label">SELECCIONAR ÁREA</label>
             <select id="prod-select-area" class="prod-select">
               <option value="">-- ELIGE UNA OPCIÓN --</option>
-              <option value="carne">PRODUCCIÓN CÁRNICA (KG)</option>
+              <option value="carne">PRODUCCIÓN CÁRNICA (kg)</option>
               <option value="leche">PRODUCCIÓN LÁCTEA (L)</option>
               <option value="venta_masiva">VENTA MASIVA / MATADERO</option>
               <option value="gasto">GASTO ANALÍTICO</option>
