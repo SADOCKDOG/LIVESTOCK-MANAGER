@@ -266,7 +266,7 @@ window.WizardCenso = {
         `;
         loader.innerHTML = `
           <div class="pdf-loader">
-            <div class="pdf-loader-emoji">⏳</div>
+            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
             <div class="pdf-loader-title">Generando Declaración</div>
             <div class="pdf-loader-desc">Informe de Censo Anual</div>
             <div class="pdf-loader-bar">

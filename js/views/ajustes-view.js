@@ -506,8 +506,8 @@ const AjustesView = {
         <div class="text-gold font-800 text-sm uppercase tracking-widest mt-10">Desarrollado por</div>
         <div class="text-white font-900 text-2xl uppercase mt-4">David Asuar Arteaga</div>
         <p class="text-aaa about-desc uppercase font-700 text-xs mt-15 leading-relaxed">Plataforma profesional de gestión ganadera inteligente y trazabilidad industrial integrada.</p>
-        <div class="mt-20"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-900 no-underline text-md uppercase">📩 soporte.sdogfarm@gmail.com</a></div>
-        <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-900 no-underline text-md uppercase inline-flex items-center gap-6">🐙 GitHub</a></div>
+        <div class="mt-20"><a href="mailto:soporte.sdogfarm@gmail.com" class="text-gold font-900 no-underline text-md uppercase">soporte.sdogfarm@gmail.com</a></div>
+        <div class="mt-12"><a href="https://github.com/SADOCKDOG/LIVESTOCK-MANAGER" target="_blank" rel="noopener noreferrer" class="text-gold font-900 no-underline text-md uppercase inline-flex items-center gap-6">GitHub</a></div>
         <div class="mt-40 text-[0.65rem] text-444 uppercase font-900 tracking-widest about-footer">
           © 2026 Livestock Manager Premium · v${window.APP_INFO.version}<br>
           Todos los derechos reservados.

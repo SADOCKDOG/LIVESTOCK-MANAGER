@@ -81,7 +81,7 @@ const DocumentosView = {
       this._setupFilters();
     } catch (e) {
       console.error('[Documentos] Error:', e);
-      main.innerHTML = `<div class="card text-center p-40 text-red">❌ Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red">Error: ${e.message}</div>`;
     }
   },
 

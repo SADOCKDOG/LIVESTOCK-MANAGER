@@ -433,7 +433,7 @@ const ErrorHandler = {
     return {
       title: "Error",
       message: error.message || "Ocurrió un error inesperado",
-      icon: "⚠️",
+      icon: typeof Icons !== 'undefined' ? Icons.alerta() : "",
       severity: "error",
     };
   },

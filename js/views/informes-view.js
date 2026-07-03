@@ -3549,7 +3549,7 @@ const InformesView = {
       <table class="pdf-tbl pdf-tbl-md mb-10">
         ${eficienciaData.kpis.map(k => `<tr><td class="pdf-kv pdf-b">${k.label}</td><td class="pdf-kv pdf-r pdf-b" style="color:${semaforoPdf(k.status)};">${k.value}</td><td class="pdf-kv pdf-r pdf-muted">Obj: ${k.objetivo}${k.unidad}</td></tr>`).join('')}
       </table>
-      <p class="pdf-tbl-xs pdf-muted">🟢 Óptimo · 🟡 Alerta · 🔴 Crítico</p>
+      <p class="pdf-tbl-xs pdf-muted">Óptimo · Alerta · Crítico</p>
     `;
   },
 
@@ -3561,7 +3561,7 @@ const InformesView = {
       <table class="pdf-tbl pdf-tbl-sm">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Zona</th><th class="pdf-th-sm pdf-c">Aforo</th><th class="pdf-th-sm pdf-c">Ocupación</th><th class="pdf-th-sm pdf-c">%</th><th class="pdf-th-sm pdf-c">Estado</th></tr></thead>
         <tbody>${cargasData.porZona.map(z => `<tr><td class="pdf-td"><strong>${z.nombre}</strong></td><td class="pdf-td pdf-c">${z.aforo}</td><td class="pdf-td pdf-c">${z.ocupacion}</td><td class="pdf-td pdf-c">${z.pctOcupacion}%</td><td class="pdf-td pdf-c">${z.estado}</td></tr>`).join('')}</tbody>
-        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-c pdf-b">${cargasData.totalAforo}</td><td class="pdf-tot pdf-c pdf-b">${cargasData.totalOcupacion}</td><td class="pdf-tot pdf-c pdf-b">${cargasData.pctGlobal}%</td><td class="pdf-tot pdf-c">${cargasData.numAlertas > 0 ? '⚠️ ' + cargasData.numAlertas + ' alertas' : '✅'}</td></tr></tfoot>
+        <tfoot><tr class="pdf-bg2"><td class="pdf-tot pdf-b">TOTAL</td><td class="pdf-tot pdf-c pdf-b">${cargasData.totalAforo}</td><td class="pdf-tot pdf-c pdf-b">${cargasData.totalOcupacion}</td><td class="pdf-tot pdf-c pdf-b">${cargasData.pctGlobal}%</td><td class="pdf-tot pdf-c">${cargasData.numAlertas > 0 ? cargasData.numAlertas + ' alertas' : 'OK'}</td></tr></tfoot>
       </table>
     `;
   },
@@ -3637,8 +3637,8 @@ const InformesView = {
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Costes Fijos</td><td class="pdf-kv pdf-r">${breakEvenData.costesFijos.toLocaleString()}€</td></tr>
         <tr><td class="pdf-kv pdf-b">Costes Variables</td><td class="pdf-kv pdf-r">${breakEvenData.costesVariables.toLocaleString()}€</td></tr>
-        <tr><td class="pdf-kv pdf-b">Break-Even Carne</td><td class="pdf-kv pdf-r pdf-b">${breakEvenData.breakEvenKg} kg <span style="color:${breakEvenData.cubiertoCarne ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoCarne ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
-        <tr><td class="pdf-kv pdf-b">Break-Even Leche</td><td class="pdf-kv pdf-r pdf-b">${breakEvenData.breakEvenLitros} L <span style="color:${breakEvenData.cubiertoLeche ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoLeche ? '✅ Cubierto' : '❌ No cubierto'})</span></td></tr>
+        <tr><td class="pdf-kv pdf-b">Break-Even Carne</td><td class="pdf-kv pdf-r pdf-b">${breakEvenData.breakEvenKg} kg <span style="color:${breakEvenData.cubiertoCarne ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoCarne ? 'Cubierto' : 'No cubierto'})</span></td></tr>
+        <tr><td class="pdf-kv pdf-b">Break-Even Leche</td><td class="pdf-kv pdf-r pdf-b">${breakEvenData.breakEvenLitros} L <span style="color:${breakEvenData.cubiertoLeche ? '#10b981' : '#cc0000'};">(${breakEvenData.cubiertoLeche ? 'Cubierto' : 'No cubierto'})</span></td></tr>
         <tr><td class="pdf-kv">Margen Seguridad Carne</td><td class="pdf-kv pdf-r">${breakEvenData.margenSeguridadKg}</td></tr>
         <tr><td class="pdf-kv">Margen Seguridad Leche</td><td class="pdf-kv pdf-r">${breakEvenData.margenSeguridadLitros}</td></tr>
       </table>
@@ -3670,9 +3670,9 @@ const InformesView = {
       animation:fadeInUp 0.3s ease-out;
       letter-spacing:0.3px;
     `;
-    el.innerHTML = `📤 Compartir ${fileObj.titulo}`;
+    el.innerHTML = `Compartir ${fileObj.titulo}`;
     el.onclick = async () => {
-      el.innerHTML = '⏳ Compartiendo...';
+      el.innerHTML = 'Compartiendo...';
       el.style.pointerEvents = 'none';
       await this._ejecutarShare(fileObj);
       this._ocultarBotonFlotante();
@@ -3804,7 +3804,7 @@ const InformesView = {
   // ==========================================
   _renderExportar(content, d) {
     if (!window.ExportService) {
-      content.innerHTML = `<div class="card empty-state">📤 ExportService no disponible. Recarga la aplicación.</div>`;
+      content.innerHTML = `<div class="card empty-state">ExportService no disponible. Recarga la aplicación.</div>`;
       return;
     }
 

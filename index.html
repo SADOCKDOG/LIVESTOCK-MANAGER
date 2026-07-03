@@ -15,7 +15,7 @@
     />
     <title>Livestock Manager</title>
     <link rel="stylesheet" href="css/design-tokens.css?v=5.3.6" />
-    <link rel="stylesheet" href="css/styles.css?v=5.3.7" />
+    <link rel="stylesheet" href="css/styles.css?v=5.3.8" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/Logo aplicación.png" />
 
@@ -85,7 +85,7 @@
         const diag = document.getElementById('error-diag');
         if (diag) {
           diag.style.display = 'block';
-          diag.innerHTML = '❌ ERROR JS\n\n' + msg + '\n\nArchivo: ' + (url || '?') + '\nLínea: ' + (line || '?') + '\nCol: ' + (col || '?') + '\n\nStack: ' + (err ? err.stack : 'N/A') + '\n\n[Toque aquí para cerrar]';
+          diag.innerHTML = 'ERROR JS\n\n' + msg + '\n\nArchivo: ' + (url || '?') + '\nLínea: ' + (line || '?') + '\nCol: ' + (col || '?') + '\n\nStack: ' + (err ? err.stack : 'N/A') + '\n\n[Toque aquí para cerrar]';
           diag.onclick = () => diag.style.display = 'none';
         }
         return true;
@@ -94,7 +94,7 @@
         const diag = document.getElementById('error-diag');
         if (diag) {
           diag.style.display = 'block';
-          diag.innerHTML = '❌ PROMESA RECHAZADA\n\n' + (e.reason ? e.reason.message || e.reason : '?') + '\n\nStack: ' + (e.reason ? e.reason.stack || 'N/A' : 'N/A') + '\n\n[Toque aquí para cerrar]';
+          diag.innerHTML = 'PROMESA RECHAZADA\n\n' + (e.reason ? e.reason.message || e.reason : '?') + '\n\nStack: ' + (e.reason ? e.reason.stack || 'N/A' : 'N/A') + '\n\n[Toque aquí para cerrar]';
           diag.onclick = () => diag.style.display = 'none';
         }
       });
@@ -361,7 +361,7 @@
     <script src="js/views/explotacion-view.js"></script>
     <script src="js/views/gastos-view.js"></script>
     <script src="js/views/comercializacion-view.js"></script>
-    <script src="js/views/informes-view.js?v=20260703130000"></script>
+    <script src="js/views/informes-view.js?v=20260703190000"></script>
     <script src="js/views/trazabilidad-view.js"></script>
     <script src="js/views/cuaderno-view.js"></script>
     <script src="js/views/documentos-view.js"></script>

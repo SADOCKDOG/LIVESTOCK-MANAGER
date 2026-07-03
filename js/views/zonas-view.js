@@ -63,7 +63,7 @@ const ZonasView = {
         totalOcupacion += censoTotal;
         const pct = aforo > 0 ? Math.round((censoTotal / aforo) * 100) : 0;
         const colorCenso = pct > 100 ? 'var(--c-danger)' : pct >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
-        const estadoTexto = pct > 100 ? '🔴 Sobrecarga' : pct >= 80 ? '🟡 Óptimo' : pct >= 50 ? '🟢 Aceptable' : '⚪ Infrautilizada';
+        const estadoTexto = pct > 100 ? 'Sobrecarga' : pct >= 80 ? 'Óptimo' : pct >= 50 ? 'Aceptable' : 'Infrautilizada';
 
         const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
         let ugmTotal = 0;
@@ -88,7 +88,7 @@ const ZonasView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="badge badge-sm uppercase font-800" style="color:${colorCenso}; border:1px solid ${colorCenso}40; background:${colorCenso}15;">${estadoTexto.split(' ')[1]}</span>
+                  <span class="badge badge-sm uppercase font-800" style="color:${colorCenso}; border:1px solid ${colorCenso}40; background:${colorCenso}15;">${estadoTexto}</span>
                 </div>
               </div>
 

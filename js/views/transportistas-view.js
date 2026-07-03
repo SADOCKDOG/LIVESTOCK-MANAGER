@@ -163,13 +163,13 @@ const TransportistasView = {
                     </div>
                     <div class="mt-12 flex gap-8 flex-wrap">
                         <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.certificado_bienestar ? 'rgba(204,255,0,0.15)' : 'rgba(255,68,68,0.15)'}; color:${t.certificado_bienestar ? 'var(--c-success)' : 'var(--c-danger)'};">
-                            ${t.certificado_bienestar ? '✅ Cert. Bienestar' : '❌ Sin Cert. Bienestar'}
+                            ${t.certificado_bienestar ? 'Cert. Bienestar' : 'Sin Cert. Bienestar'}
                         </span>
                         <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.condiciones_termoneutrales ? 'rgba(204,255,0,0.15)' : 'rgba(107,114,128,0.15)'}; color:${t.condiciones_termoneutrales ? 'var(--c-success)' : '#9ca3af'};">
-                            ${t.condiciones_termoneutrales ? '🌡️ Termoneutral' : 'Sin control térmico'}
+                            ${t.condiciones_termoneutrales ? 'Termoneutral' : 'Sin control térmico'}
                         </span>
                     </div>
-                    ${t.notas ? `<div class="mt-10 p-10 text-gray text-sm rounded-sm bg-card">📝 ${t.notas}</div>` : ''}
+                    ${t.notas ? `<div class="mt-10 p-10 text-gray text-sm rounded-sm bg-card">${t.notas}</div>` : ''}
                     <div class="mt-10 p-10 rounded-sm bg-card">
                         <div class="grid grid-cols-2 gap-8 text-sm">
                             <div><span class="text-gray">Expediciones:</span> <span class="text-white font-bold">${resumen.total_expediciones}</span></div>
@@ -336,7 +336,7 @@ const TransportistasView = {
                 overlay.remove();
                 TransportistasView.render();
             } catch (e) {
-                errorDiv.textContent = '❌ ' + e.message;
+                errorDiv.textContent = '' + e.message;
                 errorDiv.style.display = 'block';
             }
         };

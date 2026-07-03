@@ -240,7 +240,7 @@ const RebanosView = {
       filtrados.forEach(t => {
         html += `<div class="info-box-sm border-left-green mt-8 bg-black">
           <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(t.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0}D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">🚫 PROHIBIDO LECHE</strong>' : ''}</div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0}D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">PROHIBIDO LECHE</strong>' : ''}</div>
         </div>`;
       });
       container.innerHTML = html;
