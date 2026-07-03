@@ -179,7 +179,7 @@ window.WizardCrotales = {
           console.log(`[wizard-crotales] Pedido guardado en BD: id=${pedidoId}`);
 
           const pdfData = { ...data, especie, tipo, cantidad, adsg_nombre, adsg_codigo, adsg_veterinario, adsg_vet_colegiado, adsg_vet_nif };
-          App.toast(`✅ Pedido guardado (nº ${pedidoId})`);
+          App.toast(`Pedido guardado (nº ${pedidoId})`, 'success');
           await WizardCrotales.generarPDF(finca, pdfData, pedidoId);
           if (document.getElementById('docs-lista')) {
             try { await DocumentosView.render(); } catch (_) { /* noop */ }
@@ -289,7 +289,7 @@ window.WizardCrotales = {
           const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
           URL.revokeObjectURL(url);
         }
-        App.toast("Documento compartido ✅");
+        App.toast("Documento compartido", 'success');
       } catch (e) { App.toastError("Error: " + e.message); }
     };
 

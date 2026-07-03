@@ -511,9 +511,9 @@ const AnimalesView = {
           });
 
           if (resultado.exito) {
-            App.toast(`✅ ${resultado.mensaje}`);
+            App.toast(`${resultado.mensaje}`, 'success');
           } else {
-            App.toastError(`⚠️ ${resultado.mensaje}`);
+            App.toast(`${resultado.mensaje}`, 'warning');
           }
         } catch (err) {
           App.toastError(`Error notificando REGA: ${err.message}`);
@@ -596,7 +596,7 @@ const AnimalesView = {
 
       const nuevoId = await Animales.save(data);
       this._animalGuardado = true;
-      App.toast("Animal guardado correctamente ✔");
+      App.toast("Animal guardado correctamente");
 
       // Gap 11: Si está marcado "Notificado a REGA", registrar notificación
       if (data.notificado_rega && window.NotificacionesREGA) {
@@ -618,7 +618,7 @@ const AnimalesView = {
                 finca_rega: finca.rega || finca.codigo_REGA,
                 tipo_evento: 'alta'
               });
-              App.toast(`✅ Notificación REGA registrada: ${resNotif.numero_seguimiento}`);
+              App.toast(`Notificación REGA registrada: ${resNotif.numero_seguimiento}`, 'success');
             }
           }
         } catch (err) {

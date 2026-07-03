@@ -670,7 +670,7 @@ const CompradoresView = {
             if (!data.nif_cif) return App.toastError('El NIF/CIF es obligatorio');
 
             const nuevoId = await Compradores.save(data);
-            App.toast(id ? 'Comprador actualizado ✔' : 'Comprador creado ✔');
+            App.toast(id ? 'Comprador actualizado' : 'Comprador creado', 'success');
 
             // Si venimos del wizard de venta, volver
             if (window._volverAWizardVenta) {

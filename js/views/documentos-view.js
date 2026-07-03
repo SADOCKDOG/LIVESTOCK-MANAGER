@@ -177,7 +177,7 @@ const DocumentosView = {
       const a = document.createElement('a');
       a.href = url; a.download = `Documentos_${new Date().toISOString().split('T')[0]}.xlsx`; a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      App.toast('✅ Documentos exportados');
+      App.toast('Documentos exportados', 'success');
     } catch (e) { App.toastError('Error al exportar: ' + e.message); }
   },
 
@@ -401,7 +401,7 @@ const DocumentosView = {
             const win = window.open('', '_blank');
             if (win) { win.document.write('<html><head><title>' + filename + '</title><style>body{font-family:serif;padding:40px;color:#000;background:#fff;}</style></head><body>' + el.innerHTML + '</body></html>'); win.document.close(); win.print(); }
           }
-          App.toast("Documento descargado ✅");
+          App.toast("Documento descargado", 'success');
         } catch (e) { App.toastError("Error: " + e.message); }
       };
     } catch (e) {

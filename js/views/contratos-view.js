@@ -191,7 +191,7 @@ const ContratosView = {
             if (!data.compradorId) return App.toastError('Selecciona un comprador');
 
             await Contratos.save(data);
-            App.toast(id ? 'Contrato actualizado ✔' : 'Contrato creado ✔');
+            App.toast(id ? 'Contrato actualizado' : 'Contrato creado', 'success');
             
             location.hash = '#/compradores';
         } catch (e) {

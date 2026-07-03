@@ -438,7 +438,7 @@ const TrazabilidadView = {
         a.href = url; a.download = fileName; a.style.display = 'none';
         document.body.appendChild(a); a.click();
         setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
-        App.toast('✅ PDF descargado');
+        App.toast('PDF descargado', 'success');
       }
     } catch (e) {
       console.error('[TrazabilidadPDF]', e);

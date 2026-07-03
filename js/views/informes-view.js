@@ -2415,7 +2415,7 @@ const InformesView = {
           fincaId: await Fincas.getActiveId(),
           creadoEn: new Date().toISOString()
         });
-        App.toast('✅ Subvención registrada');
+        App.toast('Subvención registrada', 'success');
         overlay.remove();
         if (window.InformesView) { InformesView._cachedData = null; await InformesView.render(); }
       } catch (e) { App.toastError("Error: " + e.message); }
@@ -3718,7 +3718,7 @@ const InformesView = {
           url: result.uri,
           dialogTitle: `Compartir ${titulo} con…`
         });
-        App.toast(`${titulo} compartido ✅`);
+        App.toast(`${titulo} compartido`, 'success');
         return true;
       }
     } catch (e) {
@@ -3734,7 +3734,7 @@ const InformesView = {
           text: shareText || '',
           files: [file]
         });
-        App.toast(`${titulo} compartido ✅`);
+        App.toast(`${titulo} compartido`, 'success');
         return true;
       }
     } catch (e) {
@@ -3749,7 +3749,7 @@ const InformesView = {
     a.href = url; a.download = fileName; a.style.display = 'none';
     document.body.appendChild(a); a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
-    App.toast(`${titulo} descargado ✅`);
+    App.toast(`${titulo} descargado`, 'success');
     return false;
   },
 
@@ -3758,7 +3758,7 @@ const InformesView = {
     App.toast(`Generando ${titulo}...`);
     try {
       const blob = await generador();
-      App.toast(`${titulo} listo ✅`);
+      App.toast(`${titulo} listo`, 'success');
 
       const finca = await window.Fincas?.getActive().catch(() => null) || null;
       const shareTitle = 'Informe Livestock Manager';

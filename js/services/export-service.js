@@ -419,7 +419,7 @@ const ExportService = {
    */
    async descargar(content, filename, mime = 'text/csv;charset=utf-8') {
     if (window.PremiumManager && window.PremiumManager.isFree()) {
-      if (window.App?.toast) App.toast('❌ La exportación solo está disponible en Premium');
+      if (window.App?.toast) App.toast('La exportación solo está disponible en Premium', 'error');
       return;
     }
     // 1️⃣ Capacitor Filesystem + Share (funciona en Android nativo)
@@ -447,7 +447,7 @@ const ExportService = {
           files: [result.uri],
           dialogTitle: `Compartir ${filename} con…`
         });
-        App.toast(`${filename} compartido ✅`);
+        App.toast(`${filename} compartido`, 'success');
         return;
       }
     } catch (e) {
@@ -464,7 +464,7 @@ const ExportService = {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-    App.toast(`${filename} descargado ✅`);
+    App.toast(`${filename} descargado`, 'success');
   },
 
   /**
@@ -478,11 +478,11 @@ const ExportService = {
     if (!reporte.valido) {
       const msg = reporte.errores[0];
       console.error('[ExportService] Exportación bloqueada:', reporte.errores);
-      if (window.App?.toast) App.toast(`❌ ${msg}`);
+      if (window.App?.toast) App.toast(`${msg}`, 'error');
       return false;
     }
     if (reporte.avisos.length && window.App?.toast) {
-      App.toast(`⚠️ Exportado con ${reporte.avisos.length} aviso(s). Revisa la consola.`);
+      App.toast(`Exportado con ${reporte.avisos.length} aviso(s). Revisa la consola.`, 'warning');
     }
     return true;
   },

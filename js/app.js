@@ -716,18 +716,22 @@ const App = {
   },
 
   /**
-   * Toast semántico (G9). El tipo se infiere del marcador en CUALQUIER posición:
-   * success · error · warning · info. Sin marcador → neutro (dorado).
-   * Los emojis (marcadores y decorativos:…) se retiran del texto:
+   * Toast semántico (G9). Uso preferente: tipo EXPLÍCITO como 2º argumento:
+   *   App.toast('Guardado', 'success') · tipos: success · error · warning · info · '' (neutro dorado).
+   * Compatibilidad: si el 2º argumento es un número se trata como duración (API legacy)
+   * y para strings dinámicos sin tipo se mantiene la inferencia por marcador
+   * (check/cruz/aviso/info en cualquier posición). Los emojis se retiran del texto:
    * el icono lo aporta Toast como SVG semántico (Icons.check/alerta/cerrar/info).
    */
-  toast(msg, duracionMs) {
+  toast(msg, type, duracionMs) {
     if (typeof msg !== 'string') return;
-    let type = '';
-    if (msg.includes('✅')) type = 'success';
-    else if (msg.includes('❌')) type = 'error';
-    else if (msg.includes('⚠')) type = 'warning';
-    else if (msg.includes('ℹ') || /^info\b/i.test(msg)) type = 'info';
+    if (typeof type === 'number') { duracionMs = type; type = ''; }
+    if (!type) {
+      if (msg.includes('✅')) type = 'success';
+      else if (msg.includes('❌')) type = 'error';
+      else if (msg.includes('⚠')) type = 'warning';
+      else if (msg.includes('ℹ') || /^info\b/i.test(msg)) type = 'info';
+    }
     const text = msg
       .replace(/^info\b\s*/i, '')
       .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}]/gu, '')
@@ -1054,8 +1058,7 @@ const App = {
 
           const timeout = setTimeout(() => {
             reader.abort?.();
-            App.toast(
-              'Tiempo agotado. Recuerda: los crotales ganaderos NO usan NFC (13.56 MHz) ' +
+            App.toast('Tiempo agotado. Recuerda: los crotales ganaderos NO usan NFC (13.56 MHz) ' +
               'sino RFID LF (134.2 kHz). Usa un lector Bluetooth externo.',
               5000
             );
@@ -1100,8 +1103,7 @@ const App = {
 
       // 2️⃣ Mensaje informativo si no hay Web NFC o falló
       if (!('NDEFReader' in window)) {
-        App.toast(
-          'NFC en móvil NO lee crotales LF (134.2 kHz). ' +
+        App.toast('NFC en móvil NO lee crotales LF (134.2 kHz). ' +
           'Usa el botón SCAN para leer el código visual con la cámara. ' +
           'Para lectura electrónica, conecta un lector RFID Bluetooth externo (Allflex, Datamars).',
           6000
@@ -1297,7 +1299,7 @@ const App = {
     if (window.AnimalesView?._validarCrotalUI) {
       window.AnimalesView._validarCrotalUI(input);
     }
-    App.toast(`✅ Crotal leído: ${codigo.toUpperCase()}`, 4000);
+    App.toast(`Crotal leído: ${codigo.toUpperCase()}`, 'success', 4000);
   },
 
   /** Cancela el escaneo web y libera recursos */
@@ -1494,8 +1496,8 @@ const App = {
       if (overlay) overlay.remove();
       const nCrias = (payload.crias || []).length;
       this.toast(tipo === 'Parto' && nCrias
-        ? `Parto guardado · ${nCrias} cría(s) dada(s) de alta ✔`
-        : 'Evento reproductivo guardado ✔');
+        ? `Parto guardado · ${nCrias} cría(s) dada(s) de alta`
+        : 'Evento reproductivo guardado', 'success');
       // Recargar historial
       this._cargarHistorialReproduccion(animalId);
     } catch (e) {
@@ -1504,7 +1506,7 @@ const App = {
     } finally {
       this._guardandoRepro = false;
       const b = document.getElementById('wiz-repro-guardar');
-      if (b) { b.disabled = false; b.textContent = '✔ Guardar'; b.style.opacity = '1'; }
+      if (b) { b.disabled = false; b.textContent = 'Guardar'; b.style.opacity = '1'; }
     }
   },
 
@@ -2057,7 +2059,7 @@ const App = {
             dialogTitle: "Compartir copia de seguridad con…",
           });
 
-          App.toast(`Backup compartido ✅ (${totalRegistros} registros)`);
+          App.toast(`Backup compartido (${totalRegistros} registros)`, 'success');
           return;
         }
       } catch (capErr) {
@@ -2074,7 +2076,7 @@ const App = {
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 10000);
-      App.toast(`Backup descargado ✅ (${totalRegistros} registros)`);
+      App.toast(`Backup descargado (${totalRegistros} registros)`, 'success');
     } catch (error) {
       App.toastError("Error al exportar: " + error.message);
     }
@@ -2095,7 +2097,7 @@ const App = {
           window.db,
           e.target.result
         );
-        App.toast(`Backup restaurado ✅ (${res.fincas.length} finca${res.fincas.length > 1 ? 's' : ''})`);
+        App.toast(`Backup restaurado (${res.fincas.length} finca${res.fincas.length > 1 ? 's' : ''})`, 'success');
         if (res.multiplesFincas) {
           await Confirm.alert("Restauración Completada", "Base de datos restaurada. Detectadas múltiples fincas.");
         } else {
