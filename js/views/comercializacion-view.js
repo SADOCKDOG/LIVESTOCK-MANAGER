@@ -145,7 +145,7 @@ const ComercializacionView = {
       </div>
 
       ${pipelineInfo ? `
-      <div class="card p-12 mb-14 border-222" style="border-left:4px solid var(--c-success); background: rgba(204,255,0,0.05);">
+      <div class="card-registro p-12 mb-14 border-222" style="--registro-color: var(--c-success); background: rgba(204,255,0,0.05);">
         <div class="text-[0.65rem] text-gray uppercase font-extrabold tracking-wider">Flujo activo</div>
         <div class="text-sm text-white mt-4 font-700">Procedente de <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
         <div class="text-[0.62rem] text-aaa mt-4">Fitosanitarios pendientes: <strong class="${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? 'text-red' : 'text-green'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong></div>
@@ -206,7 +206,7 @@ const ComercializacionView = {
     const headerLabels = { carne: 'Balance Cárnico', leche: 'Balance Lácteo', gastos: 'Resumen Gastos' };
 
     return `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
+      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: ${meta.color}; width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${headerIcons[tab] || Icons.info()} ${headerLabels[tab] || 'Resumen'}
         </div>
@@ -245,7 +245,7 @@ const ComercializacionView = {
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card card-animal no-underline" onclick="${r.onclick || ''}" style="border-left:4px solid ${color}; padding:12px; margin-bottom:8px; width:100%;">
+        <div class="card-registro" onclick="${r.onclick || ''}" style="--registro-color: ${color}; padding:12px; margin-bottom:8px; width:100%;">
           <div class="flex flex-col" style="width:100%;">
             <div class="flex justify-between items-start gap-6 w-full">
               <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap; flex:1; min-width:0;">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</span>
@@ -264,7 +264,7 @@ const ComercializacionView = {
 
     content.innerHTML = `
       <!-- PANEL DE ACCIONES COMERCIALES (ESTILO NEÓN) -->
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: ${color};">
+      <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: ${color}; --theme-color: ${color};">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${color}; --neon-glow: ${color}B0; --neon-inner: ${color}40" onclick="${registrarHandler}">
@@ -275,7 +275,7 @@ const ComercializacionView = {
         <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.comercial()} Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
       </div>
 
-      <div class="card p-14 border-222">
+      <div class="card-registro p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
           ${Icons.documento()} ${listName}
         </div>

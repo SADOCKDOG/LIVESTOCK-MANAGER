@@ -254,7 +254,7 @@ const CarneView = {
         <div class="grid gap-10">
           ${d.rebanosCarne.length > 0
             ? d.rebanosCarne.map(r => `
-                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
+                <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: var(--p-gold-dark);">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-8">
@@ -284,7 +284,7 @@ const CarneView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card report-section p-16 border-top-3px border-top-3px-green">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.transportistas()}</span>
@@ -313,7 +313,7 @@ const CarneView = {
         <div class="grid gap-10">
           ${d.ventasCarne.length > 0
             ? d.ventasCarne.slice(0, 15).map(v => `
-                <div class="card card-animal border-4-left-green" onclick="App._abrirDetalleVentaCarne(${v.id})">
+                <div class="card-registro" onclick="App._abrirDetalleVentaCarne(${v.id})" style="--registro-color: var(--c-success);">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-8">
@@ -358,7 +358,7 @@ const CarneView = {
 
     const html = `
       ${supresionesHtml}
-      <div class="card report-section p-16 border-top-3px border-top-3px-purple">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.documento()}</span>
@@ -390,7 +390,7 @@ const CarneView = {
             ? d.sanitariosCarne.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresion.some(ts => ts.id === s.id);
                 return `
-                  <div class="card card-animal" style="border-left:4px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
+                  <div class="card-registro" style="--registro-color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">

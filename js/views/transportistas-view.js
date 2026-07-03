@@ -34,7 +34,7 @@ const TransportistasView = {
             </div>
 
             <div class="max-w-600 mx-auto">
-                <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+                <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--p-gold); --theme-color: var(--p-gold);">
                   <div class="section-header-theme">ACCIONES</div>
                   <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                     <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="TransportistasView._abrirFormulario()">
@@ -45,9 +45,9 @@ const TransportistasView = {
                   <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.transportistas()} Registro y gestión de transportistas, vehículos y flota de transporte</span></div>
                 </div>
                 <div class="grid grid-cols-3 gap-6 mb-14">
-                    <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
-                    <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
-                    <div class="info-box-center border-left-amber"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
+                    <div class="card-registro" style="--registro-color: var(--c-blue);"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
+                    <div class="card-registro" style="--registro-color: var(--c-green);"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
+                    <div class="card-registro" style="--registro-color: var(--c-amber);"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
                 </div>
                 <div id="trans-list"></div>
             </div>
@@ -76,8 +76,8 @@ const TransportistasView = {
         }
 
         container.innerHTML = transportistas.map(t => `
-            <div class="card card-animal no-underline mb-8" onclick="TransportistasView._verDetalle(${t.id})"
-                 style="border-left:4px solid ${t.activo ? 'var(--c-success)' : '#6b7280'}; padding:14px; margin:0; margin-bottom:10px;">
+            <div class="card-registro" onclick="TransportistasView._verDetalle(${t.id})"
+                 style="--registro-color: ${t.activo ? 'var(--c-success)' : '#6b7280'}; padding:14px; margin:0; margin-bottom:10px;">
                 <div class="flex flex-col gap-10">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-10 min-w-0">

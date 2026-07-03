@@ -320,26 +320,36 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-            ${Icons.tendencia()} RENDIMIENTO Y EFICIENCIA DE CARNE
-          </div>
-          <div class="flex flex-col">
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.balanza()} GMD Media</span>
-              <strong class="text-xl font-950 text-green">+${d.gmdMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/día</strong>
+        <div class="card-registro" style="--registro-color: ${themeColor};">
+          <div class="flex flex-col gap-10">
+            <!-- Encabezado -->
+            <div class="flex justify-between items-center w-full">
+              <div class="flex items-center gap-10 min-w-0">
+                <div class="text-xl" style="color:${themeColor};">${Icons.tendencia()}</div>
+                <div class="text-xs">
+                  <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${themeColor}; !important;">RENDIMIENTO Y EFICIENCIA DE CARNE</div>
+                  <div class="text-gray mt-2 font-700 uppercase"><span style="color:${themeColor}; opacity:0.9; font-weight:900;">MÉTRICAS CLAVE</span></div>
+                </div>
+              </div>
             </div>
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Alimentación</span>
-              <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
-            </div>
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Pesajes</span>
-              <strong class="text-xl font-950 text-amber">${d.pesajes.length}</strong>
-            </div>
-            <div class="py-8 flex justify-between items-center">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Censo Activo</span>
-              <strong class="text-xl font-950 text-blue">${d.animalesFinca.length}</strong>
+            <!-- Contenido principal -->
+            <div class="flex flex-col gap-4">
+              <div class="flex justify-between items-center border-bottom-222 py-3">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-3">${Icons.balanza()} GMD Media</span>
+                <strong class="text-sm font-600 text-white">+${d.gmdMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/día</strong>
+              </div>
+              <div class="flex justify-between items-center border-bottom-222 py-3">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-3">${Icons.gastos()} Alimentación</span>
+                <strong class="text-sm font-600 text-white">${d.totalGastosAlim.toLocaleString()} €</strong>
+              </div>
+              <div class="flex justify-between items-center border-bottom-222 py-3">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-3">${Icons.paquete()} Pesajes</span>
+                <strong class="text-sm font-600 text-white">${d.pesajes.length}</strong>
+              </div>
+              <div class="flex justify-between items-center py-3">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-3">${Icons.animales()} Censo Activo</span>
+                <strong class="text-sm font-600 text-white">${d.animalesFinca.length}</strong>
+              </div>
             </div>
           </div>
         </div>
@@ -381,7 +391,7 @@ if (window.enableScrollShadows) {
           <div class="grid gap-8 mh-350">
             ${d.pesajes.length > 0
               ? d.pesajes.slice(0, 15).map(e => `
-                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="border-left:4px solid ${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'}; padding:10px; margin:0;">
+                  <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="--registro-color: ${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'}; padding:10px; margin:0;">
                     <div class="flex justify-between items-center">
                       <div class="text-xs">
                         <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Animal/Lote'}</div>
@@ -412,26 +422,38 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-            ${Icons.leche()} RENDIMIENTO Y EFICIENCIA DE LECHE
-          </div>
-          <div class="flex flex-col">
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
-              <strong class="text-xl font-950" style="color:${d.mofaLeche >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
+        <div class="card-registro" style="--registro-color: ${themeColor};">
+          <div class="flex flex-col gap-10">
+            <!-- Encabezado -->
+            <div class="flex justify-between items-center w-full">
+              <div class="flex items-center gap-10 min-w-0">
+                <div class="text-xl" style="color:${themeColor};">${Icons.leche()}</div>
+                <div class="text-xs">
+                  <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${themeColor}; !important;">RENDIMIENTO Y EFICIENCIA DE LECHE</div>
+                  <div class="text-gray mt-2 font-700 uppercase">Modo Leche</div>
+                </div>
+              </div>
             </div>
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.leche()} Total Leche</span>
-              <strong class="text-xl font-950 text-blue">${this._fmt(d.totalLitros)} L</strong>
+
+            <!-- Cuerpo - KPIs en formato .card-registro -->
+            <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+              <div class="flex items-center gap-4">
+                ${Icons.dinero()} Margen (MOFA) ${Math.round(d.mofaLeche).toLocaleString()} €
+              </div>
+              <div class="flex items-center gap-4">
+                ${Icons.leche()} Total Leche ${this._fmt(d.totalLitros)} L
+              </div>
+              <div class="flex items-center gap-4">
+                ${Icons.grafico()} Extracto Seco ${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D'}
+              </div>
+              <div class="flex items-center gap-4">
+                ${Icons.gastos()} Costes Alim. ${d.totalGastosAlim.toLocaleString()} €
+              </div>
             </div>
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Extracto Seco</span>
-              <strong class="text-xl font-950 text-gold">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D'}</strong>
-            </div>
-            <div class="py-8 flex justify-between items-center">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
-              <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
+
+            <!-- Pie (opcional) -->
+            <div class="text-right">
+              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLES ➔</div>
             </div>
           </div>
         </div>
@@ -453,7 +475,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- Calidad e Higiene de Tanque (Analíticas) -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" >
+        <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-info);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.grafico()} CALIDAD DE TANQUE</div>
           <div class="scroll-shadow-container overflow-x-auto">
             <table class="premium-table">
@@ -495,12 +517,12 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- Controles Ordeño Recientes -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" >
+        <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-info);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.leche()} ORDEÑOS Y CONTROLES DIARIOS</div>
           <div class="grid gap-6">
             ${d.ordeños.length > 0
               ? d.ordeños.slice(0, 10).map(o => `
-                  <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="border-left:4px solid ${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'}; padding:10px; margin:0; width:100%;">
+                  <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="--registro-color: ${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'}; padding:10px; margin:0; width:100%;">
                     <div class="flex justify-between items-center gap-6" style="width:100%;">
                       <div class="min-w-0 flex-1">
                         <div class="font-bold text-white uppercase text-sm overflow-hidden text-ellipsis" style="white-space:nowrap;">${o.snap_identificacion || 'Control Lote/Animal'}</div>
@@ -531,26 +553,38 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
         <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-            ${Icons.rotacion()} RENDIMIENTO Y EFICIENCIA HÍBRIDA
-          </div>
-          <div class="flex flex-col">
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
-              <strong class="text-xl font-950" style="color:${d.mofaHibrido >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}">${Math.round(d.mofaHibrido).toLocaleString()} €</strong>
+        <div class="card-registro" style="--registro-color: ${themeColor};">
+          <div class="flex flex-col gap-10">
+            <!-- Encabezado -->
+            <div class="flex justify-between items-center w-full">
+              <div class="flex items-center gap-10 min-w-0">
+                <div class="text-xl" style="color:${themeColor};">${Icons.rotacion()}</div>
+                <div class="text-xs">
+                  <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${themeColor}; !important;">RENDIMIENTO Y EFICIENCIA HÍBRIDA</div>
+                  <div class="text-gray mt-2 font-700 uppercase">Modo Híbrido</div>
+                </div>
+              </div>
             </div>
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Eficiencia</span>
-              <strong class="text-xl font-950 text-green">${d.ratioMofaHibrido.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%</strong>
+
+            <!-- Cuerpo - KPIs en formato .card-registro -->
+            <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+              <div class="flex items-center gap-4">
+                ${Icons.dinero()} Margen (MOFA) ${Math.round(d.mofaHibrido).toLocaleString()} €
+              </div>
+              <div class="flex items-center gap-4">
+                ${Icons.grafico()} Ratio MOFA/MOFO ${d.ratioMofaHibrido.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
+              </div>
+              <div class="flex items-center gap-4">
+                ${Icons.gastos()} Costes Alim. ${d.totalGastosAlim.toLocaleString()} €
+              </div>
+              <div class="flex items-center gap-4">
+                ${Icons.paquete()} L / Pesajes ${this._fmt(d.totalLitros)} L / ${d.pesajes.length}
+              </div>
             </div>
-            <div class="py-8 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
-              <strong class="text-xl font-950 text-red">${d.totalGastosAlim.toLocaleString()} €</strong>
-            </div>
-            <div class="py-8 flex justify-between items-center">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} L / Pesajes</span>
-              <strong class="text-xl font-950 text-blue">${this._fmt(d.totalLitros)} L / ${d.pesajes.length}</strong>
+
+            <!-- Pie (opcional) -->
+            <div class="text-right">
+              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLES ➔</div>
             </div>
           </div>
         </div>
@@ -617,7 +651,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- Historial Consolidado -->
-        <div class="card p-14 mb-16 border-222">
+        <div class="card-registro p-14 mb-16 border-222" style="--registro-color: ${color};">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
             ${Icons.documento()} Historial Consolidado Reciente
           </div>
@@ -627,7 +661,7 @@ if (window.enableScrollShadows) {
                   const esPeso = e.unidad === 'kg';
                   const color = esPeso ? 'var(--c-danger)' : 'var(--c-info)';
                   return `
-                    <div class="card card-animal" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${esPeso ? 'carne' : 'leche'}')" style="border-left:4px solid ${color}; padding:10px; margin:0;">
+                    <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${esPeso ? 'carne' : 'leche'}')" style="--registro-color: ${color}; padding:10px; margin:0;">
                       <div class="flex justify-between items-center">
                       <div class="text-xs">
                         <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Registro Mixto'}</div>
@@ -702,7 +736,7 @@ if (window.enableScrollShadows) {
     }
 
     let html = `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
+      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.paquete()} BALANCE DE STOCK Y LLENADO DE SILOS
         </div>
@@ -1214,7 +1248,7 @@ if (window.enableScrollShadows) {
     let html = `
       <div style="--theme-color: var(--c-danger); --neon-glow: color-mix(in srgb, var(--c-danger) 69%, transparent); --neon-inner: color-mix(in srgb, var(--c-danger) 25%, transparent)">
         <!-- KPIs GASTOS -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
+        <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-danger); width:100%;">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
             ${Icons.dinero()} BALANCE DE COSTES
           </div>
@@ -1237,7 +1271,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- ACCIONES RÁPIDAS DE GASTOS -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+        <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--c-danger); --theme-color: var(--c-danger);">
           <div class="section-header-theme" style="--theme-color: var(--c-danger)">${Icons.dinero()} GESTIÓN DE COSTES</div>
           <div class="flex justify-center mt-10">
             <button class="widget-link-btn widget-link-btn--neon neon-theme" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
@@ -1248,7 +1282,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- CONTROL NORMATIVO FITOSANITARIOS -->
-        <div class="card p-12 mb-16 border-222" style="border-left:4px solid var(--c-success);">
+        <div class="card-registro p-12 mb-16 border-222" style="--registro-color: var(--c-success);">
           <div class="text-xs text-white font-black uppercase flex items-center gap-6 mb-8">${Icons.sanidad()} CUMPLIMIENTO REGISTRO FITOSANITARIO</div>
           <div class="text-[0.65rem] text-aaa uppercase font-900 leading-relaxed">
             Aplicaciones con control completo: <strong class="text-white">${fitoConControl}</strong><br>
@@ -1258,7 +1292,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- LISTADO / HISTORIAL DE GASTOS -->
-        <div class="card p-16 mb-16 border-222">
+        <div class="card-registro p-16 mb-16 border-222" style="--registro-color: var(--c-danger);">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
             ${Icons.documento()} Historial de gastos registrados
           </div>
@@ -1268,7 +1302,7 @@ if (window.enableScrollShadows) {
                   const catMap = { 'Alimentacion': 'var(--c-warning)', 'Alimentación': 'var(--c-warning)', 'Sanidad': 'var(--c-danger)', 'Fitosanitarios': 'var(--c-success)', 'Electricidad': 'var(--c-info)', 'Personal': 'var(--c-orange)', 'Amortizacion': 'var(--c-purple)', 'Amortización': 'var(--c-purple)' };
                   const catColor = catMap[g.categoria] || '#888';
                   return `
-                    <div class="card card-animal" style="border-left:4px solid ${catColor}; padding:12px; margin:0;">
+                    <div class="card-registro" style="--registro-color: ${catColor}; padding:12px; margin:0;">
                       <div class="flex justify-between items-center">
                         <div class="text-xs">
                           <div class="font-bold text-white uppercase">${g.concepto || 'Gasto Ganadero'}</div>
@@ -1309,7 +1343,7 @@ if (window.enableScrollShadows) {
         ${silosHtml}
 
         <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+        <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--c-info); --theme-color: var(--c-info);">
           <div class="section-header-theme" style="--theme-color: var(--c-info)">${Icons.paquete()} GESTIÓN DE STOCK</div>
           <div class="flex justify-center mt-10">
             <button class="widget-link-btn widget-link-btn--neon neon-info" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${this._activeMode}')">
@@ -1320,7 +1354,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- HISTORIAL DE MOVIMIENTOS -->
-        <div class="card p-16 mb-16 border-222">
+        <div class="card-registro p-16 mb-16 border-222" style="--registro-color: var(--c-info);">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
             ${Icons.documento()} Historial de movimientos de silo
           </div>
@@ -1331,7 +1365,7 @@ if (window.enableScrollShadows) {
                   const badgeColor = esCompra ? 'var(--c-success)' : 'var(--c-danger)';
                   const labelMov = esCompra ? 'CARGA' : 'CONSUMO';
                   return `
-                    <div class="card card-animal" style="border-left:4px solid ${badgeColor}; padding:12px; margin:0;">
+                    <div class="card-registro" style="--registro-color: ${badgeColor}; padding:12px; margin:0;">
                       <div class="flex justify-between items-center">
                         <div class="text-xs">
                           <div class="font-bold text-white uppercase">${ev.snap_identificacion || 'Silo'}</div>

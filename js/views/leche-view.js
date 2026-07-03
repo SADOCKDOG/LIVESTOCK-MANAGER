@@ -201,7 +201,7 @@ const LecheView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-orange">
+      <div class="card-registro report-section leche-report-card border-top-3px border-top-3px-orange" style="--registro-color: var(--c-orange);">
         <div class="leche-report-title">
           <span class="leche-report-icon">${Icons.edificio()}</span>
           <div class="leche-report-title-text">
@@ -224,7 +224,7 @@ const LecheView = {
         <div class="grid gap-10">
           ${d.rebanosLeche.length > 0
             ? d.rebanosLeche.map(r => `
-                <div class="card card-animal border-4-left-gold" onclick="location.hash='/rebano?id=${r.id}'">
+                <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${window.ModoContextoHelper.getEspecieColor(r.especie) || '#6B7280'};">
                   <div class="flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-6">
@@ -256,7 +256,7 @@ const LecheView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-green">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="leche-report-title">
           <span class="leche-report-icon">${Icons.transportistas()}</span>
           <div class="leche-report-title-text">
@@ -285,8 +285,8 @@ const LecheView = {
         ${d.entregas.length > 0
           ? d.entregas.slice(0, 15).map(e => this._cardEntrega(e)).join('')
           : `<div class="empty-state"><p class="empty-state-text">Sin entregas a cisterna.</p></div>`
-        }
-      </div>
+      }
+    </div>
     `;
     content.innerHTML = html;
   },
@@ -295,7 +295,7 @@ const LecheView = {
   _renderLegislacion(content, d) {
     const html = `
       ${this._inyectarAlertaSupresion(d)}
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-purple">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <div class="leche-report-title">
           <span class="leche-report-icon">${Icons.documento()}</span>
           <div class="leche-report-title-text">
@@ -325,7 +325,7 @@ const LecheView = {
             ? d.sanitariosLeche.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresionLeche.some(ts => ts.id === s.id);
                 return `
-                  <div class="card card-animal" style="border-left:4px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
+                  <div class="card-registro" style="--registro-color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">
@@ -357,7 +357,8 @@ const LecheView = {
     const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
 
     return `
-      <div class="leche-entrega-card" style="--entrega-border-color:${esAlerta ? 'var(--c-danger)' : semaforo.color};" onclick="location.hash='/albaran-leche?id=${e.id}'">
+      <div class="card-registro" onclick="location.hash='/albaran-leche?id=${e.id}'"
+           style="--registro-color: ${esAlerta ? 'var(--c-danger)' : semaforo.color};">
         <div class="leche-entrega-content">
           <div class="leche-entrega-left">
             <div class="text-white font-900 uppercase text-sm flex items-center gap-6">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — <span class="text-gold" style="font-size:1.1rem;">${(e.cantidad || 0).toLocaleString()}</span> <small class="text-aaa">L</small></div>

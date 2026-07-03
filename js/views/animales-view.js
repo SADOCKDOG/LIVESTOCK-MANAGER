@@ -22,7 +22,7 @@ const AnimalesView = {
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
 
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-orange);">
+      <div class="card-registro" style="--registro-color: var(--c-orange);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
@@ -37,7 +37,7 @@ const AnimalesView = {
       html += `<div class="empty-state">
         <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-orange);">
+        <div class="card-registro" style="--registro-color: var(--c-orange);">
           <div class="section-header-theme">ACCIONES</div>
           <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
             <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">

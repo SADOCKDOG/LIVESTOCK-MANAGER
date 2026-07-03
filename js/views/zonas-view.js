@@ -11,10 +11,10 @@ const ZonasView = {
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
     const zonasConIndice = (finca.zonas || [])
-      .map((zona, realIndex) => ({ zona, realIndex }))
-      .filter(({ zona }) => !zona?.anulada);
+          .map((zona, realIndex) => ({ zona, realIndex }))
+          .filter(({ zona }) => !zona?.anulada);
     let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-success);">
+      <div class="card-registro" onclick="ZonasView._crearZona()" style="--registro-color: var(--c-success);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ZonasView._crearZona()">
@@ -77,7 +77,7 @@ const ZonasView = {
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
         html += `
-          <div class="card-registro registro-success" onclick="location.hash='/zona?index=${item.realIndex}'">
+          <div class="card-registro" onclick="location.hash='/zona?index=${item.realIndex}'" style="--registro-color: ${colorCenso};">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">
@@ -124,7 +124,7 @@ const ZonasView = {
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
       const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
       html += `
-        <div class="card mt-15" style="background:rgba(204,255,0,0.03);padding:15px;">
+        <div class="card-registro mt-15" style="--registro-color: ${colorGlobal}; background:rgba(204,255,0,0.03);padding:15px;">
           <div class="flex justify-between items-center mb-6">
             <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
             <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
@@ -161,7 +161,7 @@ const ZonasView = {
     
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
-      <div class="card border-top-3px border-top-3px-orange">
+      <div class="card-registro border-top-3px border-top-3px-orange" style="--registro-color: var(--c-success);">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
           <input type="text" id="z-edit-nombre" value="${zona.nombre}" class="premium-input"></div>

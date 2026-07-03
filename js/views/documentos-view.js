@@ -112,7 +112,7 @@ const DocumentosView = {
 
     return `
       ${bannerInterno}
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
+      <div class="card-registro" style="--registro-color: var(--c-info); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} DOCUMENTOS</div>
         <div class="grid grid-cols-5 gap-4 mb-6">
           <div class="bg-dark rounded-lg p-6 text-center border border-222">
@@ -153,7 +153,7 @@ const DocumentosView = {
         <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
       </div>
 
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
+      <div class="card-registro" style="--registro-color: var(--c-info); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} ÚLTIMOS DOCUMENTOS</div>
         <div id="docs-lista">${this._renderLista(docsRecientes, ventaMap)}</div>
         ${docs.length > 5 ? `<div class="text-center mt-6 pt-6 border-top-222"><span class="text-[0.6rem] text-gray font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa "Consultar / Imprimir" para ver todos</span></div>` : ''}
@@ -214,7 +214,7 @@ const DocumentosView = {
           : `<div class="text-xs text-red mt-6">${Icons.adjuntar()} Acuse manual pendiente</div>`;
 
         return `
-          <div class="card" style="border-left:4px solid ${color};">
+          <div class="card-registro" style="--registro-color: ${color};">
             <div class="flex justify-between items-start">
               <div>
                 <div class="font-800 text-sm" style="color:${color}; display:flex; align-items:center; gap:6px;">

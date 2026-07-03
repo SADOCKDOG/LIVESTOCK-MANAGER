@@ -179,7 +179,7 @@ const ManualesView = {
 
   _renderLista() {
     return this._MANUALES.map(m => `
-      <div class="card manual-card" style="border-left:4px solid ${m.color}; padding:16px; cursor:pointer;"
+      <div class="card-registro manual-card" style="--registro-color: ${m.color}; padding:16px; cursor:pointer;"
            onclick="ManualesView._abrirManual('${m.archivo}', '${m.titulo.replace(/'/g, "\\'")}')">
         <div class="flex items-center gap-14">
           <span class="flex-shrink-0" style="width:32px; height:32px; color:${m.color}; display:flex; align-items:center; justify-content:center;">

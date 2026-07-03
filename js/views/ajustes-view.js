@@ -43,7 +43,7 @@ const AjustesView = {
 
     main.innerHTML = `
       ${isFree ? `
-      <div class="card mb-25 p-20" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
+      <div class="card-registro mb-25 p-20" style="--registro-color: var(--c-warning); style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
         <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(217,119,6,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
         <div style="position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(217,119,6,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
         <div class="flex items-center gap-15">
@@ -81,7 +81,7 @@ const AjustesView = {
 
       <!-- ===================== GESTOR DE FINCA ===================== -->
       ${activeFinca ? `
-      <div class="card card-accent card-accent-green mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.finca()} Gestor de Finca Activa</h3>
         <p class="text-gray mt-5 text-sm">Información técnica y administrativa de la explotación ganadera seleccionada.</p>
         <div class="info-box mt-15">
@@ -106,7 +106,7 @@ const AjustesView = {
       ` : ''}
 
       <!-- ===================== MIS FINCAS ===================== -->
-      <div class="card card-accent card-accent-amber mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-warning);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.finca()} Mis Fincas</h3>
         <p class="text-gray mt-5 text-sm">Gestiona tus explotaciones ganaderas y cambia la finca activa del sistema.</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-15 mb-20">
@@ -134,7 +134,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== COPIA DE SEGURIDAD ===================== -->
-      <div class="card card-accent card-accent-blue mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-info);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.guardar()} Copias de Seguridad</h3>
         <p class="text-gray mt-5 text-sm">Exporta o importa todos los datos de la aplicación en formato JSON para seguridad.</p>
         ${isFree ? `
@@ -160,7 +160,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== PAQUETE LÁCTEO ===================== -->
-      <div class="card card-accent card-accent-amber mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-warning);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.leche()} Paquete Lácteo</h3>
         <p class="text-gray mt-5 text-sm">Gestión de contratos obligatorios (RD 752/2016) y declaraciones mensuales INFOLAC.</p>
         ${activeFinca ? `
@@ -181,7 +181,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== ADSG ===================== -->
-      <div class="card card-accent card-accent-blue mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-info);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.sanidad()} Sanidad Ganadera (ADSG)</h3>
         <p class="text-gray mt-5 text-sm">Agrupación de Defensa Sanitaria Ganadera y datos del veterinario de explotación.</p>
         ${activeFinca ? `
@@ -209,7 +209,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== COSTES DE REFERENCIA ===================== -->
-      <div class="card card-accent card-accent-gold mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--p-gold);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.dinero()} Costes de Referencia</h3>
         <p class="text-gray mt-5 text-sm">Define el coste de alimentación estimado medio por especie para el análisis de rentabilidad.</p>
         ${activeFinca ? `
@@ -234,7 +234,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== CONFIGURACIÓN AUTONÓMICA ===================== -->
-      <div class="card card-accent card-accent-purple mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.globo()} Normativa Autonómica</h3>
         <p class="text-gray mt-5 text-sm">Configuración de la plataforma de movimiento (SIGGAN/BADIGEX) y umbrales PAC.</p>
         ${activeFinca ? (() => {
@@ -266,7 +266,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
-      <div class="card card-accent card-accent-green mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.objetivo()} Objetivos de Explotación</h3>
         <p class="text-gray mt-5 text-sm">Define las metas productivas para el Panel de Eficiencia Técnica (semáforos de estado).</p>
         <div class="grid grid-cols-2 gap-10 mt-15">
@@ -280,7 +280,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
-      <div class="card card-accent card-accent-amber mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-warning);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.reproduccion()} Especies y Razas</h3>
         <p class="text-gray mt-5 text-sm">Gestiona las especies activas y sus parámetros de referencia en la explotación.</p>
         <div id="especies-container" class="mt-15">${this._renderEspecies(config)}</div>
@@ -293,7 +293,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
-      <div class="card card-accent card-accent-red mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-danger);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.campana()} Gestión de Alertas</h3>
         <p class="text-gray mt-5 text-sm">Configura qué tipos de notificación quieres recibir en el Dashboard principal.</p>
         <div class="grid gap-10 mt-15">
@@ -312,7 +312,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== PREFERENCIAS ===================== -->
-      <div class="card card-accent card-accent-purple mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.ajustes()} Preferencias de Aplicación</h3>
         <p class="text-gray mt-5 text-sm">Configuración del comportamiento general y visual de la aplicación móvil.</p>
         <div class="grid gap-12 mt-15">
@@ -358,7 +358,7 @@ const AjustesView = {
                 { id: 'purple', label: 'Violeta', color: '#8b5cf6' },
                 { id: 'red',    label: 'Rojo',  color: '#ef4444' },
               ].map(t => `
-                <button class="theme-dot ${config.colorTema === t.id ? 'active' : ''}" 
+                <button class="theme-dot ${config.colorTema === t.id ? 'active' : ''}"
                   style="background:${t.color}; width:36px; height:36px; border-radius:50%; border:3px solid ${config.colorTema === t.id ? t.color : 'transparent'}; cursor:pointer; transition:all 0.2s;"
                   onclick="AjustesView._cambiarColor('${t.id}')" title="${t.label}"></button>
               `).join('')}
@@ -368,7 +368,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== INFORMACIÓN DEL SISTEMA ===================== -->
-      <div class="card card-accent card-accent-gold mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--p-gold);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.info()} Información del Sistema</h3>
         <p class="text-gray mt-5 text-sm">Estado técnico de la base de datos local y versión actual de la aplicación.</p>
         <div class="info-box mt-15">
@@ -388,7 +388,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== GESTIÓN DE TRAZABILIDAD ===================== -->
-      <div class="card card-accent card-accent-green mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.trazabilidad()} Trazabilidad</h3>
         <p class="text-gray mt-5 text-sm">Solicitud oficial de remesas de crotales y normativa de identificación.</p>
         <div class="grid grid-cols-2 gap-10 mt-20">
@@ -404,8 +404,8 @@ const AjustesView = {
       </div>
 
       <!-- ===================== TRÁMITES SIGGAN ===================== -->
-      <div class="card card-accent card-accent-purple mb-25 p-20">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.edificio()} Trámites Oficiales</h3>
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.edificio()} Trámites Oficiales</h3></h3>
         <p class="text-gray mt-5 text-sm">Generación de documentación oficial para plataformas autonómicas (SIGGAN/SIA).</p>
         <div class="grid grid-cols-3 gap-8 mt-20">
           <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="App._abrirWizardGuiaMovimiento()">
@@ -424,7 +424,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== CATÁLOGOS REGA ===================== -->
-      <div class="card card-accent card-accent-blue mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-info);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.libroVentas()} Catálogos REGA</h3>
         <p class="text-gray mt-5 text-sm">Catálogos normativos oficiales con detalle completo y acceso a contenido.</p>
         <div class="info-box mt-15">
@@ -447,7 +447,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== HISTORIAL TRÁMITES ===================== -->
-      <div class="card card-accent card-accent-gold mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--p-gold);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.documento()} Historial de Documentos</h3>
         <p class="text-gray mt-5 text-sm">Últimos eventos de tramitación oficial registrados en la base de datos.</p>
         <div class="mt-15">
@@ -477,7 +477,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== GUÍA FARMACOLÓGICA ===================== -->
-      <div class="card card-accent card-accent-red mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--c-danger);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.sanidad()} Guía Farmacológica</h3>
         <p class="text-gray mt-5 text-sm">Tiempos de retiro en carne y supresión en leche para medicamentos veterinarios.</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-20">
@@ -489,7 +489,7 @@ const AjustesView = {
       </div>
 
       <!-- ===================== MANUAL DE USUARIO ===================== -->
-      <div class="card card-accent card-accent-gold mb-25 p-20">
+      <div class="card-registro" style="--registro-color: var(--p-gold);">
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.libro()} Ayuda y Soporte</h3>
         <p class="text-gray mt-5 text-sm">Acceso al manual de usuario integral y documentación de la plataforma.</p>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-20">
@@ -530,7 +530,7 @@ const AjustesView = {
         <h2 class="pesaje-titulo-h2">${tipo === 'tipos' ? Icons.documento() : Icons.animales()} CATÁLOGO ${tipo === 'tipos' ? 'TIPOS EXPLOTACIÓN' : 'ESPECIES'}</h2>
       </div>
       <div class="wizard-content-scrollable">
-        <div class="card p-16 border-222">
+        <div class="card-registro p-16 border-222" style="--registro-color: var(--c-info);">
           <div class="flex flex-wrap gap-3">
             ${items.map(i => `<span class="text-xs text-white font-700 uppercase bg-dark px-10 py-4 rounded-sm border border-222">${i}</span>`).join('')}
           </div>

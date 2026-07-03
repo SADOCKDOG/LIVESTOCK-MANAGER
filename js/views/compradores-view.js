@@ -82,7 +82,7 @@ const CompradoresView = {
                 </div>
               </div>
 
-              <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+              <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--p-gold); --theme-color: var(--p-gold);">
                 <div class="section-header-theme">ACCIONES</div>
                 <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                   <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
@@ -112,7 +112,7 @@ const CompradoresView = {
                 </div>
               </div>
 
-              <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-success);">
+              <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--c-success); --theme-color: var(--c-success);">
                 <div class="section-header-theme">ACCIONES</div>
                 <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                   <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContratoLibre()">
@@ -295,7 +295,7 @@ const CompradoresView = {
           const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
           
           return `
-          <div class="card bg-black-opacity-50" style="border-left:4px solid ${color}; padding:16px; margin-bottom:10px; border-radius:12px;">
+          <div class="card-registro" style="--registro-color: ${color};">
             <div class="flex justify-between items-start w-full">
               <div>
                 <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
@@ -312,7 +312,7 @@ const CompradoresView = {
                 ${ct.fecha_fin ? '<br>AL <span class="text-ccc">' + new Date(ct.fecha_fin).toLocaleDateString() + '</span>' : '<br><span class="text-aaa">(INDEFINIDO)</span>'}
               </div>
             </div>
-            
+
             <div class="mt-12 text-xs text-ccc bg-black p-10 rounded-sm border border-222">
               <div class="uppercase font-800 text-[0.65rem] text-gray-500 mb-4 tracking-wider">COMPRADOR ASIGNADO:</div>
               <div class="flex items-center gap-6">
@@ -389,7 +389,7 @@ const CompradoresView = {
           </div>
 
           <!-- Cabecera -->
-          <div class="card p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
+          <div class="card-registro p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
             <div class="flex justify-between items-start mb-16">
               <div>
                 <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight" style="color:${colorComp} !important;">${comprador.nombre}</h2>
@@ -422,17 +422,17 @@ const CompradoresView = {
 
           <!-- KPIS -->
           <div class="grid grid-cols-3 gap-8 mb-16">
-            <div class="summary-cell summary-cell-kpi border-left-red">
+            <div class="card-registro" style="--registro-color: var(--c-danger);">
               <small class="s-lbl uppercase font-900">CARNE</small>
               <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
               <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
             </div>
-            <div class="summary-cell summary-cell-kpi border-left-amber">
+            <div class="card-registro" style="--registro-color: var(--c-amber);">
               <small class="s-lbl uppercase font-900">LECHE</small>
               <div class="s-val inf-val-lg text-amber font-950">${resumen.total_entregas_leche}</div>
               <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L</small>
             </div>
-            <div class="summary-cell summary-cell-kpi border-left-purple">
+            <div class="card-registro" style="--registro-color: var(--c-purple);">
               <small class="s-lbl uppercase font-900">CONTRATOS</small>
               <div class="s-val inf-val-lg text-purple font-950">${contratos.length}</div>
               <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.contratos_activos} ACTIVOS</small>
