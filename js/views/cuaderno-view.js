@@ -541,7 +541,7 @@ const CuadernoDigitalView = {
           files: [result.uri],
           dialogTitle: `Compartir ${titulo} con…`
         });
-        App.toast(`${titulo} compartido ✅`);
+        App.toast(`${titulo} compartido`, 'success');
         return true;
       }
     } catch (e) {
@@ -557,7 +557,7 @@ const CuadernoDigitalView = {
           text: shareText,
           files: [file]
         });
-        App.toast(`${titulo} compartido ✅`);
+        App.toast(`${titulo} compartido`, 'success');
         return true;
       }
     } catch (e) {
@@ -575,7 +575,7 @@ const CuadernoDigitalView = {
     a.href = url; a.download = fileName; a.style.display = 'none';
     document.body.appendChild(a); a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
-    App.toast(`${titulo} descargado ✅`);
+    App.toast(`${titulo} descargado`, 'success');
     return false;
   },
 

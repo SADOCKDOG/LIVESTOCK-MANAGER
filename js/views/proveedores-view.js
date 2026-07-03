@@ -406,7 +406,7 @@ const ProveedoresView = {
             if (!data.nombre) return App.toastError('El nombre es obligatorio');
 
             const nuevoId = await Proveedores.save(data);
-            App.toast(id ? 'Proveedor actualizado ✔' : 'Proveedor creado ✔');
+            App.toast(id ? 'Proveedor actualizado' : 'Proveedor creado', 'success');
             location.hash = '#/proveedor?id=' + nuevoId;
         } catch (e) {
             App.toastError(e.message);

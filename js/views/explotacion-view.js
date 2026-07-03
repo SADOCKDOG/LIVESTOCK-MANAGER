@@ -1361,7 +1361,7 @@ if (window.enableScrollShadows) {
     if (!await Confirm.confirm("Eliminar Gasto", "¿Deseas eliminar este registro de gasto definitivamente?", true)) return;
     try {
       await window.db.delete('gastos_ganaderia', Number(id));
-      App.toast("🗑️ Gasto eliminado");
+      App.toast("Gasto eliminado");
       this.render();
     } catch (e) { App.toastError("Error al eliminar gasto: " + e.message); }
   },
@@ -1370,7 +1370,7 @@ if (window.enableScrollShadows) {
     if (!await Confirm.confirm("Eliminar Movimiento", "¿Deseas eliminar este movimiento de silo definitivamente?", true)) return;
     try {
       await window.db.delete('registro_eventos', Number(id));
-      App.toast("🗑️ Movimiento de almacén eliminado");
+      App.toast("Movimiento de almacén eliminado");
       this.render();
     } catch (e) { App.toastError("Error al eliminar movimiento: " + e.message); }
   }

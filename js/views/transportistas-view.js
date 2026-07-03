@@ -332,7 +332,7 @@ const TransportistasView = {
 
             try {
                 await Transportistas.save(data);
-                App.toast(isEdit ? 'Transportista actualizado ✔' : 'Transportista creado ✔');
+                App.toast(isEdit ? 'Transportista actualizado' : 'Transportista creado', 'success');
                 overlay.remove();
                 TransportistasView.render();
             } catch (e) {
@@ -346,7 +346,7 @@ const TransportistasView = {
         if (!await Confirm.confirm("Eliminar Transportista", "¿Eliminar este transportista de forma permanente?", true)) return;
         try {
             await Transportistas.delete(id);
-            App.toast('Transportista eliminado ✔');
+            App.toast('Transportista eliminado');
             this.render();
         } catch (e) {
             App.toastError(e.message);

@@ -387,7 +387,7 @@ const ManualesView = {
         const dataUri = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
         const result = await fsPlugin.writeFile({ path: fileName, data: dataUri.split(',')[1], directory: 'CACHE' });
         await sharePlugin.share({ title: titulo, text: titulo, url: result.uri, files: [result.uri], dialogTitle: 'Compartir ' + titulo });
-        App.toast('✅ PDF listo para compartir');
+        App.toast('PDF listo para compartir', 'success');
         return;
       }
     } catch (e) { console.warn('[Manual Share] falló:', e?.message || e); }
@@ -404,7 +404,7 @@ const ManualesView = {
     const a = document.createElement('a'); a.href = url; a.download = fileName; a.style.display = 'none';
     document.body.appendChild(a); a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
-    App.toast('✅ PDF descargado');
+    App.toast('PDF descargado', 'success');
   },
 };
 

@@ -559,7 +559,7 @@ const AjustesView = {
     const num = parseFloat(val);
     if (isNaN(num)) return;
     await this._saveConfig({ [key]: num });
-    App.toast(`🎯 Objetivo actualizado: ${num}`);
+    App.toast(`Objetivo actualizado: ${num}`);
   },
 
   async _toggleAlerta(id, checked) {
@@ -568,12 +568,12 @@ const AjustesView = {
     if (window.AlertasService && window.EventBus) {
       AlertasService.getAll().then(a => EventBus.emit('alertas:updated', a)).catch(() => {});
     }
-    App.toast(checked ? '🔔 Alerta activada' : '🔕 Alerta desactivada');
+    App.toast(checked ? 'Alerta activada' : 'Alerta desactivada');
   },
 
   async _toggleAutoBackup(checked) {
     await this._saveConfig({ autoBackup: checked });
-    App.toast(checked ? '💾 Backup automático activado' : '💾 Backup automático desactivado');
+    App.toast(checked ? 'Backup automático activado' : 'Backup automático desactivado');
   },
 
   async _toggleTema(checked) {
@@ -616,12 +616,12 @@ const AjustesView = {
       const isActive = d.getAttribute('onclick')?.includes(`'${tema}'`);
       d.style.borderColor = isActive ? d.style.background : 'transparent';
     });
-    App.toast(`🎨 Tema ${tema} aplicado`);
+    App.toast(`Tema ${tema} aplicado`);
   },
 
   async _guardarPreferencia(key, val) {
     await this._saveConfig({ [key]: val });
-    App.toast('✅ Preferencia guardada');
+    App.toast('Preferencia guardada', 'success');
   },
 
   _renderEspecies(config) {
@@ -662,7 +662,7 @@ const AjustesView = {
       especies.push({ nombre, consumoAgua: parseInt(document.getElementById('esp-agua').value) || 10, precioRef: parseFloat(document.getElementById('esp-precio').value) || 0 });
       await this._saveConfig({ especies });
       overlay.remove();
-      App.toast('✅ Especie añadida');
+      App.toast('Especie añadida', 'success');
       App.renderAjustes();
     };
   },
@@ -780,7 +780,7 @@ const AjustesView = {
     try {
       await Fincas.save(finca);
       document.querySelector('.wizard-overlay').remove();
-      App.toast('✅ Datos de finca guardados');
+      App.toast('Datos de finca guardados', 'success');
       App.renderAjustes();
     } catch (e) {
       App.toastError('Error al guardar: ' + e.message);
@@ -855,7 +855,7 @@ const AjustesView = {
     finca.actualizadoEn = new Date().toISOString();
     try {
       await window.db.put('fincas', finca);
-      App.toast('✅ Zona creada');
+      App.toast('Zona creada', 'success');
       AjustesView._gestionarZonas();
     } catch (e) {
       App.toastError('Error: ' + e.message);
@@ -936,7 +936,7 @@ const AjustesView = {
     try {
       await window.db.put('fincas', finca);
       document.querySelector('.wizard-overlay').remove();
-      App.toast('✅ Zona guardada');
+      App.toast('Zona guardada', 'success');
       AjustesView._gestionarZonas();
     } catch (e) {
       App.toastError('Error: ' + e.message);
@@ -954,7 +954,7 @@ const AjustesView = {
 
     try {
       await window.db.put('fincas', finca);
-      App.toast('🗑️ Zona eliminada');
+      App.toast('Zona eliminada');
       AjustesView._gestionarZonas();
     } catch (e) {
       App.toastError('Error: ' + e.message);
@@ -1070,7 +1070,7 @@ const AjustesView = {
       try {
         await window.ADSGs.save({ nombre, codigo, veterinario, colegiado, telefono, vet_nif });
         overlay.remove();
-        App.toast("✅ ADSG Guardada");
+        App.toast("ADSG Guardada", 'success');
         AjustesView.render();
       } catch (e) { App.toastError(e.message); }
     };
@@ -1130,7 +1130,7 @@ const AjustesView = {
       try {
         await window.ADSGs.save(adsg);
         overlay.remove();
-        App.toast("✅ ADSG Actualizada");
+        App.toast("ADSG Actualizada", 'success');
         AjustesView.render();
       } catch (e) { App.toastError(e.message); }
     };
@@ -1139,7 +1139,7 @@ const AjustesView = {
   async _eliminarADSG(id) {
     if (!await Confirm.confirm("Eliminar ADSG", "¿Deseas eliminar esta agrupación?")) return;
     await window.ADSGs.remove(id);
-    App.toast("🗑️ ADSG Eliminada");
+    App.toast("ADSG Eliminada");
     AjustesView.render();
   },
 
@@ -1183,7 +1183,7 @@ const AjustesView = {
           actualizadoEn: new Date().toISOString()
         });
         overlay.remove();
-        App.toast("✅ Coste de referencia guardado");
+        App.toast("Coste de referencia guardado", 'success');
         AjustesView.render();
       } catch (e) { App.toastError(e.message); }
     };
@@ -1192,7 +1192,7 @@ const AjustesView = {
   async _eliminarCosteRef(id) {
     if (!await Confirm.confirm("Eliminar Coste Ref.", "¿Eliminar este parámetro de coste?")) return;
     await window.db.delete('config_costes_referencia', id);
-    App.toast("🗑️ Parámetro eliminado");
+    App.toast("Parámetro eliminado");
     AjustesView.render();
   }
 };

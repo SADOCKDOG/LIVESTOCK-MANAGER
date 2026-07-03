@@ -372,7 +372,7 @@ window.WizardCenso = {
         updateProgress(100, '¡Listo!');
         await new Promise(r => setTimeout(r, 400));
         loader.remove();
-        App.toast("Declaración enviada ✅");
+        App.toast("Declaración enviada", 'success');
 
       } catch (e) {
         console.error("Error en generación PDF Censo:", e);

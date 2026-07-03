@@ -28,7 +28,7 @@
     purchase: function () {
       var self = this;
       if (self._purchased) {
-        App.toast('✅ Ya eres Premium. Todas las funciones están desbloqueadas.');
+        App.toast('Ya eres Premium. Todas las funciones están desbloqueadas.', 'success');
         return;
       }
       if (!self._store) {
@@ -118,7 +118,7 @@
         var msg = (err && err.message) || '';
         if ((err && err.code === 6777003) || /already owned|ya has comprado/i.test(msg)) {
           self._markPurchased();
-          App.toast('✅ Compra Premium restaurada.');
+          App.toast('Compra Premium restaurada.', 'success');
         }
       });
 

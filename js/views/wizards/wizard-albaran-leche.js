@@ -133,7 +133,7 @@ window.AlbaranLecheWizard = {
           if (!data.fecha) { App.toastError("La fecha de recogida es obligatoria"); return false; }
           if (data.l <= 0) { App.toastError("El volumen debe ser mayor a 0 Litros"); return false; }
           if (!data.comunidad_autonoma) { App.toastError("Selecciona la comunidad autónoma"); return false; }
-          if (data.temp > 6) { App.toastError("⚠️ ALERTA SANITARIA: Temperatura > 6°C detectada."); }
+          if (data.temp > 6) { App.toast("ALERTA SANITARIA: Temperatura > 6°C detectada.", 'warning'); }
           if (!data.inh) { App.toastError("Debes certificar la ausencia de inhibidores."); return false; }
           return true;
         }
@@ -267,7 +267,7 @@ window.AlbaranLecheWizard = {
           const prohibidoLecheActivo = sanitarios && sanitarios.some(s => s.prohibidoLeche === true);
           if (prohibidoLecheActivo) {
             const motivo = sanitarios.find(s => s.prohibidoLeche === true);
-            App.toastError(`🚫 VENTA DE LECHE PROHIBIDA: Se ha detectado un tratamiento con restricción. Consultá con Inspección (${motivo.tipo_tratamiento || 'medicamento'}). Revisa SANEAMIENTOS.`);
+            App.toastError(`VENTA DE LECHE PROHIBIDA: Se ha detectado un tratamiento con restricción. Consultá con Inspección (${motivo.tipo_tratamiento || 'medicamento'}). Revisa SANEAMIENTOS.`);
             return;
           }
 
@@ -399,7 +399,7 @@ window.AlbaranLecheWizard = {
             console.warn("[Leche] No se pudo registrar en evento maestro:", regErr);
           }
 
-          App.toast("✅ Salida láctea registrada.");
+          App.toast("Salida láctea registrada.", 'success');
           // Refrescar vista
           if (window.LecheView) {
             window.LecheView._cachedData = null;
