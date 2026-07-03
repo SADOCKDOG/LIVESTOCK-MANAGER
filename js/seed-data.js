@@ -46,12 +46,17 @@
   }
 
   function showToast(msg, bg) {
-    var toast = document.getElementById('toast-container');
-    if (toast) {
-      var el = document.createElement('div');
-      el.style.cssText = 'background:' + (bg || '#d97706') + ';color:#fff;padding:12px;border-radius:12px;margin-bottom:8px;font-weight:700;';
-      el.textContent = msg;
-      toast.appendChild(el);
+    // G9: pasar por el sistema unificado de toasts (cola, escape, icono SVG)
+    if (window.Toast && typeof window.Toast.show === 'function') {
+      window.Toast.show(msg, bg ? 'success' : '');
+    } else {
+      var toast = document.getElementById('toast-container');
+      if (toast) {
+        var el = document.createElement('div');
+        el.style.cssText = 'background:' + (bg || '#d97706') + ';color:#fff;padding:12px;border-radius:12px;margin-bottom:8px;font-weight:700;';
+        el.textContent = msg;
+        toast.appendChild(el);
+      }
     }
     console.log('[SEED]', msg);
   }

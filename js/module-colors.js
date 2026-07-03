@@ -21,6 +21,7 @@ window.MODULE_COLORS = Object.freeze({
   '/compradores': '#3b82f6',
   // Warning / Informes / Alertas
   '/informes': '#FFD600',
+  '/alertas': '#FFD600',
   // Naranja de módulo: Animales / Cuaderno
   '/animales': '#F97316',
   '/cuaderno': '#F97316',
