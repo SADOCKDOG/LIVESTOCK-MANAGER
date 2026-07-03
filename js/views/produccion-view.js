@@ -174,17 +174,17 @@ const ProduccionView = {
       records: d.carneEvents.slice(0, 30).map(e => {
         const isInd = e.tipo_entidad === 'animal';
         const label = isInd ? 'INDIVIDUAL' : 'LOTE';
-        const idDisplay = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} animales` : (e.snap_tipo || 'S/N'));
+        const idDisplay = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} ${e.lote_animales_count === 1 ? 'animal' : 'animales'}` : (e.snap_tipo || 'S/N'));
         return {
           title: `${label}: ${idDisplay}`,
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
-          value: (e.valor_neto || 0) + ' kg',
+          value: Number(e.valor_neto || 0).toLocaleString('es-ES') + ' kg',
           typeColor: isInd ? 'var(--c-danger)' : 'var(--c-warning)',
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
       }),
-      emptyMsg: 'Sin registros cárnicos. Usa "Registrar Cárnica" para añadir.'
+      emptyMsg: 'Sin registros cárnicos. Usa el botón "Nuevo" para añadir.'
     });
   },
 
@@ -195,7 +195,7 @@ const ProduccionView = {
       kpis: [
         { label: 'Total litros', value: this._fmt(d.litrosTotal) + ' L' },
         { label: 'Registros', value: d.litrosCount },
-        { label: 'Extracto Seco Medio', value: d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toFixed(2) + '%' : 'N/D' },
+        { label: 'Extracto Seco Medio', value: d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D' },
       ],
       registrarLabel: 'Láctea', listName: 'Lista PRO Láctea',
       registrarHandler: "App._abrirAsistenteProduccion('leche')",
@@ -209,17 +209,17 @@ const ProduccionView = {
         if (isLote) label = 'LOTE';
         if (isTanque) label = 'TANQUE';
 
-        const idDisplayLeche = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} animales` : (e.snap_tipo || 'S/N'));
+        const idDisplayLeche = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} ${e.lote_animales_count === 1 ? 'animal' : 'animales'}` : (e.snap_tipo || 'S/N'));
         return {
           title: `${label}: ${idDisplayLeche}`,
           date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
           zone: e.snap_zona || '',
-          value: (e.valor_neto || 0) + ' L',
+          value: Number(e.valor_neto || 0).toLocaleString('es-ES') + ' L',
           typeColor: isInd ? 'var(--c-info)' : (isLote ? 'var(--c-purple)' : 'var(--c-success)'),
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
       }),
-      emptyMsg: 'Sin registros lácteos. Usa "Registrar Láctea" para añadir.'
+      emptyMsg: 'Sin registros lácteos. Usa el botón "Nuevo" para añadir.'
     });
   },
 

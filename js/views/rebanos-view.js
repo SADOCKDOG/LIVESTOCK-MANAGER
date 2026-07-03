@@ -28,16 +28,16 @@ const RebanosView = {
       html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-info);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
     else {
       // Barra de resumen de Rebaños
-      const carneCount = rebanos.filter(r => r.tipo.toLowerCase().includes('carne') || r.tipo.toLowerCase().includes('cárn')).length;
-      const lecheCount = rebanos.filter(r => r.tipo.toLowerCase().includes('leche') || r.tipo.toLowerCase().includes('láct')).length;
-      const hibridoCount = rebanos.filter(r => r.tipo.toLowerCase().includes('mixt') || r.tipo.toLowerCase().includes('híbr') || r.tipo.toLowerCase().includes('doble')).length;
+      const carneCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn')).length;
+      const lecheCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct')).length;
+      const hibridoCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble')).length;
 
       html += `
         <div class="flex flex-wrap gap-4 mb-10">
           <span class="badge badge-sm badge-gold flex items-center gap-4 uppercase">${Icons.carne()} Carne: ${carneCount}</span>
           <span class="badge badge-sm badge-blue flex items-center gap-4 uppercase">${Icons.leche()} Leche: ${lecheCount}</span>
           <span class="badge badge-sm badge-purple flex items-center gap-4 uppercase">${Icons.rotacion()} Híbridos: ${hibridoCount}</span>
-          <span class="badge badge-sm badge-green flex items-center gap-4 uppercase">${Icons.check()} ${rebanosActivos} activos</span>
+          <span class="badge badge-sm badge-green flex items-center gap-4 uppercase">${Icons.check()} ${rebanosActivos} ${rebanosActivos === 1 ? 'activo' : 'activos'}</span>
         </div>`;
 
       html += `<div class="grid gap-15">`;
@@ -63,7 +63,7 @@ const RebanosView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} Activos</span>
+                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} ${activos === 1 ? 'Activo' : 'Activos'}</span>
                 </div>
               </div>
 
@@ -72,7 +72,7 @@ const RebanosView = {
                   <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
                     <div class="flex items-center gap-4">${Icons.zonas()} ${r.zonaActual || "Finca General"}</div>
                     <div class="flex items-center gap-4">${Icons.animales()} ${n} Total</div>
-                    ${prodLeche > 0 ? `<div class="flex items-center gap-4 text-gold">${Icons.leche()} ${prodLeche.toFixed(0)} L</div>` : ''}
+                    ${prodLeche > 0 ? `<div class="flex items-center gap-4 text-gold">${Icons.leche()} ${Math.round(prodLeche).toLocaleString('es-ES')} L</div>` : ''}
                     ${ultimoEvento ? `<div class="flex items-center gap-4 text-aaa">${Icons.calendar()} ${new Date(ultimoEvento.fecha).toLocaleDateString()}</div>` : ''}
                   </div>
                 </div>
@@ -116,8 +116,8 @@ const RebanosView = {
         <div class="info-box-center border-left-amber"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-amber">${animales.length}</div></div>
         <div class="info-box-center border-left-green"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos}</div></div>
         <div class="info-box-center border-left-red"><small class="s-lbl">VENDIDOS</small><div class="inf-val-lg text-red">${vendidos}</div></div>
-        <div class="info-box-center border-left-blue"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} kg</small><div class="inf-val-lg text-blue">${totalKg.toFixed(0)}</div></div>
-        <div class="info-box-center border-left-gold"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold">${totalLeche.toFixed(0)}</div></div>
+        <div class="info-box-center border-left-blue"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.carne()} kg</small><div class="inf-val-lg text-blue">${Math.round(totalKg).toLocaleString('es-ES')}</div></div>
+        <div class="info-box-center border-left-gold"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.leche()} LITROS</small><div class="inf-val-lg text-gold">${Math.round(totalLeche).toLocaleString('es-ES')}</div></div>
         <div class="info-box-center border-left-purple"><small class="s-lbl flex items-center gap-4 justify-center">${Icons.registros()} EVENTOS</small><div class="inf-val-lg text-purple">${eventosReb.length}</div></div>
       </div>
 
@@ -210,7 +210,7 @@ const RebanosView = {
               <div class="flex items-center gap-10">
                 <span style="color:${colorEsp}">${Icons.animales()}</span>
                 <div class="text-xs">
-                  <div class="text-white font-900 uppercase" style="color:${colorEsp} !important;">${a.numero_identificacion}</div>
+                  <div class="text-white font-900 uppercase" style="color:${colorEsp} !important;">${a.numero_identificacion || a.nombre || '#' + a.id}</div>
                   <div class="text-gray-500 font-800 text-[0.6rem] uppercase mt-2">${a.raza || 'S/R'} · <span style="color:${colorEsp}; opacity:0.7;">${a.categoria || ''}</span></div>
                 </div>
               </div>
@@ -220,7 +220,7 @@ const RebanosView = {
               </div>
             </div>
           </div>`;
-        }).join("")}
+        }).join("") || '<div class="text-gray text-center p-20">Sin animales en este rebaño</div>'}
       </div>`;
     this._cargarHistorialSanitario(id);
   },
@@ -240,7 +240,7 @@ const RebanosView = {
       filtrados.forEach(t => {
         html += `<div class="info-box-sm border-left-green mt-8 bg-black">
           <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(t.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0}D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">PROHIBIDO LECHE</strong>' : ''}</div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0} D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">PROHIBIDO LECHE</strong>' : ''}</div>
         </div>`;
       });
       container.innerHTML = html;

@@ -41,8 +41,8 @@ window.AlbaranLecheWizard = {
       const precioFinal = parseFloat((pb + (es * pex) - tasa + prim).toFixed(4));
       const importeTotal = parseFloat((cant * precioFinal).toFixed(2));
 
-      precioDisplay.textContent = precioFinal.toFixed(4) + ' €/L';
-      importeDisplay.textContent = importeTotal.toFixed(2) + ' €';
+      precioDisplay.textContent = precioFinal.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) + ' €/L';
+      importeDisplay.textContent = importeTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
     };
 
     App._recalcularMOFA = function() {
@@ -167,7 +167,7 @@ window.AlbaranLecheWizard = {
 
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">GERMENES (UFC/ML)</label>
+                <label class="wizard-label">GÉRMENES (UFC/ML)</label>
                 <input type="number" id="w-l-ger" value="${data.germenes || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
@@ -200,8 +200,8 @@ window.AlbaranLecheWizard = {
 
               <div class="bg-black border border-222 rounded-sm p-14">
                 <div class="grid grid-cols-2 gap-8 text-[0.65rem] uppercase font-900 tracking-tight">
-                  <div class="mt-4 border-top-222 pt-4">PRECIO FINAL:</div><div class="mt-4 border-top-222 pt-4 text-right"><strong id="w-l-precio-final-display" class="text-green text-sm">${precioFinal.toFixed(4)} €/L</strong></div>
-                  <div class="mt-2">IMPORTE TOTAL:</div><div class="mt-2 text-right"><strong id="w-l-importe-display" class="text-green text-lg">${importeTotal.toFixed(2)} €</strong></div>
+                  <div class="mt-4 border-top-222 pt-4">PRECIO FINAL:</div><div class="mt-4 border-top-222 pt-4 text-right"><strong id="w-l-precio-final-display" class="text-green text-sm">${precioFinal.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} €/L</strong></div>
+                  <div class="mt-2">IMPORTE TOTAL:</div><div class="mt-2 text-right"><strong id="w-l-importe-display" class="text-green text-lg">${importeTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</strong></div>
                 </div>
               </div>
             </div>
@@ -267,7 +267,7 @@ window.AlbaranLecheWizard = {
           const prohibidoLecheActivo = sanitarios && sanitarios.some(s => s.prohibidoLeche === true);
           if (prohibidoLecheActivo) {
             const motivo = sanitarios.find(s => s.prohibidoLeche === true);
-            App.toastError(`VENTA DE LECHE PROHIBIDA: Se ha detectado un tratamiento con restricción. Consultá con Inspección (${motivo.tipo_tratamiento || 'medicamento'}). Revisa SANEAMIENTOS.`);
+            App.toastError(`VENTA DE LECHE PROHIBIDA: Se ha detectado un tratamiento con restricción. Consulta con Inspección (${motivo.tipo_tratamiento || 'medicamento'}). Revisa SANEAMIENTOS.`);
             return;
           }
 

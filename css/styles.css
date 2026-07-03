@@ -2541,10 +2541,10 @@ label {
     transition: all 0.18s;
 }
 .inf-export-btn:hover { background: #1a1a1a; color: #bbb; border-color: #444; }
-.inf-export-btn--excel { border-color: var(--c-success)25; color: var(--c-success); }
-.inf-export-btn--excel:hover { background: var(--c-success)10; border-color: var(--c-success); }
-.inf-export-btn--full { border-color: var(--c-warning)25; color: var(--c-warning); }
-.inf-export-btn--full:hover { background: var(--c-warning)10; border-color: var(--c-warning); }
+.inf-export-btn--excel { border-color: color-mix(in srgb, var(--c-success) 15%, transparent); color: var(--c-success); }
+.inf-export-btn--excel:hover { background: color-mix(in srgb, var(--c-success) 6%, transparent); border-color: var(--c-success); }
+.inf-export-btn--full { border-color: color-mix(in srgb, var(--c-warning) 15%, transparent); color: var(--c-warning); }
+.inf-export-btn--full:hover { background: color-mix(in srgb, var(--c-warning) 6%, transparent); border-color: var(--c-warning); }
 
 
 /* ===== INFORMES CONTENT COMPONENTS (Fase 6) ===== */

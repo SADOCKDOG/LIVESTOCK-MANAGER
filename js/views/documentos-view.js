@@ -187,7 +187,7 @@ const DocumentosView = {
       : docs.filter(d => (d.tipo || '').toLowerCase() === this._currentTab);
 
     if (!filtrados.length) {
-      return `<div class="empty-state"><div class="empty-state-icon">${Icons.documento()}</div><p class="empty-state-text">No hay documentos ${this._currentTab !== 'todos' ? 'de este tipo' : ''}.</p></div>`;
+      return `<div class="empty-state"><div class="empty-state-icon">${Icons.documento()}</div><p class="empty-state-text">No hay documentos${this._currentTab !== 'todos' ? ' de este tipo' : ''}.</p></div>`;
     }
 
     const colors = { dimoe: 'var(--c-success)', factura: 'var(--c-info)', certificado: 'var(--c-warning)', dib: 'var(--c-purple)', crotales: 'var(--c-orange)' };
@@ -202,9 +202,9 @@ const DocumentosView = {
         
         let descHtml = '';
         if (doc.isPedidoCrotales) {
-          descHtml = `Especie: <strong>${doc.dataRaw.especie}</strong> &middot; Cantidad: <strong>${doc.dataRaw.cantidad} pares</strong>`;
+          descHtml = `Especie: <strong>${doc.dataRaw.especie ?? '—'}</strong> &middot; Cantidad: <strong>${doc.dataRaw.cantidad ?? '—'}${typeof doc.dataRaw.cantidad === 'number' ? (doc.dataRaw.cantidad === 1 ? ' par' : ' pares') : ''}</strong>`;
         } else if (doc.isMovimiento) {
-          descHtml = `Movimiento de <strong>${doc.dataRaw.tipo === 'salida' ? 'Salida' : 'Entrada'}</strong> &middot; Animales: <strong>${doc.dataRaw.num_animales}</strong>`;
+          descHtml = `Movimiento de <strong>${doc.dataRaw.tipo === 'salida' ? 'Salida' : 'Entrada'}</strong> &middot; Animales: <strong>${doc.dataRaw.num_animales ?? '—'}</strong>`;
         } else {
           descHtml = doc.numero || 'Sin número registrado';
         }
@@ -376,8 +376,8 @@ const DocumentosView = {
             <p><strong>Número:</strong> ${doc.numero || 'S/N'}</p>
             <p><strong>Fecha:</strong> ${this._fmtFecha(doc.createdAt || doc.fecha)}</p>
             <p><strong>Estado:</strong> ${(doc.estado || '').toUpperCase()}</p>
-            ${doc.isPedidoCrotales ? `<p><strong>Especie:</strong> ${doc.dataRaw.especie} · <strong>Cantidad:</strong> ${doc.dataRaw.cantidad} pares · <strong>Material:</strong> ${doc.dataRaw.tipo}</p>` : ''}
-            ${doc.isMovimiento ? `<p><strong>Tipo:</strong> ${doc.dataRaw.tipo} · <strong>Animales:</strong> ${doc.dataRaw.num_animales}</p>` : ''}
+            ${doc.isPedidoCrotales ? `<p><strong>Especie:</strong> ${doc.dataRaw.especie ?? '—'} · <strong>Cantidad:</strong> ${doc.dataRaw.cantidad ?? '—'}${typeof doc.dataRaw.cantidad === 'number' ? (doc.dataRaw.cantidad === 1 ? ' par' : ' pares') : ''} · <strong>Material:</strong> ${doc.dataRaw.tipo ?? '—'}</p>` : ''}
+            ${doc.isMovimiento ? `<p><strong>Tipo:</strong> ${doc.dataRaw.tipo ?? '—'} · <strong>Animales:</strong> ${doc.dataRaw.num_animales ?? '—'}</p>` : ''}
           </div>
           <div style="padding:20px;border:1px solid #ccc;background:#f9f9f9;font-size:0.85rem;margin-top:40px;">
             <p style="margin:0;"><strong>Documento generado por Livestock Manager Premium</strong></p>
@@ -425,15 +425,15 @@ const DocumentosView = {
     let infoExtra = '';
     if (doc.isPedidoCrotales) {
       infoExtra = `
-        <div><span class="text-gray">Cantidad:</span> <span class="text-white">${doc.dataRaw.cantidad} pares</span></div>
-        <div><span class="text-gray">Especie:</span> <span class="text-white">${doc.dataRaw.especie}</span></div>
-        <div><span class="text-gray">Material:</span> <span class="text-white">${doc.dataRaw.tipo}</span></div>
+        <div><span class="text-gray">Cantidad:</span> <span class="text-white">${doc.dataRaw.cantidad ?? '—'}${typeof doc.dataRaw.cantidad === 'number' ? (doc.dataRaw.cantidad === 1 ? ' par' : ' pares') : ''}</span></div>
+        <div><span class="text-gray">Especie:</span> <span class="text-white">${doc.dataRaw.especie ?? '—'}</span></div>
+        <div><span class="text-gray">Material:</span> <span class="text-white">${doc.dataRaw.tipo ?? '—'}</span></div>
         <div class="col-span-2"><span class="text-gray">ADSG / Destinatario:</span> <span class="text-white">${doc.dataRaw.adsg_nombre || '—'}</span></div>
       `;
     } else if (doc.isMovimiento) {
       infoExtra = `
         <div><span class="text-gray">Tipo Mov.:</span> <span class="text-white">${(doc.dataRaw.tipo || '').toUpperCase()}</span></div>
-        <div><span class="text-gray">Nº Animales:</span> <span class="text-white">${doc.dataRaw.num_animales}</span></div>
+        <div><span class="text-gray">Nº Animales:</span> <span class="text-white">${doc.dataRaw.num_animales ?? '—'}</span></div>
         <div class="col-span-2"><span class="text-gray">REGA Origen:</span> <span class="text-white">${doc.dataRaw.rega_origen || '—'}</span></div>
         <div class="col-span-2"><span class="text-gray">REGA Destino:</span> <span class="text-white">${doc.dataRaw.rega_destino || '—'}</span></div>
       `;
@@ -511,7 +511,8 @@ const DocumentosView = {
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 
-    const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : 'Guía DIMOE';
+    const docLabels = { dimoe: 'Guía DIMOE', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido de Crotales' };
+    const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : (docLabels[tipo] || 'Documento');
     overlay.innerHTML = `
       <div class="card" style="max-width:520px;width:100%;padding:24px;">
         <div class="flex justify-between items-center mb-8">

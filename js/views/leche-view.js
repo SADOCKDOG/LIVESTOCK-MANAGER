@@ -128,7 +128,7 @@ const LecheView = {
         patrimonio: [
           { label: 'Censo Leche', value: animalesLeche.length + ' cabezas' },
           { label: 'Lotes Lecheros', value: rebanosLeche.length },
-          { label: 'Raza Principal', value: animalesLeche.length > 0 ? (animalesLeche[0].raza || 'Assaf') : 'Lacaune' }
+          { label: 'Raza Principal', value: animalesLeche.length > 0 ? (animalesLeche[0].raza || 'N/D') : 'N/D' }
         ],
         explotacion: [
           { label: 'Litros Control', value: totalLitrosControles.toLocaleString() + ' L' },
@@ -191,7 +191,7 @@ const LecheView = {
         <strong>${Icons.alerta()} CRÍTICO - SUPRESIÓN DE LECHE EN CURSO (ANTIBIÓTICOS/INHIBIDORES):</strong>
         <ul class="mt-4 pl-20 m-0">
           ${d.tratamientosSupresionLeche.map(s => `
-            <li>Rebaño treated: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> de supresión para ordeño (Finaliza: ${s.fechaFin})</li>
+            <li>Rebaño en tratamiento: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — ${typeof s.diasRestantes === 'number' ? `Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> de supresión para ordeño` : '<strong class="text-white">Supresión indefinida</strong>'} (Finaliza: ${s.fechaFin})</li>
           `).join('')}
         </ul>
       </div>
@@ -329,17 +329,17 @@ const LecheView = {
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">
-                          <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-info)'}">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${s.medicamento || s.tipo_tratamiento}</h3>
+                          <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}">${Icons.sanidad()}</span>
+                          <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
                         </div>
                         <div class="flex flex-wrap gap-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
                           <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
-                          <span>Espera Leche: <strong class="text-white bg-blue-900 px-4 rounded-sm">${s.tiempo_espera_leche_dias || 0} DÍAS</strong></span>
+                          <span>Espera Leche: <strong class="text-white bg-blue-900 px-4 rounded-sm">${s.tiempo_espera_leche_dias || 0} ${(s.tiempo_espera_leche_dias || 0) === 1 ? 'DÍA' : 'DÍAS'}</strong></span>
                         </div>
                       </div>
                       <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid color-mix(in srgb, ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'} 38%, transparent);">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
                   </div>`;
@@ -364,7 +364,7 @@ const LecheView = {
             <div class="text-[0.65rem] text-gray uppercase font-800 mt-2 tracking-widest">Cisterna: <span class="text-white">${e.matriculaCisterna || '—'}</span></div>
           </div>
           <div class="text-right">
-            <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(255,68,68,0.2)' : 'rgba(204,255,0,0.15)'}; color:${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}; border: 1px solid ${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}40;">${e.estadoAnalitica || 'PENDIENTE'}</span>
+            <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(255,68,68,0.2)' : 'rgba(204,255,0,0.15)'}; color:${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}; border: 1px solid color-mix(in srgb, ${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'} 25%, transparent);">${e.estadoAnalitica || 'PENDIENTE'}</span>
           </div>
         </div>
       </div>`;

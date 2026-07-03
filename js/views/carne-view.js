@@ -179,7 +179,7 @@ const CarneView = {
         comercializacion: [
           { label: 'Ventas Matadero', value: totalVentasEuros.toLocaleString() + ' €', color: 'var(--c-success)' },
           { label: 'Total kg Sacrificados', value: totalKgMatadero.toLocaleString() + ' kg' },
-          { label: 'Rendimiento Canal', value: rendimientoMedio.toFixed(1) + '%' }
+          { label: 'Rendimiento Canal', value: rendimientoMedio.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' }
         ],
         legislacion: [
           { label: 'Alertas Supresión', value: tratamientosSupresion.length, color: tratamientosSupresion.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
@@ -349,7 +349,7 @@ const CarneView = {
           <strong class="flex items-center gap-6">${Icons.alerta()} ALERTA: SUPRESIÓN DE CARNE ACTIVA:</strong>
           <ul class="mt-4 pl-20 m-0">
             ${d.tratamientosSupresion.map(s => `
-              <li>Rebaño: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} días</strong> (Finaliza: ${s.fechaFin})</li>
+              <li>Rebaño: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> (Finaliza: ${s.fechaFin})</li>
             `).join('')}
           </ul>
         </div>
@@ -395,16 +395,16 @@ const CarneView = {
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">
                           <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis uppercase font-900">${s.medicamento || s.tipo_tratamiento}</h3>
+                          <h3 class="section-h3 m-0 text-ellipsis uppercase font-900">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
                         </div>
                         <div class="flex wrap gap-6 mt-6 text-[0.65rem] text-gray font-800 uppercase tracking-tight">
                           <span class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
                           <span>·</span>
-                          <span>Espera Carne: <strong class="text-white bg-red-900 px-4 rounded-sm">${s.tiempo_espera_carne_dias || 0} DÍAS</strong></span>
+                          <span>Espera Carne: <strong class="text-white bg-red-900 px-4 rounded-sm">${s.tiempo_espera_carne_dias || 0} ${(s.tiempo_espera_carne_dias || 0) === 1 ? 'DÍA' : 'DÍAS'}</strong></span>
                         </div>
                       </div>
                       <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}60;">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid color-mix(in srgb, ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'} 38%, transparent);">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
                   </div>`;

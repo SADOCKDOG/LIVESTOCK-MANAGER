@@ -72,7 +72,7 @@ const ManualesView = {
     {
       id: 'compradores',
       titulo: 'Compradores — Gestión de Clientes',
-      descripcion: 'Alta y gestión de compradores (cárnico, láctico, híbrido), contratos, historial de ventas y entregas de leche. Cómo aparece en Venta Masiva y Albarán de Leche.',
+      descripcion: 'Alta y gestión de compradores (cárnico, lácteo, híbrido), contratos, historial de ventas y entregas de leche. Cómo aparece en Venta Masiva y Albarán de Leche.',
       icono: 'compradores',
       archivo: 'manual/manual-compradores.html',
       color: 'var(--c-danger)',

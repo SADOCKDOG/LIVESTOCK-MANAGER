@@ -110,7 +110,7 @@ const TrazabilidadView = {
       icon: Icons.animales(),
       titulo: 'NACIMIENTO / ALTA',
       detalle: `
-        <strong>Crotal:</strong> <span class="text-gold font-bold">${animal.numero_identificacion}</span><br>
+        <strong>Crotal:</strong> <span class="text-gold font-bold">${animal.numero_identificacion || '—'}</span><br>
         ${animal.dib ? `<strong>DIB:</strong> <span class="text-white font-bold">${animal.dib}</span><br>` : ''}
         <strong>Especie:</strong> ${animal.especie || 'N/D'}<br>
         <strong>Raza:</strong> ${animal.raza || 'N/D'}<br>
@@ -139,7 +139,7 @@ const TrazabilidadView = {
           ${s.num_animales_tratados ? `<strong>Nº animales tratados:</strong> <span class="text-white font-bold">${s.num_animales_tratados}</span><br>` : ''}
           ${s.lote_medicamento ? `<strong>Lote:</strong> ${s.lote_medicamento}<br>` : ''}
           ${s.caducidad_medicamento ? `<strong>Caducidad:</strong> ${s.caducidad_medicamento}<br>` : ''}
-          <strong>Supresión carne:</strong> <span class="text-red font-bold">${s.tiempo_espera_carne_dias || 0}</span> días${supresion}<br>
+          <strong>Supresión carne:</strong> <span class="text-red font-bold">${s.tiempo_espera_carne_dias || 0}</span> ${(s.tiempo_espera_carne_dias || 0) === 1 ? 'día' : 'días'}${supresion}<br>
           ${s.prohibidoLeche ? `<strong class="text-red">${Icons.alerta()} PROHIBIDO para leche</strong><br>` : ''}
           ${s.veterinario_prescriptor ? `<strong>Veterinario:</strong> ${s.veterinario_prescriptor}${s.veterinario_colegiado ? ' (Nº ' + s.veterinario_colegiado + ')' : ''}<br>` : ''}
           ${s.numero_receta ? `<strong>Nº receta:</strong> ${s.numero_receta}<br>` : ''}
@@ -264,8 +264,8 @@ const TrazabilidadView = {
         <!-- Datos Básicos del Animal -->
         <div class="card p-16 mb-16">
           <div class="flex justify-between items-center mb-10 flex-wrap gap-8">
-            <strong class="text-amber text-lg">${animal.numero_identificacion}</strong>
-            <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado}</span>
+            <strong class="text-amber text-lg">${animal.numero_identificacion || '—'}</strong>
+            <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado || '—'}</span>
           </div>
           <div class="traz-meta-grid">
             <div><span class="text-gray">Especie:</span> ${animal.especie || 'N/D'}</div>

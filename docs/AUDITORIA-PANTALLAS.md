@@ -63,33 +63,35 @@
 
 ## 3. Checklist por pantalla
 
-Leyenda: [AUTO] escaneo automático hecho · [VISUAL] pase visual · [OK] conforme · [PEND] pendiente
-| Ruta / Pantalla | [AUTO] | [VISUAL] | Hallazgos específicos |
-|---|:---:|:---:|---|
-| `#/` Dashboard | [OK] | [OK] | G7 (border-top muertos, 127 inline); marco y cards OK tras F1 marco |
-| `#/ganaderia` | [OK] | [PEND] | 15 inline |
-| `#/rebanos` (+detalle) | [OK] | [PEND] | 24 inline |
-| `#/animales` (+detalle) | [OK] | [PEND] | 25 inline; color módulo `#f97316` fuera de paleta (G5) |
-| `#/explotacion` (ExPro) | [OK] | [PEND] | 72 inline |
-| `#/carne` · `#/leche` · `#/hibrido` | [OK] | [PEND] | híbrido usa `#10b981` (G5) |
-| `#/zonas` (+detalle) | [OK] | [PEND] | color módulo contradictorio (G5: debe ser `#CCFF00`) |
-| `#/comercializacion` (+albarán/venta) | [OK] | [PEND] | 16 inline; `/venta-carne` sin volver (G10d) |
-| `#/gastos` (+detalle) | [OK] | [PEND] | 14 inline |
-| `#/informes` | [OK] | [PEND] | 222 inline (mayoría PDF, revisar resto) |
-| `#/cuaderno` | [OK] | [PEND] | 16 inline; color `#d97706` (G4) |
-| `#/trazabilidad` | [OK] | [PEND] | 42 inline |
-| `#/documentos` | [OK] | [PEND] | 27 inline; sin volver (G10d) |
-| `#/compradores` (+detalle) | [OK] | [PEND] | 34 inline |
-| `#/proveedores` (+detalle) | [OK] | [PEND] | color `#a855f7` fuera de paleta (G4/G5) |
-| `#/transportistas` | [OK] | [PEND] | 18 inline; color `#ec4899` fuera de paleta |
-| `#/contrato` | [OK] | [PEND] | — |
-| `#/ajustes` | [OK] | [OK] | 40 inline; toggles nuevos OK; cards accent restauradas (G1/G2) |
-| `#/manuales` | [OK] | [PEND] | 11 inline; color `#9333ea` fuera de paleta |
-| Notificaciones (campana/badge/alertas) | [OK] | [OK] | F6 [OK]: ruta `/alertas` + dropdown con contador + prefs efectivas |
-| Wizards (9) | [OK] | [PEND] | censo/guía/crotales ~31 inline c/u; cancelar sin confirmación (G10) |
-| Onboarding / Bienvenida | [OK] | [OK] | versión unificada ✓ |
-| Menú "Más" (sheet) | [OK] | [OK] | colores G5; back físico no lo cierra (G10a) |
-| Menú desplegable header | [OK] | [OK] | colores G5 |
+Leyenda: [AUTO] escaneo automático hecho · [COD] pase de código profundo (textos, unidades, plurales, formato es-ES, fallbacks, empty-states, CSS roto) · [VISUAL] pase visual en dispositivo · [OK] conforme · [PEND] pendiente
+| Ruta / Pantalla | [AUTO] | [COD] | [VISUAL] | Hallazgos específicos |
+|---|:---:|:---:|:---:|---|
+| `#/` Dashboard | [OK] | [OK] | [OK] | Conforme tras F1/F3 (G7 resuelto) |
+| `#/ganaderia` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: edad nunca visible (`fechaNacimiento`→`fecha_nacimiento`), plurales cabeza/parcela/año |
+| `#/rebanos` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: crash si rebaño sin `tipo`, plurales, miles es-ES en KPIs, fallback crotal, empty-state detalle, "6D"→"6 D" |
+| `#/animales` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregido: fallback crotal en título de card (color módulo naranja ya oficial, G5 resuelto) |
+| `#/explotacion` (ExPro) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: KPIs GMD/ratio/ES/grasa/proteína a es-ES, valores crudos formateados, COSTOS→COSTES, registro(s)→plural real, kg/d→kg/día, `var()+alpha` inválido en conmutadores (glow) |
+| `#/carne` · `#/leche` · `#/hibrido` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "Rebaño treated", "Restan INDEFINIDO días"/"PROHIBIDOd", raza inventada (Assaf/Lacaune→N/D), badges sin borde (`var()+alpha`), plurales DÍA/DÍAS, fallback 'Tratamiento', empty-state rebaños mixtos |
+| `#/zonas` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: UGM/carga a es-ES, "HA"→"ha" (color módulo lima ya aplicado, G5 resuelto) |
+| `#/comercializacion` (+albarán/venta) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: rendimiento/ES a es-ES, peso canal formateado, "--°C"→"—" y espacio en °C |
+| `#/gastos` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "LOTE 1 animales", ES medio es-ES, valores crudos, mensajes de vacío referían botón inexistente ("Registrar…"→"Nuevo") |
+| `#/informes` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: typo "Prolifeidad", **datos ficticios como fallback** (Dr. Manuel Ortiz, contratos, ADSG, NIF → 'N/D', 15 casos), "Aforo Máx.", plurales, empty-state censo. Diferido: `toLocaleString()` sin locale (~50 sitios, lote propio) |
+| `#/cuaderno` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: dinero con punto (`toFixed(2)€`→es-ES) en pantalla y PDF, miles es-ES, plurales parto/entrega/animales activos |
+| `#/trazabilidad` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "undefined" en cabecera de ficha y badge estado, plural días |
+| `#/documentos` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "Guía DIMOE" para facturas/DIB (mapa tipo→label), "undefined pares/animales", espacio antes de punto |
+| `#/compradores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: **precio inventado 5,5 €/kg**→'—', badges sin fondo (`var()+alpha`), crash contrato sin tipo, "undefined" en formulario, 'láctico'→'Lácteo' (presentación) |
+| `#/proveedores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badges sin fondo, categorías con tilde en presentación (`_labelCat`), "undefined" en formulario |
+| `#/transportistas` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badge activo sin fondo, plural animales, ➔→Icons. Diferido: empty-state con filtro Inactivos |
+| `#/contrato` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: crash tipo_comprador undefined, 'LÁCTICO'→'LÁCTEO' |
+| `#/ajustes` | [OK] | [OK] | [OK] | Toggles nuevos OK; cards accent restauradas (G1/G2) |
+| `#/manuales` | [OK] | [OK] 2026-07-03 | [PEND] | Corregido: "láctico"→"lácteo". Diferido: hex del visor (criterio) |
+| Notificaciones (campana/badge/alertas) | [OK] | [OK] | [OK] | F6 [OK]: ruta `/alertas` + dropdown con contador + prefs efectivas |
+| Wizards (9) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: **factura con precio inventado 5,5 €/kg** (venta-masiva → 0 + nota "pendiente de fijar"), SVG crudo en toast (guía), €/L y € a es-ES (albarán-leche), GÉRMENES, "Consultá"→"Consulta", "Regla 3"→mensaje claro, empty-state traslado, razas "undefined", plurales, class duplicado (finca), mg/mL |
+| Onboarding / Bienvenida | [OK] | [OK] | [OK] | versión unificada ✓ · iconos SVG (norma emoticonos) |
+| Menú "Más" (sheet) | [OK] | [OK] | [OK] | G5 resuelto (mapa único); back físico lo cierra (G10a resuelto) |
+| Menú desplegable header | [OK] | [OK] | [OK] | G5 resuelto (mapa único) |
+
+**Diferidos del pase de código (criterio/lotes propios):** (a) `toLocaleString()`/`toLocaleDateString()` sin `'es-ES'` explícito — masivo en informes-view y disperso en compradores/proveedores (formato correcto salvo dispositivo en locale extranjero); (b) hex neutros de escala de grises en pantalla (`#fff/#555/#888/#222`) en títulos y empty-states — decidir si merecen token; (c) hex de módulo del visor de manuales y timeline de trazabilidad; (d) empty-state de transportistas con filtro activo; (e) opción de contrato potencialmente duplicada en select de albarán-leche.
 
 ---
 
@@ -108,3 +110,4 @@ Leyenda: [AUTO] escaneo automático hecho · [VISUAL] pase visual · [OK] confor
 - **2026-07-03** — Norma de prohibición de emoticonos aplicada: barrido total (~92 líneas en 20+ ficheros: vistas, servicios, asistente, error-handler, index.html) vía codemod protegido (no toca toasts/inferencia/consola) + sustituciones manuales por `Icons.*` SVG (loaders PDF unificados a `.pdf-loader-icon`, asistente/tour de bienvenida, error-handler). Fixes de lógica dependiente de emojis: `zonas-view` (`estadoTexto.split('')[1]` → texto directo), `informes-view` (celda TOTAL de cargas → 'OK'). Este documento migrado a marcadores textuales ([CRIT]/[ALTO]/[MEDIO]/[BAJO], [OK]/[PEND], [AUTO]/[VISUAL]).
 - **2026-07-03** — Toasts a API explícita: `App.toast(msg, type, duracionMs)` (número como 2º arg = duración legacy). Codemod con parseo de literales (comillas/backticks/escapes/concatenaciones): 40 llamadas migradas a tipo explícito ('success'/'error'/'warning') + 48 limpiadas de emojis decorativos + 8 ternarios a mano (confirmaciones de guardado → 'success'). `toastError('aviso…')` con marcador → `App.toast(…, 'warning')`. Inferencia por marcador conservada solo como fallback de strings dinámicos. Fuente sin emoticonos: 0 restantes fuera de QA/consola.
 - **2026-07-03** — Reconciliación de estados: G6/G7/G11 verificados contra el código (grep: cero `16,185,129`/`#059669`, cero `border-top:3px` inline en dashboard, `.page-title-*` con tokens) → marcados [OK]. G8 re-etiquetado: el trabajo real se hizo en AUDITORIA-UI-UX Fase 4; queda revisión de criterio de los ~600 inline residuales.
+- **2026-07-03** — Pase de código por pantalla (checklist §3, columna [COD]): auditoría profunda de 25 vistas/wizards con 4 agentes + corrección de ~75 defectos. Destacados: 2 fuentes de DATOS INVENTADOS (precio 5,5 €/kg en ficha comprador y factura de venta masiva; veterinario/contrato/ADSG ficticios como fallback en informe Por Finca → 'N/D'); patrón transversal `var(--c-x)NN` (pseudo-alpha inválido, badges sin fondo/borde) erradicado en 8 ficheros + styles.css con `color-mix`; 2 crashes potenciales (rebaño sin tipo, contrato sin tipo); SVG crudo visible en toast de guía; 'Rebaño treated', 'Restan INDEFINIDO días', 'PROHIBIDOd'; ~20 plurales condicionales; decimales/miles a es-ES en KPIs de 9 vistas; 'láctico'→'lácteo' en presentación; edad invisible en ganadería (campo camelCase). Diferidos documentados al pie del checklist. Pase [VISUAL] en dispositivo pendiente de David.

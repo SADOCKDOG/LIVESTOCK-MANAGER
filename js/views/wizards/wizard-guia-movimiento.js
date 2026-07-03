@@ -343,7 +343,7 @@ window.WizardGuiaMovimiento = {
             plataforma: mov.plataforma || '',
             created_at: new Date().toISOString(),
           }).catch(() => {});
-          App.toast("Guía de movimiento registrada " + Icons.check());
+          App.toast("Guía de movimiento registrada", 'success');
           WizardGuiaMovimiento.generarDocumento(finca, mov);
         } catch (e) {
           App.toastError(e.message || 'No se pudo registrar el movimiento');

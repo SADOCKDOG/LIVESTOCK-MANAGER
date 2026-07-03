@@ -90,7 +90,7 @@ const TransportistasView = {
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="badge badge-sm uppercase" style="background:${t.activo ? 'var(--c-success)15' : '#6b728015'}; color:${t.activo ? 'var(--c-success)' : '#9ca3af'}; border:1px solid ${t.activo ? 'var(--c-success)35' : '#6b728035'};">
+                            <span class="badge badge-sm uppercase" style="background:${t.activo ? 'color-mix(in srgb, var(--c-success) 8%, transparent)' : '#6b728015'}; color:${t.activo ? 'var(--c-success)' : '#9ca3af'}; border:1px solid ${t.activo ? 'color-mix(in srgb, var(--c-success) 21%, transparent)' : '#6b728035'};">
                                 ${t.activo ? 'Activo' : 'Inactivo'}
                             </span>
                         </div>
@@ -104,7 +104,7 @@ const TransportistasView = {
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+                            <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ${Icons.siguiente()}</div>
                         </div>
                     </div>
                 </div>
@@ -135,7 +135,7 @@ const TransportistasView = {
                             <h2 class="m-0 font-900 text-white uppercase text-xl">${t.nombre}</h2>
                         </div>
                         <div class="flex gap-8 flex-wrap">
-                          <span class="badge badge-sm uppercase" style="background:${t.activo ? 'var(--c-success)15' : 'var(--c-danger)15'}; color:${t.activo ? 'var(--c-success)' : 'var(--c-danger)'}; border:1px solid ${t.activo ? 'var(--c-success)35' : 'var(--c-danger)35'};">
+                          <span class="badge badge-sm uppercase" style="background:${t.activo ? 'color-mix(in srgb, var(--c-success) 8%, transparent)' : 'color-mix(in srgb, var(--c-danger) 8%, transparent)'}; color:${t.activo ? 'var(--c-success)' : 'var(--c-danger)'}; border:1px solid ${t.activo ? 'color-mix(in srgb, var(--c-success) 21%, transparent)' : 'color-mix(in srgb, var(--c-danger) 21%, transparent)'};">
                             ${t.activo ? 'Activo' : 'Inactivo'}
                           </span>
                         </div>
@@ -159,7 +159,7 @@ const TransportistasView = {
                         <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.enlace()} Email</small><div class="text-white mt-2">${t.email || '-'}</div></div>
                         <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.documento()} Registro Transporte</small><div class="text-white mt-2">${t.registro_transporte || '-'}</div></div>
                         <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.transportistas()} Tipo Vehículo</small><div class="text-white mt-2">${this._labelTipoVehiculo(t.tipo_vehiculo)}</div></div>
-                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.animales()} Capacidad</small><div class="text-white mt-2">${t.capacidad_animales || '0'} animales</div></div>
+                        <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.animales()} Capacidad</small><div class="text-white mt-2">${t.capacidad_animales || 0} ${Number(t.capacidad_animales) === 1 ? 'animal' : 'animales'}</div></div>
                     </div>
                     <div class="mt-12 flex gap-8 flex-wrap">
                         <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.certificado_bienestar ? 'rgba(204,255,0,0.15)' : 'rgba(255,68,68,0.15)'}; color:${t.certificado_bienestar ? 'var(--c-success)' : 'var(--c-danger)'};">

@@ -568,7 +568,7 @@ const InformesView = {
               <div class="text-right">
                 <span class="text-amber font-800">${r.total.toLocaleString()}€</span>
                 <span class="text-gray text-xs ml-6">${InformesView._fmt(r.kg, 1)} kg</span>
-                <span class="text-blue text-xs ml-6">${r.numVentas} ventas</span>
+                <span class="text-blue text-xs ml-6">${r.numVentas} ${r.numVentas === 1 ? 'venta' : 'ventas'}</span>
               </div>
             </div>`).join('')}
         </div>` : ''}
@@ -722,10 +722,10 @@ const InformesView = {
             </div>
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Intervalo Entre Partos (IEP)</span>
-              <strong class="text-xl font-950 text-purple">${kpisRepro.intervaloEntrePartosDias} días</strong>
+              <strong class="text-xl font-950 text-purple">${kpisRepro.intervaloEntrePartosDias} ${Number(kpisRepro.intervaloEntrePartosDias) === 1 ? 'día' : 'días'}</strong>
             </div>
             <div class="py-10 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900">Prolifeidad</span>
+              <span class="text-xs text-gray uppercase font-900">Prolificidad</span>
               <strong class="text-xl font-950 text-purple">${kpisRepro.indiceProlificidad}</strong>
             </div>
             <div class="py-10 flex justify-between items-center border-bottom-222">
@@ -912,7 +912,7 @@ const InformesView = {
           <table class="inf-table tbl-accent-green">
             <thead><tr><th>Rebaño</th><th>Tipo</th><th>Total</th><th>Activos</th><th class="text-red">Vendidos</th></tr></thead>
             <tbody>${censo.map(r => `
-              <tr><td><strong>${r.nombre}</strong></td><td class="text-gray">${r.tipo}</td><td class="font-800">${r.total}</td><td class="text-green">${r.activos}</td><td class="text-red">${r.vendidos}</td></tr>`).join('')}</tbody>
+              <tr><td><strong>${r.nombre}</strong></td><td class="text-gray">${r.tipo}</td><td class="font-800">${r.total}</td><td class="text-green">${r.activos}</td><td class="text-red">${r.vendidos}</td></tr>`).join('') || '<tr><td colspan="5" class="text-gray text-center">Sin datos de censo</td></tr>'}</tbody>
           </table>
         </div>
       </div>
@@ -1477,23 +1477,23 @@ const InformesView = {
             <div><span class="text-gray">Provincia:</span> <strong>${finca.provincia || 'N/D'}</strong></div>
             <div><span class="text-gray">CCAA:</span> <strong class="uppercase">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</strong></div>
             <div><span class="text-gray">NIF/CIF:</span> <strong>${finca.nif_cif || 'N/D'}</strong></div>
-            <div><span class="text-gray">Clasificación:</span> <strong>${finca.tipo_explotacion || 'Mixto'} (${finca.sistema_explotacion || 'Semiextensivo'})</strong></div>
+            <div><span class="text-gray">Clasificación:</span> <strong>${finca.tipo_explotacion || 'N/D'} (${finca.sistema_explotacion || 'N/D'})</strong></div>
             <div><span class="text-gray">Rebaños Activos:</span> <strong>${numRebanos}</strong></div>
           </div>
           <div class="grid grid-cols-2 gap-8 text-sm mb-14 border-bottom-222 pb-10">
-            <div><span class="text-gray">ADSG Asociada:</span> <strong class="text-amber">${finca.adsg_nombre || finca.adsg || 'El Condado (ADSG-AN-21005)'}</strong></div>
-            <div><span class="text-gray">Cód. ADSG:</span> <strong>${finca.adsg_codigo || 'ADSG-AN-21005'}</strong></div>
-            <div><span class="text-gray">Veterinario:</span> <strong>${finca.adsg_veterinario || 'Dr. Manuel Ortiz'}</strong></div>
-            <div><span class="text-gray">Nº Colegiado:</span> <strong>${finca.adsg_vet_colegiado || '21/1045'}</strong></div>
+            <div><span class="text-gray">ADSG Asociada:</span> <strong class="text-amber">${finca.adsg_nombre || finca.adsg || 'N/D'}</strong></div>
+            <div><span class="text-gray">Cód. ADSG:</span> <strong>${finca.adsg_codigo || 'N/D'}</strong></div>
+            <div><span class="text-gray">Veterinario:</span> <strong>${finca.adsg_veterinario || 'N/D'}</strong></div>
+            <div><span class="text-gray">Nº Colegiado:</span> <strong>${finca.adsg_vet_colegiado || 'N/D'}</strong></div>
           </div>
           <!-- Datos del Paquete Lácteo Regulador -->
           <div class="card p-10 bg-black border-272 text-sm mt-5" style="border-left: 3px solid var(--c-info);">
             <div class="text-white font-900 text-xs mb-6 uppercase flex items-center gap-4">${Icons.leche()} Regulaciones Paquete Lácteo (INFOLAC)</div>
             <div class="grid grid-cols-2 gap-6 text-[0.72rem]">
-              <div><span class="text-gray">Nº Contrato Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_numero || 'CT-2026-002'}</strong></div>
-              <div><span class="text-gray">Vencimiento Contrato:</span> <strong class="text-white">${finca.contrato_lacteo_fecha_fin || '2027-12-31'}</strong></div>
-              <div><span class="text-gray">Comprador Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_comprador || 'Lácteos La Serena SA'}</strong></div>
-              <div><span class="text-gray">Nº INFOLAC:</span> <strong class="text-white">${finca.numero_infolac || 'INF-21005-901'}</strong></div>
+              <div><span class="text-gray">Nº Contrato Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_numero || 'N/D'}</strong></div>
+              <div><span class="text-gray">Vencimiento Contrato:</span> <strong class="text-white">${finca.contrato_lacteo_fecha_fin || 'N/D'}</strong></div>
+              <div><span class="text-gray">Comprador Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_comprador || 'N/D'}</strong></div>
+              <div><span class="text-gray">Nº INFOLAC:</span> <strong class="text-white">${finca.numero_infolac || 'N/D'}</strong></div>
             </div>
           </div>
         </div>
@@ -1595,7 +1595,7 @@ const InformesView = {
             <div><span class="text-gray">Propietario:</span> <strong>${finca.propietario || 'N/D'}</strong></div>
             <div><span class="text-gray">NIF/CIF:</span> <strong>${finca.nif_cif || 'N/D'}</strong></div>
             <div><span class="text-gray">Dirección:</span> <strong>${finca.direccion || 'N/D'}</strong></div>
-            <div><span class="text-gray">Clasif. Zootécnica:</span> <strong>${finca.tipo_explotacion || 'Mixto'} (${finca.sistema_explotacion || 'Semiextensivo'})</strong></div>
+            <div><span class="text-gray">Clasif. Zootécnica:</span> <strong>${finca.tipo_explotacion || 'N/D'} (${finca.sistema_explotacion || 'N/D'})</strong></div>
             <div><span class="text-gray">Comunidad Autónoma:</span> <strong class="uppercase">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</strong></div>
             <div><span class="text-gray">Municipio:</span> <strong>${finca.municipio || 'N/D'}</strong></div>
             <div><span class="text-gray">Provincia:</span> <strong>${finca.provincia || 'N/D'}</strong></div>
@@ -1603,11 +1603,11 @@ const InformesView = {
             <div><span class="text-gray">Email:</span> <strong>${finca.email || 'N/D'}</strong></div>
           </div>
           <div class="border-top-222 mt-10 pt-10 grid grid-cols-2 gap-8 text-sm">
-            <div><span class="text-gray">ADSG Asociada:</span> <strong class="text-amber">${finca.adsg_nombre || finca.adsg || 'El Condado (ADSG-AN-21005)'}</strong></div>
-            <div><span class="text-gray">Cód. ADSG:</span> <strong>${finca.adsg_codigo || 'ADSG-AN-21005'}</strong></div>
-            <div><span class="text-gray">Vet. Responsable:</span> <strong>${finca.adsg_veterinario || 'Dr. Manuel Ortiz'}</strong></div>
-            <div><span class="text-gray">Col. Veterinario:</span> <strong>${finca.adsg_vet_colegiado || '21/1045'}</strong></div>
-            <div><span class="text-gray">NIF Veterinario:</span> <strong>${finca.adsg_vet_nif || '29875412A'}</strong></div>
+            <div><span class="text-gray">ADSG Asociada:</span> <strong class="text-amber">${finca.adsg_nombre || finca.adsg || 'N/D'}</strong></div>
+            <div><span class="text-gray">Cód. ADSG:</span> <strong>${finca.adsg_codigo || 'N/D'}</strong></div>
+            <div><span class="text-gray">Vet. Responsable:</span> <strong>${finca.adsg_veterinario || 'N/D'}</strong></div>
+            <div><span class="text-gray">Col. Veterinario:</span> <strong>${finca.adsg_vet_colegiado || 'N/D'}</strong></div>
+            <div><span class="text-gray">NIF Veterinario:</span> <strong>${finca.adsg_vet_nif || 'N/D'}</strong></div>
           </div>
         </div>
 
@@ -1998,7 +1998,7 @@ const InformesView = {
               <span class="text-xl text-blue font-950">${InformesView._fmt(superficieTotal, 1)} ha</span>
             </div>
             <div class="info-box-center py-6">
-              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Aforo Max</small>
+              <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Aforo Máx.</small>
               <span class="text-xl text-green font-950">${data.totalAforo}</span>
             </div>
             <div class="info-box-center py-6">
@@ -2012,12 +2012,12 @@ const InformesView = {
           </div>
         </div>
         ${data.numAlertas > 0 ? `<div class="card card-tint-red mb-14 p-12">
-          <div class="flex items-center gap-8"><span class="text-xl">${Icons.alerta()}</span><div><strong class="text-red">${data.numAlertas} alertas</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
+          <div class="flex items-center gap-8"><span class="text-xl">${Icons.alerta()}</span><div><strong class="text-red">${data.numAlertas} ${data.numAlertas === 1 ? 'alerta' : 'alertas'}</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
         </div>` : ''}
         ${data.porZona.length > 0 ? `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table inf-table-sm tbl-accent-amber">
-            <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo Max</th><th class="text-center">Ocupación</th><th class="text-center">Carga UGM/ha</th><th class="text-center">%</th><th>Estado</th></tr></thead>
+            <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo Máx.</th><th class="text-center">Ocupación</th><th class="text-center">Carga UGM/ha</th><th class="text-center">%</th><th>Estado</th></tr></thead>
             <tbody>${data.porZona.map(z => {
               const capUgm = Number(z.superficie) > 0 ? InformesView._fmt((z.ocupacion / z.superficie), 2) : '0,00';
               return `
