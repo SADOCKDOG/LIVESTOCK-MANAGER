@@ -244,7 +244,7 @@ const InformesView = {
         this._obtenerDatosPorFinca(fId),
         this._obtenerVentasPorRebano(fId),
         this._obtenerLechePorRebano(fId),
-        Analitica.obtenerCuentaResultados(fId).catch(() => ({ porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0.0' })),
+        Analitica.obtenerCuentaResultados(fId).catch(() => ({ porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0,0' })),
         Analitica.obtenerCosteProduccionDiario(fId).catch(() => ({ porRebano: [], totalGasto: 0, totalAnimales: 0, costeMedioCabeza: 0, costeMedioDia: 0 })),
         Analitica.obtenerRotacionCenso(fId).catch(() => ({ ultimos90: {}, ultimos30: {}, totalAnimales: 0, activos: 0, tasaReposicion: '0%', tasaBajas: '0%', periodo: '90 días' })),
         Analitica.obtenerCargasAforos(fId).catch(() => ({ porZona: [], totalAforo: 0, totalOcupacion: 0, pctGlobal: '0', alertas: [], numAlertas: 0, numZonas: 0 })),
@@ -358,7 +358,7 @@ const InformesView = {
   _renderGeneral(content, d) {
     const { rent, censo, kpisRepro, estadisticasSanidad, lecheStats, margenA } = d;
     const balanceTotal = rent?.balance || 0;
-    const pctRent = rent?.ingresos > 0 ? ((balanceTotal / rent.ingresos) * 100).toFixed(1) : '0.0';
+    const pctRent = rent?.ingresos > 0 ? InformesView._fmt(((balanceTotal / rent.ingresos) * 100), 1) : '0,0';
     const totalAnimales = censo.reduce((s, r) => s + r.total, 0);
     const alertas = estadisticasSanidad?.retencionesActivas > 0;
 
@@ -524,15 +524,15 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">kg Totales</small>
-              <span class="text-xl text-green font-950">${kgTotal.toFixed(1)} kg</span>
+              <span class="text-xl text-green font-950">${InformesView._fmt(kgTotal, 1)} kg</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Precio Medio kg</small>
-              <span class="text-xl text-violet font-950">${precioMedioKg.toFixed(2)}€/kg</span>
+              <span class="text-xl text-violet font-950">${InformesView._fmt(precioMedioKg, 2)}€/kg</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Peso Medio Sacrif.</small>
-              <span class="text-xl text-gold font-950">${ventasHist.length > 0 ? (kgTotal / ventasHist.reduce((s, v) => s + (v.animales || 1), 0)).toFixed(1) + ' kg' : '—'}</span>
+              <span class="text-xl text-gold font-950">${ventasHist.length > 0 ? InformesView._fmt((kgTotal / ventasHist.reduce((s, v) => s + (v.animales || 1), 0)), 1) + ' kg' : '—'}</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">GMD Media Global</small>
@@ -567,7 +567,7 @@ const InformesView = {
               <span class="text-aaa text-sm">${Icons.rebanos()} ${r.rebano}</span>
               <div class="text-right">
                 <span class="text-amber font-800">${r.total.toLocaleString()}€</span>
-                <span class="text-gray text-xs ml-6">${r.kg.toFixed(1)} kg</span>
+                <span class="text-gray text-xs ml-6">${InformesView._fmt(r.kg, 1)} kg</span>
                 <span class="text-blue text-xs ml-6">${r.numVentas} ventas</span>
               </div>
             </div>`).join('')}
@@ -600,7 +600,7 @@ const InformesView = {
     // MOFA
     const mofaTotal = rawLeche.reduce((s, e) => s + (e.mofa || 0), 0);
     const importeTotal = rawLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
-    const mofaRatio = importeTotal > 0 ? ((mofaTotal / importeTotal) * 100).toFixed(1) : 0;
+    const mofaRatio = importeTotal > 0 ? InformesView._fmt(((mofaTotal / importeTotal) * 100), 1) : 0;
     // Umbrales de calidad
     const umbrales = window.ComunidadesService?.CALIDAD_LECHE_OVINO_UMBRALES || null;
     const semaforo = (valor, min, max) => {
@@ -651,23 +651,23 @@ const InformesView = {
           <div class="grid grid-cols-2 gap-8">
             <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
               <small class="s-lbl uppercase font-900">GRASA</small>
-              <div class="inf-val-md font-950" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${grasaMedia.toFixed(2)}%</div>
+              <div class="inf-val-md font-950" style="color:${semaforo(grasaMedia, umbrales?.grasa?.min, null)}">${InformesView._fmt(grasaMedia, 2)}%</div>
               ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.grasa.min}%</small>` : ''}
             </div>
             <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(protMedia, umbrales?.proteina?.min, null)};">
               <small class="s-lbl uppercase font-900">PROTEÍNA</small>
-              <div class="inf-val-md font-950" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${protMedia.toFixed(2)}%</div>
+              <div class="inf-val-md font-950" style="color:${semaforo(protMedia, umbrales?.proteina?.min, null)}">${InformesView._fmt(protMedia, 2)}%</div>
               ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.proteina.min}%</small>` : ''}
             </div>
             <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(esMedia, umbrales?.extracto_seco?.min, null)};">
               <small class="s-lbl uppercase font-900">EXTRACTO SECO</small>
-              <div class="inf-val-md font-950" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${esMedia.toFixed(2)}%</div>
+              <div class="inf-val-md font-950" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${InformesView._fmt(esMedia, 2)}%</div>
               ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
             </div>
             <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
               <small class="s-lbl uppercase font-900">CÉL. SOMÁTICAS</small>
               <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}</div>
-              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≤${(umbrales.somaticas.max / 1000).toFixed(0)}k</small>` : ''}
+              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≤${InformesView._fmt((umbrales.somaticas.max / 1000), 0)}k</small>` : ''}
             </div>
           </div>
         </div>` : ''}
@@ -709,7 +709,7 @@ const InformesView = {
     });
     const abortos = (eventos || []).filter(e => e.motivo_tarea === 'aborto').length;
     const totalEventos = partos.length + abortos;
-    const tasaAbortos = totalEventos > 0 ? ((abortos / totalEventos) * 100).toFixed(1) : 0;
+    const tasaAbortos = totalEventos > 0 ? InformesView._fmt(((abortos / totalEventos) * 100), 1) : 0;
 
     content.innerHTML = this._sectionActionsHTML('reproductivo', 'Reproductivo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
@@ -749,7 +749,7 @@ const InformesView = {
               <small class="s-lbl">${trim}</small>
               <div class="flex items-center gap-6">
                 <strong class="text-white text-md font-900">${count}</strong>
-                <span class="text-gray text-[0.6rem] font-800">(${((count / partos.length) * 100).toFixed(0)}%)</span>
+                <span class="text-gray text-[0.6rem] font-800">(${InformesView._fmt(((count / partos.length) * 100), 0)}%)</span>
               </div>
             </div>`).join('')}
         </div>` : ''}
@@ -800,7 +800,7 @@ const InformesView = {
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-xs text-gray uppercase font-900">Coste Sanitario / Animal</span>
-              <strong class="text-xl font-950 ${costeSanitarioAnimal > 0 ? 'text-amber' : 'text-gray'}">${costeSanitarioAnimal > 0 ? costeSanitarioAnimal.toFixed(2) + ' €' : '—'}</strong>
+              <strong class="text-xl font-950 ${costeSanitarioAnimal > 0 ? 'text-amber' : 'text-gray'}">${costeSanitarioAnimal > 0 ? InformesView._fmt(costeSanitarioAnimal, 2) + ' €' : '—'}</strong>
             </div>
           </div>
         </div>
@@ -901,7 +901,7 @@ const InformesView = {
               <small class="s-lbl">${cat}</small>
               <div class="flex flex-col items-center">
                 <strong class="text-xl text-white font-950">${cnt}</strong>
-                <span class="text-gray text-[0.6rem] font-800 uppercase tracking-wider">${((cnt / animales.length) * 100).toFixed(1)}%</span>
+                <span class="text-gray text-[0.6rem] font-800 uppercase tracking-wider">${InformesView._fmt(((cnt / animales.length) * 100), 1)}%</span>
               </div>
             </div>`).join('')}
         </div>` : '';
@@ -943,7 +943,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Peso Total (kg)</small>
-              <span class="text-xl text-green font-950">${totalKg.toFixed(1)}</span>
+              <span class="text-xl text-green font-950">${InformesView._fmt(totalKg, 1)}</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Importe Total</small>
@@ -975,7 +975,7 @@ const InformesView = {
                 const tieneDimoe = (docsLegales || []).some(d => d.tipo === 'dimoe' && Number(d.ventaId) === Number(v.id));
                 const kg = v.pesoCanal || v.pesoVivo || 0;
                 const base = (v.precio_total || 0) - (v.importe_iva || 0);
-                const precioKg = kg > 0 ? (base / kg).toFixed(2) : '0.00';
+                const precioKg = kg > 0 ? InformesView._fmt((base / kg), 2) : '0,00';
                 const irpf = v.importe_retencion || 0;
                 const neto = (v.precio_total || 0) - irpf;
                 return `<tr>
@@ -983,12 +983,12 @@ const InformesView = {
                   <td><strong>${v.numero_albaran || '-'}</strong></td>
                   <td>${v.razonSocial || v.nombreComprador || '-'}</td>
                   <td>${v.nifComprador || v.nif || '-'}</td>
-                  <td class="text-right">${kg.toFixed(1)}</td>
+                  <td class="text-right">${InformesView._fmt(kg, 1)}</td>
                   <td class="text-right font-bold text-gray">${precioKg} €/kg</td>
-                  <td class="text-right">${base.toFixed(2)}€</td>
-                  <td class="text-right text-blue">${(v.importe_iva || 0).toFixed(2)}€</td>
-                  <td class="text-right text-red">${irpf.toFixed(2)}€</td>
-                  <td class="text-right font-bold text-green">${neto.toFixed(2)}€</td>
+                  <td class="text-right">${InformesView._fmt(base, 2)}€</td>
+                  <td class="text-right text-blue">${InformesView._fmt((v.importe_iva || 0), 2)}€</td>
+                  <td class="text-right text-red">${InformesView._fmt(irpf, 2)}€</td>
+                  <td class="text-right font-bold text-green">${InformesView._fmt(neto, 2)}€</td>
                   <td class="text-center">${tieneDimoe ? '${Icons.check()} DIMOE' : '${Icons.check()} SIGGAN'}</td>
                 </tr>`;
               }).join('')}
@@ -996,12 +996,12 @@ const InformesView = {
             <tfoot>
               <tr>
                 <td colspan="4" class="text-right text-gray">TOTALES</td>
-                <td class="text-right font-bold">${totalKg.toFixed(1)}</td>
+                <td class="text-right font-bold">${InformesView._fmt(totalKg, 1)}</td>
                 <td class="text-right font-bold text-gray">—</td>
-                <td class="text-right font-bold">${(totalImporte - totalIVA).toFixed(2)}€</td>
-                <td class="text-right font-bold text-blue">${totalIVA.toFixed(2)}€</td>
-                <td class="text-right font-bold text-red">${totalRetencion.toFixed(2)}€</td>
-                <td class="text-right font-bold text-green">${(totalImporte - totalRetencion).toFixed(2)}€</td>
+                <td class="text-right font-bold">${InformesView._fmt((totalImporte - totalIVA), 2)}€</td>
+                <td class="text-right font-bold text-blue">${InformesView._fmt(totalIVA, 2)}€</td>
+                <td class="text-right font-bold text-red">${InformesView._fmt(totalRetencion, 2)}€</td>
+                <td class="text-right font-bold text-green">${InformesView._fmt((totalImporte - totalRetencion), 2)}€</td>
                 <td class="text-center">—</td>
               </tr>
             </tfoot>
@@ -1032,9 +1032,9 @@ const InformesView = {
                 <tr>
                   <td><strong>${c.nombre}</strong></td>
                   <td class="text-center">${c.num}</td>
-                  <td class="text-right">${c.kg.toFixed(1)}</td>
+                  <td class="text-right">${InformesView._fmt(c.kg, 1)}</td>
                   <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
-                  <td class="text-right font-bold text-green">${c.precioMedio.toFixed(2)}€</td>
+                  <td class="text-right font-bold text-green">${InformesView._fmt(c.precioMedio, 2)}€</td>
                 </tr>`).join('')}
               </tbody>
             </table>
@@ -1074,7 +1074,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">kg Totales</small>
-              <span class="text-xl text-purple font-950">${totalKg.toFixed(1)}</span>
+              <span class="text-xl text-purple font-950">${InformesView._fmt(totalKg, 1)}</span>
             </div>
           </div>
         </div>
@@ -1102,15 +1102,15 @@ const InformesView = {
               <th>Última Venta</th>
             </tr></thead>
             <tbody>${data.map(c => {
-              const precioMedio = c.kg > 0 ? (c.total / c.kg).toFixed(2) : '0.00';
-              const pctIngresos = totalIngresos > 0 ? ((c.total / totalIngresos) * 100).toFixed(1) : '0.0';
+              const precioMedio = c.kg > 0 ? InformesView._fmt((c.total / c.kg), 2) : '0,00';
+              const pctIngresos = totalIngresos > 0 ? InformesView._fmt(((c.total / totalIngresos) * 100), 1) : '0,0';
               const tieneContrato = c.total > 0;
               return `<tr>
                 <td><strong>${c.nombre}</strong></td>
                 <td class="text-gray text-xs">${c.nif || '-'}</td>
                 <td><span class="badge badge-sm ${c.tipo === 'cárnico' ? 'badge-amber' : (c.tipo === 'lácteo' || c.tipo === 'láctico') ? 'badge-gold' : 'badge-blue'}">${c.tipo || 'mixto'}</span></td>
                 <td class="text-right">${c.numVentas}</td>
-                <td class="text-right">${c.kg.toFixed(1)}</td>
+                <td class="text-right">${InformesView._fmt(c.kg, 1)}</td>
                 <td class="text-right font-bold text-gray">${precioMedio} €/kg</td>
                 <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
                 <td class="text-center font-bold text-green">${pctIngresos}%</td>
@@ -1121,7 +1121,7 @@ const InformesView = {
             <tfoot><tr>
               <td colspan="3" class="text-right text-gray">TOTALES</td>
               <td class="text-right font-bold">${totalVentas}</td>
-              <td class="text-right font-bold">${totalKg.toFixed(1)}</td>
+              <td class="text-right font-bold">${InformesView._fmt(totalKg, 1)}</td>
               <td class="text-right font-bold text-gray">—</td>
               <td class="text-right font-bold text-amber">${totalIngresos.toLocaleString()}€</td>
               <td class="text-center font-bold text-green">100%</td>
@@ -1218,8 +1218,8 @@ const InformesView = {
             </tr></thead>
             <tbody>${data.map(p => {
               const cats = Object.entries(p.categorias).sort((a, b) => b[1] - a[1]).slice(0, 3);
-              const pct = totalGasto > 0 ? ((p.total / totalGasto) * 100).toFixed(1) : '0.0';
-              const mediaFac = p.numFacturas > 0 ? (p.total / p.numFacturas).toFixed(2) : '0.00';
+              const pct = totalGasto > 0 ? InformesView._fmt(((p.total / totalGasto) * 100), 1) : '0,0';
+              const mediaFac = p.numFacturas > 0 ? InformesView._fmt((p.total / p.numFacturas), 2) : '0,00';
               return `<tr>
                 <td><strong>${p.nombre}</strong></td>
                 <td class="text-gray text-xs">${p.nif || '-'}</td>
@@ -1297,7 +1297,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Media/Op</small>
-              <span class="font-950 text-purple" style="font-size:1.1rem;">${data.mediaPorOperacion.toFixed(2)}€</span>
+              <span class="font-950 text-purple" style="font-size:1.1rem;">${InformesView._fmt(data.mediaPorOperacion, 2)}€</span>
             </div>
           </div>
         </div>
@@ -1752,7 +1752,7 @@ const InformesView = {
   /** PyG: Cuenta de Resultados mensual */
   _renderPyG(content, d) {
     const { pygData, rent, todosGastos, entregasLeche, ventasCarne } = d;
-    const data = pygData || { porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0.0' };
+    const data = pygData || { porMes: [], totalIngresos: 0, totalGastos: 0, totalBalance: 0, gastosPorCategoria: [], numMeses: 0, rentabilidad: '0,0' };
     
     // Cálculos financieros precisos
     const ingLeche = (entregasLeche || []).reduce((s, e) => s + (e.importe_total || (e.cantidad || 0) * (e.precioBase || 0)), 0);
@@ -1767,7 +1767,7 @@ const InformesView = {
     const gastosAmort = (todosGastos || []).filter(g => (g.categoria || '').toLowerCase().includes('amort')).reduce((s, g) => s + (g.monto || 0), 0);
     const totalGastosCalculado = (todosGastos || []).reduce((s, g) => s + (g.monto || 0), 0) || data.totalGastos;
     const balanceTotal = totalIngresosCalculado - totalGastosCalculado;
-    const rentabilidadCalculada = totalIngresosCalculado > 0 ? ((balanceTotal / totalIngresosCalculado) * 100).toFixed(1) : '0.0';
+    const rentabilidadCalculada = totalIngresosCalculado > 0 ? InformesView._fmt(((balanceTotal / totalIngresosCalculado) * 100), 1) : '0,0';
 
     content.innerHTML = this._sectionActionsHTML('pyg', 'PyG') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
@@ -1808,13 +1808,13 @@ const InformesView = {
                 <td style="width:24px;">${Icons.leche()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;"><strong>Ingresos por Venta de Leche (Entregas Lácteas)</strong></td>
                 <td class="text-right text-green" style="white-space:nowrap;">${ingLeche.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingLeche / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? InformesView._fmt(((ingLeche / totalIngresosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.carne()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;"><strong>Ingresos por Venta de Ganado (Canal / Vivo)</strong></td>
                 <td class="text-right text-green" style="white-space:nowrap;">${ingCarne.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? ((ingCarne / totalIngresosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? InformesView._fmt(((ingCarne / totalIngresosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
                 <td colspan="2">TOTAL INGRESOS BRUTOS</td>
@@ -1835,37 +1835,37 @@ const InformesView = {
                 <td>${Icons.pac()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos en Alimentación (Piensos, Forrajes, Ración)</td>
                 <td class="text-right text-red" style="white-space:nowrap;">${gastosAlim.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAlim / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosAlim / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.fitosanitario()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos Fitosanitarios (Tratamientos parcelas, herbicidas)</td>
                 <td class="text-right text-red" style="white-space:nowrap;">${gastosFito.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosFito / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosFito / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.sanidad()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos de Sanidad Ganadera (Medicamentos, ADSG, vacunas)</td>
                 <td class="text-right text-red" style="white-space:nowrap;">${gastosSanidad.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosSanidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosSanidad / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.rayo()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos en Electricidad y Suministros (Energía, Gasoil)</td>
                 <td class="text-right text-red" style="white-space:nowrap;">${gastosElectricidad.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosElectricidad / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosElectricidad / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.finca()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos de Personal (Mano de obra, seguridad social)</td>
                 <td class="text-right text-red" style="white-space:nowrap;">${gastosPersonal.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosPersonal / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosPersonal / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.edificio()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Amortizaciones (Instalaciones, maquinaria, cercados)</td>
                 <td class="text-right text-red" style="white-space:nowrap;">${gastosAmort.toLocaleString()}€</td>
-                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? ((gastosAmort / totalGastosCalculado) * 100).toFixed(1) : 0}%</td>
+                <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosAmort / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
                 <td colspan="2">TOTAL GASTOS OPERATIVOS</td>
@@ -1986,7 +1986,7 @@ const InformesView = {
     // Calcular superficie total pastable y UGM globales
     const superficieTotal = data.porZona.reduce((sum, z) => sum + (Number(z.superficie) || 0), 0);
     const ugmGlobal = data.totalOcupacion; // simplificado: 1 vaca = 1 UGM
-    const cargaGlobal = superficieTotal > 0 ? (ugmGlobal / superficieTotal).toFixed(2) : '0.00';
+    const cargaGlobal = superficieTotal > 0 ? InformesView._fmt((ugmGlobal / superficieTotal), 2) : '0,00';
 
     content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
@@ -1995,7 +1995,7 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Sup. Pastos</small>
-              <span class="text-xl text-blue font-950">${superficieTotal.toFixed(1)} ha</span>
+              <span class="text-xl text-blue font-950">${InformesView._fmt(superficieTotal, 1)} ha</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Aforo Max</small>
@@ -2019,7 +2019,7 @@ const InformesView = {
           <table class="inf-table inf-table-sm tbl-accent-amber">
             <thead><tr><th>Zona</th><th class="text-center">Superficie</th><th class="text-center">Aforo Max</th><th class="text-center">Ocupación</th><th class="text-center">Carga UGM/ha</th><th class="text-center">%</th><th>Estado</th></tr></thead>
             <tbody>${data.porZona.map(z => {
-              const capUgm = Number(z.superficie) > 0 ? (z.ocupacion / z.superficie).toFixed(2) : '0.00';
+              const capUgm = Number(z.superficie) > 0 ? InformesView._fmt((z.ocupacion / z.superficie), 2) : '0,00';
               return `
               <tr>
                 <td><strong>${z.nombre}</strong>${z.especie ? `<br><span class="text-gray text-xs">${z.especie}</span>` : ''}</td>
@@ -2192,11 +2192,11 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">kg Total</small>
-              <span class="font-950 text-amber" style="font-size:1.1rem;">${data.totalKg.toFixed(1)}</span>
+              <span class="font-950 text-amber" style="font-size:1.1rem;">${InformesView._fmt(data.totalKg, 1)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Litros Total</small>
-              <span class="font-950 text-gold" style="font-size:1.1rem;">${data.totalLitros.toFixed(1)}</span>
+              <span class="font-950 text-gold" style="font-size:1.1rem;">${InformesView._fmt(data.totalLitros, 1)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta kg</small>
@@ -2225,10 +2225,10 @@ const InformesView = {
             <tbody>${data.porMes.map(m => `
               <tr>
                 <td><strong>${m.mes}</strong></td>
-                <td class="text-right text-amber">${m.kg.toFixed(1)}</td>
-                <td class="text-right text-gold">${m.litros.toFixed(1)}</td>
-                <td class="text-right font-bold">${m.kgAcum.toFixed(1)}</td>
-                <td class="text-right font-bold">${m.litrosAcum.toFixed(1)}</td>
+                <td class="text-right text-amber">${InformesView._fmt(m.kg, 1)}</td>
+                <td class="text-right text-gold">${InformesView._fmt(m.litros, 1)}</td>
+                <td class="text-right font-bold">${InformesView._fmt(m.kgAcum, 1)}</td>
+                <td class="text-right font-bold">${InformesView._fmt(m.litrosAcum, 1)}</td>
                 <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
               </tr>`).join('')}</tbody>
           </table>
@@ -2337,7 +2337,7 @@ const InformesView = {
           <table class="inf-table inf-table-sm tbl-accent-green">
             <thead><tr><th>Año</th><th>Concepto</th><th>Régimen</th><th class="text-right">Solicitado</th><th class="text-right">Cobrado</th><th class="text-center">Estado</th></tr></thead>
             <tbody>${data.registros.map(r => {
-              const pct = r.importe_solicitado > 0 ? ((r.importe_cobrado || 0) / r.importe_solicitado * 100).toFixed(0) : 0;
+              const pct = r.importe_solicitado > 0 ? InformesView._fmt(((r.importe_cobrado || 0) / r.importe_solicitado * 100), 0) : 0;
               const est = pct >= 100 ? `${Icons.check()} COBRADO` : pct > 0 ? `${Icons.rotacion()} PARCIAL` : `${Icons.calendar()} PENDIENTE`;
               return `<tr>
                 <td class="font-900">${r.anio || '-'}</td>
@@ -3272,17 +3272,17 @@ const InformesView = {
           <tr><td class="pdf-td4">${v.fechaSacrificio || v.fecha_emision || '-'}</td>
           <td class="pdf-td4">${v.numero_albaran || '-'}</td>
           <td class="pdf-td4">${v.razonSocial || v.nombreComprador || '-'}</td>
-          <td class="pdf-td4 pdf-r">${(v.pesoCanal || v.pesoVivo || 0).toFixed(1)}</td>
-          <td class="pdf-td4 pdf-r">${((v.precio_total || 0) - (v.importe_iva || 0)).toFixed(2)}€</td>
-          <td class="pdf-td4 pdf-r">${(v.importe_iva || 0).toFixed(2)}€</td>
-          <td class="pdf-td4 pdf-r pdf-b">${(v.precio_total || 0).toFixed(2)}€</td>
+          <td class="pdf-td4 pdf-r">${InformesView._fmt((v.pesoCanal || v.pesoVivo || 0), 1)}</td>
+          <td class="pdf-td4 pdf-r">${InformesView._fmt(((v.precio_total || 0) - (v.importe_iva || 0)), 2)}€</td>
+          <td class="pdf-td4 pdf-r">${InformesView._fmt((v.importe_iva || 0), 2)}€</td>
+          <td class="pdf-td4 pdf-r pdf-b">${InformesView._fmt((v.precio_total || 0), 2)}€</td>
         </tr>`).join('')}</tbody>
         <tfoot><tr class="pdf-bg1">
           <td colspan="3" class="pdf-big pdf-r pdf-b">TOTALES</td>
-          <td class="pdf-big pdf-r pdf-b">${totalKg.toFixed(1)}</td>
-          <td class="pdf-big pdf-r pdf-b">${(totalImporte - totalIVA).toFixed(2)}€</td>
-          <td class="pdf-big pdf-r pdf-b">${totalIVA.toFixed(2)}€</td>
-          <td class="pdf-big pdf-r pdf-b pdf-base">${totalImporte.toFixed(2)}€</td>
+          <td class="pdf-big pdf-r pdf-b">${InformesView._fmt(totalKg, 1)}</td>
+          <td class="pdf-big pdf-r pdf-b">${InformesView._fmt((totalImporte - totalIVA), 2)}€</td>
+          <td class="pdf-big pdf-r pdf-b">${InformesView._fmt(totalIVA, 2)}€</td>
+          <td class="pdf-big pdf-r pdf-b pdf-base">${InformesView._fmt(totalImporte, 2)}€</td>
         </tr></tfoot>
       </table>
     `;
@@ -3377,13 +3377,13 @@ const InformesView = {
           <tr><td class="pdf-td4"><strong>${c.nombre}</strong></td>
           <td class="pdf-td4">${c.nif || '-'}</td>
           <td class="pdf-td4 pdf-c">${c.numVentas}</td>
-          <td class="pdf-td4 pdf-r">${c.kg.toFixed(1)}</td>
+          <td class="pdf-td4 pdf-r">${InformesView._fmt(c.kg, 1)}</td>
           <td class="pdf-td4 pdf-r pdf-b">${c.total.toLocaleString()}€</td>
         </tr>`).join('')}</tbody>
         <tfoot><tr class="pdf-bg1">
           <td colspan="2" class="pdf-big pdf-r pdf-b">TOTALES</td>
           <td class="pdf-big pdf-c pdf-b">${data.reduce((s, c) => s + c.numVentas, 0)}</td>
-          <td class="pdf-big pdf-r pdf-b">${totalKg.toFixed(1)}</td>
+          <td class="pdf-big pdf-r pdf-b">${InformesView._fmt(totalKg, 1)}</td>
           <td class="pdf-big pdf-r pdf-b pdf-base">${totalIngresos.toLocaleString()}€</td>
         </tr></tfoot>
       </table>
@@ -3522,7 +3522,7 @@ const InformesView = {
       <h4 class="pdf-sec4" style="color:#ef4444;">Gastos por Categoría</h4>
       <table class="pdf-tbl pdf-tbl-sm">
         <thead><tr class="pdf-bg0"><th class="pdf-th-sm">Categoría</th><th class="pdf-th-sm pdf-r">Total</th><th class="pdf-th-sm pdf-r">%</th></tr></thead>
-        <tbody>${pygData.gastosPorCategoria.map(g => `<tr><td class="pdf-td">${g.categoria}</td><td class="pdf-td pdf-r">${g.total.toLocaleString()}€</td><td class="pdf-td pdf-r">${pygData.totalGastos > 0 ? ((g.total / pygData.totalGastos) * 100).toFixed(1) : 0}%</td></tr>`).join('')}</tbody>
+        <tbody>${pygData.gastosPorCategoria.map(g => `<tr><td class="pdf-td">${g.categoria}</td><td class="pdf-td pdf-r">${g.total.toLocaleString()}€</td><td class="pdf-td pdf-r">${pygData.totalGastos > 0 ? InformesView._fmt(((g.total / pygData.totalGastos) * 100), 1) : 0}%</td></tr>`).join('')}</tbody>
       </table>` : ''}
     `;
   },
