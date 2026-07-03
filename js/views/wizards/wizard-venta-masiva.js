@@ -137,7 +137,7 @@ window.VentaMasivaWizard = {
                 <tr class="tr-blocked border-bottom-222">
                     <td class="text-center p-14"><input type="checkbox" disabled class="checkbox-lg opacity-20"></td>
                     <td class="font-900 p-14 uppercase text-white">${animal.numero_identificacion}</td>
-                    <td class="p-14 text-aaa uppercase font-800">${animal.raza}</td>
+                    <td class="p-14 text-aaa uppercase font-800">${animal.raza || '—'}</td>
                     <td class="text-red font-950 p-14 uppercase text-[0.6rem] tracking-tight">${motivos.join(' | ')}</td>
                 </tr>`;
               } else {
@@ -145,7 +145,7 @@ window.VentaMasivaWizard = {
                 <tr class="tr-active border-bottom-222">
                     <td class="text-center p-14"><input type="checkbox" name="animal-select" value="${animal.id}" ${data.seleccionados?.includes(animal.id) ? "checked" : ""} class="batch-animal-chk checkbox-lg cursor-pointer"></td>
                     <td class="text-gold font-950 p-14 uppercase">${animal.numero_identificacion}</td>
-                    <td class="p-14 text-white uppercase font-800">${animal.raza}</td>
+                    <td class="p-14 text-white uppercase font-800">${animal.raza || '—'}</td>
                     <td class="text-green font-950 p-14 uppercase text-[0.6rem] tracking-tight">APTO</td>
                 </tr>`;
               }
@@ -277,7 +277,7 @@ window.VentaMasivaWizard = {
         },
         validate: async (data) => {
           if (data.pCanal >= data.pVivo && data.pVivo > 0) {
-            App.toastError("Regla 3: Peso Canal no puede ser >= Peso Vivo.");
+            App.toastError("El peso canal no puede ser mayor o igual que el peso vivo.");
             return false;
           }
           return true;
@@ -768,7 +768,7 @@ window.VentaMasivaWizard = {
             await window.db.put('meta', { key: 'contador_albaran', valor: contador, actualizadoEn: new Date().toISOString() });
           } catch(e) { /* ignore */ }
 
-          App.toast(`Lote de ${N} animales procesado con éxito.`);
+          App.toast(`Lote de ${N} ${N === 1 ? 'animal procesado' : 'animales procesados'} con éxito.`);
 
           // Mostrar albarán
           let facturaGenerada = false;
@@ -779,7 +779,9 @@ window.VentaMasivaWizard = {
           // Generar Factura si hay datos económicos
           try {
             if (primerAlbaran && window.Liquidacion && window.PdfService) {
-              const precioEstimado = finalData.precioUnitario || 5.5;
+              // El wizard no recoge precio unitario en ningún paso: no inventar precio.
+              // Si no hay precio real, se factura a 0 con nota "(precio pendiente de fijar)".
+              const precioEstimado = finalData.precioUnitario || 0;
               const gastosTotal = (finalData.gTrans || 0) + (finalData.gMata || 0);
               const liq = window.Liquidacion.calcular({
                 pesoCanal: finalData.pCanal || 0,
@@ -788,6 +790,9 @@ window.VentaMasivaWizard = {
                 ivaPct: finalData.ivaPct || 10,
                 retencionPct: finalData.retencionPct || 0
               });
+              if (!finalData.precioUnitario && liq && Array.isArray(liq.desglose)) {
+                liq.desglose.unshift({ concepto: 'Precio unitario (precio pendiente de fijar)', cantidad: 0 });
+              }
               let facturaContador = 0;
               try {
                 const metaFact = await window.db.get('meta', 'contador_factura');

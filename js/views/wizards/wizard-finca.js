@@ -175,7 +175,7 @@ window.WizardFinca = {
 
               <hr class="border-333 my-16">
               <div class="bg-darker border-muted rounded p-14">
-                <p class="text-2xs text-gray-500 flex items-center gap-6" class="m-0">
+                <p class="text-2xs text-gray-500 flex items-center gap-6 m-0">
                   ${Icons.info()} <strong>¿No tienes contrato lácteo?</strong> Si produces leche pero no has formalizado contrato,
                   el Paquete Lácteo te obliga a hacerlo. Consulta la guía en Ajustes &gt; Paquete Lácteo.
                 </p>

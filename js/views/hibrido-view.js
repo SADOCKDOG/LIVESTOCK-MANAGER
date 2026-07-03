@@ -224,7 +224,7 @@ const HibridoView = {
                   <span class="badge badge-sm badge-gold" class="block mb-4">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
                 </div>
               </div>
-            </div>`).join('')}
+            </div>`).join('') || `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin rebaños mixtos activos.</span></div>`}
         </div>
       </div>
     `;
@@ -332,10 +332,10 @@ const HibridoView = {
           <strong>${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
           <ul class="mt-4 pl-20 m-0">
             ${d.supresionesCarne.map(s => `
-              <li><span class="sup-badge sup-badge-carne">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes}d</strong> para matadero.</li>
+              <li><span class="sup-badge sup-badge-carne">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> para matadero.</li>
             `).join('')}
             ${d.supresionesLeche.map(s => `
-              <li><span class="sup-badge sup-badge-leche">LECHE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes}d</strong> para ordeño.</li>
+              <li><span class="sup-badge sup-badge-leche">LECHE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — ${typeof s.diasRestantes === 'number' ? `Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> para ordeño.` : '<strong class="text-white">Ordeño prohibido durante el tratamiento.</strong>'}</li>
             `).join('')}
           </ul>
         </div>
@@ -381,7 +381,7 @@ const HibridoView = {
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-6">
                           <span class="text-xl">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento}</h3>
+                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
                         </div>
                         <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
                           <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
@@ -392,7 +392,7 @@ const HibridoView = {
                       <div class="text-right flex-shrink-0 ml-8">
                         ${enSupC ? `<span class="badge badge-sm badge-red block mb-2">SUP. CARNE</span>` : ''}
                         ${enSupL ? `<span class="badge badge-sm badge-blue block">SUP. LECHE</span>` : ''}
-                        ${!enSupC && !enSupL ? `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid var(--c-purple)40;">LIBRE</span>` : ''}
+                        ${!enSupC && !enSupL ? `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">LIBRE</span>` : ''}
                       </div>
                     </div>
                   </div>`;

@@ -87,11 +87,11 @@ const GanaderiaView = {
           </div>
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Animales Activos</span>
-            <strong class="text-xl font-950 text-green">${animalesActivos.length} cabezas</strong>
+            <strong class="text-xl font-950 text-green">${animalesActivos.length} ${animalesActivos.length === 1 ? "cabeza" : "cabezas"}</strong>
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.zonas()} Zonas / Parcelas</span>
-            <strong class="text-xl font-950 text-blue">${zonas.length} parcelas</strong>
+            <strong class="text-xl font-950 text-blue">${zonas.length} ${zonas.length === 1 ? "parcela" : "parcelas"}</strong>
           </div>
         </div>
       </div>
@@ -136,7 +136,7 @@ const GanaderiaView = {
           ${animalesModo.slice(0, 10).map(a => {
               const reb = rebanos.find(r => r.id === a.rebanoId);
               const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
-              const edad = a.fechaNacimiento ? Math.floor((new Date() - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365)) : null;
+              const edad = (a.fecha_nacimiento || a.fechaNacimiento) ? Math.floor((new Date() - new Date(a.fecha_nacimiento || a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365)) : null;
               return `
                 <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:12px; margin:0;">
                   <div class="flex justify-between items-start gap-6">
@@ -147,7 +147,7 @@ const GanaderiaView = {
                       </div>
                       <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
                         <span>${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}</span>
-                        ${edad !== null ? `<span>${edad} años</span>` : ''}
+                        ${edad !== null ? `<span>${edad} ${edad === 1 ? "año" : "años"}</span>` : ''}
                         <span class="flex items-center gap-3">${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}</span>
                       </div>
                     </div>

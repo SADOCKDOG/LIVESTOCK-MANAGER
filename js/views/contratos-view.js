@@ -45,7 +45,7 @@ const ContratosView = {
               <select id="ct-comprador" class="wizard-input wizard-select font-900 uppercase">
                 <option value="">— SELECCIONAR COMPRADOR —</option>
                 ${compradores.map(c =>
-                  `<option value="${c.id}" ${Number(contrato.compradorId) === c.id ? 'selected' : ''}>${c.nombre.toUpperCase()} (${c.tipo_comprador.toUpperCase()})</option>`
+                  `<option value="${c.id}" ${Number(contrato.compradorId) === c.id ? 'selected' : ''}>${c.nombre.toUpperCase()}${c.tipo_comprador ? ' (' + ((c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador)).toUpperCase() + ')' : ''}</option>`
                 ).join('')}
               </select>
             </div>

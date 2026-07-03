@@ -141,7 +141,7 @@ const CuadernoDigitalView = {
       <!-- KPIs -->
       <div class="grid grid-cols-4 gap-6 mb-14">
         <div class="info-box-center border-left-green"><small class="s-lbl">${Icons.rebanos()} CENSO</small><div class="inf-val-lg text-green">${d.totalActivos}</div></div>
-        <div class="info-box-center border-left-blue"><small class="s-lbl">${Icons.reproduccion()} REPROD.</small><div class="inf-val-lg text-blue">${d.partos} partos</div></div>
+        <div class="info-box-center border-left-blue"><small class="s-lbl">${Icons.reproduccion()} REPROD.</small><div class="inf-val-lg text-blue">${d.partos} ${d.partos === 1 ? 'parto' : 'partos'}</div></div>
         <div class="info-box-center border-left-red"><small class="s-lbl">${Icons.sanidad()} SANIDAD</small><div class="inf-val-lg text-red">${d.tratamientosActivos.length} ${d.tratamientosActivos.length === 1 ? "activo" : "activos"}</div></div>
         <div class="info-box-center border-left-amber"><small class="s-lbl">${Icons.comercial()} VENTAS</small><div class="inf-val-lg text-amber">${d.ventasCarne.length + d.ventasLeche.length}</div></div>
       </div>
@@ -187,7 +187,7 @@ const CuadernoDigitalView = {
       <!-- 2. CENSO -->
       <div class="card card-left-blue">
         <h3 class="section-h3 text-blue-400" id="seccion-censo">2. ${Icons.rebanos()} Censo Actual <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
-        <div class="text-3xl font-black text-white mb-10">${d.totalActivos} animales activos</div>
+        <div class="text-3xl font-black text-white mb-10">${d.totalActivos} ${d.totalActivos === 1 ? 'animal activo' : 'animales activos'}</div>
         ${Object.entries(d.censo).length === 0 ? '<p class="empty-state-text mb-0">Sin animales registrados.</p>' : ''}
         ${Object.entries(d.censo).map(([especie, info]) => `
         <div class="rounded-sm p-10 mb-8 bg-dark">
@@ -349,14 +349,14 @@ const CuadernoDigitalView = {
           <div class="rounded-sm p-12 bg-dark">
             <h4 class="text-gold mb-8 text-85 m-0">${Icons.leche()} Leche</h4>
             ${d.ventasLeche.length > 0 ? `
-              <div class="text-white font-black text-lg">${d.ventasLeche.reduce((s, v) => s + (v.litros || v.cantidad || 0), 0).toFixed(0)} L</div>
-              <div class="text-gray text-2xs">${d.ventasLeche.length} entregas</div>
+              <div class="text-white font-black text-lg">${Math.round(d.ventasLeche.reduce((s, v) => s + (v.litros || v.cantidad || 0), 0)).toLocaleString('es-ES')} L</div>
+              <div class="text-gray text-2xs">${d.ventasLeche.length} ${d.ventasLeche.length === 1 ? "entrega" : "entregas"}</div>
             ` : '<div class="empty-state mb-0"><p class="empty-state-text">Sin datos de producción láctea.</p></div>'}
           </div>
           <div class="rounded-sm p-12 bg-dark">
             <h4 class="text-gold mb-8 text-85 m-0">${Icons.carne()} Carne</h4>
             ${d.ventasCarne.length > 0 ? `
-              <div class="text-white font-black text-lg">${d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0).toFixed(0)} kg</div>
+              <div class="text-white font-black text-lg">${Math.round(d.ventasCarne.reduce((s, v) => s + (v.peso_canal || 0), 0)).toLocaleString('es-ES')} kg</div>
               <div class="text-gray text-2xs">${d.ventasCarne.length} ${d.ventasCarne.length === 1 ? "expedición" : "expediciones"}</div>
             ` : '<div class="empty-state mb-0"><p class="empty-state-text">Sin datos de producción cárnica.</p></div>'}
           </div>
@@ -370,13 +370,13 @@ const CuadernoDigitalView = {
           <div class="rounded-sm p-12 bg-dark">
             <div class="text-gray text-2xs">Ingresos Carne</div>
             <div class="text-xl font-black text-green">
-              ${d.ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0).toFixed(2)} €
+              ${d.ventasCarne.reduce((s, v) => s + (v.precio_total || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
             </div>
           </div>
           <div class="rounded-sm p-12 bg-dark">
             <div class="text-gray text-2xs">Ingresos Leche</div>
             <div class="text-xl font-black text-green">
-              ${d.ventasLeche.reduce((s, v) => s + (v.precio_total || v.importe || 0), 0).toFixed(2)} €
+              ${d.ventasLeche.reduce((s, v) => s + (v.precio_total || v.importe || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
             </div>
           </div>
         </div>
@@ -833,14 +833,14 @@ const CuadernoDigitalView = {
 
     <h2>9. Producción</h2>
     <div class="grid2">
-      <div class="stat-box"><div class="stat-num">${totalLeche.toFixed(0)} L</div><div class="stat-label">Leche total</div></div>
-      <div class="stat-box"><div class="stat-num">${totalCarneKg.toFixed(0)} kg</div><div class="stat-label">Carne (peso canal)</div></div>
+      <div class="stat-box"><div class="stat-num">${Math.round(totalLeche).toLocaleString('es-ES')} L</div><div class="stat-label">Leche total</div></div>
+      <div class="stat-box"><div class="stat-num">${Math.round(totalCarneKg).toLocaleString('es-ES')} kg</div><div class="stat-label">Carne (peso canal)</div></div>
     </div>
 
     <h2>10. Resumen Económico</h2>
     <div class="grid2">
-      <div class="stat-box"><div class="stat-num">${ingresosCarne.toFixed(2)} €</div><div class="stat-label">Ingresos Carne</div></div>
-      <div class="stat-box"><div class="stat-num">${ingresosLeche.toFixed(2)} €</div><div class="stat-label">Ingresos Leche</div></div>
+      <div class="stat-box"><div class="stat-num">${ingresosCarne.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</div><div class="stat-label">Ingresos Carne</div></div>
+      <div class="stat-box"><div class="stat-num">${ingresosLeche.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</div><div class="stat-label">Ingresos Leche</div></div>
     </div>
 
     <h2>11. Transportistas</h2>

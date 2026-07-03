@@ -72,7 +72,7 @@ const ZonasView = {
           const ans = await Animales.list(r.id);
           ugmTotal += ans.length * factor;
         }
-        const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
+        const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         const pacTexto = z.codigo_pac ? `PAC: ${z.codigo_pac}` : 'PAC: pendiente';
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
@@ -84,7 +84,7 @@ const ZonasView = {
                   <div class="text-xl" style="color:${colorCenso}">${Icons.zonas()}</div>
                   <div class="text-xs">
                     <div class="font-bold text-white uppercase text-base tracking-tight">${z.nombre}</div>
-                    <div class="text-gray mt-2 font-700 uppercase">${z.usoPrincipal || 'Sin uso Principal'}${superficie ? ` · ${superficie} HA` : ''}</div>
+                    <div class="text-gray mt-2 font-700 uppercase">${z.usoPrincipal || 'Sin uso Principal'}${superficie ? ` · ${Number(superficie).toLocaleString('es-ES')} ha` : ''}</div>
                   </div>
                 </div>
                 <div class="text-right">
@@ -94,7 +94,7 @@ const ZonasView = {
 
               <div class="p-10 rounded" style="background:#000; border:1px solid #222;">
                 <div class="flex justify-between font-900 text-[0.65rem] mb-4 uppercase">
-                  <span class="text-gray">Carga: ${ugmTotal.toFixed(1)} UGM</span>
+                  <span class="text-gray">Carga: ${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} UGM</span>
                   <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
                 </div>
                 <div class="progress-track">
@@ -106,7 +106,7 @@ const ZonasView = {
                 <div class="flex-1 min-w-0">
                   <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase">
                     ${z.codigo_pac ? `<div class="flex items-center gap-4">${Icons.documento()} PAC: ${z.codigo_pac}</div>` : ''}
-                    <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/HA</div>
+                    <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
                     ${especiesEnZona.size ? `<div class="flex items-center gap-4">${Icons.animales()} ${[...especiesEnZona].join(', ')}</div>` : ''}
                   </div>
                 </div>
@@ -157,7 +157,7 @@ const ZonasView = {
       const ans = await Animales.list(r.id);
       ugmTotal += ans.length * factor;
     }
-    const cargaGanadera = superficie > 0 ? (ugmTotal / superficie).toFixed(2) : 0;
+    const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
@@ -177,7 +177,7 @@ const ZonasView = {
           <input type="number" id="z-edit-agua" value="${zona.distancia_agua_m || ""}" placeholder="Metros" class="premium-input"></div>
           <div class="text-gray text-xs mt-8">
             <strong>${Icons.grafico()} Métricas SIGGAN (solo lectura):</strong><br/>
-            UGM Total: <strong>${ugmTotal.toFixed(1)}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
+            UGM Total: <strong>${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
           </div>
           <div><label class="form-label">Localización</label>
           <textarea id="z-edit-localizacion" class="premium-input min-h-60 resize-none">${zona.localizacion || ""}</textarea></div>

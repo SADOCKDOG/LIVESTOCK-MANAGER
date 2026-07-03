@@ -6,6 +6,11 @@
 const ProveedoresView = {
     _cachedData: null,
 
+    _labelCat(cat) {
+        const labels = { 'Alimentacion': 'Alimentación', 'Amortizacion': 'Amortización' };
+        return labels[cat] || cat;
+    },
+
     async render() {
         const main = document.getElementById("app-content");
         main.innerHTML = `
@@ -113,7 +118,7 @@ const ProveedoresView = {
                 </div>
                 ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
                 <div class="flex flex-wrap gap-2 mt-2">
-                  ${p.categorias.map(cat => `<span class="text-[0.5rem] text-gray font-800 uppercase bg-black px-6 py-2 rounded-sm border border-222">${cat.toUpperCase()}</span>`).join('')}
+                  ${p.categorias.map(cat => `<span class="text-[0.5rem] text-gray font-800 uppercase bg-black px-6 py-2 rounded-sm border border-222">${this._labelCat(cat).toUpperCase()}</span>`).join('')}
                 </div>` : ''}
               </div>
               <div class="flex flex-col items-end gap-3 flex-shrink-0">
@@ -152,8 +157,8 @@ const ProveedoresView = {
                 <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
                 <div class="mt-4">
                   ${proveedor.activo === false
-                    ? '<span class="badge badge-sm font-950 uppercase" style="background:var(--c-danger)20; color:var(--c-danger); border:1px solid var(--c-danger)40;">INACTIVO</span>'
-                    : '<span class="badge badge-sm font-950 uppercase" style="background:var(--c-success)20; color:var(--c-success); border:1px solid var(--c-success)40;">ACTIVO</span>'}
+                    ? '<span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, var(--c-danger) 12%, transparent); color:var(--c-danger); border:1px solid color-mix(in srgb, var(--c-danger) 25%, transparent);">INACTIVO</span>'
+                    : '<span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, var(--c-success) 12%, transparent); color:var(--c-success); border:1px solid color-mix(in srgb, var(--c-success) 25%, transparent);">ACTIVO</span>'}
                 </div>
               </div>
               <div class="flex gap-8">
@@ -202,7 +207,7 @@ const ProveedoresView = {
               Object.entries(resumen.por_categoria).map(([cat, info]) => `
                 <div class="history-row border-bottom-222 py-10">
                   <div class="flex items-center gap-8">
-                    <span class="text-white font-900 uppercase text-xs">${Icons.paquete()} ${cat}</span>
+                    <span class="text-white font-900 uppercase text-xs">${Icons.paquete()} ${this._labelCat(cat)}</span>
                     <span class="text-gray-600 font-800 text-[0.6rem] uppercase tracking-tighter">(${info.count} REGISTROS)</span>
                   </div>
                   <div class="text-green font-950 text-md">${info.total.toLocaleString()} €</div>
@@ -266,17 +271,17 @@ const ProveedoresView = {
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">NOMBRE / RAZÓN SOCIAL *</label>
-                <input type="text" id="p-nombre" value="${p.nombre}" class="wizard-input uppercase font-900" placeholder="EJ: SUMINISTROS AGRÍCOLAS S.L.">
+                <input type="text" id="p-nombre" value="${p.nombre || ''}" class="wizard-input uppercase font-900" placeholder="EJ: SUMINISTROS AGRÍCOLAS S.L.">
             </div>
 
             <div class="grid grid-cols-2 gap-12 mb-15">
               <div class="wizard-input-group">
                 <label class="wizard-label">NIF / CIF</label>
-                <input type="text" id="p-nif" value="${p.nif_cif}" class="wizard-input uppercase font-800" placeholder="B12345678">
+                <input type="text" id="p-nif" value="${p.nif_cif || ''}" class="wizard-input uppercase font-800" placeholder="B12345678">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">TELÉFONO</label>
-                <input type="tel" id="p-tel" value="${p.telefono}" class="wizard-input font-800" placeholder="600000000">
+                <input type="tel" id="p-tel" value="${p.telefono || ''}" class="wizard-input font-800" placeholder="600000000">
               </div>
             </div>
 
@@ -306,21 +311,21 @@ const ProveedoresView = {
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">DIRECCIÓN POSTAL</label>
-                <input type="text" id="p-dir" value="${p.direccion}" class="wizard-input uppercase font-800">
+                <input type="text" id="p-dir" value="${p.direccion || ''}" class="wizard-input uppercase font-800">
             </div>
 
             <div class="grid grid-cols-3 gap-12 mb-15">
               <div class="wizard-input-group">
                 <label class="wizard-label">C.P.</label>
-                <input type="text" id="p-cp" value="${p.codigo_postal}" class="wizard-input font-800">
+                <input type="text" id="p-cp" value="${p.codigo_postal || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">CIUDAD</label>
-                <input type="text" id="p-ciudad" value="${p.ciudad}" class="wizard-input uppercase font-800">
+                <input type="text" id="p-ciudad" value="${p.ciudad || ''}" class="wizard-input uppercase font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label">PROVINCIA</label>
-                <input type="text" id="p-prov" value="${p.provincia}" class="wizard-input uppercase font-800">
+                <input type="text" id="p-prov" value="${p.provincia || ''}" class="wizard-input uppercase font-800">
               </div>
             </div>
 
@@ -338,7 +343,7 @@ const ProveedoresView = {
                       onchange="this.parentElement.style.background=this.checked ? 'rgba(204,255,0,0.15)' : '#111';
                                this.parentElement.style.borderColor=this.checked ? 'var(--c-success)' : '#333';
                                this.parentElement.style.color=this.checked ? 'var(--c-success)' : '#aaa';">
-                    ${cat}
+                    ${this._labelCat(cat)}
                   </label>`;
                 }).join('')}
               </div>
@@ -346,17 +351,17 @@ const ProveedoresView = {
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">EMAIL CONTACTO</label>
-                <input type="email" id="p-email" value="${p.email}" class="wizard-input font-800 lowercase">
+                <input type="email" id="p-email" value="${p.email || ''}" class="wizard-input font-800 lowercase">
             </div>
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">CONDICIONES DE PAGO</label>
-                <input type="text" id="p-pago" value="${p.condiciones_pago}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
+                <input type="text" id="p-pago" value="${p.condiciones_pago || ''}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
             </div>
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">NOTAS / OBSERVACIONES</label>
-                <textarea id="p-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${p.notas}</textarea>
+                <textarea id="p-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${p.notas || ''}</textarea>
             </div>
 
             <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">

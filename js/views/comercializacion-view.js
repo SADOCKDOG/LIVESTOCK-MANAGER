@@ -60,7 +60,7 @@ const ComercializacionView = {
           carne: [
             { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
             { label: 'Animales', value: ventas.length },
-            { label: 'Rend. Prom.', value: rendProm.toFixed(1) + '%' },
+            { label: 'Rend. Prom.', value: rendProm.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' },
             { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
           ],
           leche: [
@@ -309,7 +309,7 @@ const ComercializacionView = {
           title: (v.razonSocial || 'Matadero Central'),
           date: v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-',
           zone: v.snap_zona || '',
-          value: (v.pesoCanal || 0) + ' kg',
+          value: (v.pesoCanal || 0).toLocaleString('es-ES') + ' kg',
           subvalue: 'Rend: ' + (v.rendimientoCanal || 0) + '%',
           badges: [badgeHtml(v), badgeTramite].filter(Boolean).join(' '),
           onclick: "App._abrirDetalleVentaCarne(" + v.id + ")"
@@ -331,7 +331,7 @@ const ComercializacionView = {
       records: d.entregas.slice(0, 50).map(e => {
         const esAlerta = e.estadoAnalitica === "Alerta Crítica" || e.antibioticos === true;
         const lab = e.laboratorio || {};
-        const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toFixed(1) : '--');
+        const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '--');
         const badges = window.CalidadLecheHelper ? window.CalidadLecheHelper.badgesCompletos(e) : '';
 
         // Añadir precio final y MOFA como badges si existen
@@ -356,7 +356,7 @@ const ComercializacionView = {
           date: e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-',
           zone: '',
           value: (e.cantidad || 0).toLocaleString() + ' L',
-          subvalue: (e.temperatura || '--') + '°C' + (es !== '--' ? ' · ES: ' + es + '%' : ''),
+          subvalue: (e.temperatura != null ? e.temperatura.toLocaleString('es-ES') + ' °C' : '—') + (es !== '--' ? ' · ES: ' + es + '%' : ''),
           badges: allBadges,
           onclick: "location.hash='/albaran-leche?id=" + e.id + "'"
         };

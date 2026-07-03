@@ -31,14 +31,17 @@ window.WizardTraslado = {
             <div class="wizard-input-group">
               <label class="wizard-label">SELECCIONA LOS ANIMALES A TRASLADAR</label>
               <div id="w-tras-list" class="rounded-sm bg-card wizard-list-scroll">
-                ${data.allAnimales.map((a) => {
-                  const yaEnRebano = a.rebanoId == data.rebano.id;
-                  const checked = yaEnRebano || data.selectedIds.includes(a.id);
-                  return `<label class="flex items-center gap-10 p-10 wizard-list-item">
-                    <input type="checkbox" value="${a.id}" ${checked ? "checked" : ""} ${yaEnRebano ? "disabled" : ""} class="w-tras-chk">
-                    <span class="${yaEnRebano ? 'text-gold' : ''}">${a.numero_identificacion} (${a.raza})${yaEnRebano ? " · ya en destino" : ""}</span>
-                  </label>`;
-                }).join("")}
+                ${data.allAnimales.length > 0
+                  ? data.allAnimales.map((a) => {
+                    const yaEnRebano = a.rebanoId == data.rebano.id;
+                    const checked = yaEnRebano || data.selectedIds.includes(a.id);
+                    return `<label class="flex items-center gap-10 p-10 wizard-list-item">
+                      <input type="checkbox" value="${a.id}" ${checked ? "checked" : ""} ${yaEnRebano ? "disabled" : ""} class="w-tras-chk">
+                      <span class="${yaEnRebano ? 'text-gold' : ''}">${a.numero_identificacion} (${a.raza || '—'})${yaEnRebano ? " · ya en destino" : ""}</span>
+                    </label>`;
+                  }).join("")
+                  : '<div class="text-center text-gray p-20 uppercase font-900 text-xs">Sin animales activos para trasladar</div>'
+                }
               </div>
             </div>
           </div>
@@ -73,7 +76,7 @@ window.WizardTraslado = {
                 <label class="wizard-label">ANIMALES SELECCIONADOS</label>
                 <div class="rounded-sm bg-card wizard-list-scroll-sm">
                   ${seleccionados.map((a) =>
-                    `<div class="p-10 text-sm wizard-list-item">${a.numero_identificacion} (${a.raza})</div>`
+                    `<div class="p-10 text-sm wizard-list-item">${a.numero_identificacion} (${a.raza || '—'})</div>`
                   ).join("")}
                 </div>
               </div>
@@ -200,7 +203,7 @@ window.WizardTraslado = {
               console.warn("[Traslado] No se pudo registrar el evento de movimiento:", e?.message);
             }
           }
-          App.toast(`Traslado completado · ${trasladados} animal(es)`);
+          App.toast(`Traslado completado · ${trasladados} ${trasladados === 1 ? 'animal' : 'animales'}`);
           App.renderDetalleRebano(new URLSearchParams(`id=${data.rebano.id}`));
         } catch (e) {
           App.toastError(e.message);

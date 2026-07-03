@@ -127,7 +127,7 @@ const AnimalesView = {
             <div class="flex items-center gap-10 min-w-0">
               <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
               <div class="text-xs">
-                <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${a.numero_identificacion} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
+                <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${a.numero_identificacion || a.nombre || '#' + a.id} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
                 <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
               </div>
             </div>

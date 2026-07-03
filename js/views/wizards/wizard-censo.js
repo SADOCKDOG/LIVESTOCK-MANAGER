@@ -43,7 +43,7 @@ window.WizardCenso = {
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.animales()} CENSO CONSOLIDADO</div>
             <div class="text-center bg-black border border-222 p-16 rounded-sm mb-16">
               <div class="text-aaa uppercase font-900 text-[0.65rem] tracking-widest mb-4">TOTAL CABEZAS ACTIVAS</div>
-              <div class="text-white font-950 text-3xl tracking-tighter">${censo.total} ANIMALES</div>
+              <div class="text-white font-950 text-3xl tracking-tighter">${censo.total} ${censo.total === 1 ? 'ANIMAL' : 'ANIMALES'}</div>
             </div>
             ${filas.length === 0 ? '<p class="text-center text-gray uppercase font-800 text-xs p-10">No hay animales activos en la fecha</p>' : ''}
             <div class="grid gap-10">

@@ -88,7 +88,7 @@ window.WizardTratamiento = {
                         </div>
                     </div>
                     <div class="wizard-input-group mb-12">
-                        <label class="wizard-label">CONCENTRACIÓN (MG/ML)</label>
+                        <label class="wizard-label">CONCENTRACIÓN (mg/mL)</label>
                         <input type="number" id="calc-conc" class="wizard-input font-800" placeholder="200">
                     </div>
                     <button type="button" id="btn-calcular" class="widget-link-btn widget-link-btn--neon neon-success w-full px-12 py-8 min-h-0 h-auto">
