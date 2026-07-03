@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Wizard Tratamiento Sanitario
  * Extraído de app.js para modularización
  */
@@ -79,11 +79,11 @@ window.WizardTratamiento = {
                 <div id="calc-dosis-container" class="mt-15 p-12 bg-black border border-222 rounded-sm d-none">
                     <div class="grid grid-cols-2 gap-10 mb-12">
                         <div class="wizard-input-group">
-                            <label class="wizard-label">PESO (KG)</label>
+                            <label class="wizard-label">PESO (kg)</label>
                             <input type="number" id="calc-peso" class="wizard-input font-800" placeholder="50">
                         </div>
                         <div class="wizard-input-group">
-                            <label class="wizard-label">DOSIS (MG/KG)</label>
+                            <label class="wizard-label">DOSIS (mg/kg)</label>
                             <input type="number" id="calc-dosis" class="wizard-input font-800" placeholder="20">
                         </div>
                     </div>

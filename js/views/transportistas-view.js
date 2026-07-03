@@ -85,7 +85,7 @@ const TransportistasView = {
                             <div class="text-xs">
                                 <div class="font-bold text-white uppercase text-base tracking-tight">${t.nombre}</div>
                                 <div class="text-gray mt-2 font-700 uppercase">
-                                    ${t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : ''}${t.matricula ? ' · 🚚 ' + t.matricula : ''}
+                                    ${[t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : '', t.matricula ? Icons.transportistas() + ' ' + t.matricula : ''].filter(Boolean).join(' · ')}
                                 </div>
                             </div>
                         </div>

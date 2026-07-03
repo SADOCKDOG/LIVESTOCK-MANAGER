@@ -69,7 +69,7 @@ const PesajesUI = {
         const _pesajesLote = [];
         const esModoLote = entidades.length > 1;
 
-        const unidadLabel = esModoLeche ? "VOLUMEN (L)" : "PESO (KG)";
+        const unidadLabel = esModoLeche ? "VOLUMEN (L)" : "PESO (kg)";
         const unidadAbreviada = esModoLeche ? "L" : "kg";
 
         const renderWizard = async () => {
@@ -154,9 +154,9 @@ const PesajesUI = {
                     <div class="card card-accent card-accent-blue p-16 border-222 bg-black">
                         <div class="section-header-theme mb-12">${Icons.transportistas()} LOGÍSTICA / BÁSCULA</div>
                         <div class="pesaje-logis-grid mb-12">
-                            <div><label class="text-[0.55rem] text-gray-500 uppercase font-950 tracking-widest mb-6 d-block">BRUTO (KG)</label>
+                            <div><label class="text-[0.55rem] text-gray-500 uppercase font-950 tracking-widest mb-6 d-block">BRUTO (kg)</label>
                             <input type="number" id="w-bruto" class="wizard-input h-50 text-xl font-950 text-white"></div>
-                            <div><label class="text-[0.55rem] text-gray-500 uppercase font-950 tracking-widest mb-6 d-block">TARA (KG)</label>
+                            <div><label class="text-[0.55rem] text-gray-500 uppercase font-950 tracking-widest mb-6 d-block">TARA (kg)</label>
                             <input type="number" id="w-tara" class="wizard-input h-50 text-xl font-950 text-white"></div>
                         </div>
                         <div class="pesaje-logis-grid-2 items-end">
@@ -164,7 +164,7 @@ const PesajesUI = {
                             <input type="text" id="w-matricula" class="wizard-input h-45 uppercase font-950"></div>
                             <div class="bg-black border border-222 p-10 rounded-sm text-right">
                                 <span class="text-gray-500 uppercase font-950 text-[0.55rem] block mb-2 tracking-widest">NETO REAL:</span>
-                                <span id="w-neto-display" class="text-green pesaje-neto-val tracking-tighter">0 KG</span>
+                                <span id="w-neto-display" class="text-green pesaje-neto-val tracking-tighter">0 kg</span>
                             </div>
                         </div>
                     </div>
@@ -181,7 +181,7 @@ const PesajesUI = {
 
                     ${motivo === 'expedicion' && !esModoLeche ? `
                     <div class="pesaje-precio-box">
-                        <label class="text-[0.6rem] text-green font-950 uppercase tracking-widest d-block mb-12">${Icons.dinero()} PRECIO LIQUIDACIÓN (€/KG CANAL)</label>
+                        <label class="text-[0.6rem] text-green font-950 uppercase tracking-widest d-block mb-12">${Icons.dinero()} PRECIO LIQUIDACIÓN (€/kg CANAL)</label>
                         <input type="number" id="w-precio" value="5.50" step="0.01" class="wizard-input h-50 text-2xl font-black text-green">
                     </div>
                     ` : ''}
@@ -252,7 +252,7 @@ const PesajesUI = {
                 const nDisp = overlay.querySelector('#w-neto-display');
                 const updateNeto = () => {
                     const neto = Math.max(0, (parseFloat(bIn.value) || 0) - (parseFloat(tIn.value) || 0));
-                    nDisp.textContent = neto.toLocaleString() + " KG";
+                    nDisp.textContent = neto.toLocaleString() + " kg";
                 };
                 bIn.oninput = updateNeto; tIn.oninput = updateNeto;
             }

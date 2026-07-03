@@ -142,7 +142,7 @@ const ContratosView = {
             <div>
               <label class="text-[0.55rem] text-gray-500 font-950 uppercase tracking-widest mb-4 d-block">UNIDAD</label>
               <select class="precio-unidad wizard-input wizard-select font-900 p-8 text-[0.65rem]">
-                <option value="kg" ${pr.unidad === 'kg' ? 'selected' : ''}>€/KG</option>
+                <option value="kg" ${pr.unidad === 'kg' ? 'selected' : ''}>€/kg</option>
                 <option value="L" ${pr.unidad === 'L' ? 'selected' : ''}>€/L</option>
                 <option value="unidad" ${pr.unidad === 'unidad' ? 'selected' : ''}>€/UD</option>
                 <option value="cabeza" ${pr.unidad === 'cabeza' ? 'selected' : ''}>€/CAB</option>

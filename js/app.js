@@ -789,7 +789,7 @@ const App = {
         : `
                             <tr><td class="td-lbl">Matrícula Cisterna</td><td class="td-val">${albaran.trazabilidad.matricula}</td></tr>
                             <tr><td class="td-lbl">Muestra Letra Q</td><td class="td-val">${albaran.trazabilidad.muestra_letra_q}</td></tr>
-                            <tr><td class="td-lbl">Temp. Carga</td><td class="td-val">${albaran.trazabilidad.temp_carga} ºC</td></tr>
+                            <tr><td class="td-lbl">Temp. Carga</td><td class="td-val">${albaran.trazabilidad.temp_carga} °C</td></tr>
                         `
       }
                     </table>
@@ -1804,8 +1804,18 @@ const App = {
   async renderTrazabilidad(params) {
     if (window.TrazabilidadView) {
       const id = params?.get ? params.get('id') : null;
-      if (id) await TrazabilidadView.render(parseInt(id));
+      if (id) {
+        await TrazabilidadView.render(parseInt(id));
+        return;
+      }
     }
+    // Sin animal seleccionado (o vista no disponible): estado vacío en lugar de dejar el loader
+    document.getElementById("app-content").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">${Icons.trazabilidad()}</div>
+        <p class="empty-state-text">Selecciona un animal para consultar su trazabilidad 360°.</p>
+        <button class="btn btn-primary mt-15" onclick="App.route('/animales')">${Icons.animales()} Ir a Animales</button>
+      </div>`;
   },
 
   async renderCuadernoDigital() {

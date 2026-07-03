@@ -343,7 +343,7 @@ const DashboardView = {
             </div>
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PRECIO</div>
-              <div style="font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toFixed(3)}</div>
+              <div style="font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</div>
               <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">€/L</div>
             </div>
             <div>

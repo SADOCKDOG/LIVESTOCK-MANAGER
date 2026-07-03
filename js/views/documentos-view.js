@@ -210,8 +210,8 @@ const DocumentosView = {
         }
 
         const acuseHtml = doc.acuseManual
-          ? `<div class="text-xs text-green mt-6">📎 Acuse manual: <span class="font-900">${doc.acuseManual}</span></div>`
-          : `<div class="text-xs text-red mt-6">📎 Acuse manual pendiente</div>`;
+          ? `<div class="text-xs text-green mt-6">${Icons.adjuntar()} Acuse manual: <span class="font-900">${doc.acuseManual}</span></div>`
+          : `<div class="text-xs text-red mt-6">${Icons.adjuntar()} Acuse manual pendiente</div>`;
 
         return `
           <div class="card" style="border-left:4px solid ${color};">
@@ -232,11 +232,11 @@ const DocumentosView = {
             ${acuseHtml}
             <div class="mt-8 flex gap-6 flex-wrap">
               ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">✏️ Editar Borrador</button>
+                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar Borrador</button>
               ` : `
-                <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">🖨 Imprimir PDF</button>
+                <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} Imprimir PDF</button>
               `}
-              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">📎 Guardar acuse</button>
+              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Guardar acuse</button>
               <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verDetalle(${doc.id}, '${doc.tipo}')">${Icons.documento()} Detalle</button>
             </div>
           </div>
@@ -442,8 +442,8 @@ const DocumentosView = {
     }
 
     const acuseTexto = doc.acuseManual
-      ? `<span class="text-green">📎 Acuse manual: ${doc.acuseManual}</span>`
-      : '<span class="text-red">📎 Acuse manual pendiente</span>';
+      ? `<span class="text-green">${Icons.adjuntar()} Acuse manual: ${doc.acuseManual}</span>`
+      : `<span class="text-red">${Icons.adjuntar()} Acuse manual pendiente</span>`;
 
     overlay.innerHTML = `
       <div class="card" style="max-width:520px;width:100%;padding:24px;">
@@ -463,11 +463,11 @@ const DocumentosView = {
         <div class="text-xs mb-8">${acuseTexto}</div>
         <div class="flex flex-wrap gap-8 justify-end text-xs">
           <button class="btn btn-sm" onclick="document.getElementById('doc-detail-overlay-${docId}').remove()">Cerrar</button>
-          <button class="btn btn-sm btn-outline" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">📎 Registrar acuse</button>
+          <button class="btn btn-sm btn-outline" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Registrar acuse</button>
           ${doc.estado === 'borrador' ? `
-            <button class="btn btn-sm btn-primary" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id}); document.getElementById('doc-detail-overlay-${docId}').remove();">✏️ Editar</button>
+            <button class="btn btn-sm btn-primary" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id}); document.getElementById('doc-detail-overlay-${docId}').remove();">${Icons.editar()} Editar</button>
           ` : `
-            <button class="btn btn-sm btn-primary" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id}); document.getElementById('doc-detail-overlay-${docId}').remove();">🖨 Imprimir</button>
+            <button class="btn btn-sm btn-primary" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id}); document.getElementById('doc-detail-overlay-${docId}').remove();">${Icons.imprimir()} Imprimir</button>
           `}
         </div>
       </div>`;

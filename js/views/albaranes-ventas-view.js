@@ -242,11 +242,11 @@ const AlbaranesVentasView = {
       if (tipo === 'leche') {
         detalleHtml = `
           <div><span class="text-gray">Litros:</span> <span class="text-white">${reg.cantidad.toLocaleString()} L</span></div>
-          <div><span class="text-gray">Temperatura:</span> <span class="text-white">${reg.temperatura} ºC</span></div>
+          <div><span class="text-gray">Temperatura:</span> <span class="text-white">${reg.temperatura} °C</span></div>
           <div><span class="text-gray">Grasa:</span> <span class="text-white">${reg.laboratorio?.grasa || 0} %</span></div>
           <div><span class="text-gray">Proteína:</span> <span class="text-white">${reg.laboratorio?.proteina || 0} %</span></div>
-          <div><span class="text-gray">Cél. Somáticas:</span> <span class="text-white">${reg.laboratorio?.somaticas || 0} k/mL</span></div>
-          <div><span class="text-gray">Bacterias:</span> <span class="text-white">${reg.laboratorio?.germenes || 0} k/mL</span></div>
+          <div><span class="text-gray">Cél. Somáticas:</span> <span class="text-white">${((reg.laboratorio?.somaticas || 0) / 1000).toFixed(0)}k cél/mL</span></div>
+          <div><span class="text-gray">Bacterias:</span> <span class="text-white">${((reg.laboratorio?.germenes || 0) / 1000).toFixed(0)}k UFC/mL</span></div>
           <div><span class="text-gray">Inhibidores/Antibi.:</span> <span class="text-white" style="color:${reg.antibioticos ? 'var(--c-danger)' : 'var(--c-success)'};">${reg.antibioticos ? 'POSITIVO' : 'NEGATIVO'}</span></div>
           <div><span class="text-gray">Cisterna:</span> <span class="text-white">${reg.matriculaCisterna || '—'}</span></div>
         `;

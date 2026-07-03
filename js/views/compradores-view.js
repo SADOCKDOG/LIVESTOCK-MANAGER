@@ -221,7 +221,7 @@ const CompradoresView = {
                   <div class="text-xs">
                     <div class="font-950 text-white uppercase text-base tracking-tight" style="color:${color} !important;">${c.nombre}</div>
                     <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
-                      ${c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : ''}${c.ciudad ? ' · ' + Icons.zonas() + ' ' + c.ciudad.toUpperCase() : ''}
+                      ${[c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : '', c.ciudad ? Icons.zonas() + ' ' + c.ciudad.toUpperCase() : ''].filter(Boolean).join(' · ')}
                     </div>
                   </div>
                 </div>
@@ -327,7 +327,7 @@ const CompradoresView = {
                 <div class="mt-10 flex flex-wrap gap-4 border-top-222 pt-10">
                   ${ct.precios.map(pr => `
                     <span style="background:#111; border:1px solid #333; padding:4px 10px; border-radius:30px; font-size:0.6rem; font-weight:900; color:#aaa; text-transform:uppercase;">
-                      ${pr.producto}: <strong class="text-white ml-2">${pr.precio_unitario.toFixed(3)} €/${pr.unidad.toUpperCase()}</strong>
+                      ${pr.producto}: <strong class="text-white ml-2">${pr.precio_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/${pr.unidad.toUpperCase()}</strong>
                     </span>
                   `).join('')}
                 </div>
@@ -425,7 +425,7 @@ const CompradoresView = {
             <div class="summary-cell summary-cell-kpi border-left-red">
               <small class="s-lbl uppercase font-900">CARNE</small>
               <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
-              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} KG</small>
+              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
             </div>
             <div class="summary-cell summary-cell-kpi border-left-amber">
               <small class="s-lbl uppercase font-900">LECHE</small>
@@ -478,7 +478,7 @@ const CompradoresView = {
                 <div class="history-row border-bottom-222 py-12">
                   <div>
                     <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
-                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${v.pesoCanal || 0} KG CANAL · REND: <strong class="text-white">${v.rendimientoCanal || 0}%</strong></div>
+                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${v.pesoCanal || 0} kg CANAL · REND: <strong class="text-white">${v.rendimientoCanal || 0}%</strong></div>
                   </div>
                   <div class="text-right">
                     <div class="text-red font-950 text-md">${(v.precio_total || (v.pesoCanal || 0) * 5.5).toLocaleString()} €</div>
@@ -503,7 +503,7 @@ const CompradoresView = {
                   </div>
                   <div class="text-right">
                     <div class="text-amber font-950 text-md">${(e.cantidad || 0).toLocaleString()} L</div>
-                    ${e.precio_final_unitario ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">${(e.precio_final_unitario).toFixed(3)} €/L</div>` : ''}
+                    ${e.precio_final_unitario ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">${e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/L</div>` : ''}
                   </div>
                 </div>
               `).join('')}

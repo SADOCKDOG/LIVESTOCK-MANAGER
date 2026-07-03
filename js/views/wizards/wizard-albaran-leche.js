@@ -76,7 +76,7 @@ window.AlbaranLecheWizard = {
                 <input type="text" id="w-l-mat" value="${data.matricula}" placeholder="ABC-000" class="wizard-input uppercase font-900 text-lg">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">TEMPERATURA (ºC)</label>
+                <label class="wizard-label">TEMPERATURA (°C)</label>
                 <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input font-950 text-xl" style="color:${data.temp <= 4 ? 'var(--c-success)' : 'var(--c-danger)'};">
               </div>
             </div>
@@ -106,7 +106,7 @@ window.AlbaranLecheWizard = {
             <div class="p-10 bg-black border border-222 rounded-sm mb-12">
               <label class="flex items-center gap-10 text-xs text-white cursor-pointer mb-8">
                 <input type="checkbox" id="w-l-frio" ${data.cadena_frio_cumplida ? 'checked' : ''} style="accent-color:var(--c-info);">
-                <span class="uppercase font-900 text-[0.6rem] tracking-tight">CADENA DE FRÍO CUMPLIDA (< 4ºC)</span>
+                <span class="uppercase font-900 text-[0.6rem] tracking-tight">CADENA DE FRÍO CUMPLIDA (< 4°C)</span>
               </label>
               <label class="flex items-center gap-10 text-xs text-white cursor-pointer">
                 <input type="checkbox" id="w-l-inh" ${data.inh ? 'checked' : ''} style="accent-color:var(--c-info);">
@@ -133,7 +133,7 @@ window.AlbaranLecheWizard = {
           if (!data.fecha) { App.toastError("La fecha de recogida es obligatoria"); return false; }
           if (data.l <= 0) { App.toastError("El volumen debe ser mayor a 0 Litros"); return false; }
           if (!data.comunidad_autonoma) { App.toastError("Selecciona la comunidad autónoma"); return false; }
-          if (data.temp > 6) { App.toastError("⚠️ ALERTA SANITARIA: Temperatura > 6ºC detectada."); }
+          if (data.temp > 6) { App.toastError("⚠️ ALERTA SANITARIA: Temperatura > 6°C detectada."); }
           if (!data.inh) { App.toastError("Debes certificar la ausencia de inhibidores."); return false; }
           return true;
         }
