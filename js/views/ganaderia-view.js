@@ -105,11 +105,11 @@ const GanaderiaView = {
         <div class="grid gap-8">
           ${rebanosModo.length > 0
             ? rebanosModo.slice(0, 8).map(r => `
-              <a href="#/rebano?id=${r.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:10px; margin:0;">
+              <a href="#/rebano?id=${r.id}" class="card-registro" style="--registro-color: ${meta.color};">
                 <div class="flex justify-between items-center">
                   <div class="text-xs">
-                    <div class="font-bold text-white">${r.nombre || 'Rebaño'}</div>
-                    <div class="text-gray mt-2">Tipo: ${r.tipo || 'N/D'}</div>
+                    <div class="registro-titulo">${r.nombre || 'Rebaño'}</div>
+                    <div class="registro-sub">Tipo: ${r.tipo || 'N/D'}</div>
                   </div>
                   <span class="badge badge-sm" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">ID ${r.id}</span>
                 </div>
@@ -138,7 +138,7 @@ const GanaderiaView = {
               const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
               const edad = (a.fecha_nacimiento || a.fechaNacimiento) ? Math.floor((new Date() - new Date(a.fecha_nacimiento || a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365)) : null;
               return `
-                <a href="#/animal?id=${a.id}" class="card card-animal no-underline" style="border-left:4px solid ${meta.color}; padding:12px; margin:0;">
+                <a href="#/animal?id=${a.id}" class="card-registro" style="--registro-color: ${meta.color};">
                   <div class="flex justify-between items-start gap-6">
                     <div class="min-w-0 flex-1">
                       <div class="flex items-center gap-6">
