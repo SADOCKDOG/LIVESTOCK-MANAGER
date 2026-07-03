@@ -328,6 +328,9 @@ const AjustesView = {
               <input type="checkbox" ${config.glowMarco !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleGlowMarco(this.checked)"> MARCO PRINCIPAL DE PANTALLA
             </label>
             <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
+              <input type="checkbox" ${config.glowLaterales !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleGlowLaterales(this.checked)"> HAZ DE LUZ LATERAL (IZQUIERDO Y DERECHO)
+            </label>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
               <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleGlowBotones(this.checked)"> BOTONES DE LA APLICACIÓN
             </label>
           </div>
@@ -537,7 +540,7 @@ const AjustesView = {
   },
 
   async _loadConfig() {
-    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: false, glowMarco: true, glowBotones: true, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
+    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: false, glowMarco: true, glowLaterales: true, glowBotones: true, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
     try {
       const stored = await window.db.get('meta', 'appConfig');
       return stored?.value ? { ...defaults, ...stored.value } : defaults;
@@ -579,6 +582,12 @@ const AjustesView = {
     await this._saveConfig({ glowMarco: checked });
     document.body.classList.toggle('glow-marco-off', !checked);
     App.toast(checked ? 'Marco principal iluminado' : 'Marco principal sin iluminación');
+  },
+
+  async _toggleGlowLaterales(checked) {
+    await this._saveConfig({ glowLaterales: checked });
+    document.body.classList.toggle('glow-laterales-off', !checked);
+    App.toast(checked ? 'Haz de luz lateral activado' : 'Haz de luz lateral desactivado');
   },
 
   async _toggleGlowBotones(checked) {
