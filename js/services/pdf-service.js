@@ -25,7 +25,7 @@ const PdfService = {
         ${contentHtml}
       </div>
       <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-        <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">📄 DESCARGAR PDF</button>
+        <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">DESCARGAR PDF</button>
         <button class="btn btn-secondary" id="btn-cerrar-pdf" style="width:auto; padding:0 30px;">CERRAR</button>
       </div>
     `;
@@ -44,7 +44,7 @@ const PdfService = {
         `;
         loader.innerHTML = `
           <div style="width:280px; text-align:center;">
-            <div style="font-size:3rem; margin-bottom:20px; animation: bounce 2s infinite;">📄</div>
+            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:20px; transform:scale(2);">${window.Icons ? Icons.documento() : ''}</div>
             <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
             <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">${title}</div>
             <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
@@ -289,7 +289,7 @@ const PdfService = {
 
         ${traza.transportista ? `
         <div style="margin-top:30px;">
-          <h3 style="background:#eee; padding:5px; font-size:1rem;">🚛 TRANSPORTE</h3>
+          <h3 style="background:#eee; padding:5px; font-size:1rem;">TRANSPORTE</h3>
           <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9rem;">
             <tr><td class="td-lbl">Transportista</td><td class="td-val">${traza.transportista.nombre}</td></tr>
             <tr><td class="td-lbl">NIF</td><td class="td-val">${traza.transportista.nif || 'N/D'}</td></tr>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - CuadernoDigitalView v1.0.0
  * Cuaderno Digital de Explotación Ganadera (RD 787/2023)
  *
@@ -21,7 +21,7 @@ const CuadernoDigitalView = {
       this._renderContenido(main, data);
     } catch (e) {
       console.error('[CuadernoDigital] Error:', e);
-      main.innerHTML = `<div class="card text-center p-40 text-red">❌ Error al generar Cuaderno Digital: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red">Error al generar Cuaderno Digital: ${e.message}</div>`;
     }
   },
 
@@ -424,7 +424,7 @@ const CuadernoDigitalView = {
       `;
       loader.innerHTML = `
         <div class="pdf-loader">
-          <div class="pdf-loader-emoji">📄</div>
+          <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
           <div class="pdf-loader-title">Generando PDF</div>
           <div class="pdf-loader-desc">Cuaderno Digital</div>
           <div class="pdf-loader-bar">
@@ -606,9 +606,9 @@ const CuadernoDigitalView = {
     overlay.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background:#fff; overflow-y:auto; display:flex; flex-direction:column;';
     overlay.innerHTML = `
       <div style="position:sticky; top:0; z-index:10; background:#f5f5f5; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d97706; -webkit-print-color-adjust:exact;">
-        <span style="font-weight:bold; font-size:14px; color:#333;">📋 Vista de Impresión — Cuaderno Digital</span>
+        <span style="font-weight:bold; font-size:14px; color:#333;">Vista de Impresión — Cuaderno Digital</span>
         <div style="display:flex; gap:10px;">
-          <button id="cuaderno-btn-print" style="padding:10px 24px; font-size:14px; cursor:pointer; background:#d97706; color:#fff; border:none; border-radius:6px; font-weight:bold;">📄 Compartir / Imprimir PDF</button>
+          <button id="cuaderno-btn-print" style="padding:10px 24px; font-size:14px; cursor:pointer; background:#d97706; color:#fff; border:none; border-radius:6px; font-weight:bold;">Compartir / Imprimir PDF</button>
           <button id="cuaderno-btn-cerrar" style="padding:10px 20px; font-size:14px; cursor:pointer; background:#666; color:#fff; border:none; border-radius:6px;">${Icons.cerrar()} Cerrar</button>
         </div>
       </div>
@@ -648,7 +648,7 @@ const CuadernoDigitalView = {
         `;
         loader.innerHTML = `
           <div class="pdf-loader">
-            <div class="pdf-loader-emoji">📄</div>
+            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
             <div class="pdf-loader-title">Generando PDF</div>
             <div class="pdf-loader-desc">Cuaderno Digital</div>
             <div class="pdf-loader-bar">
@@ -739,7 +739,7 @@ const CuadernoDigitalView = {
     const ingresosLeche = d.ventasLeche.reduce((s, v) => s + (v.precio_total || v.importe || 0), 0);
 
     return `
-    <h1>📋 CUADERNO DIGITAL DE EXPLOTACIÓN</h1>
+    <h1>CUADERNO DIGITAL DE EXPLOTACIÓN</h1>
     <p style="text-align:center; font-size:9px; color:#666;">Real Decreto 787/2023 · Generado: ${new Date().toLocaleString('es-ES')}</p>
 
     <h2>1. Datos de la Explotación</h2>

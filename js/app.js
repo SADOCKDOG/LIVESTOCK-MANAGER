@@ -717,8 +717,8 @@ const App = {
 
   /**
    * Toast semántico (G9). El tipo se infiere del marcador en CUALQUIER posición:
-   * ✅ success · ❌ error · ⚠️ warning · ℹ️ info. Sin marcador → neutro (dorado).
-   * Los emojis (marcadores y decorativos: 🗑️💾🎯🔔…) se retiran del texto:
+   * success · error · warning · info. Sin marcador → neutro (dorado).
+   * Los emojis (marcadores y decorativos:…) se retiran del texto:
    * el icono lo aporta Toast como SVG semántico (Icons.check/alerta/cerrar/info).
    */
   toast(msg, duracionMs) {
@@ -802,7 +802,7 @@ const App = {
                             <tr><td class="td-lbl">Establecimiento Destino</td><td class="td-val">${albaran.trazabilidad.matadero}</td></tr>
                             <tr><td class="td-lbl">Nº Albarán</td><td class="td-val">${albaran.trazabilidad.numero_albaran || 'N/A'}</td></tr>
                             <tr><td class="td-lbl">DIMOE</td><td class="td-val">${albaran.trazabilidad.dimoe || 'N/A'}</td></tr>
-                            <tr style="background:#f9f9f9;"><td colspan="2" class="td-lbl">🚛 TRANSPORTE</td></tr>
+                            <tr style="background:#f9f9f9;"><td colspan="2" class="td-lbl">TRANSPORTE</td></tr>
                             <tr><td class="td-lbl">Transportista</td><td class="td-val">${albaran.trazabilidad.transportista?.nombre || 'N/D'}</td></tr>
                             <tr><td class="td-lbl">NIF Transportista</td><td class="td-val">${albaran.trazabilidad.transportista?.nif || 'N/D'}</td></tr>
                             <tr><td class="td-lbl">Matrícula</td><td class="td-val">${albaran.trazabilidad.transportista?.matricula || 'N/D'}</td></tr>
@@ -820,7 +820,7 @@ const App = {
                 </div>
             </div>
             <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-                <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">📄 DESCARGAR PDF</button>
+                <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">DESCARGAR PDF</button>
                 <button class="btn btn-secondary" onclick="document.getElementById('albaran-preview-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
             </div>
         `;
@@ -838,7 +838,7 @@ const App = {
         `;
         loader.innerHTML = `
           <div class="pdf-loader">
-            <div class="pdf-loader-emoji">📄</div>
+            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
             <div class="pdf-loader-title">Generando PDF</div>
             <div class="pdf-loader-desc">Albarán ${albaran.cabecera.numero_albaran}</div>
             <div class="pdf-loader-bar">
@@ -1101,8 +1101,8 @@ const App = {
       // 2️⃣ Mensaje informativo si no hay Web NFC o falló
       if (!('NDEFReader' in window)) {
         App.toast(
-          '⚠️ NFC en móvil NO lee crotales LF (134.2 kHz). ' +
-          'Usa el botón 📷 SCAN para leer el código visual con la cámara. ' +
+          'NFC en móvil NO lee crotales LF (134.2 kHz). ' +
+          'Usa el botón SCAN para leer el código visual con la cámara. ' +
           'Para lectura electrónica, conecta un lector RFID Bluetooth externo (Allflex, Datamars).',
           6000
         );
@@ -1202,7 +1202,7 @@ const App = {
     overlay.innerHTML = `
       <div id="scanner-container" class="flex-1 w-full overflow-hidden"></div>
       <div class="p-14 text-center bg-dark">
-        <div class="text-white text-sm mb-8">🔍 Enfoca el código de barras o QR del crotal</div>
+        <div class="text-white text-sm mb-8">Enfoca el código de barras o QR del crotal</div>
         <button class="btn btn-primary btn-sm btn--red" onclick="App._cancelarScanWeb()">✕ Cancelar</button>
       </div>`;
     document.body.appendChild(overlay);
@@ -1527,7 +1527,7 @@ const App = {
       document.getElementById("app-content").innerHTML = `
         <div class="mb-20">
           <a href="#/comercializacion?tab=carne" class="text-gold no-underline">← Volver</a>
-          <h2 class="text-white mt-10">🥩 Detalle de Venta</h2>
+          <h2 class="text-white mt-10">Detalle de Venta</h2>
         </div>
 
         <div class="card mb-20 border-top-5-danger">
@@ -1569,7 +1569,7 @@ const App = {
             <div class="text-gray text-tiny uppercase font-bold mb-4">Comprador / Destino</div>
             <div class="text-white font-bold">${v.razonSocial || 'N/D'}</div>
             <div class="text-gray text-xs">NIF: ${v.nifComprador || 'N/D'}</div>
-            <div class="text-gray text-xs mt-4">📍 ${v.codigoMatadero || ''}</div>
+            <div class="text-gray text-xs mt-4">${v.codigoMatadero || ''}</div>
           </div>
 
           <div class="flex gap-10 mt-30">
@@ -1709,7 +1709,7 @@ const App = {
     const id = params.get("id");
     const g = await window.db.get("gastos_ganaderia", parseInt(id));
     document.getElementById("app-content").innerHTML = `
-            <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="text-gold" class="no-underline">← Volver</a><h2>💸 Ficha de Gasto</h2></div>
+            <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="text-gold" class="no-underline">← Volver</a><h2>Ficha de Gasto</h2></div>
             <div class="card border-top-4-blue">
                 <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
                 <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">

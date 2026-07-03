@@ -244,13 +244,13 @@ const AlertasService = {
       let pacAlerta = null;
       if (mes >= 1 && mes <= 3) {
         pacAlerta = {
-          mensaje: '🌾 Solicitud Única PAC — plazo del 1 de febrero al 30 de abril',
+          mensaje: 'Solicitud Única PAC — plazo del 1 de febrero al 30 de abril',
           urgencia: mes === 3 ? 'amarillo' : 'verde',
           accion: 'Presentar solicitud única PAC (SIGPAC, DUN, cuaderno digital).',
         };
       } else if (mes === 4) {
         pacAlerta = {
-          mensaje: '🌾 Solicitud Única PAC — finaliza el 30 de abril',
+          mensaje: 'Solicitud Única PAC — finaliza el 30 de abril',
           urgencia: 'rojo',
           accion: 'Último mes para presentar la solicitud única PAC sin penalización.',
         };
@@ -258,7 +258,7 @@ const AlertasService = {
       // Umbrales PAC específicos por comunidad
       if (cc.toLowerCase().includes('extremadura') && mes >= 6 && mes <= 7) {
         pacAlerta = {
-          mensaje: '📋 Declaración de ayudas asociadas (Extremadura) — plazo abierto',
+          mensaje: 'Declaración de ayudas asociadas (Extremadura) — plazo abierto',
           urgencia: 'amarillo',
           accion: 'Presentar documentación de ayudas asociadas a la PAC en Extremadura.',
         };
@@ -348,7 +348,7 @@ const AlertasService = {
 
     if (mes >= 9 && mes <= 11) {
       return {
-        titulo: '🍂 Otoño: Pre-Cubrición',
+        titulo: 'Otoño: Pre-Cubrición',
         sugerencias: [
           'Vacuna contra Abortos (Clamidia/Toxoplasmosis)',
           'Suplementar Vitamina A, D3, E para fertilidad',
@@ -358,7 +358,7 @@ const AlertasService = {
     }
     if (mes >= 3 && mes <= 5) {
       return {
-        titulo: '🌸 Primavera: Pre-Parto y Destete',
+        titulo: 'Primavera: Pre-Parto y Destete',
         sugerencias: [
           'Vacuna Clostridial (4 sem antes del parto)',
           'Vigilar Cetosis (Propilenglicol si gestación múltiple)',
@@ -368,7 +368,7 @@ const AlertasService = {
     }
     if (mes >= 6 && mes <= 8) {
       return {
-        titulo: '☀️ Verano',
+        titulo: 'Verano',
         sugerencias: [
           'Asegurar sombra y agua limpia abundante',
           'Control de parásitos externos (Moscas, garrapatas)',
@@ -377,7 +377,7 @@ const AlertasService = {
       };
     }
     return {
-      titulo: '❄️ Invierno',
+      titulo: 'Invierno',
       sugerencias: [
         'Asegurar forraje y resguardo contra frío',
         'Vigilar problemas respiratorios (Neumonías)',

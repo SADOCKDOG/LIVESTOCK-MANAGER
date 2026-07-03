@@ -1578,7 +1578,7 @@ label {
 .asistente-icono {
     font-size: 32px; margin-right: 20px; background: #1a1a1a;
     width: 60px; height: 60px; display: flex; align-items: center;
-    justify-content: center; border-radius: 14px;
+    justify-content: center; border-radius: 14px; color: var(--p-gold, #c9851f);
 }
 .asistente-info-opcion { flex: 1; }
 .asistente-titulo      { font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
@@ -1652,7 +1652,7 @@ label {
 }
 .tour-btn-cerrar:hover { background: rgba(255,255,255,0.15); color: #fff; }
 .tour-body   { padding: 40px 28px 20px; text-align: center; flex: 1; overflow-y: auto; }
-.tour-icono  { font-size: 3.2rem; margin-bottom: 16px; display: block; }
+.tour-icono  { font-size: 3.2rem; margin-bottom: 16px; display: block; color: var(--p-gold, #c9851f); }
 .tour-titulo { color: #fff; font-size: 1.3rem; font-weight: 800; margin: 0 0 14px 0; letter-spacing: -0.3px; }
 .tour-texto  { color: #aaa; font-size: 0.9rem; line-height: 1.65; margin: 0 0 18px 0; }
 .tour-accion { margin: 10px 0; }
@@ -2853,7 +2853,7 @@ label {
 
 /* === PDF loader overlay widget === */
 .pdf-loader         { width: 280px; text-align: center; }
-.pdf-loader-emoji   { font-size: 3rem; margin-bottom: 20px; animation: bounce 2s infinite; }
+.pdf-loader-icon    { animation: bounce 2s infinite; }
 .pdf-loader-title   { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
 .pdf-loader-desc    { font-size: 0.85rem; color: #aaa; margin-bottom: 20px; }
 .pdf-loader-bar     { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; }

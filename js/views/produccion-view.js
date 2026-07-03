@@ -387,7 +387,7 @@ const ProduccionView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
         <div class="card p-25" style="max-width:400px; ">
-          <h3 class="mt-0 text-gold text-md">🧾 Editar Gasto</h3>
+          <h3 class="mt-0 text-gold text-md">Editar Gasto</h3>
 
           <div class="wizard-input-group mt-15">
             <label class="wizard-label">Concepto</label>

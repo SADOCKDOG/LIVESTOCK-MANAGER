@@ -64,7 +64,7 @@ const AlbaranesVentasView = {
       main.innerHTML = this._renderHTML(todosRegistros);
     } catch (e) {
       console.error('[AlbaranesVentasView] Error:', e);
-      main.innerHTML = `<div class="card text-center p-40 text-red">❌ Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red">Error: ${e.message}</div>`;
     }
   },
 

@@ -53,7 +53,7 @@ const CompradoresView = {
             this._renderActiveModule();
         } catch (e) {
             console.error('[CompradoresView] Error:', e);
-            document.getElementById("module-container").innerHTML = `<div class="card text-center p-40 text-red">❌ Error al cargar datos: ${e.message}</div>`;
+            document.getElementById("module-container").innerHTML = `<div class="card text-center p-40 text-red">Error al cargar datos: ${e.message}</div>`;
         }
     },
 
