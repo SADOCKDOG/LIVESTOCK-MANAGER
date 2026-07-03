@@ -35,6 +35,7 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 - Formato **Fichas (Cards)** en lugar de tablas clásicas.
 - Cada ficha (`.card-animal`, `.entity-card`) es un rectángulo horizontal con fondo `#1E1E1E`.
 - **Indicador lateral**: Llevan una franja vertical a la izquierda (`border-left: 4px solid var(--color)`) para indicar el estado o módulo.
+- **Componente CANÓNICO obligatorio**: `.card-registro` (styles.css). Color semántico por clase `.registro-success/-danger/-warning/-info/-purple/-pink/-orange` o inline `--registro-color: ${colorDinámico}` cuando depende del dato (p. ej. especie). PROHIBIDO crear nuevas variantes ad-hoc (`card-animal` + inline, `card-left-*`, etc. son legacy en extinción).
 - Alineación: Información principal a la izquierda, acciones o KPIs clave a la derecha.
 
 ### C. Formularios, Inputs y Wizards

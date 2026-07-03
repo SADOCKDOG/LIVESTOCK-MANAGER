@@ -52,7 +52,7 @@ const RebanosView = {
         const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(r.especie) : colorEstado;
 
         html += `
-          <div class="card card-animal no-underline" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid ${colorEspecie}; padding:14px; margin:0; margin-bottom:8px;">
+          <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${colorEspecie};">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">

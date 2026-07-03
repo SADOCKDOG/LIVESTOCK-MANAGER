@@ -212,8 +212,8 @@ const CompradoresView = {
           const cContratos = contratosPorComprador[c.id] || [];
 
           return `
-          <div class="card card-animal no-underline" onclick="CompradoresView.renderDetalle(${c.id})"
-            style="border-left:4px solid ${color}; padding:14px; margin:0; margin-bottom:8px; cursor:pointer; background:rgba(0,0,0,0.2);">
+          <div class="card-registro" onclick="CompradoresView.renderDetalle(${c.id})"
+            style="--registro-color: ${color};">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-start w-full">
                 <div class="flex items-center gap-10 min-w-0">
