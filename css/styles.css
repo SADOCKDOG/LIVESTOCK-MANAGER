@@ -127,12 +127,13 @@ header {
     background: linear-gradient(
         to right,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.25) 50%,
         rgba(255, 255, 255, 0) 100%
     );
     transform: rotate(30deg);
     animation: rega-haz-luz 3.5s infinite linear;
     pointer-events: none;
+    z-index: 0; /* Asegura que el haz esté por debajo del texto */
 }
 
 @keyframes rega-haz-luz {
@@ -144,7 +145,8 @@ header {
     overflow: hidden;
     white-space: nowrap;
     position: relative;
-    z-index: 1;
+    z-index: 2; /* Texto claramente por encima para nitidez total */
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); /* Sombra para reforzar el contraste sobre el haz */
 }
 
 /* Header contextual — título de vista + botón volver */
