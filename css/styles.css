@@ -823,6 +823,8 @@ label {
 /* Colores según MAPA ÚNICO de módulos (js/module-colors.js + design-tokens.css) */
 .more-sheet-item[href="#/zonas"] { color: var(--c-success); }
 .more-sheet-item[href="#/leche"] { color: var(--c-info); }
+.more-sheet-item[href="#/carne"] { color: var(--c-danger); }
+.more-sheet-item[href="#/hibrido"] { color: var(--c-success); }
 .more-sheet-item[href="#/comercializacion"] { color: var(--c-success); }
 .more-sheet-item[href="#/compradores"] { color: var(--c-info); }
 .more-sheet-item[href="#/proveedores"] { color: var(--c-purple); }
