@@ -98,7 +98,7 @@ const GanaderiaView = {
 
 
 
-      <div class="card p-14 mb-14 border-222">
+      <div class="card-registro p-14 mb-14 border-222" style="--registro-color: ${meta.color};">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Rebaños del modo ${meta.label}
         </div>
@@ -120,7 +120,7 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="card p-14 border-222">
+      <div class="card-registro p-14 border-222" style="--registro-color: ${meta.color};">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Censo reciente (${animalesModo.length} total · ${especies.size} ${especies.size === 1 ? "especie" : "especies"})
         </div>

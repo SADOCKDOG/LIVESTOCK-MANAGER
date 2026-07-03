@@ -22,7 +22,7 @@ const ProveedoresView = {
 
           <div class="mb-16">
             <div id="prov-kpis"></div>
-            <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+            <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--p-gold); --theme-color: var(--p-gold);">
               <div class="section-header-theme">ACCIONES</div>
               <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
                 <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ProveedoresView.renderFormulario()">
@@ -53,7 +53,7 @@ const ProveedoresView = {
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
+              <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-accent); width:100%;">
                 <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
                 <div class="flex flex-col">
                   <div class="py-8 flex justify-between items-center border-bottom-222">
@@ -105,8 +105,8 @@ const ProveedoresView = {
         }
 
         contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => `
-          <div class="card-registro registro-purple" onclick="ProveedoresView.renderDetalle(${p.id})"
-            style="width:100%;">
+          <div class="card-registro" onclick="ProveedoresView.renderDetalle(${p.id})"
+            style="--registro-color: var(--c-purple); width:100%;">
             <div class="flex justify-between items-start gap-6" style="width:100%;">
               <div class="min-w-0 flex-1" style="min-width:0;">
                 <div class="flex items-center gap-6">
@@ -151,7 +151,7 @@ const ProveedoresView = {
           </div>
 
           <!-- Cabecera -->
-          <div class="card p-20 border-top-3px border-top-3px-green bg-black">
+          <div class="card-registro" style="--registro-color: var(--c-success);">
             <div class="flex justify-between items-start mb-16">
               <div>
                 <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
@@ -199,7 +199,7 @@ const ProveedoresView = {
           </div>
 
           <!-- Desglose por categoría -->
-          <div class="card p-16 mb-16 border-222 bg-black">
+          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-info);">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
                 ${Icons.grafico()} GASTOS POR CATEGORÍA
             </div>
@@ -216,7 +216,7 @@ const ProveedoresView = {
           </div>
 
           <!-- Historial de Gastos -->
-          <div class="card p-16 mb-20 border-222 bg-black">
+          <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-warning);">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
                 ${Icons.dinero()} ÚLTIMOS REGISTROS
             </div>
@@ -237,7 +237,7 @@ const ProveedoresView = {
           </div>
 
           ${proveedor.notas ? `
-          <div class="card card-accent card-accent-gold p-16 mb-40">
+          <div class="card-registro card-accent card-accent-gold p-16 mb-40" style="--registro-color: var(--p-gold);">
             <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
             <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${proveedor.notas}</p>
           </div>` : '<div class="pb-40"></div>'}
@@ -266,7 +266,7 @@ const ProveedoresView = {
               <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
             </button>
           </div>
-          <div class="card card-accent card-accent-green p-20 bg-black">
+          <div class="card-registro card-accent card-accent-green p-20 bg-black" style="--registro-color: var(--c-success);">
             <div class="section-header-theme mb-20" style="--theme-color: var(--c-success)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
 
             <div class="wizard-input-group mb-15">

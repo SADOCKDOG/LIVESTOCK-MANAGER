@@ -164,7 +164,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 1. EXPLOTACIÓN -->
-      <div class="card card-left-amber">
+      <div class="card-registro" style="--registro-color: var(--c-warning);">
         <h3 class="section-h3 text-gold">1. ${Icons.home()} Datos de la Explotación</h3>
         <div class="grid grid-cols-2 gap-6 text-85">
           <div><span class="text-gray">Nombre:</span> <strong class="text-white">${f.nombre || '—'}</strong></div>
@@ -185,7 +185,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 2. CENSO -->
-      <div class="card card-left-blue">
+      <div class="card-registro" style="--registro-color: var(--c-info);">
         <h3 class="section-h3 text-blue-400" id="seccion-censo">2. ${Icons.rebanos()} Censo Actual <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
         <div class="text-3xl font-black text-white mb-10">${d.totalActivos} ${d.totalActivos === 1 ? 'animal activo' : 'animales activos'}</div>
         ${Object.entries(d.censo).length === 0 ? '<p class="empty-state-text mb-0">Sin animales registrados.</p>' : ''}
@@ -208,7 +208,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 3.b ENTRADAS / SALIDAS / NACIMIENTOS / MUERTES (SIGGAN) -->
-      <div class="card card-left-purple">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <h3 class="section-h3 text-purple-400" id="seccion-siggan-movs">3.b ${Icons.documento()} Libro de Registro SIGGAN (${d.year})</h3>
         <div class="grid grid-cols-4 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
@@ -241,7 +241,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 3. MOVIMIENTOS -->
-      <div class="card card-left-purple">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <h3 class="section-h3 text-purple-400" id="seccion-movimientos">3. ${Icons.rotacion()} Movimientos y Eventos</h3>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
@@ -269,7 +269,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 4. SANIDAD -->
-      <div class="card card-left-red">
+      <div class="card-registro" style="--registro-color: var(--c-danger);">
         <h3 class="section-h3 text-red" id="seccion-sanidad">4. ${Icons.sanidad()} Registro Sanitario</h3>
         <div class="grid grid-cols-2 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
@@ -300,7 +300,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 4.b SANEAMIENTOS / CAMPAÑAS OFICIALES (SIGGAN) -->
-      <div class="card card-left-red">
+      <div class="card-registro" style="--registro-color: var(--c-danger);">
         <h3 class="section-h3 text-red" id="seccion-saneamientos">4.b ${Icons.veterinario()} Campañas de Saneamiento (ADSG)</h3>
         <div class="text-sm mh-200">
           ${d.saneamientos.slice(0, 20).map(s =>
@@ -315,7 +315,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 5. REPRODUCCIÓN -->
-      <div class="card card-left-pink">
+      <div class="card-registro" style="--registro-color: var(--c-pink);">
         <h3 class="section-h3 text-pink" id="seccion-repro">5. ${Icons.reproduccion()} Registro Reproductivo</h3>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
@@ -343,7 +343,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 6. PRODUCCIÓN -->
-      <div class="card card-left-green">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <h3 class="section-h3 text-green" id="seccion-produccion">6. ${Icons.paquete()} Producción</h3>
         <div class="grid grid-cols-2 gap-10">
           <div class="rounded-sm p-12 bg-dark">
@@ -364,7 +364,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 7. RESUMEN ECONÓMICO -->
-      <div class="card card-left-amber">
+      <div class="card-registro" style="--registro-color: var(--c-warning);">
         <h3 class="section-h3 text-gold" id="seccion-economico">7. ${Icons.dinero()} Resumen Económico</h3>
         <div class="grid grid-cols-2 gap-10">
           <div class="rounded-sm p-12 bg-dark">
@@ -383,7 +383,7 @@ const CuadernoDigitalView = {
       </div>
 
       <!-- 8. TRANSPORTISTAS -->
-      <div class="card card-left-blue">
+      <div class="card-registro" style="--registro-color: var(--c-info);">
         <h3 class="section-h3 text-blue-400">8. ${Icons.transportistas()} Transportistas</h3>
         ${d.transportistas.length > 0 ? d.transportistas.map(t => `
         <div class="flex justify-between rounded-sm mb-6 bg-dark text-82 px-12 py-8">

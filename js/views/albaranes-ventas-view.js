@@ -64,7 +64,7 @@ const AlbaranesVentasView = {
       main.innerHTML = this._renderHTML(todosRegistros);
     } catch (e) {
       console.error('[AlbaranesVentasView] Error:', e);
-      main.innerHTML = `<div class="card text-center p-40 text-red">Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error: ${e.message}</div>`;
     }
   },
 
@@ -90,7 +90,7 @@ const AlbaranesVentasView = {
         <div class="info-box-center border-left-gold"><small class="s-lbl">VENTAS CARNE</small><div class="inf-val-lg text-gold">${totalCarne.toFixed(2)} €</div></div>
       </div>
 
-      <div class="card p-14 mb-14 flex items-center justify-between gap-10">
+      <div class="card-registro p-14 mb-14 flex items-center justify-between gap-10" style="--registro-color: var(--c-gray);">
         <div class="flex-1">
           <input type="text" id="sales-search-input" placeholder="Buscar por comprador, número de albarán..." class="wizard-input text-sm" value="${this._searchQuery}" oninput="AlbaranesVentasView._buscar(this.value)">
         </div>
@@ -143,7 +143,7 @@ const AlbaranesVentasView = {
         const esBorrador = reg.estado === 'borrador';
 
         return `
-          <div class="card" style="border-left:4px solid ${color};">
+          <div class="card-registro" style="--registro-color: ${color};">
             <div class="flex justify-between items-start">
               <div>
                 <div class="font-800 text-xs" style="color:${color}; display:flex; align-items:center; gap:6px;">
@@ -262,7 +262,7 @@ const AlbaranesVentasView = {
       }
 
       overlay.innerHTML = `
-        <div class="card" style="max-width:550px;width:100%;padding:24px;">
+        <div class="card-registro" style="--registro-color: var(--c-info); max-width:550px;width:100%;padding:24px;">
           <div class="flex justify-between items-center mb-14">
             <div>
               <div class="font-800 text-sm" style="color:${color};">${tipo === 'leche' ? 'ENTREGA DE LECHE' : 'VENTA DE CARNE'}</div>

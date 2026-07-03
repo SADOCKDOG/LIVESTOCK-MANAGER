@@ -186,7 +186,7 @@ const HibridoView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card report-section p-16 border-top-3px border-top-3px-orange">
+      <div class="card-registro" style="--registro-color: var(--c-warning);">
         <div class="flex items-center gap-12 mb-16">
           <span class="text-3xl">${Icons.edificio()}</span>
           <div>
@@ -209,7 +209,7 @@ const HibridoView = {
         </div>
         <div class="grid gap-10">
           ${d.rebanos.map(r => `
-            <div class="card card-animal" onclick="location.hash='/rebano?id=${r.id}'" style="border-left:4px solid var(--c-warning);">
+            <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: var(--c-warning);">
               <div class="flex justify-between items-start">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-6">
@@ -262,7 +262,7 @@ const HibridoView = {
     lList.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
     const html = `
-      <div class="card report-section p-16 border-top-3px border-top-3px-green">
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.transportistas()}</span>
@@ -297,7 +297,7 @@ const HibridoView = {
           ${lList.slice(0, 15).map(l => {
             const color = l.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
             return `
-              <div class="card card-animal" onclick="${l.onclick}" style="border-left:4px solid ${color};">
+              <div class="card-registro" onclick="${l.onclick}" style="--registro-color: ${color};">
                 <div class="flex justify-between items-start">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-6">
@@ -344,7 +344,7 @@ const HibridoView = {
 
     const html = `
       ${alertasHtml}
-      <div class="card report-section p-16 border-top-3px" style="border-top-color:var(--c-purple);">
+      <div class="card-registro" style="--registro-color: var(--c-purple);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.documento()}</span>
@@ -376,7 +376,7 @@ const HibridoView = {
                 const enSupL = d.supresionesLeche.some(ts => ts.id === s.id);
                 const color = (enSupC || enSupL) ? 'var(--c-danger)' : 'var(--c-purple)';
                 return `
-                  <div class="card card-animal" style="border-left:4px solid ${color};">
+                  <div class="card-registro" style="--registro-color: ${color};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-6">

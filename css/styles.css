@@ -99,18 +99,52 @@ header {
     flex-shrink: 0;
 }
 
-/* #finca-badge: estilos visuales inline en index.html.
-   Sin punto indicador ni viñeta de alertas: la viñeta va pegada al botón
-   central (grid 1fr auto 1fr del header) y limita su ancho para el nombre. */
-#finca-badge {
+/* #finca-badge: Viñeta REGA con efecto "haz de luz" (shimmer)
+   Se adapta al tamaño del código REGA. */
+#finca-badge.rega-badge-container {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #444;
+    padding: 4px 12px;
+    border-radius: 20px;
+    filter: drop-shadow(0 0 6px var(--header-neon-color, rgba(204, 255, 0, 0.5)));
+    transition: filter 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-self: center; /* Centrado en su columna, entre el botón central y el borde derecho */
     min-width: 0;
-    max-width: 240px;
+}
+
+#finca-badge.rega-badge-container::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: rega-haz-luz 3.5s infinite linear;
+    pointer-events: none;
+}
+
+@keyframes rega-haz-luz {
+    0% { transform: translateX(-150%) rotate(30deg); }
+    100% { transform: translateX(150%) rotate(30deg); }
 }
 
 #nombre-finca-header {
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    position: relative;
+    z-index: 1;
 }
 
 /* Header contextual — título de vista + botón volver */
@@ -1107,20 +1141,20 @@ label {
    Los datos calculados/resúmenes NO usan esta clase (van sin franja).
    ============================================================ */
 .card-registro {
-    /* Contraste gris + efecto relieve (estilo de referencia: Rebaños del modo / Censo reciente) */
-    background: linear-gradient(145deg, var(--surface) 0%, #151515 100%);
+    /* Estilo estandarizado para tarjetas de registro - basado en Menú Leche --> Patrimonio y Ganado --> Rebaños Lácteos Activos */
+    background: var(--surface);
     border: 1px solid var(--border);
     border-left: 4px solid var(--registro-color, var(--text-s));
-    border-radius: var(--r-lg);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
-    padding: 12px 14px;
-    margin: 0 0 8px;
+    border-radius: var(--radius);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(212,163,115,0.1);
+    padding: 16px;
+    margin: 0 0 20px;
     cursor: pointer;
     text-decoration: none;
-    transition: transform 0.2s ease;
+    transition: transform 0.25s ease;
     -webkit-tap-highlight-color: transparent;
 }
-.card-registro:active { transform: scale(0.98); }
+.card-registro:active { transform: translateY(-2px); }
 /* Tipografía NORMALIZADA dentro de la ficha (escala de tokens) */
 .card-registro .registro-titulo {
     font-size: var(--fs-sm);
@@ -3192,15 +3226,6 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 .pb-8 { padding-bottom: 8px; }
 .bg-green-subtle { background: rgba(204,255,0,0.03); }
 .cursor-pointer { cursor: pointer; }
-
-/* Animación de marquesina para la finca activa */
-@keyframes marquee {
-    0%, 20% { transform: translateX(0); }
-    80%, 100% { transform: translateX(calc(-100% + 90px)); }
-}
-.marquee-text {
-    animation: marquee 6s linear infinite alternate;
-}
 
 /* =========================================================================
    REGLA ESTRICTA DE DISEÑO: NO LÍNEAS SUPERIORES EN LAS CARDS

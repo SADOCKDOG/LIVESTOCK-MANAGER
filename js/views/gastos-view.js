@@ -179,7 +179,7 @@ const GastosView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card report-section p-16 mb-14" >
+      <div class="card-registro" style="--registro-color: ${color};">
         <div class="flex items-center gap-12 mb-12">
           <span class="text-3xl">${icon}</span>
           <div>
@@ -201,7 +201,8 @@ const GastosView = {
               </div>
             `).join('')}
           </div>
-        </div>` : ''}
+        </div>
+        ` : ''}
         <div class="text-center mb-12">
           <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
             ${Icons.agregar()} ${registrarLabel}

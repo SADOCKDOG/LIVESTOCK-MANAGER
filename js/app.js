@@ -154,7 +154,7 @@ const App = {
     const finca = await Fincas.getActive();
     const headerEl = document.getElementById("nombre-finca-header");
     if (headerEl && finca) {
-      headerEl.innerHTML = finca.nombre;
+      headerEl.innerHTML = finca.rega || finca.codigo_REGA || 'SIN REGA';
       headerEl.onclick = () => (location.hash = "/ajustes");
       headerEl.style.cursor = "pointer";
     }

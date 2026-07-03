@@ -105,7 +105,7 @@ const ProduccionView = {
       ? records.map(r => {
         const borderCls = r.typeColor || color;
         return `
-        <div class="card card-animal" onclick="${r.onclick || ''}" style="border-left:4px solid ${borderCls};">
+        <div class="card-registro" onclick="${r.onclick || ''}" style="--registro-color: ${borderCls};">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-8">
