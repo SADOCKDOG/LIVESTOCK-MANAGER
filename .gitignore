@@ -40,3 +40,7 @@ js/mode-config.js
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Artefactos temporales de pruebas
+tmp/
+tmp_test/
