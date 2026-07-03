@@ -564,6 +564,10 @@ const AjustesView = {
 
   async _toggleAlerta(id, checked) {
     await this._saveConfig({ [id]: checked });
+    // Recalcular alertas en vivo (dashboard escucha 'alertas:updated')
+    if (window.AlertasService && window.EventBus) {
+      AlertasService.getAll().then(a => EventBus.emit('alertas:updated', a)).catch(() => {});
+    }
     App.toast(checked ? '🔔 Alerta activada' : '🔕 Alerta desactivada');
   },
 

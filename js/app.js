@@ -26,6 +26,7 @@ const App = {
     "/venta-carne": "renderDetalleVentaCarne",
     "/gasto": "renderDetalleGasto",
     "/informes": "renderInformes",
+    "/alertas": "renderAlertas",
     "/ajustes": "renderAjustes",
     "/compradores": "renderCompradores",
     "/comprador": "renderComprador",
@@ -180,6 +181,7 @@ const App = {
     '/albaran-leche': 'Albarán Lácteo',
     '/gasto': 'Detalle Gasto',
     '/informes': 'Informes',
+    '/alertas': 'Alertas',
     '/ajustes': 'Ajustes',
     '/compradores': 'Compradores',
     '/comprador': 'Ficha Comprador',
@@ -253,6 +255,7 @@ const App = {
       { path: '/transportistas', label: 'Logística', icon: Icons.transportistas() },
       { path: '/gastos', label: 'Gastos', icon: Icons.dinero() },
       { path: '/informes', label: 'Informes', icon: Icons.libroVentas() },
+      { path: '/alertas', label: 'Alertas', icon: Icons.campana() },
       { path: '/cuaderno', label: 'Cuaderno', icon: Icons.libro() },
       { path: '/manuales', label: 'Manuales', icon: Icons.libro() },
       { path: '/ajustes', label: 'Ajustes', icon: Icons.ajustes() },
@@ -261,9 +264,20 @@ const App = {
     grid.innerHTML = items.map(item => `
       <a href="#${item.path}" class="header-dropdown-item" onclick="App._toggleHeaderDropdown()">
         <div class="icon" style="color: ${window.getModuleColor(item.path)}">${item.icon}</div>
-        <span>${item.label}</span>
+        <span>${item.label}${item.path === '/alertas' ? ' <span id="dropdown-alertas-count" style="display:none; background:var(--c-danger); color:#fff; border-radius:10px; padding:0 6px; font-size:0.65rem; font-weight:900; margin-left:4px; vertical-align:middle;"></span>' : ''}</span>
       </a>
     `).join('');
+
+    // Contador de alertas activas (asíncrono, no bloquea la apertura del menú)
+    if (window.AlertasService) {
+      AlertasService.getActiveCount().then(n => {
+        const badge = document.getElementById('dropdown-alertas-count');
+        if (badge && n > 0) {
+          badge.textContent = n > 99 ? '99+' : n;
+          badge.style.display = 'inline-block';
+        }
+      }).catch(() => {});
+    }
   },
 
   /**
@@ -353,6 +367,7 @@ const App = {
       '/albaran-leche': Icons.leche(),
       '/gasto': Icons.gastos(),
       '/informes': Icons.informes(),
+      '/alertas': Icons.campana(),
       '/ajustes': Icons.ajustes(),
       '/compradores': Icons.compradores(),
       '/comprador': Icons.compradores(),
@@ -700,30 +715,36 @@ const App = {
     return `rgba(${r},${g},${b},${alpha})`;
   },
 
+  /**
+   * Toast semántico (G9). El tipo se infiere del marcador en CUALQUIER posición:
+   * ✅ success · ❌ error · ⚠️ warning · ℹ️ info. Sin marcador → neutro (dorado).
+   * Los emojis (marcadores y decorativos: 🗑️💾🎯🔔…) se retiran del texto:
+   * el icono lo aporta Toast como SVG semántico (Icons.check/alerta/cerrar/info).
+   */
   toast(msg, duracionMs) {
     if (typeof msg !== 'string') return;
     let type = '';
-    let text = msg;
-    if (msg.startsWith('✅')) {
-      type = 'success';
-      text = msg.replace(/^✅\s*/, '');
-    } else if (msg.startsWith('❌')) {
-      type = 'error';
-      text = msg.replace(/^❌\s*/, '');
-    } else if (msg.startsWith('⚠️')) {
-      type = 'warning';
-      text = msg.replace(/^⚠️\s*/, '');
-    } else if (msg.startsWith('ℹ️') || msg.startsWith('info')) {
-      type = 'info';
-      text = msg.replace(/^(ℹ️|info)\s*/, '');
-    }
-    window.Toast.show(text, type, duracionMs);
+    if (msg.includes('✅')) type = 'success';
+    else if (msg.includes('❌')) type = 'error';
+    else if (msg.includes('⚠')) type = 'warning';
+    else if (msg.includes('ℹ') || /^info\b/i.test(msg)) type = 'info';
+    const text = msg
+      .replace(/^info\b\s*/i, '')
+      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}]/gu, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    window.Toast.show(text || msg, type, duracionMs);
   },
 
   toastError(msg) {
     if (typeof msg !== 'string') return;
-    const text = msg.replace(/^❌\s*/, '');
-    window.Toast.error(text);
+    const text = msg.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}]/gu, '').replace(/\s{2,}/g, ' ').trim();
+    // Un ⚠️ enviado por toastError es un aviso, no un error (G9)
+    if (msg.includes('⚠')) {
+      window.Toast.warning(text || msg);
+      return;
+    }
+    window.Toast.error(text || msg);
   },
 
   // ==========================================
@@ -1853,13 +1874,26 @@ const App = {
   // ==========================================
   //  // 9. INFORMES PREMIUM (v4.1.0)
   // ==========================================
-  async renderInformes() {
+  async renderInformes(params) {
     try {
+      // Soporte de deep-link: #/informes?tab=alertas (o cualquier sub-tab válido)
+      const tab = params?.get ? params.get('tab') : null;
+      if (tab && window.InformesView) {
+        const esValido = Object.values(InformesView._categories || {})
+          .some(cat => Object.prototype.hasOwnProperty.call(cat.tabs || {}, tab));
+        if (esValido) InformesView._currentTab = tab;
+      }
       await InformesView.render();
     } catch (e) {
       console.error("[App] Error delegando a InformesView:", e);
       App.toastError("Error al cargar informes");
     }
+  },
+
+  /** Ruta directa a las alertas (dropdown del header, dashboard). */
+  async renderAlertas() {
+    if (window.InformesView) InformesView._currentTab = 'alertas';
+    await App.renderInformes();
   },
 
   // [Eliminado] _renderizarGraficosInformes — los gráficos los gestiona InformesView

@@ -176,7 +176,7 @@ const DashboardView = {
             ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
           </ul>` : '<div class="text-grey" style="font-size: 0.8rem; margin-bottom: 20px;">Sin sugerencias para esta temporada.</div>'}
           <div class="text-center" style="border-top: 1px solid #2a2a2a; padding-top: 20px;">
-            <a href="#/informes?tab=alertas" class="text-blue no-underline" style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Ver Alertas Completas ${Icons.siguiente()}</a>
+            <a href="#/alertas" class="text-blue no-underline" style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Ver Alertas Completas ${Icons.siguiente()}</a>
           </div>
         </div>
       </div>

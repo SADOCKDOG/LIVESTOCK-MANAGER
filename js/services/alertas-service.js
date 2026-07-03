@@ -1,11 +1,27 @@
 /**
- * Livestock Manager - AlertasService v1.0.0
+ * Livestock Manager - AlertasService v1.1.0
  * Servicio centralizado de alertas: sanitarias, trazabilidad y calendario.
  * Reemplaza la lógica dispersa en App.renderDashboard y otros módulos.
+ * v1.1.0: respeta las preferencias de Ajustes → Gestión de Alertas (F6).
  */
 
 const AlertasService = {
   _listeners: new Set(),
+
+  /**
+   * Preferencias de Ajustes → Gestión de Alertas (meta/appConfig).
+   * Defaults alineados con AjustesView._loadConfig.
+   */
+  async _getPrefs() {
+    const defaults = {
+      alertSanidad: true, alertTrazabilidad: true, alertPAC: true,
+      alertADSG: true, alertINCOLAC: true, alertContratos: false,
+    };
+    try {
+      const cfg = await window.db.get('meta', 'appConfig');
+      return { ...defaults, ...(cfg?.value || {}) };
+    } catch (e) { return defaults; }
+  },
 
   /**
    * Suscribirse a cambios en las alertas
@@ -43,6 +59,8 @@ const AlertasService = {
    */
   async obtenerAlertasSanitarias() {
     try {
+      const prefs = await this._getPrefs();
+      if (prefs.alertSanidad === false) return [];
       const rebanos = await window.db.getAll('rebanos');
       const rebanosIds = rebanos.map(r => r.id);
       const todosTratamientos = await window.db.getAll('sanitarios_ganado') || [];
@@ -82,6 +100,8 @@ const AlertasService = {
    */
   async obtenerAlertasTrazabilidad() {
     try {
+      const prefs = await this._getPrefs();
+      if (prefs.alertTrazabilidad === false) return [];
       const animales = await window.db.getAll('animales');
       const hoy = new Date();
       const alertas = [];
@@ -168,11 +188,12 @@ const AlertasService = {
     try {
       const alertas = [];
       const hoy = new Date();
+      const prefs = await this._getPrefs();
 
       // 1. Contrato lácteo — vencimiento próximo
       const fincas = await window.db.getAll('fincas');
       const finca = fincas?.[0];
-      if (finca?.contrato_lacteo_fecha_fin) {
+      if (prefs.alertContratos !== false && finca?.contrato_lacteo_fecha_fin) {
         const fechaFin = new Date(finca.contrato_lacteo_fecha_fin);
         const diasRestantes = Math.ceil((fechaFin - hoy) / (1000 * 60 * 60 * 24));
         if (diasRestantes > 0 && diasRestantes <= 60) {
@@ -188,31 +209,33 @@ const AlertasService = {
       }
 
       // 2. INFOLAC — declaración mensual pendiente
-      const registrosLeche = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', finca?.id || 0);
-      const ultimoRegistro = registrosLeche.sort((a, b) => new Date(b.fechaRecogida) - new Date(a.fechaRecogida))[0];
-      if (ultimoRegistro) {
-        const ultimaFecha = new Date(ultimoRegistro.fechaRecogida);
-        const diasDesdeUltimo = Math.ceil((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
-        if (diasDesdeUltimo >= 25) {
+      if (prefs.alertINCOLAC !== false) {
+        const registrosLeche = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', finca?.id || 0);
+        const ultimoRegistro = registrosLeche.sort((a, b) => new Date(b.fechaRecogida) - new Date(a.fechaRecogida))[0];
+        if (ultimoRegistro) {
+          const ultimaFecha = new Date(ultimoRegistro.fechaRecogida);
+          const diasDesdeUltimo = Math.ceil((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
+          if (diasDesdeUltimo >= 25) {
+            alertas.push({
+              tipo: 'administrativa',
+              seccion: 'infolac',
+              mensaje: `Declaración INFOLAC pendiente. Última recogida hace ${diasDesdeUltimo} días`,
+              urgencia: diasDesdeUltimo >= 35 ? 'rojo' : 'amarillo',
+              accion: 'Declarar producción mensual en la plataforma INFOLAC de la comunidad autónoma.',
+              diasRestantes: 40 - diasDesdeUltimo,
+            });
+          }
+        } else if (finca) {
+          // Sin registros de leche — recordatorio de alta inicial
           alertas.push({
             tipo: 'administrativa',
             seccion: 'infolac',
-            mensaje: `Declaración INFOLAC pendiente. Última recogida hace ${diasDesdeUltimo} días`,
-            urgencia: diasDesdeUltimo >= 35 ? 'rojo' : 'amarillo',
-            accion: 'Declarar producción mensual en la plataforma INFOLAC de la comunidad autónoma.',
-            diasRestantes: 40 - diasDesdeUltimo,
+            mensaje: 'Sin registros de comercialización láctea. Dar de alta en INFOLAC.',
+            urgencia: 'amarillo',
+            accion: 'Registrar primera venta de leche y darse de alta en INFOLAC.',
+            diasRestantes: null,
           });
         }
-      } else if (finca) {
-        // Sin registros de leche — recordatorio de alta inicial
-        alertas.push({
-          tipo: 'administrativa',
-          seccion: 'infolac',
-          mensaje: 'Sin registros de comercialización láctea. Dar de alta en INFOLAC.',
-          urgencia: 'amarillo',
-          accion: 'Registrar primera venta de leche y darse de alta en INFOLAC.',
-          diasRestantes: null,
-        });
       }
 
       // 3. PAC — plazos según comunidad autónoma
@@ -240,7 +263,7 @@ const AlertasService = {
           accion: 'Presentar documentación de ayudas asociadas a la PAC en Extremadura.',
         };
       }
-      if (pacAlerta) {
+      if (pacAlerta && prefs.alertPAC !== false) {
         alertas.push({
           tipo: 'administrativa',
           seccion: 'pac',
@@ -252,7 +275,7 @@ const AlertasService = {
       }
 
       // 4. ADSG / REGA — renovación anual
-      if (finca?.adsg && finca?.adsg_fecha_vencimiento) {
+      if (prefs.alertADSG !== false && finca?.adsg && finca?.adsg_fecha_vencimiento) {
         const fechaAdsg = new Date(finca.adsg_fecha_vencimiento);
         const diasRestantesAdsg = Math.ceil((fechaAdsg - hoy) / (1000 * 60 * 60 * 24));
         if (diasRestantesAdsg > 0 && diasRestantesAdsg <= 45) {
@@ -268,24 +291,26 @@ const AlertasService = {
       }
 
       // 5. Contratos de compra próximos a vencer
-      try {
-        const contratosCompra = await window.db.getAll('contratos_compra') || [];
-        contratosCompra.forEach(ct => {
-          if (!ct.activo || !ct.fecha_fin) return;
-          const fechaFin = new Date(ct.fecha_fin);
-          const diasRestantes = Math.ceil((fechaFin - hoy) / (1000 * 60 * 60 * 24));
-          if (diasRestantes > 0 && diasRestantes <= 60) {
-            alertas.push({
-              tipo: 'administrativa',
-              seccion: 'contrato_compra',
-              mensaje: `Contrato ${ct.numero_contrato || ''} vence el ${fechaFin.toLocaleDateString('es-ES')} (${diasRestantes} días)`,
-              urgencia: diasRestantes <= 15 ? 'rojo' : diasRestantes <= 30 ? 'amarillo' : 'verde',
-              accion: 'Renovar contrato de compra con el comprador.',
-              diasRestantes,
-            });
-          }
-        });
-      } catch(e) { /* contratos_compra store puede no existir */ }
+      if (prefs.alertContratos !== false) {
+        try {
+          const contratosCompra = await window.db.getAll('contratos_compra') || [];
+          contratosCompra.forEach(ct => {
+            if (!ct.activo || !ct.fecha_fin) return;
+            const fechaFin = new Date(ct.fecha_fin);
+            const diasRestantes = Math.ceil((fechaFin - hoy) / (1000 * 60 * 60 * 24));
+            if (diasRestantes > 0 && diasRestantes <= 60) {
+              alertas.push({
+                tipo: 'administrativa',
+                seccion: 'contrato_compra',
+                mensaje: `Contrato ${ct.numero_contrato || ''} vence el ${fechaFin.toLocaleDateString('es-ES')} (${diasRestantes} días)`,
+                urgencia: diasRestantes <= 15 ? 'rojo' : diasRestantes <= 30 ? 'amarillo' : 'verde',
+                accion: 'Renovar contrato de compra con el comprador.',
+                diasRestantes,
+              });
+            }
+          });
+        } catch(e) { /* contratos_compra store puede no existir */ }
+      }
 
       // 6. Certificado transportista próximo a vencer
       try {
