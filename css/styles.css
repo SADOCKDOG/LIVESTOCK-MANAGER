@@ -1098,6 +1098,33 @@ label {
     padding: 16px;
 }
 
+/* ============================================================
+   CARD DE REGISTRO — componente CANÓNICO (AGENTS.md §3B)
+   Ficha generada por acción o alerta: franja izquierda semántica.
+   Color por clase .registro-* o inline --registro-color (dinámico).
+   Los datos calculados/resúmenes NO usan esta clase (van sin franja).
+   ============================================================ */
+.card-registro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--registro-color, var(--text-s));
+    border-radius: var(--r-lg);
+    padding: 14px;
+    margin: 0 0 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.card-registro:active { transform: scale(0.98); }
+.registro-success { --registro-color: var(--c-success); }
+.registro-danger  { --registro-color: var(--c-danger); }
+.registro-warning { --registro-color: var(--c-warning); }
+.registro-info    { --registro-color: var(--c-info); }
+.registro-purple  { --registro-color: var(--c-purple); }
+.registro-pink    { --registro-color: var(--c-pink); }
+.registro-orange  { --registro-color: var(--c-orange); }
+
 /* ── Cards con borde izquierdo coloreado ── */
 .card-left-amber  { border-left: 4px solid var(--c-warning); }
 .card-left-blue   { border-left: 4px solid #3b82f6; }

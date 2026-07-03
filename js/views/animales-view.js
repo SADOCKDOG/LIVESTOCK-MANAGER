@@ -121,7 +121,7 @@ const AnimalesView = {
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
     return `
-      <div class="card card-animal no-underline" onclick="location.hash='/animal?id=${a.id}'" style="border-left:4px solid ${colorEspecie}; padding:14px; margin:0; margin-bottom:8px;">
+      <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${colorEspecie};">
         <div class="flex flex-col gap-10">
           <div class="flex justify-between items-center w-full">
             <div class="flex items-center gap-10 min-w-0">

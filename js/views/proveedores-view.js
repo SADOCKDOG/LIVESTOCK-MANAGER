@@ -105,8 +105,8 @@ const ProveedoresView = {
         }
 
         contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => `
-          <div class="card card-animal no-underline" onclick="ProveedoresView.renderDetalle(${p.id})"
-            style="border-left:4px solid var(--c-success); padding:12px; margin:0; width:100%;">
+          <div class="card-registro registro-purple" onclick="ProveedoresView.renderDetalle(${p.id})"
+            style="width:100%;">
             <div class="flex justify-between items-start gap-6" style="width:100%;">
               <div class="min-w-0 flex-1" style="min-width:0;">
                 <div class="flex items-center gap-6">
