@@ -574,21 +574,11 @@ const App = {
       }
 
       // Visibilidad en el Bottom Sheet (#nav-more-sheet)
+      // El sheet "Más" es el ÍNDICE COMPLETO de módulos: todos visibles siempre.
+      // (La ocultación de "duplicados encapsulados" dejaba módulos huérfanos,
+      //  solo alcanzables desde el desplegable del header — decisión de David 2026-07-04.)
       const sheetItems = document.querySelectorAll('#nav-more-sheet .more-sheet-item');
-      sheetItems.forEach(item => {
-        const href = item.getAttribute('href');
-        if (href === '#/leche') {
-          // Ocultar si ya está como botón principal o si es solo carne o si es hibrido (ya que leche está dentro de hibrido)
-          if (modo === 'leche' || modo === 'carne' || modo === 'hibrido') {
-            item.style.display = 'none';
-          } else {
-            item.style.display = 'flex';
-          }
-        } else if (href === '#/zonas' || href === '#/comercializacion' || href === '#/gastos' || href === '#/cuaderno' || href === '#/documentos') {
-          // Ocultar duplicados que ahora están encapsulados dentro de los bloques de los módulos
-          item.style.display = 'none';
-        }
-      });
+      sheetItems.forEach(item => { item.style.display = 'flex'; });
     } catch (e) {
       console.warn('[Navigation] Error en updateNavigationMenu:', e);
     }
