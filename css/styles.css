@@ -100,10 +100,9 @@ header {
 }
 
 /* #finca-badge: estilos visuales inline en index.html.
-   El punto de finca activa es EXTERNO (#finca-active-dot); la viñeta no lleva punto interior
-   y crece flexible para dar el máximo espacio al nombre. */
+   Sin punto indicador ni viñeta de alertas: la viñeta va pegada al botón
+   central (grid 1fr auto 1fr del header) y limita su ancho para el nombre. */
 #finca-badge {
-    flex: 1 1 auto;
     min-width: 0;
     max-width: 240px;
 }
@@ -3162,14 +3161,17 @@ body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 
 /* =========================================================================
    RETROILUMINACIÓN Y HAZ DE LUZ (Ajustes → Preferencias de Aplicación)
-   body.glow-marco-off   → desactiva la línea neón y el haz del marco principal
-   body.glow-botones-off → desactiva la retroiluminación de los botones
+   body.glow-marco-off     → desactiva la línea neón y el haz del marco principal
+   body.glow-laterales-off → desactiva solo el haz de luz lateral (izquierdo y derecho)
+   body.glow-botones-off   → desactiva la retroiluminación de los botones
    ========================================================================= */
 body.glow-marco-off header {
     border-bottom-color: #333333;
     box-shadow: none;
 }
 body.glow-marco-off::after { display: none; }
+/* Haz lateral: body::after son las líneas laterales con haz (izq. y dcha.) del marco */
+body.glow-laterales-off::after { display: none; }
 body.glow-marco-off nav.bottom-nav {
     border-top-color: #222;
     box-shadow: 0 -4px 15px rgba(0,0,0,0.5);

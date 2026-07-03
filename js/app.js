@@ -113,6 +113,7 @@ const App = {
           document.body.setAttribute('data-tema', cfg.value.colorTema);
         }
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
+        if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
       } catch (_) {}
       await App.route();
