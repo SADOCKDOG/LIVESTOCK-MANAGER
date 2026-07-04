@@ -66,7 +66,7 @@ body.scanner-active::after { display: none; }
    ============================================ */
 header {
     /* Transparencia unificada del marco: misma en header y bottom-nav */
-    background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    background: rgba(18, 18, 18, var(--banner-opacity, 0.4)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     height: calc(62px + var(--safe-top));
     padding: calc(4px + var(--safe-top)) 12px 0;
     display: flex;
@@ -349,7 +349,7 @@ nav.bottom-nav {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     height: calc(65px + var(--safe-bottom));
-    background: rgba(18, 18, 18, 0.4);
+    background: rgba(18, 18, 18, var(--banner-opacity, 0.4));
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
