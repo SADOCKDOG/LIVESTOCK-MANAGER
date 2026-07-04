@@ -547,10 +547,10 @@ const AjustesView = {
       objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5,
       autoBackup: false, temaOscuro: true, mostrarContextos: false,
       glowMarco: true, glowLaterales: true, glowBotones: true,
-      glowMarcoFijo: false, glowMarcoFijoColor: '#CCFF00',
+      glowMarcoFijo: false, glowMarcoFijoColor: '#FFFFFF',
       hazLuzColor: '', // vacío = sigue al marco
       hazLuzIntensidad: 45,
-      fabColor: '#CCFF00',
+      fabColor: '', // vacío = sigue al módulo
       fabIntensidad: 60,
       colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [],
       alertSanidad: true, alertTrazabilidad: true, alertPAC: true,
@@ -1234,14 +1234,17 @@ const AjustesView = {
         content: (data) => `
           <div class="grid gap-12">
             <p class="text-gray text-xs uppercase font-800">Selecciona qué elementos mostrarán iluminación neón:</p>
-            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
-              <input type="checkbox" id="w-glow-marco" ${data.glowMarco !== false ? 'checked' : ''} style="accent-color:var(--p-cork);"> MARCO PRINCIPAL (HEADER/BOTTOM)
+            <label class="wizard-check-label">
+              <input type="checkbox" id="w-glow-marco" ${data.glowMarco !== false ? 'checked' : ''}>
+              <span>MARCO PRINCIPAL (HEADER/BOTTOM)</span>
             </label>
-            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
-              <input type="checkbox" id="w-glow-laterales" ${data.glowLaterales !== false ? 'checked' : ''} style="accent-color:var(--p-cork);"> HAZ DE LUZ LATERAL
+            <label class="wizard-check-label">
+              <input type="checkbox" id="w-glow-laterales" ${data.glowLaterales !== false ? 'checked' : ''}>
+              <span>HAZ DE LUZ LATERAL</span>
             </label>
-            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
-              <input type="checkbox" id="w-glow-botones" ${data.glowBotones !== false ? 'checked' : ''} style="accent-color:var(--p-cork);"> BOTONES DINÁMICOS
+            <label class="wizard-check-label">
+              <input type="checkbox" id="w-glow-botones" ${data.glowBotones !== false ? 'checked' : ''}>
+              <span>BOTONES DINÁMICOS</span>
             </label>
           </div>
         `,
@@ -1256,16 +1259,16 @@ const AjustesView = {
         content: (data) => `
           <div class="grid gap-15">
             <p class="text-gray text-xs uppercase font-800">¿Deseas que el marco cambie según el módulo o prefieres un color fijo?</p>
-            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
-              <input type="checkbox" id="w-glow-fijo" ${data.glowMarcoFijo ? 'checked' : ''} style="accent-color:var(--p-cork);"> USAR COLOR FIJO EN EL MARCO
+            <label class="wizard-check-label">
+              <input type="checkbox" id="w-glow-fijo" ${data.glowMarcoFijo ? 'checked' : ''}>
+              <span>USAR COLOR FIJO EN EL MARCO</span>
             </label>
             <div id="w-color-fijo-container" style="display:${data.glowMarcoFijo ? 'block' : 'none'};">
               <label class="wizard-label">COLOR DEL MARCO</label>
-              <div class="flex flex-wrap gap-8 mt-8">
+              <div class="flex flex-wrap gap-8 mt-8 theme-dots-container">
                 ${colors.map(c => `
                   <button class="theme-dot ${data.glowMarcoFijoColor === c.hex ? 'active' : ''}"
-                    style="background:${c.hex}; width:40px; height:40px; border-radius:50%; border:3px solid ${data.glowMarcoFijoColor === c.hex ? '#fff' : 'transparent'};"
-                    onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.borderColor='transparent'); this.style.borderColor='#fff'; window._tempGlowColor='${c.hex}';"></button>
+                    style="background:${c.hex};" data-color="${c.hex}"></button>
                 `).join('')}
               </div>
             </div>
@@ -1274,10 +1277,19 @@ const AjustesView = {
         onRender: (data, area) => {
           const chk = area.querySelector('#w-glow-fijo');
           const cont = area.querySelector('#w-color-fijo-container');
-          window._tempGlowColor = data.glowMarcoFijoColor || '#CCFF00';
+          window._tempGlowColor = data.glowMarcoFijoColor || '#FFFFFF';
+
           chk.onchange = (e) => {
             cont.style.display = e.target.checked ? 'block' : 'none';
           };
+
+          area.querySelectorAll('.theme-dot').forEach(btn => {
+            btn.onclick = () => {
+              area.querySelectorAll('.theme-dot').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              window._tempGlowColor = btn.dataset.color;
+            };
+          });
         },
         onChange: (data) => {
           data.glowMarcoFijo = document.getElementById('w-glow-fijo').checked;
@@ -1305,11 +1317,10 @@ const AjustesView = {
               </select>
             </div>
             <div id="w-haz-color-fijo" style="display:${data.hazLuzColor ? 'block' : 'none'};">
-              <div class="flex flex-wrap gap-8 mt-8">
+              <div class="flex flex-wrap gap-8 mt-8 theme-dots-container">
                 ${colors.map(c => `
                   <button class="theme-dot ${data.hazLuzColor === c.hex ? 'active' : ''}"
-                    style="background:${c.hex}; width:40px; height:40px; border-radius:50%; border:3px solid ${data.hazLuzColor === c.hex ? '#fff' : 'transparent'};"
-                    onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.borderColor='transparent'); this.style.borderColor='#fff'; window._tempHazColor='${c.hex}';"></button>
+                    style="background:${c.hex};" data-color="${c.hex}"></button>
                 `).join('')}
               </div>
             </div>
@@ -1320,7 +1331,8 @@ const AjustesView = {
           const cont = area.querySelector('#w-haz-color-fijo');
           const range = area.querySelector('#w-haz-int');
           const lbl = area.querySelector('#lbl-haz-int');
-          window._tempHazColor = data.hazLuzColor || '#CCFF00';
+          window._tempHazColor = data.hazLuzColor || '#FFFFFF';
+
           sel.onchange = (e) => {
             cont.style.display = e.target.value === 'fijo' ? 'block' : 'none';
             if (e.target.value === '') window._tempHazColor = '';
@@ -1328,6 +1340,14 @@ const AjustesView = {
           range.oninput = (e) => {
             lbl.textContent = `INTENSIDAD DEL HAZ DE LUZ (${e.target.value}%)`;
           };
+
+          area.querySelectorAll('#w-haz-color-fijo .theme-dot').forEach(btn => {
+            btn.onclick = () => {
+              area.querySelectorAll('#w-haz-color-fijo .theme-dot').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              window._tempHazColor = btn.dataset.color;
+            };
+          });
         },
         onChange: (data) => {
           data.hazLuzIntensidad = parseInt(document.getElementById('w-haz-int').value);
@@ -1339,13 +1359,21 @@ const AjustesView = {
         title: 'Botón de Registro',
         content: (data) => `
           <div class="grid gap-15">
-            <p class="text-gray text-xs uppercase font-800">Elige el color neón para el botón flotante y sus etiquetas:</p>
-            <div class="flex flex-wrap gap-8 mt-8">
-              ${colors.map(c => `
-                <button class="theme-dot ${data.fabColor === c.hex ? 'active' : ''}"
-                  style="background:${c.hex}; width:44px; height:44px; border-radius:50%; border:3px solid ${data.fabColor === c.hex ? '#fff' : 'transparent'};"
-                  onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.borderColor='transparent'); this.style.borderColor='#fff'; window._tempFabColor='${c.hex}';"></button>
-              `).join('')}
+            <p class="text-gray text-xs uppercase font-800">Elige el color para el botón flotante y etiquetas:</p>
+            <div class="wizard-input-group">
+              <label class="wizard-label">MODO DE COLOR</label>
+              <select id="w-fab-color-mode" class="wizard-input">
+                <option value="" ${!data.fabColor ? 'selected' : ''}>DINÁMICO (SIGUE AL MARCO / MÓDULO)</option>
+                <option value="fijo" ${data.fabColor ? 'selected' : ''}>FIJO (PERSONALIZADO)</option>
+              </select>
+            </div>
+            <div id="w-fab-color-fijo-container" style="display:${data.fabColor ? 'block' : 'none'};">
+              <div class="flex flex-wrap gap-8 mt-8 theme-dots-container">
+                ${colors.map(c => `
+                  <button class="theme-dot ${data.fabColor === c.hex ? 'active' : ''}"
+                    style="background:${c.hex};" data-color="${c.hex}"></button>
+                `).join('')}
+              </div>
             </div>
 
             <div class="wizard-input-group mt-10">
@@ -1355,40 +1383,55 @@ const AjustesView = {
 
             <div class="mt-10 p-15 rounded-md border border-222 bg-black flex items-center justify-between">
                <span class="text-xs text-gray uppercase font-800">Vista Previa</span>
-               <div id="fab-preview-circle" style="width:40px; height:40px; border-radius:50%; border:2px solid ${data.fabColor || '#CCFF00'}; background:rgba(30,30,30,0.95); display:flex; align-items:center; justify-content:center; color:${data.fabColor || '#CCFF00'}; box-shadow: 0 0 ${10 * (data.fabIntensidad / 100)}px ${data.fabColor || '#CCFF00'};">
+               <div id="fab-preview-circle" style="width:40px; height:40px; border-radius:50%; border:2px solid ${data.fabColor || '#FFFFFF'}; background:rgba(30,30,30,0.95); display:flex; align-items:center; justify-content:center; color:${data.fabColor || '#FFFFFF'}; box-shadow: 0 0 ${15 * (data.fabIntensidad / 100)}px ${data.fabColor || '#FFFFFF'};">
                  ${Icons.fabPlus()}
                </div>
             </div>
           </div>
         `,
         onRender: (data, area) => {
-          window._tempFabColor = data.fabColor || '#CCFF00';
+          const sel = area.querySelector('#w-fab-color-mode');
+          const cont = area.querySelector('#w-fab-color-fijo-container');
           const range = area.querySelector('#w-fab-int');
           const lbl = area.querySelector('#lbl-fab-int');
           const preview = area.querySelector('#fab-preview-circle');
 
+          window._tempFabColor = data.fabColor || '#FFFFFF';
+
           const updatePreview = () => {
              if (preview) {
-                preview.style.borderColor = window._tempFabColor;
-                preview.style.color = window._tempFabColor;
+                const color = sel.value === 'fijo' ? window._tempFabColor : '#FFFFFF';
+                preview.style.borderColor = color;
+                preview.style.color = color;
                 const int = range.value / 100;
-                preview.style.boxShadow = `0 0 ${15 * int}px ${window._tempFabColor}`;
+                preview.style.boxShadow = `0 0 ${15 * int}px ${color}`;
              }
           };
 
-          area.querySelectorAll('.theme-dot').forEach(btn => {
-            btn.addEventListener('click', () => {
+          sel.onchange = (e) => {
+            cont.style.display = e.target.value === 'fijo' ? 'block' : 'none';
+            updatePreview();
+          };
+
+          area.querySelectorAll('#w-fab-color-fijo-container .theme-dot').forEach(btn => {
+            btn.onclick = () => {
+              area.querySelectorAll('#w-fab-color-fijo-container .theme-dot').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              window._tempFabColor = btn.dataset.color;
               updatePreview();
-            });
+            };
           });
 
           range.oninput = (e) => {
             lbl.textContent = `INTENSIDAD DE BRILLO (${e.target.value}%)`;
             updatePreview();
           };
+
+          updatePreview();
         },
         onChange: (data) => {
-          data.fabColor = window._tempFabColor || '#CCFF00';
+          const mode = document.getElementById('w-fab-color-mode').value;
+          data.fabColor = mode === 'fijo' ? (window._tempFabColor || '#FFFFFF') : '';
           data.fabIntensidad = parseInt(document.getElementById('w-fab-int').value);
         }
       }
