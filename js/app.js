@@ -123,6 +123,7 @@ const App = {
         // Cargar intensidad y color de haz
         if (cfg?.value?.hazLuzIntensidad) {
           document.documentElement.style.setProperty('--haz-intensity', cfg.value.hazLuzIntensidad + '%');
+          document.documentElement.style.setProperty('--haz-intensity-num', cfg.value.hazLuzIntensidad);
         }
         if (cfg?.value?.hazLuzColor) {
           document.documentElement.style.setProperty('--haz-luz-color', cfg.value.hazLuzColor);

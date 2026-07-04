@@ -228,7 +228,7 @@ const CarneView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card report-section p-16 border-top-3px border-top-3px-orange">
+      <div class="card-registro report-section p-16 border-top-3px border-top-3px-orange" style="--registro-color: var(--c-warning);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.edificio()}</span>
@@ -434,7 +434,7 @@ const CarneView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;">
+          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
               <h3 class="mt-0 text-gold">Editar Registro Cárnico</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -522,7 +522,7 @@ const CarneView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; ">
+      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-gray);">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Cárnico</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño de carne a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">

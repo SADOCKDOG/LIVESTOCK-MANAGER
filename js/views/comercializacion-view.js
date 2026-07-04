@@ -478,7 +478,7 @@ const ComercializacionView = {
     const e = await window.db.get("comercializacion_leche", parseInt(id));
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/comercializacion?tab=leche" class="link-back">← Volver</a><h2>${Icons.leche()} Analítica de Tanque</h2></div>
-      <div class="card border-top-5-gold">
+      <div class="card-registro border-top-5-gold" style="--registro-color: var(--c-gold);">
         <div class="grid grid-cols-2 gap-12">
           <div><label>Volumen (L)</label><input type="number" id="le-cant" value="${e.cantidad}" class="premium-input"></div>
           <div><label>Precio (€/L)</label><input type="number" id="le-pb" value="${e.precioBase}" class="premium-input"></div>
@@ -506,7 +506,7 @@ const ComercializacionView = {
     const g = await window.db.get("gastos_ganaderia", parseInt(id));
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="link-back">← Volver</a><h2>${Icons.gastos()} Ficha de Gasto</h2></div>
-      <div class="card border-top-4-blue">
+      <div class="card-registro border-top-4-blue" style="--registro-color: var(--c-info);">
         <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
         <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
         <div class="flex justify-between items-center mt-20">

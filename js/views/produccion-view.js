@@ -128,7 +128,7 @@ const ProduccionView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card report-section p-16 mb-14" >
+      <div class="card-registro report-section p-16 mb-14" style="--registro-color: var(--c-success);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${icon}</span>
@@ -282,7 +282,7 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;">
+          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
               <h3 class="mt-0 text-gold">Editar Registro</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -386,7 +386,7 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-        <div class="card p-25" style="max-width:400px; ">
+        <div class="card-registro p-25" style="max-width:400px; ;; --registro-color: var(--c-gray);">
           <h3 class="mt-0 text-gold text-md">Editar Gasto</h3>
 
           <div class="wizard-input-group mt-15">

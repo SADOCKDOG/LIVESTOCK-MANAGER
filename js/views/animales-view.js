@@ -13,7 +13,7 @@ const AnimalesView = {
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
     if (rebanos.length === 0)
-      return (main.innerHTML = `<div class="card empty-state"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
+      return (main.innerHTML = `<div class="card-registro empty-state" style="--registro-color: var(--c-white);"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
 
     const rebanoMap = {};
     rebanos.forEach(r => { rebanoMap[r.id] = r; });
@@ -260,7 +260,7 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card card-accent card-accent-amber p-16 mb-20">
+          <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.info()} DATOS GENERALES</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
@@ -305,7 +305,7 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card card-accent card-accent-blue p-16 mb-20">
+          <div class="card-registro card-accent card-accent-blue p-16 mb-20" style="--registro-color: var(--c-info);">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
@@ -338,7 +338,7 @@ const AnimalesView = {
           </div>
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
-          <div class="card card-accent card-accent-green p-16 mb-20">
+          <div class="card-registro card-accent card-accent-green p-16 mb-20" style="--registro-color: var(--c-success);">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
@@ -394,17 +394,17 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card card-accent card-accent-gold p-16 mb-20">
+          <div class="card-registro card-accent card-accent-gold p-16 mb-20" style="--registro-color: var(--c-gold);">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.documento()} OBSERVACIONES</div>
             <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
-            <div class="card card-accent card-accent-amber p-16 mb-20">
+            <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
                <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">COMPAÑEROS LOTE</div>
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
-            <div class="card card-accent card-accent-purple p-16 mb-20">
+            <div class="card-registro card-accent card-accent-purple p-16 mb-20" style="--registro-color: var(--c-purple);">
                <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">HISTORIAL REPRO</div>
                <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
