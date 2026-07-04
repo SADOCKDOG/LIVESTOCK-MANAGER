@@ -43,7 +43,7 @@ const AjustesView = {
 
     main.innerHTML = `
       ${isFree ? `
-      <div class="card-registro mb-25 p-20" style="--registro-color: var(--c-warning); style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
+      <div class="card-registro mb-25 p-20" style="--registro-color: var(--c-warning);background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
         <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(217,119,6,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
         <div style="position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(217,119,6,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
         <div class="flex items-center gap-15">

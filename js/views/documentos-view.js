@@ -81,7 +81,7 @@ const DocumentosView = {
       this._setupFilters();
     } catch (e) {
       console.error('[Documentos] Error:', e);
-      main.innerHTML = `<div class="card text-center p-40 text-red">Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error: ${e.message}</div>`;
     }
   },
 
@@ -103,7 +103,7 @@ const DocumentosView = {
     const docsRecientes = docs.slice(0, 5);
 
     const bannerInterno = `
-      <div class="card card-dark-gradient border-222 modo-interno-banner mb-14" >
+      <div class="card-registro card-dark-gradient border-222 modo-interno-banner mb-14" style="--registro-color: var(--c-warning);"> 
         <div class="section-header-theme" style="--theme-color: var(--c-warning);">${Icons.alerta()} MODO INTERNO SIGGAN</div>
         <p class="text-xs text-aaa mt-6">
           Genera la documentación desde Livestock Manager y sube los ficheros a SIGGAN/BADIGEX de forma manual. Registra aquí el número de acuse o el justificante recibido para mantener la trazabilidad interna.
@@ -138,7 +138,7 @@ const DocumentosView = {
         </div>
       </div>
 
-      <div class="card p-12 mb-14 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+      <div class="card-registro p-12 mb-14 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold); --registro-color: var(--p-gold);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="DocumentosView._abrirAsistenteConsulta()">
@@ -263,7 +263,7 @@ const DocumentosView = {
         <h2 class="pesaje-titulo-h2">${Icons.buscar()} CONSULTAR / IMPRIMIR</h2>
       </div>
       <div class="wizard-content-scrollable">
-        <div class="card p-16 mb-16 border-222 card-dark-gradient">
+        <div class="card-registro p-16 mb-16 border-222 card-dark-gradient" style="--registro-color: var(--c-info);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 text-center">SELECCIONA TIPO DE DOCUMENTO</div>
           <div class="grid grid-cols-2 gap-8">
             ${[
@@ -446,7 +446,7 @@ const DocumentosView = {
       : `<span class="text-red">${Icons.adjuntar()} Acuse manual pendiente</span>`;
 
     overlay.innerHTML = `
-      <div class="card" style="max-width:520px;width:100%;padding:24px;">
+      <div class="card-registro" style="max-width:520px;width:100%;padding:24px;; --registro-color: var(--c-gray);">
         <div class="flex justify-between items-start mb-10">
           <div>
             <div class="font-800 text-sm" style="color:${color};">${label}</div>
@@ -514,7 +514,7 @@ const DocumentosView = {
     const docLabels = { dimoe: 'Guía DIMOE', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido de Crotales' };
     const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : (docLabels[tipo] || 'Documento');
     overlay.innerHTML = `
-      <div class="card" style="max-width:520px;width:100%;padding:24px;">
+      <div class="card-registro" style="max-width:520px;width:100%;padding:24px;; --registro-color: var(--c-gray);">
         <div class="flex justify-between items-center mb-8">
           <div>
             <div class="font-900 text-sm" style="color:var(--c-warning);">${docLabel}</div>

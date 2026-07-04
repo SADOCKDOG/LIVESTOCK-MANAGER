@@ -37,7 +37,7 @@ const ContratosView = {
               <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
             </button>
           </div>
-          <div class="card card-accent card-accent-purple p-20 bg-black">
+          <div class="card-registro card-accent card-accent-purple p-20 bg-black" style="--registro-color: var(--c-purple);">
             <div class="section-header-theme mb-20" style="--theme-color: var(--c-purple)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR CONTRATO' : 'NUEVO CONTRATO'}</div>
 
             <div class="wizard-input-group mb-15">

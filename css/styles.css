@@ -436,27 +436,60 @@ nav.bottom-nav {
 }
 
 
-.fab-btn {
+/* ── BOTÓN FLOTANTE (FAB) CON ETIQUETA DINÁMICA ── */
+.fab-container {
     position: fixed !important;
-    bottom: calc(85px + var(--safe-bottom)) !important;
+    bottom: calc(80px + var(--safe-bottom)) !important;
     right: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    z-index: 3000 !important;
+}
+
+.fab-label {
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--p-cork, #CCFF00);
+    padding: 8px 16px;
+    border-radius: 14px;
+    font-size: 0.72rem;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    border: 1px solid rgba(204, 255, 0, 0.25);
+    white-space: nowrap;
+    filter: drop-shadow(0 0 5px rgba(204, 255, 0, 0.15));
+    transition: all 0.2s ease;
+    opacity: 0.9;
+}
+
+.fab-btn {
     width: 56px !important;
     height: 56px !important;
-    border-radius: var(--r-pill, 28px) !important;
+    border-radius: 50% !important;
     background: linear-gradient(135deg, var(--c-success) 0%, var(--p-cork-dark) 100%) !important;
-    box-shadow: 0 6px 16px rgba(204, 255, 0, 0.4) !important;
+    box-shadow: 0 8px 20px rgba(204, 255, 0, 0.35) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border: none !important;
-    color: #fff !important;
+    color: #000 !important; /* Negro para máximo contraste sobre neon lime */
     cursor: pointer !important;
-    z-index: 1000 !important;
-    transition: transform 0.1s !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    position: relative !important;
 }
 
-.fab-btn:active {
-    transform: scale(0.92) !important;
+.fab-container:active .fab-btn {
+    transform: scale(0.9) !important;
+}
+.fab-container:active .fab-label {
+    transform: translateX(-4px);
+    opacity: 1;
 }
 
 .btn:active,

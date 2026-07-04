@@ -53,7 +53,7 @@ const CompradoresView = {
             this._renderActiveModule();
         } catch (e) {
             console.error('[CompradoresView] Error:', e);
-            document.getElementById("module-container").innerHTML = `<div class="card text-center p-40 text-red">Error al cargar datos: ${e.message}</div>`;
+            document.getElementById("module-container").innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error al cargar datos: ${e.message}</div>`;
         }
     },
 
@@ -440,7 +440,7 @@ const CompradoresView = {
           </div>
 
           <!-- Contratos activos -->
-          <div class="card p-16 mb-16 border-222 bg-black">
+          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-success);">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-16 flex items-center gap-8">
                 ${Icons.contratos()} CONTRATOS VIGENTES
             </div>
@@ -469,7 +469,7 @@ const CompradoresView = {
           </div>
 
           <!-- Historial de Ventas Carne -->
-          <div class="card p-16 mb-16 border-222 bg-black">
+          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-danger);">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
                 ${Icons.carne()} HISTORIAL CARNE
             </div>
@@ -490,7 +490,7 @@ const CompradoresView = {
           </div>
 
           <!-- Historial de Leche -->
-          <div class="card p-16 mb-20 border-222 bg-black">
+          <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-amber);">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
                 ${Icons.leche()} HISTORIAL LECHE
             </div>
@@ -511,7 +511,7 @@ const CompradoresView = {
           </div>
 
           ${comprador.notas ? `
-          <div class="card card-accent card-accent-gold p-16 mb-40">
+          <div class="card-registro card-accent card-accent-gold p-16 mb-40" style="--registro-color: var(--c-gold);">
             <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
             <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${comprador.notas}</p>
           </div>` : '<div class="pb-40"></div>'}
@@ -537,7 +537,7 @@ const CompradoresView = {
               <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
             </button>
           </div>
-          <div class="card card-accent card-accent-amber p-20 bg-black">
+          <div class="card-registro card-accent card-accent-amber p-20 bg-black" style="--registro-color: var(--c-amber);">
             <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
 
             <div class="wizard-input-group mb-15">
