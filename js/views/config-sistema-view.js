@@ -92,9 +92,33 @@ const ConfigSistemaView = {
             <input type="checkbox" ${config.glowLaterales !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleGlowLaterales', this.checked)">
             <span>Haces Laterales</span>
           </label>
+          <label class="wizard-check-label">
+            <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleGlowBotones', this.checked)">
+            <span>Resplandor en Botones</span>
+          </label>
           <button class="widget-link-btn widget-link-btn--neon neon-success w-full mt-10" onclick="AjustesView._abrirWizardRetroiluminacion()">
             ${Icons.ajustes()} Wizard de Iluminación Avanzado
           </button>
+        </div>
+      </div>
+
+      <div class="card-registro mb-16" style="--registro-color: var(--c-info);">
+        <div class="section-header-theme mb-15">${Icons.calendar()} Formatos de Sistema</div>
+        <div class="grid grid-cols-1 gap-15">
+          <div class="wizard-input-group">
+            <label class="wizard-label">FORMATO DE FECHA</label>
+            <select class="wizard-input" onchange="ConfigSistemaView._action('guardarPreferencia', 'formatoFecha', this.value)">
+              <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (Europa)</option>
+              <option value="en-US" ${config.formatoFecha === 'en-US' ? 'selected' : ''}>MM/DD/AAAA (Internacional)</option>
+            </select>
+          </div>
+          <div class="wizard-input-group">
+            <label class="wizard-label">MONEDA PRINCIPAL</label>
+            <select class="wizard-input" onchange="ConfigSistemaView._action('guardarPreferencia', 'moneda', this.value)">
+              <option value="€" ${config.moneda !== '$' ? 'selected' : ''}>Euro (€)</option>
+              <option value="$" ${config.moneda === '$' ? 'selected' : ''}>Dólar ($)</option>
+            </select>
+          </div>
         </div>
       </div>
 
