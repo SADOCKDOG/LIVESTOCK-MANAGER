@@ -204,6 +204,9 @@ const Icons = {
       '<polyline points="9 18 15 12 9 6"/>'
     );
   },
+  chevronAbajo() {
+    return this._svg('<polyline points="6 9 12 15 18 9"/>');
+  },
   check() {
     return this._svg('<polyline points="20 6 9 17 4 12"/>');
   },
