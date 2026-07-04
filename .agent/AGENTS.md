@@ -36,6 +36,8 @@ Toda nueva pantalla debe ensamblarse utilizando estas plantillas:
 - Cada ficha (`.card-animal`, `.entity-card`) es un rectángulo horizontal con fondo `#1E1E1E`.
 - **Indicador lateral**: Llevan una franja vertical a la izquierda (`border-left: 4px solid var(--color)`) para indicar el estado o módulo.
 - **Componente CANÓNICO obligatorio**: `.card-registro` (styles.css). Color semántico por clase `.registro-success/-danger/-warning/-info/-purple/-pink/-orange` o inline `--registro-color: ${colorDinámico}` cuando depende del dato (p. ej. especie). PROHIBIDO crear nuevas variantes ad-hoc (`card-animal` + inline, `card-left-*`, etc. son legacy en extinción).
+- **Ficha de registro (layout aprobado)**: 2 columnas — información a la izquierda; a la derecha un raíl con el **estado arriba (compacto, ~0.65rem)** y la **acción "Ficha ->" abajo, en TEXTO PLANO amarillo (nunca viñeta iluminada)**. Los **valores numéricos** del registro llevan **color identificativo** (semántico), con la etiqueta en gris acero.
+- **PLANTILLA DEFINITIVA de lista de registros** (referencia: `AnimalesView`, vista Gastos): toda lista va dentro de una **card AGLUTINADORA** `.card-registro` con la franja del color del módulo, que contiene, en este orden: (1) **cabecera** `Icono + Nombre del registro + subtítulo "N registros · resumen"`; (2) **card de RESUMEN** de los datos registrados (`.card card-total-3d`) con filas KPI `etiqueta gris · valor en color`; (3) sub-cabecera `Icono + "Lista de X"`; (4) el **histórico** de fichas `.card-registro` individuales. No dejar listas de fichas "sueltas" sin aglutinadora ni resumen.
 - Alineación: Información principal a la izquierda, acciones o KPIs clave a la derecha.
 
 ### C. Formularios, Inputs y Wizards
