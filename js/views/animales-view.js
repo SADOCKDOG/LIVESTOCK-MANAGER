@@ -37,26 +37,6 @@ const AnimalesView = {
       return;
     }
 
-    // Búsqueda + selector de especie compacto
-    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-white);">
-      <div class="flex gap-8 items-center">
-        <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
-               oninput="AnimalesView._filtrar(this.value)"
-               class="search-input flex-1 min-w-0">
-        <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
-        <select id="animales-filtro-especie" class="form-select-gold"
-                onchange="AnimalesView._setFiltro('especie', this.value)"
-                style="width:130px;min-width:120px;">
-          <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
-          <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
-          <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
-          <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
-          <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
-        </select>
-      </div>
-    </div>
-    `;
-
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     const vendidos = animales.filter(a => a.estado === 'vendido').length;
     // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas (patrón Gastos)
@@ -87,8 +67,24 @@ const AnimalesView = {
           </div>
         </div>
       </div>
-      <!-- Histórico de registros -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">${Icons.documento()} Lista de Animales</div>
+      <!-- Filtro de búsqueda integrado (controla el histórico) -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">${Icons.documento()} Lista de Animales</div>
+      <div class="flex gap-8 items-center mb-12">
+        <div class="relative flex-1 min-w-0">
+          <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
+                 oninput="AnimalesView._filtrar(this.value)"
+                 class="search-input w-full">
+        </div>
+        <select id="animales-filtro-especie" class="form-select-gold"
+                onchange="AnimalesView._setFiltro('especie', this.value)"
+                style="width:120px; min-width:110px; flex-shrink:0;">
+          <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
+          <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
+          <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
+          <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
+          <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
+        </select>
+      </div>
       <div id="animales-lista" class="grid gap-12">`;
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
     html += `</div></div>
