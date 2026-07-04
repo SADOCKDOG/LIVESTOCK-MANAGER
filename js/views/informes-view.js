@@ -273,7 +273,7 @@ const InformesView = {
       this._renderTabActual();
     } catch (e) {
       document.getElementById("informes-content").innerHTML =
-        `<div class="card-registro empty-state style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);""><p class="text-red">Error al cargar datos: ${e.message}</p></div>`;
+        `<div class="card-registro empty-state style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);""><p class="text-red">Error al cargar datos: ${e.message}</p></div>`;
     }
   },
 
@@ -317,7 +317,7 @@ const InformesView = {
       }
     } catch (e) {
       console.error('[InformesView] Error en render:', e);
-      content.innerHTML = `<div class="card-registro empty-state style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);""><p class="text-red text-base">${Icons.cerrar()} Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
+      content.innerHTML = `<div class="card-registro empty-state style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);""><p class="text-red text-base">${Icons.cerrar()} Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
     }
 
     // Animación de entrada suave
@@ -374,7 +374,7 @@ const InformesView = {
         <div class="summary-cell"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg text-red" style="word-break:break-all;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
       </div>
 
-      ${alertas ? `<div class="card-registro inf-alert-red style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"">
+      ${alertas ? `<div class="card-registro inf-alert-red style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"">
           <div class="flex items-center gap-12">
             <span class="text-3xl text-red">${Icons.alerta()}</span>
             <div><strong class="text-red text-md uppercase font-950">${estadisticasSanidad.retencionesActivas} ${estadisticasSanidad.retencionesActivas === 1 ? "lote" : "lotes"}</strong><span class="text-aaa text-xs uppercase font-800 tracking-wider block">con supresión de venta activa</span></div>
@@ -382,9 +382,9 @@ const InformesView = {
         </div>` : ''}
 
       <!-- Rentabilidad -->
-      <div class="card-registro report-section border-top-3px border-top-3px-green report-card style=" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+      <div class="card-registro report-section border-top-3px border-top-3px-green report-card style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
         <div class="inf-card-title pb-8 flex items-center gap-6">${Icons.dinero()} Rentabilidad General</div>
-        <div class="card-registro p-14 mb-2 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left:5px solid var(--c-success); background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-14 mb-2 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left:5px solid var(--c-success); background:rgba(255,255,255,0.02);">
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Ingresos Cárnica</span>
@@ -411,7 +411,7 @@ const InformesView = {
       </div>
 
       <!-- Margen Neto -->
-      <div class="card-registro report-section border-top-3px border-top-3px-green report-card style=" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+      <div class="card-registro report-section border-top-3px border-top-3px-green report-card style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
         <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Margen Neto por Animal</div>
         ${margenA && margenA.length > 0
         ? '<div class="chart-wrap"><canvas id="chart-margen-animal" class="chart-canvas"></canvas></div>'
@@ -419,7 +419,7 @@ const InformesView = {
       </div>
 
         <div class="grid grid-cols-2 gap-12 mb-14">
-          <div class="card-registro border-top-3px border-top-3px-purple p-14 bg-black-opacity-50 style=" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
+          <div class="card-registro border-top-3px border-top-3px-purple p-14 bg-black-opacity-50 style="--registro-color: var(--c-purple);"" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
             <div class="inf-card-title mb-10 flex items-center gap-6 justify-center">${Icons.reproduccion()} REPRODUCTIVO</div>
             <div class="grid grid-cols-2 gap-6">
               <div class="info-box-center py-6">
@@ -435,7 +435,7 @@ const InformesView = {
               <span class="text-violet font-900 text-[0.6rem] tracking-widest uppercase">Prolificidad: ${kpisRepro.indiceProlificidad}</span>
             </div>
           </div>
-          <div class="card-registro border-top-3px border-top-3px-red p-14 bg-black-opacity-50 style=" style="--registro-color: var(--c-danger);"--registro-color: var(--c-danger);"">
+          <div class="card-registro border-top-3px border-top-3px-red p-14 bg-black-opacity-50 style="--registro-color: var(--c-danger);"" style="--registro-color: var(--c-danger);"--registro-color: var(--c-danger);"">
             <div class="inf-card-title mb-10 flex items-center gap-6 justify-center">${Icons.sanidad()} SANIDAD</div>
             <div class="grid grid-cols-2 gap-6">
               <div class="info-box-center py-6">
@@ -459,7 +459,7 @@ const InformesView = {
         if (!actual) return '';
         const diffBalance = actual.balance - (anterior?.balance || 0);
         const diffIngresos = actual.ingresos - (anterior?.ingresos || 0);
-        return `<div class="card-registro report-section border-top-3px border-top-3px-blue report-card style=" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
+        return `<div class="card-registro report-section border-top-3px border-top-3px-blue report-card style="--registro-color: var(--c-info);"" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
           <div class="inf-card-title flex items-center gap-6 mb-12">${Icons.calendar()} Comparativa Mensual</div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
             <div class="info-box-center border-left-blue py-10">
@@ -479,7 +479,7 @@ const InformesView = {
         </div>`;
       })() : ''}
 
-      ${lecheStats.totalLitros > 0 ? `<div class="card-registro report-section border-top-3px border-top-3px-amber report-card style=" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
+      ${lecheStats.totalLitros > 0 ? `<div class="card-registro report-section border-top-3px border-top-3px-amber report-card style="--registro-color: var(--c-amber);"" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
         <div class="inf-card-title flex items-center gap-6 mb-12">${Icons.leche()} Producción Lechera</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-10">
           <div class="info-box-center py-10"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-gold font-950">${this._fmt(lecheStats.totalLitros, 1)} L</div></div>
@@ -512,7 +512,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('carne', 'Cárnico') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-orange report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.carne()} Resumen Cárnico</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos Totales</small>
@@ -613,7 +613,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('leche', 'Lácteo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.leche()} Producción Láctea</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Litros</small>
@@ -646,7 +646,7 @@ const InformesView = {
         </div>
 
         ${conLab.length > 0 ? `
-        <div class="card-registro mb-14 p-12 card-tint-amber style=" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
+        <div class="card-registro mb-14 p-12 card-tint-amber style="--registro-color: var(--c-amber);"" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
           <div class="inf-section-title mb-10 text-center uppercase font-950">${Icons.fitosanitario()} Calidad de la Leche (${conLab.length} analíticas)</div>
           <div class="grid grid-cols-2 gap-8">
             <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(grasaMedia, umbrales?.grasa?.min, null)};">
@@ -714,7 +714,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('reproductivo', 'Reproductivo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} KPIs Reproductivos</div>
-        <div class="card-registro p-14 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left:5px solid var(--c-purple); background:rgba(139,92,246,0.03);">
+        <div class="card-registro p-14 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left:5px solid var(--c-purple); background:rgba(139,92,246,0.03);">
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Fertilidad</span>
@@ -788,7 +788,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('sanidad', 'Sanidad') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.sanidad()} Sanidad y Tratamientos</div>
-        <div class="card-registro p-14 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left:5px solid #FF4444; background:rgba(239,68,68,0.02);">
+        <div class="card-registro p-14 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left:5px solid #FF4444; background:rgba(239,68,68,0.02);">
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Total Tratamientos</span>
@@ -862,7 +862,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('censo', 'Censo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-gold report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.animales()} Censo General</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Censo</small>
@@ -935,7 +935,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('ventas', 'Ventas') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.libroVentas()} Libro de Ventas</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Ventas</small>
@@ -1023,7 +1023,7 @@ const InformesView = {
           })).sort((a, b) => b.total - a.total);
           if (comps.length < 2) return '';
           return `
-        <div class="card-registro report-section border-top-3px border-top-3px-green report-card mt-14 style=" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-green report-card mt-14 style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
           <div class="inf-card-title">${Icons.grafico()} Precio Medio por Comprador</div>
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm tbl-accent-green">
@@ -1058,7 +1058,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('compradores', 'Compradores') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.compradores()} Informe por Comprador</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Compradores</small>
@@ -1079,7 +1079,7 @@ const InformesView = {
           </div>
         </div>
         ${topComprador ? `
-        <div class="card-registro mb-14 card-tint-blue style=" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
+        <div class="card-registro mb-14 card-tint-blue style="--registro-color: var(--c-info);"" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
           <div class="flex justify-between items-center px-14 py-10">
             <div><span class="text-gray text-xs">COMPRADOR PRINCIPAL</span><div class="text-white font-800 text-md mt-4">${topComprador.nombre}</div></div>
             <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-amber font-900 text-md">${topComprador.total.toLocaleString()}€</div></div>
@@ -1175,7 +1175,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('proveedores', 'Proveedores') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.proveedores()} Informe por Proveedor</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Proveedores</small>
@@ -1196,7 +1196,7 @@ const InformesView = {
           </div>
         </div>
         ${topProv ? `
-        <div class="card-registro mb-14 card-tint-orange style=" style="--registro-color: var(--c-warning);"--registro-color: var(--c-warning);"">
+        <div class="card-registro mb-14 card-tint-orange style="--registro-color: var(--c-warning);"" style="--registro-color: var(--c-warning);"--registro-color: var(--c-warning);"">
           <div class="flex justify-between items-center px-14 py-10">
             <div><span class="text-gray text-xs">PRINCIPAL PROVEEDOR</span><div class="text-white font-800 text-md mt-4">${topProv.nombre}</div></div>
             <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-red font-900 text-md">${topProv.total.toLocaleString()}€</div></div>
@@ -1281,7 +1281,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('fitosanitario', 'Fitosanitario') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.fitosanitario()} Informe Fitosanitario</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gasto Total</small>
@@ -1347,9 +1347,9 @@ const InformesView = {
 
     content.innerHTML = this._sectionActionsHTML('alertas', 'Alertas') + `
       <div class="inf-report mb-14">
-        <div class="card-registro report-section border-top-3px border-top-3px-red report-card style=" style="--registro-color: var(--c-danger);"--registro-color: var(--c-danger);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-red report-card style="--registro-color: var(--c-danger);"" style="--registro-color: var(--c-danger);"--registro-color: var(--c-danger);"">
           <div class="inf-card-title flex items-center gap-6">${Icons.alerta()} Panel de Alertas</div>
-          <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(239,68,68,0.02);">
+          <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(239,68,68,0.02);">
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Alertas</small>
@@ -1423,7 +1423,7 @@ const InformesView = {
           </div>` : ''}
 
           ${alertas.calendario?.sugerencias?.length > 0 ? `
-          <div class="card-registro border-top-3px border-top-3px-blue p-14 style=" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
+          <div class="card-registro border-top-3px border-top-3px-blue p-14 style="--registro-color: var(--c-info);"" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
             <div class="inf-card-title mb-8">${Icons.calendar()} ${alertas.calendario.titulo || 'Calendario Preventivo'}</div>
             <ul class="m-0 pl-18">
               ${alertas.calendario.sugerencias.map(s => `<li class="text-sm text-gray mb-4">${s}</li>`).join('')}
@@ -1452,7 +1452,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('por-finca', 'Por Finca') + `
       <div class="inf-report mb-14">
         <!-- Ficha Explotación -->
-        <div class="card-registro report-section border-top-3px border-top-3px-gold report-card style=" style="--registro-color: var(--c-gold);"--registro-color: var(--c-gold);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-gold report-card style="--registro-color: var(--c-gold);"" style="--registro-color: var(--c-gold);"--registro-color: var(--c-gold);"">
           <div class="inf-card-title flex items-center gap-6">${Icons.finca()} ${finca.nombre || 'Explotación'}</div>
           <div class="grid grid-cols-2 gap-10 mb-14">
             <div class="info-box border-left-green">
@@ -1487,7 +1487,7 @@ const InformesView = {
             <div><span class="text-gray">Nº Colegiado:</span> <strong>${finca.adsg_vet_colegiado || 'N/D'}</strong></div>
           </div>
           <!-- Datos del Paquete Lácteo Regulador -->
-          <div class="card-registro p-10 bg-black border-272 text-sm mt-5 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left: 3px solid var(--c-info);">
+          <div class="card-registro p-10 bg-black border-272 text-sm mt-5 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="border-left: 3px solid var(--c-info);">
             <div class="text-white font-900 text-xs mb-6 uppercase flex items-center gap-4">${Icons.leche()} Regulaciones Paquete Lácteo (INFOLAC)</div>
             <div class="grid grid-cols-2 gap-6 text-[0.72rem]">
               <div><span class="text-gray">Nº Contrato Lácteo:</span> <strong class="text-white">${finca.contrato_lacteo_numero || 'N/D'}</strong></div>
@@ -1500,7 +1500,7 @@ const InformesView = {
 
         <!-- Resumen Económico -->
         ${rent ? `
-        <div class="card-registro report-section border-top-3px border-top-3px-green report-card style=" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-green report-card style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
           <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Resumen Económico</div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
             <div class="info-box-center border-left-amber py-12">
@@ -1520,7 +1520,7 @@ const InformesView = {
 
         <!-- Rebaños -->
         ${rebanos?.length > 0 ? `
-        <div class="card-registro report-section border-top-3px border-top-3px-purple report-card style=" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-purple report-card style="--registro-color: var(--c-purple);"" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
           <div class="inf-card-title flex items-center gap-6">${Icons.rebanos()} Rebaños</div>
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm tbl-accent-purple">
@@ -1565,7 +1565,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('rega', 'REGA') + `
       <div class="inf-report mb-14">
         <!-- KPIs Unificados -->
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Censo Total</small>
@@ -1586,7 +1586,7 @@ const InformesView = {
           </div>
         </div>
         <!-- Datos Explotación -->
-        <div class="card-registro report-section border-top-3px border-top-3px-gold report-card style=" style="--registro-color: var(--c-gold);" style="--registro-color: var(--c-gold);"--registro-color: var(--c-gold);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-gold report-card style="--registro-color: var(--c-gold);"" style="--registro-color: var(--c-gold);" style="--registro-color: var(--c-gold);"--registro-color: var(--c-gold);"">
           <div class="inf-card-title">${Icons.finca()} Datos de la Explotación</div>
           <div class="grid grid-cols-2 gap-8 text-sm">
             <div><span class="text-gray">Nombre:</span> <strong>${finca.nombre || 'N/D'}</strong></div>
@@ -1612,9 +1612,9 @@ const InformesView = {
         </div>
 
         <!-- Resumen Censo -->
-        <div class="card-registro report-section border-top-3px border-top-3px-green report-card style=" style="--registro-color: var(--c-success);" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-green report-card style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
           <div class="inf-card-title">${Icons.animales()} Censo Actual</div>
-          <div class="card-registro p-12 mb-12 border-222 style=" style="--registro-color: var(--c-gray);" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+          <div class="card-registro p-12 mb-12 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Animales</small>
@@ -1714,7 +1714,7 @@ const InformesView = {
         </div>
 
         <!-- Movimientos recientes -->
-        <div class="card-registro report-section border-top-3px border-top-3px-purple report-card style=" style="--registro-color: var(--c-purple);" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
+        <div class="card-registro report-section border-top-3px border-top-3px-purple report-card style="--registro-color: var(--c-purple);"" style="--registro-color: var(--c-purple);" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
           <div class="inf-card-title">${Icons.paquete()} Últimos Movimientos</div>
           ${eventosRecientes.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>' : `
           <div class="table-scroll scroll-shadow-container">
@@ -1772,7 +1772,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('pyg', 'PyG') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-green report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Cuenta de Resultados PyG (Estructurada)</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos</small>
@@ -1893,7 +1893,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('coste-prod', 'Coste Producción') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title">${Icons.carne()} Coste de Producción por Animal</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Coste Medio/Cabeza</small>
@@ -1943,7 +1943,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('eficiencia', 'Eficiencia Técnica') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title">${Icons.grafico()} Panel de Eficiencia Técnica</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Rebaños</small>
@@ -1991,7 +1991,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('cargas', 'Aforos') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-amber report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Cargas y Aforos</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Sup. Pastos</small>
@@ -2011,7 +2011,7 @@ const InformesView = {
             </div>
           </div>
         </div>
-        ${data.numAlertas > 0 ? `<div class="card-registro card-tint-red mb-14 p-12 style=" style="--registro-color: var(--c-danger);"--registro-color: var(--c-danger);"">
+        ${data.numAlertas > 0 ? `<div class="card-registro card-tint-red mb-14 p-12 style="--registro-color: var(--c-danger);"" style="--registro-color: var(--c-danger);"--registro-color: var(--c-danger);"">
           <div class="flex items-center gap-8"><span class="text-xl">${Icons.alerta()}</span><div><strong class="text-red">${data.numAlertas} ${data.numAlertas === 1 ? 'alerta' : 'alertas'}</strong><span class="text-gray text-sm block">Zonas con sobrecarga o infrautilización</span></div></div>
         </div>` : ''}
         ${data.porZona.length > 0 ? `
@@ -2045,7 +2045,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('rotacion', 'Rotación Censo') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title">${Icons.rotacion()} Rotación de Censo (${data.periodo})</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-5 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Censo Total</small>
@@ -2069,7 +2069,7 @@ const InformesView = {
             </div>
           </div>
         </div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Nacimientos</small>
@@ -2100,7 +2100,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('flujo-caja', 'Flujo Caja') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-teal report-card">
         <div class="inf-card-title">${Icons.tendencia()} Flujo de Caja</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Entradas</small>
@@ -2144,7 +2144,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('rent-esp', 'Rent. Especie') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-purple report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.reproduccion()} Rentabilidad por Especie</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
@@ -2188,7 +2188,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('curva-prod', 'Curva Producción') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-blue report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Curva de Producción</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">kg Total</small>
@@ -2243,7 +2243,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('breakeven', 'Break-Even') + `
       <div class="inf-report card report-section border-top-3px border-top-3px-red report-card">
         <div class="inf-card-title flex items-center gap-6">${Icons.balanza()} Análisis de Punto Muerto (Break-Even)</div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(239,68,68,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(239,68,68,0.02);">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Fijos</small>
@@ -2260,7 +2260,7 @@ const InformesView = {
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-14">
-          <div class="card-registro p-14 card-tint-green style=" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+          <div class="card-registro p-14 card-tint-green style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
             <div class="inf-card-title mb-10 text-base flex items-center gap-6">${Icons.carne()} Carne</div>
             <div class="grid grid-cols-2 gap-x-10 gap-y-12">
               <div class="min-w-0"><small class="s-lbl">Precio Medio kg</small><div class="inf-val-md text-amber truncate" title="${this._fmt(data.precioMedioKg, 2)}€">${this._fmt(data.precioMedioKg, 2)}€</div></div>
@@ -2269,7 +2269,7 @@ const InformesView = {
               <div class="min-w-0"><small class="s-lbl">Margen Seguridad</small><div class="inf-val-md text-blue truncate" title="${data.margenSeguridadKg}">${data.margenSeguridadKg}</div></div>
             </div>
           </div>
-          <div class="card-registro p-14 card-tint-amber style=" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
+          <div class="card-registro p-14 card-tint-amber style="--registro-color: var(--c-amber);"" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
             <div class="inf-card-title mb-10 text-base flex items-center gap-6">${Icons.leche()} Leche</div>
             <div class="grid grid-cols-2 gap-x-10 gap-y-12">
               <div class="min-w-0"><small class="s-lbl">Precio Medio L</small><div class="inf-val-md text-gold truncate" title="${this._fmt(data.precioMedioLitro, 3)}€">${this._fmt(data.precioMedioLitro, 3)}€</div></div>
@@ -2297,7 +2297,7 @@ const InformesView = {
           <div class="inf-card-title m-0">${Icons.pac()} Subvenciones PAC</div>
           <button class="btn btn-primary btn-sm btn--green-dk" onclick="InformesView._agregarPAC()">${Icons.agregar()} Añadir</button>
         </div>
-        <div class="card-registro p-12 mb-14 border-222 style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+        <div class="card-registro p-12 mb-14 border-222 style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Solicitado</small>
@@ -2362,7 +2362,7 @@ const InformesView = {
     overlay.style.alignItems = 'center';
     overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
     overlay.innerHTML = `
-      <div class="card-registro p-25 max-w-380 border-top-5-success style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"">
+      <div class="card-registro p-25 max-w-380 border-top-5-success style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"">
         <h3 class="mt-0 text-green">${Icons.pac()} Nueva Subvención PAC</h3>
         <div class="wizard-input-group">
           <label class="wizard-label">Año</label>
@@ -3804,7 +3804,7 @@ const InformesView = {
   // ==========================================
   _renderExportar(content, d) {
     if (!window.ExportService) {
-      content.innerHTML = `<div class="card-registro empty-state style=" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"">ExportService no disponible. Recarga la aplicación.</div>`;
+      content.innerHTML = `<div class="card-registro empty-state style="--registro-color: var(--c-white);"" style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"">ExportService no disponible. Recarga la aplicación.</div>`;
       return;
     }
 
@@ -3814,7 +3814,7 @@ const InformesView = {
       <p class="text-gray text-sm">Genera ficheros compatibles con REGA, SIA/PIGGAN y plataformas autonómicas.</p>
     </div>
     <div class="grid gap-15">
-      <div class="card-registro card-left-amber style=" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
+      <div class="card-registro card-left-amber style="--registro-color: var(--c-amber);"" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.informeRega()} REGA — Censo y Explotación</h4>
@@ -3823,7 +3823,7 @@ const InformesView = {
           <button class="btn btn-primary btn-download btn--amber" onclick="InformesView._exportREGA()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
-      <div class="card-registro card-left-blue style=" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
+      <div class="card-registro card-left-blue style="--registro-color: var(--c-info);"" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.rotacion()} SIA/PIGGAN — Movimientos</h4>
@@ -3832,7 +3832,7 @@ const InformesView = {
           <button class="btn btn-primary btn-download btn--blue" onclick="InformesView._exportMovimientos()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
-      <div class="card-registro card-left-green style=" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+      <div class="card-registro card-left-green style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.grafico()} PIGGAN — Producción</h4>
@@ -3841,7 +3841,7 @@ const InformesView = {
           <button class="btn btn-primary btn-download btn--green-dk" onclick="InformesView._exportProduccion()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
-      <div class="card-registro card-left-purple card-tint-violet style=" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
+      <div class="card-registro card-left-purple card-tint-violet style="--registro-color: var(--c-purple);"" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.paquete()} Exportación Completa</h4>

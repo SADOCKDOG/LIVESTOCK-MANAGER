@@ -333,6 +333,9 @@ const AjustesView = {
             <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-12 rounded-sm">
               <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} style="accent-color:var(--c-purple);" onchange="AjustesView._toggleGlowBotones(this.checked)"> BOTONES DE LA APLICACIÓN
             </label>
+            <button class="btn btn-secondary btn-sm mt-5" onclick="AjustesView._abrirWizardRetroiluminacion()">
+              ${Icons.ajustes()} Configuración Avanzada de Luz
+            </button>
           </div>
           <div class="flex flex-col gap-4">
             <label class="text-xs text-gray uppercase font-800 ml-4">Formato Fecha</label>
@@ -540,7 +543,17 @@ const AjustesView = {
   },
 
   async _loadConfig() {
-    const defaults = { objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5, autoBackup: false, temaOscuro: true, mostrarContextos: false, glowMarco: true, glowLaterales: true, glowBotones: true, colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [], alertSanidad: true, alertTrazabilidad: true, alertPAC: true, alertADSG: true, alertINCOLAC: true, alertContratos: false };
+    const defaults = {
+      objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5,
+      autoBackup: false, temaOscuro: true, mostrarContextos: false,
+      glowMarco: true, glowLaterales: true, glowBotones: true,
+      glowMarcoFijo: false, glowMarcoFijoColor: '#CCFF00',
+      hazLuzColor: '', // vacío = sigue al marco
+      hazLuzIntensidad: 45,
+      colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [],
+      alertSanidad: true, alertTrazabilidad: true, alertPAC: true,
+      alertADSG: true, alertINCOLAC: true, alertContratos: false
+    };
     try {
       const stored = await window.db.get('meta', 'appConfig');
       return stored?.value ? { ...defaults, ...stored.value } : defaults;
@@ -552,6 +565,7 @@ const AjustesView = {
       const current = await this._loadConfig();
       const merged = { ...current, ...updates };
       await window.db.put('meta', { key: 'appConfig', value: merged, actualizadoEn: new Date().toISOString() });
+      if (window.App) window.App._config = merged;
     } catch (e) { console.warn('[Ajustes] Error guardando config:', e); }
   },
 
@@ -1194,6 +1208,156 @@ const AjustesView = {
     await window.db.delete('config_costes_referencia', id);
     App.toast("Parámetro eliminado");
     AjustesView.render();
+  },
+
+  async _abrirWizardRetroiluminacion() {
+    const config = await this._loadConfig();
+    const colors = [
+      { name: 'Neon Lime', hex: '#CCFF00' },
+      { name: 'Neon Gold', hex: '#FFD600' },
+      { name: 'Neon Blue', hex: '#3b82f6' },
+      { name: 'Neon Red', hex: '#FF4444' },
+      { name: 'Neon Orange', hex: '#F97316' },
+      { name: 'Neon Purple', hex: '#A855F7' }
+    ];
+
+    const steps = [
+      {
+        title: 'Componentes Activos',
+        content: (data) => `
+          <div class="grid gap-12">
+            <p class="text-gray text-xs uppercase font-800">Selecciona qué elementos mostrarán iluminación neón:</p>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
+              <input type="checkbox" id="w-glow-marco" ${data.glowMarco !== false ? 'checked' : ''} style="accent-color:var(--p-cork);"> MARCO PRINCIPAL (HEADER/BOTTOM)
+            </label>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
+              <input type="checkbox" id="w-glow-laterales" ${data.glowLaterales !== false ? 'checked' : ''} style="accent-color:var(--p-cork);"> HAZ DE LUZ LATERAL
+            </label>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
+              <input type="checkbox" id="w-glow-botones" ${data.glowBotones !== false ? 'checked' : ''} style="accent-color:var(--p-cork);"> BOTONES DINÁMICOS
+            </label>
+          </div>
+        `,
+        onChange: (data) => {
+          data.glowMarco = document.getElementById('w-glow-marco').checked;
+          data.glowLaterales = document.getElementById('w-glow-laterales').checked;
+          data.glowBotones = document.getElementById('w-glow-botones').checked;
+        }
+      },
+      {
+        title: 'Color del Marco',
+        content: (data) => `
+          <div class="grid gap-15">
+            <p class="text-gray text-xs uppercase font-800">¿Deseas que el marco cambie según el módulo o prefieres un color fijo?</p>
+            <label class="flex items-center gap-10 text-sm text-white cursor-pointer bg-black border border-222 p-14 rounded-md">
+              <input type="checkbox" id="w-glow-fijo" ${data.glowMarcoFijo ? 'checked' : ''} style="accent-color:var(--p-cork);"> USAR COLOR FIJO EN EL MARCO
+            </label>
+            <div id="w-color-fijo-container" style="display:${data.glowMarcoFijo ? 'block' : 'none'};">
+              <label class="wizard-label">COLOR DEL MARCO</label>
+              <div class="flex flex-wrap gap-8 mt-8">
+                ${colors.map(c => `
+                  <button class="theme-dot ${data.glowMarcoFijoColor === c.hex ? 'active' : ''}"
+                    style="background:${c.hex}; width:40px; height:40px; border-radius:50%; border:3px solid ${data.glowMarcoFijoColor === c.hex ? '#fff' : 'transparent'};"
+                    onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.borderColor='transparent'); this.style.borderColor='#fff'; window._tempGlowColor='${c.hex}';"></button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `,
+        onRender: (data, area) => {
+          const chk = area.querySelector('#w-glow-fijo');
+          const cont = area.querySelector('#w-color-fijo-container');
+          window._tempGlowColor = data.glowMarcoFijoColor;
+          chk.onchange = (e) => {
+            cont.style.display = e.target.checked ? 'block' : 'none';
+          };
+        },
+        onChange: (data) => {
+          data.glowMarcoFijo = document.getElementById('w-glow-fijo').checked;
+          data.glowMarcoFijoColor = window._tempGlowColor || data.glowMarcoFijoColor;
+        }
+      },
+      {
+        title: 'Haz de Luz',
+        content: (data) => `
+          <div class="grid gap-15">
+            <div class="wizard-input-group">
+              <label class="wizard-label">INTENSIDAD DEL HAZ DE LUZ (${data.hazLuzIntensidad}%)</label>
+              <input type="range" id="w-haz-int" min="10" max="90" value="${data.hazLuzIntensidad}" class="w-full" style="accent-color:var(--p-cork);">
+              <div class="flex justify-between text-[10px] text-gray uppercase font-800 mt-4">
+                <span>Sutil</span>
+                <span>Intermedio</span>
+                <span>Fuerte</span>
+              </div>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">COLOR DEL HAZ DE LUZ</label>
+              <select id="w-haz-color-mode" class="wizard-input">
+                <option value="" ${!data.hazLuzColor ? 'selected' : ''}>DINÁMICO (SIGUE AL MARCO)</option>
+                <option value="fijo" ${data.hazLuzColor ? 'selected' : ''}>FIJO (PERSONALIZADO)</option>
+              </select>
+            </div>
+            <div id="w-haz-color-fijo" style="display:${data.hazLuzColor ? 'block' : 'none'};">
+              <div class="flex flex-wrap gap-8 mt-8">
+                ${colors.map(c => `
+                  <button class="theme-dot ${data.hazLuzColor === c.hex ? 'active' : ''}"
+                    style="background:${c.hex}; width:40px; height:40px; border-radius:50%; border:3px solid ${data.hazLuzColor === c.hex ? '#fff' : 'transparent'};"
+                    onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.borderColor='transparent'); this.style.borderColor='#fff'; window._tempHazColor='${c.hex}';"></button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `,
+        onRender: (data, area) => {
+          const sel = area.querySelector('#w-haz-color-mode');
+          const cont = area.querySelector('#w-haz-color-fijo');
+          const range = area.querySelector('#w-haz-int');
+          const lbl = area.querySelector('.wizard-label');
+          window._tempHazColor = data.hazLuzColor;
+          sel.onchange = (e) => {
+            cont.style.display = e.target.value === 'fijo' ? 'block' : 'none';
+            if (e.target.value === '') window._tempHazColor = '';
+          };
+          range.oninput = (e) => {
+            lbl.textContent = `INTENSIDAD DEL HAZ DE LUZ (${e.target.value}%)`;
+          };
+        },
+        onChange: (data) => {
+          data.hazLuzIntensidad = parseInt(document.getElementById('w-haz-int').value);
+          const mode = document.getElementById('w-haz-color-mode').value;
+          data.hazLuzColor = mode === 'fijo' ? (window._tempHazColor || '#CCFF00') : '';
+        }
+      }
+    ];
+
+    window.WizardManager.create({
+      id: 'wizard-config-glow',
+      title: 'RETROILUMINACIÓN',
+      initialData: config,
+      steps: steps,
+      onComplete: async (finalData) => {
+        await this._saveConfig(finalData);
+        // Aplicar cambios inmediatos
+        document.body.classList.toggle('glow-marco-off', !finalData.glowMarco);
+        document.body.classList.toggle('glow-laterales-off', !finalData.glowLaterales);
+        document.body.classList.toggle('glow-botones-off', !finalData.glowBotones);
+
+        if (window.App && window.App.updateHeaderColor) {
+          window.App.updateHeaderColor();
+        }
+
+        // Inyectar variables de haz
+        document.documentElement.style.setProperty('--haz-intensity', finalData.hazLuzIntensidad + '%');
+        if (finalData.hazLuzColor) {
+          document.documentElement.style.setProperty('--haz-luz-color', finalData.hazLuzColor);
+        } else {
+          document.documentElement.style.removeProperty('--haz-luz-color');
+        }
+
+        App.toast("Configuración guardada", 'success');
+        this.render();
+      }
+    });
   }
 };
 
