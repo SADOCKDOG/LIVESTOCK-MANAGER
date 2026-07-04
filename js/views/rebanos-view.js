@@ -12,20 +12,10 @@ const RebanosView = {
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const totalRebanos = rebanos.length;
     const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
-    let html = `
-      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-info);">
-        <div class="section-header-theme">ACCIONES</div>
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="RebanosView._crearRebano()">
-            ${Icons.agregar()}
-            <span class="widget-link-label">Nuevo Rebaño</span>
-          </button>
-        </div>
-        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.rebanos()} Creación y gestión de lotes, rebaños y agrupaciones ganaderas</span></div>
-      </div>`;
+    let html = '';
 
     if (rebanos.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-info);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-info);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="RebanosView._crearRebano()">${Icons.agregar()} Crear primer rebaño</button></div></div>`;
     else {
       // Barra de resumen de Rebaños
       const carneCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn')).length;
@@ -85,8 +75,11 @@ const RebanosView = {
       }
       html += `</div>`;
     }
-    html += `<!-- Botón Flotante de Acción para móviles -->
-      <button class="fab-btn" onclick="RebanosView._crearRebano()" title="Nuevo Rebaño">${Icons.agregar()}</button>`;
+    html += `<!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="RebanosView._crearRebano()">
+        <span class="fab-label">Nuevo Rebaño</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
     main.innerHTML = html;
   },
 

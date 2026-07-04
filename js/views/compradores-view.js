@@ -82,17 +82,6 @@ const CompradoresView = {
                 </div>
               </div>
 
-              <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--p-gold); --theme-color: var(--p-gold);">
-                <div class="section-header-theme">ACCIONES</div>
-                <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-                  <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="CompradoresView.renderFormulario()">
-                    ${Icons.agregar()}
-                    <span class="widget-link-label">Nuevo Comprador</span>
-                  </button>
-                </div>
-                <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.compradores()} Registro y gestión de compradores por tipo de producción</span></div>
-              </div>
-
               <div class="flex gap-8 mb-14">
                 <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
                   oninput="CompradoresView._filtrarCompradores(this.value)"
@@ -101,6 +90,11 @@ const CompradoresView = {
 
               <div id="compr-lista"></div>
 
+              <!-- Botón Flotante de Acción con viñeta -->
+              <div class="fab-container" onclick="CompradoresView.renderFormulario()">
+                <span class="fab-label">Nuevo Comprador</span>
+                <button class="fab-btn">${Icons.fabPlus()}</button>
+              </div>
             `;
             this._aplicarFiltrosCompradores();
         } else {
@@ -112,17 +106,6 @@ const CompradoresView = {
                 </div>
               </div>
 
-              <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--c-success); --theme-color: var(--c-success);">
-                <div class="section-header-theme">ACCIONES</div>
-                <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-                  <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContratoLibre()">
-                    ${Icons.agregar()}
-                    <span class="widget-link-label">Nuevo Contrato</span>
-                  </button>
-                </div>
-                <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.contratos()} Creación y gestión de contratos comerciales y acuerdos de compra</span></div>
-              </div>
-
               <div class="flex gap-8 mb-14">
                 <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
                   oninput="CompradoresView._filtrarContratos(this.value)"
@@ -131,6 +114,11 @@ const CompradoresView = {
 
               <div id="contratos-lista"></div>
 
+              <!-- Botón Flotante de Acción con viñeta -->
+              <div class="fab-container" onclick="CompradoresView._nuevoContratoLibre()">
+                <span class="fab-label">Nuevo Contrato</span>
+                <button class="fab-btn">${Icons.fabPlus()}</button>
+              </div>
             `;
             this._aplicarFiltrosContratos();
         }

@@ -203,17 +203,16 @@ const GastosView = {
           </div>
         </div>
         ` : ''}
-        <div class="text-center mb-12">
-          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
-            ${Icons.agregar()} ${registrarLabel}
-          </button>
-        </div>
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} ${listName}
         </div>
         ${recordsHtml}
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" aria-label="${registrarLabel}">${Icons.agregar()}</button>`;
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="${registrarHandler}">
+        <span class="fab-label">Nuevo ${registrarLabel}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
   },
 
   _fmt(n) {
