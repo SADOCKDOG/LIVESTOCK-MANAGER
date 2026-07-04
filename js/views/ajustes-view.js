@@ -6,6 +6,7 @@
 
 const AjustesView = {
   async render() {
+    if (window.App) App.updateHeaderColor('ajustes');
     const main = document.getElementById("app-content");
     const fincas = await Fincas.list();
     const activeId = await Fincas.getActiveId();
