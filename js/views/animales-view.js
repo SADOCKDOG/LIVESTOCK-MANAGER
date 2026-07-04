@@ -37,15 +37,6 @@ const AnimalesView = {
       return;
     }
 
-    // Barra de resumen
-    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-white);">
-      <div class="flex flex-wrap gap-4">
-        ${especies.map(esp => `<span class="badge badge-sm badge-gold uppercase">${esp}: ${animales.filter(a => a.especie === esp).length}</span>`).join('')}
-        <span class="badge badge-sm badge-green uppercase">${Icons.check()} ${activos} activos</span>
-        <span class="badge badge-sm badge-red uppercase">${Icons.paquete()} ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
-      </div>
-    </div>`;
-
     // Búsqueda + selector de especie compacto
     html += `<div class="card-registro mb-10" style="--registro-color: var(--c-white);">
       <div class="flex gap-8 items-center">
@@ -67,9 +58,37 @@ const AnimalesView = {
     `;
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
-    // Card aglutinadora: describe el registro (Censo de Animales) y contiene las fichas
+    const vendidos = animales.filter(a => a.estado === 'vendido').length;
+    // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas (patrón Gastos)
     html += `<div class="card-registro mb-10" style="--registro-color: var(--c-orange);">
-      <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.animales()} Censo de Animales <span style="color:var(--c-orange); font-weight:900;">${animales.length}</span></div>
+      <div class="flex items-center gap-12 mb-12">
+        <span class="text-3xl" style="color:var(--c-orange);">${Icons.animales()}</span>
+        <div>
+          <div class="text-white font-900 text-lg">Censo de Animales</div>
+          <div class="text-gray" style="font-size:0.68rem;">${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos</div>
+        </div>
+      </div>
+      <!-- Resumen de datos registrados -->
+      <div class="card p-12 mb-14 border-222 card-total-3d" style="background: rgba(255,255,255,0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.animales()} Resumen del Censo</div>
+        <div class="flex flex-col">
+          ${especies.map(esp => `
+            <div class="py-12 flex justify-between items-center border-bottom-222">
+              <span class="text-xs text-gray uppercase font-900">${esp}</span>
+              <strong class="text-xl font-950" style="color: var(--c-info);">${animales.filter(a => a.especie === esp).length}</strong>
+            </div>`).join('')}
+          <div class="py-12 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900">Activos</span>
+            <strong class="text-xl font-950" style="color: var(--c-success);">${activos}</strong>
+          </div>
+          <div class="py-12 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900">Vendidos</span>
+            <strong class="text-xl font-950" style="color: var(--c-danger);">${vendidos}</strong>
+          </div>
+        </div>
+      </div>
+      <!-- Histórico de registros -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">${Icons.documento()} Lista de Animales</div>
       <div id="animales-lista" class="grid gap-12">`;
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
     html += `</div></div>
