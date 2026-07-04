@@ -142,6 +142,9 @@ const App = {
         const fInt = cfg?.value?.fabIntensidad ?? 60;
         document.documentElement.style.setProperty('--fab-intensity', fInt + '%');
         document.documentElement.style.setProperty('--fab-intensity-num', fInt);
+
+        const bOpacity = cfg?.value?.bannerOpacity ?? 0.4;
+        document.documentElement.style.setProperty('--banner-opacity', bOpacity);
       } catch (_) {}
       await App.route();
     } catch (error) {

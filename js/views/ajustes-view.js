@@ -553,6 +553,7 @@ const AjustesView = {
       hazLuzIntensidad: 45,
       fabColor: '', // vacío = sigue al módulo
       fabIntensidad: 60,
+      bannerOpacity: 0.4,
       colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [],
       alertSanidad: true, alertTrazabilidad: true, alertPAC: true,
       alertADSG: true, alertINCOLAC: true, alertContratos: false
@@ -1273,11 +1274,24 @@ const AjustesView = {
                 `).join('')}
               </div>
             </div>
+
+            <div class="wizard-input-group mt-10">
+              <label class="wizard-label" id="lbl-banner-opacity">TRANSPARENCIA DE BANNERS (${Math.round((data.bannerOpacity || 0.4) * 100)}%)</label>
+              <input type="range" id="w-banner-opacity" min="0" max="100" value="${(data.bannerOpacity || 0.4) * 100}" class="w-full" style="accent-color:var(--p-cork);">
+              <div class="flex justify-between text-[10px] text-gray uppercase font-800 mt-4">
+                <span>Cristal</span>
+                <span>Traslúcido</span>
+                <span>Opaco</span>
+              </div>
+            </div>
           </div>
         `,
         onRender: (data, area) => {
           const chk = area.querySelector('#w-glow-fijo');
           const cont = area.querySelector('#w-color-fijo-container');
+          const range = area.querySelector('#w-banner-opacity');
+          const lbl = area.querySelector('#lbl-banner-opacity');
+
           window._tempGlowColor = data.glowMarcoFijoColor || '#FFFFFF';
 
           chk.onchange = (e) => {
@@ -1291,10 +1305,15 @@ const AjustesView = {
               window._tempGlowColor = btn.dataset.color;
             };
           });
+
+          range.oninput = (e) => {
+            lbl.textContent = `TRANSPARENCIA DE BANNERS (${e.target.value}%)`;
+          };
         },
         onChange: (data) => {
           data.glowMarcoFijo = document.getElementById('w-glow-fijo').checked;
           data.glowMarcoFijoColor = window._tempGlowColor;
+          data.bannerOpacity = parseInt(document.getElementById('w-banner-opacity').value) / 100;
         }
       },
       {
@@ -1473,6 +1492,10 @@ const AjustesView = {
         if (finalData.fabIntensidad) {
           document.documentElement.style.setProperty('--fab-intensity', finalData.fabIntensidad + '%');
           document.documentElement.style.setProperty('--fab-intensity-num', finalData.fabIntensidad);
+        }
+
+        if (finalData.bannerOpacity !== undefined) {
+          document.documentElement.style.setProperty('--banner-opacity', finalData.bannerOpacity);
         }
 
         App.toast("Configuración guardada", 'success');
