@@ -659,7 +659,7 @@ const AjustesView = {
     overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;';
     overlay.innerHTML = `
-      <div class="card p-25 max-w-340 border-top-5-amber">
+      <div class="card-registro p-25 max-w-340 border-top-5-amber" style="--registro-color: var(--c-warning);">
         <h3 class="mt-0 text-gold flex items-center gap-8">${Icons.reproduccion()} Nueva Especie</h3>
         <div class="wizard-input-group"><label class="wizard-label">Nombre</label><input type="text" id="esp-nombre" placeholder="Vacas, Ovejas, Cabras..." class="wizard-input"></div>
         <div class="grid grid-cols-2 gap-10">
@@ -1035,7 +1035,7 @@ const AjustesView = {
   async _nuevoADSG() {
     const fincaId = await Fincas.getActiveId();
     const html = `
-      <div class="card p-25 max-w-400 border-top-5-blue">
+      <div class="card-registro p-25 max-w-400 border-top-5-blue" style="--registro-color: var(--c-info);">
         <h3 class="mt-0 text-white font-900 uppercase">${Icons.sanidad()} NUEVA ADSG</h3>
         <div class="wizard-input-group mb-12">
           <label class="wizard-label">NOMBRE AGRUPACIÓN *</label>
@@ -1102,7 +1102,7 @@ const AjustesView = {
     overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center;';
     overlay.innerHTML = `
-      <div class="card p-25 max-w-400 border-top-5-blue">
+      <div class="card-registro p-25 max-w-400 border-top-5-blue" style="--registro-color: var(--c-info);">
         <h3 class="mt-0 text-white font-900 uppercase">${Icons.editar()} EDITAR ADSG</h3>
         <div class="wizard-input-group mb-12">
           <label class="wizard-label">NOMBRE AGRUPACIÓN *</label>
@@ -1169,7 +1169,7 @@ const AjustesView = {
     overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed; inset:0; z-index:7000; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center;';
     overlay.innerHTML = `
-      <div class="card p-25 max-w-340 border-top-5-amber">
+      <div class="card-registro p-25 max-w-340 border-top-5-amber" style="--registro-color: var(--c-warning);">
         <h3 class="mt-0 text-gold font-900 uppercase">${Icons.dinero()} NUEVO COSTE REF.</h3>
         <div class="wizard-input-group mb-15">
           <label class="wizard-label">ESPECIE</label>
