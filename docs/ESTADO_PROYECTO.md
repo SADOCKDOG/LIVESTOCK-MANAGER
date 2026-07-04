@@ -1,7 +1,7 @@
 # Estado del Proyecto — Livestock Manager (SIGGAN)
-> Fotografía técnica regenerada el **2026-06-28** · Versión de app: **v4.7.0** · Base de datos: **IndexedDB DB v11** · Service Worker: **`corcho-v6.7.19`**
+> Fotografía técnica regenerada el **2026-07-04** · Versión de app: **v4.8.9** (versionCode **513**) · Base de datos: **IndexedDB DB v14** · Service Worker: **`corcho-v6.10.34`**
 >
-> Documento anterior: v4.5.0 / DB v10 / SW corcho-v6.5.63 (2026-06-24) — **obsoleto**.
+> Documento anterior: v4.7.0 / DB v11 / SW corcho-v6.7.19 (2026-06-28) — **obsoleto**.
 
 ---
 
@@ -9,14 +9,24 @@
 
 | Artefacto | Valor |
 |---|---|
-| `package.json` | `4.7.0` |
-| `index.html` CSS cache-bust | `?v=5.3.0` |
-| **Base de datos IndexedDB** | **DB v11** |
-| **Service Worker** `CACHE_NAME` | **`corcho-v6.7.19`** |
-| `app.js` (ExPro about) | `v4.5.0` (string interno pendiente de actualizar) |
-| Git commits desde v4.5.0 | ~159 commits |
+| `js/app-version.js` (`window.APP_INFO`) | `version: '4.8.9'`, `versionCode: 513` — **fuente única** |
+| `package.json` | `4.8.9` |
+| `index.html` CSS cache-bust | `styles.css?v=5.4.2` · `design-tokens.css?v=5.3.6` |
+| **Base de datos IndexedDB** | **DB v14** (`DB_VERSION` en `js/db.js`) |
+| **Service Worker** `CACHE_NAME` | **`corcho-v6.10.34`** |
+| Play Console (Alpha cerrada + interna) | v4.8.8 (512) publicada; local va por delante en 4.8.9 (513) |
 
-> **Disciplina de caché:** al modificar cualquier JS/CSS/HTML hay que subir `CACHE_NAME` en `sw.js` para forzar recarga en Android/PWA.
+> **Fuente única de versión:** `js/app-version.js` (`window.APP_INFO`) es la referencia; se acabaron los strings hardcodeados en `app.js`/Ajustes. La versión de BD sale de `DB_VERSION` (`js/db.js`).
+> **Disciplina de caché:** al modificar cualquier JS/CSS/HTML hay que subir `CACHE_NAME` en `sw.js` (y el `?v=` de CSS) para forzar recarga en Android/PWA.
+
+### Novedades desde v4.7.0 (auditoría integral + rediseño 2026-07)
+- **Auditoría UI/UX F1–F6 completada** (ver `docs/AUDITORIA-PANTALLAS.md`): tokens de color unificados (`css/design-tokens.css` canónico + `js/module-colors.js` mapa único de módulos), navegación de retroceso/cancelar robusta, textos/unidades es-ES, notificaciones (`/alertas`, AlertasService v1.1), toasts a API explícita `App.toast(msg, type, dur)`, **norma sin emoticonos** (todo `Icons.*` SVG).
+- **Componente canónico `.card-registro`** (styles.css) con relieve/contraste gris y tipografía por tokens; adoptado en las listas de registro de la app.
+- **Banner superior**: muestra el **código REGA** de la finca activa (antes el nombre) con haz de luz; header en grid `1fr auto 1fr`.
+- **FAB personalizable**: color dinámico por módulo con memoria, intensidad y blanco retroiluminado; wizard de Retroiluminación (marco/laterales/botones, clases `glow-marco-off` / `glow-laterales-off` / `glow-botones-off`).
+- **Ajustes refactorizado**: `ConfigSistemaView` (ruta `/sistema`, pestañas Interfaz/Seguridad/Auditoría) absorbe la configuración visual; `ajustes-view.js` adelgazado ~1125 líneas. `interfaz-view.js` fue un intento intermedio, ya eliminado.
+- **Navegación sin módulos huérfanos**: el sheet «Más» es el índice completo de módulos.
+- **Fix compra Premium** (`purchase-manager.js`): restauración de compras y `ITEM_ALREADY_OWNED` gestionados; estado leído síncrono al arranque.
 
 ---
 

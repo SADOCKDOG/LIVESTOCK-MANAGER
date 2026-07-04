@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corcho-v6.10.33';
+const CACHE_NAME = 'corcho-v6.10.34';
 const ASSETS = [
   './',
   './index.html',
