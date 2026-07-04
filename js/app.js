@@ -121,20 +121,27 @@ const App = {
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
 
         // Cargar intensidad y color de haz
-        if (cfg?.value?.hazLuzIntensidad) {
-          document.documentElement.style.setProperty('--haz-intensity', cfg.value.hazLuzIntensidad + '%');
-          document.documentElement.style.setProperty('--haz-intensity-num', cfg.value.hazLuzIntensidad);
+        const hazInt = cfg?.value?.hazLuzIntensidad ?? 45;
+        document.documentElement.style.setProperty('--haz-intensity', hazInt + '%');
+        document.documentElement.style.setProperty('--haz-intensity-num', hazInt);
+
+        const hazColor = cfg?.value?.hazLuzColor || '';
+        if (hazColor) {
+          document.documentElement.style.setProperty('--haz-luz-color', hazColor);
+        } else {
+          document.documentElement.style.removeProperty('--haz-luz-color');
         }
-        if (cfg?.value?.hazLuzColor) {
-          document.documentElement.style.setProperty('--haz-luz-color', cfg.value.hazLuzColor);
+
+        const fColor = cfg?.value?.fabColor || '';
+        if (fColor) {
+          document.documentElement.style.setProperty('--p-cork', fColor);
+        } else {
+          document.documentElement.style.removeProperty('--p-cork');
         }
-        if (cfg?.value?.fabColor) {
-          document.documentElement.style.setProperty('--p-cork', cfg.value.fabColor);
-        }
-        if (cfg?.value?.fabIntensidad) {
-          document.documentElement.style.setProperty('--fab-intensity', cfg.value.fabIntensidad + '%');
-          document.documentElement.style.setProperty('--fab-intensity-num', cfg.value.fabIntensidad);
-        }
+
+        const fInt = cfg?.value?.fabIntensidad ?? 60;
+        document.documentElement.style.setProperty('--fab-intensity', fInt + '%');
+        document.documentElement.style.setProperty('--fab-intensity-num', fInt);
       } catch (_) {}
       await App.route();
     } catch (error) {
@@ -431,8 +438,11 @@ const App = {
   updateHeaderColor(mode) {
     const cfg = this._config;
     let color;
-    if (cfg?.glowMarcoFijo && cfg.glowMarcoFijoColor) {
-      color = cfg.glowMarcoFijoColor;
+    const isFixed = cfg?.glowMarcoFijo ?? false;
+    const fixedColor = cfg?.glowMarcoFijoColor ?? '#FFFFFF';
+
+    if (isFixed) {
+      color = fixedColor;
     } else {
       const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
       color = window.getModuleColor(path);
