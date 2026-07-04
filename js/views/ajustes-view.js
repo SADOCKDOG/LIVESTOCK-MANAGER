@@ -1214,11 +1214,15 @@ const AjustesView = {
     const config = await this._loadConfig();
     const colors = [
       { name: 'Neon Lime', hex: '#CCFF00' },
-      { name: 'Neon Gold', hex: '#FFD600' },
-      { name: 'Neon Blue', hex: '#3b82f6' },
       { name: 'Neon Red', hex: '#FF4444' },
+      { name: 'Neon Blue', hex: '#3b82f6' },
+      { name: 'Neon Gold', hex: '#FFD600' },
       { name: 'Neon Orange', hex: '#F97316' },
-      { name: 'Neon Purple', hex: '#A855F7' }
+      { name: 'Neon Purple', hex: '#A855F7' },
+      { name: 'Neon Pink', hex: '#EC4899' },
+      { name: 'Neon Green', hex: '#10b981' },
+      { name: 'Neon Indigo', hex: '#8b5cf6' },
+      { name: 'Steel Grey', hex: '#94A3B8' }
     ];
 
     const steps = [
@@ -1267,14 +1271,14 @@ const AjustesView = {
         onRender: (data, area) => {
           const chk = area.querySelector('#w-glow-fijo');
           const cont = area.querySelector('#w-color-fijo-container');
-          window._tempGlowColor = data.glowMarcoFijoColor;
+          window._tempGlowColor = data.glowMarcoFijoColor || '#CCFF00';
           chk.onchange = (e) => {
             cont.style.display = e.target.checked ? 'block' : 'none';
           };
         },
         onChange: (data) => {
           data.glowMarcoFijo = document.getElementById('w-glow-fijo').checked;
-          data.glowMarcoFijoColor = window._tempGlowColor || data.glowMarcoFijoColor;
+          data.glowMarcoFijoColor = window._tempGlowColor;
         }
       },
       {
@@ -1282,8 +1286,8 @@ const AjustesView = {
         content: (data) => `
           <div class="grid gap-15">
             <div class="wizard-input-group">
-              <label class="wizard-label">INTENSIDAD DEL HAZ DE LUZ (${data.hazLuzIntensidad}%)</label>
-              <input type="range" id="w-haz-int" min="10" max="90" value="${data.hazLuzIntensidad}" class="w-full" style="accent-color:var(--p-cork);">
+              <label class="wizard-label" id="lbl-haz-int">INTENSIDAD DEL HAZ DE LUZ (${data.hazLuzIntensidad || 45}%)</label>
+              <input type="range" id="w-haz-int" min="10" max="90" value="${data.hazLuzIntensidad || 45}" class="w-full" style="accent-color:var(--p-cork);">
               <div class="flex justify-between text-[10px] text-gray uppercase font-800 mt-4">
                 <span>Sutil</span>
                 <span>Intermedio</span>
@@ -1312,8 +1316,8 @@ const AjustesView = {
           const sel = area.querySelector('#w-haz-color-mode');
           const cont = area.querySelector('#w-haz-color-fijo');
           const range = area.querySelector('#w-haz-int');
-          const lbl = area.querySelector('.wizard-label');
-          window._tempHazColor = data.hazLuzColor;
+          const lbl = area.querySelector('#lbl-haz-int');
+          window._tempHazColor = data.hazLuzColor || '#CCFF00';
           sel.onchange = (e) => {
             cont.style.display = e.target.value === 'fijo' ? 'block' : 'none';
             if (e.target.value === '') window._tempHazColor = '';
@@ -1348,6 +1352,7 @@ const AjustesView = {
 
         // Inyectar variables de haz
         document.documentElement.style.setProperty('--haz-intensity', finalData.hazLuzIntensidad + '%');
+        document.documentElement.style.setProperty('--haz-intensity-num', finalData.hazLuzIntensidad);
         if (finalData.hazLuzColor) {
           document.documentElement.style.setProperty('--haz-luz-color', finalData.hazLuzColor);
         } else {
