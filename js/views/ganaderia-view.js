@@ -76,7 +76,7 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="mb-14 border-bottom-222 pb-10">
+      <div class="card-registro mb-14 border-bottom-222 pb-10" style="--registro-color: ${meta.color};">
         <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>

@@ -65,7 +65,7 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card mb-14 p-12" style="background:rgba(255,68,68,0.03);">
+      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
           <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
@@ -74,7 +74,7 @@ const GastosView = {
       </div>
 
       <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255,68,68, 0.015);">
+      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-purple); background: rgba(255,68,68, 0.015);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
         </div>
@@ -158,8 +158,8 @@ const GastosView = {
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card mb-6" onclick="${r.onclick || ''}"
-             style="border-left:4px solid ${color}; padding:12px 14px; cursor:pointer; background:rgba(0,0,0,0.3);">
+        <div class="card-registro" onclick="${r.onclick || ''}"
+             style="--registro-color: ${color};">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
               <div class="text-white font-900 uppercase tracking-tight nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${Icons.documento()} ${r.title}</div>

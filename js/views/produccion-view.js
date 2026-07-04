@@ -148,8 +148,10 @@ const ProduccionView = {
           }).join('')}
         </div>` : ''}
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.registros()} ${listName}
+        <div class="card-registro" style="--registro-color: var(--c-white);">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-4">
+            ${Icons.registros()} ${listName}
+          </div>
         </div>
         <div class="grid gap-10">
           ${recordsHtml}

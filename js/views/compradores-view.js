@@ -234,7 +234,7 @@ const CompradoresView = {
               </div>
 
               <div class="flex justify-end w-full mt-2">
-                <span class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest flex items-center gap-3">VER FICHA ${Icons.siguiente()}</span>
+                <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
               </div>
             </div>
           </div>

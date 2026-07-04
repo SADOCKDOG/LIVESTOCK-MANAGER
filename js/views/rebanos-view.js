@@ -67,7 +67,7 @@ const RebanosView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLE ➔</div>
+                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
                 </div>
               </div>
             </div>
@@ -116,13 +116,13 @@ const RebanosView = {
 
       <!-- Categorías -->
       ${Object.keys(porCategoria).length > 0 ? `
-      <div class="card mb-20 border-top-3px border-top-3px-purple p-12">
+      <div class="card-registro mb-20 border-top-3px border-top-3px-purple p-12" style="--registro-color: var(--c-purple);">
         <div class="inf-section-title mb-6 flex items-center gap-8">${Icons.documento()} POR CATEGORÍA</div>
         <div class="flex flex-wrap gap-4">${Object.entries(porCategoria).map(([c, n]) => `<span class="badge badge-sm badge-purple font-900">${c.toUpperCase()}: ${n}</span>`).join('')}</div>
       </div>` : ''}
 
       <!-- Edición -->
-      <div class="card border-top-3px border-top-3px-gold mb-25 p-16">
+      <div class="card-registro border-top-3px border-top-3px-gold mb-25 p-16" style="--registro-color: var(--c-warning);">
         <div class="inf-card-title flex items-center gap-8 mb-16">${Icons.editar()} DATOS DEL REBAÑO</div>
         <div class="flex flex-col gap-15">
           <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Nombre</label>
@@ -173,7 +173,7 @@ const RebanosView = {
       </div>
       
       <!-- Sanidad -->
-      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24" style="--theme-color: var(--c-success);">
+      <div class="card-registro mb-20 border-222 card-dark-gradient p-12 pb-24" style="--registro-color: var(--c-success); --theme-color: var(--c-success);">
         <div class="section-header-theme">SANIDAD</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
@@ -185,7 +185,7 @@ const RebanosView = {
       </div>
 
       <!-- Animales -->
-      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
+      <div class="card-registro p-12 mb-16 border-222 card-dark-gradient pb-24" style="--registro-color: var(--c-info);">
         <div class="section-header-theme" style="--theme-color: var(--c-info)">ANIMALES (${animales.length})</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12">
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirSelectorAnimales(${id})">

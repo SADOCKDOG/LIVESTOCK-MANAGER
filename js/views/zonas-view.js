@@ -34,15 +34,23 @@ const ZonasView = {
           if (n > 0) {
             const colorEspecie = r.especie === 'Vacas' ? 'var(--c-info)' : r.especie === 'Ovejas' ? 'var(--c-success)' : r.especie === 'Cabras' ? 'var(--c-warning)' : 'var(--c-pink)';
             rebanosHtml += `
-              <div class="flex justify-between items-center mt-6" style="background:rgba(255,255,255,0.02); border-left:3px solid ${colorEspecie}; padding:8px 12px; border-radius:8px;">
-                <div class="flex items-center gap-8">
-                  <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
-                  <div>
-                    <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
-                    <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
+              <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${colorEspecie};">
+                <div class="flex flex-col gap-10">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-8">
+                        <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
+                        <div>
+                          <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
+                          <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <div class="font-900 text-sm">${n}</div>
+                    </div>
                   </div>
                 </div>
-                <div class="text-white font-900 text-sm">${n}</div>
               </div>`;
           }
         }

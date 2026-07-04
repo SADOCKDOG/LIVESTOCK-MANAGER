@@ -29,6 +29,7 @@ const App = {
     "/informes": "renderInformes",
     "/alertas": "renderAlertas",
     "/ajustes": "renderAjustes",
+    "/sistema": "renderConfigSistema",
     "/compradores": "renderCompradores",
     "/comprador": "renderComprador",
     "/proveedores": "renderProveedores",
@@ -2009,6 +2010,14 @@ const App = {
       await AjustesView.render();
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Error: Vista Ajustes no disponible</div>';
+    }
+  },
+
+  async renderConfigSistema(params) {
+    if (window.ConfigSistemaView) {
+      await ConfigSistemaView.render(params);
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Error: Módulo de Sistema no disponible</div>';
     }
   },
 

@@ -24,7 +24,7 @@ const AnimalesView = {
     let html = '';
 
     if (animales.length === 0) {
-      html += `<div class="empty-state">
+      html += `<div class="card-registro empty-state" style="--registro-color: var(--c-orange);">
         <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
         <div class="text-center mt-20">
@@ -38,33 +38,33 @@ const AnimalesView = {
     }
 
     // Barra de resumen
-    html += `
-      <div class="flex flex-wrap gap-4 mb-10">
+    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-white);">
+      <div class="flex flex-wrap gap-4">
         ${especies.map(esp => `<span class="badge badge-sm badge-gold uppercase">${esp}: ${animales.filter(a => a.especie === esp).length}</span>`).join('')}
         <span class="badge badge-sm badge-green uppercase">${Icons.check()} ${activos} activos</span>
         <span class="badge badge-sm badge-red uppercase">${Icons.paquete()} ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
-      </div>`;
+      </div>
+    </div>`;
 
     // Búsqueda + selector de especie compacto
-    html += `
-      <div class="sticky-top" style="padding-bottom:10px;">
-        <div class="flex gap-8 items-center">
-          <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
-                 oninput="AnimalesView._filtrar(this.value)"
-                 class="search-input flex-1 min-w-0">
-          <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
-          <select id="animales-filtro-especie" class="form-select-gold"
-                  onchange="AnimalesView._setFiltro('especie', this.value)"
-                  style="width:130px;min-width:120px;">
-            <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
-            <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
-            <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
-            <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
-            <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
-          </select>
-        </div>
+    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-white);">
+      <div class="flex gap-8 items-center">
+        <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
+               oninput="AnimalesView._filtrar(this.value)"
+               class="search-input flex-1 min-w-0">
+        <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
+        <select id="animales-filtro-especie" class="form-select-gold"
+                onchange="AnimalesView._setFiltro('especie', this.value)"
+                style="width:130px;min-width:120px;">
+          <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
+          <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
+          <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
+          <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
+          <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
+        </select>
       </div>
-      <div id="animales-lista" class="grid gap-12">`;
+    </div>
+    <div id="animales-lista" class="grid gap-12 card-registro mb-10" style="--registro-color: var(--c-white);">`;
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
@@ -74,9 +74,11 @@ const AnimalesView = {
         <span class="fab-label">Nuevo Animal</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
-      <div id="animales-empty-search" class="empty-state-search d-none">
-        <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
-        <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
+      <div class="card-registro mt-10" style="--registro-color: var(--c-white);">
+        <div id="animales-empty-search" class="empty-state-search d-none">
+          <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
+          <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
+        </div>
       </div>
 `;
 
@@ -120,7 +122,15 @@ const AnimalesView = {
               </div>
             </div>
             <div class="text-right">
-              <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${a.estado || 'activo'}</span>
+              <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${colorEstado}; color: ${colorEstado};
+                  background: ${colorEstado === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
+                            colorEstado === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
+                            colorEstado === 'var(--c-danger)' ? 'rgba(255,68,68,0.1)' :
+                            colorEstado === '#888' ? 'rgba(136,136,136,0.1)' :
+                            'rgba(204,255,0,0.1)'};
+                  padding: 6px 12px; border-radius: 8px; display: inline-block;">
+                ${a.estado || 'activo'}
+              </span>
             </div>
           </div>
 
@@ -133,7 +143,7 @@ const AnimalesView = {
               </div>
             </div>
             <div class="text-right">
-              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
             </div>
           </div>
         </div>
