@@ -1465,7 +1465,10 @@ const AjustesView = {
         // Inyectar color del FAB
         if (finalData.fabColor) {
           document.documentElement.style.setProperty('--p-cork', finalData.fabColor);
+        } else {
+          document.documentElement.style.removeProperty('--p-cork');
         }
+
         if (finalData.fabIntensidad) {
           document.documentElement.style.setProperty('--fab-intensity', finalData.fabIntensidad + '%');
           document.documentElement.style.setProperty('--fab-intensity-num', finalData.fabIntensidad);
