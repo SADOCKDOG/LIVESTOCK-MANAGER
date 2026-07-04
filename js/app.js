@@ -7,6 +7,7 @@
 const App = {
   _animalGuardado: false,
   _pesadaBatch: null,
+  _config: null,
   routes: {
     "/": "renderDashboard",
     "/ganaderia": "renderGanaderia",
@@ -104,7 +105,9 @@ const App = {
       App._initScrollShadows();
       // Cargar preferencias visuales
       try {
-        const cfg = await window.db.get('meta', 'appConfig');
+        const storedCfg = await window.db.get('meta', 'appConfig');
+        this._config = storedCfg?.value || {};
+        const cfg = storedCfg;
         const mostrar = cfg?.value?.mostrarContextos;
         if (mostrar === false || mostrar === undefined) {
           document.body.classList.add('hide-context');
@@ -116,6 +119,14 @@ const App = {
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
         if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
+
+        // Cargar intensidad y color de haz
+        if (cfg?.value?.hazLuzIntensidad) {
+          document.documentElement.style.setProperty('--haz-intensity', cfg.value.hazLuzIntensidad + '%');
+        }
+        if (cfg?.value?.hazLuzColor) {
+          document.documentElement.style.setProperty('--haz-luz-color', cfg.value.hazLuzColor);
+        }
       } catch (_) {}
       await App.route();
     } catch (error) {
@@ -410,8 +421,14 @@ const App = {
   /** Actualiza el color neon de la cabecera según el mapa único MODULE_COLORS.
    *  Con mode explícito (carne/leche/...) usa ese módulo; sin mode, el color de la ruta actual. */
   updateHeaderColor(mode) {
-    const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
-    const color = window.getModuleColor(path);
+    const cfg = this._config;
+    let color;
+    if (cfg?.glowMarcoFijo && cfg.glowMarcoFijoColor) {
+      color = cfg.glowMarcoFijoColor;
+    } else {
+      const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
+      color = window.getModuleColor(path);
+    }
     document.documentElement.style.setProperty('--header-neon-color', color);
   },
 
