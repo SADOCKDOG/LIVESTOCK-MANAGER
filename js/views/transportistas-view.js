@@ -194,7 +194,7 @@ const TransportistasView = {
         overlay.style.zIndex = "6000";
 
         overlay.innerHTML = `
-            <div class="card" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px;  margin:16px;">
+            <div class="card-registro" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px; margin:16px; --registro-color: var(--c-pink);">
                 <h3 class="mt-0 text-sm text-blue-400">${isEdit ? `${Icons.editar()} EDITAR TRANSPORTISTA` : `${Icons.agregar()} NUEVO TRANSPORTISTA`}</h3>
 
                 <div class="wizard-input-group">
