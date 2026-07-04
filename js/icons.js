@@ -155,6 +155,9 @@ const Icons = {
   agregar() {
     return this._svg('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>');
   },
+  fabPlus() {
+    return this._svg('<path d="M12 4v16m8-8H4" />', { 'stroke-width': '3.8' });
+  },
   editar() {
     return this._svg(
       '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>' +

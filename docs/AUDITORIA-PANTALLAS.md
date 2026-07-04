@@ -78,12 +78,12 @@ Leyenda: [AUTO] escaneo automático hecho · [COD] pase de código profundo (tex
 | `#/informes` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: typo "Prolifeidad", **datos ficticios como fallback** (Dr. Manuel Ortiz, contratos, ADSG, NIF → 'N/D', 15 casos), "Aforo Máx.", plurales, empty-state censo. Diferido: `toLocaleString()` sin locale (~50 sitios, lote propio) |
 | `#/cuaderno` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: dinero con punto (`toFixed(2)€`→es-ES) en pantalla y PDF, miles es-ES, plurales parto/entrega/animales activos |
 | `#/trazabilidad` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "undefined" en cabecera de ficha y badge estado, plural días |
-| `#/documentos` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "Guía DIMOE" para facturas/DIB (mapa tipo→label), "undefined pares/animales", espacio antes de punto |
-| `#/compradores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: **precio inventado 5,5 €/kg**→'—', badges sin fondo (`var()+alpha`), crash contrato sin tipo, "undefined" en formulario, 'láctico'→'Lácteo' (presentación) |
+| `#/documentos` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "Guía DIMOE" para facturas/DIB (mapa tipo→label), "undefined pares/animales", espacio antes de punto; cards estandarizadas usando .card-registro con --registro-color |
+| `#/compradores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: **precio inventado 5,5 €/kg**→'—', badges sin fondo (`var()+alpha`), crash contrato sin tipo, "undefined" en formulario, 'láctico'→'Lácteo' (presentación); cards estandarizadas usando .card-registro con --registro-color |
 | `#/proveedores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badges sin fondo, categorías con tilde en presentación (`_labelCat`), "undefined" en formulario |
 | `#/transportistas` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badge activo sin fondo, plural animales, ➔→Icons. Diferido: empty-state con filtro Inactivos |
-| `#/contrato` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: crash tipo_comprador undefined, 'LÁCTICO'→'LÁCTEO' |
-| `#/ajustes` | [OK] | [OK] | [OK] | Toggles nuevos OK; cards accent restauradas (G1/G2) |
+| `#/contrato` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: crash tipo_comprador undefined, 'LÁCTICO'→'LÁCTEO'; card estandarizada usando .card-registro con --registro-color |
+| `#/ajustes` | [OK] | [OK] | [OK] | Toggles nuevos OK; cards accent restauradas (G1/G2); cards estandarizadas usando .card-registro con --registro-color |
 | `#/manuales` | [OK] | [OK] 2026-07-03 | [PEND] | Corregido: "láctico"→"lácteo". Diferido: hex del visor (criterio) |
 | Notificaciones (campana/badge/alertas) | [OK] | [OK] | [OK] | F6 [OK]: ruta `/alertas` + dropdown con contador + prefs efectivas |
 | Wizards (9) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: **factura con precio inventado 5,5 €/kg** (venta-masiva → 0 + nota "pendiente de fijar"), SVG crudo en toast (guía), €/L y € a es-ES (albarán-leche), GÉRMENES, "Consultá"→"Consulta", "Regla 3"→mensaje claro, empty-state traslado, razas "undefined", plurales, class duplicado (finca), mg/mL |

@@ -34,22 +34,18 @@ const TransportistasView = {
             </div>
 
             <div class="max-w-600 mx-auto">
-                <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--p-gold); --theme-color: var(--p-gold);">
-                  <div class="section-header-theme">ACCIONES</div>
-                  <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-                    <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="TransportistasView._abrirFormulario()">
-                      ${Icons.agregar()}
-                      <span class="widget-link-label">Nuevo Transportista</span>
-                    </button>
-                  </div>
-                  <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.transportistas()} Registro y gestión de transportistas, vehículos y flota de transporte</span></div>
-                </div>
                 <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="card-registro" style="--registro-color: var(--c-blue);"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
                     <div class="card-registro" style="--registro-color: var(--c-green);"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
                     <div class="card-registro" style="--registro-color: var(--c-amber);"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
                 </div>
                 <div id="trans-list"></div>
+            </div>
+
+            <!-- Botón Flotante de Acción con viñeta -->
+            <div class="fab-container" onclick="TransportistasView._abrirFormulario()">
+                <span class="fab-label">Nuevo Transportista</span>
+                <button class="fab-btn">${Icons.fabPlus()}</button>
             </div>
         `;
         await this._renderLista();

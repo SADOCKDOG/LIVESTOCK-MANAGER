@@ -263,18 +263,6 @@ const ComercializacionView = {
       : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <!-- PANEL DE ACCIONES COMERCIALES (ESTILO NEÓN) -->
-      <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: ${color}; --theme-color: ${color};">
-        <div class="section-header-theme">ACCIONES</div>
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${color}; --neon-glow: ${color}B0; --neon-inner: ${color}40" onclick="${registrarHandler}">
-            ${Icons.agregar()}
-            <span class="widget-link-label">${registrarLabel}</span>
-          </button>
-        </div>
-        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.comercial()} Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
-      </div>
-
       <div class="card-registro p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
           ${Icons.documento()} ${listName}
@@ -283,7 +271,11 @@ const ComercializacionView = {
           ${recordsHtml}
         </div>
       </div>
-      `;
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="${registrarHandler}">
+        <span class="fab-label">${registrarLabel}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
   },
 
   // ===================== TAB CARNE =====================

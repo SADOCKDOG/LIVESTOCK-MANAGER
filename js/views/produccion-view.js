@@ -137,9 +137,6 @@ const ProduccionView = {
               ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
             </div>
           </div>
-          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
-            ${Icons.agregar()} Nuevo
-          </button>
         </div>
 
         ${kpis ? `
@@ -158,7 +155,11 @@ const ProduccionView = {
           ${recordsHtml}
         </div>
       </div>
-      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="${registrarHandler}">
+        <span class="fab-label">Nuevo Registro ${registrarLabel}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
   },
 
   _renderCarne(content, d) {

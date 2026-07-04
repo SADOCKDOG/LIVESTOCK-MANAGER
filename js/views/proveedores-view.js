@@ -22,16 +22,6 @@ const ProveedoresView = {
 
           <div class="mb-16">
             <div id="prov-kpis"></div>
-            <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--p-gold); --theme-color: var(--p-gold);">
-              <div class="section-header-theme">ACCIONES</div>
-              <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-                <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ProveedoresView.renderFormulario()">
-                  ${Icons.agregar()}
-                  <span class="widget-link-label">Nuevo Proveedor</span>
-                </button>
-              </div>
-              <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.proveedores()} Registro y gestión de proveedores de servicios e insumos ganaderos</span></div>
-            </div>
             <div class="flex gap-8 mb-14">
               <input type="search" id="search-proveedores" placeholder="Buscar por nombre, NIF o ciudad..."
                 oninput="ProveedoresView._filtrar(this.value)"
@@ -39,6 +29,12 @@ const ProveedoresView = {
             </div>
           </div>
           <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
+
+          <!-- Botón Flotante de Acción con viñeta -->
+          <div class="fab-container" onclick="ProveedoresView.renderFormulario()">
+            <span class="fab-label">Nuevo Proveedor</span>
+            <button class="fab-btn">${Icons.fabPlus()}</button>
+          </div>
           `;
 
         await this._cargarDatos();

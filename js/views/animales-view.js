@@ -21,31 +21,16 @@ const AnimalesView = {
     const activos = animales.filter(a => a.estado === 'activo').length;
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
 
-    let html = `
-      <div class="card-registro" style="--registro-color: var(--c-orange);">
-        <div class="section-header-theme">ACCIONES</div>
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
-            ${Icons.agregar()}
-            <span class="widget-link-label">Nuevo Animal</span>
-          </button>
-        </div>
-        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.animales()} Alta, identificación y registro de nuevos animales en el censo</span></div>
-      </div>`;
+    let html = '';
 
     if (animales.length === 0) {
       html += `<div class="empty-state">
         <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <div class="card-registro" style="--registro-color: var(--c-orange);">
-          <div class="section-header-theme">ACCIONES</div>
-          <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
-              ${Icons.agregar()}
-              <span class="widget-link-label">Registrar primer animal</span>
+        <div class="text-center mt-20">
+            <button class="btn btn-create btn-lg" onclick="location.hash='/animal'">
+              ${Icons.agregar()} Registrar primer animal
             </button>
-          </div>
-          <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.animales()} Alta, identificación y registro de nuevos animales en el censo</span></div>
         </div>
       </div>`;
       main.innerHTML = html;
@@ -84,8 +69,11 @@ const AnimalesView = {
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
     html += `</div>
-      <!-- Botón Flotante de Acción para móviles -->
-      <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="location.hash='/animal'">
+        <span class="fab-label">Nuevo Animal</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>
       <div id="animales-empty-search" class="empty-state-search d-none">
         <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
         <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>

@@ -13,19 +13,9 @@ const ZonasView = {
     const zonasConIndice = (finca.zonas || [])
           .map((zona, realIndex) => ({ zona, realIndex }))
           .filter(({ zona }) => !zona?.anulada);
-    let html = `
-      <div class="card-registro" onclick="ZonasView._crearZona()" style="--registro-color: var(--c-success);">
-        <div class="section-header-theme">ACCIONES</div>
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ZonasView._crearZona()">
-            ${Icons.agregar()}
-            <span class="widget-link-label">Nueva Zona</span>
-          </button>
-        </div>
-        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.zonas()} Creación y gestión de zonas, parcelas y recintos de la explotación</span></div>
-      </div>`;
+    let html = '';
     if (zonasConIndice.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()">${Icons.agregar()} Crear primera zona</button></div></div>`;
     else {
       let totalAforo = 0, totalOcupacion = 0;
       html += `<div class="grid gap-15">`;
@@ -134,7 +124,12 @@ const ZonasView = {
           </div>
         </div>`;
     }
-    main.innerHTML = html + `<button class="fab-btn" onclick="ZonasView._crearZona()" aria-label="Nueva Zona">${Icons.agregar()}</button>`;
+    main.innerHTML = html + `
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="ZonasView._crearZona()">
+        <span class="fab-label">Nueva Zona</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
   },
 
   async renderDetalle(params) {
