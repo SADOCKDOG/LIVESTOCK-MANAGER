@@ -48,10 +48,13 @@ const AnimalesView = {
           <div class="text-gray" style="font-size:0.68rem;">${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos</div>
         </div>
       </div>
-      <!-- Resumen de datos registrados -->
-      <div class="card p-12 mb-14 border-222 card-total-3d" style="background: rgba(255,255,255,0.02);">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.animales()} Resumen del Censo</div>
-        <div class="flex flex-col">
+      <!-- Resumen de datos registrados (colapsable) -->
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+          <span class="flex items-center gap-6">${Icons.animales()} Resumen del Censo</span>
+          <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
+        </div>
+        <div class="resumen-body flex flex-col">
           ${especies.map(esp => `
             <div class="py-12 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">${esp}</span>

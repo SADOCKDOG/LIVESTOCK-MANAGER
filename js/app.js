@@ -463,6 +463,12 @@ const App = {
     sheet.classList.toggle("open");
   },
 
+  /** Colapsa/expande la card de resumen (chevron esquina superior derecha). Reutilizable en todas las vistas. */
+  toggleResumen(btn) {
+    const card = btn && btn.closest('.card-resumen');
+    if (card) card.classList.toggle('collapsed');
+  },
+
   async _onCompradorChangeWizard(selectEl) {
     const val = parseInt(selectEl.value);
     if (!val) {

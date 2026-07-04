@@ -1221,6 +1221,24 @@ label {
     text-transform: uppercase;
     letter-spacing: 0.4px;
 }
+/* Card de RESUMEN colapsable (chevron en la esquina superior derecha) */
+.card-resumen .resumen-toggle {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-s); padding: 2px; margin: -2px -2px 0 0;
+    display: flex; align-items: center;
+    transition: transform 0.25s ease, color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.card-resumen .resumen-toggle svg { width: 20px; height: 20px; }
+.card-resumen .resumen-toggle:active { color: var(--text-p); }
+.card-resumen .resumen-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    max-height: 1000px; opacity: 1;
+}
+.card-resumen.collapsed .resumen-body { max-height: 0; opacity: 0; margin: 0; }
+.card-resumen.collapsed .resumen-toggle { transform: rotate(-90deg); }
+
 .registro-success { --registro-color: var(--c-success); }
 .registro-danger  { --registro-color: var(--c-danger); }
 .registro-warning { --registro-color: var(--c-warning); }
