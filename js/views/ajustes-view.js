@@ -1378,7 +1378,7 @@ const AjustesView = {
 
             <div class="wizard-input-group mt-10">
               <label class="wizard-label" id="lbl-fab-int">INTENSIDAD DE BRILLO (${data.fabIntensidad || 60}%)</label>
-              <input type="range" id="w-fab-int" min="10" max="100" value="${data.fabIntensidad || 60}" class="w-full" style="accent-color:var(--p-cork);">
+              <input type="range" id="w-fab-int" min="10" max="100" value="${data.fabIntensidad || 60}" class="w-full" style="accent-color:var(--fab-neon-color, #FFFFFF);">
             </div>
 
             <div class="mt-10 p-15 rounded-md border border-222 bg-black flex items-center justify-between">
@@ -1464,9 +1464,9 @@ const AjustesView = {
 
         // Inyectar color del FAB
         if (finalData.fabColor) {
-          document.documentElement.style.setProperty('--p-cork', finalData.fabColor);
+          document.documentElement.style.setProperty('--fab-neon-color', finalData.fabColor);
         } else {
-          document.documentElement.style.removeProperty('--p-cork');
+          document.documentElement.style.removeProperty('--fab-neon-color');
         }
 
         if (finalData.fabIntensidad) {

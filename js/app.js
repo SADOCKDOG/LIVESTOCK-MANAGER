@@ -134,9 +134,9 @@ const App = {
 
         const fColor = cfg?.value?.fabColor || '';
         if (fColor) {
-          document.documentElement.style.setProperty('--p-cork', fColor);
+          document.documentElement.style.setProperty('--fab-neon-color', fColor);
         } else {
-          document.documentElement.style.removeProperty('--p-cork');
+          document.documentElement.style.removeProperty('--fab-neon-color');
         }
 
         const fInt = cfg?.value?.fabIntensidad ?? 60;
