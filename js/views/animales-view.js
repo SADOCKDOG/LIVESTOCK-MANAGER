@@ -64,11 +64,15 @@ const AnimalesView = {
         </select>
       </div>
     </div>
-    <div id="animales-lista" class="grid gap-12 card-registro mb-10" style="--registro-color: var(--c-white);">`;
+    `;
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
+    // Card aglutinadora: describe el registro (Censo de Animales) y contiene las fichas
+    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-orange);">
+      <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.animales()} Censo de Animales <span style="color:var(--c-orange); font-weight:900;">${animales.length}</span></div>
+      <div id="animales-lista" class="grid gap-12">`;
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
-    html += `</div>
+    html += `</div></div>
       <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="location.hash='/animal'">
         <span class="fab-label">Nuevo Animal</span>
@@ -110,42 +114,32 @@ const AnimalesView = {
     const colorEstado = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : a.estado === 'baja' ? 'var(--c-danger)' : '#888';
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
-    return `
-      <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${colorEspecie};">
-        <div class="flex flex-col gap-10">
-          <div class="flex justify-between items-center w-full">
-            <div class="flex items-center gap-10 min-w-0">
-              <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
-              <div class="text-xs">
-                <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${a.numero_identificacion || a.nombre || '#' + a.id} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
-                <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
-              </div>
-            </div>
-            <div class="text-right">
-              <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${colorEstado}; color: ${colorEstado};
-                  background: ${colorEstado === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
-                            colorEstado === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
-                            colorEstado === 'var(--c-danger)' ? 'rgba(255,68,68,0.1)' :
-                            colorEstado === '#888' ? 'rgba(136,136,136,0.1)' :
-                            'rgba(204,255,0,0.1)'};
-                  padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                ${a.estado || 'activo'}
-              </span>
-            </div>
-          </div>
+    const bgEstado = colorEstado === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
+                     colorEstado === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
+                     colorEstado === 'var(--c-danger)' ? 'rgba(255,68,68,0.1)' :
+                     'rgba(136,136,136,0.1)';
 
-          <div class="flex justify-between items-end w-full">
-            <div class="flex-1 min-w-0">
-              <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-                <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
-                ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} ${edad} ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
-                ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
-              </div>
-            </div>
-            <div class="text-right">
-              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+    return `
+      <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${colorEspecie}; display:flex; gap:10px; align-items:stretch;">
+        <!-- Columna izquierda: información -->
+        <div class="flex-1 min-w-0 flex flex-col gap-8">
+          <div class="flex items-center gap-10 min-w-0">
+            <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
+            <div class="text-xs min-w-0">
+              <div class="font-bold uppercase text-base tracking-tight text-ellipsis" style="color:${colorEspecie};">${a.numero_identificacion || a.nombre || '#' + a.id} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
+              <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
             </div>
           </div>
+          <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+            <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
+            ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
+            ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
+          </div>
+        </div>
+        <!-- Columna derecha: estado arriba (compacto), acción abajo (texto plano) -->
+        <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
+          <span style="font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.3px; border:1px solid ${colorEstado}; color:${colorEstado}; background:${bgEstado}; padding:3px 8px; border-radius:6px; white-space:nowrap;">${a.estado || 'activo'}</span>
+          <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
         </div>
       </div>`;
   },
