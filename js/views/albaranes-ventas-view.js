@@ -149,8 +149,13 @@ const AlbaranesVentasView = {
                 <div class="font-800 text-xs" style="color:${color}; display:flex; align-items:center; gap:6px;">
                   ${reg.tipo === 'leche' ? Icons.leche() : Icons.carne()}
                   ${reg.tipo.toUpperCase()}
-                  <span class="badge uppercase font-900 ml-6" style="background:${badgeColor}; color:${reg.estado === 'borrador' ? 'black' : 'white'}; font-size:0.6rem; padding:1px 6px; border-radius:4px;">
-                    ${reg.estado}
+                  <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${badgeColor}; color: ${badgeColor};
+                      background: ${badgeColor === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
+                                badgeColor === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
+                                badgeColor === 'var(--c-info)' ? 'rgba(204,255,0,0.1)' :  // fallback to same as warning for info
+                                'rgba(204,255,0,0.1)'};
+                      padding: 6px 12px; border-radius: 8px; display: inline-block;">
+                      ${reg.estado}
                   </span>
                 </div>
                 <div class="font-900 text-white text-base mt-4">${reg.titulo} (${reg.numero})</div>
