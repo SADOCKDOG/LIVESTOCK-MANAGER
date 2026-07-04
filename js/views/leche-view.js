@@ -383,7 +383,7 @@ const LecheView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px; ">
+          <div class="card-registro p-25" style="--registro-color: var(--c-orange); max-width:420px; ">
               <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -459,7 +459,7 @@ const LecheView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; ">
+      <div class="card-registro p-25" style="--registro-color: var(--c-orange); max-width:380px; ">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Lácteo</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño lechero a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
