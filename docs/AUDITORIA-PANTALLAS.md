@@ -81,7 +81,7 @@ Leyenda: [AUTO] escaneo automático hecho · [COD] pase de código profundo (tex
 | `#/documentos` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: "Guía DIMOE" para facturas/DIB (mapa tipo→label), "undefined pares/animales", espacio antes de punto; cards estandarizadas usando .card-registro con --registro-color |
 | `#/compradores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: **precio inventado 5,5 €/kg**→'—', badges sin fondo (`var()+alpha`), crash contrato sin tipo, "undefined" en formulario, 'láctico'→'Lácteo' (presentación); cards estandarizadas usando .card-registro con --registro-color |
 | `#/proveedores` (+detalle) | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badges sin fondo, categorías con tilde en presentación (`_labelCat`), "undefined" en formulario |
-| `#/transportistas` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badge activo sin fondo, plural animales, ➔→Icons. Diferido: empty-state con filtro Inactivos |
+| `#/transportistas` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: badge activo sin fondo, plural animales, ➔→Icons. Diferido: empty-state con filtro Inactivos; card estandarizada usando .card-registro con --registro-color |
 | `#/contrato` | [OK] | [OK] 2026-07-03 | [PEND] | Corregidos: crash tipo_comprador undefined, 'LÁCTICO'→'LÁCTEO'; card estandarizada usando .card-registro con --registro-color |
 | `#/ajustes` | [OK] | [OK] | [OK] | Toggles nuevos OK; cards accent restauradas (G1/G2); cards estandarizadas usando .card-registro con --registro-color |
 | `#/manuales` | [OK] | [OK] 2026-07-03 | [PEND] | Corregido: "láctico"→"lácteo". Diferido: hex del visor (criterio) |
