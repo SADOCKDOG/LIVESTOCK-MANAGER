@@ -550,6 +550,8 @@ const AjustesView = {
       glowMarcoFijo: false, glowMarcoFijoColor: '#CCFF00',
       hazLuzColor: '', // vacío = sigue al marco
       hazLuzIntensidad: 45,
+      fabColor: '#CCFF00',
+      fabIntensidad: 60,
       colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [],
       alertSanidad: true, alertTrazabilidad: true, alertPAC: true,
       alertADSG: true, alertINCOLAC: true, alertContratos: false
@@ -1222,7 +1224,8 @@ const AjustesView = {
       { name: 'Neon Pink', hex: '#EC4899' },
       { name: 'Neon Green', hex: '#10b981' },
       { name: 'Neon Indigo', hex: '#8b5cf6' },
-      { name: 'Steel Grey', hex: '#94A3B8' }
+      { name: 'Steel Grey', hex: '#94A3B8' },
+      { name: 'White Backlit', hex: '#FFFFFF' }
     ];
 
     const steps = [
@@ -1331,6 +1334,63 @@ const AjustesView = {
           const mode = document.getElementById('w-haz-color-mode').value;
           data.hazLuzColor = mode === 'fijo' ? (window._tempHazColor || '#CCFF00') : '';
         }
+      },
+      {
+        title: 'Botón de Registro',
+        content: (data) => `
+          <div class="grid gap-15">
+            <p class="text-gray text-xs uppercase font-800">Elige el color neón para el botón flotante y sus etiquetas:</p>
+            <div class="flex flex-wrap gap-8 mt-8">
+              ${colors.map(c => `
+                <button class="theme-dot ${data.fabColor === c.hex ? 'active' : ''}"
+                  style="background:${c.hex}; width:44px; height:44px; border-radius:50%; border:3px solid ${data.fabColor === c.hex ? '#fff' : 'transparent'};"
+                  onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.borderColor='transparent'); this.style.borderColor='#fff'; window._tempFabColor='${c.hex}';"></button>
+              `).join('')}
+            </div>
+
+            <div class="wizard-input-group mt-10">
+              <label class="wizard-label" id="lbl-fab-int">INTENSIDAD DE BRILLO (${data.fabIntensidad || 60}%)</label>
+              <input type="range" id="w-fab-int" min="10" max="100" value="${data.fabIntensidad || 60}" class="w-full" style="accent-color:var(--p-cork);">
+            </div>
+
+            <div class="mt-10 p-15 rounded-md border border-222 bg-black flex items-center justify-between">
+               <span class="text-xs text-gray uppercase font-800">Vista Previa</span>
+               <div id="fab-preview-circle" style="width:40px; height:40px; border-radius:50%; border:2px solid ${data.fabColor || '#CCFF00'}; background:rgba(30,30,30,0.95); display:flex; align-items:center; justify-content:center; color:${data.fabColor || '#CCFF00'}; box-shadow: 0 0 ${10 * (data.fabIntensidad / 100)}px ${data.fabColor || '#CCFF00'};">
+                 ${Icons.fabPlus()}
+               </div>
+            </div>
+          </div>
+        `,
+        onRender: (data, area) => {
+          window._tempFabColor = data.fabColor || '#CCFF00';
+          const range = area.querySelector('#w-fab-int');
+          const lbl = area.querySelector('#lbl-fab-int');
+          const preview = area.querySelector('#fab-preview-circle');
+
+          const updatePreview = () => {
+             if (preview) {
+                preview.style.borderColor = window._tempFabColor;
+                preview.style.color = window._tempFabColor;
+                const int = range.value / 100;
+                preview.style.boxShadow = `0 0 ${15 * int}px ${window._tempFabColor}`;
+             }
+          };
+
+          area.querySelectorAll('.theme-dot').forEach(btn => {
+            btn.addEventListener('click', () => {
+              updatePreview();
+            });
+          });
+
+          range.oninput = (e) => {
+            lbl.textContent = `INTENSIDAD DE BRILLO (${e.target.value}%)`;
+            updatePreview();
+          };
+        },
+        onChange: (data) => {
+          data.fabColor = window._tempFabColor || '#CCFF00';
+          data.fabIntensidad = parseInt(document.getElementById('w-fab-int').value);
+        }
       }
     ];
 
@@ -1357,6 +1417,15 @@ const AjustesView = {
           document.documentElement.style.setProperty('--haz-luz-color', finalData.hazLuzColor);
         } else {
           document.documentElement.style.removeProperty('--haz-luz-color');
+        }
+
+        // Inyectar color del FAB
+        if (finalData.fabColor) {
+          document.documentElement.style.setProperty('--p-cork', finalData.fabColor);
+        }
+        if (finalData.fabIntensidad) {
+          document.documentElement.style.setProperty('--fab-intensity', finalData.fabIntensidad + '%');
+          document.documentElement.style.setProperty('--fab-intensity-num', finalData.fabIntensidad);
         }
 
         App.toast("Configuración guardada", 'success');

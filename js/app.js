@@ -128,6 +128,13 @@ const App = {
         if (cfg?.value?.hazLuzColor) {
           document.documentElement.style.setProperty('--haz-luz-color', cfg.value.hazLuzColor);
         }
+        if (cfg?.value?.fabColor) {
+          document.documentElement.style.setProperty('--p-cork', cfg.value.fabColor);
+        }
+        if (cfg?.value?.fabIntensidad) {
+          document.documentElement.style.setProperty('--fab-intensity', cfg.value.fabIntensidad + '%');
+          document.documentElement.style.setProperty('--fab-intensity-num', cfg.value.fabIntensidad);
+        }
       } catch (_) {}
       await App.route();
     } catch (error) {
