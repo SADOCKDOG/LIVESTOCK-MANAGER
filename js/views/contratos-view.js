@@ -18,25 +18,25 @@ const ContratosView = {
                   GESTIÓN COMERCIAL Y VIGENCIA
                 </div>
               </div>
-              <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
-                ${Icons.flechaAbajo()}
+              <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+                ${Icons.chevronAbajo()}
               </button>
             </div>
 
             <!-- Card de RESUMEN -->
             <div class="card card-total-3d card-resumen mb-20">
-              <div class="flex flex-col gap-6">
-                <div class="flex justify-between items-center px-4">
+              <div class="resumen-body flex flex-col gap-6">
+                <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                    <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.contratos()} TOTAL</span>
-                   <span class="text-white font-900" style="color: var(--c-info)">${contratos.length}</span>
+                   <strong class="text-xl font-950" style="color: var(--c-info)">${contratos.length}</strong>
                 </div>
-                <div class="flex justify-between items-center px-4">
+                <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                    <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
-                   <span class="text-white font-900" style="color: var(--c-success)">${activos.length}</span>
+                   <strong class="text-xl font-950" style="color: var(--c-success)">${activos.length}</strong>
                 </div>
-                <div class="flex justify-between items-center px-4">
+                <div class="flex justify-between items-center px-4 py-8">
                    <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.alerta()} VENCIDOS</span>
-                   <span class="text-white font-900" style="color: var(--c-danger)">${contratos.length - activos.length}</span>
+                   <strong class="text-xl font-950" style="color: var(--c-danger)">${contratos.length - activos.length}</strong>
                 </div>
               </div>
             </div>
@@ -48,7 +48,7 @@ const ContratosView = {
             </div>
 
             <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-              ${Icons.listado()} LISTADO DE CONTRATOS
+              ${Icons.documento()} LISTADO DE CONTRATOS
             </div>
             <div id="contratos-lista-standalone"></div>
           </div>
@@ -101,7 +101,7 @@ const ContratosView = {
                                 ${c.tipo === 'leche' ? Icons.leche() : Icons.carne()}
                                 CONTRATO ${c.tipo.toUpperCase()}
                             </div>
-                            <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${c.numero_contrato}</div>
+                            <div class="font-950 text-gold uppercase text-base tracking-tight">${c.numero_contrato}</div>
                             <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
                                 ${comp ? comp.nombre : 'SIN COMPRADOR'}
                             </div>
@@ -113,7 +113,7 @@ const ContratosView = {
                         </div>
                     </div>
                     <div class="text-right">
-                        <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
                     </div>
                 </div>
             </div>`;

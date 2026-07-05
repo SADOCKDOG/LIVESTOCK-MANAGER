@@ -35,25 +35,25 @@ const TransportistasView = {
                     ${todos.length} REGISTROS · RESUMEN DE FLOTA
                   </div>
                 </div>
-                <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
-                  ${Icons.flechaAbajo()}
+                <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+                  ${Icons.chevronAbajo()}
                 </button>
               </div>
 
               <!-- Card de RESUMEN -->
               <div class="card card-total-3d card-resumen mb-20">
-                <div class="flex flex-col gap-6">
-                  <div class="flex justify-between items-center px-4">
+                <div class="resumen-body flex flex-col gap-6">
+                  <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                      <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.transportistas()} TOTAL</span>
-                     <span class="text-white font-900" style="color: var(--c-info)">${todos.length}</span>
+                     <strong class="text-xl font-950" style="color: var(--c-info)">${todos.length}</strong>
                   </div>
-                  <div class="flex justify-between items-center px-4">
+                  <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                      <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
-                     <span class="text-white font-900" style="color: var(--c-success)">${activos.length}</span>
+                     <strong class="text-xl font-950" style="color: var(--c-success)">${activos.length}</strong>
                   </div>
-                  <div class="flex justify-between items-center px-4">
+                  <div class="flex justify-between items-center px-4 py-8">
                      <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.animales()} CAPACIDAD FLOTA</span>
-                     <span class="text-white font-900" style="color: var(--c-warning)">${capacidadTotal} CAB.</span>
+                     <strong class="text-xl font-950" style="color: var(--c-warning)">${capacidadTotal} CAB.</strong>
                   </div>
                 </div>
               </div>
@@ -66,7 +66,7 @@ const TransportistasView = {
               </div>
 
               <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-                ${Icons.listado()} LISTADO DE TRANSPORTISTAS
+                ${Icons.documento()} LISTADO DE TRANSPORTISTAS
               </div>
               <div id="trans-list"></div>
             </div>
@@ -108,7 +108,7 @@ const TransportistasView = {
                         <div class="flex items-center gap-10 min-w-0">
                             <div class="text-xl" style="color:${t.activo ? 'var(--c-success)' : '#6b7280'}">${Icons.transportistas()}</div>
                             <div class="text-xs">
-                                <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${t.nombre}</div>
+                                <div class="font-950 text-gold uppercase text-base tracking-tight">${t.nombre}</div>
                                 <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
                                     ${[t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : '', t.matricula ? Icons.transportistas() + ' ' + t.matricula : ''].filter(Boolean).join(' · ')}
                                 </div>
@@ -122,7 +122,7 @@ const TransportistasView = {
                     </div>
 
                     <div class="text-right">
-                        <div style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></div>
+                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
                     </div>
                 </div>
             </div>
@@ -195,7 +195,7 @@ const TransportistasView = {
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8 mb-4">
                             <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,var(--c-info),var(--c-info));"></span>
-                            <h2 class="m-0 font-900 text-white uppercase text-xl">${t.nombre}</h2>
+                            <h2 class="m-0 font-950 text-gold uppercase text-xl">${t.nombre}</h2>
                         </div>
                         <div class="flex gap-8 flex-wrap">
                           <span class="badge badge-sm uppercase" style="background:${t.activo ? 'color-mix(in srgb, var(--c-success) 8%, transparent)' : 'color-mix(in srgb, var(--c-danger) 8%, transparent)'}; color:${t.activo ? 'var(--c-success)' : 'var(--c-danger)'}; border:1px solid ${t.activo ? 'color-mix(in srgb, var(--c-success) 21%, transparent)' : 'color-mix(in srgb, var(--c-danger) 21%, transparent)'};">

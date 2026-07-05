@@ -1,8 +1,7 @@
-﻿/**
- * Livestock Manager - HibridoView v2.0.0
- * Vista de Consola Híbrida/Mixta con las 4 pestañas modulares de gestión unificada
+/**
+ * Livestock Manager - HibridoView v2.2.0
+ * Consola Híbrida/Mixta refactorizada bajo patrón "Aglutinadora"
  */
-
 const HibridoView = {
   _currentTab: 'patrimonio',
   _cachedData: null,
@@ -17,568 +16,146 @@ const HibridoView = {
 
   async render() {
     const main = document.getElementById('app-content');
-    const fincaId = await Fincas.getActiveId();
-    const finca = await Fincas.getActive();
+    const fincaId = await Fincas?.getActiveId();
+    const finca = await Fincas?.getActive();
 
-    // Cargar datos
-    const [rebanos, animales, eventos, ventasCarne, entregasLeche, todosSanitarios, todosGastos] = await Promise.all([
-      window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
-      window.db.getAll('animales').catch(() => []),
-      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
-      window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
-      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-      window.db.getAll('sanitarios_ganado').catch(() => []),
-      window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => [])
+    const [rebanos, animales, ventasCarne, entregasLeche, sanitariosGanado, todosGastos] = await Promise.all([
+      window.db?.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
+      window.db?.getAll('animales').catch(() => []),
+      window.db?.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
+      window.db?.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+      window.db?.getAll('sanitarios_ganado').catch(() => []),
+      window.db?.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => [])
     ]);
 
     const rebanosIds = rebanos.map(r => r.id);
     const animalesFinca = animales.filter(a => rebanosIds.includes(a.rebanoId));
+    const sanitariosFinca = sanitariosGanado.filter(s => rebanosIds.includes(s.rebanoId));
 
-    // 1. Producción mixta consolidada
-    const proConsolidada = eventos.filter(e => 
-      (e.unidad === 'kg' || e.unidad === 'L' || e.unidad === 'Litros') &&
-      (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano')
-    );
-    proConsolidada.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
-    // 2. Sanitarios
-    const sanitariosFinca = todosSanitarios.filter(s => rebanosIds.includes(s.rebanoId));
-    sanitariosFinca.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-    // Periodos de supresión activos de carne y de leche
-    const hoy = new Date();
-    const supresionesCarne = [];
-    const supresionesLeche = [];
-    sanitariosFinca.forEach(s => {
-      const fechaApli = new Date(s.fecha);
-      
-      // Carne
-      const dCarne = s.tiempo_espera_carne_dias || 0;
-      if (dCarne > 0) {
-        const fFinC = new Date(fechaApli.getTime() + dCarne * 24 * 60 * 60 * 1000);
-        if (fFinC > hoy) {
-          supresionesCarne.push({
-            ...s,
-            diasRestantes: Math.ceil((fFinC - hoy) / (24 * 60 * 60 * 1000)),
-            fechaFin: fFinC.toISOString().split('T')[0]
-          });
-        }
-      }
-
-      // Leche
-      const dLeche = s.tiempo_espera_leche_dias || 0;
-      if (dLeche > 0 || s.prohibidoLeche) {
-        const fFinL = new Date(fechaApli.getTime() + (s.prohibidoLeche ? 999 * 24 : dLeche * 24) * 60 * 60 * 1000);
-        if (fFinL > hoy) {
-          supresionesLeche.push({
-            ...s,
-            diasRestantes: s.prohibidoLeche ? 'PROHIBIDO' : Math.ceil((fFinL - hoy) / (24 * 60 * 60 * 1000)),
-            fechaFin: s.prohibidoLeche ? 'INDEFINIDO' : fFinL.toISOString().split('T')[0]
-          });
-        }
-      }
-    });
-
-    // 3. Totales económicos y MOFA consolidado
-    const totalIngresosCarne = ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
-    const totalIngresosLeche = entregasLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
-    const totalIngresosConsolidados = totalIngresosCarne + totalIngresosLeche;
-
-    const gastosAlim = todosGastos.filter(g => 
-      (g.categoria || '').toLowerCase() === 'alimentacion' || 
-      (g.categoria || '').toLowerCase() === 'alimentación' ||
-      (g.concepto || '').toLowerCase().includes('pienso') ||
-      (g.concepto || '').toLowerCase().includes('forraje') ||
-      (g.concepto || '').toLowerCase().includes('pasto')
-    );
-    const totalGastosAlim = gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
-    const mofaConsolidado = totalIngresosConsolidados - totalGastosAlim;
-    const ratioMofaConsolidado = totalIngresosConsolidados > 0 ? (mofaConsolidado / totalIngresosConsolidados) * 100 : 0;
-
-    // Proporciones
-    const pctCarne = totalIngresosConsolidados > 0 ? (totalIngresosCarne / totalIngresosConsolidados) * 100 : 0;
-    const pctLeche = totalIngresosConsolidados > 0 ? (totalIngresosLeche / totalIngresosConsolidados) * 100 : 0;
+    const totalIngresos = (ventasCarne?.reduce((s, v) => s + (v.importe_total || 0), 0) || 0) + (entregasLeche?.reduce((s, e) => s + (e.importe_total || 0), 0) || 0);
+    const totalGastosAlim = todosGastos?.filter(g =>
+      (g?.categoria || '').toLowerCase()?.includes('alimentaci') ||
+      (g?.concepto || '').toLowerCase()?.includes('pienso')
+    ).reduce((s, g) => s + (g?.monto || 0), 0) || 0;
 
     main.innerHTML = `
-      <div class="mb-14">
-        <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
+      <div class="mb-14 px-4">
+        <div class="scroll-shadow-container scroll-tabs-row mb-10">
           <div class="hibrido-tabs">
-            <button class="hibrido-tab active" data-tab="patrimonio" onclick="HibridoView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
-            <button class="hibrido-tab" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
-            <button class="hibrido-tab" data-tab="legislacion" onclick="HibridoView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
+            <button class="hibrido-tab active" data-tab="patrimonio" onclick="HibridoView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio</button>
+            <button class="hibrido-tab" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Ventas</button>
+            <button class="hibrido-tab" data-tab="legislacion" onclick="HibridoView._cambiarTab('legislacion')">${Icons.documento()} Sanidad</button>
           </div>
         </div>
       </div>
-      <div id="hibrido-content"><div class="loader">Cargando consola híbrida...</div></div>`;
+      <div id="hibrido-content"></div>`;
 
     this._cachedData = {
-      fincaId,
-      siloEventos: eventos.filter(e => e.tipo_entidad === 'silo_pienso'),
-      rebanos,
-      animalesFinca,
-      proConsolidada,
-      ventasCarne,
-      entregasLeche,
-      sanitariosFinca,
-      supresionesCarne,
-      supresionesLeche,
-      gastosAlim,
+      rebanos, animalesFinca, ventasCarne, entregasLeche, sanitariosFinca,
       kpis: {
         patrimonio: [
-          { label: 'Censo Mixto', value: animalesFinca.length + ' cabezas' },
-          { label: 'Lotes/Rebaños', value: rebanos.length },
-          { label: 'Finca Activa', value: finca?.nombre || 'Mixta' }
-        ],
-        explotacion: [
-          { label: 'Margen Global', value: Math.round(mofaConsolidado).toLocaleString() + ' €', color: mofaConsolidado >= 0 ? 'var(--c-success)' : 'var(--c-danger)' },
-          { label: 'Coste Piensos', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' },
-          { label: 'Ratio MOFA', value: ratioMofaConsolidado.toFixed(1) + '%' }
+          { label: 'Censo Global', value: animalesFinca.length + ' cab.' },
+          { label: 'Lotes Mixtos', value: rebanos.length }
         ],
         comercializacion: [
-          { label: 'Ingresos Totales', value: totalIngresosConsolidados.toLocaleString() + ' €', color: 'var(--c-success)' },
-          { label: 'Ventas Leche', value: `${pctLeche.toFixed(0)}%` },
-          { label: 'Ventas Carne', value: `${pctCarne.toFixed(0)}%` }
+          { label: 'Ingreso Global', value: Math.round(totalIngresos).toLocaleString() + ' €', color: 'var(--c-success)' },
+          { label: 'Ratio Gasto Alim.', value: totalIngresos > 0 ? ((totalGastosAlim / totalIngresos) * 100).toFixed(1) + '%' : '0%', color: 'var(--c-danger)' }
         ],
         legislacion: [
-          { label: 'Supresiones Carne', value: supresionesCarne.length, color: supresionesCarne.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
-          { label: 'Supresiones Leche', value: supresionesLeche.length, color: supresionesLeche.length > 0 ? 'var(--c-info)' : 'var(--c-success)' }
+          { label: 'Sanitarios', value: sanitariosFinca.length, color: 'var(--c-purple)' }
         ]
       }
     };
-
     this._renderTabActual();
   },
 
   _cambiarTab(tab) {
     this._currentTab = tab;
-    document.querySelectorAll('.hibrido-tab').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-    });
+    document.querySelectorAll('.hibrido-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     this._renderTabActual();
     window.scrollTo(0, 0);
   },
 
   _renderTabActual() {
     const d = this._cachedData;
-    if (!d) return;
     const content = document.getElementById('hibrido-content');
-    if (!content) return;
+    if (!d || !content) return;
 
-    switch (this._currentTab) {
-      case 'patrimonio': this._renderPatrimonio(content, d); break;
-      case 'comercializacion': this._renderComercializacion(content, d); break;
-      case 'legislacion': this._renderLegislacion(content, d); break;
-      default: this._renderPatrimonio(content, d);
-    }
-  },
+    let color = 'var(--c-warning)';
+    let icon = Icons.edificio();
 
-  _kpiGrid(kpis, color) {
-    if (!kpis || !kpis.length) return '';
-    return `<div class="grid grid-cols-3 gap-8 mb-12">
-      ${kpis.map(k => `
-        <div class="leche-kpi-item" style="--kpi-color:${k.color || color}; --kpi-value-color:${k.color || '#fff'}">
-          <small class="leche-kpi-label">${k.label}</small>
-          <div class="leche-kpi-value">${k.value}</div>
-        </div>`).join('')}
-    </div>`;
-  },
-
-  // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
-  _renderPatrimonio(content, d) {
-    const kpis = d.kpis?.patrimonio || [];
-    const themeColor = 'var(--c-warning)';
-    const html = `
-      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
-        <div class="flex justify-between items-start mb-10">
-          <div>
-            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
-              ${Icons.edificio()} PATRIMONIO Y GANADERÍA
-            </h2>
-            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
-              ORGANIZACIÓN GANADERA DE DOBLE APTITUD
-            </div>
+    content.innerHTML = `
+      <div class="card-registro mb-10 mx-4" style="--registro-color: ${color};">
+        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
+          <div class="flex justify-between items-center mb-6">
+            <span class="text-xs text-white font-black uppercase tracking-wider flex items-center gap-6">${icon} Resumen ${this._currentTab}</span>
+            <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
-          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
-            ${Icons.flechaAbajo()}
-          </button>
-        </div>
-
-        <!-- Card de RESUMEN -->
-        <div class="card card-total-3d card-resumen mb-20">
-          <div class="flex flex-col gap-6">
-            ${kpis.map(k => `
-              <div class="flex justify-between items-center px-4">
-                 <span class="text-gray text-[0.7rem] font-800 uppercase">${k.label}</span>
-                 <span class="text-white font-900" style="color: ${k.color || 'white'}">${k.value}</span>
-              </div>
-            `).join('')}
+          <div class="resumen-body flex flex-col">
+            ${d.kpis[this._currentTab].map(k => `
+              <div class="py-10 border-bottom-222 flex justify-between items-center">
+                <span class="text-[0.65rem] text-gray uppercase font-900">${k.label}</span>
+                <strong class="text-lg font-950" style="color: ${k.color || '#fff'}">${k.value}</strong>
+              </div>`).join('')}
           </div>
         </div>
 
-        <!-- Accesos directos táctiles -->
-        <div class="grid grid-cols-3 gap-8 mb-20">
-          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-orange">${Icons.animales()} <span class="widget-link-label text-[0.65rem]">Animales</span></a>
-          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">${Icons.rebanos()} <span class="widget-link-label text-[0.65rem]">Rebaños</span></a>
-          <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">${Icons.zonas()} <span class="widget-link-label text-[0.65rem]">Zonas</span></a>
-        </div>
-
-        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-          ${Icons.listado()} REBAÑOS MIXTOS ACTIVOS (${d.rebanos.length})
-        </div>
-        <div class="grid gap-10">
-          ${d.rebanos.map(r => {
-            const activosCount = d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length;
-            return `
-            <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: var(--c-warning);">
-              <div class="flex flex-col gap-10">
-                <div class="flex justify-between items-center w-full">
-                  <div class="flex items-center gap-10 min-w-0">
-                    <span class="text-xl" style="color: var(--c-warning)">${Icons.rebanos()}</span>
-                    <div class="text-xs">
-                      <div class="font-bold text-white uppercase text-base tracking-tight">${r.nombre}</div>
-                      <div class="text-gray mt-2 font-700 uppercase">${r.tipo} · ${r.especie}</div>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <span class="badge badge-sm badge-gold uppercase font-900">${activosCount} ${activosCount === 1 ? 'Cabeza' : 'Cabezas'}</span>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
-                </div>
-              </div>
-            </div>`;
-          }).join('') || `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin rebaños mixtos activos.</span></div>`}
-        </div>
-      </div>
-    `;
-    content.innerHTML = html;
-  },
-
-
-
-  // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
-  _renderComercializacion(content, d) {
-    const themeColor = 'var(--c-success)';
-    // Liquidaciones unificadas
-    const lList = [];
-    d.ventasCarne.forEach(v => {
-      lList.push({
-        id: v.id,
-        tipo: 'carne',
-        titulo: `${v.razonSocial || 'Matadero'}`,
-        fecha: v.fechaSacrificio || v.fecha,
-        valor: v.importe_total || v.valor_neto || 0,
-        detalle: `${v.pesoCanal || 0} kg canal`,
-        onclick: `App._abrirDetalleVentaCarne(${v.id})`
-      });
-    });
-    d.entregasLeche.forEach(e => {
-      lList.push({
-        id: e.id,
-        tipo: 'leche',
-        titulo: `Entrega Leche`,
-        fecha: e.fechaRecogida || e.fecha,
-        valor: e.importe_total || e.cantidad * e.precioBase || 0,
-        detalle: `${(e.cantidad || 0).toLocaleString()} L`,
-        onclick: `location.hash='/albaran-leche?id=${e.id}'`
-      });
-    });
-    lList.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
-    const html = `
-      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
-        <div class="flex justify-between items-start mb-10">
-          <div>
-            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
-              ${Icons.transportistas()} COMERCIALIZACIÓN
-            </h2>
-            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
-              LOGÍSTICA Y VENTAS CONSOLIDADO
-            </div>
-          </div>
-          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
-            ${Icons.flechaAbajo()}
-          </button>
-        </div>
-
-        <!-- Card de RESUMEN -->
-        <div class="card card-total-3d card-resumen mb-20">
-          <div class="flex flex-col gap-6">
-            ${d.kpis.comercializacion.map(k => `
-              <div class="flex justify-between items-center px-4">
-                 <span class="text-gray text-[0.7rem] font-800 uppercase">${k.label}</span>
-                 <span class="text-white font-900" style="color: ${k.color || 'white'}">${k.value}</span>
-              </div>
-            `).join('')}
+        <div class="flex gap-8 items-center mb-12">
+          <div class="relative flex-1 min-w-0">
+            <input type="search" placeholder="Filtrar consola..." oninput="HibridoView._filtrar(this.value)" class="search-input w-full">
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-10 mb-20">
-          <button class="widget-link-btn widget-link-btn--neon neon-orange" onclick="App._abrirWizardVentaMasiva()">
-            ${Icons.agregar()} <span class="widget-link-label text-[0.65rem] font-900 uppercase">Venta Carne</span>
-          </button>
-          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardAlbaranLeche()">
-            ${Icons.agregar()} <span class="widget-link-label text-[0.65rem] font-900 uppercase">Albarán Leche</span>
-          </button>
+        <div id="hibrido-lista" class="grid gap-10">
+          ${this._getRecordsHtml()}
         </div>
-
-        <!-- Accesos directos comerciales -->
-        <div class="grid grid-cols-3 gap-8 mb-20">
-          <a href="#/compradores" class="widget-link-btn widget-link-btn--neon neon-purple">${Icons.compradores()} <span class="widget-link-label text-[0.6rem]">Compradores</span></a>
-          <a href="#/transportistas" class="widget-link-btn widget-link-btn--neon neon-pink">${Icons.transportistas()} <span class="widget-link-label text-[0.6rem]">Logística</span></a>
-          <a href="#/comercializacion" class="widget-link-btn widget-link-btn--neon neon-success">${Icons.comercial()} <span class="widget-link-label text-[0.6rem]">Comercial</span></a>
-        </div>
-
-        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-          ${Icons.listado()} ÚLTIMAS VENTAS MIXTAS (${lList.length})
-        </div>
-        <div class="grid gap-10">
-          ${lList.slice(0, 15).map(l => {
-            const color = l.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
-            return `
-              <div class="card-registro" onclick="${l.onclick}" style="--registro-color: ${color};">
-                <div class="flex flex-col gap-10">
-                  <div class="flex justify-between items-center w-full">
-                    <div class="flex items-center gap-10 min-w-0">
-                      <span class="text-xl" style="color:${color}">${l.tipo === 'carne' ? Icons.carne() : Icons.leche()}</span>
-                      <div class="text-xs">
-                        <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis">${l.titulo}</div>
-                        <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(l.fecha)} · ${l.detalle}</div>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <span class="badge badge-sm text-green font-900 text-lg" style="background:rgba(204,255,0,0.1); border:1px solid rgba(204,255,0,0.3); padding: 4px 10px;">${Math.round(l.valor).toLocaleString()} €</span>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--c-warning); text-transform: uppercase;">Detalle -></span>
-                  </div>
-                </div>
-              </div>`;
-          }).join('')}
-        </div>
-      </div>
-    `;
-    content.innerHTML = html;
+      </div>`;
   },
 
-  // ========== BLOQUE 4: REGISTROS, LEGISLACIÓN Y CUMPLIMIENTO SANITARIO ==========
-  _renderLegislacion(content, d) {
-    const themeColor = 'var(--c-purple)';
-    // Alertas de supresión
-    let alertasHtml = '';
-    if (d.supresionesCarne.length > 0 || d.supresionesLeche.length > 0) {
-      alertasHtml = `
-        <div class="supresion-alerta-box mb-16 p-12 rounded border border-danger bg-danger-transparent">
-          <strong class="text-white uppercase font-900 flex items-center gap-6">${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
-          <ul class="mt-8 pl-20 m-0 text-xs text-ccc font-700">
-            ${d.supresionesCarne.map(s => `
-              <li class="mb-4"><span class="badge badge-sm badge-red">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes} D</strong></li>
-            `).join('')}
-            ${d.supresionesLeche.map(s => `
-              <li class="mb-4"><span class="badge badge-sm badge-blue">LECHE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — ${typeof s.diasRestantes === 'number' ? `Restan <strong class="text-white">${s.diasRestantes} D</strong>` : '<strong class="text-white">PROHIBIDO</strong>'}</li>
-            `).join('')}
-          </ul>
-        </div>
-      `;
-    }
-
-    const html = `
-      ${alertasHtml}
-      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
-        <div class="flex justify-between items-start mb-10">
-          <div>
-            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
-              ${Icons.documento()} CUMPLIMIENTO
-            </h2>
-            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
-              CUADERNO Y CUMPLIMIENTO SANITARIO
-            </div>
-          </div>
-          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
-            ${Icons.flechaAbajo()}
-          </button>
-        </div>
-
-        <!-- Card de RESUMEN -->
-        <div class="card card-total-3d card-resumen mb-20">
-          <div class="flex flex-col gap-6">
-            ${d.kpis.legislacion.map(k => `
-              <div class="flex justify-between items-center px-4">
-                 <span class="text-gray text-[0.7rem] font-800 uppercase">${k.label}</span>
-                 <span class="text-white font-900" style="color: ${k.color || 'white'}">${k.value}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <div class="flex justify-center mb-20">
-          <button class="widget-link-btn widget-link-btn--neon neon-purple w-full max-w-260" onclick="HibridoView._abrirAsistenteTratamientoMix()">
-            ${Icons.agregar()} <span class="widget-link-label text-[0.65rem] font-900 uppercase">Registrar Tratamiento</span>
-          </button>
-        </div>
-
-        <!-- Accesos directos de legislación -->
-        <div class="grid grid-cols-2 gap-8 mb-20">
-          <a href="#/documentos" class="widget-link-btn widget-link-btn--neon neon-purple">${Icons.documento()} <span class="widget-link-label text-[0.65rem]">Documentos</span></a>
-          <a href="#/cuaderno" class="widget-link-btn widget-link-btn--neon neon-orange">${Icons.cuaderno()} <span class="widget-link-label text-[0.65rem]">Cuaderno</span></a>
-        </div>
-
-        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-          ${Icons.listado()} HISTORIAL SANITARIO (${d.sanitariosFinca.length})
-        </div>
-        <div class="grid gap-10">
-          ${d.sanitariosFinca.length > 0
-            ? d.sanitariosFinca.slice(0, 15).map(s => {
-                const enSupC = d.supresionesCarne.some(ts => ts.id === s.id);
-                const enSupL = d.supresionesLeche.some(ts => ts.id === s.id);
-                const color = (enSupC || enSupL) ? 'var(--c-danger)' : 'var(--c-purple)';
-                return `
-                  <div class="card-registro" style="--registro-color: ${color};">
-                    <div class="flex flex-col gap-10">
-                      <div class="flex justify-between items-start w-full">
-                        <div class="flex items-center gap-10 min-w-0">
-                          <span class="text-xl" style="color:${color}">${Icons.sanidad()}</span>
-                          <div class="text-xs">
-                            <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</div>
-                            <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(s.fecha)} · REB: ${s.rebanoId}</div>
-                          </div>
-                        </div>
-                        <div class="text-right flex flex-col gap-4">
-                          ${enSupC ? `<span class="badge badge-sm badge-red font-900">SUP. CARNE</span>` : ''}
-                          ${enSupL ? `<span class="badge badge-sm badge-blue font-900">SUP. LECHE</span>` : ''}
-                          ${!enSupC && !enSupL ? `<span class="badge badge-sm uppercase font-900" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">LIBRE</span>` : ''}
-                        </div>
-                      </div>
-                      <div class="text-gray text-[0.6rem] font-800 uppercase px-4 py-2 bg-black border border-222 rounded-sm">
-                        Carne: <strong class="text-white">${s.tiempo_espera_carne_dias || 0}d</strong> · Leche: <strong class="text-white">${s.tiempo_espera_leche_dias || 0}d</strong>
-                      </div>
-                    </div>
-                  </div>`;
-              }).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin tratamientos sanitarios.</span></div>`
-          }
-        </div>
-      </div>
-    `;
-    content.innerHTML = html;
-  },
-
-  async _abrirOpcionesRegistro(id, tipo) {
-    if (tipo === 'carne' && window.CarneView) {
-      await window.CarneView._abrirOpcionesRegistro(id);
-      setTimeout(() => HibridoView.render(), 500);
-    } else {
-      // Editar registro lácteo
-      try {
-        const evento = await window.db.get('registro_eventos', id);
-        if (!evento) return;
-
-        const overlay = document.createElement("div");
-        overlay.className = "wizard-full-screen";
-        overlay.style.justifyContent = "center";
-        overlay.style.alignItems = "center";
-        overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
-        overlay.innerHTML = `
-            <div class="card-registro p-25" style="max-width:420px; ; --registro-color: var(--c-gray);">
-                <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
-                <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
-
-                <div class="grid grid-cols-2 gap-10">
-                  <div class="wizard-input-group">
-                      <label class="wizard-label">Litros (L)</label>
-                      <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
-                  </div>
-                  <div class="wizard-input-group">
-                      <label class="wizard-label">Fecha</label>
-                      <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
-                  </div>
-                </div>
-
-                <div class="wizard-input-group">
-                    <label class="wizard-label">Identificación (Crotal/Lote)</label>
-                    <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
-                </div>
-
-                <div class="flex gap-10 mt-20">
-                    <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
-                    <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
-                </div>
-                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
-            </div>`;
-        document.body.appendChild(overlay);
-
-        overlay.querySelector('#btn-save-reg').onclick = async () => {
-          const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
-          const fecha = overlay.querySelector('#edit-reg-fecha').value;
-          const ident = overlay.querySelector('#edit-reg-ident').value.trim();
-
-          if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
-
-          evento.valor_neto = val;
-          evento.fecha = fecha;
-          evento.snap_identificacion = ident;
-          evento.actualizadoEn = new Date().toISOString();
-
-          await window.db.put('registro_eventos', evento);
-          App.toast("Registro lácteo actualizado");
-          overlay.remove();
-          HibridoView.render();
-        };
-
-        overlay.querySelector('#btn-del-reg').onclick = async () => {
-          if (!await Confirm.confirm("Eliminar Control", "¿Eliminar este control de forma permanente?", true)) return;
-          await window.db.delete('registro_eventos', id);
-          App.toast("Registro lácteo eliminado");
-          overlay.remove();
-          HibridoView.render();
-        };
-      } catch (e) {
-        App.toastError(e.message);
-      }
-    }
-  },
-
-  async _abrirAsistenteTratamientoMix() {
+  _getRecordsHtml(filtro = '') {
     const d = this._cachedData;
-    if (!d || d.rebanos.length === 0) {
-      App.toastError("No hay rebaños en esta finca para tratar.");
-      return;
+    const f = filtro.toLowerCase();
+    if (this._currentTab === 'patrimonio') {
+      return d.rebanos.filter(r => (r.nombre || '').toLowerCase().includes(f)).map(r => this._cardRegistro({
+        icon: Icons.rebanos(), title: r.nombre, color: 'var(--c-warning)', onClick: `location.hash='/rebano?id=${r.id}'`,
+        metadata: `<span>${r.tipo}</span><span>·</span><span>${r.especie}</span>`
+      })).join('');
+    } else if (this._currentTab === 'comercializacion') {
+      const list = [...d.ventasCarne.map(v => ({ ...v, t: 'carne' })), ...d.entregasLeche.map(e => ({ ...e, t: 'leche' }))];
+      list.sort((a, b) => new Date(b.fecha || b.fechaSacrificio || 0) - new Date(a.fecha || a.fechaSacrificio || 0));
+      return list.filter(i => (i.razonSocial || 'Entrega').toLowerCase().includes(f)).slice(0, 15).map(i => this._cardRegistro({
+        icon: i.t === 'carne' ? Icons.carne() : Icons.leche(), title: i.razonSocial || 'Entrega Mixta', color: i.t === 'carne' ? 'var(--c-danger)' : 'var(--c-info)', onClick: i.t === 'carne' ? `App._abrirDetalleVentaCarne(${i.id})` : `location.hash='/albaran-leche?id=${i.id}'`,
+        metadata: `<span>${this._fmtFecha(i.fecha || i.fechaSacrificio)}</span>`,
+        badge: `<span class="text-gold font-950">${Math.round(i.importe_total || 0).toLocaleString()} €</span>`
+      })).join('');
+    } else {
+      return d.sanitariosFinca.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => this._cardRegistro({
+        icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
+        metadata: `<span>${this._fmtFecha(s.fecha)}</span>`
+      })).join('');
     }
-    
-    if (d.rebanos.length === 1) {
-      await window.WizardTratamiento.registrar(d.rebanos[0].id);
-      return;
-    }
-    
-    const overlay = document.createElement("div");
-    overlay.className = "wizard-full-screen";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
-    overlay.innerHTML = `
-      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-gray);">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Veterinario</h3>
-        <label class="wizard-label mb-10">Selecciona el rebaño a tratar:</label>
-        <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
-          ${d.rebanos.map(r => `<option value="${r.id}">${r.nombre} (${r.tipo} · ${r.especie})</option>`).join('')}
-        </select>
-        <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-treat-next">Proceder ${Icons.siguiente()}</button>
-          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    
-    overlay.querySelector('#btn-treat-next').onclick = async () => {
-      const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
-      overlay.remove();
-      await window.WizardTratamiento.registrar(rebId);
-      setTimeout(() => HibridoView.render(), 1000);
-    };
   },
-};
 
+  _filtrar(texto) {
+    const lista = document.getElementById('hibrido-lista');
+    if (lista) lista.innerHTML = this._getRecordsHtml(texto);
+  },
+
+  _cardRegistro(opts) {
+    return `
+      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${opts.color}; cursor:pointer;">
+        <div class="flex-1 min-w-0 flex flex-col justify-center">
+          <div class="flex items-center gap-10 min-w-0">
+            <span class="text-xl" style="color:${opts.color};">${opts.icon}</span>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${opts.title}</div>
+          </div>
+          <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
+        </div>
+        <div class="flex flex-col items-end justify-between flex-shrink-0">
+          <div class="top-part">${opts.badge || ''}</div>
+          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
+        </div>
+      </div>`;
+  }
+};
 window.HibridoView = HibridoView;
