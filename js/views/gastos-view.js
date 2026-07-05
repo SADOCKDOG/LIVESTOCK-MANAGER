@@ -128,6 +128,45 @@ const GastosView = {
     const data = d.kpis[this._currentTab];
     if (!data) { content.innerHTML = '<div class="loader">Sin datos</div>'; return; }
 
+    // Recent gastos section
+    const recientes = data.records.slice(0, 5);
+    let recientesHtml = '';
+    if (recientes.length === 0) {
+      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin gastos recientes</span></div>`;
+    } else {
+      recientesHtml = `
+        <div class="mb-14">
+          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GASTOS RECIENTES
+          </div>
+          <div class="grid gap-6">${recientes.map(g => {
+            const color = this._getCategoryColor(g.categoria || '');
+            return `
+            <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})"
+                 style="--registro-color: ${color};">
+              <div class="flex justify-between items-start">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-6">
+                    <span class="text-xl" style="color:${color}">${Icons.paquete()}</span>
+                    <div class="font-bold text-white uppercase">${g.concepto || g.categoria || 'Gasto'}</div>
+                  </div>
+                  <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
+                    ${g.fecha ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(g.fecha).toLocaleDateString()}</span>` : ''}
+                    ${g.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${g.snap_zona}</span>` : ''}
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-3">
+                  <span class="badge badge-sm font-900" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
+                    #${g.id}
+                  </span>
+                </div>
+              </div>
+            `;
+          }).join('')}</div>
+        </div>
+      `;
+    }
+
     this._renderSeccion(content, {
       icon: catInfo.icon,
       title: `Gastos — ${catInfo.label}`,
@@ -149,12 +188,13 @@ const GastosView = {
         value: GastosView._fmt(g.monto || 0) + ' €',
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),
-      emptyMsg: `Sin gastos de ${catInfo.label.toLowerCase()}. Usa "Registrar Gasto" para añadir.`
+      emptyMsg: `Sin gastos de ${catInfo.label.toLowerCase()}. Usa "Registrar Gasto" para añadir.`,
+      recientesHtml: recientesHtml // we'll inject after the section header
     });
   },
 
   _renderSeccion(content, opts) {
-    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
+    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler, recientesHtml } = opts;
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
@@ -203,6 +243,7 @@ const GastosView = {
           </div>
         </div>
         ` : ''}
+        ${recientesHtml || ''}
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} ${listName}
         </div>
@@ -215,11 +256,21 @@ const GastosView = {
       </div>`;
   },
 
+  _getCategoryColor(cat) {
+    const catMap = {
+      'Alimentacion': 'var(--c-warning)',
+      'Sanidad': 'var(--c-danger)',
+      'Fitosanitarios': 'var(--c-success)',
+      'Electricidad': 'var(--c-info)',
+      'Personal': 'var(--c-orange)',
+      'Amortizacion': 'var(--c-purple)'
+    };
+    return catMap[cat] || 'var(--c-purple)';
+  },
+
   _fmt(n) {
     return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
   }
 };
 
 window.GastosView = GastosView;
-
-
