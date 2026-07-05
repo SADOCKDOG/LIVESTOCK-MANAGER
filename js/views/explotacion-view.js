@@ -651,7 +651,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- Historial Consolidado -->
-        <div class="card-registro p-14 mb-16 border-222" style="--registro-color: ${color};">
+        <div class="card-registro p-14 mb-16 border-222" style="--registro-color: ${themeColor};">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
             ${Icons.documento()} Historial Consolidado Reciente
           </div>

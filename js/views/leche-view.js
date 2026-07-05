@@ -200,6 +200,7 @@ const LecheView = {
 
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
+    const kpis = d.kpis?.patrimonio || [];
     const html = `
       <div class="card-registro report-section leche-report-card border-top-3px border-top-3px-orange" style="--registro-color: var(--c-orange);">
         <div class="leche-report-title">
@@ -209,7 +210,7 @@ const LecheView = {
             <div class="leche-report-title-sub">Gestión de censo y rebaños lácteos</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.patrimonio, 'var(--c-warning)')}
+        ${this._kpiGrid(kpis, 'var(--c-warning)')}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">

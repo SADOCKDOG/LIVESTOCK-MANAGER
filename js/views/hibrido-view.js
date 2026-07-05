@@ -184,7 +184,7 @@ const HibridoView = {
   },
 
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
-  _renderPatrimonio(content, d) {
+    const kpis = d.kpis?.patrimonio || [];
     const html = `
       <div class="card-registro" style="--registro-color: var(--c-warning);">
         <div class="flex items-center gap-12 mb-16">
@@ -195,7 +195,7 @@ const HibridoView = {
           </div>
         </div>
 
-        ${this._kpiGrid(d.kpis.patrimonio, 'var(--c-warning)')}
+        ${this._kpiGrid(kpis, 'var(--c-warning)')}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
