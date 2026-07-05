@@ -65,6 +65,7 @@ const LecheView = {
         ],
         comercializacion: [
           { label: 'Entregado', value: litrosTotal.toLocaleString() + ' L', color: 'var(--c-warning)' },
+          { label: 'Entregas', value: numEntregas },
           { label: 'Facturación', value: Math.round(importeTotal).toLocaleString() + ' €', color: 'var(--c-success)' }
         ],
         legislacion: [
@@ -102,8 +103,8 @@ const LecheView = {
         </div>
 
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color:${color}">${icon} Resumen ${this._currentTab}</span>
+          <div class="flex justify-between items-center mb-6">
+            <span class="text-xs text-white font-black uppercase tracking-wider flex items-center gap-6">${icon} Resumen ${this._currentTab}</span>
             <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
           <div class="resumen-body flex flex-col">
@@ -131,22 +132,38 @@ const LecheView = {
     const d = this._cachedData;
     const f = filtro.toLowerCase();
     if (this._currentTab === 'patrimonio') {
-      return d.animalesLeche.filter(a => (a.nombre || a.numero_identificacion || '').toLowerCase().includes(f)).slice(0, 15).map(a => this._cardRegistro({
-        icon: Icons.animales(), title: a.nombre || a.numero_identificacion || 'Animal', color: 'var(--c-info)', onClick: `location.hash='/animal?id=${a.id}'`,
-        metadata: `<span>Nac: ${this._fmtFecha(a.fecha_nacimiento)}</span><span>·</span><span>${a.raza || 'Sin raza'}</span>`
-      })).join('');
+      return d.animalesLeche.filter(a => (a.nombre || a.numero_identificacion || '').toLowerCase().includes(f)).slice(0, 15).map(a => this._renderCardAnimal(a)).join('');
     } else if (this._currentTab === 'comercializacion') {
-      return d.entregas.filter(e => (e.matriculaCisterna || '').toLowerCase().includes(f)).slice(0, 15).map(e => this._cardRegistro({
+      return d.entregas.filter(e => (e.matriculaCisterna || '').toLowerCase().includes(f)).slice(0, 15).map(e => this._cardEntrega(e)).join('');
+    } else {
+      return d.sanitariosLeche.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => {
+          const enSup = (s.tiempo_espera_leche_dias || 0) > 0;
+          return this._cardRegistro({
+            icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: enSup ? 'var(--c-danger)' : 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
+            metadata: `<span>${this._fmtFecha(s.fecha)}</span><span>·</span><span>Espera: ${s.tiempo_espera_leche_dias || 0}d</span>`,
+            badge: enSup ? 'SUPRESIÓN' : 'LIBRE'
+          });
+      }).join('');
+    }
+  },
+
+  _renderCardAnimal(a) {
+    return this._cardRegistro({
+      icon: Icons.animales(),
+      title: a.nombre || a.numero_identificacion || 'Animal',
+      color: window.ModoContextoHelper?.getEspecieColor(a.especie) || 'var(--c-info)',
+      onClick: `location.hash='/animal?id=${a.id}'`,
+      metadata: `<span>Nac: ${this._fmtFecha(a.fecha_nacimiento)}</span><span>·</span><span>${a.raza || 'Sin raza'}</span>`,
+      badge: `#${a.id}`
+    });
+  },
+
+  _cardEntrega(e) {
+      return this._cardRegistro({
         icon: Icons.leche(), title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`, color: 'var(--c-success)', onClick: `location.hash='/albaran-leche?id=${e.id}'`,
         metadata: `<span>${this._fmtFecha(e.fechaRecogida || e.fecha)}</span>`,
-        badge: `<span class="text-gold font-950">${(e.cantidad || 0).toLocaleString()} L</span>`
-      })).join('');
-    } else {
-      return d.sanitariosLeche.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => this._cardRegistro({
-        icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
-        metadata: `<span>${this._fmtFecha(s.fecha)}</span><span>·</span><span>Espera: ${s.tiempo_espera_leche_dias || 0}d</span>`
-      })).join('');
-    }
+        badge: `${(e.cantidad || 0).toLocaleString()} L`
+      });
   },
 
   _filtrar(texto) {
@@ -155,18 +172,28 @@ const LecheView = {
   },
 
   _cardRegistro(opts) {
+    const color = opts.color || 'var(--c-info)';
     return `
-      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${opts.color}; cursor:pointer;">
+      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${opts.color};">${opts.icon}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${opts.title}</div>
+            <span class="text-xl" style="color:${color};">${opts.icon}</span>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${opts.title}</div>
           </div>
           <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
         </div>
         <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">${opts.badge || ''}</div>
-          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
+          <div class="top-part">
+            ${opts.badge ? `
+              <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${opts.badge}
+              </div>` : ''}
+          </div>
+          <div class="bottom-part">
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+              Ficha ${Icons.flechaDerecha()}
+            </span>
+          </div>
         </div>
       </div>`;
   },

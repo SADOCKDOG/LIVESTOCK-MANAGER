@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - GanaderiaView v1.1.0
+ * Livestock Manager - GanaderiaView v1.2.0
  * Bloque consolidado de Ganadería con modo independiente (carne/leche/híbrido).
  * Refactored with Aglutinadora UI Pattern & Neon Branding.
  */
@@ -44,7 +44,6 @@ const GanaderiaView = {
     const rebanoIds = new Set(rebanosModo.map(r => r.id));
     const animalesModo = animales.filter(a => rebanoIds.has(a.rebanoId));
     const animalesActivos = animalesModo.filter(a => (a.estado || 'activo') === 'activo');
-    const especies = new Set(animalesModo.map(a => (a.especie || '').toLowerCase()).filter(Boolean));
 
     let recientes = [];
     if (this._activeMode === 'carne') {
@@ -95,7 +94,6 @@ const GanaderiaView = {
       </div>
 
       <div class="report-section px-4">
-        <!-- Card de RESUMEN Normalizada -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
             <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} Balance ${meta.label}</span>
@@ -132,17 +130,17 @@ const GanaderiaView = {
                   <div class="flex-1 min-w-0 flex flex-col justify-center">
                     <div class="flex items-center gap-10 min-w-0">
                       <span class="text-xl" style="color:${color};">${icon}</span>
-                      <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${e.snap_identificacion || 'Registro'}</div>
+                      <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Registro'}</div>
                     </div>
                     <div class="text-[0.6rem] text-gray font-800 uppercase mt-4">
-                      ${Icons.calendar()} ${this._fmtFecha(e.fecha)}
+                      ${Icons.calendar()} <span style="color: var(--p-gold);">${this._fmtFecha(e.fecha)}</span>
                     </div>
                   </div>
                   <div class="flex flex-col items-end justify-between flex-shrink-0">
-                    <span class="badge badge-sm font-950" style="background:${color}20; color:${color}; border:1px solid ${color}40;">
+                    <div style="background:${color}15; color:${color}; border: 1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
                       ${e.valor_neto} ${e.unidad === 'kg' ? 'kg' : 'L'}
-                    </span>
-                    <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha ➔</span>
+                    </div>
+                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
                   </div>
                 </div>`;
             }).join('')}
@@ -157,12 +155,14 @@ const GanaderiaView = {
             <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'"
                  style="--registro-color: ${meta.color}; display:flex; gap:10px; align-items:stretch;">
               <div class="flex-1 min-w-0 flex flex-col justify-center">
-                <div class="font-950 text-gold uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${r.nombre}</div>
+                <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${r.nombre}</div>
                 <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">Tipo: ${r.tipo}</div>
               </div>
               <div class="flex flex-col items-end justify-between flex-shrink-0">
-                <span class="badge badge-sm" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">ID ${r.id}</span>
-                <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha ➔</span>
+                <div style="background:${meta.color}15; color:${meta.color}; border: 1px solid ${meta.color}40; filter: drop-shadow(0 0 4px ${meta.color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                  ID ${r.id}
+                </div>
+                <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
               </div>
             </div>`).join('')}
         </div>
