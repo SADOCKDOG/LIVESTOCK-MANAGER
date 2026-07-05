@@ -13,27 +13,45 @@ const ProveedoresView = {
 
     async render() {
         const main = document.getElementById("app-content");
-        main.innerHTML = `
-          <div class="mb-14">
-            <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-              <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> PROVEEDORES
-            </div>
-          </div>
+        const themeColor = 'var(--c-purple)';
 
-          <div class="mb-16">
+        main.innerHTML = `
+          <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+            <div class="flex justify-between items-start mb-10">
+              <div>
+                <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                  ${Icons.proveedores()} PROVEEDORES
+                </h2>
+                <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                  RESUMEN DE GESTIÓN Y LISTADO
+                </div>
+              </div>
+              <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+                ${Icons.flechaAbajo()}
+              </button>
+            </div>
+
+            <!-- Card de RESUMEN -->
             <div id="prov-kpis"></div>
+
+            <!-- Filtros (si hubiera tabs, irían aquí, pero por ahora solo búsqueda) -->
+
             <div class="flex gap-8 mb-14">
               <input type="search" id="search-proveedores" placeholder="Buscar por nombre, NIF o ciudad..."
                 oninput="ProveedoresView._filtrar(this.value)"
-                class="search-input flex-1">
+                class="search-input flex-1 uppercase font-700">
             </div>
-          </div>
-          <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
 
-          <!-- Botón Flotante de Acción con viñeta -->
+            <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+              ${Icons.listado()} LISTADO DE PROVEEDORES
+            </div>
+            <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
+          </div>
+
+          <!-- Botón Flotante de Acción -->
           <div class="fab-container" onclick="ProveedoresView.renderFormulario()">
             <span class="fab-label">Nuevo Proveedor</span>
-            <button class="fab-btn">${Icons.fabPlus()}</button>
+            <button class="fab-btn" style="--neon: ${themeColor}">${Icons.fabPlus()}</button>
           </div>
           `;
 
@@ -47,22 +65,22 @@ const ProveedoresView = {
         const gastosConProveedor = gastos.filter(g => g.proveedorId != null);
         const totalGasto = gastosConProveedor.reduce((s, g) => s + (g.monto || 0), 0);
         const kpisEl = document.getElementById('prov-kpis');
+        const activosCount = proveedores.filter(p => p.activo !== false).length;
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-accent); width:100%;">
-                <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
-                <div class="flex flex-col">
-                  <div class="py-8 flex justify-between items-center border-bottom-222">
-                    <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.proveedores()} Proveedores</span>
-                    <strong class="text-xl font-950" style="color:var(--c-accent);">${proveedores.length}</strong>
+              <div class="card card-total-3d card-resumen mb-20">
+                <div class="flex flex-col gap-6">
+                  <div class="flex justify-between items-center px-4">
+                     <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.proveedores()} TOTAL</span>
+                     <span class="text-white font-900" style="color: var(--c-info)">${proveedores.length}</span>
                   </div>
-                  <div class="py-8 flex justify-between items-center border-bottom-222">
-                    <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Gasto Asignado</span>
-                    <strong class="text-xl font-950" style="color:var(--c-warning);">${totalGasto.toLocaleString()}€</strong>
+                  <div class="flex justify-between items-center px-4">
+                     <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+                     <span class="text-white font-900" style="color: var(--c-success)">${activosCount}</span>
                   </div>
-                  <div class="py-8 flex justify-between items-center">
-                    <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Registros</span>
-                    <strong class="text-xl font-950" style="color:var(--c-info);">${gastosConProveedor.length}</strong>
+                  <div class="flex justify-between items-center px-4">
+                     <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.dinero()} GASTO ASIGNADO</span>
+                     <span class="text-white font-900" style="color: var(--c-warning)">${totalGasto.toLocaleString()} €</span>
                   </div>
                 </div>
               </div>`;
@@ -127,38 +145,26 @@ const ProveedoresView = {
             `;
         }
 
-        if (lista.length === 0) {
-            contenedor.innerHTML = recientesHtml + `
-              <div class="empty-state border border-222">
-                <div class="empty-state-icon" style="color:#555;">${Icons.proveedores()}</div>
-                <p class="empty-state-text uppercase font-900 text-xs">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
-                <button onclick="ProveedoresView.renderFormulario()"
-                  class="widget-link-btn widget-link-btn--neon neon-success px-16 mt-10">
-                  ${Icons.agregar()} <span class="widget-link-label">REGISTRAR PRIMERO</span>
-                </button>
-              </div>`;
-            return;
-        }
-
-        contenedor.innerHTML = recientesHtml + `<div class="grid gap-6">${lista.map(p => `
+        contenedor.innerHTML = `<div class="grid gap-12">${lista.map(p => `
           <div class="card-registro" onclick="ProveedoresView.renderDetalle(${p.id})"
-            style="--registro-color: var(--c-purple); width:100%;">
-            <div class="flex justify-between items-start gap-6" style="width:100%;">
-              <div class="min-w-0 flex-1" style="min-width:0;">
-                <div class="flex items-center gap-6">
-                  <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap;">${p.nombre}</span>
+            style="--registro-color: var(--c-purple);">
+            <div class="flex flex-col gap-10">
+              <div class="flex justify-between items-start w-full">
+                <div class="flex items-center gap-10 min-w-0">
+                  <div class="text-xl" style="color:var(--c-purple)">${Icons.proveedores()}</div>
+                  <div class="text-xs">
+                    <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${p.nombre}</div>
+                    <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
+                      ${[p.nif_cif ? Icons.documento() + ' ' + p.nif_cif : '', p.ciudad ? Icons.zonas() + ' ' + p.ciudad.toUpperCase() : ''].filter(Boolean).join(' · ')}
+                    </div>
+                  </div>
                 </div>
-                <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
-                  ${p.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${p.nif_cif}</span>` : ''}
-                  ${p.ciudad ? `<span class="flex items-center gap-2">${Icons.zonas()} ${p.ciudad.toUpperCase()}</span>` : ''}
+                <div class="text-right">
+                  ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:rgba(255,68,68,0.15); color:var(--c-danger); border:1px solid rgba(255,68,68,0.3);">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:rgba(204,255,0,0.15); color:var(--c-success); border:1px solid rgba(204,255,0,0.3);">ACTIVO</span>'}
                 </div>
-                ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
-                <div class="flex flex-wrap gap-2 mt-2">
-                  ${p.categorias.map(cat => `<span class="text-[0.5rem] text-gray font-800 uppercase bg-black px-6 py-2 rounded-sm border border-222">${this._labelCat(cat).toUpperCase()}</span>`).join('')}
-                </div>` : ''}
               </div>
-              <div class="flex flex-col items-end gap-3 flex-shrink-0">
-                ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:rgba(255,68,68,0.15); color:var(--c-danger); border:1px solid rgba(255,68,68,0.3);">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:rgba(204,255,0,0.15); color:var(--c-success); border:1px solid rgba(204,255,0,0.3);">ACTIVO</span>'}
+              <div class="text-right">
+                <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
               </div>
             </div>
           </div>

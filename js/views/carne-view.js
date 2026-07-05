@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - CarneView v2.0.0
  * Vista del Módulo de Carne con los 4 bloques unificados de gestión
  */
@@ -19,7 +19,7 @@ const CarneView = {
     const main = document.getElementById('app-content');
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
-    
+
     // Cargar datos
     const [rebanos, animales, eventos, ventasCarne, todosSanitarios, todosGastos] = await Promise.all([
       window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
@@ -31,11 +31,11 @@ const CarneView = {
     ]);
 
     // Filtrar rebanos cárnicos o mixtos
-    const rebanosCarne = rebanos.filter(r => 
-      r.tipo.toLowerCase().includes('carne') || 
-      r.tipo.toLowerCase().includes('cárn') || 
-      r.tipo.toLowerCase().includes('mixt') || 
-      r.tipo.toLowerCase().includes('híbr') || 
+    const rebanosCarne = rebanos.filter(r =>
+      r.tipo.toLowerCase().includes('carne') ||
+      r.tipo.toLowerCase().includes('cárn') ||
+      r.tipo.toLowerCase().includes('mixt') ||
+      r.tipo.toLowerCase().includes('híbr') ||
       r.tipo.toLowerCase().includes('doble')
     );
     const rebanosIds = rebanosCarne.map(r => r.id);
@@ -44,8 +44,8 @@ const CarneView = {
     const animalesCarne = animales.filter(a => rebanosIds.includes(a.rebanoId));
 
     // Filtrar pesajes (unidad kg) de carne
-    const pesajes = eventos.filter(e => 
-      e.unidad === 'kg' && 
+    const pesajes = eventos.filter(e =>
+      e.unidad === 'kg' &&
       (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano') &&
       (rebanosIds.includes(e.rebanoId) || e.snap_tipo?.toLowerCase()?.includes('carne') || e.snap_tipo?.toLowerCase()?.includes('cárn') || e.snap_tipo?.toLowerCase()?.includes('mixt'))
     );
@@ -129,8 +129,8 @@ const CarneView = {
     const rendimientoMedio = ventasCarne.length > 0 ? (ventasCarne.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventasCarne.length) : 0;
 
     // Costes y Almacén
-    const gastosAlim = todosGastos.filter(g => 
-      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+    const gastosAlim = todosGastos.filter(g =>
+      (g.categoria || '').toLowerCase() === 'alimentacion' ||
       (g.categoria || '').toLowerCase() === 'alimentación' ||
       (g.concepto || '').toLowerCase().includes('pienso') ||
       (g.concepto || '').toLowerCase().includes('forraje') ||
@@ -228,6 +228,44 @@ const CarneView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const kpis = d.kpis?.patrimonio || [];
+    // Get the 5 most recent animals by id (descending)
+    const recientesAnimales = [...d.animalesCarne]
+      .sort((a, b) => b.id - a.id)
+      .slice(0, 5);
+    let itemsHtml = '';
+    for (const a of recientesAnimales) {
+      const color = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#6B7280';
+      itemsHtml += `
+        <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${color};">
+          <div class="flex justify-between items-start">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-8">
+                <span class="text-xl" style="color:${color};">${Icons.animales()}</span>
+                <h3 class="section-h3 m-0 text-ellipsis">${a.nombre || a.numero_identificacion || 'Animal #' + a.id}</h3>
+              </div>
+              <div class="flex flex-wrap gap-4 mt-2 text-[0.65rem] text-gray font-800 uppercase">
+                <span>${Icons.calendar()} ${a.fecha_nacimiento ? new Date(a.fecha_nacimiento).toLocaleDateString() : 'Fecha N/D'}</span>
+                ${a.raza ? `<span>·</span><span>Raza: ${a.raza}</span>` : ''}
+              </div>
+              <div class="text-right flex-shrink-0 ml-8">
+  <span class="badge badge-sm font-950" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
+                #${a.id}
+              </span>
+              <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    const recientesHtml = recientesAnimales.length > 0 ?
+      `<div class="mb-14">
+         <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+           <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> ANIMALES RECIENTES
+         </div>
+         <div class="grid gap-6">${itemsHtml}</div>
+       </div>` :
+      `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin animales recientes</span></div>`;
+
     const html = `
       <div class="card-registro report-section p-16 border-top-3px border-top-3px-orange" style="--registro-color: var(--c-warning);">
         <div class="flex justify-between items-center mb-16">
@@ -241,6 +279,7 @@ const CarneView = {
         </div>
 
         ${this._kpiGrid(kpis, 'var(--c-warning)')}
+        ${recientesHtml}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -273,7 +312,8 @@ const CarneView = {
                       <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
                     </div>
                   </div>
-                </div>`).join('')
+                </div>`
+              ).join('')
             : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin lotes de carne registrados.</span></div>`
           }
         </div>
@@ -311,7 +351,7 @@ const CarneView = {
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Historial de Facturas/Matadero
         </div>
-        <div class="grid gap-10">
+        <div class="gap-10">
           ${d.ventasCarne.length > 0
             ? d.ventasCarne.slice(0, 15).map(v => `
                 <div class="card-registro" onclick="App._abrirDetalleVentaCarne(${v.id})" style="--registro-color: var(--c-success);">
@@ -386,7 +426,7 @@ const CarneView = {
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Historial Sanitario Cárnico (${d.sanitariosCarne.length})
         </div>
-        <div class="grid gap-10">
+        <div class="gap-10">
           ${d.sanitariosCarne.length > 0
             ? d.sanitariosCarne.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresion.some(ts => ts.id === s.id);
@@ -508,15 +548,15 @@ const CarneView = {
   async _abrirAsistenteTratamientoCarne() {
     const d = this._cachedData;
     if (!d || d.rebanosCarne.length === 0) {
-      App.toastError("No hay rebaños de carne en esta finca para tratar.");
+      app.toastError("No hay rebaños de carne en esta finca para tratar.");
       return;
     }
-    
+
     if (d.rebanosCarne.length === 1) {
       await window.WizardTratamiento.registrar(d.rebanosCarne[0].id);
       return;
     }
-    
+
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
     overlay.style.justifyContent = "center";
@@ -536,7 +576,7 @@ const CarneView = {
       </div>
     `;
     document.body.appendChild(overlay);
-    
+
     overlay.querySelector('#btn-treat-next').onclick = async () => {
       const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
       overlay.remove();

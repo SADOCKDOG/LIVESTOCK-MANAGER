@@ -186,46 +186,69 @@ const HibridoView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const kpis = d.kpis?.patrimonio || [];
+    const themeColor = 'var(--c-warning)';
     const html = `
-      <div class="card-registro" style="--registro-color: var(--c-warning);">
-        <div class="flex items-center gap-12 mb-16">
-          <span class="text-3xl">${Icons.edificio()}</span>
+      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+        <div class="flex justify-between items-start mb-10">
           <div>
-            <div class="text-white font-900 text-lg">Patrimonio y Censo Consolidado</div>
-            <div class="text-gray text-xs">Organización ganadera de doble aptitud</div>
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+              ${Icons.edificio()} PATRIMONIO Y GANADERÍA
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              ORGANIZACIÓN GANADERA DE DOBLE APTITUD
+            </div>
+          </div>
+          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+            ${Icons.flechaAbajo()}
+          </button>
+        </div>
+
+        <!-- Card de RESUMEN -->
+        <div class="card card-total-3d card-resumen mb-20">
+          <div class="flex flex-col gap-6">
+            ${kpis.map(k => `
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${k.label}</span>
+                 <span class="text-white font-900" style="color: ${k.color || 'white'}">${k.value}</span>
+              </div>
+            `).join('')}
           </div>
         </div>
 
-        ${this._kpiGrid(kpis, 'var(--c-warning)')}
-
         <!-- Accesos directos táctiles -->
-        <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/animales" class="widget-link-btn">${Icons.animales()} Animales</a>
-          <a href="#/rebanos" class="widget-link-btn">${Icons.rebanos()} Rebaños</a>
-          <a href="#/zonas" class="widget-link-btn">${Icons.zonas()} Zonas</a>
+        <div class="grid grid-cols-3 gap-8 mb-20">
+          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-orange">${Icons.animales()} <span class="widget-link-label text-[0.65rem]">Animales</span></a>
+          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info">${Icons.rebanos()} <span class="widget-link-label text-[0.65rem]">Rebaños</span></a>
+          <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-success">${Icons.zonas()} <span class="widget-link-label text-[0.65rem]">Zonas</span></a>
         </div>
 
-        <div class="leche-list-header">
-          ${Icons.documento()} Rebaños Mixtos Activos (${d.rebanos.length})
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+          ${Icons.listado()} REBAÑOS MIXTOS ACTIVOS (${d.rebanos.length})
         </div>
         <div class="grid gap-10">
-          ${d.rebanos.map(r => `
+          ${d.rebanos.map(r => {
+            const activosCount = d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length;
+            return `
             <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: var(--c-warning);">
-              <div class="flex justify-between items-start">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-6">
-                    <span class="text-xl">${Icons.rebanos()}</span>
-                    <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
+              <div class="flex flex-col gap-10">
+                <div class="flex justify-between items-center w-full">
+                  <div class="flex items-center gap-10 min-w-0">
+                    <span class="text-xl" style="color: var(--c-warning)">${Icons.rebanos()}</span>
+                    <div class="text-xs">
+                      <div class="font-bold text-white uppercase text-base tracking-tight">${r.nombre}</div>
+                      <div class="text-gray mt-2 font-700 uppercase">${r.tipo} · ${r.especie}</div>
+                    </div>
                   </div>
-                  <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                    <span>Aptitud: ${r.tipo} · Especie: ${r.especie}</span>
+                  <div class="text-right">
+                    <span class="badge badge-sm badge-gold uppercase font-900">${activosCount} ${activosCount === 1 ? 'Cabeza' : 'Cabezas'}</span>
                   </div>
                 </div>
-                <div class="text-right flex-shrink-0 ml-8">
-                  <span class="badge badge-sm badge-gold" class="block mb-4">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
+                <div class="text-right">
+                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
                 </div>
               </div>
-            </div>`).join('') || `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin rebaños mixtos activos.</span></div>`}
+            </div>`;
+          }).join('') || `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin rebaños mixtos activos.</span></div>`}
         </div>
       </div>
     `;
@@ -236,13 +259,14 @@ const HibridoView = {
 
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
+    const themeColor = 'var(--c-success)';
     // Liquidaciones unificadas
     const lList = [];
     d.ventasCarne.forEach(v => {
       lList.push({
         id: v.id,
         tipo: 'carne',
-        titulo: `${Icons.carne()} Carne: ${v.numero_albaran || 'Albarán'} - ${v.razonSocial || 'Matadero'}`,
+        titulo: `${v.razonSocial || 'Matadero'}`,
         fecha: v.fechaSacrificio || v.fecha,
         valor: v.importe_total || v.valor_neto || 0,
         detalle: `${v.pesoCanal || 0} kg canal`,
@@ -253,66 +277,82 @@ const HibridoView = {
       lList.push({
         id: e.id,
         tipo: 'leche',
-        titulo: `${Icons.leche()} Leche: Entrega de ${(e.cantidad || 0).toLocaleString()} L`,
+        titulo: `Entrega Leche`,
         fecha: e.fechaRecogida || e.fecha,
         valor: e.importe_total || e.cantidad * e.precioBase || 0,
-        detalle: `Vehículo: ${e.matriculaCisterna || '—'}`,
+        detalle: `${(e.cantidad || 0).toLocaleString()} L`,
         onclick: `location.hash='/albaran-leche?id=${e.id}'`
       });
     });
     lList.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
     const html = `
-      <div class="card-registro" style="--registro-color: var(--c-success);">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.transportistas()}</span>
-            <div>
-              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
-              <div class="text-gray text-xs">Logística, transporte, compradores, contratos y ventas consolidado</div>
+      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+        <div class="flex justify-between items-start mb-10">
+          <div>
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+              ${Icons.transportistas()} COMERCIALIZACIÓN
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              LOGÍSTICA Y VENTAS CONSOLIDADO
             </div>
           </div>
-          <div class="flex gap-4">
-            <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
-              ${Icons.agregar()} Venta Carne
-            </button>
-            <button class="btn btn-success btn-sm" onclick="App._abrirWizardAlbaranLeche()">
-              ${Icons.agregar()} Albarán Leche
-            </button>
+          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+            ${Icons.flechaAbajo()}
+          </button>
+        </div>
+
+        <!-- Card de RESUMEN -->
+        <div class="card card-total-3d card-resumen mb-20">
+          <div class="flex flex-col gap-6">
+            ${d.kpis.comercializacion.map(k => `
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${k.label}</span>
+                 <span class="text-white font-900" style="color: ${k.color || 'white'}">${k.value}</span>
+              </div>
+            `).join('')}
           </div>
         </div>
 
-        ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
-
-        <!-- Accesos directos comerciales -->
-        <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
-          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Logística</a>
-          <a href="#/comercializacion" class="widget-link-btn">${Icons.comercial()} Comercial</a>
+        <div class="grid grid-cols-2 gap-10 mb-20">
+          <button class="widget-link-btn widget-link-btn--neon neon-orange" onclick="App._abrirWizardVentaMasiva()">
+            ${Icons.agregar()} <span class="widget-link-label text-[0.65rem] font-900 uppercase">Venta Carne</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirWizardAlbaranLeche()">
+            ${Icons.agregar()} <span class="widget-link-label text-[0.65rem] font-900 uppercase">Albarán Leche</span>
+          </button>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Historial de Ventas e Ingresos Mixtos (${lList.length})
+        <!-- Accesos directos comerciales -->
+        <div class="grid grid-cols-3 gap-8 mb-20">
+          <a href="#/compradores" class="widget-link-btn widget-link-btn--neon neon-purple">${Icons.compradores()} <span class="widget-link-label text-[0.6rem]">Compradores</span></a>
+          <a href="#/transportistas" class="widget-link-btn widget-link-btn--neon neon-pink">${Icons.transportistas()} <span class="widget-link-label text-[0.6rem]">Logística</span></a>
+          <a href="#/comercializacion" class="widget-link-btn widget-link-btn--neon neon-success">${Icons.comercial()} <span class="widget-link-label text-[0.6rem]">Comercial</span></a>
+        </div>
+
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+          ${Icons.listado()} ÚLTIMAS VENTAS MIXTAS (${lList.length})
         </div>
         <div class="grid gap-10">
           ${lList.slice(0, 15).map(l => {
             const color = l.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
             return `
               <div class="card-registro" onclick="${l.onclick}" style="--registro-color: ${color};">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-6">
-                      <span class="text-xl">${l.tipo === 'carne' ? Icons.carne() : Icons.leche()}</span>
-                      <h3 class="section-h3 m-0 text-ellipsis">${l.titulo}</h3>
+                <div class="flex flex-col gap-10">
+                  <div class="flex justify-between items-center w-full">
+                    <div class="flex items-center gap-10 min-w-0">
+                      <span class="text-xl" style="color:${color}">${l.tipo === 'carne' ? Icons.carne() : Icons.leche()}</span>
+                      <div class="text-xs">
+                        <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis">${l.titulo}</div>
+                        <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(l.fecha)} · ${l.detalle}</div>
+                      </div>
                     </div>
-                    <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                      <span>${Icons.calendar()} ${this._fmtFecha(l.fecha)}</span>
-                      <span>·</span>
-                      <span>${l.detalle}</span>
+                    <div class="text-right">
+                      <span class="badge badge-sm text-green font-900 text-lg" style="background:rgba(204,255,0,0.1); border:1px solid rgba(204,255,0,0.3); padding: 4px 10px;">${Math.round(l.valor).toLocaleString()} €</span>
                     </div>
                   </div>
-                  <div class="text-right flex-shrink-0 ml-8">
-                    <span class="badge badge-sm text-green font-bold text-lg" style="background:rgba(204,255,0,0.1); border:1px solid rgba(204,255,0,0.3); display:block;">${Math.round(l.valor).toLocaleString()} €</span>
+                  <div class="text-right">
+                    <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--c-warning); text-transform: uppercase;">Detalle -></span>
                   </div>
                 </div>
               </div>`;
@@ -325,18 +365,19 @@ const HibridoView = {
 
   // ========== BLOQUE 4: REGISTROS, LEGISLACIÓN Y CUMPLIMIENTO SANITARIO ==========
   _renderLegislacion(content, d) {
+    const themeColor = 'var(--c-purple)';
     // Alertas de supresión
     let alertasHtml = '';
     if (d.supresionesCarne.length > 0 || d.supresionesLeche.length > 0) {
       alertasHtml = `
-        <div class="supresion-alerta-box">
-          <strong>${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
-          <ul class="mt-4 pl-20 m-0">
+        <div class="supresion-alerta-box mb-16 p-12 rounded border border-danger bg-danger-transparent">
+          <strong class="text-white uppercase font-900 flex items-center gap-6">${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
+          <ul class="mt-8 pl-20 m-0 text-xs text-ccc font-700">
             ${d.supresionesCarne.map(s => `
-              <li><span class="sup-badge sup-badge-carne">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> para matadero.</li>
+              <li class="mb-4"><span class="badge badge-sm badge-red">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes} D</strong></li>
             `).join('')}
             ${d.supresionesLeche.map(s => `
-              <li><span class="sup-badge sup-badge-leche">LECHE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — ${typeof s.diasRestantes === 'number' ? `Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> para ordeño.` : '<strong class="text-white">Ordeño prohibido durante el tratamiento.</strong>'}</li>
+              <li class="mb-4"><span class="badge badge-sm badge-blue">LECHE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — ${typeof s.diasRestantes === 'number' ? `Restan <strong class="text-white">${s.diasRestantes} D</strong>` : '<strong class="text-white">PROHIBIDO</strong>'}</li>
             `).join('')}
           </ul>
         </div>
@@ -345,30 +386,47 @@ const HibridoView = {
 
     const html = `
       ${alertasHtml}
-      <div class="card-registro" style="--registro-color: var(--c-purple);">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.documento()}</span>
-            <div>
-              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
-              <div class="text-gray text-xs">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
+      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+        <div class="flex justify-between items-start mb-10">
+          <div>
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+              ${Icons.documento()} CUMPLIMIENTO
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              CUADERNO Y CUMPLIMIENTO SANITARIO
             </div>
           </div>
-          <button class="btn btn-secondary btn-sm" style="background:var(--c-purple); border-color:var(--c-purple);" onclick="HibridoView._abrirAsistenteTratamientoMix()">
-            ${Icons.agregar()} Registrar Tratamiento
+          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+            ${Icons.flechaAbajo()}
           </button>
         </div>
 
-        ${this._kpiGrid(d.kpis.legislacion, 'var(--c-purple)')}
-
-        <!-- Accesos directos de legislación -->
-        <div class="grid grid-cols-2 gap-8 mb-16">
-          <a href="#/documentos" class="widget-link-btn">${Icons.documento()} Documentos</a>
-          <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno de Explotación</a>
+        <!-- Card de RESUMEN -->
+        <div class="card card-total-3d card-resumen mb-20">
+          <div class="flex flex-col gap-6">
+            ${d.kpis.legislacion.map(k => `
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${k.label}</span>
+                 <span class="text-white font-900" style="color: ${k.color || 'white'}">${k.value}</span>
+              </div>
+            `).join('')}
+          </div>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Historial Sanitario Consolidado (${d.sanitariosFinca.length})
+        <div class="flex justify-center mb-20">
+          <button class="widget-link-btn widget-link-btn--neon neon-purple w-full max-w-260" onclick="HibridoView._abrirAsistenteTratamientoMix()">
+            ${Icons.agregar()} <span class="widget-link-label text-[0.65rem] font-900 uppercase">Registrar Tratamiento</span>
+          </button>
+        </div>
+
+        <!-- Accesos directos de legislación -->
+        <div class="grid grid-cols-2 gap-8 mb-20">
+          <a href="#/documentos" class="widget-link-btn widget-link-btn--neon neon-purple">${Icons.documento()} <span class="widget-link-label text-[0.65rem]">Documentos</span></a>
+          <a href="#/cuaderno" class="widget-link-btn widget-link-btn--neon neon-orange">${Icons.cuaderno()} <span class="widget-link-label text-[0.65rem]">Cuaderno</span></a>
+        </div>
+
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+          ${Icons.listado()} HISTORIAL SANITARIO (${d.sanitariosFinca.length})
         </div>
         <div class="grid gap-10">
           ${d.sanitariosFinca.length > 0
@@ -378,22 +436,23 @@ const HibridoView = {
                 const color = (enSupC || enSupL) ? 'var(--c-danger)' : 'var(--c-purple)';
                 return `
                   <div class="card-registro" style="--registro-color: ${color};">
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-6">
-                          <span class="text-xl">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
+                    <div class="flex flex-col gap-10">
+                      <div class="flex justify-between items-start w-full">
+                        <div class="flex items-center gap-10 min-w-0">
+                          <span class="text-xl" style="color:${color}">${Icons.sanidad()}</span>
+                          <div class="text-xs">
+                            <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</div>
+                            <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(s.fecha)} · REB: ${s.rebanoId}</div>
+                          </div>
                         </div>
-                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                          <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
-                          <span>·</span>
-                          <span>Carne: <strong>${s.tiempo_espera_carne_dias || 0}d</strong> · Leche: <strong>${s.tiempo_espera_leche_dias || 0}d</strong></span>
+                        <div class="text-right flex flex-col gap-4">
+                          ${enSupC ? `<span class="badge badge-sm badge-red font-900">SUP. CARNE</span>` : ''}
+                          ${enSupL ? `<span class="badge badge-sm badge-blue font-900">SUP. LECHE</span>` : ''}
+                          ${!enSupC && !enSupL ? `<span class="badge badge-sm uppercase font-900" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">LIBRE</span>` : ''}
                         </div>
                       </div>
-                      <div class="text-right flex-shrink-0 ml-8">
-                        ${enSupC ? `<span class="badge badge-sm badge-red block mb-2">SUP. CARNE</span>` : ''}
-                        ${enSupL ? `<span class="badge badge-sm badge-blue block">SUP. LECHE</span>` : ''}
-                        ${!enSupC && !enSupL ? `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">LIBRE</span>` : ''}
+                      <div class="text-gray text-[0.6rem] font-800 uppercase px-4 py-2 bg-black border border-222 rounded-sm">
+                        Carne: <strong class="text-white">${s.tiempo_espera_carne_dias || 0}d</strong> · Leche: <strong class="text-white">${s.tiempo_espera_leche_dias || 0}d</strong>
                       </div>
                     </div>
                   </div>`;

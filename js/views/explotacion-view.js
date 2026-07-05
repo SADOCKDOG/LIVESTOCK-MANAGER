@@ -319,82 +319,95 @@ if (window.enableScrollShadows) {
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
-        <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color:${themeColor};">${Icons.tendencia()} Rendimiento y Eficiencia de Carne</span>
-            <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
-          </div>
-          <div class="resumen-body flex flex-col">
-            <div class="flex justify-between items-center border-bottom-222 py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.balanza()} GMD Media</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">+${d.gmdMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/día</strong>
-            </div>
-            <div class="flex justify-between items-center border-bottom-222 py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Alimentación</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${d.totalGastosAlim.toLocaleString()} €</strong>
-            </div>
-            <div class="flex justify-between items-center border-bottom-222 py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.paquete()} Pesajes</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${d.pesajes.length}</strong>
-            </div>
-            <div class="flex justify-between items-center py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.animales()} Censo Activo</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${d.animalesFinca.length}</strong>
-            </div>
-          </div>
-        </div>
 
-        <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme">ACCIONES DE REGISTRO</div>
-          <div class="grid grid-cols-2 gap-10">
-            <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
-              ${Icons.agregar()}
-              <span class="widget-link-label">Peso (kg)</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
-              ${Icons.sanidad()}
-              <span class="widget-link-label">Tratamiento</span>
+        <!-- Aglutinadora Carne -->
+        <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+          <div class="flex justify-between items-start mb-10">
+            <div>
+              <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                ${Icons.carne()} RENDIMIENTO CARNE
+              </h2>
+              <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                RESUMEN DE EFICIENCIA Y GMD
+              </div>
+            </div>
+            <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+              ${Icons.flechaAbajo()}
             </button>
           </div>
-          <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.balanza()} Pesaje · ${Icons.sanidad()} Tratamiento sanitario</span></div>
-        </div>
 
-        <!-- Líderes GMD -->
-        <div class="mb-14 p-12 rounded bg-dark border border-222 border-top-3px border-top-3px-amber">
-          <div class="text-xs text-amber font-black uppercase mb-6 flex items-center gap-6">${Icons.tendencia()} LÍDERES DE GANANCIA DE PESO (GMD)</div>
-          <div class="grid gap-6">
-            ${d.gmdList.slice(0, 4).map(g => `
-              <div class="flex justify-between items-center text-xs text-white">
-                <span class="text-ccc">${g.crotal} (${g.rebano})</span>
-                <strong class="text-green">+${g.gmd.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg/día</strong>
-              </div>`).join('') || '<div class="text-xs text-555">Sin datos evaluados de GMD. Registra al menos dos pesajes para el mismo animal.</div>'}
+          <!-- Card de RESUMEN -->
+          <div class="card card-total-3d card-resumen mb-20">
+            <div class="flex flex-col gap-6">
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.balanza()} GMD MEDIA</span>
+                 <span class="text-white font-900" style="color: var(--c-success)">+${d.gmdMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg/día</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.gastos()} ALIMENTACIÓN</span>
+                 <span class="text-white font-900" style="color: var(--c-warning)">${d.totalGastosAlim.toLocaleString()} €</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.paquete()} PESAJES</span>
+                 <span class="text-white font-900" style="color: var(--c-info)">${d.pesajes.length}</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.animales()} CENSO ACTIVO</span>
+                 <span class="text-white font-900">${d.animalesFinca.length}</span>
+              </div>
+            </div>
           </div>
-          <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">Registro mixto de pesajes, ordeños y tratamientos para explotación híbrida</span></div>
-        </div>
 
-        <!-- Historial Consolidado -->
-        <div class="card p-16 mb-16 border-222">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-            ${Icons.documento()} Últimos pesajes registrados
+          <!-- PANEL DE ACCIONES -->
+          <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: ${themeColor}">
+            <div class="section-header-theme">ACCIONES DE REGISTRO</div>
+            <div class="grid grid-cols-2 gap-10">
+              <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
+                ${Icons.agregar()}
+                <span class="widget-link-label">Peso (kg)</span>
+              </button>
+              <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('carne')">
+                ${Icons.sanidad()}
+                <span class="widget-link-label">Tratamiento</span>
+              </button>
+            </div>
           </div>
-          <div class="grid gap-8 mh-350">
+
+          <!-- Líderes GMD -->
+          <div class="mb-14 p-12 rounded bg-dark border border-222 border-top-3px border-top-3px-amber">
+            <div class="text-xs text-amber font-black uppercase mb-6 flex items-center gap-6">${Icons.tendencia()} LÍDERES DE GANANCIA DE PESO (GMD)</div>
+            <div class="grid gap-6">
+              ${d.gmdList.slice(0, 4).map(g => `
+                <div class="flex justify-between items-center text-xs text-white">
+                  <span class="text-ccc uppercase font-800">${g.crotal}</span>
+                  <strong class="text-green font-900">+${g.gmd.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg/d</strong>
+                </div>`).join('') || '<div class="text-xs text-555">Sin datos evaluados de GMD.</div>'}
+            </div>
+          </div>
+
+          <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+            ${Icons.listado()} ÚLTIMOS PESAJES
+          </div>
+          <div class="grid gap-8">
             ${d.pesajes.length > 0
               ? d.pesajes.slice(0, 15).map(e => `
-                  <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="--registro-color: ${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'}; display:flex; gap:10px; align-items:stretch;">
-                    <div class="flex-1 min-w-0 flex flex-col gap-8">
-                      <div class="flex items-center gap-10 min-w-0">
-                        <span class="text-xl" style="color:${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'};">${Icons.carne()}</span>
-                        <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Animal/Lote'}</div>
+                  <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, 'carne')" style="--registro-color: ${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'};">
+                    <div class="flex flex-col gap-10">
+                      <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-10 min-w-0">
+                          <span class="text-xl" style="color:${e.tipo_entidad === 'animal' ? 'var(--c-danger)' : 'var(--c-warning)'};">${Icons.carne()}</span>
+                          <div class="text-xs">
+                             <div class="font-bold text-white uppercase text-base tracking-tight">${e.snap_identificacion || 'Animal/Lote'}</div>
+                             <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(e.fecha)}</div>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <span class="badge badge-sm font-bold text-red badge-red-outline" style="font-size:0.75rem; white-space:nowrap;">${Number(e.valor_neto || 0).toLocaleString('es-ES')} kg</span>
+                        </div>
                       </div>
-                      <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-                        <div class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(e.fecha)}</div>
+                      <div class="text-right">
+                        <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--c-warning); text-transform: uppercase;">Ficha -></span>
                       </div>
-                    </div>
-                    <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
-                      <span class="badge badge-sm font-bold text-red badge-red-outline" style="font-size:0.75rem; white-space:nowrap;">${Number(e.valor_neto || 0).toLocaleString('es-ES')} kg</span>
-                      <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
                     </div>
                   </div>`).join('')
               : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin pesajes registrados</span></div>`
@@ -418,63 +431,74 @@ if (window.enableScrollShadows) {
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
-        <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color:${themeColor};">${Icons.leche()} Rendimiento y Eficiencia de Leche</span>
-            <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
-          </div>
-          <div class="resumen-body flex flex-col">
-            <div class="flex justify-between items-center border-bottom-222 py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Margen (MOFA)</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
-            </div>
-            <div class="flex justify-between items-center border-bottom-222 py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.leche()} Total Leche</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${this._fmt(d.totalLitros)} L</strong>
-            </div>
-            <div class="flex justify-between items-center border-bottom-222 py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.grafico()} Extracto Seco</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D'}</strong>
-            </div>
-            <div class="flex justify-between items-center py-10">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.gastos()} Costes Alim.</span>
-              <strong class="text-xl font-950" style="color:${themeColor};">${d.totalGastosAlim.toLocaleString()} €</strong>
-            </div>
-          </div>
-        </div>
 
-        <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme">ACCIONES DE REGISTRO</div>
-          <div class="grid grid-cols-2 gap-10">
-            <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
-              ${Icons.agregar()}
-              <span class="widget-link-label">Control (L)</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
-              ${Icons.sanidad()}
-              <span class="widget-link-label">Tratamiento</span>
+        <!-- Aglutinadora Leche -->
+        <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+          <div class="flex justify-between items-start mb-10">
+            <div>
+              <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                ${Icons.leche()} RENDIMIENTO LECHE
+              </h2>
+              <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                RESUMEN DE EFICIENCIA Y CALIDAD
+              </div>
+            </div>
+            <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+              ${Icons.flechaAbajo()}
             </button>
           </div>
-          <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">Registro de controles lecheros y tratamientos sanitarios para producción láctea</span></div>
-        </div>
 
-        <!-- Calidad e Higiene de Tanque (Analíticas) -->
-        <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-info);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.grafico()} CALIDAD DE TANQUE</div>
-          <div class="scroll-shadow-container overflow-x-auto">
+          <!-- Card de RESUMEN -->
+          <div class="card card-total-3d card-resumen mb-20">
+            <div class="flex flex-col gap-6">
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.dinero()} MARGEN (MOFA)</span>
+                 <span class="text-white font-900" style="color: var(--c-success)">${Math.round(d.mofaLeche).toLocaleString()} €</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.leche()} TOTAL LECHE</span>
+                 <span class="text-white font-900" style="color: var(--c-info)">${this._fmt(d.totalLitros)} L</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.grafico()} EXTRACTO SECO</span>
+                 <span class="text-white font-900">${d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D'}</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.gastos()} COSTES ALIM.</span>
+                 <span class="text-white font-900" style="color: var(--c-danger)">${d.totalGastosAlim.toLocaleString()} €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL DE ACCIONES -->
+          <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: ${themeColor}">
+            <div class="section-header-theme">ACCIONES DE REGISTRO</div>
+            <div class="grid grid-cols-2 gap-10">
+              <button class="widget-link-btn widget-link-btn--neon neon-theme" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
+                ${Icons.agregar()}
+                <span class="widget-link-label">Control (L)</span>
+              </button>
+              <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('leche')">
+                ${Icons.sanidad()}
+                <span class="widget-link-label">Tratamiento</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Calidad e Higiene de Tanque -->
+          <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+            ${Icons.grafico()} CALIDAD DE TANQUE (ÚLTIMAS ANALÍTICAS)
+          </div>
+          <div class="scroll-shadow-container overflow-x-auto mb-20">
             <table class="premium-table">
               <thead>
                 <tr>
-                  <th>Fecha</th>
-                  <th>Litros</th>
-                  <th>Grasa</th>
-                  <th>Proteína</th>
-                  <th>C.Somát.</th>
-                  <th>Bacterias</th>
-                  <th>Inhib.</th>
-                  <th>Calidad</th>
+                  <th class="uppercase text-[0.6rem]">Fecha</th>
+                  <th class="uppercase text-[0.6rem]">Litros</th>
+                  <th class="uppercase text-[0.6rem]">Grasa</th>
+                  <th class="uppercase text-[0.6rem]">Proteína</th>
+                  <th class="uppercase text-[0.6rem]">C.Somát.</th>
+                  <th class="uppercase text-[0.6rem]">Calidad</th>
                 </tr>
               </thead>
               <tbody>
@@ -484,44 +508,44 @@ if (window.enableScrollShadows) {
                       const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
                       return `
                         <tr>
-                          <td><span class="flex items-center gap-4 text-white font-800" style="font-size:0.7rem;">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)}</span></td>
-                          <td class="font-900 text-white text-sm">${(e.cantidad || 0).toLocaleString()} L</td>
-                          <td style="color:var(--c-warning);">${lab.grasa != null ? lab.grasa.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'}</td>
-                          <td style="color:var(--c-info);">${lab.proteina != null ? lab.proteina.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'}</td>
-                          <td style="color:${(lab.somaticas || 0) > 400000 ? 'var(--c-danger)' : 'var(--c-success)'};">${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '—'}</td>
-                          <td style="color:${(lab.germenes || 0) > 1500000 ? 'var(--c-danger)' : 'var(--c-success)'};">${lab.germenes ? (lab.germenes / 1000).toFixed(0) + 'k' : '—'}</td>
-                          <td style="color:${e.certificadoInhibidores === false || e.antibioticos ? 'var(--c-danger)' : 'var(--c-success)'};">${e.certificadoInhibidores ? 'OK' : 'PEND'}</td>
-                          <td><span class="badge" style="background:${semaforo.color}15; color:${semaforo.color}; border:1px solid ${semaforo.color}30; font-size:0.58rem; padding:2px 6px;">${semaforo.label}</span></td>
+                          <td><span class="flex items-center gap-4 text-white font-800" style="font-size:0.65rem;">${this._fmtFecha(e.fechaRecogida || e.fecha)}</span></td>
+                          <td class="font-900 text-white text-xs">${(e.cantidad || 0).toLocaleString()} L</td>
+                          <td style="color:var(--c-warning); font-size:0.65rem;">${lab.grasa != null ? lab.grasa.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'}</td>
+                          <td style="color:var(--c-info); font-size:0.65rem;">${lab.proteina != null ? lab.proteina.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'}</td>
+                          <td style="color:${(lab.somaticas || 0) > 400000 ? 'var(--c-danger)' : 'var(--c-success)'}; font-size:0.65rem;">${lab.somaticas ? (lab.somaticas / 1000).toFixed(0) + 'k' : '—'}</td>
+                          <td><span class="badge" style="background:${semaforo.color}15; color:${semaforo.color}; border:1px solid ${semaforo.color}30; font-size:0.55rem; padding:2px 4px;">${semaforo.label.split(',')[0]}</span></td>
                         </tr>
                       `;
                     }).join('')
-                  : `<tr><td colspan="8" class="text-center text-555 p-10">No hay analíticas registradas.</td></tr>`
+                  : `<tr><td colspan="6" class="text-center text-555 p-10">No hay analíticas registradas.</td></tr>`
                 }
               </tbody>
             </table>
           </div>
-        </div>
 
-        <!-- Controles Ordeño Recientes -->
-        <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-info);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex items-center gap-6">${Icons.leche()} ORDEÑOS Y CONTROLES DIARIOS</div>
+          <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+            ${Icons.listado()} CONTROLES DIARIOS
+          </div>
           <div class="grid gap-6">
             ${d.ordeños.length > 0
               ? d.ordeños.slice(0, 10).map(o => `
-                  <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="--registro-color: ${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'}; display:flex; gap:10px; align-items:stretch;">
-                    <div class="flex-1 min-w-0 flex flex-col gap-8">
-                      <div class="flex items-center gap-10 min-w-0">
-                        <span class="text-xl" style="color:${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'};">${Icons.leche()}</span>
-                        <div class="font-bold text-white uppercase text-sm overflow-hidden text-ellipsis" style="white-space:nowrap;">${o.snap_identificacion || 'Control Lote/Animal'}</div>
+                  <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${o.id}, 'leche')" style="--registro-color: ${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'};">
+                    <div class="flex flex-col gap-10">
+                      <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-10 min-w-0">
+                          <span class="text-xl" style="color:${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-purple)'};">${Icons.leche()}</span>
+                          <div class="text-xs">
+                            <div class="font-bold text-white uppercase text-base tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap;">${o.snap_identificacion || 'Control Lote/Animal'}</div>
+                            <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(o.fecha)} · ${o.tipo_entidad === 'animal' ? 'INDIV.' : 'LOTE'}</div>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <span class="font-950" style="color:var(--c-info); font-size:0.95rem; white-space:nowrap;">${Number(o.valor_neto || 0).toLocaleString('es-ES')} L</span>
+                        </div>
                       </div>
-                      <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-                        <div class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(o.fecha)}</div>
-                        <div class="flex items-center gap-4" style="color:${o.tipo_entidad === 'animal' ? 'var(--c-info)' : 'var(--c-accent)'};">${o.tipo_entidad === 'animal' ? 'Individual' : 'Lote'}</div>
+                      <div class="text-right">
+                        <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--c-warning); text-transform: uppercase;">Ficha -></span>
                       </div>
-                    </div>
-                    <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
-                      <span class="font-950" style="color:var(--c-info); font-size:0.95rem; white-space:nowrap;">${Number(o.valor_neto || 0).toLocaleString('es-ES')} L</span>
-                      <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
                     </div>
                   </div>`).join('')
               : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin registros de ordeño</span></div>`
@@ -545,128 +569,128 @@ if (window.enableScrollShadows) {
 
     let html = `
       <div style="--theme-color: ${themeColor}; --neon-glow: ${themeColor}B0; --neon-inner: ${themeColor}40">
-        <!-- KPI Unificado de Rendimiento y Eficiencia -->
-        <div class="card-registro" style="--registro-color: ${themeColor};">
-          <div class="flex flex-col gap-10">
-            <!-- Encabezado -->
-            <div class="flex justify-between items-center w-full">
-              <div class="flex items-center gap-10 min-w-0">
-                <div class="text-xl" style="color:${themeColor};">${Icons.rotacion()}</div>
-                <div class="text-xs">
-                  <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${themeColor}; !important;">RENDIMIENTO Y EFICIENCIA HÍBRIDA</div>
-                  <div class="text-gray mt-2 font-700 uppercase">Modo Híbrido</div>
-                </div>
+
+        <!-- Aglutinadora Híbrido -->
+        <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+          <div class="flex justify-between items-start mb-10">
+            <div>
+              <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                ${Icons.rotacion()} RENDIMIENTO HÍBRIDO
+              </h2>
+              <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                CONSOLIDADO CARNE Y LECHE
               </div>
             </div>
-
-            <!-- Cuerpo - KPIs en formato .card-registro -->
-            <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-              <div class="flex items-center gap-4">
-                ${Icons.dinero()} Margen (MOFA) ${Math.round(d.mofaHibrido).toLocaleString()} €
-              </div>
-              <div class="flex items-center gap-4">
-                ${Icons.grafico()} Ratio MOFA/MOFO ${d.ratioMofaHibrido.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
-              </div>
-              <div class="flex items-center gap-4">
-                ${Icons.gastos()} Costes Alim. ${d.totalGastosAlim.toLocaleString()} €
-              </div>
-              <div class="flex items-center gap-4">
-                ${Icons.paquete()} L / Pesajes ${this._fmt(d.totalLitros)} L / ${d.pesajes.length}
-              </div>
-            </div>
-
-            <!-- Pie (opcional) -->
-            <div class="text-right">
-              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLES ➔</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PANEL DE ACCIONES -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
-          <div class="section-header-theme">ACCIONES DE REGISTRO</div>
-          <div class="grid grid-cols-3 gap-10">
-            <button class="widget-link-btn widget-link-btn--neon neon-orange" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
-              ${Icons.agregar()}
-              <span class="widget-link-label">Peso (kg)</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
-              ${Icons.agregar()}
-              <span class="widget-link-label">Ordeño (L)</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
-              ${Icons.sanidad()}
-              <span class="widget-link-label">Tratamiento</span>
+            <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+              ${Icons.flechaAbajo()}
             </button>
           </div>
-        </div>
 
-        <!-- True Hub: Highlight Carne & Leche Side-by-Side -->
-        <div class="grid grid-cols-2 gap-10 mb-14">
-          <div class="p-10 rounded bg-dark border border-222 border-top-3px border-top-3px-red">
-            <div class="text-xs font-bold text-red uppercase mb-6 flex items-center gap-6">${Icons.carne()} Carne: Líderes GMD</div>
-            <div class="grid gap-4 text-xs">
-              ${d.gmdList.slice(0, 3).map(g => `
-                <div class="flex justify-between">
-                  <span class="text-ccc">${g.crotal}</span>
-                  <strong class="text-green">+${g.gmd.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-                </div>`).join('') || '<div class="text-555">Sin datos.</div>'}
+          <!-- Card de RESUMEN -->
+          <div class="card card-total-3d card-resumen mb-20">
+            <div class="flex flex-col gap-6">
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.dinero()} MARGEN (MOFA)</span>
+                 <span class="text-white font-900" style="color: var(--c-success)">${Math.round(d.mofaHibrido).toLocaleString()} €</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.grafico()} RATIO MOFA/MOFO</span>
+                 <span class="text-white font-900">${d.ratioMofaHibrido.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.gastos()} COSTES ALIM.</span>
+                 <span class="text-white font-900" style="color: var(--c-danger)">${d.totalGastosAlim.toLocaleString()} €</span>
+              </div>
+              <div class="flex justify-between items-center px-4">
+                 <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.paquete()} REGISTROS</span>
+                 <span class="text-white font-900">${this._fmt(d.totalLitros)} L / ${d.pesajes.length} KG</span>
+              </div>
             </div>
           </div>
 
-          <div class="p-10 rounded bg-dark border border-222 border-top-3px border-top-3px-blue">
-            <div class="text-xs font-bold text-blue uppercase mb-6 flex items-center gap-6">${Icons.grafico()} Leche: Última analítica</div>
-            <div class="grid gap-4 text-xs">
-              ${d.entregasLeche.length > 0
-                ? (() => {
-                    const e = d.entregasLeche[0];
-                    const lab = e.laboratorio || {};
-                    const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
-                    return `
-                      <div class="flex justify-between">
-                        <span>Litros:</span>
-                        <strong>${(e.cantidad || 0).toLocaleString()} L</strong>
-                      </div>
-                      <div class="flex justify-between">
-                        <span>Grasa/Prot:</span>
-                        <strong>G ${lab.grasa != null ? lab.grasa.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'} / P ${lab.proteina != null ? lab.proteina.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '—'}</strong>
-                      </div>
-                      <div class="flex justify-between">
-                        <span>Calidad:</span>
-                        <strong style="color:${semaforo.color}">${semaforo.label.split(',')[0]}</strong>
-                      </div>
-                    `;
-                  })()
-                : '<div class="text-555">Sin analíticas.</div>'
-              }
+          <!-- PANEL DE ACCIONES -->
+          <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: ${themeColor}">
+            <div class="section-header-theme">ACCIONES DE REGISTRO</div>
+            <div class="grid grid-cols-3 gap-10">
+              <button class="widget-link-btn widget-link-btn--neon neon-orange" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+                ${Icons.agregar()}
+                <span class="widget-link-label">Peso (kg)</span>
+              </button>
+              <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+                ${Icons.agregar()}
+                <span class="widget-link-label">Ordeño (L)</span>
+              </button>
+              <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="ExplotacionView._abrirAsistenteSanitario('hibrido')">
+                ${Icons.sanidad()}
+                <span class="widget-link-label">Tratamiento</span>
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Historial Consolidado -->
-        <div class="card-registro p-14 mb-16 border-222" style="--registro-color: ${themeColor};">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-            ${Icons.documento()} Historial Consolidado Reciente
+          <!-- Side-by-Side Highlights -->
+          <div class="grid grid-cols-2 gap-10 mb-14">
+            <div class="p-10 rounded bg-dark border border-222 border-top-3px border-top-3px-red">
+              <div class="text-xs font-bold text-red uppercase mb-6 flex items-center gap-6">${Icons.carne()} Carne GMD</div>
+              <div class="grid gap-4 text-xs">
+                ${d.gmdList.slice(0, 3).map(g => `
+                  <div class="flex justify-between">
+                    <span class="text-ccc uppercase font-800" style="font-size:0.6rem;">${g.crotal}</span>
+                    <strong class="text-green">+${g.gmd.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                  </div>`).join('') || '<div class="text-555">Sin datos.</div>'}
+              </div>
+            </div>
+
+            <div class="p-10 rounded bg-dark border border-222 border-top-3px border-top-3px-blue">
+              <div class="text-xs font-bold text-blue uppercase mb-6 flex items-center gap-6">${Icons.leche()} Leche Anal.</div>
+              <div class="grid gap-4 text-xs">
+                ${d.entregasLeche.length > 0
+                  ? (() => {
+                      const e = d.entregasLeche[0];
+                      const lab = e.laboratorio || {};
+                      const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
+                      return `
+                        <div class="flex justify-between">
+                          <span>Litros:</span>
+                          <strong>${(e.cantidad || 0).toLocaleString()} L</strong>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Calidad:</span>
+                          <strong style="color:${semaforo.color}">${semaforo.label.split(',')[0]}</strong>
+                        </div>
+                      `;
+                    })()
+                  : '<div class="text-555">Sin analíticas.</div>'
+                }
+              </div>
+            </div>
           </div>
-          <div class="grid gap-8 mh-220">
+
+          <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+            ${Icons.listado()} HISTORIAL CONSOLIDADO
+          </div>
+          <div class="grid gap-8">
             ${d.proConsolidada.length > 0
               ? d.proConsolidada.slice(0, 12).map(e => {
                   const esPeso = e.unidad === 'kg';
-                  const color = esPeso ? 'var(--c-danger)' : 'var(--c-info)';
+                  const colorE = esPeso ? 'var(--c-danger)' : 'var(--c-info)';
                   return `
-                    <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${esPeso ? 'carne' : 'leche'}')" style="--registro-color: ${color}; display:flex; gap:10px; align-items:stretch;">
-                      <div class="flex-1 min-w-0 flex flex-col gap-8">
-                        <div class="flex items-center gap-10 min-w-0">
-                          <span class="text-xl" style="color:${color};">${esPeso ? Icons.carne() : Icons.leche()}</span>
-                          <div class="font-bold text-white uppercase">${e.snap_identificacion || 'Registro Mixto'}</div>
+                    <div class="card-registro" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${esPeso ? 'carne' : 'leche'}')" style="--registro-color: ${colorE};">
+                      <div class="flex flex-col gap-10">
+                        <div class="flex justify-between items-center w-full">
+                          <div class="flex items-center gap-10 min-w-0">
+                            <span class="text-xl" style="color:${colorE};">${esPeso ? Icons.carne() : Icons.leche()}</span>
+                            <div class="text-xs">
+                              <div class="font-bold text-white uppercase text-base tracking-tight">${e.snap_identificacion || 'Registro Mixto'}</div>
+                              <div class="text-gray mt-2 font-700 uppercase">${Icons.calendar()} ${this._fmtFecha(e.fecha)}</div>
+                            </div>
+                          </div>
+                          <div class="text-right">
+                            <span class="badge badge-sm font-bold" style="background:${colorE}10; color:${colorE}; border:1px solid ${colorE}30; font-size:0.75rem; white-space:nowrap;">${Number(e.valor_neto || 0).toLocaleString('es-ES')} ${e.unidad}</span>
+                          </div>
                         </div>
-                        <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-                          <div class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(e.fecha)}</div>
+                        <div class="text-right">
+                          <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--c-warning); text-transform: uppercase;">Ficha -></span>
                         </div>
-                      </div>
-                      <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
-                        <span class="badge badge-sm font-bold" style="background:${color}10; color:${color}; border:1px solid ${color}30; font-size:0.75rem; white-space:nowrap;">${Number(e.valor_neto || 0).toLocaleString('es-ES')} ${e.unidad}</span>
-                        <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
                       </div>
                     </div>`;
                 }).join('')

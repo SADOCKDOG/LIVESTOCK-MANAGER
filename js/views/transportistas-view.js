@@ -21,38 +21,60 @@ const TransportistasView = {
         const main = document.getElementById("app-content");
         const todos = await Transportistas.list().catch(() => []);
         const activos = todos.filter(t => t.activo !== false);
+        const themeColor = 'var(--c-pink)';
+        const capacidadTotal = todos.reduce((acc, t) => acc + (parseInt(t.capacidad_animales) || 0), 0);
+
         main.innerHTML = `
-            <div class="mb-14">
-              <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> LOGÍSTICA / TRANSPORTE
-              </div>
-              <div class="comer-mode-switch">
-                 <button class="comer-mode-btn ${this._currentFilter === 'todos' ? 'active' : ''}" style="--mode-color:#aaa; color: var(--mode-color);" data-tab="todos" onclick="TransportistasView._setFilter('todos')">Todos</button>
-                 <button class="comer-mode-btn ${this._currentFilter === 'activos' ? 'active' : ''}" style="--mode-color:var(--c-success); color: var(--mode-color);" data-tab="activos" onclick="TransportistasView._setFilter('activos')">Activos</button>
-                 <button class="comer-mode-btn ${this._currentFilter === 'inactivos' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" data-tab="inactivos" onclick="TransportistasView._setFilter('inactivos')">Inactivos</button>
-              </div>
-            </div>
-
-            <div class="max-w-600 mx-auto">
-                <div class="grid grid-cols-3 gap-6 mb-14">
-                    <div class="card-registro" style="--registro-color: var(--c-blue);"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
-                    <div class="card-registro" style="--registro-color: var(--c-green);"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
-                    <div class="card-registro" style="--registro-color: var(--c-amber);"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - actos.length}</div></div>
-                </div>
-                <!-- Transportistas recientes -->
-                <div class="mb-14">
-                  <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                    <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> TRANSPORTISTAS RECIENTES
+            <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+              <div class="flex justify-between items-start mb-10">
+                <div>
+                  <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                    ${Icons.transportistas()} LOGÍSTICA
+                  </h2>
+                  <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                    ${todos.length} REGISTROS · RESUMEN DE FLOTA
                   </div>
-                  <div id="trans-recientes"></div>
                 </div>
-                <div id="trans-list"></div>
+                <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+                  ${Icons.flechaAbajo()}
+                </button>
+              </div>
+
+              <!-- Card de RESUMEN -->
+              <div class="card card-total-3d card-resumen mb-20">
+                <div class="flex flex-col gap-6">
+                  <div class="flex justify-between items-center px-4">
+                     <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.transportistas()} TOTAL</span>
+                     <span class="text-white font-900" style="color: var(--c-info)">${todos.length}</span>
+                  </div>
+                  <div class="flex justify-between items-center px-4">
+                     <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+                     <span class="text-white font-900" style="color: var(--c-success)">${activos.length}</span>
+                  </div>
+                  <div class="flex justify-between items-center px-4">
+                     <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.animales()} CAPACIDAD FLOTA</span>
+                     <span class="text-white font-900" style="color: var(--c-warning)">${capacidadTotal} CAB.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filtros / Tabs -->
+              <div class="flex gap-8 mb-20 overflow-x-auto pb-4 no-scrollbar">
+                 <button class="badge badge-sm uppercase font-900 ${this._currentFilter === 'todos' ? 'active' : ''}" onclick="TransportistasView._setFilter('todos')">TODOS</button>
+                 <button class="badge badge-sm uppercase font-900 ${this._currentFilter === 'activos' ? 'active' : ''}" onclick="TransportistasView._setFilter('activos')">ACTIVOS</button>
+                 <button class="badge badge-sm uppercase font-900 ${this._currentFilter === 'inactivos' ? 'active' : ''}" onclick="TransportistasView._setFilter('inactivos')">INACTIVOS</button>
+              </div>
+
+              <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+                ${Icons.listado()} LISTADO DE TRANSPORTISTAS
+              </div>
+              <div id="trans-list"></div>
             </div>
 
-            <!-- Botón Flotante de Acción con viñeta -->
+            <!-- Botón Flotante de Acción -->
             <div class="fab-container" onclick="TransportistasView._abrirFormulario()">
                 <span class="fab-label">Nuevo Transportista</span>
-                <button class="fab-btn">${Icons.fabPlus()}</button>
+                <button class="fab-btn" style="--neon: ${themeColor}">${Icons.fabPlus()}</button>
             </div>
         `;
         await this._renderLista();
@@ -80,14 +102,14 @@ const TransportistasView = {
 
         container.innerHTML = transportistas.map(t => `
             <div class="card-registro" onclick="TransportistasView._verDetalle(${t.id})"
-                 style="--registro-color: ${t.activo ? 'var(--c-success)' : '#6b7280'}; padding:14px; margin:0; margin-bottom:10px;">
+                 style="--registro-color: ${t.activo ? 'var(--c-success)' : '#6b7280'};">
                 <div class="flex flex-col gap-10">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-10 min-w-0">
                             <div class="text-xl" style="color:${t.activo ? 'var(--c-success)' : '#6b7280'}">${Icons.transportistas()}</div>
                             <div class="text-xs">
-                                <div class="font-bold text-white uppercase text-base tracking-tight">${t.nombre}</div>
-                                <div class="text-gray mt-2 font-700 uppercase">
+                                <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${t.nombre}</div>
+                                <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
                                     ${[t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : '', t.matricula ? Icons.transportistas() + ' ' + t.matricula : ''].filter(Boolean).join(' · ')}
                                 </div>
                             </div>
@@ -99,16 +121,8 @@ const TransportistasView = {
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-end w-full">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase">
-                                <div class="flex items-center gap-4">${t.certificado_bienestar ? Icons.check() + ' Bienestar OK' : Icons.alerta() + ' Sin Certificado'}</div>
-                                ${t.condiciones_termoneutrales ? `<div class="flex items-center gap-4">${Icons.info()} Termoneutral</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></div>
-                        </div>
+                    <div class="text-right">
+                        <div style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></div>
                     </div>
                 </div>
             </div>

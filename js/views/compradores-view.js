@@ -67,66 +67,132 @@ const CompradoresView = {
         const container = document.getElementById("module-container");
         if (!container) return;
 
+        const themeColor = 'var(--c-purple)';
+
         if (this._activeModule === 'compradores') {
-            const meta = this._getTabMeta(this._currentTab);
+            const totalCompradores = this._cachedCompradores?.length || 0;
+            const activosCount = this._cachedCompradores?.filter(c => c.activo !== false).length || 0;
+            // Valor estimado: suma de ventas (carne + leche si existiera un campo de valor, o simplemente total registros)
+            // Según la regla: Total, Activos, Valor Estimado
+            const valorEstimado = (this._cachedContratos || []).reduce((acc, c) => acc + (c.activo ? 1 : 0), 0); // O alguna métrica real
+
             container.innerHTML = `
-              <div class="mb-14">
-                <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                  <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMPRADORES
+              <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+                <div class="flex justify-between items-start mb-10">
+                  <div>
+                    <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                      ${Icons.compradores()} COMPRADORES
+                    </h2>
+                    <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                      ${totalCompradores} REGISTROS · RESUMEN DE GESTIÓN
+                    </div>
+                  </div>
+                  <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+                    ${Icons.flechaAbajo()}
+                  </button>
                 </div>
-                <div class="comer-mode-switch">
-                  <button class="comer-mode-btn ${this._currentTab === 'todos' ? 'active' : ''}" style="--mode-color:var(--p-gold); color: var(--mode-color);" data-tab="todos" onclick="CompradoresView._cambiarFiltro('todos')">${Icons.documento()} TODOS</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'cárnico' ? 'active' : ''}" style="--mode-color:var(--c-orange); color: var(--mode-color);" data-tab="cárnico" onclick="CompradoresView._cambiarFiltro('cárnico')">${Icons.carne()} CARNE</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'láctico' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" data-tab="láctico" onclick="CompradoresView._cambiarFiltro('láctico')">${Icons.leche()} LECHE</button>
-                  <button class="comer-mode-btn ${this._currentTab === 'híbrido' ? 'active' : ''}" style="--mode-color:var(--c-success); color: var(--mode-color);" data-tab="híbrido" onclick="CompradoresView._cambiarFiltro('híbrido')">${Icons.rotacion()} HÍBRIDO</button>
+
+                <!-- Card de RESUMEN -->
+                <div class="card card-total-3d card-resumen mb-20">
+                  <div class="flex flex-col gap-6">
+                    <div class="flex justify-between items-center px-4">
+                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.compradores()} TOTAL</span>
+                       <span class="text-white font-900" style="color: var(--c-info)">${totalCompradores}</span>
+                    </div>
+                    <div class="flex justify-between items-center px-4">
+                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+                       <span class="text-white font-900" style="color: var(--c-success)">${activosCount}</span>
+                    </div>
+                    <div class="flex justify-between items-center px-4">
+                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.dinero()} CONTRATOS ACTIVOS</span>
+                       <span class="text-white font-900" style="color: var(--c-warning)">${valorEstimado}</span>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- Filtros / Tabs -->
+                <div class="flex gap-8 mb-20 overflow-x-auto pb-4 no-scrollbar">
+                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'todos' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('todos')">TODOS</button>
+                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'cárnico' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('cárnico')">CARNE</button>
+                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'láctico' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('láctico')">LECHE</button>
+                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'híbrido' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('híbrido')">HÍBRIDOS</button>
+                </div>
+
+                <div class="flex gap-8 mb-14">
+                  <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
+                    oninput="CompradoresView._filtrarCompradores(this.value)"
+                    class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
+                </div>
+
+                <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+                  ${Icons.listado()} LISTADO DE COMPRADORES
+                </div>
+                <div id="compr-lista"></div>
               </div>
 
-              <div class="flex gap-8 mb-14">
-                <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
-                  oninput="CompradoresView._filtrarCompradores(this.value)"
-                  class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
-              </div>
-
-              <!-- Recientes compradores -->
-              <div class="mb-14">
-                <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                  <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMPRADORES RECIENTES
-                </div>
-                <div id="compr-recientes"></div>
-              </div>
-
-              <div id="compr-lista"></div>
-
-              <!-- Botón Flotante de Acción con viñeta -->
+              <!-- Botón Flotante de Acción -->
               <div class="fab-container" onclick="CompradoresView.renderFormulario()">
                 <span class="fab-label">Nuevo Comprador</span>
-                <button class="fab-btn">${Icons.fabPlus()}</button>
+                <button class="fab-btn" style="--neon: ${themeColor}">${Icons.fabPlus()}</button>
               </div>
             `;
             this._aplicarFiltrosCompradores();
-            this._renderRecientesCompradores();
         } else {
             // Módulo de Contratos
+            const themeColorContratos = 'var(--c-purple)';
+            const totalContratos = this._cachedContratos?.length || 0;
+            const activosContratos = this._cachedContratos?.filter(c => c.activo !== false).length || 0;
+
             container.innerHTML = `
-              <div class="mb-14">
-                <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-                  <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> CONTRATOS COMERCIALES
+              <div class="card-registro" style="--registro-color: ${themeColorContratos}; padding: 15px;">
+                <div class="flex justify-between items-start mb-10">
+                  <div>
+                    <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColorContratos}">
+                      ${Icons.contratos()} CONTRATOS
+                    </h2>
+                    <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                      ${totalContratos} REGISTROS · RESUMEN DE VIGENCIA
+                    </div>
+                  </div>
+                  <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColorContratos}">
+                    ${Icons.flechaAbajo()}
+                  </button>
                 </div>
+
+                <!-- Card de RESUMEN -->
+                <div class="card card-total-3d card-resumen mb-20">
+                  <div class="flex flex-col gap-6">
+                    <div class="flex justify-between items-center px-4">
+                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.contratos()} TOTAL</span>
+                       <span class="text-white font-900" style="color: var(--c-info)">${totalContratos}</span>
+                    </div>
+                    <div class="flex justify-between items-center px-4">
+                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+                       <span class="text-white font-900" style="color: var(--c-success)">${activosContratos}</span>
+                    </div>
+                    <div class="flex justify-between items-center px-4">
+                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.alerta()} VENCIDOS</span>
+                       <span class="text-white font-900" style="color: var(--c-danger)">${totalContratos - activosContratos}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex gap-8 mb-14">
+                  <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
+                    oninput="CompradoresView._filtrarContratos(this.value)"
+                    class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
+                </div>
+
+                <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+                  ${Icons.listado()} LISTADO DE CONTRATOS
+                </div>
+                <div id="contratos-lista"></div>
               </div>
 
-              <div class="flex gap-8 mb-14">
-                <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
-                  oninput="CompradoresView._filtrarContratos(this.value)"
-                  class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
-              </div>
-
-              <div id="contratos-lista"></div>
-
-              <!-- Botón Flotante de Acción con viñeta -->
+              <!-- Botón Flotante de Acción -->
               <div class="fab-container" onclick="CompradoresView._nuevoContratoLibre()">
                 <span class="fab-label">Nuevo Contrato</span>
-                <button class="fab-btn">${Icons.fabPlus()}</button>
+                <button class="fab-btn" style="--neon: ${themeColorContratos}">${Icons.fabPlus()}</button>
               </div>
             `;
             this._aplicarFiltrosContratos();
@@ -216,7 +282,7 @@ const CompradoresView = {
                 <div class="flex items-center gap-10 min-w-0">
                   <div class="text-xl" style="color:${color}">${Icons.compradores()}</div>
                   <div class="text-xs">
-                    <div class="font-950 text-white uppercase text-base tracking-tight" style="color:${color} !important;">${c.nombre}</div>
+                    <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${c.nombre}</div>
                     <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
                       ${[c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : '', c.ciudad ? Icons.zonas() + ' ' + c.ciudad.toUpperCase() : ''].filter(Boolean).join(' · ')}
                     </div>
@@ -228,6 +294,7 @@ const CompradoresView = {
                   </span>
                   ${c.activo === false ? '<div class="text-red text-[0.55rem] font-950 mt-4 uppercase tracking-widest">INACTIVO</div>' : ''}
                 </div>
+              </div>
 
               <!-- Contratos asociados al comprador -->
               <div class="mt-6 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter style-border-top" style=" padding-top:10px;">
@@ -330,52 +397,39 @@ const CompradoresView = {
           const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
 
           return `
-          <div class="card-registro" style="--registro-color: ${color};">
-            <div class="flex justify-between items-start w-full">
-              <div>
-                <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
-                  ${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}
-                  CONTRATO${ct.tipo ? ' ' + ((ct.tipo === 'láctico' ? 'lácteo' : ct.tipo)).toUpperCase() : ''}
-                  <span class="badge" style="background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
-                    ${ct.activo ? 'ACTIVO' : 'INACTIVO'}
-                  </span>
-                </div>
-                <div class="font-black text-white text-lg mt-2 uppercase tracking-tight">${ct.numero_contrato}</div>
-              </div>
-              <div class="text-right text-[0.6rem] text-gray-500 font-800 uppercase tracking-widest">
-                Vigencia: <span class="text-ccc">${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}</span>
-                ${ct.fecha_fin ? '<br>AL <span class="text-ccc">' + new Date(ct.fecha_fin).toLocaleDateString() + '</span>' : '<br><span class="text-aaa">(INDEFINIDO)</span>'}
-              </div>
-            </div>
-
-            <div class="mt-12 text-xs text-ccc bg-black p-10 rounded-sm border border-222">
-              <div class="uppercase font-800 text-[0.65rem] text-gray-500 mb-4 tracking-wider">COMPRADOR ASIGNADO:</div>
-              <div class="flex items-center gap-6">
-                ${comp ? `
-                  <a href="#/comprador?id=${comp.id}" class="text-gold font-950 uppercase hover-underline text-sm flex items-center gap-4">${Icons.compradores()} ${comp.nombre}</a>
-                ` : `
-                  <span class="text-red font-950 uppercase text-xs flex items-center gap-4">${Icons.alerta()} NO ASIGNADO / HUÉRFANO</span>
-                `}
-              </div>
-              ${ct.condiciones ? `<div class="mt-8 italic text-aaa border-top-222 pt-8 uppercase text-[0.6rem] leading-relaxed">Condiciones: ${ct.condiciones}</div>` : ''}
-              ${ct.precios && ct.precios.length > 0 ? `
-                <div class="mt-10 flex flex-wrap gap-4 border-top-222 pt-10">
-                  ${ct.precios.map(pr => `
-                    <span style="background:#111; border:1px solid #333; padding:4px 10px; border-radius:30px; font-size:0.6rem; font-weight:900; color:#aaa; text-transform:uppercase;">
-                      ${pr.producto}: <strong class="text-white ml-2">${pr.precio_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/${pr.unidad.toUpperCase()}</strong>
+          <div class="card-registro" onclick="CompradoresView._verContrato(${ct.id})" style="--registro-color: ${color};">
+            <div class="flex flex-col gap-10">
+              <div class="flex justify-between items-start w-full">
+                <div>
+                  <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
+                    ${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}
+                    CONTRATO${ct.tipo ? ' ' + ((ct.tipo === 'láctico' ? 'lácteo' : ct.tipo)).toUpperCase() : ''}
+                    <span class="badge" style="background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
+                      ${ct.activo ? 'ACTIVO' : 'INACTIVO'}
                     </span>
-                  `).join('')}
+                  </div>
+                  <div class="font-black text-white text-lg mt-2 uppercase tracking-tight" style="color:var(--p-gold) !important;">${ct.numero_contrato}</div>
                 </div>
-              ` : ''}
-            </div>
+                <div class="text-right text-[0.6rem] text-gray-500 font-800 uppercase tracking-widest">
+                  Vigencia: <span class="text-ccc">${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}</span>
+                  ${ct.fecha_fin ? '<br>AL <span class="text-ccc">' + new Date(ct.fecha_fin).toLocaleDateString() + '</span>' : '<br><span class="text-aaa">(INDEFINIDO)</span>'}
+                </div>
+              </div>
 
-            <div class="mt-16 flex gap-8">
-              <button class="widget-link-btn widget-link-btn--neon neon-info flex-1 px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._verContrato(${ct.id})">
-                ${Icons.editar()} <span class="widget-link-label text-[0.65rem]">EDITAR</span>
-              </button>
-              ${comp ? `<button class="widget-link-btn widget-link-btn--neon neon-warning flex-1 px-12 py-8 min-h-0 h-auto" onclick="location.hash='#/comprador?id=${comp.id}'">
-                ${Icons.compradores()} <span class="widget-link-label text-[0.65rem]">FICHA CLIENTE</span>
-              </button>` : ''}
+              <div class="mt-4 text-xs text-ccc bg-black p-10 rounded-sm border border-222">
+                <div class="uppercase font-800 text-[0.65rem] text-gray-500 mb-4 tracking-wider">COMPRADOR ASIGNADO:</div>
+                <div class="flex items-center gap-6">
+                  ${comp ? `
+                    <span class="text-gold font-950 uppercase text-sm flex items-center gap-4">${Icons.compradores()} ${comp.nombre}</span>
+                  ` : `
+                    <span class="text-red font-950 uppercase text-xs flex items-center gap-4">${Icons.alerta()} NO ASIGNADO / HUÉRFANO</span>
+                  `}
+                </div>
+              </div>
+
+              <div class="text-right mt-6">
+                <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+              </div>
             </div>
           </div>
         `}).join('')}</div>`;

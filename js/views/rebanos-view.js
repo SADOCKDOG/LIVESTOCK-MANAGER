@@ -5,55 +5,114 @@
  */
 
 const RebanosView = {
+  filter: 'todos',
+
   async render() {
     if (window.App) App.updateHeaderColor('rebanos');
     const main = document.getElementById("app-content");
     const rebanos = await Rebanos.list();
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
-    const totalRebanos = rebanos.length;
-    const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
-    let html = '';
 
-    if (rebanos.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-info);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="RebanosView._crearRebano()">${Icons.agregar()} Crear primer rebaño</button></div></div>`;
-    else {
-      // Barra de resumen de Rebaños
-      const carneCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn')).length;
-      const lecheCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct')).length;
-      const hibridoCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble')).length;
+    const themeColor = window.getModuleColor('/rebanos');
+
+    if (rebanos.length === 0) {
+      main.innerHTML = `<div class="empty-state"><div class="empty-state-icon" style="color:${themeColor};">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="RebanosView._crearRebano()">${Icons.agregar()} Crear primer rebaño</button></div></div>`;
+      return;
+    }
+
+    // Lógica de filtrado
+    let filtrados = rebanos;
+    if (this.filter === 'carne') {
+      filtrados = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn'));
+    } else if (this.filter === 'leche') {
+      filtrados = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct'));
+    } else if (this.filter === 'hibrido') {
+      filtrados = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble'));
+    } else if (this.filter === 'activos') {
+      filtrados = rebanos.filter(r => r.estado !== 'inactivo');
+    }
+
+    const carneCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn')).length;
+    const lecheCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct')).length;
+    const hibridoCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble')).length;
+    const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
+
+    let html = `
+      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+        <div class="flex justify-between items-start mb-10">
+          <div>
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+              ${Icons.rebanos()} REBAÑOS
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              ${rebanos.length} REGISTROS · RESUMEN DE CABECERA
+            </div>
+          </div>
+          <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+            ${Icons.chevronAbajo()}
+          </button>
+        </div>
+
+        <!-- Card de RESUMEN -->
+        <div class="card card-total-3d card-resumen mb-20">
+          <div class="resumen-body flex flex-col gap-6">
+            <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
+               <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.carne()} CARNE</span>
+               <strong class="text-xl font-950" style="color: var(--c-warning)">${carneCount}</strong>
+            </div>
+            <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
+               <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.leche()} LECHE</span>
+               <strong class="text-xl font-950" style="color: var(--c-info)">${lecheCount}</strong>
+            </div>
+            <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
+               <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.rotacion()} HÍBRIDOS</span>
+               <strong class="text-xl font-950" style="color: var(--c-purple)">${hibridoCount}</strong>
+            </div>
+            <div class="flex justify-between items-center px-4 py-8">
+               <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+               <strong class="text-xl font-950" style="color: var(--c-success)">${rebanosActivos}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros / Tabs integrados -->
+        <div class="flex gap-8 mb-20 overflow-x-auto pb-4 no-scrollbar border-bottom-222">
+           <button class="badge badge-sm uppercase font-900 ${this.filter === 'todos' ? 'active' : ''}" onclick="RebanosView.setFilter('todos')">TODOS</button>
+           <button class="badge badge-sm uppercase font-900 ${this.filter === 'carne' ? 'active' : ''}" onclick="RebanosView.setFilter('carne')">CARNE</button>
+           <button class="badge badge-sm uppercase font-900 ${this.filter === 'leche' ? 'active' : ''}" onclick="RebanosView.setFilter('leche')">LECHE</button>
+           <button class="badge badge-sm uppercase font-900 ${this.filter === 'hibrido' ? 'active' : ''}" onclick="RebanosView.setFilter('hibrido')">HÍBRIDOS</button>
+           <button class="badge badge-sm uppercase font-900 ${this.filter === 'activos' ? 'active' : ''}" onclick="RebanosView.setFilter('activos')">ACTIVOS</button>
+        </div>
+
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+          ${Icons.listado()} LISTADO DE REBAÑOS (${filtrados.length})
+        </div>
+
+        <div class="grid gap-15">`;
+
+    for (let r of filtrados) {
+      const animales = await Animales.list(r.id);
+      const n = animales.length;
+      const activos = animales.filter(a => a.estado === 'activo').length;
+      const eventosReb = eventos.filter(e => e.entidad_id === r.id || (e.tipo_entidad === 'rebano' && e.snap_identificacion === r.nombre));
+      const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+      const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
+      const colorEstado = r.estado !== 'inactivo' ? 'var(--c-success)' : '#6b7280';
+      const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(r.especie) : colorEstado;
 
       html += `
-        <div class="flex flex-wrap gap-4 mb-10">
-          <span class="badge badge-sm badge-gold flex items-center gap-4 uppercase">${Icons.carne()} Carne: ${carneCount}</span>
-          <span class="badge badge-sm badge-blue flex items-center gap-4 uppercase">${Icons.leche()} Leche: ${lecheCount}</span>
-          <span class="badge badge-sm badge-purple flex items-center gap-4 uppercase">${Icons.rotacion()} Híbridos: ${hibridoCount}</span>
-          <span class="badge badge-sm badge-green flex items-center gap-4 uppercase">${Icons.check()} ${rebanosActivos} ${rebanosActivos === 1 ? 'activo' : 'activos'}</span>
-        </div>`;
-
-      html += `<div class="grid gap-15">`;
-      for (let r of rebanos) {
-        const animales = await Animales.list(r.id);
-        const n = animales.length;
-        const activos = animales.filter(a => a.estado === 'activo').length;
-        const eventosReb = eventos.filter(e => e.entidad_id === r.id || (e.tipo_entidad === 'rebano' && e.snap_identificacion === r.nombre));
-        const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
-        const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
-        const colorEstado = r.estado !== 'inactivo' ? 'var(--c-success)' : '#6b7280';
-        const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(r.especie) : colorEstado;
-
-        html += `
           <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${colorEspecie};">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
                 <div class="flex items-center gap-10 min-w-0">
                   <div class="text-xl" style="color:${colorEspecie}">${Icons.rebanos()}</div>
                   <div class="text-xs">
-                    <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${r.nombre}</div>
+                    <div class="font-bold uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${r.nombre}</div>
                     <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(r.especie || 'N/D').toUpperCase()}</span> · ${(r.tipo || 'Sin Tipo')}</div>
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} ${activos === 1 ? 'Activo' : 'Activos'}</span>
+                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35; font-size:0.55rem;">${activos} ${activos === 1 ? 'Activo' : 'Activos'}</span>
                 </div>
               </div>
 
@@ -62,25 +121,29 @@ const RebanosView = {
                   <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
                     <div class="flex items-center gap-4">${Icons.zonas()} ${r.zonaActual || "Finca General"}</div>
                     <div class="flex items-center gap-4">${Icons.animales()} ${n} Total</div>
-                    ${prodLeche > 0 ? `<div class="flex items-center gap-4 text-gold">${Icons.leche()} ${Math.round(prodLeche).toLocaleString('es-ES')} L</div>` : ''}
+                    ${prodLeche > 0 ? `<div class="flex items-center gap-4 text-gold" style="color: var(--p-gold) !important;">${Icons.leche()} ${Math.round(prodLeche).toLocaleString('es-ES')} L</div>` : ''}
                     ${ultimoEvento ? `<div class="flex items-center gap-4 text-aaa">${Icons.calendar()} ${new Date(ultimoEvento.fecha).toLocaleDateString()}</div>` : ''}
                   </div>
                 </div>
                 <div class="text-right">
-                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+                  <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
                 </div>
               </div>
             </div>
           </div>`;
-      }
-      html += `</div>`;
     }
-    html += `<!-- Botón Flotante de Acción con viñeta -->
+    html += `</div>
+      </div>
       <div class="fab-container" onclick="RebanosView._crearRebano()">
         <span class="fab-label">Nuevo Rebaño</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
     main.innerHTML = html;
+  },
+
+  setFilter(f) {
+    this.filter = f;
+    this.render();
   },
 
   async renderDetalle(params) {

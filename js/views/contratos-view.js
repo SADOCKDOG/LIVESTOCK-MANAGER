@@ -1,9 +1,124 @@
-/**
- * ContratosView - Livestock Manager Premium v4.2.0
- * Vista de contratos de compra: diseño Premium Neón con trazabilidad de precios.
- */
-
 const ContratosView = {
+    _searchQuery: '',
+
+    async render() {
+        const main = document.getElementById("app-content");
+        const themeColor = 'var(--c-purple)';
+        const contratos = await Contratos.list().catch(() => []);
+        const activos = contratos.filter(c => c.activo !== false);
+
+        main.innerHTML = `
+          <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+            <div class="flex justify-between items-start mb-10">
+              <div>
+                <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                  ${Icons.contratos()} CONTRATOS
+                </h2>
+                <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                  GESTIÓN COMERCIAL Y VIGENCIA
+                </div>
+              </div>
+              <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
+                ${Icons.flechaAbajo()}
+              </button>
+            </div>
+
+            <!-- Card de RESUMEN -->
+            <div class="card card-total-3d card-resumen mb-20">
+              <div class="flex flex-col gap-6">
+                <div class="flex justify-between items-center px-4">
+                   <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.contratos()} TOTAL</span>
+                   <span class="text-white font-900" style="color: var(--c-info)">${contratos.length}</span>
+                </div>
+                <div class="flex justify-between items-center px-4">
+                   <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+                   <span class="text-white font-900" style="color: var(--c-success)">${activos.length}</span>
+                </div>
+                <div class="flex justify-between items-center px-4">
+                   <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.alerta()} VENCIDOS</span>
+                   <span class="text-white font-900" style="color: var(--c-danger)">${contratos.length - activos.length}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-8 mb-14">
+              <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
+                oninput="ContratosView._filtrar(this.value)"
+                class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
+            </div>
+
+            <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+              ${Icons.listado()} LISTADO DE CONTRATOS
+            </div>
+            <div id="contratos-lista-standalone"></div>
+          </div>
+
+          <!-- Botón Flotante de Acción -->
+          <div class="fab-container" onclick="ContratosView.renderFormulario()">
+            <span class="fab-label">Nuevo Contrato</span>
+            <button class="fab-btn" style="--neon: ${themeColor}">${Icons.fabPlus()}</button>
+          </div>
+        `;
+
+        this._renderLista(contratos);
+    },
+
+    _filtrar(val) {
+        this._searchQuery = val;
+        Contratos.list().then(list => {
+            const q = val.toLowerCase();
+            const filtered = list.filter(c =>
+                (c.numero_contrato || '').toLowerCase().includes(q) ||
+                (c.condiciones || '').toLowerCase().includes(q)
+            );
+            this._renderLista(filtered);
+        });
+    },
+
+    async _renderLista(lista) {
+        const container = document.getElementById('contratos-lista-standalone');
+        if (!container) return;
+
+        if (lista.length === 0) {
+            container.innerHTML = `<div class="empty-state"><p class="empty-state-text">No hay contratos que coincidan</p></div>`;
+            return;
+        }
+
+        const compradores = await Compradores.list().catch(() => []);
+        const compMap = {};
+        compradores.forEach(c => compMap[c.id] = c);
+
+        container.innerHTML = `<div class="grid gap-12">${lista.map(c => {
+            const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-purple)');
+            const comp = compMap[c.compradorId];
+
+            return `
+            <div class="card-registro" onclick="ContratosView.renderFormulario({get: (k) => k === 'id' ? ${c.id} : null})" style="--registro-color: ${color};">
+                <div class="flex flex-col gap-10">
+                    <div class="flex justify-between items-start w-full">
+                        <div>
+                            <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
+                                ${c.tipo === 'leche' ? Icons.leche() : Icons.carne()}
+                                CONTRATO ${c.tipo.toUpperCase()}
+                            </div>
+                            <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${c.numero_contrato}</div>
+                            <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
+                                ${comp ? comp.nombre : 'SIN COMPRADOR'}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="badge badge-sm font-950 uppercase" style="background:${c.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${c.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${c.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'};">
+                                ${c.activo ? 'ACTIVO' : 'INACTIVO'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('')}</div>`;
+    },
 
     // ============================================
     // FORMULARIO DE CONTRATO (nuevo / editar)
