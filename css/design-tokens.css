@@ -11,13 +11,19 @@
     --p-gold: #FFD600;        /* Amarillo Neón */
     --p-gold-dark: #B89900;
 
-    /* ── BASE OLED ── */
-    --bg: #121212;            /* Carbon Black */
-    --surface: #1E1E1E;       /* Deep Grey */
-    --surface-light: #2A2A2A; /* Elevación */
-    --surface-input: #1a1a1a;
-    --border: #333333;        /* Border Grey */
-    --border-input: #333333;
+    /* ── BASE OLED (Grafito neutro frío — mejor contraste de datos neón) ── */
+    --bg: #141517;            /* Graphite */
+    --surface: #1E2023;       /* Deep Graphite */
+    --surface-light: #262A2E; /* Elevación */
+    --surface-input: #16181A;
+    --border: #2C2F33;        /* Border Graphite */
+    --border-input: #2C2F33;
+
+    /* ── FAMILIAS TIPOGRÁFICAS (identidad) ──
+       body Inter · títulos Archivo Expanded · datos/identificadores IBM Plex Mono */
+    --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Archivo Expanded', 'Archivo', 'Inter', sans-serif;
+    --font-mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', 'Fira Code', monospace;
 
     /* ── TEXTO ── */
     --text-p: #FFFFFF;        /* Pure White */

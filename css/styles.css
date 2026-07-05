@@ -10,7 +10,7 @@
 html { height: 100%; }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
     background-color: var(--bg);
     color: var(--text-p);
     margin: 0;
@@ -2498,6 +2498,22 @@ label {
 
 /* ── Sección h3 dentro de card ── */
 .section-h3 { font-size: 0.95rem; margin: 0 0 10px 0; }
+
+/* ══ CAPA TIPOGRÁFICA DE IDENTIDAD ══
+   Títulos de sección → Archivo Expanded (rótulo institucional).
+   Identificadores y medidas → IBM Plex Mono (chapa / báscula / formulario oficial).
+   Utilidades .display / .mono para adopción por-vista (barrido fino de crotales/kg/L/€). */
+.section-h3,
+.leche-report-title-main,
+.hibrido-report-title-main,
+.display { font-family: var(--font-display); letter-spacing: 0.01em; }
+
+.leche-kpi-value,
+.kpi-value,
+.card-resumen .resumen-body strong,
+.card-total-3d .resumen-body strong,
+#finca-badge.rega-badge-container,
+.mono { font-family: var(--font-mono); }
 
 /* ── Input de búsqueda ── */
 .search-input {
