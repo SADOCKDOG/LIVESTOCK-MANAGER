@@ -1,9 +1,7 @@
 /**
- * Livestock Manager - ExplotacionView v1.2.0
+ * Livestock Manager - ExplotacionView v1.3.0
  * Vista unificada del Módulo ExPro (Explotación y Producción)
- * Contiene tres modos seleccionables: Carne (Rojo), Leche (Azul), Híbrido (Verde)
  */
-
 const ExplotacionView = {
   _activeMode: 'leche',
   _activeSubModule: 'explotacion',
@@ -52,8 +50,6 @@ const ExplotacionView = {
       const rebanosCarne = window.ModoContextoHelper?.filterRebanosByMode(rebanos, 'carne') || [];
       const rebanosLeche = window.ModoContextoHelper?.filterRebanosByMode(rebanos, 'leche') || [];
       const rebanosHibrido = window.ModoContextoHelper?.filterRebanosByMode(rebanos, 'hibrido') || [];
-      const rebCarneIds = new Set(rebanosCarne.map(r => r.id));
-      const rebLecheIds = new Set(rebanosLeche.map(r => r.id));
 
       const pesajes = eventos.filter(e => e.unidad === 'kg' && (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano'));
       pesajes.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
@@ -69,7 +65,8 @@ const ExplotacionView = {
         finca, pesajes, ordeños, totalLitros, totalIngresosLeche, totalGastosAlim,
         animalesFinca: animales.filter(a => rebanos.map(r => r.id).includes(a.rebanoId)),
         rebanosLeche, rebanosCarne, rebanosHibrido,
-        mofaLeche: totalIngresosLeche - totalGastosAlim
+        mofaLeche: totalIngresosLeche - totalGastosAlim,
+        todosGastos: todosGastos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha))
       };
       this._cachedFincaId = fincaId;
       this._needsDataRefresh = false;
@@ -109,11 +106,10 @@ const ExplotacionView = {
       <div class="mb-14 px-4">
         <div class="expro-mode-switch">
           <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
-          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionMode._cambiarModo('leche')">${Icons.leche()} Leche</button>
+          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
         </div>
       </div>
       <div class="report-section px-4">
-        <!-- Card de RESUMEN Normalizada -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
             <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} Balance ${meta.label}</span>
@@ -136,9 +132,9 @@ const ExplotacionView = {
         </div>
         <div class="grid gap-10">
           ${(this._activeMode === 'leche' ? d.ordeños : d.pesajes).slice(0, 10).map(e => `
-            <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${meta.color};">
+            <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${meta.color};" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad}', ${e.entidad_id})">
               <div class="flex-1 min-w-0 flex flex-col justify-center">
-                <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${e.snap_identificacion || 'Registro'}</div>
+                <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Registro'}</div>
                 <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${this._fmtFecha(e.fecha)}</div>
               </div>
               <div class="flex flex-col items-end justify-between flex-shrink-0">
@@ -159,8 +155,55 @@ const ExplotacionView = {
   },
 
   _renderGastosView(container, d) {
-    // Basic Gastos layout within ExPro
-    container.innerHTML = `<div class="p-20 text-center text-gray uppercase font-900 text-xs">Módulo de Gastos Operativos</div>`;
+    const gastos = d.todosGastos || [];
+    container.innerHTML = `
+      <div class="report-section px-4">
+        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+            <span class="flex items-center gap-6" style="color: var(--c-danger)">${Icons.dinero()} Balance Gastos</span>
+            <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
+          </div>
+          <div class="resumen-body flex flex-col">
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Total Gastos</span>
+              <strong class="text-lg font-950" style="color: var(--c-danger);">${gastos.reduce((s, g) => s + (g.monto || 0), 0).toLocaleString()} €</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
+          ${Icons.documento()} HISTORIAL DE GASTOS
+        </div>
+        <div class="grid gap-10">
+          ${gastos.slice(0, 15).map(g => `
+            <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: var(--c-purple);" onclick="ExplotacionView._abrirOpcionesGasto(${g.id})">
+              <div class="flex-1 min-w-0 flex flex-col justify-center">
+                <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${g.concept || g.concepto || g.categoria}</div>
+                <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${this._fmtFecha(g.fecha)} · ${g.categoria}</div>
+              </div>
+              <div class="flex flex-col items-end justify-between flex-shrink-0">
+                <div style="background:var(--c-purple)15; color:var(--c-purple); border: 1px solid var(--c-purple)40; filter: drop-shadow(0 0 4px var(--c-purple)); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                  ${(g.monto || 0).toLocaleString()} €
+                </div>
+                <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  },
+
+  async _abrirOpcionesRegistro(eventId, entidadTipo, entidadId) {
+    if (entidadTipo === 'animal' && entidadId) {
+        location.hash = `#/animal?id=${entidadId}`;
+    } else if (entidadTipo === 'rebano' && entidadId) {
+        location.hash = `#/rebano?id=${entidadId}`;
+    } else {
+        App?.toast(`Visualizando registro #${eventId}`);
+    }
+  },
+
+  async _abrirOpcionesGasto(id) {
+    location.hash = `#/gasto?id=${id}`;
   }
 };
 
