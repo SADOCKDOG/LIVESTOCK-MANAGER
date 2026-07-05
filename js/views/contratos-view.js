@@ -92,29 +92,24 @@ const ContratosView = {
             const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-purple)');
             const comp = compMap[c.compradorId];
 
+            const estadoColor = c.activo ? 'var(--c-success)' : '#6b7280';
             return `
-            <div class="card-registro" onclick="ContratosView.renderFormulario({get: (k) => k === 'id' ? ${c.id} : null})" style="--registro-color: ${color};">
-                <div class="flex flex-col gap-10">
-                    <div class="flex justify-between items-start w-full">
-                        <div>
-                            <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
-                                ${c.tipo === 'leche' ? Icons.leche() : Icons.carne()}
-                                CONTRATO ${c.tipo.toUpperCase()}
-                            </div>
-                            <div class="font-950 text-gold uppercase text-base tracking-tight">${c.numero_contrato}</div>
-                            <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
-                                ${comp ? comp.nombre : 'SIN COMPRADOR'}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="badge badge-sm font-950 uppercase" style="background:${c.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${c.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${c.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'};">
-                                ${c.activo ? 'ACTIVO' : 'INACTIVO'}
-                            </span>
-                        </div>
+            <div class="card-registro" onclick="ContratosView.renderFormulario({get: (k) => k === 'id' ? ${c.id} : null})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+                <div class="flex-1 min-w-0 flex flex-col justify-center">
+                    <div class="flex items-center gap-10 min-w-0">
+                        <span class="text-xl" style="color:${color}">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()}</span>
+                        <div class="font-950 text-gold uppercase text-base tracking-tight">${c.numero_contrato}</div>
                     </div>
-                    <div class="text-right">
-                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+                    <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
+                        <span class="flex items-center gap-4" style="color:${color};">CONTRATO ${c.tipo.toUpperCase()}</span>
+                        <span class="flex items-center gap-4">${Icons.compradores()} ${comp ? comp.nombre : 'SIN COMPRADOR'}</span>
                     </div>
+                </div>
+                <div class="flex flex-col items-end justify-between flex-shrink-0">
+                    <div style="background:${estadoColor}15; color:${estadoColor}; border:1px solid ${estadoColor}40; filter: drop-shadow(0 0 4px ${estadoColor}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                        ${c.activo ? 'ACTIVO' : 'INACTIVO'}
+                    </div>
+                    <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
                 </div>
             </div>`;
         }).join('')}</div>`;

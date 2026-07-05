@@ -100,33 +100,29 @@ const TransportistasView = {
             return;
         }
 
-        container.innerHTML = transportistas.map(t => `
+        container.innerHTML = transportistas.map(t => {
+            const color = t.activo ? 'var(--c-success)' : '#6b7280';
+            return `
             <div class="card-registro" onclick="TransportistasView._verDetalle(${t.id})"
-                 style="--registro-color: ${t.activo ? 'var(--c-success)' : '#6b7280'};">
-                <div class="flex flex-col gap-10">
-                    <div class="flex justify-between items-center w-full">
-                        <div class="flex items-center gap-10 min-w-0">
-                            <div class="text-xl" style="color:${t.activo ? 'var(--c-success)' : '#6b7280'}">${Icons.transportistas()}</div>
-                            <div class="text-xs">
-                                <div class="font-950 text-gold uppercase text-base tracking-tight">${t.nombre}</div>
-                                <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
-                                    ${[t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : '', t.matricula ? Icons.transportistas() + ' ' + t.matricula : ''].filter(Boolean).join(' · ')}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="badge badge-sm uppercase" style="background:${t.activo ? 'color-mix(in srgb, var(--c-success) 8%, transparent)' : '#6b728015'}; color:${t.activo ? 'var(--c-success)' : '#9ca3af'}; border:1px solid ${t.activo ? 'color-mix(in srgb, var(--c-success) 21%, transparent)' : '#6b728035'};">
-                                ${t.activo ? 'Activo' : 'Inactivo'}
-                            </span>
-                        </div>
+                 style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+                <div class="flex-1 min-w-0 flex flex-col justify-center">
+                    <div class="flex items-center gap-10 min-w-0">
+                        <span class="text-xl" style="color:${color}">${Icons.transportistas()}</span>
+                        <div class="font-950 text-gold uppercase text-base tracking-tight">${t.nombre}</div>
                     </div>
-
-                    <div class="text-right">
-                        <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+                    <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
+                        ${t.nif_cif ? `<span class="flex items-center gap-4">${Icons.documento()} ${t.nif_cif}</span>` : ''}
+                        ${t.matricula ? `<span class="flex items-center gap-4">${Icons.transportistas()} ${t.matricula}</span>` : ''}
                     </div>
                 </div>
+                <div class="flex flex-col items-end justify-between flex-shrink-0">
+                    <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                        ${t.activo ? 'Activo' : 'Inactivo'}
+                    </div>
+                    <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
+                </div>
             </div>
-        `).join('');
+        `;}).join('');
 
         // Render recent transportistas
         this._renderRecientesTransportistas();
@@ -148,23 +144,22 @@ const TransportistasView = {
                 const color = t.activo ? 'var(--c-success)' : '#6b7280';
                 return `
                 <div class="card-registro" onclick="TransportistasView._verDetalle(${t.id})"
-                     style="--registro-color: ${color};">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-6">
-                                <span class="text-xl" style="color:${color}">${Icons.transportistas()}</span>
-                                <div class="font-bold text-white uppercase">${t.nombre}</div>
-                            </div>
-                            <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
-                                ${t.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${t.nif_cif}</span>` : ''}
-                                ${t.matricula ? `<span class="flex items-center gap-2">${Icons.transportistas()} ${t.matricula}</span>` : ''}
-                            </div>
+                     style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                        <div class="flex items-center gap-10 min-w-0">
+                            <span class="text-xl" style="color:${color}">${Icons.transportistas()}</span>
+                            <div class="font-950 text-gold uppercase text-base tracking-tight">${t.nombre}</div>
                         </div>
-                        <div class="flex flex-col items-end gap-3">
-                            <span class="badge badge-sm font-900" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
-                                #${t.id}
-                            </span>
+                        <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
+                            ${t.nif_cif ? `<span class="flex items-center gap-4">${Icons.documento()} ${t.nif_cif}</span>` : ''}
+                            ${t.matricula ? `<span class="flex items-center gap-4">${Icons.transportistas()} ${t.matricula}</span>` : ''}
                         </div>
+                    </div>
+                    <div class="flex flex-col items-end justify-between flex-shrink-0">
+                        <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                            ${t.activo ? 'Activo' : 'Inactivo'}
+                        </div>
+                        <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
                     </div>
                 </div>
                 `;

@@ -143,44 +143,34 @@ const AlbaranesVentasView = {
         const esBorrador = reg.estado === 'borrador';
 
         return `
-          <div class="card-registro" style="--registro-color: ${color};">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-800 text-xs" style="color:${color}; display:flex; align-items:center; gap:6px;">
-                  ${reg.tipo === 'leche' ? Icons.leche() : Icons.carne()}
-                  ${reg.tipo.toUpperCase()}
-                  <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${badgeColor}; color: ${badgeColor};
-                      background: ${badgeColor === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
-                                badgeColor === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
-                                badgeColor === 'var(--c-info)' ? 'rgba(204,255,0,0.1)' :  // fallback to same as warning for info
-                                'rgba(204,255,0,0.1)'};
-                      padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                      ${reg.estado}
-                  </span>
-                </div>
-                <div class="font-950 text-gold text-base mt-4 uppercase tracking-tight">${reg.titulo} (${reg.numero})</div>
-              </div>
-              <div class="text-xs text-ccc">${fecha}</div>
-            </div>
-            <div class="flex justify-between items-end w-full">
-              <div class="flex-1 min-w-0">
-                <div class="mt-8 grid grid-cols-2 gap-4 text-xs text-ccc uppercase font-800">
-                  <div>Comprador: <span class="text-white font-800">${reg.comprador}</span></div>
-                  <div>Importe: <span class="text-green font-950">${reg.importe.toFixed(2)} €</span></div>
-                  <div>Volumen: <span class="text-gold font-800">${reg.cantidad.toLocaleString()} ${reg.unidad}</span></div>
+          <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color};">
+            <div class="flex-1 min-w-0 flex flex-col gap-8">
+              <div class="flex items-center gap-10 min-w-0">
+                <span class="text-xl" style="color:${color}">${reg.tipo === 'leche' ? Icons.leche() : Icons.carne()}</span>
+                <div>
+                  <div class="font-800 text-xs" style="color:${color};">${reg.tipo.toUpperCase()}</div>
+                  <div class="font-950 text-gold text-base uppercase tracking-tight">${reg.titulo} (${reg.numero})</div>
                 </div>
               </div>
-              <div class="text-right">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+              <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase">
+                <span class="flex items-center gap-4">${Icons.calendar()} ${fecha}</span>
+                <span class="flex items-center gap-4">${Icons.compradores()} ${reg.comprador}</span>
+                <span class="flex items-center gap-4">${Icons.dinero()} <span class="text-green font-950">${reg.importe.toFixed(2)} €</span></span>
+                <span class="flex items-center gap-4"><span class="text-gold font-800">${reg.cantidad.toLocaleString()} ${reg.unidad}</span></span>
+              </div>
+              <div class="flex gap-6">
+                ${esBorrador ? `
+                  <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="event.stopPropagation(); AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">${Icons.editar()} Editar Borrador</button>
+                ` : `
+                  <button class="btn btn-sm btn-outline text-xs" onclick="event.stopPropagation(); AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id})">${Icons.exportar()} Imprimir Albarán</button>
+                `}
               </div>
             </div>
-            <div class="mt-10 flex gap-6">
-              ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">${Icons.editar()} Editar Borrador</button>
-              ` : `
-                <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id})">${Icons.exportar()} Imprimir Albarán</button>
-              `}
-              <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._verDetalle(${reg.id}, '${reg.tipo}')">${Icons.documento()} Ver Detalle</button>
+            <div class="flex flex-col items-end justify-between flex-shrink-0">
+              <div style="background:${badgeColor}15; color:${badgeColor}; border:1px solid ${badgeColor}40; filter: drop-shadow(0 0 4px ${badgeColor}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                ${reg.estado}
+              </div>
+              <span onclick="event.stopPropagation(); AlbaranesVentasView._verDetalle(${reg.id}, '${reg.tipo}')" style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase; cursor:pointer;">Ficha ${Icons.flechaDerecha()}</span>
             </div>
           </div>
         `;

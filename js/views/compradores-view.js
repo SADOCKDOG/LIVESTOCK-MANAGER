@@ -274,43 +274,38 @@ const CompradoresView = {
           const color = this._colorTipo(c.tipo_comprador);
           const cContratos = contratosPorComprador[c.id] || [];
 
+          const tipoLabel = (c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido';
           return `
           <div class="card-registro" onclick="CompradoresView.renderDetalle(${c.id})"
-            style="--registro-color: ${color};">
-            <div class="flex flex-col gap-10">
-              <div class="flex justify-between items-start w-full">
-                <div class="flex items-center gap-10 min-w-0">
-                  <div class="text-xl" style="color:${color}">${Icons.compradores()}</div>
-                  <div class="text-xs">
-                    <div class="font-950 text-gold uppercase text-base tracking-tight">${c.nombre}</div>
-                    <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
-                      ${[c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : '', c.ciudad ? Icons.zonas() + ' ' + c.ciudad.toUpperCase() : ''].filter(Boolean).join(' · ')}
-                    </div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span class="badge badge-sm font-900 uppercase" style="background:color-mix(in srgb, ${color} 12%, transparent); color:${color}; border:1px solid color-mix(in srgb, ${color} 25%, transparent);">
-                    ${(c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido'}
-                  </span>
-                  ${c.activo === false ? '<div class="text-red text-[0.55rem] font-950 mt-4 uppercase tracking-widest">INACTIVO</div>' : ''}
-                </div>
+            style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+            <div class="flex-1 min-w-0 flex flex-col gap-8 justify-center">
+              <div class="flex items-center gap-10 min-w-0">
+                <span class="text-xl" style="color:${color}">${Icons.compradores()}</span>
+                <div class="font-950 text-gold uppercase text-base tracking-tight">${c.nombre}</div>
               </div>
-
-              <!-- Contratos asociados al comprador -->
-              <div class="mt-6 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter style-border-top" style=" padding-top:10px;">
-                <span class="text-gray-600 font-900 mr-6">CONTRATOS VINCULADOS:</span>
+              <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase">
+                ${c.nif_cif ? `<span class="flex items-center gap-4">${Icons.documento()} ${c.nif_cif}</span>` : ''}
+                ${c.ciudad ? `<span class="flex items-center gap-4">${Icons.zonas()} ${c.ciudad.toUpperCase()}</span>` : ''}
+              </div>
+              <div class="text-[0.6rem] text-aaa font-800 uppercase tracking-tighter">
+                <span class="text-gray-600 font-900 mr-6">CONTRATOS:</span>
                 ${cContratos.length === 0 ? '<span class="text-gray-700 italic">SIN CONTRATOS ASIGNADOS</span>' :
                   cContratos.map(ct => `
-                    <span class="badge" style="margin-left:4px; font-size:0.6rem; background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; padding:2px 8px; border-radius:30px; font-weight:900;">
+                    <span class="badge" style="margin-left:4px; font-size:0.58rem; background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; padding:2px 8px; border-radius:30px; font-weight:900;">
                       ${ct.numero_contrato}
                     </span>
                   `).join('')
                 }
               </div>
-
-              <div class="text-right">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+            </div>
+            <div class="flex flex-col items-end justify-between flex-shrink-0">
+              <div class="flex flex-col items-end gap-3">
+                <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                  ${tipoLabel}
+                </div>
+                ${c.activo === false ? '<div class="text-red text-[0.55rem] font-950 uppercase tracking-widest">INACTIVO</div>' : ''}
               </div>
+              <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
             </div>
           </div>
         `}).join('')}</div>`;
@@ -330,25 +325,25 @@ const CompradoresView = {
 
         container.innerHTML = `<div class="grid gap-6">${recientes.map(c => {
             const color = this._colorTipo(c.tipo_comprador);
+            const tipoLabel = (c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido';
             return `
             <div class="card-registro" onclick="CompradoresView.renderDetalle(${c.id})"
-                 style="--registro-color: ${color};">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-6">
-                            <span class="text-xl" style="color:${color}">${Icons.compradores()}</span>
-                            <div class="font-bold text-white uppercase">${c.nombre}</div>
-                        </div>
-                        <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
-                            ${c.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${c.nif_cif}</span>` : ''}
-                            ${c.ciudad ? `<span class="flex items-center gap-2">${Icons.zonas()} ${c.ciudad.toUpperCase()}</span>` : ''}
-                        </div>
+                 style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+                <div class="flex-1 min-w-0 flex flex-col justify-center">
+                    <div class="flex items-center gap-10 min-w-0">
+                        <span class="text-xl" style="color:${color}">${Icons.compradores()}</span>
+                        <div class="font-950 text-gold uppercase text-base tracking-tight">${c.nombre}</div>
                     </div>
-                    <div class="flex flex-col items-end gap-3">
-                        <span class="badge badge-sm font-900" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
-                            #${c.id}
-                        </span>
+                    <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
+                        ${c.nif_cif ? `<span class="flex items-center gap-4">${Icons.documento()} ${c.nif_cif}</span>` : ''}
+                        ${c.ciudad ? `<span class="flex items-center gap-4">${Icons.zonas()} ${c.ciudad.toUpperCase()}</span>` : ''}
                     </div>
+                </div>
+                <div class="flex flex-col items-end justify-between flex-shrink-0">
+                    <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                        ${tipoLabel}
+                    </div>
+                    <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
                 </div>
             </div>
             `;
@@ -396,40 +391,27 @@ const CompradoresView = {
           const comp = compradorMap[ct.compradorId];
           const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
 
+          const estadoColor = ct.activo ? 'var(--c-success)' : '#6b7280';
           return `
-          <div class="card-registro" onclick="CompradoresView._verContrato(${ct.id})" style="--registro-color: ${color};">
-            <div class="flex flex-col gap-10">
-              <div class="flex justify-between items-start w-full">
-                <div>
-                  <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
-                    ${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}
-                    CONTRATO${ct.tipo ? ' ' + ((ct.tipo === 'láctico' ? 'lácteo' : ct.tipo)).toUpperCase() : ''}
-                    <span class="badge" style="background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
-                      ${ct.activo ? 'ACTIVO' : 'INACTIVO'}
-                    </span>
-                  </div>
-                  <div class="font-950 text-gold text-lg mt-2 uppercase tracking-tight">${ct.numero_contrato}</div>
-                </div>
-                <div class="text-right text-[0.6rem] text-gray-500 font-800 uppercase tracking-widest">
-                  Vigencia: <span class="text-ccc">${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}</span>
-                  ${ct.fecha_fin ? '<br>AL <span class="text-ccc">' + new Date(ct.fecha_fin).toLocaleDateString() + '</span>' : '<br><span class="text-aaa">(INDEFINIDO)</span>'}
-                </div>
+          <div class="card-registro" onclick="CompradoresView._verContrato(${ct.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+            <div class="flex-1 min-w-0 flex flex-col gap-8 justify-center">
+              <div class="flex items-center gap-10 min-w-0">
+                <span class="text-xl" style="color:${color}">${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}</span>
+                <div class="font-950 text-gold uppercase text-base tracking-tight">${ct.numero_contrato}</div>
               </div>
-
-              <div class="mt-4 text-xs text-ccc bg-black p-10 rounded-sm border border-222">
-                <div class="uppercase font-800 text-[0.65rem] text-gray-500 mb-4 tracking-wider">COMPRADOR ASIGNADO:</div>
-                <div class="flex items-center gap-6">
-                  ${comp ? `
-                    <span class="text-gold font-950 uppercase text-sm flex items-center gap-4">${Icons.compradores()} ${comp.nombre}</span>
-                  ` : `
-                    <span class="text-red font-950 uppercase text-xs flex items-center gap-4">${Icons.alerta()} NO ASIGNADO / HUÉRFANO</span>
-                  `}
-                </div>
+              <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase">
+                <span class="flex items-center gap-4" style="color:${color};">CONTRATO${ct.tipo ? ' ' + ((ct.tipo === 'láctico' ? 'lácteo' : ct.tipo)).toUpperCase() : ''}</span>
+                ${comp
+                  ? `<span class="flex items-center gap-4">${Icons.compradores()} ${comp.nombre}</span>`
+                  : `<span class="flex items-center gap-4 text-red">${Icons.alerta()} NO ASIGNADO</span>`}
+                <span class="flex items-center gap-4">${Icons.calendar()} ${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}${ct.fecha_fin ? ' → ' + new Date(ct.fecha_fin).toLocaleDateString() : ' → INDEFINIDO'}</span>
               </div>
-
-              <div class="text-right">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+            </div>
+            <div class="flex flex-col items-end justify-between flex-shrink-0">
+              <div style="background:${estadoColor}15; color:${estadoColor}; border:1px solid ${estadoColor}40; filter: drop-shadow(0 0 4px ${estadoColor}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                ${ct.activo ? 'ACTIVO' : 'INACTIVO'}
               </div>
+              <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
             </div>
           </div>
         `}).join('')}</div>`;
