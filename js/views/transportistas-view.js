@@ -37,7 +37,14 @@ const TransportistasView = {
                 <div class="grid grid-cols-3 gap-6 mb-14">
                     <div class="card-registro" style="--registro-color: var(--c-blue);"><small class="s-lbl">TOTAL</small><div class="inf-val-lg text-blue">${todos.length}</div></div>
                     <div class="card-registro" style="--registro-color: var(--c-green);"><small class="s-lbl">ACTIVOS</small><div class="inf-val-lg text-green">${activos.length}</div></div>
-                    <div class="card-registro" style="--registro-color: var(--c-amber);"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - activos.length}</div></div>
+                    <div class="card-registro" style="--registro-color: var(--c-amber);"><small class="s-lbl">INACTIVOS</small><div class="inf-val-lg text-amber">${todos.length - actos.length}</div></div>
+                </div>
+                <!-- Transportistas recientes -->
+                <div class="mb-14">
+                  <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+                    <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> TRANSPORTISTAS RECIENTES
+                  </div>
+                  <div id="trans-recientes"></div>
                 </div>
                 <div id="trans-list"></div>
             </div>
@@ -106,6 +113,52 @@ const TransportistasView = {
                 </div>
             </div>
         `).join('');
+
+        // Render recent transportistas
+        this._renderRecientesTransportistas();
+    },
+
+    _renderRecientesTransportistas() {
+        const container = document.getElementById('trans-recientes');
+        if (!container) return;
+        // Fetch all transportistas to get recent ones (could be optimized)
+        Transportistas.list().then(all => {
+            const recientes = all
+                .sort((a, b) => (b.id || 0) - (a.id || 0))
+                .slice(0, 5);
+            if (recientes.length === 0) {
+                container.innerHTML = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin transportistas recientes</span></div>`;
+                return;
+            }
+            container.innerHTML = `<div class="grid gap-6">${recientes.map(t => {
+                const color = t.activo ? 'var(--c-success)' : '#6b7280';
+                return `
+                <div class="card-registro" onclick="TransportistasView._verDetalle(${t.id})"
+                     style="--registro-color: ${color};">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-6">
+                                <span class="text-xl" style="color:${color}">${Icons.transportistas()}</span>
+                                <div class="font-bold text-white uppercase">${t.nombre}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
+                                ${t.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${t.nif_cif}</span>` : ''}
+                                ${t.matricula ? `<span class="flex items-center gap-2">${Icons.transportistas()} ${t.matricula}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-3">
+                            <span class="badge badge-sm font-900" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
+                                #${t.id}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('')}</div>`;
+        }).catch(err => {
+            console.error('Error loading recent transportistas:', err);
+            container.innerHTML = `<div class="p-14 text-center text-red">Error cargando recientes</div>`;
+        });
     },
 
     async _verDetalle(id) {
@@ -212,7 +265,7 @@ const TransportistasView = {
                 <div class="wizard-input-group">
                     <label class="wizard-label">REGISTRO DE TRANSPORTE</label>
                     <input type="text" id="tf-registro" value="${t?.registro_transporte || ''}" class="wizard-input" placeholder="Nº registro oficial...">
-                </div>
+                </div
                 <div class="wizard-input-group">
                     <label class="wizard-label">AUTORIZACIÓN TRANSPORTE GANADO (ATG) <span class="text-red">*</span></label>
                     <input type="text" id="tf-atg" value="${t?.autorizacion_transporte_ganado || ''}" class="wizard-input" placeholder="ATG-...">
@@ -228,34 +281,34 @@ const TransportistasView = {
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-12">
-                    <div class="wizard-input-group">
+                    <div class="wizard-input-group>
                         <label class="wizard-label">TELÉFONO</label>
                         <input type="tel" id="tf-telefono" value="${t?.telefono || ''}" class="wizard-input" placeholder="Teléfono...">
                     </div>
-                    <div class="wizard-input-group">
+                    <div class="wizard-input-group>
                         <label class="wizard-label">EMAIL</label>
                         <input type="email" id="tf-email" value="${t?.email || ''}" class="wizard-input" placeholder="Email...">
                     </div>
                 </div>
-                <div class="wizard-input-group">
+                <div class="wizard-input-group>
                     <label class="wizard-label">DIRECCIÓN</label>
                     <input type="text" id="tf-direccion" value="${t?.direccion || ''}" class="wizard-input" placeholder="Dirección...">
                 </div>
                 <div class="grid" style="grid-template-columns:2fr 1fr 1fr; gap:12px;">
-                    <div class="wizard-input-group">
+                    <div class="wizard-input-group>
                         <label class="wizard-label">CIUDAD</label>
                         <input type="text" id="tf-ciudad" value="${t?.ciudad || ''}" class="wizard-input" placeholder="Ciudad...">
                     </div>
-                    <div class="wizard-input-group">
+                    <div class="wizard-input-group>
                         <label class="wizard-label">C.POSTAL</label>
                         <input type="text" id="tf-cp" value="${t?.codigo_postal || ''}" class="wizard-input" placeholder="CP...">
                     </div>
-                    <div class="wizard-input-group">
+                    <div class="wizard-input-group>
                         <label class="wizard-label">PROVINCIA</label>
                         <input type="text" id="tf-provincia" value="${t?.provincia || ''}" class="wizard-input" placeholder="Prov...">
                     </div>
                 </div>
-                <div class="wizard-input-group">
+                <div class="wizard-input-group>
                     <label class="wizard-label">TIPO VEHÍCULO</label>
                     <select id="tf-tipo-vehiculo" class="wizard-input">
                         <option value="">Seleccionar...</option>
@@ -265,30 +318,30 @@ const TransportistasView = {
                         <option value="cisterna" ${t?.tipo_vehiculo === 'cisterna' ? 'selected' : ''}>Cisterna</option>
                     </select>
                 </div>
-                <div class="wizard-input-group">
+                <div class="wizard-input-group>
                     <label class="wizard-label">CAPACIDAD (animales)</label>
                     <input type="number" id="tf-capacidad" value="${t?.capacidad_animales || 0}" class="wizard-input" min="0">
                 </div>
-                <label class="wizard-checkbox-container mb-6">
+                <label class="wizard-checkbox-container mb-6>
                     <input type="checkbox" id="tf-bienestar" ${t?.certificado_bienestar ? 'checked' : ''}>
                     <span>Certificado de bienestar animal en transporte</span>
                 </label>
-                <label class="wizard-checkbox-container mb-6">
+                <label class="wizard-checkbox-container mb-6>
                     <input type="checkbox" id="tf-termoneutral" ${t?.condiciones_termoneutrales ? 'checked' : ''}>
                     <span>Vehículo con condiciones termoneutrales</span>
                 </label>
-                <label class="wizard-checkbox-container mb-12">
+                <label class="wizard-checkbox-container mb-12>
                     <input type="checkbox" id="tf-activo" ${t?.activo !== false ? 'checked' : ''}>
                     <span>Activo</span>
                 </label>
-                <div class="wizard-input-group">
+                <div class="wizard-input-group>
                     <label class="wizard-label">NOTAS</label>
                     <textarea id="tf-notas" class="wizard-input" style="min-height:50px; resize:none;" placeholder="Observaciones...">${t?.notas || ''}</textarea>
                 </div>
 
-                <div class="flex justify-between items-center mt-20">
+                <div class="flex justify-between items-center mt-20>
                     ${isEdit ? `<button onclick="TransportistasView._eliminar(${t.id}); this.closest('.wizard-full-screen').remove();" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
-                    <div class="flex gap-10">
+                    <div class="flex gap-10>
                         <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} Cancelar</button>
                         <button class="btn btn-success" id="btn-save-trans">${Icons.guardar()} Guardar</button>
                     </div>
@@ -351,7 +404,3 @@ const TransportistasView = {
 };
 
 window.TransportistasView = TransportistasView;
-
-
-
-

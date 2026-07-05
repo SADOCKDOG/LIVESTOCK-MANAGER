@@ -87,8 +87,48 @@ const ProveedoresView = {
         const contenedor = document.getElementById('prov-lista');
         if (!contenedor) return;
 
+        // Recientes proveedores
+        const recientes = (this._cachedData || [])
+            .sort((a, b) => (b.id || 0) - (a.id || 0))
+            .slice(0, 5);
+
+        let recientesHtml = '';
+        if (recientes.length === 0) {
+            recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin proveedores recientes</span></div>`;
+        } else {
+            recientesHtml = `
+              <div class="mb-14">
+                <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+                  <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> PROVEEDORES RECIENTES
+                </div>
+                <div class="grid gap-6">${recientes.map(p => `
+                  <div class="card-registro" onclick="ProveedoresView.renderDetalle(${p.id})"
+                       style="--registro-color: var(--c-purple);">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-6">
+                          <span class="text-xl" style="color:var(--c-purple)">${Icons.proveedores()}</span>
+                          <div class="font-bold text-white uppercase">${p.nombre}</div>
+                        </div>
+                        <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
+                          ${p.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${p.nif_cif}</span>` : ''}
+                          ${p.ciudad ? `<span class="flex items-center gap-2">${Icons.zonas()} ${p.ciudad.toUpperCase()}</span>` : ''}
+                        </div>
+                      </div>
+                      <div class="flex flex-col items-end gap-3">
+                        <span class="badge badge-sm font-900" style="background:var(--c-purple)15; color:var(--c-purple); border:1px solid var(--c-purple)30;">
+                          #${p.id}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}</div>
+              </div>
+            `;
+        }
+
         if (lista.length === 0) {
-            contenedor.innerHTML = `
+            contenedor.innerHTML = recientesHtml + `
               <div class="empty-state border border-222">
                 <div class="empty-state-icon" style="color:#555;">${Icons.proveedores()}</div>
                 <p class="empty-state-text uppercase font-900 text-xs">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
@@ -100,7 +140,7 @@ const ProveedoresView = {
             return;
         }
 
-        contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => `
+        contenedor.innerHTML = recientesHtml + `<div class="grid gap-6">${lista.map(p => `
           <div class="card-registro" onclick="ProveedoresView.renderDetalle(${p.id})"
             style="--registro-color: var(--c-purple); width:100%;">
             <div class="flex justify-between items-start gap-6" style="width:100%;">
@@ -318,7 +358,7 @@ const ProveedoresView = {
               <div class="wizard-input-group">
                 <label class="wizard-label">CIUDAD</label>
                 <input type="text" id="p-ciudad" value="${p.ciudad || ''}" class="wizard-input uppercase font-800">
-              </div>
+              </div
               <div class="wizard-input-group">
                 <label class="wizard-label">PROVINCIA</label>
                 <input type="text" id="p-prov" value="${p.provincia || ''}" class="wizard-input uppercase font-800">
@@ -427,7 +467,3 @@ const ProveedoresView = {
 };
 
 window.ProveedoresView = ProveedoresView;
-
-
-
-
