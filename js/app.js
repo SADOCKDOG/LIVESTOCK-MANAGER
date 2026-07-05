@@ -26,6 +26,7 @@ const App = {
     "/albaran-leche": "renderDetalleLeche",
     "/venta-carne": "renderDetalleVentaCarne",
     "/gasto": "renderDetalleGasto",
+    "/sanitario": "renderDetalleSanitario",
     "/informes": "renderInformes",
     "/alertas": "renderAlertas",
     "/ajustes": "renderAjustes",
@@ -1742,19 +1743,28 @@ const App = {
     }
   },
 
-  async renderDetalleGasto(params) {
+  async renderDetalleSanitario(params) {
     const id = params.get("id");
-    const g = await window.db.get("gastos_ganaderia", parseInt(id));
+    const s = await window.db.get("sanitarios_ganado", parseInt(id));
+    if (!s) return this.toastError("Registro sanitario no encontrado");
     document.getElementById("app-content").innerHTML = `
-            <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="text-gold" class="no-underline">← Volver</a><h2>Ficha de Gasto</h2></div>
-            <div class="card border-top-4-blue">
-                <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
-                <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
-                <div class="flex gap-10 mt-25">
-                    <button class="btn btn-primary flex-2 btn--blue" onclick="App._guardarEdicionGasto(${id})">${Icons.guardar()} GUARDAR</button>
-                    <button class="btn btn-secondary flex-1 btn--dark-red" onclick="App._eliminarGasto(${id})">${Icons.eliminar()} BORRAR</button>
-                </div>
-            </div>`;
+      <div class="mb-20 px-4">
+        <button onclick="window.history.back()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+        </button>
+        <h2 class="mt-15">${Icons.sanidad()} Detalle Tratamiento</h2>
+      </div>
+      <div class="report-section px-4">
+        <div class="card-registro" style="--registro-color: var(--c-purple);">
+          <div class="font-950 text-gold uppercase text-lg mb-10">${s.medicamento || 'Tratamiento'}</div>
+          <div class="grid grid-cols-2 gap-10 text-xs text-gray uppercase font-800">
+            <div>Fecha: <strong class="text-white">${new Date(s.fecha).toLocaleDateString()}</strong></div>
+            <div>Tipo: <strong class="text-white">${s.tipo_tratamiento || 'N/D'}</strong></div>
+            <div>Espera Carne: <strong class="text-white">${s.tiempo_espera_carne_dias || 0} D</strong></div>
+            <div>Espera Leche: <strong class="text-white">${s.tiempo_espera_leche_dias || 0} D</strong></div>
+          </div>
+        </div>
+      </div>`;
   },
 
   async _guardarEdicionGasto(id) {

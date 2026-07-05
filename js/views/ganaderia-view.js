@@ -125,7 +125,7 @@ const GanaderiaView = {
               const icon = e.tipo_entidad === 'animal' ? (this._activeMode === 'carne' ? Icons.carne() : Icons.leche()) : Icons.rebanos();
               const color = this._activeMode === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
               return `
-                <div class="card-registro" onclick="GanaderiaView._abrirOpcionesRegistro(${e.id}, '${this._activeMode}')"
+                <div class="card-registro" onclick="GanaderiaView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad}', ${e.entidad_id})"
                      style="--registro-color: ${color}; display:flex; gap:10px; align-items:stretch;">
                   <div class="flex-1 min-w-0 flex flex-col justify-center">
                     <div class="flex items-center gap-10 min-w-0">
@@ -138,7 +138,7 @@ const GanaderiaView = {
                   </div>
                   <div class="flex flex-col items-end justify-between flex-shrink-0">
                     <div style="background:${color}15; color:${color}; border: 1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-                      ${e.valor_neto} ${e.unidad === 'kg' ? 'kg' : 'L'}
+                      ${e.valor_neto} ${e.unit || e.unidad || ''}
                     </div>
                     <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
                   </div>
@@ -176,11 +176,17 @@ const GanaderiaView = {
     this.render();
   },
 
-  _abrirOpcionesRegistro(id, tipo) {
-    if (window.ExplotacionView && typeof window.ExplotacionView._abrirOpcionesRegistro === 'function') {
-      window.ExplotacionView._abrirOpcionesRegistro(id, tipo);
+  _abrirOpcionesRegistro(eventId, entidadTipo, entidadId) {
+    if (entidadTipo === 'animal' && entidadId) {
+        location.hash = `#/animal?id=${entidadId}`;
+    } else if (entidadTipo === 'rebano' && entidadId) {
+        location.hash = `#/rebano?id=${entidadId}`;
     } else {
-      App?.toast(`Visualizando registro #${id}`);
+        if (window.ExplotacionView && typeof window.ExplotacionView._abrirOpcionesRegistro === 'function') {
+            window.ExplotacionView._abrirOpcionesRegistro(eventId, this._activeMode);
+        } else {
+            App?.toast(`Visualizando registro #${eventId}`);
+        }
     }
   },
 };
