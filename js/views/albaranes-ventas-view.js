@@ -158,14 +158,21 @@ const AlbaranesVentasView = {
                       ${reg.estado}
                   </span>
                 </div>
-                <div class="font-900 text-white text-base mt-4">${reg.titulo} (${reg.numero})</div>
+                <div class="font-950 text-gold text-base mt-4 uppercase tracking-tight">${reg.titulo} (${reg.numero})</div>
               </div>
               <div class="text-xs text-ccc">${fecha}</div>
             </div>
-            <div class="mt-8 grid grid-cols-2 gap-4 text-xs text-ccc">
-              <div>Comprador: <span class="text-white font-800">${reg.comprador}</span></div>
-              <div>Importe: <span class="text-green font-950">${reg.importe.toFixed(2)} €</span></div>
-              <div>Volumen: <span class="text-gold font-800">${reg.cantidad.toLocaleString()} ${reg.unidad}</span></div>
+            <div class="flex justify-between items-end w-full">
+              <div class="flex-1 min-w-0">
+                <div class="mt-8 grid grid-cols-2 gap-4 text-xs text-ccc uppercase font-800">
+                  <div>Comprador: <span class="text-white font-800">${reg.comprador}</span></div>
+                  <div>Importe: <span class="text-green font-950">${reg.importe.toFixed(2)} €</span></div>
+                  <div>Volumen: <span class="text-gold font-800">${reg.cantidad.toLocaleString()} ${reg.unidad}</span></div>
+                </div>
+              </div>
+              <div class="text-right">
+                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+              </div>
             </div>
             <div class="mt-10 flex gap-6">
               ${esBorrador ? `

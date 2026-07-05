@@ -70,7 +70,7 @@ const ZonasView = {
         </div>
 
         <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-          ${Icons.listado()} LISTADO DE ZONAS
+          ${Icons.documento()} LISTADO DE ZONAS
         </div>
 
         <div class="grid gap-15">`;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * TrazabilidadView - Livestock Manager Premium v4.0
  * Panel de Trazabilidad 360°: Timeline completo del ciclo de vida de un animal.
  */

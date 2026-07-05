@@ -1,662 +1,131 @@
 /**
- * Livestock Manager - ComercializacionView v2.0.0
- * Vista de Comercialización unificada con tabs tipo ProduccionView/GastosView.
- * Carne / Leche / Gastos con KPIs, botón registrar, listados filtrados.
- * Copia espejo de js/views/comercializacion-view.js
+ * Livestock Manager - ComercializacionView v2.2.0
+ * Refactorizada bajo patrón "Aglutinadora" y Neon Branding.
  */
-
 const ComercializacionView = {
   _currentTab: 'leche',
   _cachedData: null,
-  _cachedFincaId: null,
-  _needsDataRefresh: false,
-  _loadingPromise: null,
-  _filters: {
-    dateFrom: '',
-    dateTo: '',
-    search: ''
-  },
-
-  async _ensureData(fincaId, force = false) {
-    if (!fincaId) {
-      this._cachedData = { ventas: [], entregas: [], gastosRecords: [], kpis: { carne: [], leche: [], gastos: [] } };
-      this._cachedFincaId = null;
-      this._needsDataRefresh = false;
-      return this._cachedData;
-    }
-
-    if (!force && !this._needsDataRefresh && this._cachedData && this._cachedFincaId === fincaId) {
-      return this._cachedData;
-    }
-
-    if (this._loadingPromise) {
-      await this._loadingPromise;
-      return this._cachedData;
-    }
-
-    this._loadingPromise = (async () => {
-      const [ventas, entregas, gastosRecords] = await Promise.all([
-        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
-        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-        Gastos.list(fincaId).catch(() => [])
-      ]);
-
-      ventas.sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0));
-      entregas.sort((a, b) => new Date(b.fechaRecogida || 0) - new Date(a.fechaRecogida || 0));
-      gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
-      const pesoTotal = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
-      const rendProm = ventas.length > 0 ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length : 0;
-      const ingresoTotal = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
-      const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
-      const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
-      const gastoTotal = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
-
-      this._cachedData = {
-        ventas,
-        entregas,
-        gastosRecords,
-        kpis: {
-          carne: [
-            { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
-            { label: 'Animales', value: ventas.length },
-            { label: 'Rend. Prom.', value: rendProm.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' },
-            { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
-          ],
-          leche: [
-            { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
-            { label: 'Entregas', value: entregas.length },
-            { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
-            { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
-          ],
-          gastos: [
-            { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
-            { label: 'Registros', value: gastosRecords.length },
-            { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
-          ]
-        }
-      };
-
-      this._cachedFincaId = fincaId;
-      this._needsDataRefresh = false;
-      return this._cachedData;
-    })();
-
-    try {
-      return await this._loadingPromise;
-    } finally {
-      this._loadingPromise = null;
-    }
-  },
-
-  invalidateCache() {
-    this._needsDataRefresh = true;
-  },
 
   async render(params) {
     const main = document.getElementById('app-content');
-    const tab = (params && params.get ? params.get("tab") : null) || this._currentTab;
+    const tab = (params?.get ? params.get("tab") : null) || this._currentTab;
     this._currentTab = tab;
 
     const fincaId = await Fincas.getActiveId();
-    if (!fincaId) {
-      main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">No hay ninguna finca seleccionada.</p></div>`;
-      return;
-    }
+    const [ventas, entregas, gastosRecords] = await Promise.all([
+      window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+      Gastos.list(fincaId).catch(() => [])
+    ]);
 
-    const data = await this._ensureData(fincaId, this._needsDataRefresh);
-
-    const ventas = data.ventas;
-    const entregas = data.entregas;
-    const gastosRecords = data.gastosRecords;
-    let pipelineInfo = null;
-    try {
-      pipelineInfo = JSON.parse(sessionStorage.getItem('lm.explotacion_pipeline') || 'null');
-    } catch (_) {
-      pipelineInfo = null;
-    }
-    if (pipelineInfo) {
-      const maxAgeMs = 5 * 60 * 1000; // 5 minutos
-      const createdAt = Date.parse(pipelineInfo.fecha || pipelineInfo.timestamp || '');
-      if (!createdAt || (Date.now() - createdAt) > maxAgeMs) {
-        pipelineInfo = null;
-      }
-      try { sessionStorage.removeItem('lm.explotacion_pipeline'); } catch (_) {}
-    }
-
-    const meta = this._getTabMeta(this._currentTab);
-
-    // Sincronizar color de cabecera con el tab activo
-    if (window.App && App.updateHeaderColor) {
-      App.updateHeaderColor(this._currentTab === 'gastos' ? null : this._currentTab);
-    }
+    const kpis = this._calcKPIs(ventas, entregas, gastosRecords);
 
     main.innerHTML = `
-      <!-- Selector de Modo Comercial Superior -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMERCIALIZACIÓN
-        </div>
+      <div class="mb-14 px-4">
         <div class="comer-mode-switch">
-          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" data-tab="carne" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" data-tab="leche" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple); color: var(--mode-color);" data-tab="gastos" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:#FF4444;" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:#3b82f6;" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:#a855f7;" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
         </div>
       </div>
+      <div id="comer-content" class="px-4"></div>`;
 
-      ${pipelineInfo ? `
-      <div class="card-registro p-12 mb-14 border-222" style="--registro-color: var(--c-success); background: rgba(204,255,0,0.05);">
-        <div class="text-[0.65rem] text-gray uppercase font-extrabold tracking-wider">Flujo activo</div>
-        <div class="text-sm text-white mt-4 font-700">Procedente de <strong>Explotación (${(pipelineInfo.modo_explotacion || '').toUpperCase()})</strong>.</div>
-        <div class="text-[0.62rem] text-aaa mt-4">Fitosanitarios pendientes: <strong class="${(pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0) > 0 ? 'text-red' : 'text-green'}">${pipelineInfo.cumplimiento?.pendientesFitosanitarios || 0}</strong></div>
-      </div>` : ''}
-
-      <!-- KPIs dinámicos del Tab -->
-      <div class="explotacion-kpis mb-14">
-        ${this._renderKPIsTab()}
-      </div>
-
-      <div id="comer-content"><div class="loader">Cargando...</div></div>`;
-
+    this._cachedData = { ventas, entregas, gastosRecords, kpis };
     this._renderTabActual();
-  },
-
-  _getTabMeta(tab) {
-    const map = {
-      carne: { color: 'var(--c-danger)', label: 'Cárnico' },
-      leche: { color: 'var(--c-info)', label: 'Lácteo' },
-      gastos: { color: 'var(--c-purple)', label: 'Gastos' }
-    };
-    return map[tab] || map.carne;
-  },
-
-  _renderKPIsTab() {
-    const d = this._cachedData;
-    const tab = this._currentTab;
-    const kpis = d.kpis[tab] || [];
-    const meta = this._getTabMeta(tab);
-    const icons = {
-      'Peso Canal (kg)': Icons.balanza(),
-      'Animales': Icons.animales(),
-      'Rend. Prom.': Icons.grafico(),
-      'Ingreso Total': Icons.dinero(),
-      'Total Litros': Icons.leche(),
-      'Entregas': Icons.paquete(),
-      'Promedio': Icons.grafico(),
-      'MOFA Total': Icons.dinero(),
-      'Total (€)': Icons.dinero(),
-      'Registros': Icons.paquete(),
-      'Media/Registro': Icons.grafico(),
-    };
-    const valueColors = {
-      'Peso Canal (kg)': 'var(--c-warning)',
-      'Animales': 'var(--c-info)',
-      'Rend. Prom.': 'var(--c-success)',
-      'Ingreso Total': 'var(--c-success)',
-      'Total Litros': 'var(--c-info)',
-      'Entregas': 'var(--c-warning)',
-      'Promedio': 'var(--c-info)',
-      'MOFA Total': 'var(--c-success)',
-      'Total (€)': 'var(--c-danger)',
-      'Registros': 'var(--c-warning)',
-      'Media/Registro': 'var(--c-info)',
-    };
-
-    const headerIcons = { carne: Icons.carne(), leche: Icons.leche(), gastos: Icons.gastos() };
-    const headerLabels = { carne: 'Balance Cárnico', leche: 'Balance Lácteo', gastos: 'Resumen Gastos' };
-
-    return `
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: ${meta.color}; width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-          ${headerIcons[tab] || Icons.info()} ${headerLabels[tab] || 'Resumen'}
-        </div>
-        <div class="flex flex-col">
-          ${kpis.map(k => `
-            <div class="py-12 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
-              <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${icons[k.label] || Icons.info()} ${k.label}</span>
-              <strong class="text-xl font-950" style="color:${valueColors[k.label] || meta.color};">${k.value}</strong>
-            </div>
-          `).join('')}
-        </div>
-      </div>`;
-  },
-
-  _cambiarTab(tab) {
-    this._currentTab = tab;
-    this.render();
   },
 
   _renderTabActual() {
     const d = this._cachedData;
-    if (!d) return;
     const content = document.getElementById('comer-content');
-    if (!content) return;
-
-    switch (this._currentTab) {
-      case 'carne': this._renderCarne(content, d); break;
-      case 'leche': this._renderLeche(content, d); break;
-      case 'gastos': this._renderGastos(content, d); break;
-      default: this._renderCarne(content, d);
-    }
-  },
-
-  _renderSeccion(content, opts, recentItemsHtml = '') {
-    const { icon, title, color, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
-
-    const recordsHtml = records.length > 0
-      ? records.map(r => `
-        <div class="card-registro" onclick="${r.onclick || ''}" style="--registro-color: ${color}; padding:12px; margin-bottom:8px; width:100%;">
-          <div class="flex flex-col" style="width:100%;">
-            <div class="flex justify-between items-start gap-6 w-full">
-              <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap; flex:1; min-width:0;">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</span>
-              <span class="text-lg font-950 flex-shrink-0 ml-4" style="color:${color};">${r.value}</span>
-            </div>
-            <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight w-full">
-              <span class="flex items-center gap-3">${Icons.calendar()} ${r.date}</span>
-              ${r.zone ? `<span class="flex items-center gap-3">${Icons.zonas()} ${r.zone}</span>` : ''}
-              ${r.subvalue ? `<span class="flex items-center gap-3 text-aaa">${Icons.info()} ${r.subvalue}</span>` : ''}
-              ${r.meta ? `<span class="flex items-center gap-3 text-aaa">${Icons.documento()} ${r.meta}</span>` : ''}
-            </div>
-            ${r.badges ? `<div class="flex flex-wrap gap-3 mt-3 w-full">${r.badges}</div>` : ''}
-          </div>
-        </div>`).join('')
-      : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} ${emptyMsg}</span></div>`;
+    const meta = this._getTabMeta(this._currentTab);
 
     content.innerHTML = `
-      <div class="card-registro p-14 border-222">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
-          ${Icons.documento()} ${listName}
+      <div class="card-registro mb-10" style="--registro-color: ${meta.color};">
+        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
+          <div class="flex justify-between items-center mb-6">
+            <span class="text-xs text-white font-black uppercase tracking-wider flex items-center gap-6">${meta.icon} Balance ${meta.label}</span>
+            <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
+          </div>
+          <div class="resumen-body flex flex-col">
+            ${d.kpis[this._currentTab].map(k => `
+              <div class="py-10 border-bottom-222 flex justify-between items-center">
+                <span class="text-[0.65rem] text-gray uppercase font-900">${k.label}</span>
+                <strong class="text-lg font-950" style="color: ${k.color || '#fff'}">${k.value}</strong>
+              </div>`).join('')}
+          </div>
         </div>
-        ${recentItemsHtml}
-        <div class="grid">
-          ${recordsHtml}
+
+        <div class="flex gap-8 items-center mb-12">
+          <div class="relative flex-1 min-w-0">
+            <input type="search" placeholder="Filtrar historial..." oninput="ComercializacionView._filtrar(this.value)" class="search-input w-full">
+          </div>
         </div>
-      </div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="${registrarHandler}">
-        <span class="fab-label">${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
+
+        <div id="comer-lista" class="grid gap-10">
+          ${this._getRecordsHtml()}
+        </div>
       </div>`;
   },
 
-  // ===================== TAB CARNE =====================
+  _getRecordsHtml(filtro = '') {
+    const d = this._cachedData;
+    const f = filtro.toLowerCase();
+    if (this._currentTab === 'carne') {
+      return d.ventas.filter(v => (v.razonSocial || '').toLowerCase().includes(f)).slice(0, 20).map(v => this._cardRegistro({
+        icon: Icons.documento(), title: v.razonSocial || 'Matadero', color: '#FF4444', onClick: `App._abrirDetalleVentaCarne(${v.id})`,
+        metadata: `<span>${new Date(v.fechaSacrificio).toLocaleDateString()}</span>`,
+        badge: `<span class="text-gold font-950">${Math.round(v.importe_total || 0).toLocaleString()} €</span>`
+      })).join('');
+    } else if (this._currentTab === 'leche') {
+      return d.entregas.filter(e => (e.matriculaCisterna || '').toLowerCase().includes(f)).slice(0, 20).map(e => this._cardRegistro({
+        icon: Icons.leche(), title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`, color: '#3b82f6', onClick: `location.hash='/albaran-leche?id=${e.id}'`,
+        metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span>`,
+        badge: `<span class="text-gold font-950">${(e.cantidad || 0).toLocaleString()} L</span>`
+      })).join('');
+    } else {
+      return d.gastosRecords.filter(g => (g.concepto || '').toLowerCase().includes(f)).slice(0, 20).map(g => this._cardRegistro({
+        icon: Icons.gastos(), title: g.concepto || 'Gasto', color: '#a855f7', onClick: `ProduccionView._abrirOpcionesGasto(${g.id})`,
+        metadata: `<span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria}</span>`,
+        badge: `<span class="text-gold font-950">${(g.monto || 0).toLocaleString()} €</span>`
+      })).join('');
+    }
+  },
 
-  _renderCarne(content, d) {
-    const badgeHtml = (v) => {
-      let cls = (v.clasificacion?.seurop || "S/C").toUpperCase();
-      return `<span class="badge badge-red" style="font-size:0.62rem; border:1px solid rgba(255,68,68,0.2);">${cls}</span>`;
+  _filtrar(texto) {
+    const lista = document.getElementById('comer-lista');
+    if (lista) lista.innerHTML = this._getRecordsHtml(texto);
+  },
+
+  _getTabMeta(tab) {
+    const map = { carne: { color: '#FF4444', label: 'Cárnico', icon: Icons.carne() }, leche: { color: '#3b82f6', label: 'Lácteo', icon: Icons.leche() }, gastos: { color: '#a855f7', label: 'Gastos', icon: Icons.gastos() } };
+    return map[tab] || map.leche;
+  },
+
+  _calcKPIs(ventas, entregas, gastos) {
+    return {
+      carne: [{ label: 'Ingreso Total', value: ventas.reduce((s, v) => s + (v.importe_total || 0), 0).toLocaleString() + ' €', color: 'var(--c-success)' }, { label: 'Ventas', value: ventas.length }],
+      leche: [{ label: 'Total Litros', value: entregas.reduce((s, e) => s + (e.cantidad || 0), 0).toLocaleString() + ' L', color: 'var(--c-info)' }, { label: 'Facturación', value: Math.round(entregas.reduce((s, e) => s + (e.importe_total || 0), 0)).toLocaleString() + ' €', color: 'var(--c-success)' }],
+      gastos: [{ label: 'Gasto Total', value: gastos.reduce((s, g) => s + (g.monto || 0), 0).toLocaleString() + ' €', color: 'var(--c-danger)' }]
     };
+  },
 
-    // Recientes ventas de carne (5 más recientes por fecha de sacrificio)
-    const recientesVentas = [...d.ventas]
-      .sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0))
-      .slice(0, 5);
-    let recientesHtml = '';
-    if (recientesVentas.length === 0) {
-      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin ventas recientes</span></div>`;
-    } else {
-      recientesHtml = `
-        <div class="mb-14">
-          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> VENTAS RECIENTES
+  _cambiarTab(tab) { this._currentTab = tab; this.render(); },
+
+  _cardRegistro(opts) {
+    return `
+      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${opts.color}; cursor:pointer; padding:12px;">
+        <div class="flex-1 min-w-0 flex flex-col justify-center">
+          <div class="flex items-center gap-10 min-w-0">
+            <span class="text-xl" style="color:${opts.color};">${opts.icon}</span>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${opts.title}</div>
           </div>
-          <div class="grid gap-6">${recientesVentas.map(v => {
-            const badgeTramite = (v.estado_tramite || '').toString().trim()
-              ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">${Icons.edificio()} ${(v.estado_tramite || '').toUpperCase()}</span>`
-              : '';
-            return `
-              <div class="card-registro" onclick="App._abrirDetalleVentaCarne(${v.id})" style="--registro-color: var(--c-danger);">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-6">
-                      <span class="text-xl" style="color:var(--c-danger);">${Icons.carne()}</span>
-                      <div class="font-bold text-white uppercase">${v.razonSocial || 'Matadero Central'}</div>
-                    </div>
-                    <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
-                      ${v.fechaSacrificio ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(v.fechaSacrificio).toLocaleDateString()}</span>` : ''}
-                      ${v.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${v.snap_zona}</span>` : ''}
-                      <span class="flex items-center gap-4">Rend: ${v.rendimientoCanal || 0}%</span>
-                    </div>
-                  </div>
-                  <div class="flex flex-col items-end gap-3">
-                    <span class="badge badge-sm font-900" style="background:var(--c-danger)15; color:var(--c-danger); border:1px solid var(--c-danger)30;">
-                      #${v.id}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}</div>
-        </div>`;
-    }
-
-    this._renderSeccion(content, {
-      icon: Icons.carne(), title: 'Ventas de Carne', subtitle: 'Expediciones a matadero y venta directa',
-      color: 'var(--c-danger)',
-      registrarLabel: 'REGISTRAR VENTA',
-      listName: 'Lista de Ventas',
-      registrarHandler: "App._abrirWizardVentaMasiva()",
-      records: d.ventas.slice(0, 50).map(v => {
-        const estadoTramite = (v.estado_tramite || '').toString().trim();
-        const badgeTramite = estadoTramite
-          ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">${Icons.edificio()} ${estadoTramite.toUpperCase()}</span>`
-          : '';
-        return {
-          title: (v.razonSocial || 'Matadero Central'),
-          date: v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-',
-          zone: v.snap_zona || '',
-          value: (v.pesoCanal || 0).toLocaleString('es-ES') + ' kg',
-          subvalue: 'Rend: ' + (v.rendimientoCanal || 0) + '%',
-          badges: [badgeHtml(v), badgeTramite].filter(Boolean).join(' '),
-          onclick: "App._abrirDetalleVentaCarne(" + v.id + ")"
-        };
-      }),
-      emptyMsg: 'Sin ventas de carne registradas. Usa "Registrar Venta" para añadir una expedición.'
-    }, recientesHtml);
-  },
-
-  // ===================== TAB LECHE =====================
-
-  _renderLeche(content, d) {
-    // Recientes entregas de leche (5 más recientes por fecha de recogida)
-    const recientesEntregas = [...d.entregas]
-      .sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0))
-      .slice(0, 5);
-    let recientesHtml = '';
-    if (recientesEntregas.length === 0) {
-      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin entregas recientes</span></div>`;
-    } else {
-      recientesHtml = `
-        <div class="mb-14">
-          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> ENTREGAS RECIENTES
-          </div>
-          <div class="grid gap-6">${recientesEntregas.map(e => {
-            const esAlerta = e.estadoAnalitica === "Alerta Crítica" || e.antibioticos === true;
-            const lab = e.laboratorio || {};
-            const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '--');
-            const badges = window.CalidadLecheHelper ? window.CalidadLecheHelper.badgesCompletos(e) : '';
-            const extraBadges = [];
-            if (e.precio_final_unitario) {
-              extraBadges.push(window.CalidadLecheHelper.badgeParametro('Precio', e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' €/L', true, Icons.dinero()));
-            }
-            if (e.mofa != null) {
-              extraBadges.push(window.CalidadLecheHelper.badgeParametro('MOFA', Math.round(e.mofa) + ' €', e.mofa >= 0, Icons.grafico()));
-            }
-            if (e.comunidad_autonoma) {
-              const label = e.comunidad_autonoma === 'andalucia' ? 'AND' : 'EXT';
-              extraBadges.push(window.CalidadLecheHelper.badgeParametro('CCAA', label, true, Icons.zonas()));
-            }
-            if (e.estado_tramite_infolac) {
-              extraBadges.push(window.CalidadLecheHelper.badgeParametro('INFOLAC', String(e.estado_tramite_infolac).toUpperCase(), true, Icons.edificio()));
-            }
-            const allBadges = [badges, ...extraBadges].filter(Boolean).join('');
-
-            return `
-              <div class="card-registro" onclick="location.hash='/albaran-leche?id=${e.id}'"
-                   style="--registro-color: ${esAlerta ? 'var(--c-danger)' : (window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e).color : '#888')};">
-                <div class="leche-entrega-content">
-                  <div class="leche-entrega-left">
-                    <div class="text-white font-900 uppercase text-sm flex items-center gap-6">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — <span class="text-gold" style="font-size:1.1rem;">${(e.cantidad || 0).toLocaleString()}</span> <small class="text-aaa">L</small></div>
-                    <div class="text-[0.65rem] text-gray uppercase font-800 mt-2 tracking-widest">Cisterna: <span class="text-white">${e.matriculaCisterna || '—'}</span></div>
-                  </div>
-                  <div class="text-right">
-                    <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(255,68,68,0.2)' : 'rgba(204,255,0,0.15)'}; color:${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}; border: 1px solid color-mix(in srgb, ${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'} 25%, transparent);">${e.estadoAnalitica || 'PENDIENTE'}</span>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}</div>
-        </div>`;
-    }
-
-    this._renderSeccion(content, {
-      icon: Icons.leche(), title: 'Entregas de Leche', subtitle: 'Retiradas de tanque y albaranes',
-      color: 'var(--c-info)', // Azul Lácteo consistente
-      registrarLabel: 'REGISTRAR RETIRADA',
-      listName: 'Lista de Entregas',
-      registrarHandler: "App._abrirWizardAlbaranLeche()",
-      records: d.entregas.slice(0, 50).map(e => {
-        const esAlerta = e.estadoAnalitica === "Alerta Crítica" || e.antibioticos === true;
-        const lab = e.laboratorio || {};
-        const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '--');
-        const badges = window.CalidadLecheHelper ? window.CalidadLecheHelper.badgesCompletos(e) : '';
-
-        // Añadir precio final y MOFA como badges si existen
-        const extraBadges = [];
-        if (e.precio_final_unitario) {
-          extraBadges.push(window.CalidadLecheHelper.badgeParametro('Precio', e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' €/L', true, Icons.dinero()));
-        }
-        if (e.mofa != null) {
-          extraBadges.push(window.CalidadLecheHelper.badgeParametro('MOFA', Math.round(e.mofa) + ' €', e.mofa >= 0, Icons.grafico()));
-        }
-        if (e.comunidad_autonoma) {
-          const label = e.comunidad_autonoma === 'andalucia' ? 'AND' : 'EXT';
-          extraBadges.push(window.CalidadLecheHelper.badgeParametro('CCAA', label, true, Icons.zonas()));
-        }
-        if (e.estado_tramite_infolac) {
-          extraBadges.push(window.CalidadLecheHelper.badgeParametro('INFOLAC', String(e.estado_tramite_infolac).toUpperCase(), true, Icons.edificio()));
-        }
-        const allBadges = [badges, ...extraBadges].filter(Boolean).join('');
-
-        return {
-          title: 'Cisterna: ' + (e.matriculaCisterna || 'S/N'),
-          date: e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-',
-          zone: '',
-          value: (e.cantidad || 0).toLocaleString() + ' L',
-          subvalue: (e.temperatura != null ? e.temperatura.toLocaleString('es-ES') + ' °C' : '—') + (es !== '--' ? ' · ES: ' + es + '%' : ''),
-          badges: allBadges,
-          onclick: "location.hash='/albaran-leche?id=" + e.id + "'"
-        };
-      }),
-      emptyMsg: 'Sin entregas de leche registradas. Usa "Registrar Retirada" para añadir.'
-    }, recientesHtml);
-  },
-
-  // ===================== TAB GASTOS =====================
-
-  _renderGastos(content, d) {
-    // Recientes gastos (5 más recientes por fecha)
-    const recientesGastos = [...d.gastosRecords]
-      .sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0))
-      .slice(0, 5);
-    let recientesHtml = '';
-    if (recientesGastos.length === 0) {
-      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin gastos recientes</span></div>`;
-    } else {
-      recientesHtml = `
-        <div class="mb-14">
-          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GASTOS RECIENTES
-          </div>
-          <div class="grid gap-6">${recientesGastos.map(g => {
-            return `
-              <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})" style="--registro-color: var(--c-purple);">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-6">
-                      <span class="text-xl" style="color:var(--c-purple);">${Icons.gastos()}</span>
-                      <div class="font-bold text-white uppercase">${g.concepto || g.categoria || 'Gasto'</div>
-                    </div>
-                    <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
-                      ${g.fecha ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(g.fecha).toLocaleDateString()}</span>` : ''}
-                      ${g.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${g.snap_zona}</span>` : ''}
-                      <span class="flex items-center gap-4">${g.categoria || ''}</span>
-                    </div>
-                  </div>
-                  <div class="flex flex-col items-end gap-3">
-                    <span class="badge badge-sm font-900" style="background:var(--c-purple)15; color:var(--c-purple); border:1px solid var(--c-purple)30;">
-                      #${g.id}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}</div>
-        </div>`;
-    }
-
-    this._renderSeccion(content, {
-      icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
-      color: 'var(--c-purple)',
-      registrarLabel: 'REGISTRAR GASTO',
-      listName: 'Lista de Gastos',
-      registrarHandler: "App._abrirFormularioGasto()",
-      records: d.gastosRecords.slice(0, 50).map(g => ({
-        title: (g.concepto || g.categoria || 'Gasto'),
-        date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
-        zone: g.snap_zona || '',
-        meta: (g.categoria || ''),
-        value: (g.monto || 0).toLocaleString() + ' €',
-        onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
-      })),
-      emptyMsg: 'Sin gastos registrados. Usa "Registrar Gasto" para añadir.'
-    }, recientesHtml);
-  },
-
-  // ===================== ELIMINAR / EDITAR (desde app.js) =====================
-
-  async _eliminarVentaCarne(id) {
-    if (!await Confirm.confirm("Eliminar Registro de Venta", "¿Eliminar registro de venta? El animal volverá a estar ACTIVO.", true)) return;
-    try {
-      const v = await window.db.get("comercializacion_carne", id);
-      const a = await window.db.get("animales", v.animalId);
-      if (a) {
-        a.estado = "activo";
-        await Animales.save(a);
-      }
-      if (v?.movimientoId && window.Movimientos?.delete) {
-        await window.Movimientos.delete(v.movimientoId).catch(() => {});
-      }
-      await window.db.delete("comercializacion_carne", id);
-      App.toast("Venta eliminada.");
-      this._cachedData = null;
-      this.render(new Map([["tab", "carne"]]));
-    } catch (e) {
-      App.toastError(e.message);
-    }
-  },
-
-  async _eliminarGasto(id) {
-    if (!await Confirm.confirm("Eliminar Gasto", "¿Eliminar este registro de gasto?", true)) return;
-    try {
-      await Gastos.delete(id);
-      App.toast("Gasto eliminado.");
-      this._cachedData = null;
-      this.render(new Map([["tab", "gastos"]]));
-    } catch (e) {
-      App.toastError(e.message);
-    }
-  },
-
-  async _guardarEdicionLeche(id) {
-    try {
-      const e = await window.db.get("comercializacion_leche", id);
-      e.cantidad = parseFloat(document.getElementById("le-cant").value) || e.cantidad;
-      e.precioBase = parseFloat(document.getElementById("le-pb").value) || e.precioBase;
-      e.laboratorio = {
-        grasa: parseFloat(document.getElementById("le-grasa").value) || 0,
-        proteina: parseFloat(document.getElementById("le-prot").value) || 0,
-        somaticas: parseInt(document.getElementById("le-som").value) || 0,
-        germenes: parseInt(document.getElementById("le-ger").value) || 0,
-        antibioticos: document.getElementById("le-ant").value === "true",
-        extracto_seco: +((parseFloat(document.getElementById("le-grasa").value) || 0) + (parseFloat(document.getElementById("le-prot").value) || 0)).toFixed(2),
-      };
-      e.antibioticos = e.laboratorio.antibioticos;
-      e.estadoAnalitica = e.antibioticos ? "Alerta Crítica" : "Validado";
-
-      // Recalcular campos económicos derivados
-      const precioExtracto = e.precio_extracto_seco || 0.012;
-      const extractoSeco = e.laboratorio.extracto_seco || 0;
-      e.precio_final_unitario = +(e.precioBase + extractoSeco * precioExtracto + (e.primas_penalizaciones || 0)).toFixed(4);
-      e.importe_total = +(e.cantidad * e.precio_final_unitario).toFixed(2);
-      if (e.coste_alimentacion_periodo != null) {
-        e.mofa = +(e.importe_total - e.coste_alimentacion_periodo).toFixed(2);
-      }
-
-      await window.db.put("comercializacion_leche", e);
-      App.toast("Registro lácteo actualizado.");
-      this._cachedData = null;
-      this.render(new Map([["tab", "leche"]]));
-    } catch (e) {
-      App.toastError(e.message);
-    }
-  },
-
-  async _guardarEdicionGasto(id) {
-    try {
-      const g = await window.db.get("gastos_ganaderia", id);
-      g.concepto = document.getElementById("ge-con").value.trim();
-      g.monto = parseFloat(document.getElementById("ge-mon").value);
-      if (!g.concepto) return App.toastError("El concepto es obligatorio");
-      if (isNaN(g.monto) || g.monto <= 0) return App.toastError("El monto debe ser mayor a 0");
-      await Gastos.save(g);
-      App.toast("Gasto actualizado.");
-      this._cachedData = null;
-      this.render(new Map([["tab", "gastos"]]));
-    } catch (e) {
-      App.toastError(e.message);
-    }
-  },
-
-  // ===================== DETALLE LECHE (albaran) =====================
-
-  async renderDetalleLeche(params) {
-    const id = params.get("id");
-    const e = await window.db.get("comercializacion_leche", parseInt(id));
-    document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/comercializacion?tab=leche" class="link-back">← Volver</a><h2>${Icons.leche()} Analítica de Tanque</h2></div>
-      <div class="card-registro border-top-5-gold" style="--registro-color: var(--c-gold);">
-        <div class="grid grid-cols-2 gap-12">
-          <div><label>Volumen (L)</label><input type="number" id="le-cant" value="${e.cantidad}" class="premium-input"></div>
-          <div><label>Precio (€/L)</label><input type="number" id="le-pb" value="${e.precioBase}" class="premium-input"></div>
+          <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
         </div>
-        <div class="mt-20 grid grid-cols-2 gap-12">
-          <div><label>Materia Grasa (%)</label><input type="number" id="le-grasa" value="${e.laboratorio?.grasa || 0}" step="0.01" class="premium-input"></div>
-          <div><label>Proteína (%)</label><input type="number" id="le-prot" value="${e.laboratorio?.proteina || 0}" step="0.01" class="premium-input"></div>
-        </div>
-        <div class="mt-12 grid grid-cols-2 gap-12">
-          <div><label>Somáticas (cel/mL)</label><input type="number" id="le-som" value="${e.laboratorio?.somaticas || 0}" class="premium-input"></div>
-          <div><label>Gérmenes (UFC/mL)</label><input type="number" id="le-ger" value="${e.laboratorio?.germenes || 0}" class="premium-input"></div>
-        </div>
-        <div class="mt-20"><label>Control de Antibióticos</label><select id="le-ant" class="premium-input"><option value="false" ${!e.antibioticos ? "selected" : ""}>NEGATIVO (Apto)</option><option value="true" ${e.antibioticos ? "selected" : ""}>POSITIVO (Alerta Crítica)</option></select></div>
-        <div class="flex justify-end gap-10 mt-20">
-          <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=leche'">${Icons.cerrar()} Cancelar</button>
-          <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionLeche(${id})">${Icons.guardar()} Guardar</button>
+        <div class="flex flex-col items-end justify-between flex-shrink-0">
+          <div class="top-part">${opts.badge || ''}</div>
+          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
         </div>
       </div>`;
-  },
-
-  // ===================== DETALLE GASTO (edicion) =====================
-
-  async renderDetalleGasto(params) {
-    const id = params.get("id");
-    const g = await window.db.get("gastos_ganaderia", parseInt(id));
-    document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="link-back">← Volver</a><h2>${Icons.gastos()} Ficha de Gasto</h2></div>
-      <div class="card-registro border-top-4-blue" style="--registro-color: var(--c-info);">
-        <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
-        <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
-        <div class="flex justify-between items-center mt-20">
-          <button class="btn btn-danger" onclick="ComercializacionView._eliminarGasto(${id})">${Icons.eliminar()} Eliminar</button>
-          <div class="flex gap-10">
-            <button class="btn btn-secondary" onclick="location.hash='/comercializacion?tab=gastos'">${Icons.cerrar()} Cancelar</button>
-            <button class="btn btn-success" onclick="ComercializacionView._guardarEdicionGasto(${id})">${Icons.guardar()} Guardar</button>
-          </div>
-        </div>
-      </div>`;
-  },
-
-  _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
   }
 };
-
-if (window.EventBus) {
-  const dirty = () => ComercializacionView.invalidateCache();
-  ['venta:created', 'venta:deleted', 'leche:entrega', 'gasto:created', 'gasto:deleted', 'gasto:updated', 'data:imported'].forEach(evt => {
-    EventBus.on(evt, dirty);
-  });
-}
-
 window.ComercializacionView = ComercializacionView;

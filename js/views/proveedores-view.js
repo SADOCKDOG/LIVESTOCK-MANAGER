@@ -26,8 +26,8 @@ const ProveedoresView = {
                   RESUMEN DE GESTIÓN Y LISTADO
                 </div>
               </div>
-              <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: ${themeColor}">
-                ${Icons.flechaAbajo()}
+              <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+                ${Icons.chevronAbajo()}
               </button>
             </div>
 
@@ -43,7 +43,7 @@ const ProveedoresView = {
             </div>
 
             <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-              ${Icons.listado()} LISTADO DE PROVEEDORES
+              ${Icons.documento()} LISTADO DE PROVEEDORES
             </div>
             <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
           </div>
@@ -69,18 +69,18 @@ const ProveedoresView = {
         if (kpisEl) {
             kpisEl.innerHTML = `
               <div class="card card-total-3d card-resumen mb-20">
-                <div class="flex flex-col gap-6">
-                  <div class="flex justify-between items-center px-4">
+                <div class="resumen-body flex flex-col gap-6">
+                  <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                      <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.proveedores()} TOTAL</span>
-                     <span class="text-white font-900" style="color: var(--c-info)">${proveedores.length}</span>
+                     <strong class="text-xl font-950" style="color: var(--c-info)">${proveedores.length}</strong>
                   </div>
-                  <div class="flex justify-between items-center px-4">
+                  <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                      <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
-                     <span class="text-white font-900" style="color: var(--c-success)">${activosCount}</span>
+                     <strong class="text-xl font-950" style="color: var(--c-success)">${activosCount}</strong>
                   </div>
-                  <div class="flex justify-between items-center px-4">
+                  <div class="flex justify-between items-center px-4 py-8">
                      <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.dinero()} GASTO ASIGNADO</span>
-                     <span class="text-white font-900" style="color: var(--c-warning)">${totalGasto.toLocaleString()} €</span>
+                     <strong class="text-xl font-950" style="color: var(--c-warning)">${totalGasto.toLocaleString()} €</strong>
                   </div>
                 </div>
               </div>`;
@@ -153,7 +153,7 @@ const ProveedoresView = {
                 <div class="flex items-center gap-10 min-w-0">
                   <div class="text-xl" style="color:var(--c-purple)">${Icons.proveedores()}</div>
                   <div class="text-xs">
-                    <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${p.nombre}</div>
+                    <div class="font-950 text-gold uppercase text-base tracking-tight">${p.nombre}</div>
                     <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
                       ${[p.nif_cif ? Icons.documento() + ' ' + p.nif_cif : '', p.ciudad ? Icons.zonas() + ' ' + p.ciudad.toUpperCase() : ''].filter(Boolean).join(' · ')}
                     </div>
@@ -164,7 +164,7 @@ const ProveedoresView = {
                 </div>
               </div>
               <div class="text-right">
-                <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
               </div>
             </div>
           </div>
@@ -196,7 +196,7 @@ const ProveedoresView = {
           <div class="card-registro" style="--registro-color: var(--c-success);">
             <div class="flex justify-between items-start mb-16">
               <div>
-                <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
+                <h2 class="text-gold mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
                 <div class="mt-4">
                   ${proveedor.activo === false
                     ? '<span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, var(--c-danger) 12%, transparent); color:var(--c-danger); border:1px solid color-mix(in srgb, var(--c-danger) 25%, transparent);">INACTIVO</span>'
