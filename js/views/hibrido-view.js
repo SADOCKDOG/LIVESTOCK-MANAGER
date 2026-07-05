@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - HibridoView v2.2.0
+ * Livestock Manager - HibridoView v2.3.0
  * Consola Híbrida/Mixta refactorizada bajo patrón "Aglutinadora"
  */
 const HibridoView = {
@@ -19,9 +19,10 @@ const HibridoView = {
     const fincaId = await Fincas?.getActiveId();
     const finca = await Fincas?.getActive();
 
-    const [rebanos, animales, ventasCarne, entregasLeche, sanitariosGanado, todosGastos] = await Promise.all([
+    const [rebanos, animales, eventos, ventasCarne, entregasLeche, sanitariosGanado, todosGastos] = await Promise.all([
       window.db?.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
       window.db?.getAll('animales').catch(() => []),
+      window.db?.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
       window.db?.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
       window.db?.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
       window.db?.getAll('sanitarios_ganado').catch(() => []),
@@ -116,23 +117,34 @@ const HibridoView = {
     const d = this._cachedData;
     const f = filtro.toLowerCase();
     if (this._currentTab === 'patrimonio') {
-      return d.rebanos.filter(r => (r.nombre || '').toLowerCase().includes(f)).map(r => this._cardRegistro({
-        icon: Icons.rebanos(), title: r.nombre, color: 'var(--c-warning)', onClick: `location.hash='/rebano?id=${r.id}'`,
-        metadata: `<span>${r.tipo}</span><span>·</span><span>${r.especie}</span>`
-      })).join('');
+      return d.rebanos.filter(r => (r.nombre || '').toLowerCase().includes(f)).map(r => {
+        const activosCount = d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length;
+        return this._cardRegistro({
+          icon: Icons.rebanos(), title: r.nombre, color: 'var(--c-warning)', onClick: `location.hash='/rebano?id=${r.id}'`,
+          metadata: `<span>${r.tipo}</span><span>·</span><span>${r.especie}</span>`,
+          badge: `${activosCount} cab.`
+        });
+      }).join('');
     } else if (this._currentTab === 'comercializacion') {
       const list = [...d.ventasCarne.map(v => ({ ...v, t: 'carne' })), ...d.entregasLeche.map(e => ({ ...e, t: 'leche' }))];
       list.sort((a, b) => new Date(b.fecha || b.fechaSacrificio || 0) - new Date(a.fecha || a.fechaSacrificio || 0));
-      return list.filter(i => (i.razonSocial || 'Entrega').toLowerCase().includes(f)).slice(0, 15).map(i => this._cardRegistro({
-        icon: i.t === 'carne' ? Icons.carne() : Icons.leche(), title: i.razonSocial || 'Entrega Mixta', color: i.t === 'carne' ? 'var(--c-danger)' : 'var(--c-info)', onClick: i.t === 'carne' ? `App._abrirDetalleVentaCarne(${i.id})` : `location.hash='/albaran-leche?id=${i.id}'`,
-        metadata: `<span>${this._fmtFecha(i.fecha || i.fechaSacrificio)}</span>`,
-        badge: `<span class="text-gold font-950">${Math.round(i.importe_total || 0).toLocaleString()} €</span>`
-      })).join('');
+      return list.filter(i => (i.razonSocial || 'Entrega').toLowerCase().includes(f)).slice(0, 15).map(i => {
+        const iColor = i.t === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
+        return this._cardRegistro({
+          icon: i.t === 'carne' ? Icons.carne() : Icons.leche(), title: i.razonSocial || 'Entrega Mixta', color: iColor, onClick: i.t === 'carne' ? `App._abrirDetalleVentaCarne(${i.id})` : `location.hash='/albaran-leche?id=${i.id}'`,
+          metadata: `<span>${this._fmtFecha(i.fecha || i.fechaSacrificio)}</span>`,
+          badge: `${Math.round(i.importe_total || 0).toLocaleString()} €`
+        });
+      }).join('');
     } else {
-      return d.sanitariosFinca.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => this._cardRegistro({
-        icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
-        metadata: `<span>${this._fmtFecha(s.fecha)}</span>`
-      })).join('');
+      return d.sanitariosFinca.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => {
+        const enSup = (s.tiempo_espera_carne_dias || 0) > 0 || (s.tiempo_espera_leche_dias || 0) > 0;
+        return this._cardRegistro({
+          icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: enSup ? 'var(--c-danger)' : 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
+          metadata: `<span>${this._fmtFecha(s.fecha)}</span>`,
+          badge: enSup ? 'SUPRESIÓN' : 'LIBRE'
+        });
+      }).join('');
     }
   },
 
@@ -142,18 +154,28 @@ const HibridoView = {
   },
 
   _cardRegistro(opts) {
+    const color = opts.color || 'var(--c-info)';
     return `
-      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${opts.color}; cursor:pointer;">
+      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${opts.color};">${opts.icon}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${opts.title}</div>
+            <span class="text-xl" style="color:${color};">${opts.icon}</span>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${opts.title}</div>
           </div>
           <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
         </div>
         <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">${opts.badge || ''}</div>
-          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
+          <div class="top-part">
+            ${opts.badge ? `
+              <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${opts.badge}
+              </div>` : ''}
+          </div>
+          <div class="bottom-part">
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+              Ficha ${Icons.flechaDerecha()}
+            </span>
+          </div>
         </div>
       </div>`;
   }

@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - ProduccionView v3.3.0
+ * Livestock Manager - ProduccionView v3.4.0
  * Vista de Producción refactorizada bajo patrón "Aglutinadora"
  */
 const ProduccionView = {
@@ -9,13 +9,12 @@ const ProduccionView = {
   async render() {
     const main = document.getElementById("app-content");
     const fincaId = await Fincas.getActiveId();
-    const [eventos, lecheEntregas] = await Promise.all([
-      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
-      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => [])
+    const [eventos] = await Promise.all([
+      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => [])
     ]);
 
-    const carneEvents = eventos.filter(e => e?.unidad === 'kg');
-    const lecheEvents = eventos.filter(e => e?.unidad?.match(/L|Litros/));
+    const carneEvents = eventos.filter(e => e?.unidad === 'kg' && !e?.anulado);
+    const lecheEvents = eventos.filter(e => e?.unidad?.match(/L|Litros/) && !e?.anulado);
 
     main.innerHTML = `
       <div class="mb-14 px-4">
@@ -83,15 +82,23 @@ const ProduccionView = {
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-10 min-w-0">
             <span class="text-xl" style="color:${color};">${isCarne ? Icons.carne() : Icons.leche()}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${e.snap_identificacion || 'Control'}</div>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Control'}</div>
           </div>
           <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
             <span>${new Date(e.fecha).toLocaleDateString()}</span><span>·</span><span>${e.snap_zona || 'Finca'}</span>
           </div>
         </div>
         <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part"><span class="badge badge-sm font-950" style="background:${color}20; color:${color}; border:1px solid ${color}40;">${(e.valor_neto || 0).toLocaleString()} ${isCarne ? 'kg' : 'L'}</span></div>
-          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
+          <div class="top-part">
+             <div style="background:${color}15; color:${color}; border: 1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${(e.valor_neto || 0).toLocaleString()} ${isCarne ? 'kg' : 'L'}
+             </div>
+          </div>
+          <div class="bottom-part">
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+              Ficha ${Icons.flechaDerecha()}
+            </span>
+          </div>
         </div>
       </div>`).join('');
   },

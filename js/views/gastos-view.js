@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - GastosView v2.2.0
+ * Livestock Manager - GastosView v2.3.0
  * Vista de Gastos refactorizada bajo patrón "Aglutinadora"
  */
 const GastosView = {
@@ -62,22 +62,33 @@ const GastosView = {
 
   _getRecordsHtml(records, filtro = '') {
     const f = filtro.toLowerCase();
-    return records.filter(g => (g.concepto || '').toLowerCase().includes(f)).slice(0, 30).map(g => `
-      <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: var(--c-purple); cursor:pointer;">
+    return records.filter(g => (g.concepto || '').toLowerCase().includes(f)).slice(0, 30).map(g => {
+        const color = 'var(--c-purple)';
+        return `
+      <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:var(--c-purple);">${Icons.gastos()}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${g.concepto || g.categoria}</div>
+            <span class="text-xl" style="color:${color};">${Icons.gastos()}</span>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${g.concepto || g.categoria}</div>
           </div>
           <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
             <span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria}</span>
           </div>
         </div>
         <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part"><span class="text-gold font-950">${(g.monto || 0).toLocaleString()} €</span></div>
-          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
+          <div class="top-part">
+             <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${(g.monto || 0).toLocaleString()} €
+             </div>
+          </div>
+          <div class="bottom-part">
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+              Ficha ${Icons.flechaDerecha()}
+            </span>
+          </div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   },
 
   _filtrar(texto) {

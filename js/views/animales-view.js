@@ -154,10 +154,13 @@ const AnimalesView = {
             ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
           </div>
         </div>
-        <!-- Columna derecha: estado arriba (compacto), acción abajo (texto plano) -->
-        <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
-          <span style="font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.3px; border:1px solid ${colorEstado}; color:${colorEstado}; background:${bgEstado}; padding:3px 8px; border-radius:6px; white-space:nowrap;">${a.estado || 'activo'}</span>
-          <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
+        <div class="flex flex-col items-end justify-between flex-shrink-0">
+          <div style="background:${bgEstado}; color:${colorEstado}; border:1px solid ${colorEstado}40; filter: drop-shadow(0 0 4px ${colorEstado}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">
+            ${a.estado || 'activo'}
+          </div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">
+            Ficha ${Icons.flechaDerecha()}
+          </div>
         </div>
       </div>`;
   },

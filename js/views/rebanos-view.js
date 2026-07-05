@@ -146,14 +146,18 @@ const RebanosView = {
           <div class="flex items-center gap-10 min-w-0">
             <div class="text-xl" style="color:${colorEspecie}">${Icons.rebanos()}</div>
             <div class="text-xs">
-              <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color: var(--p-gold)">${r?.nombre}</div>
+              <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color: var(--p-gold); font-weight: 950;">${r?.nombre}</div>
               <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(r?.especie || 'N/D').toUpperCase()}</span> · ${(r?.tipo || 'Sin Tipo')}</div>
             </div>
           </div>
         </div>
         <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} Act.</span>
-          <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha ➔</span>
+          <div style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}40; filter: drop-shadow(0 0 4px ${colorEstado}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+            ${activos} Act.
+          </div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">
+            Ficha ${Icons.flechaDerecha()}
+          </div>
         </div>
       </div>`;
   },
@@ -219,17 +223,25 @@ const RebanosView = {
           ${Icons.animales()} ANIMALES EN ESTE LOTE
         </div>
         <div class="grid gap-10 mb-80">
-          ${animales.map(a => `
-            <div class="card-registro" style="--registro-color:#3b82f6; display:flex; gap:10px; align-items:stretch;" onclick="location.hash='/animal?id=${a.id}'">
+          ${animales.map(a => {
+            const colorEsp = window.ModoContextoHelper?.getEspecieColor(a?.especie) || '#3b82f6';
+            const colorEst = a?.estado === 'activo' ? '#CCFF00' : (a?.estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)');
+            return `
+            <div class="card-registro" style="--registro-color:${colorEsp}; display:flex; gap:10px; align-items:stretch;" onclick="location.hash='/animal?id=${a.id}'">
               <div class="flex-1 min-w-0 flex flex-col justify-center">
-                <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color: var(--p-gold)">${a.numero_identificacion || a.nombre || '#' + a.id}</div>
+                <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color: var(--p-gold); font-weight: 950;">${a.numero_identificacion || a.nombre || '#' + a.id}</div>
                 <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${a.raza || 'S/R'}</div>
               </div>
               <div class="flex flex-col items-end justify-between flex-shrink-0">
-                <span class="badge badge-sm" style="background:#CCFF0015; color:#CCFF00; border:1px solid #CCFF0035;">${a.estado}</span>
-                <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha ➔</span>
+                <div style="background:${colorEst}15; color:${colorEst}; border: 1px solid ${colorEst}40; filter: drop-shadow(0 0 4px ${colorEst}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                  ${a.estado}
+                </div>
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">
+                  Ficha ${Icons.flechaDerecha()}
+                </div>
               </div>
-            </div>`).join("") || '<div class="text-gray text-center p-20">Sin animales</div>'}
+            </div>`;
+          }).join("") || '<div class="text-gray text-center p-20">Sin animales</div>'}
         </div>
       </div>`;
   },

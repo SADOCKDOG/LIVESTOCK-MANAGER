@@ -142,8 +142,10 @@ const ExplotacionView = {
                 <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${this._fmtFecha(e.fecha)}</div>
               </div>
               <div class="flex flex-col items-end justify-between flex-shrink-0">
-                <span class="badge badge-sm" style="background:${meta.color}15; color:${meta.color};">${e.valor_neto} ${e.unidad}</span>
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha ➔</span>
+                <div style="background:${meta.color}15; color:${meta.color}; border: 1px solid ${meta.color}40; filter: drop-shadow(0 0 4px ${meta.color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                  ${e.valor_neto} ${e.unidad}
+                </div>
+                <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
               </div>
             </div>`).join('')}
         </div>

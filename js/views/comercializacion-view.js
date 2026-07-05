@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - ComercializacionView v2.2.0
+ * Livestock Manager - ComercializacionView v2.3.0
  * Refactorizada bajo patrón "Aglutinadora" y Neon Branding.
  */
 const ComercializacionView = {
@@ -74,19 +74,19 @@ const ComercializacionView = {
       return d.ventas.filter(v => (v.razonSocial || '').toLowerCase().includes(f)).slice(0, 20).map(v => this._cardRegistro({
         icon: Icons.documento(), title: v.razonSocial || 'Matadero', color: '#FF4444', onClick: `App._abrirDetalleVentaCarne(${v.id})`,
         metadata: `<span>${new Date(v.fechaSacrificio).toLocaleDateString()}</span>`,
-        badge: `<span class="text-gold font-950">${Math.round(v.importe_total || 0).toLocaleString()} €</span>`
+        badge: `${Math.round(v.importe_total || 0).toLocaleString()} €`
       })).join('');
     } else if (this._currentTab === 'leche') {
       return d.entregas.filter(e => (e.matriculaCisterna || '').toLowerCase().includes(f)).slice(0, 20).map(e => this._cardRegistro({
         icon: Icons.leche(), title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`, color: '#3b82f6', onClick: `location.hash='/albaran-leche?id=${e.id}'`,
         metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span>`,
-        badge: `<span class="text-gold font-950">${(e.cantidad || 0).toLocaleString()} L</span>`
+        badge: `${(e.cantidad || 0).toLocaleString()} L`
       })).join('');
     } else {
       return d.gastosRecords.filter(g => (g.concepto || '').toLowerCase().includes(f)).slice(0, 20).map(g => this._cardRegistro({
         icon: Icons.gastos(), title: g.concepto || 'Gasto', color: '#a855f7', onClick: `ProduccionView._abrirOpcionesGasto(${g.id})`,
         metadata: `<span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria}</span>`,
-        badge: `<span class="text-gold font-950">${(g.monto || 0).toLocaleString()} €</span>`
+        badge: `${(g.monto || 0).toLocaleString()} €`
       })).join('');
     }
   },
@@ -112,18 +112,28 @@ const ComercializacionView = {
   _cambiarTab(tab) { this._currentTab = tab; this.render(); },
 
   _cardRegistro(opts) {
+    const color = opts.color || 'var(--c-info)';
     return `
-      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${opts.color}; cursor:pointer; padding:12px;">
+      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer; padding:12px;">
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${opts.color};">${opts.icon}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${opts.title}</div>
+            <span class="text-xl" style="color:${color};">${opts.icon}</span>
+            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${opts.title}</div>
           </div>
           <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
         </div>
         <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">${opts.badge || ''}</div>
-          <div class="bottom-part"><span style="color:var(--c-warning); font-weight:700; font-size:0.7rem; text-transform:uppercase;">Ficha ➔</span></div>
+          <div class="top-part">
+            ${opts.badge ? `
+              <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${opts.badge}
+              </div>` : ''}
+          </div>
+          <div class="bottom-part">
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+              Ficha ${Icons.flechaDerecha()}
+            </span>
+          </div>
         </div>
       </div>`;
   }
