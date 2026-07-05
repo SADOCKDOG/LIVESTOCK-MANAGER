@@ -1,45 +1,48 @@
-# Librería de Componentes - Livestock Manager (SIGGAN Standard)
+# Librería de Componentes - Livestock Manager (Standard v4.8)
 
-Este documento detalla el sistema de diseño unificado tras la auditoría UI/UX v5.2.
+Este documento detalla el sistema de diseño unificado bajo el patrón **Aglutinadora** y el **Neon Branding**.
 
-## Design Tokens (`css/design-tokens.css`)
+## Design Tokens (`css/styles.css`)
 
-### Colores
-- **Primario (Oro Corcho):** `--p-cork` (#d4a373)
-- **Acento (Verde Alcornoque):** `--p-accent` (#7fb069)
-- **Éxito:** `--color-success` (#10b981)
-- **Peligro:** `--color-danger` (#ef4444)
-- **Info:** `--color-info` (#3b82f6)
+### Colores (Semántica OLED)
+- **Oro Maestro:** `--p-gold` (#fbbf24) - Usado para identificadores primarios y títulos.
+- **Éxito (Neon):** `--c-success` (#10b981) - Modo Híbrido, estados activos.
+- **Peligro (Neon):** `--c-danger` (#ef4444) - Modo Carne, alertas, supresión.
+- **Info (Neon):** `--c-info` (#3b82f6) - Modo Leche, censos, información técnica.
+- **Aviso:** `--c-warning` (#f59e0b) - Enlaces de acción (Ficha ➔), estados pendientes.
+- **Acento:** `--c-purple` / `--c-accent` (#8b5cf6) - Sanidad, genética.
 
-### Espaciado
-- `xs`: 8px
-- `sm`: 12px
-- `md`: 16px
-- `lg`: 24px
-- `xl`: 32px
+### Tipografía (Escala Semántica)
+- **Display:** `1.6rem` (KPIs masivos).
+- **H1:** `1.25rem` (Cabeceras de módulo).
+- **H2:** `1.05rem` (Títulos de tarjetas).
+- **Label:** `0.75rem` (Uppercase, 900 weight).
+- **Tiny:** `0.62rem` (Metadatos de registro).
 
-## Componentes
+## Componentes Estándar
 
-### Botones (`.btn`)
-- **Large (58px):** `.btn`. Usado para CTAs principales.
-- **Medium (48px):** `.btn-sm`, `.btn-icon`, `.wizard-btn-action`.
-- **Interacción:** Escala `0.96` y Brillo `0.9` en estado `:active`.
+### 1. Card de Resumen (`.card-resumen`)
+Contenedor de KPIs superior en cada módulo.
+- **Clase:** `card p-12 mb-14 border-222 card-total-3d card-resumen`.
+- **Funcionalidad:** Incluye un botón `.resumen-toggle` para colapsar/expandir el cuerpo.
 
-### Tarjetas (`.card`)
-- **Base:** `.card`. Padding `var(--space-lg)`, radio `var(--radius-lg)`.
-- **Acento:** `.card-accent`. Borde superior de 5px. Variantes: `-green`, `-red`, `-blue`, `-purple`.
-- **Lista:** `.card-item`, `.card-animal`. Borde izquierdo de 4px.
+### 2. Card de Registro (`.card-registro`)
+Tarjeta base para todos los listados de datos.
+- **Estructura:** Flexbox con alineación `stretch`.
+- **Contenido:** Icono SVG + Título Gold + Metadatos a la izquierda; Viñeta Iluminada + Acción "Ficha ➔" a la derecha.
+- **Referencia:** Ver [PLANTILLA-CARD-REGISTRO.md](PLANTILLA-CARD-REGISTRO.md).
 
-### Formularios
-- **Label:** `.form-label` / `.wizard-label`. 0.75rem, negrita, uppercase.
-- **Input:** `.form-input`. Altura mín. 48px, fondo `--surface-light`.
-- **Error:** `.form-error`. Incluye icono ⚠️ y color `--color-danger`.
+### 3. Filtros Integrados
+Fila de controles situada entre el resumen y el listado.
+- **Búsqueda:** `.search-input` (input de tipo search con icono lupa).
+- **Selectores:** `.form-select-gold` (selectores temáticos con borde ámbar).
 
-### Feedback
-- **Toasts:** `.toast`. Centrados, fondo glass, borde `--p-cork`.
-- **Glass backgrounds:** `.bg-green-glass`, `.bg-red-glass`, etc.
+### 4. Botones de Acción Hub (`.widget-link-btn--neon`)
+Botones de gran formato para navegación rápida o creación de registros.
+- **Layout:** Icono SVG sobre etiqueta de texto en columna.
+- **Variantes:** `.neon-danger`, `.neon-info`, `.neon-success`, `.neon-warning`, `.neon-accent`.
 
-## Iconografía
-- Clase base: `.icon`.
-- Tamaños: `.icon-sm` (20px), `.icon-md` (24px), `.icon-lg` (28px).
-- Trazo estándar: 2px.
+## Patrones de Interacción
+- **Filtrado en Tiempo Real:** El `oninput` de los buscadores debe disparar funciones `_filtrar(texto)` que actualicen el DOM sin recarga completa.
+- **Navegación de Ficha:** Todas las tarjetas de datos deben ser clicables hacia su vista de detalle (`#/animal`, `#/rebano`, `#/proveedor`, etc.).
+- **Feedback:** Uso obligatorio de `Toast` (no-bloqueante) y `Confirm` (modales de sistema) sobre `alert/confirm` nativos.

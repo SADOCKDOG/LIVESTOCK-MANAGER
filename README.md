@@ -44,6 +44,8 @@ La aplicación cuenta con una cobertura integral de los siguientes módulos:
 * **Informes Premium (BI):** Panel de Inteligencia Analítica con balance de Pérdidas y Ganancias (P&G), flujo de caja, punto de equilibrio (Break-even), subvenciones de la PAC e informes de aforo de carga.
 * **Gestión Documental:** Archivo oficial digital para almacenar guías de movimiento DIMOE, declaraciones ICA (Información de la Cadena Alimentaria) y actas de saneamiento.
 
+> Para detalles sobre el sistema de diseño y componentes aprobados, consulte la [Librería de Componentes](docs/COMPONENT-LIBRARY.md) y la [Plantilla de Card de Registro](docs/PLANTILLA-CARD-REGISTRO.md).
+
 ---
 
 ## 3. Adaptación al Marco Normativo SIGGAN / BADIGEX
