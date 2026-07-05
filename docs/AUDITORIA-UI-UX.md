@@ -4,13 +4,13 @@
 >
 > **Plataforma objetivo: teléfono Android en vertical** (`~360–430 px` de ancho). Todo el diseño se valida contra ese viewport. No hay vista de escritorio ni tablet como objetivo principal.
 >
-> Estado: **referencia activa** · Versión app: 4.8.5 / CSS 5.5.0 / SW: corcho-v6.7.22
+> Estado: **referencia activa** · Versión app: 4.8.9 / CSS 5.5.0 / SW: corcho-v6.7.22
 
 ---
 
 ## 1. Resumen ejecutivo
 
-La aplicación ha sido plenamente estandarizada bajo el sistema de diseño **Premium OLED v4.8.5**. Se han consolidado los cuatro grandes Hubs operativos (Ganadería, ExPro, CoMer e Informes) bajo una arquitectura visual idéntica y una navegación intuitiva.
+La aplicación ha sido plenamente estandarizada bajo el sistema de diseño **Premium OLED v4.8.9**. Se han consolidado los cuatro grandes Hubs operativos (Ganadería, ExPro, CoMer e Informes) bajo una arquitectura visual idéntica y una navegación intuitiva.
 
 | Síntoma | Magnitud | Estado |
 |---|---|---|
@@ -21,7 +21,7 @@ La aplicación ha sido plenamente estandarizada bajo el sistema de diseño **Pre
 
 ---
 
-## 2. Inventario de soluciones (v4.8.5)
+## 2. Inventario de soluciones (v4.8.9)
 
 ### 2.1 Cabecera Premium Gold Neon
 - **Banner Hub Centrado**: El título de la vista (Icono SVG + Texto) flota en el centro absoluto sin interferir con logo o badge.
