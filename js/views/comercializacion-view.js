@@ -84,7 +84,7 @@ const ComercializacionView = {
       })).join('');
     } else {
       return d.gastosRecords.filter(g => (g.concepto || '').toLowerCase().includes(f)).slice(0, 20).map(g => this._cardRegistro({
-        icon: Icons.gastos(), title: g.concepto || 'Gasto', color: '#a855f7', onClick: `ProduccionView._abrirOpcionesGasto(${g.id})`,
+        icon: Icons.gastos(), title: g.concepto || 'Gasto', color: '#a855f7', onClick: `ExplotacionView._abrirOpcionesGasto(${g.id})`,
         metadata: `<span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria}</span>`,
         badge: `${(g.monto || 0).toLocaleString()} €`
       })).join('');

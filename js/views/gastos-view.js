@@ -65,7 +65,7 @@ const GastosView = {
     return records.filter(g => (g.concepto || '').toLowerCase().includes(f)).slice(0, 30).map(g => {
         const color = 'var(--c-purple)';
         return `
-      <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
+      <div class="card-registro" onclick="ExplotacionView._abrirOpcionesGasto(${g.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-10 min-w-0">
             <span class="text-xl" style="color:${color};">${Icons.gastos()}</span>

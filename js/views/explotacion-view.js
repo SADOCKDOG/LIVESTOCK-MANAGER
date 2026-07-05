@@ -133,7 +133,7 @@ const ExplotacionView = {
         </div>
         <div class="grid gap-10">
           ${(this._activeMode === 'leche' ? d.ordeños : d.pesajes).slice(0, 10).map(e => `
-            <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${meta.color};" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad}', ${e.entidad_id})">
+            <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${meta.color};" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad || ''}', ${e.entidad_id || 0})">
               <div class="flex-1 min-w-0 flex flex-col justify-center">
                 <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Registro'}</div>
                 <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${this._fmtFecha(e.fecha)}</div>

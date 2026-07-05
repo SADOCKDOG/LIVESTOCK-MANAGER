@@ -125,7 +125,7 @@ const GanaderiaView = {
               const itemColor = e.unidad === 'kg' ? 'var(--c-danger)' : (e.unidad?.match(/L|Litros/) ? 'var(--c-info)' : 'var(--c-success)');
               const icon = e.unidad === 'kg' ? Icons.carne() : (e.unidad?.match(/L|Litros/) ? Icons.leche() : Icons.rebanos());
               return `
-                <div class="card-registro" onclick="GanaderiaView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad}', ${e.entidad_id})"
+                <div class="card-registro" onclick="GanaderiaView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad || ''}', ${e.entidad_id || 0})"
                      style="--registro-color: ${itemColor}; display:flex; gap:10px; align-items:stretch;">
                   <div class="flex-1 min-w-0 flex flex-col justify-center">
                     <div class="flex items-center gap-10 min-w-0">
