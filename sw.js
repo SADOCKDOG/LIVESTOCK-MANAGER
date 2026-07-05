@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corcho-v6.10.42';
+const CACHE_NAME = 'corcho-v6.11.0';
 const ASSETS = [
   './',
   './index.html',
@@ -85,6 +85,7 @@ const ASSETS = [
   './icons/Logo%20aplicaci%C3%B3n.png',
   './icons/app-icon.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap',
+  'https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;900&family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
   'https://cdn.jsdelivr.net/npm/idb@8/build/umd.js',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
