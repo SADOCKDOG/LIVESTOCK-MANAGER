@@ -1743,6 +1743,39 @@ const App = {
     }
   },
 
+  async renderDetalleGasto(params) {
+    const id = params.get("id");
+    const g = await window.db.get("gastos_ganaderia", parseInt(id));
+    if (!g) return this.toastError("Registro de gasto no encontrado");
+    document.getElementById("app-content").innerHTML = `
+      <div class="mb-20 px-4">
+        <button onclick="window.history.back()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+        </button>
+        <h2 class="mt-15">${Icons.dinero()} Ficha de Gasto</h2>
+      </div>
+      <div class="report-section px-4">
+        <div class="card border-top-4-blue p-20">
+          <div class="wizard-input-group">
+            <label class="wizard-label">Concepto</label>
+            <input type="text" id="ge-con" value="${g.concepto || ''}" class="wizard-input uppercase font-800">
+          </div>
+          <div class="wizard-input-group mt-15">
+            <label class="wizard-label">Monto (€)</label>
+            <input type="number" id="ge-mon" value="${g.monto}" class="wizard-input font-900 text-lg">
+          </div>
+          <div class="flex gap-10 mt-25">
+            <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="App._guardarEdicionGasto(${id})">
+              ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
+            </button>
+            <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="App._eliminarGasto(${id})">
+              ${Icons.eliminar()} <span class="widget-link-label">BORRAR</span>
+            </button>
+          </div>
+        </div>
+      </div>`;
+  },
+
   async renderDetalleSanitario(params) {
     const id = params.get("id");
     const s = await window.db.get("sanitarios_ganado", parseInt(id));

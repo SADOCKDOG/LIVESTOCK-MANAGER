@@ -35,6 +35,7 @@ const LecheView = {
     const sanitariosLeche = sanitariosGanado?.filter(s => rebanosLecheIds.includes(s?.rebanoId)) || [];
 
     // KPIs
+    const numEntregas = entregas?.length || 0;
     const litrosTotal = entregas?.reduce((s, e) => s + (e?.cantidad || 0), 0) || 0;
     const importeTotal = entregas?.reduce((s, e) => s + (e?.importe_total || (e?.cantidad || 0) * (e?.precioBase || 0) || 0), 0) || 0;
 
