@@ -18,6 +18,15 @@ const ProveedoresView = {
 
         main.innerHTML = `
           <div class="report-section px-4">
+            <div class="mb-14">
+              <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+                ${Icons.proveedores()} PROVEEDORES
+              </h2>
+              <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                RESUMEN DE GESTIÓN Y LISTADO
+              </div>
+            </div>
+
             <!-- Card de RESUMEN Normalizada -->
             <div id="prov-kpis"></div>
 
@@ -145,7 +154,7 @@ const ProveedoresView = {
               <div class="flex justify-between items-start mb-16">
                 <div>
                   <h2 class="text-gold mt-0 mb-4 text-xl font-black uppercase tracking-tight" style="color:var(--p-gold);">${proveedor.nombre}</h2>
-                  <div style="background:${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}15; color:${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}; border: 1px solid ${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}40; padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; display: inline-block;">
+                  <div style="background:${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}15; color:${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}; border: 1px solid ${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}40; filter: drop-shadow(0 0 4px ${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; display: inline-block;">
                     ${proveedor.activo === false ? 'INACTIVO' : 'ACTIVO'}
                   </div>
                 </div>
@@ -176,7 +185,7 @@ const ProveedoresView = {
               ${gastos.slice(0, 20).map(g => `
                 <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: var(--c-purple);">
                   <div class="flex-1 min-w-0 flex flex-col justify-center">
-                    <div class="font-950 uppercase text-[0.85rem] tracking-tight" style="color:var(--p-gold);">${g.concepto || g.categoria}</div>
+                    <div class="font-950 uppercase text-[0.85rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${g.concept || g.concepto || g.categoria}</div>
                     <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${new Date(g.fecha).toLocaleDateString()}</div>
                   </div>
                   <div class="flex flex-col items-end justify-between flex-shrink-0">
@@ -189,11 +198,17 @@ const ProveedoresView = {
     },
 
     async renderFormulario(id) {
-        // Form logic remains same but ensuring Aglutinadora layout
+        const esEdicion = !!id;
+        const p = esEdicion ? await Proveedores.get(id) : {
+            nombre: '', nif_cif: '', direccion: '', codigo_postal: '', ciudad: '', provincia: '',
+            telefono: '', email: '', categorias: [], condiciones_pago: '', notas: '', activo: true
+        };
+        const main = document.getElementById("app-content");
+        main.innerHTML = `<div class="p-20 text-gray uppercase font-900">Formulario Proveedor - Rediseñando...</div>`;
     },
 
     async _guardar(id) {
-        // Save logic
+        // Save
     },
 
     async _eliminar(id) {

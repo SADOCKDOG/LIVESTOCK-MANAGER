@@ -122,14 +122,14 @@ const GanaderiaView = {
           </div>
           <div class="grid gap-10">
             ${recientes.map(e => {
-              const icon = e.tipo_entidad === 'animal' ? (this._activeMode === 'carne' ? Icons.carne() : Icons.leche()) : Icons.rebanos();
-              const color = this._activeMode === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
+              const itemColor = e.unidad === 'kg' ? 'var(--c-danger)' : (e.unidad?.match(/L|Litros/) ? 'var(--c-info)' : 'var(--c-success)');
+              const icon = e.unidad === 'kg' ? Icons.carne() : (e.unidad?.match(/L|Litros/) ? Icons.leche() : Icons.rebanos());
               return `
                 <div class="card-registro" onclick="GanaderiaView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad}', ${e.entidad_id})"
-                     style="--registro-color: ${color}; display:flex; gap:10px; align-items:stretch;">
+                     style="--registro-color: ${itemColor}; display:flex; gap:10px; align-items:stretch;">
                   <div class="flex-1 min-w-0 flex flex-col justify-center">
                     <div class="flex items-center gap-10 min-w-0">
-                      <span class="text-xl" style="color:${color};">${icon}</span>
+                      <span class="text-xl" style="color:${itemColor};">${icon}</span>
                       <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Registro'}</div>
                     </div>
                     <div class="text-[0.6rem] text-gray font-800 uppercase mt-4">
@@ -137,8 +137,8 @@ const GanaderiaView = {
                     </div>
                   </div>
                   <div class="flex flex-col items-end justify-between flex-shrink-0">
-                    <div style="background:${color}15; color:${color}; border: 1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-                      ${e.valor_neto} ${e.unit || e.unidad || ''}
+                    <div style="background:${itemColor}15; color:${itemColor}; border: 1px solid ${itemColor}40; filter: drop-shadow(0 0 4px ${itemColor}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
+                      ${e.valor_neto} ${e.unidad || ''}
                     </div>
                     <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
                   </div>
