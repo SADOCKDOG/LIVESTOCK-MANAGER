@@ -65,44 +65,59 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
+      <!-- Aglutinadora Gastos -->
+      <div class="card-registro" style="--registro-color: var(--c-danger); padding: 15px;">
+        <div class="flex justify-between items-start mb-10">
+          <div>
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: var(--c-danger)">
+              ${Icons.dinero()} GESTIÓN DE GASTOS
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              BALANCE GLOBAL Y EVOLUCIÓN
+            </div>
+          </div>
+          <button class="resumen-toggle btn-glass-neon" onclick="App.toggleResumen(this)" style="--neon: var(--c-danger)">
+            ${Icons.flechaAbajo()}
+          </button>
         </div>
-        <div class="flex gap-6">${mesesHtml}</div>
-      </div>
 
-      <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-purple); background: rgba(255,68,68, 0.015);">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-          ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
+        <!-- Card de RESUMEN: Evolución Mensual -->
+        <div class="card card-total-3d card-resumen mb-14" style="background:rgba(255,68,68,0.03);">
+          <div class="flex justify-between items-center mb-12 px-4">
+            <span class="text-[0.65rem] text-gray font-bold uppercase">Evolución (6 meses)</span>
+            <span class="text-[0.65rem] text-white font-900">${totalGeneral.toLocaleString()} € TOTAL</span>
+          </div>
+          <div class="flex gap-6">${mesesHtml}</div>
         </div>
-        <div class="flex flex-col">
-          ${this._CATEGORIAS.filter(c => c.key !== 'todos').map(c => {
-            const catGasto = kpis[c.key]?.total || 0;
-            return `
-              <div class="py-10 flex justify-between items-center border-bottom-222">
-                <span class="text-xs text-gray uppercase font-800 flex items-center gap-6">${c.icon} ${c.label}</span>
-                <strong class="text-base font-900" style="color:${c.color};">${catGasto.toLocaleString()} €</strong>
-              </div>
-            `;
-          }).join('')}
-          <div class="py-12 mt-4 flex justify-between items-center text-white">
-            <span class="text-xs uppercase font-950 tracking-wider">TOTAL GENERAL GASTOS</span>
-            <strong class="text-2xl text-red font-950">${totalGeneral.toLocaleString()} €</strong>
+
+        <!-- Card de RESUMEN: Balance por Categoría -->
+        <div class="card card-total-3d card-resumen mb-20">
+          <div class="flex flex-col gap-6">
+            ${this._CATEGORIAS.filter(c => c.key !== 'todos').map(c => {
+              const catGasto = kpis[c.key]?.total || 0;
+              return `
+                <div class="flex justify-between items-center px-4">
+                  <span class="text-gray text-[0.7rem] font-800 uppercase flex items-center gap-4">${c.icon} ${c.label}</span>
+                  <span class="text-white font-900" style="color:${c.color};">${catGasto.toLocaleString()} €</span>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
-      </div>
 
-      <div class="mb-14">
-        <div class="tabs-scroll gasto-tabs scroll-shadow-container">
+        <!-- Filtros / Tabs -->
+        <div class="flex gap-8 mb-20 overflow-x-auto pb-4 no-scrollbar">
           ${this._CATEGORIAS.map(c => `
-            <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="GastosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label}</button>
+            <button class="badge badge-sm uppercase font-900 ${this._currentTab === c.key ? 'active' : ''}"
+                    onclick="GastosView._cambiarTab('${c.key}')"
+                    style="border-left: 2px solid ${c.color} !important;">
+              ${c.label}
+            </button>
           `).join('')}
         </div>
-      </div>
-      <div id="gasto-content"><div class="loader">Cargando gastos...</div></div>`;
+
+        <div id="gasto-content"><div class="loader">Cargando gastos...</div></div>
+      </div>`;
 
     this._cachedData = { gastosRecords, kpis };
 
@@ -144,24 +159,27 @@ const GastosView = {
             return `
             <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})"
                  style="--registro-color: ${color};">
-              <div class="flex justify-between items-start">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-6">
-                    <span class="text-xl" style="color:${color}">${Icons.paquete()}</span>
-                    <div class="font-bold text-white uppercase">${g.concepto || g.categoria || 'Gasto'}</div>
+              <div class="flex flex-col gap-10">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-6">
+                      <span class="text-xl" style="color:${color}">${Icons.paquete()}</span>
+                      <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${g.concepto || g.categoria || 'Gasto'}</div>
+                    </div>
+                    <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray-500 font-800 uppercase mt-2">
+                      ${g.fecha ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(g.fecha).toLocaleDateString()}</span>` : ''}
+                      ${g.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${g.snap_zona}</span>` : ''}
+                    </div>
                   </div>
-                  <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
-                    ${g.fecha ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(g.fecha).toLocaleDateString()}</span>` : ''}
-                    ${g.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${g.snap_zona}</span>` : ''}
+                  <div class="flex flex-col items-end gap-3">
+                    <div class="font-950" style="font-size:1.1rem; color:${color};">${g.monto.toLocaleString()} €</div>
                   </div>
                 </div>
-                <div class="flex flex-col items-end gap-3">
-                  <span class="badge badge-sm font-900" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
-                    #${g.id}
-                  </span>
+                <div class="text-right">
+                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
                 </div>
               </div>
-            `;
+            </div>`;
           }).join('')}</div>
         </div>
       `;
@@ -189,7 +207,7 @@ const GastosView = {
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),
       emptyMsg: `Sin gastos de ${catInfo.label.toLowerCase()}. Usa "Registrar Gasto" para añadir.`,
-      recientesHtml: recientesHtml // we'll inject after the section header
+      recientesHtml: recientesHtml
     });
   },
 
@@ -200,59 +218,37 @@ const GastosView = {
       ? records.map(r => `
         <div class="card-registro" onclick="${r.onclick || ''}"
              style="--registro-color: ${color};">
-          <div class="flex justify-between items-start">
-            <div class="flex-1 min-w-0">
-              <div class="text-white font-900 uppercase tracking-tight nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${Icons.documento()} ${r.title}</div>
-              <div class="text-gray uppercase font-800" style="font-size:0.6rem; margin-top:5px; letter-spacing:0.5px;">
-                <span class="flex items-center gap-4">
-                  ${Icons.calendar()} ${r.date}
-                  ${r.zone ? ' | ' + Icons.zonas() + ' ' + r.zone : ''}
-                  ${r.categoria ? ' | ' + Icons.paquete() + ' ' + r.categoria.toUpperCase() : ''}
-                </span>
+          <div class="flex flex-col gap-10">
+            <div class="flex justify-between items-center w-full">
+              <div class="flex items-center gap-10 min-w-0">
+                <span class="text-xl" style="color:${color}">${Icons.documento()}</span>
+                <div class="text-xs">
+                  <div class="font-950 text-white uppercase text-base tracking-tight" style="color:var(--p-gold) !important;">${r.title}</div>
+                  <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
+                    ${Icons.calendar()} ${r.date} ${r.zone ? ' · ' + r.zone : ''} ${r.categoria ? ' · ' + r.categoria : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-950" style="font-size:1.1rem; color:${color};">${r.value}</div>
               </div>
             </div>
-            <div class="text-right flex-shrink-0 ml-8">
-              <div class="font-950" style="font-size:1.1rem; color:${color};">${r.value}</div>
+            <div class="text-right">
+              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
             </div>
           </div>
         </div>`).join('')
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro" style="--registro-color: ${color};">
-        <div class="flex items-center gap-12 mb-12">
-          <span class="text-3xl">${icon}</span>
-          <div>
-            <div class="text-white font-900 text-lg">${title}</div>
-            ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
-          </div>
-        </div>
-        ${kpis ? `
-        <!-- KPIs Gastos Unificados en Filas -->
-        <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-            ${Icons.dinero()} BALANCE DE GASTOS
-          </div>
-          <div class="flex flex-col">
-            ${kpis.map((k, index) => `
-              <div class="py-12 flex justify-between items-center ${index < kpis.length - 1 ? 'border-bottom-222' : ''}">
-                <span class="text-xs text-gray uppercase font-900">${k.label}</span>
-                <strong class="text-xl font-950" style="color: ${k.label.includes('Total') ? 'var(--c-danger)' : 'var(--c-info)'};">${k.value}</strong>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        ` : ''}
-        ${recientesHtml || ''}
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} ${listName}
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+          ${icon} ${listName}
         </div>
         ${recordsHtml}
-      </div>
-      <!-- Botón Flotante de Acción con viñeta -->
+      <!-- Botón Flotante de Acción -->
       <div class="fab-container" onclick="${registrarHandler}">
         <span class="fab-label">Nuevo ${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
+        <button class="fab-btn" style="--neon: var(--c-danger)">${Icons.fabPlus()}</button>
       </div>`;
   },
 

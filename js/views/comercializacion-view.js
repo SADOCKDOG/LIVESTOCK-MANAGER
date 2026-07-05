@@ -240,7 +240,7 @@ const ComercializacionView = {
     }
   },
 
-  _renderSeccion(content, opts) {
+  _renderSeccion(content, opts, recentItemsHtml = '') {
     const { icon, title, color, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
 
     const recordsHtml = records.length > 0
@@ -267,6 +267,7 @@ const ComercializacionView = {
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
           ${Icons.documento()} ${listName}
         </div>
+        ${recentItemsHtml}
         <div class="grid">
           ${recordsHtml}
         </div>
@@ -285,6 +286,49 @@ const ComercializacionView = {
       let cls = (v.clasificacion?.seurop || "S/C").toUpperCase();
       return `<span class="badge badge-red" style="font-size:0.62rem; border:1px solid rgba(255,68,68,0.2);">${cls}</span>`;
     };
+
+    // Recientes ventas de carne (5 más recientes por fecha de sacrificio)
+    const recientesVentas = [...d.ventas]
+      .sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0))
+      .slice(0, 5);
+    let recientesHtml = '';
+    if (recientesVentas.length === 0) {
+      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin ventas recientes</span></div>`;
+    } else {
+      recientesHtml = `
+        <div class="mb-14">
+          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> VENTAS RECIENTES
+          </div>
+          <div class="grid gap-6">${recientesVentas.map(v => {
+            const badgeTramite = (v.estado_tramite || '').toString().trim()
+              ? `<span class="badge badge-sm" style="font-size:0.62rem; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.12); color:#93c5fd;">${Icons.edificio()} ${(v.estado_tramite || '').toUpperCase()}</span>`
+              : '';
+            return `
+              <div class="card-registro" onclick="App._abrirDetalleVentaCarne(${v.id})" style="--registro-color: var(--c-danger);">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-6">
+                      <span class="text-xl" style="color:var(--c-danger);">${Icons.carne()}</span>
+                      <div class="font-bold text-white uppercase">${v.razonSocial || 'Matadero Central'}</div>
+                    </div>
+                    <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
+                      ${v.fechaSacrificio ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(v.fechaSacrificio).toLocaleDateString()}</span>` : ''}
+                      ${v.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${v.snap_zona}</span>` : ''}
+                      <span class="flex items-center gap-4">Rend: ${v.rendimientoCanal || 0}%</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-3">
+                    <span class="badge badge-sm font-900" style="background:var(--c-danger)15; color:var(--c-danger); border:1px solid var(--c-danger)30;">
+                      #${v.id}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}</div>
+        </div>`;
+    }
 
     this._renderSeccion(content, {
       icon: Icons.carne(), title: 'Ventas de Carne', subtitle: 'Expediciones a matadero y venta directa',
@@ -308,12 +352,64 @@ const ComercializacionView = {
         };
       }),
       emptyMsg: 'Sin ventas de carne registradas. Usa "Registrar Venta" para añadir una expedición.'
-    });
+    }, recientesHtml);
   },
 
   // ===================== TAB LECHE =====================
 
   _renderLeche(content, d) {
+    // Recientes entregas de leche (5 más recientes por fecha de recogida)
+    const recientesEntregas = [...d.entregas]
+      .sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0))
+      .slice(0, 5);
+    let recientesHtml = '';
+    if (recientesEntregas.length === 0) {
+      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin entregas recientes</span></div>`;
+    } else {
+      recientesHtml = `
+        <div class="mb-14">
+          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> ENTREGAS RECIENTES
+          </div>
+          <div class="grid gap-6">${recientesEntregas.map(e => {
+            const esAlerta = e.estadoAnalitica === "Alerta Crítica" || e.antibioticos === true;
+            const lab = e.laboratorio || {};
+            const es = lab.extracto_seco || (lab.grasa != null && lab.proteina != null ? (lab.grasa + lab.proteina).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '--');
+            const badges = window.CalidadLecheHelper ? window.CalidadLecheHelper.badgesCompletos(e) : '';
+            const extraBadges = [];
+            if (e.precio_final_unitario) {
+              extraBadges.push(window.CalidadLecheHelper.badgeParametro('Precio', e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' €/L', true, Icons.dinero()));
+            }
+            if (e.mofa != null) {
+              extraBadges.push(window.CalidadLecheHelper.badgeParametro('MOFA', Math.round(e.mofa) + ' €', e.mofa >= 0, Icons.grafico()));
+            }
+            if (e.comunidad_autonoma) {
+              const label = e.comunidad_autonoma === 'andalucia' ? 'AND' : 'EXT';
+              extraBadges.push(window.CalidadLecheHelper.badgeParametro('CCAA', label, true, Icons.zonas()));
+            }
+            if (e.estado_tramite_infolac) {
+              extraBadges.push(window.CalidadLecheHelper.badgeParametro('INFOLAC', String(e.estado_tramite_infolac).toUpperCase(), true, Icons.edificio()));
+            }
+            const allBadges = [badges, ...extraBadges].filter(Boolean).join('');
+
+            return `
+              <div class="card-registro" onclick="location.hash='/albaran-leche?id=${e.id}'"
+                   style="--registro-color: ${esAlerta ? 'var(--c-danger)' : (window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e).color : '#888')};">
+                <div class="leche-entrega-content">
+                  <div class="leche-entrega-left">
+                    <div class="text-white font-900 uppercase text-sm flex items-center gap-6">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — <span class="text-gold" style="font-size:1.1rem;">${(e.cantidad || 0).toLocaleString()}</span> <small class="text-aaa">L</small></div>
+                    <div class="text-[0.65rem] text-gray uppercase font-800 mt-2 tracking-widest">Cisterna: <span class="text-white">${e.matriculaCisterna || '—'}</span></div>
+                  </div>
+                  <div class="text-right">
+                    <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(255,68,68,0.2)' : 'rgba(204,255,0,0.15)'}; color:${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}; border: 1px solid color-mix(in srgb, ${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'} 25%, transparent);">${e.estadoAnalitica || 'PENDIENTE'}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}</div>
+        </div>`;
+    }
+
     this._renderSeccion(content, {
       icon: Icons.leche(), title: 'Entregas de Leche', subtitle: 'Retiradas de tanque y albaranes',
       color: 'var(--c-info)', // Azul Lácteo consistente
@@ -354,12 +450,52 @@ const ComercializacionView = {
         };
       }),
       emptyMsg: 'Sin entregas de leche registradas. Usa "Registrar Retirada" para añadir.'
-    });
+    }, recientesHtml);
   },
 
   // ===================== TAB GASTOS =====================
 
   _renderGastos(content, d) {
+    // Recientes gastos (5 más recientes por fecha)
+    const recientesGastos = [...d.gastosRecords]
+      .sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0))
+      .slice(0, 5);
+    let recientesHtml = '';
+    if (recientesGastos.length === 0) {
+      recientesHtml = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin gastos recientes</span></div>`;
+    } else {
+      recientesHtml = `
+        <div class="mb-14">
+          <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+            <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GASTOS RECIENTES
+          </div>
+          <div class="grid gap-6">${recientesGastos.map(g => {
+            return `
+              <div class="card-registro" onclick="ProduccionView._abrirOpcionesGasto(${g.id})" style="--registro-color: var(--c-purple);">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-6">
+                      <span class="text-xl" style="color:var(--c-purple);">${Icons.gastos()}</span>
+                      <div class="font-bold text-white uppercase">${g.concepto || g.categoria || 'Gasto'</div>
+                    </div>
+                    <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2">
+                      ${g.fecha ? `<span class="flex items-center gap-4">${Icons.calendar()} ${new Date(g.fecha).toLocaleDateString()}</span>` : ''}
+                      ${g.snap_zona ? `<span class="flex items-center gap-4">${Icons.zonas()} ${g.snap_zona}</span>` : ''}
+                      <span class="flex items-center gap-4">${g.categoria || ''}</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-3">
+                    <span class="badge badge-sm font-900" style="background:var(--c-purple)15; color:var(--c-purple); border:1px solid var(--c-purple)30;">
+                      #${g.id}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}</div>
+        </div>`;
+    }
+
     this._renderSeccion(content, {
       icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
       color: 'var(--c-purple)',
@@ -375,7 +511,7 @@ const ComercializacionView = {
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),
       emptyMsg: 'Sin gastos registrados. Usa "Registrar Gasto" para añadir.'
-    });
+    }, recientesHtml);
   },
 
   // ===================== ELIMINAR / EDITAR (desde app.js) =====================
@@ -524,10 +660,3 @@ if (window.EventBus) {
 }
 
 window.ComercializacionView = ComercializacionView;
-
-
-
-
-
-
-

@@ -13,127 +13,137 @@ const ZonasView = {
     const zonasConIndice = (finca.zonas || [])
           .map((zona, realIndex) => ({ zona, realIndex }))
           .filter(({ zona }) => !zona?.anulada);
-    let html = '';
-    if (zonasConIndice.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()">${Icons.agregar()} Crear primera zona</button></div></div>`;
-    else {
-      let totalAforo = 0, totalOcupacion = 0;
-      html += `<div class="grid gap-15">`;
-      for (const item of zonasConIndice) {
-        const z = item.zona;
-        let censoTotal = 0;
-        const rebsEnZona = rebanos.filter((r) => r.zonaActual === z.nombre);
-        const especiesEnZona = new Set();
 
-        let rebanosHtml = "";
-        for (let r of rebsEnZona) {
-          const ans = await Animales.list(r.id);
-          const n = ans.length;
-          censoTotal += n;
-          especiesEnZona.add(r.especie);
-          if (n > 0) {
-            const colorEspecie = r.especie === 'Vacas' ? 'var(--c-info)' : r.especie === 'Ovejas' ? 'var(--c-success)' : r.especie === 'Cabras' ? 'var(--c-warning)' : 'var(--c-pink)';
-            rebanosHtml += `
-              <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${colorEspecie};">
-                <div class="flex flex-col gap-10">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-8">
-                        <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
-                        <div>
-                          <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
-                          <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <div class="font-900 text-sm">${n}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>`;
-          }
-        }
+    if (zonasConIndice.length === 0) {
+      main.innerHTML = `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-success);">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()">${Icons.agregar()} Crear primera zona</button></div></div>`;
+      return;
+    }
 
-        const aforo = z.aforoMax || z.aforo_maximo || 50;
-        const superficie = z.superficie || z.superficieGrafica || 0;
-        totalAforo += aforo;
-        totalOcupacion += censoTotal;
-        const pct = aforo > 0 ? Math.round((censoTotal / aforo) * 100) : 0;
-        const colorCenso = pct > 100 ? 'var(--c-danger)' : pct >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
-        const estadoTexto = pct > 100 ? 'Sobrecarga' : pct >= 80 ? 'Óptimo' : pct >= 50 ? 'Aceptable' : 'Infrautilizada';
+    let totalAforo = 0, totalOcupacion = 0;
+    const themeColor = 'var(--c-success)';
 
-        const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
-        let ugmTotal = 0;
-        for (let r of rebsEnZona) {
-          const factor = ugmFactor[r.especie] || 0.2;
-          const ans = await Animales.list(r.id);
-          ugmTotal += ans.length * factor;
-        }
-        const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const pacTexto = z.codigo_pac ? `PAC: ${z.codigo_pac}` : 'PAC: pendiente';
-        const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
+    // Pre-calcular totales para el resumen
+    for (const item of zonasConIndice) {
+      const z = item.zona;
+      const aforo = z.aforoMax || z.aforo_maximo || 50;
+      totalAforo += aforo;
 
-        html += `
-          <div class="card-registro" onclick="location.hash='/zona?index=${item.realIndex}'" style="--registro-color: ${colorCenso};">
-            <div class="flex flex-col gap-10">
-              <div class="flex justify-between items-center w-full">
-                <div class="flex items-center gap-10 min-w-0">
-                  <div class="text-xl" style="color:${colorCenso}">${Icons.zonas()}</div>
-                  <div class="text-xs">
-                    <div class="font-bold text-white uppercase text-base tracking-tight">${z.nombre}</div>
-                    <div class="text-gray mt-2 font-700 uppercase">${z.usoPrincipal || 'Sin uso Principal'}${superficie ? ` · ${Number(superficie).toLocaleString('es-ES')} ha` : ''}</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span class="badge badge-sm uppercase font-800" style="color:${colorCenso}; border:1px solid ${colorCenso}40; background:${colorCenso}15;">${estadoTexto}</span>
-                </div>
-              </div>
-
-              <div class="p-10 rounded" style="background:#000; border:1px solid #222;">
-                <div class="flex justify-between font-900 text-[0.65rem] mb-4 uppercase">
-                  <span class="text-gray">Carga: ${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} UGM</span>
-                  <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
-                </div>
-                <div class="progress-track">
-                  <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; border-radius:4px; box-shadow:0 0 8px ${colorCenso}44; transition:width 0.3s;"></div>
-                </div>
-              </div>
-
-              <div class="flex justify-between items-end w-full">
-                <div class="flex-1 min-w-0">
-                  <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase">
-                    ${z.codigo_pac ? `<div class="flex items-center gap-4">${Icons.documento()} PAC: ${z.codigo_pac}</div>` : ''}
-                    <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
-                    ${especiesEnZona.size ? `<div class="flex items-center gap-4">${Icons.animales()} ${[...especiesEnZona].join(', ')}</div>` : ''}
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
-                </div>
-              </div>
-
-              ${rebanosHtml ? `<div class="mt-4 border-top-222 pt-8">${rebanosHtml}</div>` : ''}
-            </div>
-          </div>`;
+      const rebsEnZona = rebanos.filter((r) => r.zonaActual === z.nombre);
+      for (let r of rebsEnZona) {
+        const ans = await Animales.list(r.id);
+        totalOcupacion += ans.length;
       }
-      html += `</div>`;
-      // Barra resumen global
-      const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
-      const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
-      html += `
-        <div class="card-registro mt-15" style="--registro-color: ${colorGlobal}; background:rgba(204,255,0,0.03);padding:15px;">
-          <div class="flex justify-between items-center mb-6">
-            <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
-            <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
+    }
+
+    const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
+    const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
+
+    let html = `
+      <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+        <div class="flex justify-between items-start mb-10">
+          <div>
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+              ${Icons.zonas()} ZONAS Y PARCELAS
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              ${zonasConIndice.length} REGISTROS · GESTIÓN DE AFORO Y CARGA
+            </div>
           </div>
-          <div class="progress-track progress-track--lg">
-            <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
+          <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+            ${Icons.chevronAbajo()}
+          </button>
+        </div>
+
+        <!-- Card de RESUMEN: Ocupación Global -->
+        <div class="card card-total-3d card-resumen mb-20">
+          <div class="resumen-body flex flex-col gap-6">
+            <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
+               <span class="text-gray text-[0.7rem] font-800 uppercase">OCUPACIÓN GLOBAL</span>
+               <strong class="text-xl font-950" style="color: ${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</strong>
+            </div>
+            <div class="px-4 pb-12">
+              <div class="progress-track progress-track--lg" style="height: 6px;">
+                <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+          ${Icons.listado()} LISTADO DE ZONAS
+        </div>
+
+        <div class="grid gap-15">`;
+
+    for (const item of zonasConIndice) {
+      const z = item.zona;
+      let censoTotal = 0;
+      const rebsEnZona = rebanos.filter((r) => r.zonaActual === z.nombre);
+
+      for (let r of rebsEnZona) {
+        const ans = await Animales.list(r.id);
+        censoTotal += ans.length;
+      }
+
+      const aforo = z.aforoMax || z.aforo_maximo || 50;
+      const superficie = z.superficie || z.superficieGrafica || 0;
+      const pct = aforo > 0 ? Math.round((censoTotal / aforo) * 100) : 0;
+      const colorCenso = pct > 100 ? 'var(--c-danger)' : pct >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
+      const estadoTexto = pct > 100 ? 'Sobrecarga' : pct >= 80 ? 'Óptimo' : pct >= 50 ? 'Aceptable' : 'Baja Carga';
+
+      const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
+      let ugmTotal = 0;
+      for (let r of rebsEnZona) {
+        const factor = ugmFactor[r.especie] || 0.2;
+        const ans = await Animales.list(r.id);
+        ugmTotal += ans.length * factor;
+      }
+      const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      html += `
+        <div class="card-registro" onclick="location.hash='/zona?index=${item.realIndex}'" style="--registro-color: ${colorCenso};">
+          <div class="flex flex-col gap-10">
+            <div class="flex justify-between items-center w-full">
+              <div class="flex items-center gap-10 min-w-0">
+                <div class="text-xl" style="color:${colorCenso}">${Icons.zonas()}</div>
+                <div class="text-xs">
+                  <div class="font-bold uppercase text-base tracking-tight" style="color:var(--p-gold);">${z.nombre}</div>
+                  <div class="text-gray mt-2 font-700 uppercase">${z.usoPrincipal || 'Pastos'} · ${superficie ? Number(superficie).toLocaleString('es-ES') + ' ha' : 'S/S'}</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="badge badge-sm uppercase font-900" style="color:${colorCenso}; border:1px solid ${colorCenso}40; background:${colorCenso}15; font-size:0.55rem;">${estadoTexto}</span>
+              </div>
+            </div>
+
+            <div class="p-8 rounded bg-black border border-222">
+              <div class="flex justify-between font-900 text-[0.6rem] mb-4 uppercase">
+                <span class="text-gray">CARGA: ${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} UGM</span>
+                <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
+              </div>
+              <div class="progress-track" style="height: 4px;">
+                <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; border-radius:4px; box-shadow:0 0 8px ${colorCenso}44;"></div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-end w-full">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.6rem] text-aaa font-800 uppercase">
+                  ${z.codigo_pac ? `<div class="flex items-center gap-4">${Icons.documento()} PAC: ${z.codigo_pac}</div>` : ''}
+                  <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
+              </div>
+            </div>
           </div>
         </div>`;
     }
+
+    html += `</div></div>`;
+
     main.innerHTML = html + `
-      <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="ZonasView._crearZona()">
         <span class="fab-label">Nueva Zona</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>

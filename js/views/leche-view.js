@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - LecheView v3.0.0
  * Vista del Módulo de Leche con las 4 pestañas modulares de gestión unificada
  */
@@ -33,11 +33,11 @@ const LecheView = {
     entregas.sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0));
 
     // Filtrar rebanos lecheros
-    const rebanosLeche = rebanos.filter(r => 
-      r.tipo.toLowerCase().includes('leche') || 
-      r.tipo.toLowerCase().includes('láct') || 
-      r.tipo.toLowerCase().includes('mixt') || 
-      r.tipo.toLowerCase().includes('híbr') || 
+    const rebanosLeche = rebanos.filter(r =>
+      r.tipo.toLowerCase().includes('leche') ||
+      r.tipo.toLowerCase().includes('láct') ||
+      r.tipo.toLowerCase().includes('mixt') ||
+      r.tipo.toLowerCase().includes('híbr') ||
       r.tipo.toLowerCase().includes('doble')
     );
     const rebanosLecheIds = rebanosLeche.map(r => r.id);
@@ -46,7 +46,7 @@ const LecheView = {
     const animalesLeche = animales.filter(a => rebanosLecheIds.includes(a.rebanoId));
 
     // Filtrar controles diarios individuales/lote
-    const controlesDiarios = eventos.filter(e => 
+    const controlesDiarios = eventos.filter(e =>
       (e.unidad === 'L' || e.unidad === 'Litros') &&
       (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero') &&
       (rebanosLecheIds.includes(e.rebanoId) || e.snap_tipo?.toLowerCase()?.includes('leche') || e.snap_tipo?.toLowerCase()?.includes('láct') || e.snap_tipo?.toLowerCase()?.includes('mixt'))
@@ -82,7 +82,7 @@ const LecheView = {
     const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
     const importeTotal = entregas.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
     const alertas = entregas.filter(e => e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true).length;
-    
+
     // Controles diarios KPIs
     const totalLitrosControles = controlesDiarios.reduce((s, c) => s + (c.valor_neto || 0), 0);
     const numControles = controlesDiarios.length;
@@ -91,10 +91,10 @@ const LecheView = {
     const conLab = entregas.filter(e => e.laboratorio);
     const grasaMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.grasa || 0), 0) / conLab.length : 0;
     const protMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.proteina || 0), 0) / conLab.length : 0;
-    
+
     // Costes alimentación leche
-    const gastosAlim = todosGastos.filter(g => 
-      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+    const gastosAlim = todosGastos.filter(g =>
+      (g.categoria || '').toLowerCase() === 'alimentacion' ||
       (g.categoria || '').toLowerCase() === 'alimentación' ||
       (g.concepto || '').toLowerCase().includes('pienso') ||
       (g.concepto || '').toLowerCase().includes('forraje') ||
@@ -201,6 +201,44 @@ const LecheView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const kpis = d.kpis?.patrimonio || [];
+    // Get the 5 most recent animals by id (descending)
+    const recientesAnimales = [...d.animalesLeche]
+      .sort((a, b) => b.id - a.id)
+      .slice(0, 5);
+    let itemsHtml = '';
+    for (const a of recientesAnimales) {
+      const color = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#6B7280';
+      itemsHtml += `
+        <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${color};">
+          <div class="flex justify-between items-start">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-8">
+                <span class="text-xl" style="color:${color};">${Icons.animales()}</span>
+                <h3 class="section-h3 m-0 text-ellipsis">${a.nombre || a.numero_identificacion || 'Animal #' + a.id}</h3>
+              </div>
+              <div class="flex flex-wrap gap-4 mt-2 text-[0.65rem] text-gray font-800 uppercase">
+                <span>${Icons.calendar()} ${a.fecha_nacimiento ? new Date(a.fecha_nacimiento).toLocaleDateString() : 'Fecha N/D'}</span>
+                ${a.raza ? `<span>·</span><span>Raza: ${a.raza}</span>` : ''}
+              </div>
+              <div class="text-right flex-shrink-0 ml-8">
+  <span class="badge badge-sm font-950" style="background:${color}15; color:${color}; border:1px solid ${color}30;">
+                #${a.id}
+              </span>
+              <span class="text-[0.5rem] text-gray-700 font-900 uppercase">Ver ficha ➔</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    const recientesHtml = recientesAnimales.length > 0 ?
+      `<div class="mb-14">
+         <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+           <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> ANIMALES RECIENTES
+         </div>
+         <div class="grid gap-6">${itemsHtml}</div>
+       </div>` :
+      `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin animales recientes</span></div>`;
+
     const html = `
       <div class="card-registro report-section leche-report-card border-top-3px border-top-3px-orange" style="--registro-color: var(--c-orange);">
         <div class="leche-report-title">
@@ -211,6 +249,7 @@ const LecheView = {
           </div>
         </div>
         ${this._kpiGrid(kpis, 'var(--c-warning)')}
+        ${recientesHtml}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
@@ -222,7 +261,7 @@ const LecheView = {
         <div class="leche-list-header">
           ${Icons.documento()} Rebaños Lácteos Activos (${d.rebanosLeche.length})
         </div>
-        <div class="grid gap-10">
+        <div class="gap-10">
           ${d.rebanosLeche.length > 0
             ? d.rebanosLeche.map(r => `
                 <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${window.ModoContextoHelper.getEspecieColor(r.especie) || '#6B7280'};">
@@ -243,7 +282,8 @@ const LecheView = {
                       <span class="text-xs text-777">Ficha ➔</span>
                     </div>
                   </div>
-                </div>`).join('')
+                </div>`
+              ).join('')
             : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin lotes registrados.</span></div>`
           }
         </div>
@@ -252,10 +292,41 @@ const LecheView = {
     content.innerHTML = html;
   },
 
-
-
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
+    const kpis = d.kpis?.comercializacion || [];
+    // Get the 5 most recent entregas by date (descending)
+    const recientesEntregas = [...d.entregas]
+      .sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0))
+      .slice(0, 5);
+    let itemsHtml = '';
+    for (const e of recientesEntregas) {
+      const esAlerta = e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true;
+      const semaforo = window.CalidadLecheHelper ? window.CalidadLecheHelper.semaforoCalidad(e) : { color: '#888', label: '' };
+      itemsHtml += `
+        <div class="card-registro" onclick="location.hash='/albaran-leche?id=${e.id}'"
+           style="--registro-color: ${esAlerta ? 'var(--c-danger)' : semaforo.color};">
+          <div class="leche-entrega-content">
+            <div class="leche-entrega-left">
+              <div class="text-white font-900 uppercase text-sm flex items-center gap-6">${Icons.calendar()} ${this._fmtFecha(e.fechaRecogida || e.fecha)} — <span class="text-gold" style="font-size:1.1rem;">${(e.cantidad || 0).toLocaleString()}</span> <small class="text-aaa">L</small></div>
+              <div class="text-[0.65rem] text-gray uppercase font-800 mt-2 tracking-widest">Cisterna: <span class="text-white">${e.matriculaCisterna || '—'}</span></div>
+            </div>
+            <div class="text-right">
+              <span class="badge badge-sm font-950 tracking-tighter" style="background:${esAlerta ? 'rgba(255,68,68,0.2)' : 'rgba(204,255,0,0.15)'}; color:${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'}; border: 1px solid color-mix(in srgb, ${esAlerta ? 'var(--c-danger)' : 'var(--c-success)'} 25%, transparent);">${e.estadoAnalitica || 'PENDIENTE'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    const recientesHtml = recientesEntregas.length > 0 ?
+      `<div class="mb-14">
+         <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+           <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> ENTREGAS RECIENTES
+         </div>
+         <div class="grid gap-6">${itemsHtml}</div>
+       </div>` :
+      `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin entregas recientes</span></div>`;
+
     const html = `
       <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="leche-report-title">
@@ -265,7 +336,8 @@ const LecheView = {
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
+        ${this._kpiGrid(kpis, 'var(--c-success)')}
+        ${recientesHtml}
 
         <div class="text-center mb-12">
           <button class="btn btn-create btn-sm" onclick="App._abrirWizardAlbaranLeche()">
@@ -286,14 +358,53 @@ const LecheView = {
         ${d.entregas.length > 0
           ? d.entregas.slice(0, 15).map(e => this._cardEntrega(e)).join('')
           : `<div class="empty-state"><p class="empty-state-text">Sin entregas a cisterna.</p></div>`
-      }
-    </div>
+        }
+      </div>
     `;
     content.innerHTML = html;
   },
 
   // ========== BLOQUE 4: REGISTROS, LEGISLACIÓN Y CUMPLIMIENTO SANITARIO ==========
   _renderLegislacion(content, d) {
+    const kpis = d.kpis?.legislacion || [];
+    // Get the 5 most recent sanitarios by date (descending)
+    const recientesSanitarios = [...d.sanitariosLeche]
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+      .slice(0, 5);
+    let itemsHtml = '';
+    for (const s of recientesSanitarios) {
+      const enSup = d.tratamientosSupresionLeche.some(ts => ts.id === s.id);
+      itemsHtml += `
+        <div class="card-registro" style="--registro-color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'opacity: var(--bg-opacity);">
+          <div class="flex justify-between items-start">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-8">
+                <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}">${Icons.sanidad()}</span>
+                <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
+              </div>
+
+            flex-wrap gap-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
+              <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
+              <span>·</span>
+              <span>Espera Leche: <strong class="text-white bg-blue-900 px-4 rounded-sm">${s.tiempo_espera_leche_dias || 0} ${(s.tiempo_espera_leche_dias || 0) === 1 ? 'DÍA' : 'DÍAS'}</strong></span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-8">
+            <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid color-mix(in srgb, ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'} 38%, transparent);">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
+          </div>
+        </div>
+      </div>`
+    .join('');
+    }
+    const recientesHtml = recientesSanitarios.length > 0 ?
+      `<div class="mb-14">
+         <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+           <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> TRATAMIENTOS RECIENTES
+         </div>
+         <div class="grid gap-6">${itemsHtml}</div>
+       </div>` :
+      `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin tratamientos recientes</span></div>`;
+
     const html = `
       ${this._inyectarAlertaSupresion(d)}
       <div class="card-registro" style="--registro-color: var(--c-purple);">
@@ -304,7 +415,8 @@ const LecheView = {
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
           </div>
         </div>
-        ${this._kpiGrid(d.kpis.legislacion, 'var(--c-purple)')}
+        ${this._kpiGrid(kpis, 'var(--c-purple)')}
+        ${recientesHtml}
 
         <div class="text-center mb-12">
           <button class="btn btn-secondary btn-sm btn--purple w-auto inline-flex" onclick="LecheView._abrirAsistenteTratamientoLeche()">
@@ -321,7 +433,7 @@ const LecheView = {
         <div class="leche-list-header">
           ${Icons.documento()} Historial Sanitario Lácteo (${d.sanitariosLeche.length})
         </div>
-        <div class="grid gap-10">
+        <div class="gap-10">
           ${d.sanitariosLeche.length > 0
             ? d.sanitariosLeche.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresionLeche.some(ts => ts.id === s.id);
@@ -343,7 +455,7 @@ const LecheView = {
                         <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid color-mix(in srgb, ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'} 38%, transparent);">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
                       </div>
                     </div>
-                  </div>`;
+                  </div>`
               }).join('')
             : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin tratamientos sanitarios registrados.</span></div>`
           }
@@ -448,12 +560,12 @@ const LecheView = {
       App.toastError("No hay rebaños lecheros en esta finca para tratar.");
       return;
     }
-    
+
     if (d.rebanosLeche.length === 1) {
       await window.WizardTratamiento.registrar(d.rebanosLeche[0].id);
       return;
     }
-    
+
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
     overlay.style.justifyContent = "center";
@@ -473,7 +585,7 @@ const LecheView = {
       </div>
     `;
     document.body.appendChild(overlay);
-    
+
     overlay.querySelector('#btn-treat-next').onclick = async () => {
       const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
       overlay.remove();
