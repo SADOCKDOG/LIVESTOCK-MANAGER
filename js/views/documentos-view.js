@@ -213,38 +213,36 @@ const DocumentosView = {
           ? `<div class="text-xs text-green mt-6">${Icons.adjuntar()} Acuse manual: <span class="font-900">${doc.acuseManual}</span></div>`
           : `<div class="text-xs text-red mt-6">${Icons.adjuntar()} Acuse manual pendiente</div>`;
 
+        const estadoColor = esBorrador ? 'var(--c-warning)' : 'var(--c-success)';
         return `
-          <div class="card-registro" style="--registro-color: ${color};">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-800 text-sm" style="color:${color}; display:flex; align-items:center; gap:6px;">
-                  ${doc.tipo === 'crotales' ? Icons.animales() : Icons.documento()}
-                  ${label} 
-                  ${esBorrador ? `<span class="badge badge-warning ml-6 uppercase font-900" style="background:var(--c-warning); color:black; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Borrador</span>` : `<span class="badge badge-success ml-6 uppercase font-900" style="background:var(--c-success); color:white; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Presentado</span>`}
+          <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color};">
+            <div class="flex-1 min-w-0 flex flex-col gap-8">
+              <div class="flex items-center gap-10 min-w-0">
+                <span class="text-xl" style="color:${color}">${doc.tipo === 'crotales' ? Icons.animales() : Icons.documento()}</span>
+                <div>
+                  <div class="font-800 text-sm" style="color:${color};">${label}</div>
+                  <div class="font-950 text-gold uppercase tracking-tight">${doc.numero || 'S/N'}</div>
                 </div>
-                <div class="font-950 text-gold mt-4 uppercase tracking-tight">${doc.numero || 'S/N'}</div>
               </div>
-              <div class="text-xs text-ccc">${fecha}</div>
+              <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase">
+                <span class="flex items-center gap-4">${Icons.calendar()} ${fecha}</span>
+                <span class="flex items-center gap-4">${descHtml}</span>
+              </div>
+              ${acuseHtml}
+              <div class="flex gap-6 flex-wrap">
+                ${esBorrador ? `
+                  <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="event.stopPropagation(); DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar Borrador</button>
+                ` : `
+                  <button class="btn btn-sm btn-outline text-xs" onclick="event.stopPropagation(); DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} Imprimir PDF</button>
+                `}
+                <button class="btn btn-sm btn-outline text-xs" onclick="event.stopPropagation(); DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Guardar acuse</button>
+              </div>
             </div>
-            <div class="flex justify-between items-end w-full">
-              <div class="flex-1 min-w-0">
-                <div class="mt-6 text-xs text-ccc uppercase font-800">
-                  ${descHtml}
-                </div>
-                ${acuseHtml}
+            <div class="flex flex-col items-end justify-between flex-shrink-0">
+              <div style="background:${estadoColor}15; color:${estadoColor}; border:1px solid ${estadoColor}40; filter: drop-shadow(0 0 4px ${estadoColor}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+                ${esBorrador ? 'Borrador' : 'Presentado'}
               </div>
-              <div class="text-right">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--c-warning); white-space: nowrap;">Ficha -></span>
-              </div>
-            </div>
-            <div class="mt-8 flex gap-6 flex-wrap">
-              ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar Borrador</button>
-              ` : `
-                <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} Imprimir PDF</button>
-              `}
-              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Guardar acuse</button>
-              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verDetalle(${doc.id}, '${doc.tipo}')">${Icons.documento()} Detalle</button>
+              <span onclick="event.stopPropagation(); DocumentosView._verDetalle(${doc.id}, '${doc.tipo}')" style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase; cursor:pointer;">Ficha ${Icons.flechaDerecha()}</span>
             </div>
           </div>
         `;
