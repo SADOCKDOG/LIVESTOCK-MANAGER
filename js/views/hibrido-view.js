@@ -184,6 +184,7 @@ const HibridoView = {
   },
 
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
+  _renderPatrimonio(content, d) {
     const kpis = d.kpis?.patrimonio || [];
     const html = `
       <div class="card-registro" style="--registro-color: var(--c-warning);">
