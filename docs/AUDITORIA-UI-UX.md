@@ -370,9 +370,10 @@ Orden por **impacto visual / riesgo**. Cada fase es entregable y verificable de 
       con icono SVG + `.widget-link-label` apilados en columna (nunca `btn-create` / `btn-success`).
       Color por modo: Carne → `neon-danger`, Leche → `neon-info`, Híbrido → `neon-success`.
       Tratamiento sanitario → `neon-accent` en cualquier modo.
-- [ ] Cards de registros/datos: usar `.card-animal` con `style="border-left:4px solid ${color}"`
-      dinámico (nunca clases fijas como `border-4-left-green`).
-      Estructura: título + fecha con icono a izquierda, badge de valor a derecha.
+- [ ] Cards de registros/datos (v4.8+): usar `.card-registro` con alineación `stretch`.
+      Identificadores en Oro (`var(--p-gold)`) peso 950.
+      Derecha: **Viñeta Iluminada** arriba (glow + fondo 15%) y acción "FICHA ➔" abajo (en `var(--c-warning)`).
+      Referencia: `docs/PLANTILLA-CARD-REGISTRO.md`.
 - [ ] Textos de contexto en cards: usar `text-xs text-gray uppercase font-extrabold tracking-wider` para línea de label,
       `text-xs text-aaa mt-4 leading-relaxed` para descripción. Nunca `text-[0.55rem]` o `text-gray-600`.
 - [ ] Inputs `.form-*` (alto ≥ 48px, font ≥ 16px).
