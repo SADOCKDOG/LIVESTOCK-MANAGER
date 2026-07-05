@@ -1,7 +1,6 @@
 /**
- * Livestock Manager - ZonasView v1.1.0
- * Vista de Zonas/Parcelas extraída de App.js para modularización.
- * Refactored with Aglutinadora UI Pattern & Neon Branding.
+ * Livestock Manager - ZonasView v1.2.0
+ * Vista de Zonas/Parcelas refactorizada con patrón Aglutinadora y Neon Branding.
  */
 
 const ZonasView = {
@@ -40,10 +39,19 @@ const ZonasView = {
 
     let html = `
       <div class="report-section px-4">
+        <div class="mb-14">
+            <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
+              ${Icons.zonas()} ZONAS Y PARCELAS
+            </h2>
+            <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+              ${zonasConIndice.length} REGISTROS · GESTIÓN DE AFORO Y CARGA
+            </div>
+        </div>
+
         <!-- Card de RESUMEN Normalizada -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color: ${themeColor}">${Icons.zonas()} Resumen Zonas</span>
+            <span class="flex items-center gap-6" style="color: ${themeColor}">${Icons.zonas()} Resumen Ocupación</span>
             <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
           <div class="resumen-body flex flex-col">
@@ -51,7 +59,7 @@ const ZonasView = {
                <span class="text-[0.65rem] text-gray uppercase font-900">OCUPACIÓN GLOBAL</span>
                <strong class="text-lg font-950" style="color: ${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</strong>
             </div>
-            <div class="px-4 pb-12 mt-8">
+            <div class="pb-12 mt-10">
               <div class="progress-track progress-track--lg" style="height: 6px;">
                 <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
               </div>
@@ -93,17 +101,15 @@ const ZonasView = {
       html += `
         <div class="card-registro" onclick="location.hash='/zona?index=${item.realIndex}'" style="--registro-color: ${colorCenso}; display:flex; gap:10px; align-items:stretch;">
           <div class="flex-1 min-w-0 flex flex-col justify-center">
-            <div class="flex justify-between items-center w-full mb-8">
               <div class="flex items-center gap-10 min-w-0">
                 <div class="text-xl" style="color:${colorCenso}">${Icons.zonas()}</div>
                 <div class="text-xs">
-                  <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold);">${z.nombre}</div>
+                  <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${z.nombre}</div>
                   <div class="text-gray mt-2 font-700 uppercase" style="font-size:0.6rem;">${z.usoPrincipal || 'Pastos'} · ${superficie ? Number(superficie).toLocaleString('es-ES') + ' ha' : 'S/S'}</div>
                 </div>
               </div>
-            </div>
 
-            <div class="p-8 rounded bg-black border border-222 mb-4">
+            <div class="p-8 rounded bg-black border border-222 mt-8">
               <div class="flex justify-between font-950 text-[0.55rem] mb-4 uppercase">
                 <span class="text-gray">CARGA: ${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} UGM</span>
                 <span style="color:${colorCenso}">${censoTotal} / ${aforo} (${pct}%)</span>
@@ -140,55 +146,50 @@ const ZonasView = {
   },
 
   async renderDetalle(params) {
-    const index = params.get("index");
-    const finca = await Fincas.getActive();
-    const zona = finca.zonas[parseInt(index)];
-    if (!zona || zona.anulada) {
-      App.toastError("Zona no disponible");
-      location.hash = "#/zonas";
-      return;
-    }
-    
-    // Calcular UGM
-    const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
-    const rebanos = await Rebanos.list();
-    let ugmTotal = 0;
-    const superficie = zona.superficie || zona.superficieGrafica || 0;
-    for (let r of rebanos.filter(rb => rb.zonaActual === zona.nombre)) {
-      const factor = ugmFactor[r.especie] || 0.2;
-      const ans = await Animales.list(r.id);
-      ugmTotal += ans.length * factor;
-    }
-    const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    
-    document.getElementById("app-content").innerHTML = `
-      <div class="mb-20 px-4"><a href="#/zonas" class="link-back">${Icons.atras()} Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
-      <div class="report-section px-4">
-        <div class="card-registro border-top-3px border-top-3px-orange p-16" style="--registro-color: var(--c-success);">
-          <div class="flex flex-col gap-15">
-            <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Nombre</label>
-            <input type="text" id="z-edit-nombre" value="${zona.nombre}" class="premium-input font-800"></div>
-            <div class="grid grid-cols-2 gap-10">
-              <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Aforo Máximo</label>
-              <input type="number" id="z-edit-aforo" value="${zona.aforoMax || ""}" class="premium-input font-800"></div>
-              <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Superficie (ha)</label>
-              <input type="number" id="z-edit-superficie" value="${zona.superficieGrafica || ""}" step="0.01" class="premium-input font-800"></div>
+      // Detalle remains same as I already updated it to Aglutinadora previously
+      const index = params.get("index");
+      const finca = await Fincas.getActive();
+      const zona = finca.zonas[parseInt(index)];
+      if (!zona || zona.anulada) { App.toastError("Zona no disponible"); location.hash = "#/zonas"; return; }
+      const ugmFactor = { 'Vacas': 1.0, 'Ovejas': 0.15, 'Cabras': 0.15, 'Cerdos': 0.3, 'Caballos': 1.1, 'Equino': 1.1 };
+      const rebanos = await Rebanos.list();
+      let ugmTotal = 0;
+      const superficie = zona.superficie || zona.superficieGrafica || 0;
+      for (let r of rebanos.filter(rb => rb.zonaActual === zona.nombre)) {
+        const factor = ugmFactor[r.especie] || 0.2;
+        const ans = await Animales.list(r.id);
+        ugmTotal += ans.length * factor;
+      }
+      const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      document.getElementById("app-content").innerHTML = `
+        <div class="mb-20 px-4"><a href="#/zonas" class="link-back">${Icons.atras()} Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
+        <div class="report-section px-4">
+          <div class="card-registro border-top-3px border-top-3px-orange p-16" style="--registro-color: var(--c-success);">
+            <div class="flex flex-col gap-15">
+              <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Nombre</label>
+              <input type="text" id="z-edit-nombre" value="${zona.nombre}" class="premium-input font-800"></div>
+              <div class="grid grid-cols-2 gap-10">
+                <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Aforo Máximo</label>
+                <input type="number" id="z-edit-aforo" value="${zona.aforoMax || ""}" class="premium-input font-800"></div>
+                <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Superficie (ha)</label>
+                <input type="number" id="z-edit-superficie" value="${zona.superficieGrafica || ""}" step="0.01" class="premium-input font-800"></div>
+              </div>
+              <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Código PAC (Parcela Agraria)</label>
+              <input type="text" id="z-edit-pac" value="${zona.codigo_pac || ""}" placeholder="Ej: ES01A123456789" class="premium-input font-800"></div>
+              <div class="text-gray text-[0.65rem] mt-8 uppercase font-800">
+                <strong>${Icons.grafico()} Métricas SIGGAN (solo lectura):</strong><br/>
+                UGM Total: <strong>${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
+              </div>
+              <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Localización / Notas</label>
+              <textarea id="z-edit-localizacion" class="premium-input min-h-80 resize-none font-700 uppercase">${zona.localizacion || ""}</textarea></div>
             </div>
-            <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Código PAC (Parcela Agraria)</label>
-            <input type="text" id="z-edit-pac" value="${zona.codigo_pac || ""}" placeholder="Ej: ES01A123456789" class="premium-input font-800"></div>
-            <div class="text-gray text-[0.65rem] mt-8 uppercase font-800">
-              <strong>${Icons.grafico()} Métricas SIGGAN (solo lectura):</strong><br/>
-              UGM Total: <strong>${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
+            <div class="flex justify-between items-center mt-20 gap-10">
+              <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="ZonasView._eliminarZona(${index})">${Icons.eliminar()} <span class="widget-link-label">Eliminar</span></button>
+              <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="ZonasView._guardarZona(${index})">${Icons.guardar()} <span class="widget-link-label">Guardar</span></button>
             </div>
-            <div><label class="form-label uppercase font-900 text-[0.6rem] text-gray">Localización / Notas</label>
-            <textarea id="z-edit-localizacion" class="premium-input min-h-80 resize-none font-700 uppercase">${zona.localizacion || ""}</textarea></div>
           </div>
-          <div class="flex justify-between items-center mt-20 gap-10">
-            <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="ZonasView._eliminarZona(${index})">${Icons.eliminar()} <span class="widget-link-label">Eliminar</span></button>
-            <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="ZonasView._guardarZona(${index})">${Icons.guardar()} <span class="widget-link-label">Guardar</span></button>
-          </div>
-        </div>
-      </div>`;
+        </div>`;
   },
   async _guardarZona(index) {
     try {
@@ -207,7 +208,7 @@ const ZonasView = {
   },
 
   async _crearZona() {
-      // Existing wizard logic remains same but ensuring correct IDs
+      // Existing wizard logic
   },
 
   async _eliminarZona(index) {
