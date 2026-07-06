@@ -32,71 +32,7 @@ const App = {
     return map[color] || 'text-gray';
   },
 
-  _cardRegistro(opts) {
-    const colorClass = opts.colorClass || 'color-info';
-    const colorVar = opts.color || (colorClass === 'color-info' ? 'var(--c-info)' : (colorClass === 'color-success' ? 'var(--c-success)' : (colorClass === 'color-danger' ? 'var(--c-danger)' : (colorClass === 'color-warning' ? 'var(--c-warning)' : 'var(--c-purple)'))));
 
-    return `
-      <div class="card-registro ${colorClass}" style="display: flex; gap: 10px; align-items: stretch; cursor: pointer; --registro-color: ${colorVar}; border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);" onclick="${opts.onClick}">
-        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
-          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-            <span style="font-size: 1.25rem; color: var(--registro-color);">${opts.icon}</span>
-            <div style="font-weight: 950; text-transform: uppercase; font-size: 0.9rem; letter-spacing: -0.02em;" class="${opts.titleClass || 'text-white'}">${opts.title}</div>
-          </div>
-          ${opts.metadata ? `
-          <div style="display: flex; flex-wrap: wrap; gap: 12px; font-weight: 800; text-transform: uppercase; margin-top: 8px; font-size: 0.68rem; color: var(--text-s, #94A3B8); line-height: 1.4;">
-            ${opts.metadata}
-          </div>` : ''}
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0;">
-          <div class="top-part">
-            ${opts.badge ? `
-              <div style="background:var(--registro-color)15; color:var(--registro-color); border:1px solid var(--registro-color)40; filter: drop-shadow(0 0 4px var(--registro-color)); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
-                ${opts.badge}
-              </div>` : ''}
-          </div>
-          <div class="bottom-part" style="margin-top: auto;">
-            <span style="color:var(--p-gold); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-              FICHA ${Icons.flechaDerecha()}
-            </span>
-          </div>
-        </div>
-      </div>
-    `;
-  },
-
-  _getAnimalCardProps(a, rebano, extraMetadata = '') {
-    const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
-    const iconoSexo = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : Icons.reproduccion());
-    const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : 'var(--c-info)';
-    let colorClass = this._getColorClass(colorEspecie).replace('text-', 'color-');
-    if(colorClass === 'color-gray') colorClass = 'color-gray';
-
-    const rebanoNombre = rebano ? rebano.nombre : (a.rebanoId ? 'ID ' + a.rebanoId : 'Sin rebaño');
-
-    return {
-      colorClass: colorClass,
-      titleClass: 'text-gold',
-      onClick: `location.hash='/animal?id=${a.id}'`,
-      icon: Icons.animales(),
-      title: `${a.numero_identificacion || a.nombre || '#' + a.id} <span style="color:#888; margin-left: 8px;">${iconoSexo}</span>`,
-      badge: a.estado || 'activo',
-      metadata: `
-        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
-          <div style="color: #888; font-weight: 700; text-transform: uppercase;">
-            <span class="${this._getColorClass(colorEspecie)}" style="font-weight: 900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.65rem; align-items: center;">
-            <span style="display: flex; align-items: center; gap: 4px;">${Icons.calendar()} ${a.fecha_nacimiento ? new Date(a.fecha_nacimiento).toLocaleDateString() : '-'} ${edad !== null ? '('+edad+' años)' : ''}</span>
-            <span style="display: flex; align-items: center; gap: 4px; color: #FFF; font-weight: 900;">${Icons.peso()} ${a.peso_actual || a.peso_inicial || a.peso_nacimiento || '-'} kg</span>
-            <span style="display: flex; align-items: center; gap: 4px;">${Icons.rebanos()} ${rebanoNombre}</span>
-            <span style="display: flex; align-items: center; gap: 4px; color: var(--c-purple);">${Icons.paquete()} ${a.lote || '-'}</span>
-          </div>
-          ${extraMetadata ? `<div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); color: #FFF;">${extraMetadata}</div>` : ''}
-        </div>
-      `
-    };
-  },
 
   routes: {
     "/": "renderDashboard",
@@ -563,30 +499,100 @@ const App = {
    * Genera el HTML de una tarjeta de registro estandarizada.
    * @param {Object} opts - Opciones de la tarjeta.
    */
+  /**
+   * Genera el HTML de una tarjeta de registro estandarizada según PLANTILLA-CARD-REGISTRO.md.
+   * Soporta de manera fluida y flexible las llamadas de todas las vistas del sistema.
+   * @param {Object} opts - Opciones de la tarjeta.
+   */
   _cardRegistro(opts) {
     const color = opts.color || 'var(--c-primary)';
     const onClick = opts.onClick ? `onclick="${opts.onClick}"` : '';
     const href = opts.href ? `href="${opts.href}"` : '';
     const tag = opts.href ? 'a' : 'div';
+    const className = `card-registro ${opts.className || opts.colorClass || ''}`;
+    const customStyle = opts.style || '';
+
+    // BLOQUE IZQUIERDO: Identificación y Datos
+    let leftColumnContent = '';
+
+    // Encabezado (Icono + Título)
+    let headerContent = '';
+    if (opts.icon) {
+      headerContent += `<span class="text-xl" style="color:${color}; display:inline-flex; align-items:center;">${opts.icon}</span>`;
+    }
+    
+    let titleHtml = opts.title || '';
+    if (opts.titleClass && !titleHtml.includes('<span') && !titleHtml.includes('<div')) {
+      titleHtml = `<div class="${opts.titleClass}" style="font-weight: 950; text-transform: uppercase; font-size: 0.9rem; letter-spacing: -0.02em;">${titleHtml}</div>`;
+    } else if (!titleHtml.includes('<span') && !titleHtml.includes('<div')) {
+      titleHtml = `<div class="registro-titulo" style="color:var(--p-gold); font-weight: 950; text-transform: uppercase; font-size: 0.9rem; tracking-tight: -0.02em;">${titleHtml}</div>`;
+    }
+
+    headerContent += titleHtml;
+
+    leftColumnContent += `
+      <div class="flex items-center gap-10 min-w-0">
+        ${headerContent}
+      </div>
+    `;
+
+    // Subtitle / Metadata / Content (debajo del encabezado)
+    if (opts.subtitle) {
+      leftColumnContent += `<div class="registro-sub mt-2">${opts.subtitle}</div>`;
+    }
+
+    if (opts.metadata) {
+      leftColumnContent += `
+        <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
+          ${opts.metadata}
+        </div>
+      `;
+    }
+
+    if (opts.content) {
+      leftColumnContent += opts.content;
+    }
+
+    if (opts.footerLeft) {
+      leftColumnContent += `<div class="mt-4 flex-1 min-w-0">${opts.footerLeft}</div>`;
+    }
+
+    // BLOQUE DERECHO: Estado y Acción
+    let topPartContent = '';
+    if (opts.rightSide) {
+      topPartContent = opts.rightSide;
+    } else if (opts.badge) {
+      topPartContent = `
+        <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
+          ${opts.badge}
+        </div>
+      `;
+    }
+
+    let bottomPartContent = '';
+    if (opts.footerRight) {
+      bottomPartContent = opts.footerRight;
+    } else {
+      bottomPartContent = `
+        <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase; white-space:nowrap;">
+          FICHA ${Icons.flechaDerecha()}
+        </span>
+      `;
+    }
 
     return `
-      <${tag} ${href} ${onClick} class="card-registro ${opts.className || ''}" style="--registro-color: ${color}; border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color); ${opts.style || ''}">
-        <div class="flex flex-col">
-          <div class="flex justify-between items-start gap-6 mb-4">
-            <div class="min-w-0 flex-1">
-              <div class="registro-titulo">${opts.title || ''}</div>
-              <div class="registro-sub">${opts.subtitle || ''}</div>
-              ${opts.content || ''}
-            </div>
-            ${opts.rightSide || ''}
+      <${tag} ${href} ${onClick} class="${className}" style="display:flex; gap:10px; align-items:stretch; cursor:pointer; --registro-color: ${color}; border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color); ${customStyle}">
+        <!-- BLOQUE IZQUIERDO -->
+        <div class="flex-1 min-w-0 flex flex-col justify-center">
+          ${leftColumnContent}
+        </div>
+        <!-- BLOQUE DERECHO -->
+        <div class="flex flex-col items-end justify-between flex-shrink-0">
+          <div class="top-part">
+            ${topPartContent}
           </div>
-          <div class="flex justify-between items-end w-full">
-            <div class="flex-1 min-w-0">
-              ${opts.footerLeft || ''}
-            </div>
-            <div class="text-right">
-              ${opts.footerRight || ''}
-            </div>
+          <div class="bottom-part" style="margin-top:auto;">
+            ${bottomPartContent}
           </div>
         </div>
       </${tag}>
@@ -596,12 +602,16 @@ const App = {
   /**
    * Mapea un animal y su rebaño a propiedades de card-registro.
    * El color del borde izquierdo corresponde al color de la especie.
-   * El badge superior derecho muestra el estado con su color semántico y brillo neón.
+   * El badge superior derecho muestra el estado con su color semántico y brillo neón canónico.
    */
   _getAnimalCardProps(a, rebano) {
     const estado = a.estado || 'activo';
-    // Color del badge según estado (éxito, warning, danger)
-    const estadoColor = estado === 'activo' ? 'var(--c-success)' : (estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)');
+    // Color del badge según estado (éxito, warning, danger, info, etc.)
+    const estadoColor = estado === 'activo' ? 'var(--c-success)' : 
+                        (estado === 'vendido' ? 'var(--c-info)' : 
+                        (estado === 'en tratamiento' || estado === 'pendiente' ? 'var(--c-warning)' : 
+                        (estado === 'crítico' || estado === 'retirada' ? 'var(--c-danger)' : 'var(--c-accent)')));
+    
     // Color del borde izquierdo según especie
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : 'var(--c-info)';
     const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
@@ -626,18 +636,21 @@ const App = {
           border:1px solid ${estadoColor}40;
           filter: drop-shadow(0 0 4px ${estadoColor});
           box-shadow: 0 0 6px color-mix(in srgb, ${estadoColor} 50%, transparent);
-          font-size:0.8rem;
-          padding:4px 10px;
-          border-radius:8px;
-          font-weight:800;">
+          font-size:0.6rem;
+          padding:2px 8px;
+          border-radius:6px;
+          font-weight:900;
+          text-transform:uppercase;
+          letter-spacing:0.5px;
+          white-space:nowrap;">
           ${estado.toUpperCase()}
         </span>`,
       footerRight: `<span class="btn-ficha-mini" style="
-          color:var(--text-s);
-          font-size:0.65rem;
-          font-weight:600;
+          color:var(--c-warning);
+          font-size:0.7rem;
+          font-weight:800;
           text-transform:uppercase;">
-          Ficha ${Icons.siguiente()}
+          Ficha ${Icons.flechaDerecha()}
         </span>`,
       color: colorEspecie,
       href: `#/animal?id=${a.id}`

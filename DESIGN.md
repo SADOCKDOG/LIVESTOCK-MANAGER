@@ -1,6 +1,6 @@
 # LIVESTOCK MANAGER - Brand & Design Contract
 
-Este es el contrato de diseño oficial de **LIVESTOCK MANAGER (Gestión Ganadera)**, un sistema moderno de automatización, trazabilidad y control para explotaciones agropecuarias (AgTech). 
+Este es el contrato de diseño oficial de **LIVESTOCK MANAGER (Gestión Ganadera)**, un sistema moderno de automatización, trazabilidad y control para explotaciones agropecuarias (AgTech).
 
 Este documento sirve como especificación de diseño (`DESIGN.md`) para que el agente de Open Design y Codex lo utilicen para la edición, mantenimiento y generación de nuevas interfaces y componentes, asegurando la consistencia de marca y un aspecto visual premium.
 
@@ -20,17 +20,40 @@ Livestock Manager es una plataforma robusta y de vanguardia diseñada para digit
 
 Nuestra paleta está inspirada en la naturaleza (el pasto, la tierra y el sol), pero con un tratamiento de alta saturación y contraste para ofrecer un aspecto moderno y asegurar la legibilidad bajo la luz directa del sol.
 
-| Rol | Color | Hex | Uso |
+### Colores Principales (Semánticos OLED)
+
+| Rol | Variable CSS | Hex | Uso |
 | :--- | :--- | :--- | :--- |
-| **Primario (AgTech Green)** | Grass / Esmeralda | `#10B981` | Acciones principales, éxito, botones de acción rápida, escáner. |
-| **Primario Light** | Mint / Menta | `#34D399` | Variación para hover, estados activos sutiles. |
-| **Secundario (Terra)** | Earth / Arcilla | `#78350F` | Detalles de marca, acentos de fincas, madera, establos. |
-| **Acento (Sun Gold)** | Amber / Ámbar | `#F59E0B` | Estados de reproducción (celo), advertencias sutiles, alertas leves. |
-| **Acento (Alert Red)** | Rose / Coral | `#EF4444` | Alertas críticas, tiempos de espera de medicamentos, tratamientos pendientes. |
-| **Financiero (Deep Blue)** | Indigo / Royal | `#2563EB` | Módulo de comercialización, ventas, contratos, informes. |
-| **Fondo Oscuro (Slate)** | Charcoal | `#0F172A` | Fondo de cabeceras, barra lateral, modo oscuro premium. |
-| **Fondo Claro (Soft Gray)**| Snow | `#F9FAFB` | Fondo base de la aplicación (para evitar el blanco deslumbrante). |
-| **Texto Principal** | Ink | `#111827` | Texto base con alto contraste para legibilidad en exterior. |
+| **Primario (AgTech Green)** | `--c-success` | `#10B981` | Acciones principales, éxito, botones de acción rápida, escáner. |
+| **Primario Light** | (variante) | `#34D399` | Variación para hover, estados activos sutiles. |
+| **Secundario (Terra)** | `--c-orange` | `#78350F` | Detalles de marca, acentos de fincas, madera, establos. |
+| **Acento (Sun Gold)** | `--p-gold` | `#FBBF24` | Estados de reproducción (celo), advertencias sutiles, alertas leves, identificadores primarios. |
+| **Acento (Alert Red)** | `--c-danger` | `#EF4444` | Alertas críticas, tiempos de espera de medicamentos, tratamientos pendientes. |
+| **Financiero (Deep Blue)** | `--c-info` | `#3B82F6` | Módulo de comercialización, ventas, contratos, informes. |
+| **Advertencia** | `--c-warning` | `#F59E0B` | Enlaces de acción (Ficha ➔), estados pendientes. |
+| **Acento secundario** | `--c-accent` | `#8B5CF6` | Sanidad, genética. |
+
+### Fondos y Superficies
+
+| Rol | Variable CSS | Hex | Uso |
+| :--- | :--- | :--- | :--- |
+| **Fondo Oscuro (Slate)** | `--background` | `#0F172A` | Fondo de cabeceras, barra lateral, modo oscuro premium. |
+| **Fondo Claro (Soft Gray)** | `--surface` | `#F9FAFB` | Fondo base de la aplicación (para evitar el blanco deslumbrante). |
+| **Superficie Intermedia** | `--mixed-black` | `rgba(0,0,0,0.02)` | Fondos ligeramente oscuros para secciones internas. |
+
+### Texto
+
+| Rol | Variable CSS | Hex | Uso |
+| :--- | :--- | :--- | :--- |
+| **Texto Principal** | `--text-primary` | `#111827` | Texto base con alto contraste para legibilidad en exterior. |
+| **Texto Secundario** | `--text-s` | `#94A3B8` | Texto secundario, metá-, placeholders. |
+
+### Bordes y Divisores
+
+| Rol | Variable CSS | Valor | Uso |
+| :--- | :--- | :--- | :--- |
+| **Borde Primario** | `--border-222` | `rgba(255,255,255,0.13)` | Bordes principales de tarjetas y contenedores. |
+| **Borde Secundario** | `--border-444` | `rgba(255,255,255,0.27)` | Bordes secundarios y divisores internos. |
 
 ---
 
@@ -39,11 +62,12 @@ Nuestra paleta está inspirada en la naturaleza (el pasto, la tierra y el sol), 
 - **Fuente Principal**: `Inter` u `Outfit` (sans-serif) para todo el cuerpo del texto, tablas de datos y formularios. Ofrece una legibilidad de pantalla excelente en tamaños pequeños.
 - **Fuente de Cabeceras**: `Sora` o `Cabinet Grotesk` (geométrica, moderna, con personalidad) para títulos de páginas, KPIs y nombres de animales.
 - **Escala de Tamaños**:
-  - `Display (KPIs)`: 36px / Semibold
-  - `H1 (Page Titles)`: 24px / Bold
-  - `H2 (Section Headers)`: 18px / Semibold
-  - `Body (Base)`: 14px / Regular o Medium (adecuado para alta densidad de datos)
-  - `Caption (Labels)`: 12px / Medium o Light
+  - `Display (KPIs)`: 36px / Semibold (`--text-display`)
+  - `H1 (Page Titles)`: 24px / Bold (`--text-h1`)
+  - `H2 (Section Headers)`: 18px / Semibold (`--text-h2`)
+  - `Body (Base)`: 14px / Regular o Medium (`--text-body`)
+  - `Caption (Labels)`: 12px / Medium o Light (`--text-label`)
+  - `Tiny`: 10px / Regular (`--text-tiny`) - Para metadatos mínimos
 
 ---
 
@@ -70,6 +94,71 @@ Nuestra paleta está inspirada en la naturaleza (el pasto, la tierra y el sol), 
   - **Barra Lateral de Navegación (Desktop)**: Persistente en el lateral izquierdo con el mismo orden lógico.
 - **Módulos con Asistentes (Wizards)**: Los procesos complejos se dividen en flujos paso a paso de pantalla completa con un indicador de progreso superior y botones de navegación ("Atrás" / "Continuar") fijos en la parte inferior.
 
+### 5.5 Patrón de Posicionamiento en Cards de Registro
+
+La Card de Registro sigue un patrón estricto de posicionamiento para mantener jerarquía visual y consistencia:
+
+- **Contenedor Principal**: 
+  - `display: flex`
+  - `align-items: stretch` (para que la columna derecha ocupe todo el alto)
+  - `gap: 10px` (espaciado entre columnas)
+  - `--registro-color`: Variable que define el color de acento lateral
+
+- **Lado Izquierdo** (Información Principal - `flex-1 min-w-0`):
+  - Contenedor: `flex flex-col justify-center`
+  - Contenido:
+    - Encabezado: Icono + Título principal (siempre en Oro `--p-gold`)
+    - Metadatos: Información secundaria en texto gris `--text-s`, tamaño reducido, UPPERCASE
+
+- **Lado Derecho** (Estado y Acción - `flex flex-col items-end justify-between flex-shrink-0`):
+  - **Parte Superior** (Estado): 
+    - Alineación: `items-start` (arriba) o `self-start`
+    - Contiene el **Status Badge** estándar (ver sección 6.3)
+  - **Parte Inferior** (Acción):
+    - Alineación: `items-end` (abajo) o `self-end`  
+    - Contiene el enlace "FICHA →" con estilo estándar (ver sección 6.5)
+
+### 5.6 Tokens de Diseño (CSS Custom Properties)
+
+#### Espaciado Base (sistema de 4px)
+```
+--space-px: 1px;
+--space-1: 2px;
+--space-2: 4px;
+--space-3: 6px;
+--space-4: 8px;
+--space-5: 12px;
+--space-6: 16px;
+--space-7: 20px;
+--space-8: 24px;
+--space-9: 32px;
+--space-10: 48px;
+```
+
+#### Radio de Borde
+```
+--radius-sm: 4px;
+--radius-md: 6px;
+--radius-lg: 8px;
+--radius-pill: 9999px;
+```
+
+#### Sombras y Elevación
+```
+--shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+--shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+--shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.1);
+--shadow-inner: inset 0 2px 4px rgba(0,0,0,0.06);
+```
+
+#### Transiciones y Animaciones
+```
+--transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+--transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+--transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+--animation-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+```
+
 ---
 
 ## 6. Components (Componentes Reutilizables)
@@ -85,15 +174,52 @@ Nuestra paleta está inspirada en la naturaleza (el pasto, la tierra y el sol), 
 - **Área de Acción Inferior**: Panel fijo abajo con fondo difuminado (glassmorphism) que contiene los botones "Atrás" (estilo Outline o Texto) y "Continuar" (botón lleno en verde primario).
 
 ### 6.3 Status Badge (Etiquetas de Estado)
-- **Visual**: Pequeño contenedor ovalado (`border-radius: 9999px`) con texto en mayúsculas pequeñas.
-- **Variaciones de Color**:
-  - `Activo` / `Éxito`: Fondo verde suave (`#D1FAE5`), texto verde oscuro (`#065F46`).
-  - `En Tratamiento` / `Pendiente`: Fondo amarillo suave (`#FEF3C7`), texto ámbar oscuro (`#92400E`).
-  - `Crítico` / `Retirada`: Fondo rojo suave (`#FEE2E2`), texto rojo oscuro (`#991B1B`).
-  - `Vendido` / `Historial`: Fondo azul suave (`#DBEAFE`), texto azul oscuro (`#1E40AF`).
+- **Visual**: Contenedor con formato de cápsula que indica el estado mediante codificación de color neón consistente con el sistema de diseño.
+- **Implementación Estándar** (ver PLANTILLA-CARD-REGISTRO.md):
+  - Fondo: 15% de opacidad del color semántico (`colorSemantico15`)
+  - Borde: 40% de opacidad del color semántico (`colorSemantico40`)
+  - Efecto: `drop-shadow(0 0 4px colorSemantico)` para simular retroiluminación
+  - Forma: Cápsula con `border-radius: 6px`
+  - Texto: Mayúsculas, peso 900, tamaño 0.6rem, espaciado de letras 0.5px
+- **Variaciones de Color Semántico**:
+  - `Activo` / `Éxito`: Usa `--c-success` (#10b981)
+  - `En Tratamiento` / `Pendiente`: Usa `--c-warning` (#f59e0b)
+  - `Crítico` / `Retirada`: Usa `--c-danger` (#ef4444)
+  - `Vendido` / `Historial`: Usa `--c-info` (#3b82f6)
+  - `En Proceso`: Usa `--c-accent` (#8b5cf6)
+- **Notas de Implementación**:
+  - Siempre usar la clase CSS correspondiente (`badge-success`, `badge-warning`, etc.)
+  - En JavaScript, aplicar mediante: `style="background:var(--c-success)15; color:var(--c-success); border:1px solid var(--c-success)40; filter: drop-shadow(0 0 4px var(--c-success))"`
+  - Mantener consistencia con el patrón de posicionamiento: esquina superior derecha dentro de card-registro
 
 ### 6.4 Floating Scanner Button (Botón Escáner de Crotal)
 - **Visual**: Botón flotante redondo (`border-radius: 50%`) de **56px x 56px** en la esquina inferior derecha en pantallas de ganadería. Color verde vibrante (`#10B981`), sombra elevada y un icono claro de cámara/código QR.
+
+### 6.5 Botones de Acción Hub (.widget-link-btn--neon)
+- **Visual**: Botones de formato grande para acciones primarias y navegación rápida.
+- **Estructura**: 
+  - Contenedor con display: flex, flex-direction: column, align-items: center
+  - Icono SVG superior (24x24px)
+  - Etiqueta de texto inferior en mayúsculas
+  - Espaciado entre icono y texto: 8px
+- **Variantes de Color** (usar sufijos en class):
+  - `.neon-success` (`--c-success`): Acciones primarias de éxito
+  - `.neon-danger` (`--c-danger`): Acciones de eliminación o alerta
+  - `.neon-info` (`--c-info`): Acciones informativas
+  - `.neon-warning` (`--c-warning`): Acciones de atención
+  - `.neon-accent` (`--c-accent`): Acciones secundarias destacadas
+- **Estilos Comunes**:
+  - Fondo: Transparente o rgba del color correspondiente al 10%
+  - Borde: 2px sólido del color correspondiente al 30%
+  - Texto: Color correspondiente al 100%, peso 600, tamaño 0.875rem
+  - Icono: Color correspondiente al 80%
+  - Hover: Fondo al 20% de opacidad, escala 1.05
+  - Active/Pressed: Escala 0.95
+- **Tamaño Estándar**: Mínimo 48px x 48px (área táctil) con padding interno de 12px
+- **Uso Típico**:
+  - Botones de creación principal (+)
+  - Accesos rápidos en pantalla de inicio
+  - Acciones de confirmación en formularios
 
 ---
 
@@ -113,7 +239,60 @@ Nuestra paleta está inspirada en la naturaleza (el pasto, la tierra y el sol), 
 
 ---
 
-## 9. Anti-patterns (Lo que se debe evitar)
+## 9. Sistema de Iconos y Uso
+
+### 9.1 Biblioteca de Iconos
+- **Fuente Principal**: `js/icons.js` con sistema de exportación nombrada
+- **Ejemplo de Uso**: `Icons.animales()`, `Icons.flechaDerecha()`, `Icons.agregar()`
+- **Categorías**:
+  - **Funcionales**: Navegación, acciones, estado (deben ser SVG vía `Icons.*`)
+  - **Decorativos**: Prefijos en labels, estados en texto, mensajes (pueden ser emojis)
+
+### 9.2 Política de Iconos
+- **Migrar a SVG**: Todos los iconos funcionales (pestañas, botones de acción, items de menú, cabeceras de card/sección)
+- **Mantener Emojis**: Íconos decorativos (prefijos en labels de KPI, estados en texto simple, mensajes informativos)
+- **Prioridad de Migración**: Por impacto visual y frecuencia de uso
+- **Consistencia**: Usar siempre el mismo icono para la misma acción en toda la aplicación
+- **Tamaños**: 
+  - Iconos pequeños: 16-20px (labels, badges)
+  - Iconos medios: 24-32px (botones, cabeceras)
+  - Iconos grandes: 36-48px (FAB, acciones principales)
+
+---
+
+## 10. Patrones de Interacción Estándar
+
+### 10.1 Filtrado en Tiempo Real
+- Los campos de búsqueda deben usar `input[type="search"]` con clase `.search-input`
+- El evento `oninput` debe disparar una función `_filtrar(texto)` que actualice el DOM sin recarga
+- Mostrar mensaje de "No se encontraron resultados" cuando el filtrado devuelva array vacío
+- Mantener estado de filtros en objeto `_filtroActivo` por tipo (especie, sexo, estado, etc.)
+
+### 10.2 Navegación de Ficha
+- Todas las tarjetas de datos deben ser completamente clickeables (cursor: pointer)
+- Navegación mediante `location.hash='/entity?id=${id}'` 
+- Mantener estado de selección visual mediante clases activas cuando corresponda
+
+### 10.3 Sistema de Feedback
+- **Toast**: Para notificaciones no bloqueantes (éxito, advertencia breve)
+  - Posición: inferior-centro o superior-derecho según contexto
+  - Duración: 3000ms para éxito, 5000ms para errores
+  - Animación: deslizamiento desde fuera del viewport
+- **Confirm**: Modales de sistema para acciones críticas (eliminación, cambios irreversibles)
+  - Nunca usar `alert()` o `confirm()` nativos
+  - Incluir opciones claras: "Confirmar" y "Cancelar"
+  - Usar iconografía semántica (⚠️ para advertencia, ✅ para confirmación)
+
+### 10.4 Estados de Carga y Vacío
+- **Carga**: Mostrar esqueleto o spinner animado en centro del contenedor
+- **Estado Vacío**: 
+  - Icono representativo (24-32px) en color secundario suave
+  - Mensaje claro y accionable
+  - Botón de acción primaria cuando aplique (ej: "Crear primer registro")
+
+---
+
+## 11. Anti-patterns (Lo que se debe evitar)
 
 - **Evitar fondos blancos puros en pantallas de alta exposición solar**: Causan deslumbramiento y fatiga visual rápida al ganadero en el exterior.
 - **Evitar botones y controles de entrada pequeños**: No obligar al usuario a hacer zoom o fallar al pulsar sobre un elemento.
@@ -122,22 +301,22 @@ Nuestra paleta está inspirada en la naturaleza (el pasto, la tierra y el sol), 
 
 ---
 
-## 10. Catálogo de Capturas de Pantalla y Vistas Existentes
+## 12. Catálogo de Capturas de Pantalla y Vistas Existentes
 
 Para asociar el estado visual de la aplicación con este contrato de diseño, se detallan a continuación las capturas de pantalla reales guardadas en `manual/img/` que corresponden a los flujos y módulos que Open Design puede sincronizar y permitir editar:
 
-### 10.1 Vistas y Módulos de Inicio y Configuración
+### 12.1 Vistas y Módulos de Inicio y Configuración
 - **`sc_01_inicio.png` / `cap_01_inicio.png`**: Pantalla de inicio de la aplicación con accesos directos, resúmenes rápidos de ganadería y accesos a asistentes de pesaje o tratamientos.
 - **`sc_02_expro.png` / `cap_02_expro.png`**: Vista de la explotación, gestión de fincas, parcelas y asignación de zonas geográficas.
 - **`sc_07_ajustes.png` / `sc_test_ajustes_loaded.png`**: Ajustes generales, sincronización con bases de datos gubernamentales, carga de datos de demo (Demo Chamorro) y configuración de dispositivos de lectura RFID.
 
-### 10.2 Gestión de Animales y Rebaños (Módulo de Ganadería)
+### 12.2 Gestión de Animales y Rebaños (Módulo de Ganadería)
 - **`sc_05_ganaderia.png` / `sc_test_ganaderia_view.png`**: Panel principal de ganadería, listado de rebaños activos, especies (caprino, ovino, vacuno) y distribución por zonas.
 - **`sc_06_animales_criticos.png`**: Listado de control de alertas de animales que requieren atención inmediata (en tratamiento sanitario, celos, vacunas pendientes).
 - **`sc_test_rebanos_list.png` / `sc_test_rebanos_view.png`**: Listado detallado de rebaños con el censo actual, tipo de explotación (leche, carne) y KPIs globales de animales sanos vs. enfermos.
 - **`sc_test_ficha.png` / `sc_test_ficha2.png`**: Ficha individual de un animal (ej. Vaca1), mostrando su crotal oficial, raza, árbol genealógico, historial de partos, pesajes y tratamientos sanitarios.
 
-### 10.3 Flujos de Asistentes Rápidos (Wizards de Acción)
+### 12.3 Flujos de Asistentes Rápidos (Wizards de Acción)
 - **`sc_08_wizard_pesada_individual.png` / `sc_test_individual_wizard.png`**: Asistente de pesaje para un único animal. Captura paso 1 (crotal, báscula automática) y paso 2 (registro del peso, notas corporales).
 - **`sc_09_wizard_venta_masiva.png` / `sc_test_venta_wizard_opened.png`**: Asistente paso a paso para la venta de un lote de animales. Vincula animales seleccionados, comprador seleccionado, precio acordado e IVA aplicable.
 - **`sc_10_wizard_pesaje_lote.png` / `sc_test_lote_wizard.png`**: Flujo para registrar pesos de forma masiva para un lote o rebaño completo, calculando automáticamente la ganancia media diaria (GMD).
@@ -149,7 +328,13 @@ Para asociar el estado visual de la aplicación con este contrato de diseño, se
 - **`sc_16_wizard_gasto.png` / `sc_test_gasto_tap2.png`**: Registro rápido de gastos operativos asociados a un proveedor (pienso, veterinario, maquinaria).
 - **`sc_17_wizard_traslado.png` / `sc_test_traslado_wizard_real.png`**: Flujo para mover un grupo de animales entre parcelas, zonas o establos dentro de la misma explotación.
 
-### 10.4 Módulos Comerciales y Soporte
+### 12.4 Módulos Comerciales y Soporte
 - **`sc_03_comer.png`**: Panel de comercialización con KPIs financieros, contratos de compraventa de leche/carne activos e historial de entregas.
 - **`sc_04_mas.png`**: Menú lateral expandido con accesos rápidos a proveedores, gestión documental, informes de analítica y manuales.
 - **`sc_06_manuales.png` / `sc_test_manuales.png`**: Sección de auto-ayuda integrada donde se visualizan estos manuales HTML interactivos con descripciones y diagramas.
+
+### 12.5 Componentes Estandarizados de Interfaz
+- **sc_status_badge_*.png**: Ejemplos de todos los estados de badge implementados
+- **sc_widget_button_*.png**: Variantes de botones de acción hub en todos los colores
+- **sc_card_registro_*.json**: Especificaciones de posición y espaciado en diferentes módulos
+- **sc_feedback_*.png**: Ejemplos de toast y modales de confirmación
