@@ -480,13 +480,17 @@
 
     <script>
       window.isNative = window.hasOwnProperty("Capacitor");
-      if (!window.isNative && "serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("./sw.js")
-            .then((reg) => console.log("SW OK"))
-            .catch((err) => console.error("SW Error:", err));
-        });
+      try {
+        if (!window.isNative && "serviceWorker" in navigator) {
+          window.addEventListener("load", () => {
+            navigator.serviceWorker
+              .register("./sw.js")
+              .then((reg) => console.log("SW OK"))
+              .catch((err) => console.error("SW Error:", err));
+          });
+        }
+      } catch (e) {
+        console.warn("Service Worker no disponible o bloqueado por el sandbox del entorno:", e.message);
       }
       window.onerror = function (msg, url, line) {
         try { Confirm.alert("Error", "Error: " + msg + "\nLínea: " + line); } catch (e) { console.error("Error global:", msg); }
