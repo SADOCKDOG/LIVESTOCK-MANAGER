@@ -244,37 +244,30 @@ const ComercializacionView = {
     const { icon, title, color, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
 
     const recordsHtml = records.length > 0
-      ? records.map(r => `
-        <div class="card-registro" onclick="${r.onclick || ''}" style="--registro-color: ${color}; padding:12px; margin-bottom:8px; width:100%;">
-          <div class="flex flex-col" style="width:100%;">
-            <div class="flex justify-between items-start gap-6 w-full">
-              <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap; flex:1; min-width:0;">${r.title.replace(/<\/?[^>]+(>|$)/g, "")}</span>
-              <span class="text-lg font-950 flex-shrink-0 ml-4" style="color:${color};">${r.value}</span>
+      ? records.map(r => App._cardRegistro({
+          title: r.title.replace(/<\/?[^>]+(>|$)/g, ""),
+          subtitle: `${r.date || ''} ${r.zone ? ' · ' + r.zone : ''} ${r.subvalue ? ' · ' + r.subvalue : ''}`,
+          rightSide: `
+            <div class="text-right">
+              ${r.badges ? `
+                <div class="inline-flex items-baseline gap-2">
+                  ${r.badges.split(' ').map(badge => {
+                    const content = badge.replace(/<[^>]*>/g, '');
+                    return `<span style="font-size: 0.75rem; font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(204,255,0,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block;">${content}</span>`;
+                  }).join('')}
+                </div>
+              ` : ''}
+              <div class="text-lg font-950 mt-2" style="color:${color};">${r.value || ''}</div>
             </div>
-            <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight w-full">
-              <span class="flex items-center gap-3">${Icons.calendar()} ${r.date}</span>
-              ${r.zone ? `<span class="flex items-center gap-3">${Icons.zonas()} ${r.zone}</span>` : ''}
-              ${r.subvalue ? `<span class="flex items-center gap-3 text-aaa">${Icons.info()} ${r.subvalue}</span>` : ''}
-              ${r.meta ? `<span class="flex items-center gap-3 text-aaa">${Icons.documento()} ${r.meta}</span>` : ''}
-            </div>
-            ${r.badges ? `<div class="flex flex-wrap gap-3 mt-3 w-full">${r.badges}</div>` : ''}
-          </div>
-        </div>`).join('')
+          `,
+          content: r.meta ? `<div class="text-[0.6rem] text-gray font-700 uppercase mt-2">${Icons.documento()} ${r.meta}</div>` : '',
+          footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">${Icons.documento()} Ficha</span>`,
+          color: color,
+          onClick: r.onclick
+        })).join('')
       : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <!-- PANEL DE ACCIONES COMERCIALES (ESTILO NEÓN) -->
-      <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: ${color}; --theme-color: ${color};">
-        <div class="section-header-theme">ACCIONES</div>
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
-          <button class="widget-link-btn widget-link-btn--neon" style="--neon-color: ${color}; --neon-glow: ${color}B0; --neon-inner: ${color}40" onclick="${registrarHandler}">
-            ${Icons.agregar()}
-            <span class="widget-link-label">${registrarLabel}</span>
-          </button>
-        </div>
-        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.comercial()} Registro de ventas, entregas y gastos con acceso a documentación comercial</span></div>
-      </div>
-
       <div class="card-registro p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
           ${Icons.documento()} ${listName}
@@ -283,7 +276,11 @@ const ComercializacionView = {
           ${recordsHtml}
         </div>
       </div>
-      `;
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="${registrarHandler}">
+        <span class="fab-label">${registrarLabel}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
   },
 
   // ===================== TAB CARNE =====================
@@ -478,7 +475,7 @@ const ComercializacionView = {
     const e = await window.db.get("comercializacion_leche", parseInt(id));
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/comercializacion?tab=leche" class="link-back">← Volver</a><h2>${Icons.leche()} Analítica de Tanque</h2></div>
-      <div class="card border-top-5-gold">
+      <div class="card-registro border-top-5-gold" style="--registro-color: var(--c-gold);">
         <div class="grid grid-cols-2 gap-12">
           <div><label>Volumen (L)</label><input type="number" id="le-cant" value="${e.cantidad}" class="premium-input"></div>
           <div><label>Precio (€/L)</label><input type="number" id="le-pb" value="${e.precioBase}" class="premium-input"></div>
@@ -506,7 +503,7 @@ const ComercializacionView = {
     const g = await window.db.get("gastos_ganaderia", parseInt(id));
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="link-back">← Volver</a><h2>${Icons.gastos()} Ficha de Gasto</h2></div>
-      <div class="card border-top-4-blue">
+      <div class="card-registro border-top-4-blue" style="--registro-color: var(--c-info);">
         <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
         <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
         <div class="flex justify-between items-center mt-20">

@@ -407,6 +407,10 @@ if (window.enableScrollShadows) {
 
         ${this._renderPipelineComercialHtml('carne')}
       </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-danger);" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion', modo_explotacion: 'carne' })">
+        <span class="fab-label">Registrar Pesaje</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>
     `;
 
     container.innerHTML = html;
@@ -537,6 +541,10 @@ if (window.enableScrollShadows) {
         </div>
 
         ${this._renderPipelineComercialHtml('leche')}
+      </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-info);" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion', modo_explotacion: 'leche' })">
+        <span class="fab-label">Registrar Ordeño</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
     `;
 
@@ -678,6 +686,10 @@ if (window.enableScrollShadows) {
 
         ${this._renderPipelineComercialHtml('hibrido')}
       </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'explotacion', modo_explotacion: 'hibrido' })">
+        <span class="fab-label">Nueva Actividad</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>
     `;
 
     container.innerHTML = html;
@@ -736,7 +748,7 @@ if (window.enableScrollShadows) {
     }
 
     let html = `
-      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
+      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.paquete()} BALANCE DE STOCK Y LLENADO DE SILOS
         </div>
@@ -779,6 +791,10 @@ if (window.enableScrollShadows) {
             ${Icons.agregar()} <span class="widget-link-label uppercase font-950 text-base tracking-widest">CARGA / CONSUMO</span>
           </button>
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-info);" onclick="ExplotacionView._abrirAsistenteSilo('${modo}')">
+        <span class="fab-label">Movimiento Stock</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
     `;
     return html;
@@ -1292,7 +1308,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- LISTADO / HISTORIAL DE GASTOS -->
-        <div class="card p-16 mb-16 border-222">
+        <div class="card-registro p-16 mb-16 border-222" style="--registro-color: var(--c-danger);">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
             ${Icons.documento()} Historial de gastos registrados
           </div>
@@ -1322,6 +1338,10 @@ if (window.enableScrollShadows) {
           </div>
         </div>
       </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-danger);" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
+        <span class="fab-label">Nuevo Gasto</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>
     `;
     container.innerHTML = html;
   },
@@ -1343,7 +1363,7 @@ if (window.enableScrollShadows) {
         ${silosHtml}
 
         <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
-        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
+        <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--c-info); --theme-color: var(--c-info);">
           <div class="section-header-theme" style="--theme-color: var(--c-info)">${Icons.paquete()} GESTIÓN DE STOCK</div>
           <div class="flex justify-center mt-10">
             <button class="widget-link-btn widget-link-btn--neon neon-info" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${this._activeMode}')">
@@ -1354,7 +1374,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- HISTORIAL DE MOVIMIENTOS -->
-        <div class="card p-16 mb-16 border-222">
+        <div class="card-registro p-16 mb-16 border-222" style="--registro-color: var(--c-info);">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
             ${Icons.documento()} Historial de movimientos de silo
           </div>
@@ -1387,6 +1407,10 @@ if (window.enableScrollShadows) {
           </div>
         </div>
       </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-info);" onclick="ExplotacionView._abrirAsistenteSilo('${this._activeMode}')">
+        <span class="fab-label">Movimiento Stock</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>
     `;
     container.innerHTML = html;
   },
@@ -1412,15 +1436,9 @@ if (window.enableScrollShadows) {
 
 if (window.EventBus) {
   const markDirty = () => ExplotacionView.invalidateCache();
-  ['gasto:created', 'gasto:deleted', 'gasto:updated', 'venta:created', 'venta:deleted', 'leche:entrega', 'pesaje:registrado', 'tratamiento:added', 'tratamiento:deleted', 'animal:created', 'animal:updated', 'animal:deleted', 'data:imported'].forEach(evt => {
+  ['gasto:created', 'gasto:deleted', 'gasto:updated', 'venta:created', 'venta:deleted', 'leche:entrega', 'pesaje:registrado', 'tratamiento:added', 'tratamiento:deleted', 'animal:created', 'animal:updated', 'animales:deleted', 'data:imported'].forEach(evt => {
     EventBus.on(evt, markDirty);
   });
 }
 
 window.ExplotacionView = ExplotacionView;
-
-
-
-
-
-

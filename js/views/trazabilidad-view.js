@@ -14,7 +14,7 @@ const TrazabilidadView = {
 
     const animal = await Animales.get(animalId).catch(() => null);
     if (!animal) {
-      main.innerHTML = `<div class="card error-card"><h2>Error</h2><p>Animal no encontrado (ID: ${animalId})</p></div>`;
+      main.innerHTML = `<div class="card-registro error-card" style="--registro-color: var(--c-danger);"><h2>Error</h2><p>Animal no encontrado (ID: ${animalId})</p></div>`;
       return;
     }
 
@@ -262,7 +262,7 @@ const TrazabilidadView = {
         </div>
 
         <!-- Datos Básicos del Animal -->
-        <div class="card p-16 mb-16">
+        <div class="card-registro p-16 mb-16" style="--registro-color: var(--c-info);">
           <div class="flex justify-between items-center mb-10 flex-wrap gap-8">
             <strong class="text-amber text-lg">${animal.numero_identificacion || '—'}</strong>
             <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado || '—'}</span>
@@ -281,10 +281,10 @@ const TrazabilidadView = {
 
         <!-- KPIs rápidos -->
         <div class="traz-stats-grid">
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-green text-xl">${totalPesajes}</div><div class="kpi-label text-60">PESAJES</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-blue text-xl">${totalSanitarios}</div><div class="kpi-label text-60">TRATAMIENTOS</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-violet text-xl">${totalReproduccion}</div><div class="kpi-label text-60">REPRODUCCIÓN</div></div>
-          <div class="card p-10 text-center mb-0"><div class="kpi-value text-amber text-xl">${totalEventos}</div><div class="kpi-label text-60">EVENTOS</div></div>
+          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-success);"><div class="kpi-value text-green text-xl">${totalPesajes}</div><div class="kpi-label text-60">PESAJES</div></div>
+          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-info);"><div class="kpi-value text-blue text-xl">${totalSanitarios}</div><div class="kpi-label text-60">TRATAMIENTOS</div></div>
+          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-purple);"><div class="kpi-value text-violet text-xl">${totalReproduccion}</div><div class="kpi-label text-60">REPRODUCCIÓN</div></div>
+          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-warning);"><div class="kpi-value text-amber text-xl">${totalEventos}</div><div class="kpi-label text-60">EVENTOS</div></div>
         </div>
 
         <!-- Timeline -->
