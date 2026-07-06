@@ -244,19 +244,45 @@ const ComercializacionView = {
   },
 
   _renderGastos(content, d) {
-    this._renderSeccion(content, {
-      icon: Icons.gastos(), title: 'Gastos', color: 'var(--c-purple)',
-      registrarLabel: 'REGISTRAR GASTO',
-      listName: 'Lista de Gastos',
-      registrarHandler: "App._abrirFormularioGasto()",
-      records: d.gastosRecords.slice(0, 50).map(g => ({
-        title: g.concepto || 'Gasto',
-        metadata: `<span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria || 'Varios'}</span>`,
-        badge: `${(g.monto || 0).toLocaleString()} €`,
-        onclick: `App.renderDetalleGasto(new URLSearchParams('id=${g.id}'))`
-      })),
-      emptyMsg: 'Sin gastos registrados.'
-    });
+    const records = d.gastosRecords.slice(0, 50);
+    const recordsHtml = records.length > 0
+      ? records.map(g => App._cardRegistro({
+          icon: Icons.gastos(),
+          title: g.concepto || 'Gasto',
+          metadata: `<span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria || 'Varios'}</span>`,
+          badge: `${(g.monto || 0).toLocaleString()} €`,
+          color: 'var(--c-purple)',
+          onClick: `App.renderDetalleGasto(new URLSearchParams('id=${g.id}'))`
+        })).join('')
+      : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} Sin gastos registrados.</span></div>`;
+
+    content.innerHTML = `
+      <div class="card-registro p-14 border-222" style="--registro-color: var(--c-purple);">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
+          ${Icons.gastos()} Lista de Gastos (solo lectura)
+        </div>
+        <div class="grid gap-10">
+          ${recordsHtml}
+        </div>
+      </div>
+      <div class="card-registro p-14 mb-14 border-222" style="--registro-color: var(--c-info);">
+        <div class="text-xs text-white font-900 uppercase tracking-wider mb-6 flex items-center gap-6">
+          ${Icons.info()} Gestión de Gastos
+        </div>
+        <p class="text-xs text-gray mb-10">
+          Los gastos se registran en el módulo de <strong class="text-white">Explotación</strong>. La vista analítica completa está en <strong class="text-white">Gastos</strong>.
+        </p>
+        <div class="grid grid-cols-2 gap-10">
+          <a href="#/explotacion?sub=gastos" class="widget-link-btn widget-link-btn--neon neon-success" style="text-decoration: none; text-align: center;">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Registrar Gasto</span>
+          </a>
+          <a href="#/gastos" class="widget-link-btn widget-link-btn--neon neon-info" style="text-decoration: none; text-align: center;">
+            ${Icons.grafico()}
+            <span class="widget-link-label">Ver Analítica</span>
+          </a>
+        </div>
+      </div>`;
   },
 
   _fmt(n) {

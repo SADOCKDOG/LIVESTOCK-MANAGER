@@ -2002,6 +2002,8 @@ const App = {
   },
 
   async renderGastos() {
+    // GAP 1 FIX: GastosView contiene analítica completa (gráficos, KPIs por categoría)
+    // El alta de gastos se centraliza en ExPro, pero la vista analítica sigue accesible
     if (window.GastosView) { await GastosView.render(); }
   },
 
