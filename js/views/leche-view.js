@@ -346,6 +346,7 @@ const LecheView = {
 
     return {
       ...filteredData,
+      kpis: data.kpis,
       litrosTotal,
       numEntregas,
       importeTotal,
