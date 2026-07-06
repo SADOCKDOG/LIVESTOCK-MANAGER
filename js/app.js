@@ -2298,7 +2298,7 @@ const App = {
 
   async _registrarTratamiento(rebanoId) {
     if (window.WizardTratamiento) {
-      await window.WizardTratamiento.registrar(rebanoId);
+      await window.WizardTratamiento.registrar(rebanoId || null);
     }
   },
 
