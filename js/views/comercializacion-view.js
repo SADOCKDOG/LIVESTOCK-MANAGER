@@ -270,12 +270,18 @@ const ComercializacionView = {
           ${Icons.info()} Gestión de Gastos
         </div>
         <p class="text-xs text-gray mb-10">
-          Los gastos se registran en el módulo de <strong class="text-white">Explotación</strong> y se muestran aquí en solo lectura para calcular márgenes comerciales.
+          Los gastos se registran en el módulo de <strong class="text-white">Explotación</strong>. La vista analítica completa está en <strong class="text-white">Gastos</strong>.
         </p>
-        <a href="#/explotacion?sub=gastos" class="widget-link-btn widget-link-btn--neon neon-info w-full" style="text-decoration: none; text-align: center;">
-          ${Icons.agregar()}
-          <span class="widget-link-label">Registrar Gasto en Explotación</span>
-        </a>
+        <div class="grid grid-cols-2 gap-10">
+          <a href="#/explotacion?sub=gastos" class="widget-link-btn widget-link-btn--neon neon-success" style="text-decoration: none; text-align: center;">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Registrar Gasto</span>
+          </a>
+          <a href="#/gastos" class="widget-link-btn widget-link-btn--neon neon-info" style="text-decoration: none; text-align: center;">
+            ${Icons.grafico()}
+            <span class="widget-link-label">Ver Analítica</span>
+          </a>
+        </div>
       </div>`;
   },
 

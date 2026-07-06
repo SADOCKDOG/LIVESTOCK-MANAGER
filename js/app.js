@@ -2002,13 +2002,9 @@ const App = {
   },
 
   async renderGastos() {
-    // FASE 2: Redirigir a Explotación > Gastos (dueño único de registro)
-    if (window.ExplotacionView) {
-      ExplotacionView._activeSubModule = 'gastos';
-      await ExplotacionView.render();
-    } else if (window.GastosView) {
-      await GastosView.render();
-    }
+    // GAP 1 FIX: GastosView contiene analítica completa (gráficos, KPIs por categoría)
+    // El alta de gastos se centraliza en ExPro, pero la vista analítica sigue accesible
+    if (window.GastosView) { await GastosView.render(); }
   },
 
   async renderComercializacion(params) {
