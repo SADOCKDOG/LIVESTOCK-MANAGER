@@ -13,7 +13,7 @@ const AnimalesView = {
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
     if (rebanos.length === 0)
-      return (main.innerHTML = `<div class="card-registro empty-state" style="--registro-color: var(--c-white);"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
+      return (main.innerHTML = `<div class="card empty-state"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
 
     const rebanoMap = {};
     rebanos.forEach(r => { rebanoMap[r.id] = r; });
@@ -21,86 +21,74 @@ const AnimalesView = {
     const activos = animales.filter(a => a.estado === 'activo').length;
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
 
-    let html = '';
+    let html = `
+      <div class="card-registro" style="--registro-color: var(--c-orange);">
+        <div class="section-header-theme">ACCIONES</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nuevo Animal</span>
+          </button>
+        </div>
+        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.animales()} Alta, identificación y registro de nuevos animales en el censo</span></div>
+      </div>`;
 
     if (animales.length === 0) {
-      html += `<div class="card-registro empty-state" style="--registro-color: var(--c-orange);">
+      html += `<div class="empty-state">
         <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
-        <div class="text-center mt-20">
-            <button class="btn btn-create btn-lg" onclick="location.hash='/animal'">
-              ${Icons.agregar()} Registrar primer animal
+        <div class="card-registro" style="--registro-color: var(--c-orange);">
+          <div class="section-header-theme">ACCIONES</div>
+          <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="location.hash='/animal'">
+              ${Icons.agregar()}
+              <span class="widget-link-label">Registrar primer animal</span>
             </button>
+          </div>
+          <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.animales()} Alta, identificación y registro de nuevos animales en el censo</span></div>
         </div>
       </div>`;
       main.innerHTML = html;
       return;
     }
 
-    const filtrados = this._aplicarFiltros(animales, rebanoMap);
-    const vendidos = animales.filter(a => a.estado === 'vendido').length;
-    // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas (patrón Gastos)
-    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-orange);">
-      <div class="flex items-center gap-12 mb-12">
-        <span class="text-3xl" style="color:var(--c-orange);">${Icons.animales()}</span>
-        <div>
-          <div class="text-white font-900 text-lg">Censo de Animales</div>
-          <div class="text-gray" style="font-size:0.68rem;">${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos</div>
-        </div>
-      </div>
-      <!-- Resumen de datos registrados (colapsable) -->
-      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-          <span class="flex items-center gap-6">${Icons.animales()} Resumen del Censo</span>
-          <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
-        </div>
-        <div class="resumen-body flex flex-col">
-          ${especies.map(esp => `
-            <div class="py-12 flex justify-between items-center border-bottom-222">
-              <span class="text-xs text-gray uppercase font-900">${esp}</span>
-              <strong class="text-xl font-950" style="color: var(--c-info);">${animales.filter(a => a.especie === esp).length}</strong>
-            </div>`).join('')}
-          <div class="py-12 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900">Activos</span>
-            <strong class="text-xl font-950" style="color: var(--c-success);">${activos}</strong>
-          </div>
-          <div class="py-12 flex justify-between items-center">
-            <span class="text-xs text-gray uppercase font-900">Vendidos</span>
-            <strong class="text-xl font-950" style="color: var(--c-danger);">${vendidos}</strong>
-          </div>
-        </div>
-      </div>
-      <!-- Filtro de búsqueda integrado (controla el histórico) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">${Icons.documento()} Lista de Animales</div>
-      <div class="flex gap-8 items-center mb-12">
-        <div class="relative flex-1 min-w-0">
+    // Barra de resumen
+    html += `
+      <div class="flex flex-wrap gap-4 mb-10">
+        ${especies.map(esp => `<span class="badge badge-sm badge-gold uppercase">${esp}: ${animales.filter(a => a.especie === esp).length}</span>`).join('')}
+        <span class="badge badge-sm badge-green uppercase">${Icons.check()} ${activos} activos</span>
+        <span class="badge badge-sm badge-red uppercase">${Icons.paquete()} ${animales.filter(a => a.estado === 'vendido').length} vendidos</span>
+      </div>`;
+
+    // Búsqueda + selector de especie compacto
+    html += `
+      <div class="sticky-top" style="padding-bottom:10px;">
+        <div class="flex gap-8 items-center">
           <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
-                 class="search-input w-full">
+                 class="search-input flex-1 min-w-0">
+          <div class="search-icon-input" style="position:absolute; right:150px; color:#888; pointer-events:none;">${Icons.buscar()}</div>
+          <select id="animales-filtro-especie" class="form-select-gold"
+                  onchange="AnimalesView._setFiltro('especie', this.value)"
+                  style="width:130px;min-width:120px;">
+            <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
+            <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
+            <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
+            <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
+            <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
+          </select>
         </div>
-        <select id="animales-filtro-especie" class="form-select-gold"
-                onchange="AnimalesView._setFiltro('especie', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
-          <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
-          <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
-          <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
-          <option value="Cabras" ${this._filtroActivo.especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
-          <option value="Cerdos" ${this._filtroActivo.especie === 'Cerdos' ? 'selected' : ''}>Cerdos</option>
-        </select>
       </div>
       <div id="animales-lista" class="grid gap-12">`;
+
+    const filtrados = this._aplicarFiltros(animales, rebanoMap);
     filtrados.forEach(a => html += this._renderCard(a, rebanoMap[a.rebanoId]));
-    html += `</div></div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="location.hash='/animal'">
-        <span class="fab-label">Nuevo Animal</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>
-      <div class="card-registro mt-10" style="--registro-color: var(--c-white);">
-        <div id="animales-empty-search" class="empty-state-search d-none">
-          <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
-          <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
-        </div>
+    html += `</div>
+      <!-- Botón Flotante de Acción para móviles -->
+      <button class="fab-btn" onclick="location.hash='/animal'" title="Nuevo Animal">${Icons.agregar()}</button>
+      <div id="animales-empty-search" class="empty-state-search d-none">
+        <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
+        <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
       </div>
 `;
 
@@ -132,32 +120,34 @@ const AnimalesView = {
     const colorEstado = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : a.estado === 'baja' ? 'var(--c-danger)' : '#888';
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
 
-    const bgEstado = colorEstado === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
-                     colorEstado === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
-                     colorEstado === 'var(--c-danger)' ? 'rgba(255,68,68,0.1)' :
-                     'rgba(136,136,136,0.1)';
-
     return `
-      <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${colorEspecie}; display:flex; gap:10px; align-items:stretch;">
-        <!-- Columna izquierda: información -->
-        <div class="flex-1 min-w-0 flex flex-col gap-8">
-          <div class="flex items-center gap-10 min-w-0">
-            <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
-            <div class="text-xs min-w-0">
-              <div class="font-bold uppercase text-base tracking-tight text-ellipsis" style="color:${colorEspecie};">${a.numero_identificacion || a.nombre || '#' + a.id} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
-              <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
+      <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${colorEspecie};">
+        <div class="flex flex-col gap-10">
+          <div class="flex justify-between items-center w-full">
+            <div class="flex items-center gap-10 min-w-0">
+              <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
+              <div class="text-xs">
+                <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${a.numero_identificacion || a.nombre || '#' + a.id} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
+                <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${a.estado || 'activo'}</span>
             </div>
           </div>
-          <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-            <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
-            ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
-            ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
+
+          <div class="flex justify-between items-end w-full">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+                <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
+                ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} ${edad} ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
+                ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER FICHA ➔</div>
+            </div>
           </div>
-        </div>
-        <!-- Columna derecha: estado arriba (compacto), acción abajo (texto plano) -->
-        <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
-          <span style="font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.3px; border:1px solid ${colorEstado}; color:${colorEstado}; background:${bgEstado}; padding:3px 8px; border-radius:6px; white-space:nowrap;">${a.estado || 'activo'}</span>
-          <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
         </div>
       </div>`;
   },
@@ -270,7 +260,7 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
+          <div class="card card-accent card-accent-amber p-16 mb-20">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.info()} DATOS GENERALES</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
@@ -315,7 +305,7 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card-registro card-accent card-accent-blue p-16 mb-20" style="--registro-color: var(--c-info);">
+          <div class="card card-accent card-accent-blue p-16 mb-20">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
@@ -348,7 +338,7 @@ const AnimalesView = {
           </div>
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
-          <div class="card-registro card-accent card-accent-green p-16 mb-20" style="--registro-color: var(--c-success);">
+          <div class="card card-accent card-accent-green p-16 mb-20">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
@@ -404,17 +394,17 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card-registro card-accent card-accent-gold p-16 mb-20" style="--registro-color: var(--c-gold);">
+          <div class="card card-accent card-accent-gold p-16 mb-20">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.documento()} OBSERVACIONES</div>
             <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
-            <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
+            <div class="card card-accent card-accent-amber p-16 mb-20">
                <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">COMPAÑEROS LOTE</div>
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
-            <div class="card-registro card-accent card-accent-purple p-16 mb-20" style="--registro-color: var(--c-purple);">
+            <div class="card card-accent card-accent-purple p-16 mb-20">
                <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">HISTORIAL REPRO</div>
                <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>

@@ -120,7 +120,7 @@ const ProduccionView = {
             </div>
             <div class="text-right flex-shrink-0 ml-8">
               <span class="badge badge-sm font-950 tracking-tighter" style="background:${borderCls}20;color:${borderCls};border:1px solid ${borderCls}40;display:block;margin-bottom:6px; font-size: 0.9rem;">${r.value}</span>
-              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">${Icons.documento()} Ficha</span>
+              <span class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">Ver detalle ➔</span>
             </div>
           </div>
         </div>`;
@@ -128,7 +128,7 @@ const ProduccionView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro report-section p-16 mb-14" style="--registro-color: var(--c-success);">
+      <div class="card report-section p-16 mb-14" >
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${icon}</span>
@@ -137,6 +137,9 @@ const ProduccionView = {
               ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
             </div>
           </div>
+          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
+            ${Icons.agregar()} Nuevo
+          </button>
         </div>
 
         ${kpis ? `
@@ -148,20 +151,14 @@ const ProduccionView = {
           }).join('')}
         </div>` : ''}
 
-        <div class="card-registro" style="--registro-color: var(--c-white);">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-4">
-            ${Icons.registros()} ${listName}
-          </div>
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
+          ${Icons.registros()} ${listName}
         </div>
         <div class="grid gap-10">
           ${recordsHtml}
         </div>
       </div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="${registrarHandler}">
-        <span class="fab-label">Nuevo Registro ${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>`;
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="Nuevo Registro">${Icons.agregar()}</button>`;
   },
 
   _renderCarne(content, d) {
@@ -285,7 +282,7 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
+          <div class="card p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;">
               <h3 class="mt-0 text-gold">Editar Registro</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -389,7 +386,7 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-        <div class="card-registro p-25" style="max-width:400px; ;; --registro-color: var(--c-gray);">
+        <div class="card p-25" style="max-width:400px; ">
           <h3 class="mt-0 text-gold text-md">Editar Gasto</h3>
 
           <div class="wizard-input-group mt-15">

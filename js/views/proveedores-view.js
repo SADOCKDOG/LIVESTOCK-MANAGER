@@ -22,6 +22,16 @@ const ProveedoresView = {
 
           <div class="mb-16">
             <div id="prov-kpis"></div>
+            <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
+              <div class="section-header-theme">ACCIONES</div>
+              <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+                <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ProveedoresView.renderFormulario()">
+                  ${Icons.agregar()}
+                  <span class="widget-link-label">Nuevo Proveedor</span>
+                </button>
+              </div>
+              <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.proveedores()} Registro y gestión de proveedores de servicios e insumos ganaderos</span></div>
+            </div>
             <div class="flex gap-8 mb-14">
               <input type="search" id="search-proveedores" placeholder="Buscar por nombre, NIF o ciudad..."
                 oninput="ProveedoresView._filtrar(this.value)"
@@ -29,12 +39,6 @@ const ProveedoresView = {
             </div>
           </div>
           <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
-
-          <!-- Botón Flotante de Acción con viñeta -->
-          <div class="fab-container" onclick="ProveedoresView.renderFormulario()">
-            <span class="fab-label">Nuevo Proveedor</span>
-            <button class="fab-btn">${Icons.fabPlus()}</button>
-          </div>
           `;
 
         await this._cargarDatos();
@@ -49,7 +53,7 @@ const ProveedoresView = {
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-accent); width:100%;">
+              <div class="card p-12 mb-14 border-222 card-total-3d" style=" width:100%;">
                 <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
                 <div class="flex flex-col">
                   <div class="py-8 flex justify-between items-center border-bottom-222">
@@ -101,41 +105,24 @@ const ProveedoresView = {
         }
 
         contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => `
-          <div class="card-registro" onclick="ProveedoresView.renderDetalle(${p.id})"
-            style="--registro-color: var(--c-purple); width:100%;">
-            <div class="flex flex-col">
-              <div class="flex justify-between items-start gap-6" style="width:100%;">
-                <div class="min-w-0 flex-1" style="min-width:0;">
-                  <div class="flex items-center gap-6">
-                    <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap;">${p.nombre}</span>
-                  </div>
-                  <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
-                    ${p.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${p.nif_cif}</span>` : ''}
-                    ${p.ciudad ? `<span class="flex items-center gap-2">${Icons.zonas()} ${p.ciudad.toUpperCase()}</span>` : ''}
-                  </div>
-                  ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
-                  <div class="flex flex-wrap gap-2 mt-2">
-                    ${p.categorias.map(cat => `<span class="text-[0.5rem] text-gray font-800 uppercase bg-black px-6 py-2 rounded-sm border border-222">${this._labelCat(cat).toUpperCase()}</span>`).join('')}
-                  </div>` : ''}
+          <div class="card-registro registro-purple" onclick="ProveedoresView.renderDetalle(${p.id})"
+            style="width:100%;">
+            <div class="flex justify-between items-start gap-6" style="width:100%;">
+              <div class="min-w-0 flex-1" style="min-width:0;">
+                <div class="flex items-center gap-6">
+                  <span class="text-sm font-black text-white uppercase tracking-tight overflow-hidden text-ellipsis" style="white-space:nowrap;">${p.nombre}</span>
                 </div>
-                <div class="text-right">
-                  <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${p.activo === false ? 'var(--c-danger)' : 'var(--c-success)'}; color: ${p.activo === false ? 'var(--c-danger)' : 'var(--c-success)'};
-                      background: ${p.activo === false ? 'rgba(255,68,68,0.1)' : 'rgba(204,255,0,0.1)'};
-                      padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                    ${p.activo === false ? 'INACTIVO' : 'ACTIVO'}
-                  </span>
+                <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
+                  ${p.nif_cif ? `<span class="flex items-center gap-2">${Icons.documento()} ${p.nif_cif}</span>` : ''}
+                  ${p.ciudad ? `<span class="flex items-center gap-2">${Icons.zonas()} ${p.ciudad.toUpperCase()}</span>` : ''}
                 </div>
+                ${Array.isArray(p.categorias) && p.categorias.length > 0 ? `
+                <div class="flex flex-wrap gap-2 mt-2">
+                  ${p.categorias.map(cat => `<span class="text-[0.5rem] text-gray font-800 uppercase bg-black px-6 py-2 rounded-sm border border-222">${this._labelCat(cat).toUpperCase()}</span>`).join('')}
+                </div>` : ''}
               </div>
-              <div class="flex justify-between items-end w-full">
-                <div class="flex-1 min-w-0">
-                  <div class="flex flex-wrap gap-x-6 gap-y-1 text-[0.6rem] text-gray font-700 uppercase">
-                    ${p.telefono ? `<span class="flex items-center gap-2">${Icons.info()} ${p.telefono}</span>` : ''}
-                    ${p.email ? `<span class="flex items-center gap-2">${Icons.enlace()} ${p.email}</span>` : ''}
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
-                </div>
+              <div class="flex flex-col items-end gap-3 flex-shrink-0">
+                ${p.activo === false ? '<span class="badge badge-sm font-900 uppercase" style="background:rgba(255,68,68,0.15); color:var(--c-danger); border:1px solid rgba(255,68,68,0.3);">INACTIVO</span>' : '<span class="badge badge-sm font-900 uppercase" style="background:rgba(204,255,0,0.15); color:var(--c-success); border:1px solid rgba(204,255,0,0.3);">ACTIVO</span>'}
               </div>
             </div>
           </div>
@@ -212,7 +199,7 @@ const ProveedoresView = {
           </div>
 
           <!-- Desglose por categoría -->
-          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-info);">
+          <div class="card p-16 mb-16 border-222 bg-black">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
                 ${Icons.grafico()} GASTOS POR CATEGORÍA
             </div>
@@ -229,7 +216,7 @@ const ProveedoresView = {
           </div>
 
           <!-- Historial de Gastos -->
-          <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-warning);">
+          <div class="card p-16 mb-20 border-222 bg-black">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
                 ${Icons.dinero()} ÚLTIMOS REGISTROS
             </div>
@@ -250,7 +237,7 @@ const ProveedoresView = {
           </div>
 
           ${proveedor.notas ? `
-          <div class="card-registro card-accent card-accent-gold p-16 mb-40" style="--registro-color: var(--p-gold);">
+          <div class="card card-accent card-accent-gold p-16 mb-40">
             <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
             <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${proveedor.notas}</p>
           </div>` : '<div class="pb-40"></div>'}
@@ -279,7 +266,7 @@ const ProveedoresView = {
               <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
             </button>
           </div>
-          <div class="card-registro card-accent card-accent-green p-20 bg-black" style="--registro-color: var(--c-success);">
+          <div class="card card-accent card-accent-green p-20 bg-black">
             <div class="section-header-theme mb-20" style="--theme-color: var(--c-success)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
 
             <div class="wizard-input-group mb-15">
