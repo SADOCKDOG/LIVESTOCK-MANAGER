@@ -210,6 +210,12 @@ const Icons = {
   check() {
     return this._svg('<polyline points="20 6 9 17 4 12"/>');
   },
+  calculo() {
+    return this.grafico();
+  },
+  xmark() {
+    return this.cerrar();
+  },
 
   // ── Estados / Decorativos ──
   alerta() {

@@ -370,6 +370,7 @@ const CarneView = {
 
     return {
       ...filteredData,
+      kpis: data.kpis,
       valorPatrimonioTotal,
       totalKgPesados,
       numPesajes,

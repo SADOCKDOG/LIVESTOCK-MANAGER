@@ -302,7 +302,7 @@ const RebanosView = {
     const zonas = finca ? (finca.zonas || []).filter(z => !z?.anulada) : [];
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
-    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunicionesService.getTiposExplotacionREGA() : [];
+    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const eventosReb = eventos.filter(e => e.entidad_id === Number(id) || (e.tipo_entidad === 'rebano' && e.snap_identificacion === rebano.nombre));
     const totalKg = eventosReb.filter(e => e.unidad === 'kg').reduce((s, e) => s + (e.valor_neto || 0), 0);
@@ -475,7 +475,7 @@ const RebanosView = {
   async _crearRebano() {
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
-    const tiposExplotacionREGA = window.ComunicacionesService ? window.ComunicionesService.getTiposExplotacionREGA() : [];
+    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const finca = await Fincas.getActive();
     const zonas = finca ? finca.zonas || [] : [];
 

@@ -346,7 +346,7 @@ const HibridoView = {
     // Recalcular KPIs basados en datos filtrados
     const totalIngresosCarne = filteredData.ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
     const totalIngresosLeche = filteredData.entregasLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
-    const totalIngresosConsolidados = totalIngresosCarne + totalIngresosLece;
+    const totalIngresosConsolidados = totalIngresosCarne + totalIngresosLeche;
     const totalGastosAlim = filteredData.gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
     const mofaConsolidado = totalIngresosConsolidados - totalGastosAlim;
     const ratioMofaConsolidado = totalIngresosConsolidados > 0 ? (mofaConsolidado / totalIngresosConsolidados) * 100 : 0;
@@ -355,6 +355,7 @@ const HibridoView = {
 
     return {
       ...filteredData,
+      kpis: data.kpis,
       totalIngresosCarne,
       totalIngresosLeche,
       totalIngresosConsolidados,
