@@ -7,7 +7,6 @@
 const App = {
   _animalGuardado: false,
   _pesadaBatch: null,
-  _config: null,
   routes: {
     "/": "renderDashboard",
     "/ganaderia": "renderGanaderia",
@@ -29,7 +28,6 @@ const App = {
     "/informes": "renderInformes",
     "/alertas": "renderAlertas",
     "/ajustes": "renderAjustes",
-    "/sistema": "renderConfigSistema",
     "/compradores": "renderCompradores",
     "/comprador": "renderComprador",
     "/proveedores": "renderProveedores",
@@ -106,9 +104,7 @@ const App = {
       App._initScrollShadows();
       // Cargar preferencias visuales
       try {
-        const storedCfg = await window.db.get('meta', 'appConfig');
-        this._config = storedCfg?.value || {};
-        const cfg = storedCfg;
+        const cfg = await window.db.get('meta', 'appConfig');
         const mostrar = cfg?.value?.mostrarContextos;
         if (mostrar === false || mostrar === undefined) {
           document.body.classList.add('hide-context');
@@ -120,32 +116,6 @@ const App = {
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
         if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
-
-        // Cargar intensidad y color de haz
-        const hazInt = cfg?.value?.hazLuzIntensidad ?? 45;
-        document.documentElement.style.setProperty('--haz-intensity', hazInt + '%');
-        document.documentElement.style.setProperty('--haz-intensity-num', hazInt);
-
-        const hazColor = cfg?.value?.hazLuzColor || '';
-        if (hazColor) {
-          document.documentElement.style.setProperty('--haz-luz-color', hazColor);
-        } else {
-          document.documentElement.style.removeProperty('--haz-luz-color');
-        }
-
-        const fColor = cfg?.value?.fabColor || '';
-        if (fColor) {
-          document.documentElement.style.setProperty('--fab-neon-color', fColor);
-        } else {
-          document.documentElement.style.removeProperty('--fab-neon-color');
-        }
-
-        const fInt = cfg?.value?.fabIntensidad ?? 60;
-        document.documentElement.style.setProperty('--fab-intensity', fInt + '%');
-        document.documentElement.style.setProperty('--fab-intensity-num', fInt);
-
-        const bOpacity = cfg?.value?.bannerOpacity ?? 0.4;
-        document.documentElement.style.setProperty('--banner-opacity', bOpacity);
       } catch (_) {}
       await App.route();
     } catch (error) {
@@ -184,7 +154,7 @@ const App = {
     const finca = await Fincas.getActive();
     const headerEl = document.getElementById("nombre-finca-header");
     if (headerEl && finca) {
-      headerEl.innerHTML = finca.rega || finca.codigo_REGA || 'SIN REGA';
+      headerEl.innerHTML = finca.nombre;
       headerEl.onclick = () => (location.hash = "/ajustes");
       headerEl.style.cursor = "pointer";
     }
@@ -440,17 +410,8 @@ const App = {
   /** Actualiza el color neon de la cabecera según el mapa único MODULE_COLORS.
    *  Con mode explícito (carne/leche/...) usa ese módulo; sin mode, el color de la ruta actual. */
   updateHeaderColor(mode) {
-    const cfg = this._config;
-    let color;
-    const isFixed = cfg?.glowMarcoFijo ?? false;
-    const fixedColor = cfg?.glowMarcoFijoColor ?? '#FFFFFF';
-
-    if (isFixed) {
-      color = fixedColor;
-    } else {
-      const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
-      color = window.getModuleColor(path);
-    }
+    const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
+    const color = window.getModuleColor(path);
     document.documentElement.style.setProperty('--header-neon-color', color);
   },
 
@@ -461,12 +422,6 @@ const App = {
     const sheet = document.getElementById("nav-more-sheet");
     if (!sheet) return;
     sheet.classList.toggle("open");
-  },
-
-  /** Colapsa/expande la card de resumen (chevron esquina superior derecha). Reutilizable en todas las vistas. */
-  toggleResumen(btn) {
-    const card = btn && btn.closest('.card-resumen');
-    if (card) card.classList.toggle('collapsed');
   },
 
   async _onCompradorChangeWizard(selectEl) {
@@ -2016,14 +1971,6 @@ const App = {
       await AjustesView.render();
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Error: Vista Ajustes no disponible</div>';
-    }
-  },
-
-  async renderConfigSistema(params) {
-    if (window.ConfigSistemaView) {
-      await ConfigSistemaView.render(params);
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Error: Módulo de Sistema no disponible</div>';
     }
   },
 

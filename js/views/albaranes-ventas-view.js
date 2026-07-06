@@ -1,17 +1,14 @@
 /**
- * Livestock Manager - AlbaranesVentasView v3.0.0
+ * Livestock Manager - AlbaranesVentasView v1.0.0
  * Historial integrado de albaranes de leche y registros de ventas de carne para todos los tipos de explotación.
  * Soporta re-impresión de albaranes y edición de borradores.
  */
 
 const AlbaranesVentasView = {
   _currentTab: 'todos',
-  _filtroActivo: {
-    texto: '',
-    tipo: ''
-  },
+  _searchQuery: '',
+
   async render() {
-    if (window.App) App.updateHeaderColor('albaranes-ventas');
     const main = document.getElementById("app-content");
     main.innerHTML = `<div class="loader">Cargando albaranes y ventas...</div>`;
 
@@ -32,10 +29,9 @@ const AlbaranesVentasView = {
         cantidad: v.num_animales || (v.animalId ? v.animalId.length : 1),
         unidad: 'cabezas',
         importe: v.importe_total || (v.precio_total || 0),
-        estado: v.estado_tramite || 'presentado',
+        estado: v.estado_tramite || 'presentado', // Las ventas de carne suelen guardarse presentadas
         numero: v.numero_albaran || `ALB-C-${v.id}`,
-        dataRaw: v,
-        trazabilidad: 'Albarán'
+        dataRaw: v
       }));
 
       // Normalizar registros de leche
@@ -48,10 +44,9 @@ const AlbaranesVentasView = {
         cantidad: v.cantidad,
         unidad: 'litros',
         importe: v.importe_total || 0,
-        estado: v.estado_tramite_infolac || 'borrador',
+        estado: v.estado_tramite_infolac || 'borrador', // Infolac admite borrador
         numero: v.numero_infolac || `ALB-L-${v.id}`,
-        dataRaw: v,
-        trazabilidad: 'Albarán INFOLAC'
+        dataRaw: v
       }));
 
       // Unificar listado
@@ -64,54 +59,13 @@ const AlbaranesVentasView = {
         return fb.localeCompare(fa);
       });
 
-      // Guardar datos brutos para filtrado
-      this._cachedDataRaw = todosRegistros;
+      this._cachedRegistros = todosRegistros;
 
-      // Aplicar filtros iniciales
-      const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
-      this._cachedData = filteredData;
-
-      main.innerHTML = this._renderHTML(filteredData);
+      main.innerHTML = this._renderHTML(todosRegistros);
     } catch (e) {
       console.error('[AlbaranesVentasView] Error:', e);
-      main.innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red">Error: ${e.message}</div>`;
     }
-  },
-
-  _aplicarFiltrosToData(data) {
-    // Aplicar filtros a los datos
-    let filteredData = [...data];
-
-    // Filtrar por tipo de registro
-    if (this._filtroActivo.tipo) {
-      filteredData = data.filter(r => r.tipo === this._filtroActivo.tipo);
-    }
-
-    // Filtrar por texto de búsqueda
-    if (this._filtroActivo.texto.trim()) {
-      const q = this._filtroActivo.texto.toLowerCase();
-      filteredData = data.filter(r =>
-        r.comprador.toLowerCase().includes(q) ||
-        r.numero.toLowerCase().includes(q) ||
-        r.titulo.toLowerCase().includes(q) ||
-        (r.dataRaw.razonSocial || '').toLowerCase().includes(q) ||
-        (r.dataRaw.comprador_nombre || '').toLowerCase().includes(q)
-      );
-    }
-
-    return filteredData;
-  },
-
-  _setFiltro(type, value) {
-    this._filtroActivo[type] = value;
-    this._aplicarFiltros();
-  },
-
-  _aplicarFiltros() {
-    if (!this._cachedDataRaw) return;
-    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
-    this._cachedData = filteredData;
-    this._renderLista();
   },
 
   _renderHTML(registros) {
@@ -128,130 +82,60 @@ const AlbaranesVentasView = {
     const totalCarne = registros.filter(r => r.tipo === 'carne').reduce((acc, r) => acc + (r.importe || 0), 0);
     const totalImporte = totalLeche + totalCarne;
 
-    // Resumen mensual (últimos 6 meses) - basado en fechas de ventas
-    const hoy = new Date();
-    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const porMes = {};
-    for (let i = 0; i < 6; i++) {
-      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
-    }
-    // Contar registros por mes
-    registros.forEach(r => {
-      const fechaStr = r.fecha;
-      if (fechaStr) {
-        const key = fechaStr.substring(0, 7); // YYYY-MM
-        if (porMes[key]) porMes[key].total++;
-      }
-    });
-    const mesesHtml = Object.values(porMes).reverse().map(m => {
-      const max = Math.max(1, ...Object.values(porMes).map(m => m.total));
-      const pct = Math.max(0, Math.min(100, (m.total / max) * 100));
-      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
-      return `<div class="flex-1 text-center min-w-0">
-        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
-        <div class="albaran-bar-wrap">
-          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
-        </div>
-        <div class="text-xs font-bold mt-2" style="color:${color};">${m.total}</div>
-      </div>`;
-    }).join('');
-
     return `
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-info); background:rgba(59,130,246,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${registros.length} total</span>
-        </div>
-        <div class="flex gap-6">${mesesHtml}</div>
+      <div class="grid grid-cols-4 gap-6 mb-14">
+        <div class="info-box-center border-left-blue"><small class="s-lbl">TOTAL REGISTROS</small><div class="inf-val-lg text-blue">${totalVentas}</div></div>
+        <div class="info-box-center border-left-green"><small class="s-lbl">TOTAL FACTURADO</small><div class="inf-val-lg text-green">${totalImporte.toFixed(2)} €</div></div>
+        <div class="info-box-center border-left-amber"><small class="s-lbl">ENTREGAS LECHE</small><div class="inf-val-lg text-amber">${totalLeche.toFixed(2)} €</div></div>
+        <div class="info-box-center border-left-gold"><small class="s-lbl">VENTAS CARNE</small><div class="inf-val-lg text-gold">${totalCarne.toFixed(2)} €</div></div>
       </div>
 
-      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE ALBARANES Y VENTAS
+      <div class="card p-14 mb-14 flex items-center justify-between gap-10">
+        <div class="flex-1">
+          <input type="text" id="sales-search-input" placeholder="Buscar por comprador, número de albarán..." class="wizard-input text-sm" value="${this._searchQuery}" oninput="AlbaranesVentasView._buscar(this.value)">
         </div>
-        <div id="resumen-albaranes" class="space-y-6 text-white">
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.documento()} Total Registros</span>
-            <strong class="text-xl font-950" style="color: var(--c-info);">${registros.length} ${registros.length === 1 ? "registro" : "registros"}</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center border-bottom-222">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Facturación Total</span>
-            <strong class="text-xl font-950 text-green">${totalImporte.toLocaleString()} €</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.leche()} Ventas Leche</span>
-            <strong class="text-xl font-950 text-amber">${totalLeche.toLocaleString()} €</strong>
-          </div>
-          <div class="py-8 flex justify-between items-center">
-            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.carne()} Ventas Carne</span>
-            <strong class="text-xl font-950 text-gold">${totalCarne.toLocaleString()} €</strong>
+      </div>
+
+      <div class="mb-16">
+        <div class="flex gap-6 mb-10">
+          <div class="tabs-scroll scroll-shadow-container flex-1 nowrap">
+            ${tipos.map(t => `
+              <button class="filter-pill filter-pill-gold font-800 uppercase inline-flex gap-4 ${this._currentTab === t ? 'active' : ''}"
+                onclick="AlbaranesVentasView._cambiarTab('${t}')"
+                style="letter-spacing:0.3px;">
+                ${labels[t] || t}
+              </button>
+            `).join('')}
           </div>
         </div>
       </div>
 
-      <!-- Filtro de búsqueda integrado (controla el listado) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
-        ${Icons.documento()} Historial de Albaranes y Ventas
-      </div>
-      <div class="flex gap-8 items-center mb-12">
-        <div class="relative flex-1 min-w-0">
-          <input type="search" id="albaran-search" placeholder="Buscar por comprador, número de albarán, concepto..."
-                 oninput="AlbaranesVentasView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
-        </div>
-        <select id="albaran-filtro-tipo" class="form-select-info"
-                onchange="AlbaranesVentasView._setFiltro('tipo', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
-          <option value="">Todos los tipos</option>
-          <option value="leche" ${this._filtroActivo.tipo === 'leche' ? 'selected' : ''}>Entregas Leche</option>
-          <option value="carne" ${this._filtroActivo.tipo === 'carne' ? 'selected' : ''}>Ventas Carne</option>
-        </select>
-      </div>
-
-      <!-- Tabs -->
-      <div class="mb-14">
-        <div class="scroll-shadow-container scroll-tabs-row mb-10">
-          <div class="albaranes-tabs">
-            <button class="albaranes-tab ${this._currentTab === 'todos' ? 'active' : ''}" data-tab="todos" onclick="AlbaranesVentasView._cambiarTab('todos')">${Icons.comercial()} Todo</button>
-            <button class="albaranes-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="AlbaranesVentasView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-            <button class="albaranes-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="AlbaranesVentasView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          </div>
-        </div>
-      </div>
-      <div id="albaranes-lista"><div class="loader">Cargando albaranes y ventas...</div></div>;
-
-      <!-- FAB -->
-      <div class="fixed bottom-20 right-20 z-50">
-        <button class="btn-fab-primary" onclick="AlbaranesVentasView._abrirMenuNuevo()">
-          ${Icons.agregar()}
-        </button>
-      </div>
+      <div id="sales-lista">${this._renderLista(registros)}</div>
     `;
   },
 
-  _renderLista() {
-    const filtrados = this._cambiarTab === 'todos'
-      ? this._cachedData
-      : this._cachedData.filter(r => r.tipo === this._currentTab);
+  _renderLista(registros) {
+    let filtrados = this._currentTab === 'todos' 
+      ? registros 
+      : registros.filter(r => r.tipo === this._currentTab);
+
+    if (this._searchQuery.trim()) {
+      const q = this._searchQuery.toLowerCase();
+      filtrados = filtrados.filter(r => 
+        r.comprador.toLowerCase().includes(q) || 
+        r.numero.toLowerCase().includes(q) || 
+        r.titulo.toLowerCase().includes(q)
+      );
+    }
 
     if (!filtrados.length) {
-      document.getElementById('albaranes-lista').innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.comercial()}</div><p class="empty-state-text">No hay registros de albaranes o ventas.</p></div>`;
-      return;
+      return `<div class="empty-state"><div class="empty-state-icon">${Icons.comercial()}</div><p class="empty-state-text">No hay registros de comercialización.</p></div>`;
     }
 
     const colors = { leche: 'var(--c-warning)', carne: 'var(--c-warning)' };
-    const badgeColors = {
-      borrador: 'var(--c-warning)',
-      presentado: 'var(--c-success)',
-      validado: 'var(--c-info)',
-      rechazado: 'var(--c-danger)'
-    };
+    const badgeColors = { borrador: 'var(--c-warning)', presentado: 'var(--c-success)', validado: 'var(--c-info)' };
 
-    document.getElementById('albaranes-lista').innerHTML = `<div class="grid gap-10">
+    return `<div class="grid gap-10">
       ${filtrados.map(reg => {
         const color = colors[reg.tipo] || '#666';
         const badgeColor = badgeColors[reg.estado] || '#666';
@@ -265,14 +149,8 @@ const AlbaranesVentasView = {
                 <div class="font-800 text-xs" style="color:${color}; display:flex; align-items:center; gap:6px;">
                   ${reg.tipo === 'leche' ? Icons.leche() : Icons.carne()}
                   ${reg.tipo.toUpperCase()}
-                  <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${badgeColor}; color: ${badgeColor};
-                      background: ${badgeColor === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
-                                badgeColor === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
-                                badgeColor === 'var(--c-info)' ? 'rgba(204,255,0,0.1)' :
-                                badgeColor === 'var(--c-danger)' ? 'rgba(244,67,54,0.1)' :
-                                'rgba(204,255,0,0.1)'};
-                      padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                      ${reg.estado.toUpperCase()}
+                  <span class="badge uppercase font-900 ml-6" style="background:${badgeColor}; color:${reg.estado === 'borrador' ? 'black' : 'white'}; font-size:0.6rem; padding:1px 6px; border-radius:4px;">
+                    ${reg.estado}
                   </span>
                 </div>
                 <div class="font-900 text-white text-base mt-4">${reg.titulo} (${reg.numero})</div>
@@ -281,8 +159,8 @@ const AlbaranesVentasView = {
             </div>
             <div class="mt-8 grid grid-cols-2 gap-4 text-xs text-ccc">
               <div>Comprador: <span class="text-white font-800">${reg.comprador}</span></div>
-              <div>Importe: <span class="text-green font-950">${(reg.importe || 0).toFixed(2)} €</span></div>
-              <div>Volumen: <span class="text-gold font-800">${(reg.cantidad || 0).toLocaleString()} ${reg.unidad}</span></div>
+              <div>Importe: <span class="text-green font-950">${reg.importe.toFixed(2)} €</span></div>
+              <div>Volumen: <span class="text-gold font-800">${reg.cantidad.toLocaleString()} ${reg.unidad}</span></div>
             </div>
             <div class="mt-10 flex gap-6">
               ${esBorrador ? `
@@ -298,15 +176,6 @@ const AlbaranesVentasView = {
     </div>`;
   },
 
-  _cambiarTab(tab) {
-    this._currentTab = tab;
-    document.querySelectorAll('.albaranes-tab').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-    });
-    this._renderLista();
-    window.scrollTo(0, 0);
-  },
-
   _fmtFecha(dateStr) {
     if (!dateStr) return '—';
     try {
@@ -315,50 +184,27 @@ const AlbaranesVentasView = {
     } catch { return dateStr; }
   },
 
-  // FAB Actions
-  _abrirMenuNuevo() {
-    const overlay = document.createElement("div");
-    overlay.className = "wizard-full-screen";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
-    overlay.innerHTML = `
-      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-info);">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.agregar()} Nuevo Albarán o Venta</h3>
-        <label class="wizard-label mb-10">Selecciona el tipo de documento a generar:</label>
-        <div class="wizard-input-group">
-          <select id="av-tipo-doc" class="wizard-input wizard-select mb-15">
-            <option value="leche">Entrega de Leche (Albarán)</option>
-            <option value="carne">Venta de Animales (Albarán)</option>
-          </select>
-        </div>
-        <div class="flex gap-10">
-          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-av-next">Crear ${Icons.siguiente()}</button>
-          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(overlay);
+  _cambiarTab(tab) {
+    this._currentTab = tab;
+    const lista = document.getElementById('sales-lista');
+    if (lista) {
+      lista.innerHTML = this._renderLista(this._cachedRegistros || []);
+    }
+  },
 
-    overlay.querySelector('#btn-av-next').onclick = async () => {
-      const tipo = overlay.querySelector('#av-tipo-doc').value;
-      overlay.remove();
-
-      if (tipo === 'leche') {
-        await window.AlbaranLecheWizard.abrir();
-      } else {
-        await window.VentaMasivaWizard.abrir();
-      }
-
-      setTimeout(() => AlbaranesVentasView.render(), 1000);
-    };
+  _buscar(query) {
+    this._searchQuery = query;
+    const lista = document.getElementById('sales-lista');
+    if (lista) {
+      lista.innerHTML = this._renderLista(this._cachedRegistros || []);
+    }
   },
 
   async _editarBorrador(tipo, id) {
     try {
       const reg = await window.db.get(tipo === 'leche' ? 'comercializacion_leche' : 'comercializacion_carne', Number(id));
       if (!reg) return App.toastError("Registro no encontrado");
-
+      
       if (tipo === 'leche') {
         await window.AlbaranLecheWizard.open(reg);
       } else {
@@ -373,7 +219,7 @@ const AlbaranesVentasView = {
     try {
       const reg = await window.db.get(tipo === 'leche' ? 'comercializacion_leche' : 'comercializacion_carne', Number(id));
       if (!reg) return App.toastError("Registro no encontrado");
-
+      
       const est = await window.Trazabilidad.generarEstructuraAlbaran(window.db, reg, tipo);
       await App.imprimirAlbaran(est, tipo);
     } catch (e) {
@@ -416,10 +262,10 @@ const AlbaranesVentasView = {
       }
 
       overlay.innerHTML = `
-        <div class="card-registro" style="--registro-color: var(--c-info); max-width:550px;width:100%;padding:24px;">
+        <div class="card" style="max-width:550px;width:100%;padding:24px;">
           <div class="flex justify-between items-center mb-14">
             <div>
-              <div class="font-800 text-sm" style="color:${color};">${tipo === 'leche' ? 'ENTREGA DE LECHE' : 'VENTA DE ANIMALES'}</div>
+              <div class="font-800 text-sm" style="color:${color};">${tipo === 'leche' ? 'ENTREGA DE LECHE' : 'VENTA DE CARNE'}</div>
               <div class="font-900 text-white text-lg">${reg.numero_albaran || reg.numero_infolac || `Registro #${reg.id}`}</div>
             </div>
             <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">${Icons.cerrar()}</button>

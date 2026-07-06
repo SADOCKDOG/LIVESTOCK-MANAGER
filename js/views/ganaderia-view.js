@@ -76,7 +76,7 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="card-registro mb-14 border-bottom-222 pb-10" style="--registro-color: ${meta.color};">
+      <div class="mb-14 border-bottom-222 pb-10">
         <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
@@ -98,41 +98,29 @@ const GanaderiaView = {
 
 
 
-      <div class="card-registro p-14 mb-14 border-222" style="--registro-color: ${meta.color};">
+      <div class="card p-14 mb-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Rebaños del modo ${meta.label}
         </div>
         <div class="grid gap-8">
           ${rebanosModo.length > 0
-    ? rebanosModo.slice(0, 8).map(r => `
-      <a href="#/rebano?id=${r.id}" class="card-registro" style="--registro-color: ${meta.color};">
-        <div class="flex flex-col">
-          <div class="flex justify-between items-start gap-6 mb-4">
-            <div class="text-xs">
-              <div class="registro-titulo">${r.nombre || 'Rebaño'}</div>
-              <div class="registro-sub">Tipo: ${r.tipo || 'N/D'}</div>
-            </div>
-            <div class="text-right">
-              <!-- Espacio para estado si aplicara en el futuro -->
-            </div>
-          </div>
-          <div class="flex justify-between items-end w-full">
-            <div class="flex-1 min-w-0">
-              <!-- Información adicional si es necesaria -->
-            </div>
-            <div class="text-right">
-              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
-            </div>
-          </div>
-        </div>
-      </a>
-    `).join('')
-    : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin rebaños para este modo</span></div>`
-  }
+            ? rebanosModo.slice(0, 8).map(r => `
+              <a href="#/rebano?id=${r.id}" class="card-registro" style="--registro-color: ${meta.color};">
+                <div class="flex justify-between items-center">
+                  <div class="text-xs">
+                    <div class="registro-titulo">${r.nombre || 'Rebaño'}</div>
+                    <div class="registro-sub">Tipo: ${r.tipo || 'N/D'}</div>
+                  </div>
+                  <span class="badge badge-sm" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">ID ${r.id}</span>
+                </div>
+              </a>
+            `).join('')
+            : `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin rebaños para este modo</span></div>`
+          }
         </div>
       </div>
 
-      <div class="card-registro p-14 border-222" style="--registro-color: ${meta.color};">
+      <div class="card p-14 border-222">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Censo reciente (${animalesModo.length} total · ${especies.size} ${especies.size === 1 ? "especie" : "especies"})
         </div>
@@ -151,33 +139,19 @@ const GanaderiaView = {
               const edad = (a.fecha_nacimiento || a.fechaNacimiento) ? Math.floor((new Date() - new Date(a.fecha_nacimiento || a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 365)) : null;
               return `
                 <a href="#/animal?id=${a.id}" class="card-registro" style="--registro-color: ${meta.color};">
-                  <div class="flex flex-col">
-                    <div class="flex justify-between items-start gap-6 mb-4">
-                      <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-6">
-                          <span class="text-lg font-black text-gold uppercase tracking-tight">${a.numero_identificacion || a.nombre || `#${a.id}`}</span>
-                          <span class="text-gray-400" style="font-size:0.7rem;">${sexoIcon}</span>
-                        </div>
-                        <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
-                          <span>${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}</span>
-                          ${edad !== null ? `<span>${edad} ${edad === 1 ? "año" : "años"}</span>` : ''}
-                          <span class="flex items-center gap-3">${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}</span>
-                        </div>
+                  <div class="flex justify-between items-start gap-6">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-6">
+                        <span class="text-lg font-black text-gold uppercase tracking-tight">${a.numero_identificacion || a.nombre || `#${a.id}`}</span>
+                        <span class="text-gray-400" style="font-size:0.7rem;">${sexoIcon}</span>
                       </div>
-                      <div class="text-right">
-                        <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-${a.estado === 'activo' ? 'success' : a.estado === 'vendido' ? 'warning' : 'danger'}); color: var(--c-${a.estado === 'activo' ? 'success' : a.estado === 'vendido' ? 'warning' : 'danger'}); background: ${a.estado === 'activo' ? 'rgba(204,255,0,0.1)' : a.estado === 'vendido' ? 'rgba(255,215,0,0.1)' : 'rgba(255,68,68,0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                          ${a.estado || 'activo'}
-                        </span>
+                      <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
+                        <span>${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}</span>
+                        ${edad !== null ? `<span>${edad} ${edad === 1 ? "año" : "años"}</span>` : ''}
+                        <span class="flex items-center gap-3">${Icons.rebanos()} ${reb?.nombre || 'Sin Lote'}</span>
                       </div>
                     </div>
-                    <div class="flex justify-between items-end w-full">
-                      <div class="flex-1 min-w-0">
-                        <!-- Espacio para información adicional si es necesario -->
-                      </div>
-                      <div class="text-right">
-                        <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
-                      </div>
-                    </div>
+                    <span class="badge badge-sm uppercase flex-shrink-0" style="background:${meta.color}15; color:${meta.color}; border:1px solid ${meta.color}35;">${a.estado || 'activo'}</span>
                   </div>
                 </a>
               `;

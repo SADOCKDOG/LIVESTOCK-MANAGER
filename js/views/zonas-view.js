@@ -13,12 +13,22 @@ const ZonasView = {
     const zonasConIndice = (finca.zonas || [])
           .map((zona, realIndex) => ({ zona, realIndex }))
           .filter(({ zona }) => !zona?.anulada);
-    let html = '';
+    let html = `
+      <div class="card-registro" onclick="ZonasView._crearZona()" style="--registro-color: var(--c-success);">
+        <div class="section-header-theme">ACCIONES</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="ZonasView._crearZona()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nueva Zona</span>
+          </button>
+        </div>
+        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.zonas()} Creación y gestión de zonas, parcelas y recintos de la explotación</span></div>
+      </div>`;
     if (zonasConIndice.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()">${Icons.agregar()} Crear primera zona</button></div></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p></div>`;
     else {
       let totalAforo = 0, totalOcupacion = 0;
-      let fichasHtml = '';
+      html += `<div class="grid gap-15">`;
       for (const item of zonasConIndice) {
         const z = item.zona;
         let censoTotal = 0;
@@ -34,23 +44,15 @@ const ZonasView = {
           if (n > 0) {
             const colorEspecie = r.especie === 'Vacas' ? 'var(--c-info)' : r.especie === 'Ovejas' ? 'var(--c-success)' : r.especie === 'Cabras' ? 'var(--c-warning)' : 'var(--c-pink)';
             rebanosHtml += `
-              <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${colorEspecie};">
-                <div class="flex flex-col gap-10">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-8">
-                        <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
-                        <div>
-                          <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
-                          <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <div class="font-900 text-sm">${n}</div>
-                    </div>
+              <div class="flex justify-between items-center mt-6" style="background:rgba(255,255,255,0.02); border-left:3px solid ${colorEspecie}; padding:8px 12px; border-radius:8px;">
+                <div class="flex items-center gap-8">
+                  <div style="color:${colorEspecie}; filter: drop-shadow(0 0 3px ${colorEspecie}40);">${Icons.rebanos()}</div>
+                  <div>
+                    <div style="font-size:0.75rem; font-weight:800; color:${colorEspecie}; text-transform:uppercase;">${r.nombre}</div>
+                    <div class="text-aaa text-[0.6rem] font-700 uppercase">${r.tipo}</div>
                   </div>
                 </div>
+                <div class="text-white font-900 text-sm">${n}</div>
               </div>`;
           }
         }
@@ -74,7 +76,7 @@ const ZonasView = {
         const pacTexto = z.codigo_pac ? `PAC: ${z.codigo_pac}` : 'PAC: pendiente';
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
-        fichasHtml += `
+        html += `
           <div class="card-registro" onclick="location.hash='/zona?index=${item.realIndex}'" style="--registro-color: ${colorCenso};">
             <div class="flex flex-col gap-10">
               <div class="flex justify-between items-center w-full">
@@ -109,7 +111,7 @@ const ZonasView = {
                   </div>
                 </div>
                 <div class="text-right">
-                  <span style="display:block; font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER ZONA ➔</div>
                 </div>
               </div>
 
@@ -117,44 +119,22 @@ const ZonasView = {
             </div>
           </div>`;
       }
-      // Card AGLUTINADORA: cabecera + resumen colapsable (ocupación global) + histórico de fichas
+      html += `</div>`;
+      // Barra resumen global
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
       const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
-      html += `<div class="card-registro mb-10" style="--registro-color: var(--c-success);">
-        <div class="flex items-center gap-12 mb-12">
-          <span class="text-3xl" style="color:var(--c-success);">${Icons.zonas()}</span>
-          <div>
-            <div class="text-white font-900 text-lg">Zonas / Parcelas</div>
-            <div class="text-gray" style="font-size:0.68rem;">${zonasConIndice.length} ${zonasConIndice.length === 1 ? 'registro' : 'registros'} · ${totalOcupacion} cabezas</div>
+      html += `
+        <div class="card-registro mt-15" style="--registro-color: ${colorGlobal}; background:rgba(204,255,0,0.03);padding:15px;">
+          <div class="flex justify-between items-center mb-6">
+            <span class="text-xs text-gray font-bold uppercase">OCUPACIÓN GLOBAL</span>
+            <span class="font-bold" style="color:${colorGlobal}">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</span>
           </div>
-        </div>
-        <!-- Resumen de ocupación (colapsable) -->
-        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6">${Icons.zonas()} Ocupación Global</span>
-            <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
+          <div class="progress-track progress-track--lg">
+            <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
           </div>
-          <div class="resumen-body">
-            <div class="flex justify-between items-center mb-6">
-              <span class="text-xs text-gray uppercase font-900">Cabezas / Aforo</span>
-              <strong class="text-xl font-950" style="color:${colorGlobal};">${totalOcupacion} / ${totalAforo} (${pctGlobal}%)</strong>
-            </div>
-            <div class="progress-track progress-track--lg">
-              <div style="width:${Math.min(pctGlobal, 100)}%;height:100%;background:${colorGlobal};border-radius:5px;box-shadow:0 0 12px ${colorGlobal}44;"></div>
-            </div>
-          </div>
-        </div>
-        <!-- Histórico de registros -->
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">${Icons.documento()} Lista de Zonas</div>
-        <div class="grid gap-12">${fichasHtml}</div>
-      </div>`;
+        </div>`;
     }
-    main.innerHTML = html + `
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="ZonasView._crearZona()">
-        <span class="fab-label">Nueva Zona</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>`;
+    main.innerHTML = html + `<button class="fab-btn" onclick="ZonasView._crearZona()" aria-label="Nueva Zona">${Icons.agregar()}</button>`;
   },
 
   async renderDetalle(params) {
@@ -181,7 +161,7 @@ const ZonasView = {
     
     document.getElementById("app-content").innerHTML = `
       <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
-      <div class="card-registro border-top-3px border-top-3px-orange" style="--registro-color: var(--c-success);">
+      <div class="card border-top-3px border-top-3px-orange">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
           <input type="text" id="z-edit-nombre" value="${zona.nombre}" class="premium-input"></div>

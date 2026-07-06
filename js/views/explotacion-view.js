@@ -736,7 +736,7 @@ if (window.enableScrollShadows) {
     }
 
     let html = `
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: ${borderStyleColor}; background: rgba(255, 255, 255, 0.02);">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.paquete()} BALANCE DE STOCK Y LLENADO DE SILOS
         </div>
@@ -1292,7 +1292,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- LISTADO / HISTORIAL DE GASTOS -->
-        <div class="card-registro p-16 mb-16 border-222" style="--registro-color: var(--c-danger);">
+        <div class="card p-16 mb-16 border-222">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
             ${Icons.documento()} Historial de gastos registrados
           </div>
@@ -1343,7 +1343,7 @@ if (window.enableScrollShadows) {
         ${silosHtml}
 
         <!-- REGISTRO DE MOVIMIENTO DE ALMACÉN -->
-        <div class="card-registro p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--registro-color: var(--c-info); --theme-color: var(--c-info);">
+        <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24">
           <div class="section-header-theme" style="--theme-color: var(--c-info)">${Icons.paquete()} GESTIÓN DE STOCK</div>
           <div class="flex justify-center mt-10">
             <button class="widget-link-btn widget-link-btn--neon neon-info" style="width: 100%; max-width: 260px; padding: 18px 15px;" onclick="ExplotacionView._abrirAsistenteSilo('${this._activeMode}')">
@@ -1354,7 +1354,7 @@ if (window.enableScrollShadows) {
         </div>
 
         <!-- HISTORIAL DE MOVIMIENTOS -->
-        <div class="card-registro p-16 mb-16 border-222" style="--registro-color: var(--c-info);">
+        <div class="card p-16 mb-16 border-222">
           <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
             ${Icons.documento()} Historial de movimientos de silo
           </div>

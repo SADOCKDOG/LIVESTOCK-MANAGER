@@ -81,7 +81,7 @@ const DocumentosView = {
       this._setupFilters();
     } catch (e) {
       console.error('[Documentos] Error:', e);
-      main.innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red">Error: ${e.message}</div>`;
     }
   },
 
@@ -103,7 +103,7 @@ const DocumentosView = {
     const docsRecientes = docs.slice(0, 5);
 
     const bannerInterno = `
-      <div class="card-registro card-dark-gradient border-222 modo-interno-banner mb-14" style="--registro-color: var(--c-warning);"> 
+      <div class="card card-dark-gradient border-222 modo-interno-banner mb-14" >
         <div class="section-header-theme" style="--theme-color: var(--c-warning);">${Icons.alerta()} MODO INTERNO SIGGAN</div>
         <p class="text-xs text-aaa mt-6">
           Genera la documentación desde Livestock Manager y sube los ficheros a SIGGAN/BADIGEX de forma manual. Registra aquí el número de acuse o el justificante recibido para mantener la trazabilidad interna.
@@ -138,7 +138,7 @@ const DocumentosView = {
         </div>
       </div>
 
-      <div class="card-registro p-12 mb-14 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold); --registro-color: var(--p-gold);">
+      <div class="card p-12 mb-14 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold);">
         <div class="section-header-theme">ACCIONES</div>
         <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="DocumentosView._abrirAsistenteConsulta()">
@@ -216,37 +216,28 @@ const DocumentosView = {
         return `
           <div class="card-registro" style="--registro-color: ${color};">
             <div class="flex justify-between items-start">
-              <div class="flex-1 min-w-0">
+              <div>
                 <div class="font-800 text-sm" style="color:${color}; display:flex; align-items:center; gap:6px;">
                   ${doc.tipo === 'crotales' ? Icons.animales() : Icons.documento()}
-                  ${label}
+                  ${label} 
+                  ${esBorrador ? `<span class="badge badge-warning ml-6 uppercase font-900" style="background:var(--c-warning); color:black; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Borrador</span>` : `<span class="badge badge-success ml-6 uppercase font-900" style="background:var(--c-success); color:white; font-size:0.6rem; padding:1px 6px; border-radius:4px;">Presentado</span>`}
                 </div>
-                <div class="font-900 text-white mt-2">${doc.numero || 'S/N'}</div>
+                <div class="font-900 text-white mt-4">${doc.numero || 'S/N'}</div>
               </div>
-              <div class="text-right">
-                <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-${esBorrador ? 'warning' : 'success'}); color: var(--c-${esBorrador ? 'warning' : 'success'}); background: ${esBorrador ? 'rgba(255,215,0,0.1)' : 'rgba(204,255,0,0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                  ${esBorrador ? 'Borrador' : 'Presentado'}
-                </span>
-              </div>
+              <div class="text-xs text-ccc">${fecha}</div>
             </div>
-            <div class="flex justify-between items-end w-full">
-              <div class="flex-1 min-w-0">
-                <div class="mt-6 text-xs text-ccc">
-                  ${descHtml}
-                </div>
-                ${acuseHtml}
-                <div class="mt-6 flex gap-3 flex-wrap">
-                  ${esBorrador ? `
-                    <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar Borrador</button>
-                  ` : `
-                    <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} Imprimir PDF</button>
-                  `}
-                  <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Guardar acuse</button>
-                </div>
-              </div>
-              <div class="text-right">
-                <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">${Icons.documento()} Detalle</span>
-              </div>
+            <div class="mt-6 text-xs text-ccc">
+              ${descHtml}
+            </div>
+            ${acuseHtml}
+            <div class="mt-8 flex gap-6 flex-wrap">
+              ${esBorrador ? `
+                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar Borrador</button>
+              ` : `
+                <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} Imprimir PDF</button>
+              `}
+              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Guardar acuse</button>
+              <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._verDetalle(${doc.id}, '${doc.tipo}')">${Icons.documento()} Detalle</button>
             </div>
           </div>
         `;
@@ -272,7 +263,7 @@ const DocumentosView = {
         <h2 class="pesaje-titulo-h2">${Icons.buscar()} CONSULTAR / IMPRIMIR</h2>
       </div>
       <div class="wizard-content-scrollable">
-        <div class="card-registro p-16 mb-16 border-222 card-dark-gradient" style="--registro-color: var(--c-info);">
+        <div class="card p-16 mb-16 border-222 card-dark-gradient">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-8 text-center">SELECCIONA TIPO DE DOCUMENTO</div>
           <div class="grid grid-cols-2 gap-8">
             ${[
@@ -455,7 +446,7 @@ const DocumentosView = {
       : `<span class="text-red">${Icons.adjuntar()} Acuse manual pendiente</span>`;
 
     overlay.innerHTML = `
-      <div class="card-registro" style="max-width:520px;width:100%;padding:24px;; --registro-color: var(--c-gray);">
+      <div class="card" style="max-width:520px;width:100%;padding:24px;">
         <div class="flex justify-between items-start mb-10">
           <div>
             <div class="font-800 text-sm" style="color:${color};">${label}</div>
@@ -523,7 +514,7 @@ const DocumentosView = {
     const docLabels = { dimoe: 'Guía DIMOE', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido de Crotales' };
     const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : (docLabels[tipo] || 'Documento');
     overlay.innerHTML = `
-      <div class="card-registro" style="max-width:520px;width:100%;padding:24px;; --registro-color: var(--c-gray);">
+      <div class="card" style="max-width:520px;width:100%;padding:24px;">
         <div class="flex justify-between items-center mb-8">
           <div>
             <div class="font-900 text-sm" style="color:var(--c-warning);">${docLabel}</div>

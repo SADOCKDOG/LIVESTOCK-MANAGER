@@ -65,7 +65,7 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
+      <div class="card mb-14 p-12" style="background:rgba(255,68,68,0.03);">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
           <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
@@ -74,7 +74,7 @@ const GastosView = {
       </div>
 
       <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-purple); background: rgba(255,68,68, 0.015);">
+      <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255,68,68, 0.015);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
         </div>
@@ -158,8 +158,8 @@ const GastosView = {
 
     const recordsHtml = records.length > 0
       ? records.map(r => `
-        <div class="card-registro" onclick="${r.onclick || ''}"
-             style="--registro-color: ${color};">
+        <div class="card mb-6" onclick="${r.onclick || ''}"
+             style="border-left:4px solid ${color}; padding:12px 14px; cursor:pointer; background:rgba(0,0,0,0.3);">
           <div class="flex justify-between items-start">
             <div class="flex-1 min-w-0">
               <div class="text-white font-900 uppercase tracking-tight nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${Icons.documento()} ${r.title}</div>
@@ -171,9 +171,8 @@ const GastosView = {
                 </span>
               </div>
             </div>
-            <div class="flex-col items-end">
+            <div class="text-right flex-shrink-0 ml-8">
               <div class="font-950" style="font-size:1.1rem; color:${color};">${r.value}</div>
-              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px; margin-top: 4px;">Ficha -></span>
             </div>
           </div>
         </div>`).join('')
@@ -204,16 +203,17 @@ const GastosView = {
           </div>
         </div>
         ` : ''}
+        <div class="text-center mb-12">
+          <button class="btn btn-create btn-sm" onclick="${registrarHandler}">
+            ${Icons.agregar()} ${registrarLabel}
+          </button>
+        </div>
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} ${listName}
         </div>
         ${recordsHtml}
       </div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="${registrarHandler}">
-        <span class="fab-label">Nuevo ${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>`;
+      <button class="fab-btn" onclick="${registrarHandler}" aria-label="${registrarLabel}">${Icons.agregar()}</button>`;
   },
 
   _fmt(n) {

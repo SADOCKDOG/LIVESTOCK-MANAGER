@@ -5,11 +5,6 @@
  */
 
 const RebanosView = {
-  _currentTab: 'todos',
-  _filtroActivo: {
-    texto: '',
-    tipo: ''
-  },
   async render() {
     if (window.App) App.updateHeaderColor('rebanos');
     const main = document.getElementById("app-content");
@@ -17,293 +12,84 @@ const RebanosView = {
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const totalRebanos = rebanos.length;
     const rebanosActivos = rebanos.filter(r => r.estado !== 'inactivo').length;
+    let html = `
+      <div class="card p-12 mb-16 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--c-info);">
+        <div class="section-header-theme">ACCIONES</div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="RebanosView._crearRebano()">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Nuevo Rebaño</span>
+          </button>
+        </div>
+        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.rebanos()} Creación y gestión de lotes, rebaños y agrupaciones ganaderas</span></div>
+      </div>`;
 
-    // Guardar datos brutos para filtrado posterior
-    this._cachedDataRaw = { rebanos, eventos };
+    if (rebanos.length === 0)
+      html += `<div class="empty-state"><div class="empty-state-icon" style="color:var(--c-info);">${Icons.rebanos()}</div><p class="empty-state-text">No hay rebaños registrados.</p></div>`;
+    else {
+      // Barra de resumen de Rebaños
+      const carneCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn')).length;
+      const lecheCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct')).length;
+      const hibridoCount = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble')).length;
 
-    // Aplicar filtros iniciales
-    const filteredRebanos = this._filtrar(rebanos);
+      html += `
+        <div class="flex flex-wrap gap-4 mb-10">
+          <span class="badge badge-sm badge-gold flex items-center gap-4 uppercase">${Icons.carne()} Carne: ${carneCount}</span>
+          <span class="badge badge-sm badge-blue flex items-center gap-4 uppercase">${Icons.leche()} Leche: ${lecheCount}</span>
+          <span class="badge badge-sm badge-purple flex items-center gap-4 uppercase">${Icons.rotacion()} Híbridos: ${hibridoCount}</span>
+          <span class="badge badge-sm badge-green flex items-center gap-4 uppercase">${Icons.check()} ${rebanosActivos} ${rebanosActivos === 1 ? 'activo' : 'activos'}</span>
+        </div>`;
 
-    // Resumen mensual (últimos 6 meses)
-    const hoy = new Date();
-    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const porMes = {};
-    for (let i = 0; i < 6; i++) {
-      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
-    }
-    // Contar rebaños por mes de creación
-    const rawData = this._cachedDataRaw ? this._cachedDataRaw.rebanos : [];
-    rawData.forEach(r => {
-      if (r.fecha_constitucion) {
-        const key = r.fecha_constitucion.substring(0, 7); // YYYY-MM
-        if (porMes[key]) porMes[key].total++;
+      html += `<div class="grid gap-15">`;
+      for (let r of rebanos) {
+        const animales = await Animales.list(r.id);
+        const n = animales.length;
+        const activos = animales.filter(a => a.estado === 'activo').length;
+        const eventosReb = eventos.filter(e => e.entidad_id === r.id || (e.tipo_entidad === 'rebano' && e.snap_identificacion === r.nombre));
+        const ultimoEvento = eventosReb.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+        const prodLeche = eventosReb.filter(e => e.unidad === 'L').reduce((s, e) => s + (e.valor_neto || 0), 0);
+        const colorEstado = r.estado !== 'inactivo' ? 'var(--c-success)' : '#6b7280';
+        const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(r.especie) : colorEstado;
+
+        html += `
+          <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${colorEspecie};">
+            <div class="flex flex-col gap-10">
+              <div class="flex justify-between items-center w-full">
+                <div class="flex items-center gap-10 min-w-0">
+                  <div class="text-xl" style="color:${colorEspecie}">${Icons.rebanos()}</div>
+                  <div class="text-xs">
+                    <div class="font-bold text-white uppercase text-base tracking-tight" style="color:${colorEspecie} !important;">${r.nombre}</div>
+                    <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(r.especie || 'N/D').toUpperCase()}</span> · ${(r.tipo || 'Sin Tipo')}</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="badge badge-sm uppercase" style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}35;">${activos} ${activos === 1 ? 'Activo' : 'Activos'}</span>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-end w-full">
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
+                    <div class="flex items-center gap-4">${Icons.zonas()} ${r.zonaActual || "Finca General"}</div>
+                    <div class="flex items-center gap-4">${Icons.animales()} ${n} Total</div>
+                    ${prodLeche > 0 ? `<div class="flex items-center gap-4 text-gold">${Icons.leche()} ${Math.round(prodLeche).toLocaleString('es-ES')} L</div>` : ''}
+                    ${ultimoEvento ? `<div class="flex items-center gap-4 text-aaa">${Icons.calendar()} ${new Date(ultimoEvento.fecha).toLocaleDateString()}</div>` : ''}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[0.45rem] text-gray-700 font-900 uppercase tracking-widest">VER DETALLE ➔</div>
+                </div>
+              </div>
+            </div>
+          </div>`;
       }
-    });
-    const mesesHtml = Object.values(porMes).reverse().map(m => {
-      const max = Math.max(1, ...Object.values(porMes).map(m => m.total));
-      const pct = Math.max(0, Math.min(100, (m.total / max) * 100));
-      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
-      return `<div class="flex-1 text-center min-w-0">
-        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
-        <div class="rebaño-bar-wrap">
-          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
-        </div>
-        <div class="text-xs font-bold mt-2" style="color:${color};">${m.total}</div>
-      </div>`;
-    }).join('');
-
-    main.innerHTML = `
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${totalRebanos} total</span>
-        </div>
-        <div class="flex gap-6">${mesesHtml}</div>
-      </div>
-
-      <!-- Balance Consolidado de Rebanos (colapsable) -->
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d card-resumen" style="--registro-color: var(--c-purple); background: rgba(255,68,68, 0.015);">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-          <span class="flex items-center gap-6">${Icons.rebanos()} BALANCE DE REBAÑOS</span>
-          <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
-        </div>
-        <div class="resumen-body flex flex-col">
-          ${this._CATEGORIAS.filter(c => c.key !== 'todos').map(c => {
-            const count = filteredRebanos.filter(r =>
-              c.key === 'todos' ||
-              (c.key === 'carne' && ((r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn'))) ||
-              (c.key === 'leche' && ((r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct'))) ||
-              (c.key === 'hibrido' && ((r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble'))) ||
-              (c.key === 'activo' && r.estado !== 'inactivo')
-            ).length;
-            return `
-              <div class="py-10 flex justify-between items-center border-bottom-222">
-                <span class="text-xs text-gray uppercase font-800 flex items-center gap-6">${c.icon} ${c.label}</span>
-                <strong class="text-base font-900" style="color:${c.color};">${count}</strong>
-              </div>
-            `;
-          }).join('')}
-          <div class="py-12 mt-4 flex justify-between items-center text-white">
-            <span class="text-xs uppercase font-950 tracking-wider">TOTAL DE REBAÑOS</span>
-            <strong class="text-2xl text-red font-950">${filteredRebanos.length}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-14">
-        <div class="tabs-scroll rebaño-tabs scroll-shadow-container">
-          ${this._CATEGORIAS.map(c => `
-            <button class="rebaño-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="RebanosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label}</button>
-          `).join('')}
-        </div>
-        <!-- Filtro de búsqueda integrado (controla el listado) -->
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">${Icons.rebanos()} Lista de Rebaños</div>
-        <div class="flex gap-8 items-center mb-12">
-          <div class="relative flex-1 min-w-0">
-            <input type="search" id="search-rebanos" placeholder="Buscar por nombre, raza o código de lote..."
-                   oninput="RebanosView._setFiltro('texto', this.value)"
-                   class="search-input w-full">
-          </div>
-          <select id="rebanos-filtro-tipo" class="form-select-gold"
-                  onchange="RebanosView._setFiltro('tipo', this.value)"
-                  style="width:120px; min-width:110px; flex-shrink:0;">
-            <option value="">Todos los tipos</option>
-            <option value="carne" ${this._filtroActivo.tipo === 'carne' ? 'selected' : ''}>Carne</option>
-            <option value="leche" ${this._filtroActivo.tipo === 'leche' ? 'selected' : ''}>Leche</option>
-            <option value="hibrido" ${this._filtroActivo.tipo === 'hibrido' ? 'selected' : ''}>Híbrido</option>
-          </select>
-        </div>
-      </div>
-      <div id="rebanos-content"><div class="loader">Cargando rebaños...</div></div>`;
-
-    // Actualizar datos filtrados para el tab actual
-    this._cachedData = { rebanos: filteredRebanos, eventos };
-    this._renderTabActual();
-  },
-
-  _CATEGORIAS: [
-    { key: 'todos',        icon: Icons.rebanos(), label: 'Todos',          color: 'var(--c-purple)', colorDark: '#6d28d9' },
-    { key: 'carne',        icon: Icons.carne(),   label: 'Carne',          color: 'var(--c-danger)', colorDark: '#b91c1c' },
-    { key: 'leche',        icon: Icons.leche(),   label: 'Leche',          color: 'var(--c-info)', colorDark: '#0284c7' },
-    { key: 'hibrido',      icon: Icons.rotacion(),label: 'Híbrido',       color: 'var(--c-success)', colorDark: '#059669' },
-    { key: 'activo',       icon: Icons.check(),   label: 'Activos',        color: 'var(--c-success)', colorDark: '#059669' }
-  ],
-
-  _cambiarTab(tab) {
-    this._currentTab = tab;
-    document.querySelectorAll('.rebaño-tab').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-    });
-    this._renderTabActual();
-    window.scrollTo(0, 0);
-  },
-
-  _renderTabActual() {
-    const d = this._cachedData;
-    if (!d) return;
-    const content = document.getElementById('rebanos-content');
-    if (!content) return;
-
-    const catInfo = this._CATEGORIAS.find(c => c.key === this._currentTab) || this._CATEGORIAS[0];
-    const data = d.rebanos;
-    if (!data) { content.innerHTML = '<div class="loader">Sin datos</div>'; return; }
-
-    // Calcular total para esta categoría (antes de aplicar filtros de texto/tipo)
-    const rawData = this._cachedDataRaw ? this._cachedDataRaw.rebanos : [];
-    const totalParaCategoria = this._currentTab === 'todos'
-      ? rawData.length
-      : rawData.filter(r => {
-          switch (this._currentTab) {
-            case 'carne': return (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn');
-            case 'leche': return (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct');
-            case 'hibrido': return (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble');
-            case 'activo': return r.estado !== 'inactivo';
-            default: return true;
-          }
-        }).length;
-
-    const tieneFiltro = this._filtroActivo.texto !== '' || this._filtroActivo.tipo !== '';
-
-    this._renderSeccion(content, {
-      icon: catInfo.icon,
-      title: `Rebaños — ${catInfo.label}`,
-      subtitle: data.length > 0 ? `${data.length} ${data.length === 1 ? "rebaño" : "rebaños"} · ${this._fmt(totalParaCategoria)} total` : 'Sin registros en esta categoría',
-      color: catInfo.color,
-      colorDark: catInfo.colorDark,
-      kpis: [
-        { label: 'Total', value: this._fmt(data.length) },
-        { label: 'Filtrados', value: this._fmt(tieneFiltro ? data.length : 0) }
-      ],
-      registrarLabel: 'Rebaño',
-      listName: 'Lista de Rebaños',
-      registrarHandler: "RebanosView._crearRebano()",
-      records: data.slice(0, 50).map(r => ({
-        title: r.nombre || 'Rebaño sin nombre',
-        date: r.fecha_constitucion ? new Date(r.fecha_constitucion).toLocaleDateString() : '-',
-        zona: r.zonaActual || '',
-        tipo: r.tipo || '',
-        value: `${r.estado === 'activo' ? 'Activo' : r.estado === 'inactivo' ? 'Inactivo' : 'Vendido'}`,
-        onclick: "location.hash='/rebano?id=" + r.id + "'"
-      })),
-      emptyMsg: `No hay rebaños de ${catInfo.label.toLowerCase()}. Usa "Nuevo Rebaño" para añadir.`
-    });
-  },
-
-  _renderSeccion(content, opts) {
-    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
-
-    const recordsHtml = records.length > 0
-      ? records.map(r => `
-        <div class="card-registro" onclick="${r.onclick || ''}"
-             style="--registro-color: ${color};">
-          <div class="flex justify-between items-start">
-            <div class="flex-1 min-w-0">
-              <div class="text-white font-900 uppercase tracking-tight nowrap" style="font-size:0.88rem; overflow:hidden; text-overflow:ellipsis;">${Icons.rebanos()} ${r.title}</div>
-              <div class="text-gray uppercase font-800" style="font-size:0.6rem; margin-top:5px; letter-spacing:0.5px;">
-                <span class="flex items-center gap-4">
-                  ${Icons.calendar()} ${r.date}
-                  ${r.zona ? ' | ' + Icons.zonas() + ' ' + r.zona : ''}
-                  ${r.tipo ? ' | ' + Icons.paquete() + ' ' + r.tipo.toUpperCase() : ''}
-                </span>
-              </div>
-            </div>
-            <div class="flex-col items-end">
-              <div class="font-950" style="font-size:1.1rem; color:${color};">${r.value}</div>
-              <span style="display:block; font-size:0.7rem; font-weight:700; color:var(--c-warning); margin-top:4px; white-space:nowrap;">Ficha -></span>
-            </div>
-          </div>
-        </div>`).join('')
-      : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
-
-    content.innerHTML = `
-      <div class="card-registro" style="--registro-color: ${color};">
-        <div class="flex items-center gap-12 mb-12">
-          <span class="text-3xl">${icon}</span>
-          <div>
-            <div class="text-white font-900 text-lg">${title}</div>
-            ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
-          </div>
-        </div>
-        ${kpis ? `
-        <!-- KPIs Rebaños Unificados en Filas (colapsable) -->
-        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style=" background: rgba(255, 255, 255, 0.02);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6">${Icons.rebanos()} BALANCE DE REBAÑOS</span>
-            <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
-          </div>
-          <div class="resumen-body flex flex-col">
-            ${kpis.map((k, index) => `
-              <div class="py-12 flex justify-between items-center ${index < kpis.length - 1 ? 'border-bottom-222' : ''}">
-                <span class="text-xs text-gray uppercase font-900">${k.label}</span>
-                <strong class="text-xl font-950" style="color: ${k.label.includes('Total') ? 'var(--c-danger)' : 'var(--c-info)'};">${k.value}</strong>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        ` : ''}
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} ${listName}
-        </div>
-        ${recordsHtml}
-      </div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="${registrarHandler}">
-        <span class="fab-label">Nuevo ${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>`;
-  },
-
-  _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
-  },
-
-  _aplicarFiltros() {
-    // Re-filtrar los datos basándose en los filtros actuales y la pestaña
-    const rawData = this._cachedDataRaw ? this._cachedDataRaw.rebanos : [];
-    const eventos = this._cachedDataRaw ? this._cachedDataRaw.eventos : [];
-    const filteredRebanos = this._filtrar(rawData);
-
-    // Actualizar los datos en caché con los resultados filtrados
-    this._cachedData = { rebanos: filteredRebanos, eventos };
-
-    // Volver a renderizar la pestaña actual
-    this._renderTabActual();
-  },
-
-  _setFiltro(type, value) {
-    this._filtroActivo[type] = value;
-    this._aplicarFiltros();
-  },
-
-  _filtrar(rebanos) {
-    if (!rebanos) return [];
-    let filtrados = this._currentTab === 'todos'
-      ? rebanos
-      : rebanos.filter(r => {
-          switch (this._currentTab) {
-            case 'carne': return (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn');
-            case 'leche': return (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct');
-            case 'hibrido': return (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble');
-            case 'activo': return r.estado !== 'inactivo';
-            default: return true;
-          }
-        });
-
-    if (this._filtroActivo.texto.trim()) {
-      const q = this._filtroActivo.texto.toLowerCase();
-      filtrados = filtrados.filter(r =>
-        (r.nombre || '').toLowerCase().includes(q) ||
-        (r.razonSocial || '').toLowerCase().includes(q) ||
-        (r.codigo_lote || '').toLowerCase().includes(q)
-      );
+      html += `</div>`;
     }
-
-    return filtrados;
+    html += `<!-- Botón Flotante de Acción para móviles -->
+      <button class="fab-btn" onclick="RebanosView._crearRebano()" title="Nuevo Rebaño">${Icons.agregar()}</button>`;
+    main.innerHTML = html;
   },
 
-  // Mantener todos los métodos existentes
   async renderDetalle(params) {
     const id = params.get("id");
     const rebano = await Rebanos.get(id);
@@ -312,7 +98,7 @@ const RebanosView = {
     const zonas = finca ? (finca.zonas || []).filter(z => !z?.anulada) : [];
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
-    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunicionesService.getTiposExplotacionREGA() : [];
+    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const eventosReb = eventos.filter(e => e.entidad_id === Number(id) || (e.tipo_entidad === 'rebano' && e.snap_identificacion === rebano.nombre));
     const totalKg = eventosReb.filter(e => e.unidad === 'kg').reduce((s, e) => s + (e.valor_neto || 0), 0);
@@ -337,13 +123,13 @@ const RebanosView = {
 
       <!-- Categorías -->
       ${Object.keys(porCategoria).length > 0 ? `
-      <div class="card-registro mb-20 border-top-3px border-top-3px-purple p-12" style="--registro-color: var(--c-purple);">
+      <div class="card mb-20 border-top-3px border-top-3px-purple p-12">
         <div class="inf-section-title mb-6 flex items-center gap-8">${Icons.documento()} POR CATEGORÍA</div>
         <div class="flex flex-wrap gap-4">${Object.entries(porCategoria).map(([c, n]) => `<span class="badge badge-sm badge-purple font-900">${c.toUpperCase()}: ${n}</span>`).join('')}</div>
       </div>` : ''}
 
       <!-- Edición -->
-      <div class="card-registro border-top-3px border-top-3px-gold mb-25 p-16" style="--registro-color: var(--c-warning);">
+      <div class="card border-top-3px border-top-3px-gold mb-25 p-16">
         <div class="inf-card-title flex items-center gap-8 mb-16">${Icons.editar()} DATOS DEL REBAÑO</div>
         <div class="flex flex-col gap-15">
           <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Nombre</label>
@@ -392,9 +178,9 @@ const RebanosView = {
           </button>
         </div>
       </div>
-
+      
       <!-- Sanidad -->
-      <div class="card-registro mb-20 border-222 card-dark-gradient p-12 pb-24" style="--registro-color: var(--c-success); --theme-color: var(--c-success);">
+      <div class="card mb-20 border-222 card-dark-gradient p-12 pb-24" style="--theme-color: var(--c-success);">
         <div class="section-header-theme">SANIDAD</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
@@ -406,7 +192,7 @@ const RebanosView = {
       </div>
 
       <!-- Animales -->
-      <div class="card-registro p-12 mb-16 border-222 card-dark-gradient pb-24" style="--registro-color: var(--c-info);">
+      <div class="card p-12 mb-16 border-222 card-dark-gradient pb-24">
         <div class="section-header-theme" style="--theme-color: var(--c-info)">ANIMALES (${animales.length})</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12">
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirSelectorAnimales(${id})">
@@ -414,25 +200,27 @@ const RebanosView = {
             <span class="widget-link-label">Mover Lote</span>
           </button>
         </div>
-        <div class="gap-10">
-          ${animales.map((a) => {
-            const colorEsp = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#888';
-            const colorEst = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)';
-            return `<div class="card-registro" style="--registro-color: ${colorEsp}; display:flex; gap:10px; align-items:stretch;" onclick="location.hash='/animal?id=${a.id}'">
-              <div class="flex-1 min-w-0 flex items-center gap-10">
+      </div>
+      <div class="grid gap-10">
+        ${animales.map((a) => {
+          const colorEsp = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#888';
+          const colorEst = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)';
+          return `<div class="card card-item" style="border-left:4px solid ${colorEsp}; background: rgba(0,0,0,0.2);" onclick="location.hash='/animal?id=${a.id}'">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-10">
                 <span style="color:${colorEsp}">${Icons.animales()}</span>
-                <div class="text-xs min-w-0">
+                <div class="text-xs">
                   <div class="text-white font-900 uppercase" style="color:${colorEsp} !important;">${a.numero_identificacion || a.nombre || '#' + a.id}</div>
                   <div class="text-gray-500 font-800 text-[0.6rem] uppercase mt-2">${a.raza || 'S/R'} · <span style="color:${colorEsp}; opacity:0.7;">${a.categoria || ''}</span></div>
                 </div>
               </div>
-              <div class="flex flex-col items-end justify-between flex-shrink-0" style="gap:8px;">
-                <span class="badge badge-sm uppercase" style="background:${colorEst}15; color:${colorEst}; border:1px solid ${colorEst}35; font-size:0.55rem;">${a.estado}</span>
-                <span style="font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>
+              <div class="flex items-center gap-8">
+                <span class="badge badge-sm uppercase" style="background:${colorEst}15; color:${colorEst}; border:1px solid ${colorEst}35; font-size: 0.55rem;">${a.estado}</span>
+                <span class="text-amber text-sm font-900">${Icons.flechaDerecha()}</span>
               </div>
-            </div>`;
-          }).join("") || '<div class="text-gray text-center p-20">Sin animales en este rebaño</div>'}
-        </div>
+            </div>
+          </div>`;
+        }).join("") || '<div class="text-gray text-center p-20">Sin animales en este rebaño</div>'}
       </div>`;
     this._cargarHistorialSanitario(id);
   },
@@ -485,7 +273,7 @@ const RebanosView = {
   async _crearRebano() {
     const especies = await window.db.getAll("config_especies");
     const tipos = await window.db.getAll("config_tipos_produccion");
-    const tiposExplotacionREGA = window.ComunicacionesService ? window.ComunicionesService.getTiposExplotacionREGA() : [];
+    const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const finca = await Fincas.getActive();
     const zonas = finca ? finca.zonas || [] : [];
 
@@ -555,14 +343,14 @@ const RebanosView = {
               <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
               <select id="w-reb-tipo-explotacion" class="wizard-input font-800" style="border-color: var(--c-success);">
                 <option value="">— SELECCIONAR —</option>
-                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_expotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
+                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_explotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
               </select>
               <small class="text-aaa uppercase font-700 text-[0.55rem] mt-4 block">Dato normativo obligatorio para SIGGAN/BADIGEX</small>
             </div>
           </div>
         `,
         onChange: async (data) => {
-          data.tipo_expotacion_rega = document.getElementById('w-reb-tipo-expotacion')?.value || data.tipo_expotacion_rega;
+          data.tipo_explotacion_rega = document.getElementById('w-reb-tipo-explotacion')?.value || data.tipo_explotacion_rega;
         }
       },
       {
@@ -627,7 +415,7 @@ const RebanosView = {
             especie: finalData.especie,
             tipo: finalData.tipo,
             zonaActual: finalData.zonaActual,
-            tipo_expotacion_rega: finalData.tipo_expotacion_rega,
+            tipo_explotacion_rega: finalData.tipo_explotacion_rega,
             capacidad_total: Number(finalData.capacidad_total) || 0,
             codigo_lote: finalData.codigo_lote,
             fecha_constitucion: finalData.fecha_constitucion,
@@ -659,3 +447,7 @@ const RebanosView = {
 };
 
 window.RebanosView = RebanosView;
+
+
+
+
