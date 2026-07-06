@@ -216,6 +216,12 @@ const Icons = {
   xmark() {
     return this.cerrar();
   },
+  calculo() {
+    return this.grafico();
+  },
+  xmark() {
+    return this.cerrar();
+  },
 
   // ── Estados / Decorativos ──
   alerta() {
