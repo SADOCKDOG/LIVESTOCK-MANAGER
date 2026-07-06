@@ -159,10 +159,10 @@ const CompradoresView = {
   _cambiarModulo(modulo) {
     this._activeModule = modulo;
     this._filtroActivo = { texto: '', tipo: '' }; // Reset filters when switching modules
-    document.getElementById('search-compradores')?.value = '';
-    document.getElementById('search-contratos')?.value = '';
-    document.getElementById('compradores-filtro-tipo')?.value = '';
-    document.getElementById('contratos-filtro-tipo')?.value = '';
+    const s1 = document.getElementById('search-compradores'); if (s1) s1.value = '';
+    const s2 = document.getElementById('search-contratos'); if (s2) s2.value = '';
+    const f1 = document.getElementById('compradores-filtro-tipo'); if (f1) f1.value = '';
+    const f2 = document.getElementById('contratos-filtro-tipo'); if (f2) f2.value = '';
     this.render();
   },
 
