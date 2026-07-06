@@ -62,11 +62,11 @@ const Liquidacion = {
   renderTabla(liquidacion) {
     if (!liquidacion || !liquidacion.desglose) return '<p class="text-gray">Sin datos económicos</p>';
     return `
-      <table class="liquidacion-table">
+      <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9rem;">
         ${liquidacion.desglose.map(item => `
-          <tr class="${item.bold ? 'liquidacion-tr-bold' : ''}">
-            <td class="liquidacion-td">${item.concepto}</td>
-            <td class="liquidacion-td-right">${item.cantidad >= 0 ? '' : '-'}${Liquidacion.formatEUR(Math.abs(item.cantidad))}</td>
+          <tr ${item.bold ? 'style="font-weight:bold; border-top:2px solid #000;"' : ''}>
+            <td style="padding:6px 8px; border-bottom:1px solid #ddd;">${item.concepto}</td>
+            <td style="padding:6px 8px; text-align:right; border-bottom:1px solid #ddd;">${item.cantidad >= 0 ? '' : '-'}${Liquidacion.formatEUR(Math.abs(item.cantidad))}</td>
           </tr>
         `).join('')}
       </table>

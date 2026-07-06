@@ -32,7 +32,7 @@ const SigganQA = {
   _wait: (ms) => new Promise(r => setTimeout(r, ms)),
 
   _log(status, module, detail, category = '') {
-    const icon = status === 'PASS' ? `${Icons.check()}` : status === 'FAIL' ? `${Icons.cerrar()}` : status === 'WARN' ? `${Icons.alerta()}️` : '⏳';
+    const icon = status === 'PASS' ? '✅' : status === 'FAIL' ? '❌' : status === 'WARN' ? '⚠️' : '⏳';
     const cat = category ? ` [${category}]` : '';
     console.log(`[${this._ts()}] ${icon} [${module}]${cat} ${detail}`);
     this._results.push({ status, module, detail, category, time: this._ts() });
@@ -134,7 +134,7 @@ const SigganQA = {
     this._assert(vacio.valido === false,
       'Rechaza REGA vacío', 'FORMATO');
 
-    this._log('PASS', M, `${Icons.check()} COMPLETADO — Validación REGA verificada`);
+    this._log('PASS', M, '✅ COMPLETADO — Validación REGA verificada');
     return !this._hasFail(M);
   },
 
@@ -201,7 +201,7 @@ const SigganQA = {
     this._assert(confE && confE.sistema_movimiento === 'BADIGEX',
       `Extremadura → plataforma ${confE?.sistema_movimiento}`, 'COMUNIDAD');
 
-    this._log('PASS', M, `${Icons.check()} COMPLETADO — Catálogos SIGGAN verificados`);
+    this._log('PASS', M, '✅ COMPLETADO — Catálogos SIGGAN verificados');
     return !this._hasFail(M);
   },
 
@@ -285,7 +285,7 @@ const SigganQA = {
         () => Movimientos.save({ ...movData, id: undefined, desinsectacion_certificada: false }),
         M, 'Exige certificar desinsectación en Andalucía');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Movimiento ${movData.numero_guia} (id=${movId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Movimiento ${movData.numero_guia} (id=${movId})`);
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -349,7 +349,7 @@ const SigganQA = {
         () => Saneamientos.save({ fincaId, fecha: new Date().toISOString().split('T')[0] }),
         M, 'Rechaza saneamiento sin campaña');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Saneamiento tuberculosis (id=${sanId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Saneamiento tuberculosis (id=${sanId})`);
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -413,7 +413,7 @@ const SigganQA = {
       this._assert(check.record && check.record.prohibidoLeche === true,
         'Tratamiento con supresión marca prohibidoLeche', 'SUPRESIÓN');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Tratamiento (id=${tratId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Tratamiento (id=${tratId})`);
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -458,7 +458,7 @@ const SigganQA = {
         csvMov.includes('FECHA;TIPO_MOVIMIENTO'),
         'Movimientos SIA CSV con cabecera correcta', 'SIA');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Exportaciones generadas`);
+      this._log('PASS', M, '✅ COMPLETADO — Exportaciones generadas');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -502,7 +502,7 @@ const SigganQA = {
         realErr.length === 0 ? 'Sin errores JS en consola' : `Errores: ${realErr.slice(0, 2).join(' | ')}`,
         'CONSOLA');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Cuaderno Digital verificado`);
+      this._log('PASS', M, '✅ COMPLETADO — Cuaderno Digital verificado');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -555,7 +555,7 @@ const SigganQA = {
       this._assert(listMs < 1500,
         listMs < 1500 ? `Consulta rápida (${listMs.toFixed(0)}ms < 1500ms)` : `Consulta lenta: ${listMs.toFixed(0)}ms`, 'CONSULTA');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Rendimiento medido`);
+      this._log('PASS', M, '✅ COMPLETADO — Rendimiento medido');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -606,7 +606,7 @@ const SigganQA = {
       () => EH.validateCaravana('XX-INVALIDO'),
       M, 'validateCaravana lanza excepción con crotal inválido');
 
-    this._log('PASS', M, `${Icons.check()} COMPLETADO — Validación de crotal verificada`);
+    this._log('PASS', M, '✅ COMPLETADO — Validación de crotal verificada');
     return !this._hasFail(M);
   },
 
@@ -676,7 +676,7 @@ const SigganQA = {
         this._log('WARN', M, 'Ninguna zona tiene aforoMax definido: se omite la prueba de exceso', 'AFORO');
       }
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Traslado interno y aforo verificados`);
+      this._log('PASS', M, '✅ COMPLETADO — Traslado interno y aforo verificados');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -758,7 +758,7 @@ const SigganQA = {
       this._assert((madreActual.numero_partos || 0) === madreOriginal.numero_partos + 1, M,
         'Nº de partos de la madre incrementado', 'MADRE');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — El parto genera la cría con genealogía y evento de nacimiento`);
+      this._log('PASS', M, '✅ COMPLETADO — El parto genera la cría con genealogía y evento de nacimiento');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -837,7 +837,7 @@ const SigganQA = {
       this._assert(altas.length === 1, M,
         'La edición no duplica el evento de alta', 'INTEGRIDAD');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Alta y baja quedan trazadas en el libro de registro`);
+      this._log('PASS', M, '✅ COMPLETADO — Alta y baja quedan trazadas en el libro de registro');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -898,7 +898,7 @@ const SigganQA = {
       this._assert(cargaGanadera >= 0, M,
         `Carga ganadera: ${cargaGanadera} UGM/ha (superficie: ${superficie}ha)`, 'CARGA');
       
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Zonas con UGM, carga ganadera, PAC y distancia agua`);
+      this._log('PASS', M, '✅ COMPLETADO — Zonas con UGM, carga ganadera, PAC y distancia agua');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -942,7 +942,7 @@ const SigganQA = {
       this._assert(validosCount > 0, M,
         `${validosCount} rebaño(s) con tipo_explotacion_rega válido`, 'COBERTURA');
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Rebaños con tipo_explotacion_rega normativo`);
+      this._log('PASS', M, '✅ COMPLETADO — Rebaños con tipo_explotacion_rega normativo');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -1046,7 +1046,7 @@ const SigganQA = {
         this._log('WARN', M, `No se pudo limpiar sanitario: ${e.message}`, 'CLEANUP');
       }
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Venta de leche bloqueada si prohibidoLeche activo`);
+      this._log('PASS', M, '✅ COMPLETADO — Venta de leche bloqueada si prohibidoLeche activo');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -1170,7 +1170,7 @@ const SigganQA = {
         this._log('WARN', M, `No se pudieron limpiar animales: ${e.message}`, 'CLEANUP');
       }
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Motivos de baja clasificados correctamente a SANDACH`);
+      this._log('PASS', M, '✅ COMPLETADO — Motivos de baja clasificados correctamente a SANDACH');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -1269,7 +1269,7 @@ const SigganQA = {
         this._log('WARN', M, `No se pudo limpiar: ${e.message}`, 'CLEANUP');
       }
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Notificaciones a REGA funcionan correctamente`);
+      this._log('PASS', M, '✅ COMPLETADO — Notificaciones a REGA funcionan correctamente');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -1331,13 +1331,13 @@ const SigganQA = {
         `Cobertura de módulos SIGGAN: ${modulosCubiertos}/${totalModulos} (${porcentajeCubertura}%)`, 'COBERTURA');
 
       if (modulosFallidos.length > 0) {
-        console.log(`  ${Icons.alerta()}️  Módulos incompletos: ${modulosFallidos.join(', ')}`);
+        console.log(`  ⚠️  Módulos incompletos: ${modulosFallidos.join(', ')}`);
       }
 
       if (modulosFallidos.length === 0) {
-        this._log('PASS', M, `${Icons.check()} COMPLETADO — BD DEMO CHAMORRO cubre todos los módulos`);
+        this._log('PASS', M, '✅ COMPLETADO — BD DEMO CHAMORRO cubre todos los módulos');
       } else {
-        this._log('WARN', M, `${Icons.alerta()}️ COMPLETADO CON OBSERVACIONES — Hay módulos incompletos en la DEMO`, 'COBERTURA');
+        this._log('WARN', M, '⚠️ COMPLETADO CON OBSERVACIONES — Hay módulos incompletos en la DEMO', 'COBERTURA');
       }
       return !this._hasFail(M);
     } catch (e) {
@@ -1386,7 +1386,7 @@ const SigganQA = {
         }
       }
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Modo interno verificado`);
+      this._log('PASS', M, '✅ COMPLETADO — Modo interno verificado');
       return !this._hasFail(M);
     } catch (e) {
       this._log('FAIL', M, `Excepción: ${e.message}`, 'EXCEPCIÓN');
@@ -1401,25 +1401,25 @@ const SigganQA = {
   // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
-    console.log(`${Icons.fitosanitario()} SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera`);
-    console.log(`${Icons.calendar()} ` + new Date().toLocaleString());
-    console.log(`${Icons.documento()} REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños · Venta de Leche · SANDACH`);
+    console.log('🧪 SIGGAN QA SUITE v1.0 — Adaptación al Sistema de Gestión Ganadera');
+    console.log('📅 ' + new Date().toLocaleString());
+    console.log('📋 REGA · Catálogos · Movimientos · Saneamientos · Tratamientos · Export · Cuaderno · Crotal · Aforo · Genealogía · Censo · Rebaños · Venta de Leche · SANDACH');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
-      console.error(`${Icons.cerrar()} ERROR: window.db no disponible. Espera a que la app cargue.`);
+      console.error('❌ ERROR: window.db no disponible. Espera a que la app cargue.');
       return;
     }
     if (!window.ComunidadesService) {
-      console.error(`${Icons.cerrar()} ERROR: ComunidadesService no disponible.`);
+      console.error('❌ ERROR: ComunidadesService no disponible.');
       return;
     }
     const fincaId = await Fincas.getActiveId();
     if (!fincaId) {
-      console.error(`${Icons.cerrar()} ERROR: No hay finca activa. Carga la Demo CHAMORRO en Ajustes.`);
+      console.error('❌ ERROR: No hay finca activa. Carga la Demo CHAMORRO en Ajustes.');
       return;
     }
-    console.log(`${Icons.finca()} Finca activa: ${fincaId}\n`);
+    console.log(`📍 Finca activa: ${fincaId}\n`);
 
     this._results = [];
     this._runStartIndex = 0;
@@ -1467,20 +1467,20 @@ const SigganQA = {
 
     // ---- REPORTE FINAL ----
     console.log('\n' + '='.repeat(75));
-    console.log(`${Icons.grafico()} REPORTE FINAL — SIGGAN QA v1.0`);
+    console.log('📊 REPORTE FINAL — SIGGAN QA v1.0');
     console.log('='.repeat(75));
     console.log(`⏱️  Tiempo total: ${(totalTime / 1000).toFixed(2)}s`);
-    console.log(`${Icons.check()} Tests OK: ${passed}/${tests.length}`);
-    console.log(`${Icons.cerrar()} Tests con fallo: ${failed}/${tests.length}`);
+    console.log(`✅ Tests OK: ${passed}/${tests.length}`);
+    console.log(`❌ Tests con fallo: ${failed}/${tests.length}`);
 
     const failures = this._results.filter(r => r.status === 'FAIL');
     if (failures.length > 0) {
-      console.log(`\n${Icons.cerrar()} DETALLE DE FALLOS:`);
+      console.log('\n❌ DETALLE DE FALLOS:');
       console.log('─'.repeat(60));
-      failures.forEach(f => console.log(`  ${Icons.cerrar()} [${f.module}]${f.category ? ` [${f.category}]` : ''} ${f.detail}`));
+      failures.forEach(f => console.log(`  ❌ [${f.module}]${f.category ? ` [${f.category}]` : ''} ${f.detail}`));
     }
 
-    console.log(`\n${Icons.documento()} RESUMEN POR CATEGORÍA:`);
+    console.log('\n📋 RESUMEN POR CATEGORÍA:');
     console.log('─'.repeat(50));
     const cats = [...new Set(this._results.map(r => r.category).filter(Boolean))];
     cats.forEach(cat => {
@@ -1488,12 +1488,12 @@ const SigganQA = {
       const p = cr.filter(r => r.status === 'PASS').length;
       const f = cr.filter(r => r.status === 'FAIL').length;
       const w = cr.filter(r => r.status === 'WARN').length;
-      console.log(`  ${f === 0 ? '${Icons.check()}' : '${Icons.cerrar()}'} ${cat.padEnd(18)} ${p}${Icons.check()} ${f}${Icons.cerrar()} ${w}${Icons.alerta()}️`);
+      console.log(`  ${f === 0 ? '✅' : '❌'} ${cat.padEnd(18)} ${p}✅ ${f}❌ ${w}⚠️`);
     });
 
     console.log('\n' + '='.repeat(75));
-    console.log(failed === 0 ? `${Icons.estrella()} TODOS LOS TESTS SIGGAN PASARON` : `${Icons.alerta()}️ HAY TESTS SIGGAN FALLIDOS — Revisar detalle arriba`);
-    console.log(`${Icons.info()} Ejecuta await SigganQA.cleanup() para eliminar los datos de prueba.`);
+    console.log(failed === 0 ? '🎉 TODOS LOS TESTS SIGGAN PASARON' : '⚠️ HAY TESTS SIGGAN FALLIDOS — Revisar detalle arriba');
+    console.log('💡 Ejecuta await SigganQA.cleanup() para eliminar los datos de prueba.');
     console.log('='.repeat(75) + '\n');
 
     return { passed, failed, total: tests.length, results: this._results };
@@ -1535,7 +1535,7 @@ const SigganQA = {
 
   // Limpiar datos de prueba generados por la suite
   async cleanup() {
-    console.log(`${Icons.eliminar()} Limpiando datos de prueba SIGGAN...`);
+    console.log('🧹 Limpiando datos de prueba SIGGAN...');
     const stores = ['movimientos_ganado', 'saneamientos', 'sanitarios_ganado', 'registro_eventos'];
     let total = 0;
     for (const store of stores) {
@@ -1547,18 +1547,18 @@ const SigganQA = {
           total++;
         }
         if (testItems.length > 0) {
-          console.log(`  ${Icons.eliminar()}  ${store}: ${testItems.length} registros eliminados`);
+          console.log(`  🗑️  ${store}: ${testItems.length} registros eliminados`);
         }
       } catch (e) {
-        console.warn(`  ${Icons.alerta()}️  Error limpiando ${store}: ${e.message}`);
+        console.warn(`  ⚠️  Error limpiando ${store}: ${e.message}`);
       }
     }
-    console.log(`${Icons.check()} Limpieza completada (${total} registros eliminados)`);
+    console.log(`✅ Limpieza completada (${total} registros eliminados)`);
   },
 };
 
 window.SigganQA = SigganQA;
-console.log(`${Icons.check()} SIGGAN QA Suite v1.0 cargado.`);
+console.log('✅ SIGGAN QA Suite v1.0 cargado.');
 console.log('   await SigganQA.runAll()        → Ejecutar todos los tests SIGGAN');
 console.log('   await SigganQA.run("movimientos") → Test individual');
 console.log('   await SigganQA.cleanup()        → Limpiar datos de prueba');

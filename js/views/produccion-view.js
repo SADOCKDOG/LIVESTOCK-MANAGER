@@ -1,118 +1,475 @@
-/**
- * Livestock Manager - ProduccionView v3.4.0
- * Vista de Producción refactorizada bajo patrón "Aglutinadora"
+﻿/**
+ * Livestock Manager - ProduccionView v3.1.0
+ * Vista de Producción con tabs — Cárnica y Láctea.
+ * NOTA: Ventas y Gastos se gestionan desde Comercial (antes "Ventas Carne").
+ * Copia espejo de www/js/views/produccion-view.js
  */
+
 const ProduccionView = {
   _currentTab: 'carne',
   _cachedData: null,
 
   async render() {
     const main = document.getElementById("app-content");
-    const fincaId = await Fincas.getActiveId();
-    const [eventos] = await Promise.all([
-      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => [])
-    ]);
-
-    const carneEvents = eventos.filter(e => e?.unidad === 'kg' && !e?.anulado);
-    const lecheEvents = eventos.filter(e => e?.unidad?.match(/L|Litros/) && !e?.anulado);
-
+    // Cabecera compacta + tabs
     main.innerHTML = `
-      <div class="mb-14 px-4">
-        <div class="tabs-scroll prod-tabs">
+      <div class="mb-14">
+        <div class="tabs-scroll prod-tabs scroll-shadow-container">
           <button class="prod-tab active" data-tab="carne" onclick="ProduccionView._cambiarTab('carne')">${Icons.carne()} Cárnica</button>
           <button class="prod-tab" data-tab="leche" onclick="ProduccionView._cambiarTab('leche')">${Icons.leche()} Láctea</button>
         </div>
       </div>
-      <div id="prod-content" class="px-4"></div>`;
+      <div id="prod-content"><div class="loader">Cargando registros...</div></div>`;
 
-    this._cachedData = { carneEvents, lecheEvents };
+    // Cargar datos
+    const fincaId = await Fincas.getActiveId();
+    const [eventos, gastosRecords, lecheEntregas] = await Promise.all([
+      window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
+      window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => [])
+    ]);
+
+    console.log('[DEBUG ProdView] fincaId:', fincaId, 'total eventos cargados:', eventos.length);
+    if (eventos.length > 0) {
+      console.log('[DEBUG ProdView] primer evento:', JSON.stringify({id: eventos[0].id, fecha: eventos[0].fecha, unidad: eventos[0].unidad, motivo: eventos[0].motivo_tarea, valor: eventos[0].valor_neto}));
+      console.log('[DEBUG ProdView] último evento:', JSON.stringify({id: eventos[eventos.length-1].id, fecha: eventos[eventos.length-1].fecha, unidad: eventos[eventos.length-1].unidad, motivo: eventos[eventos.length-1].motivo_tarea, valor: eventos[eventos.length-1].valor_neto}));
+    }
+    console.log('[DEBUG ProdView] valores unidad en eventos:', [...new Set(eventos.map(e => e.unidad))]);
+    console.log('[DEBUG ProdView] valores motivo_tarea en eventos:', [...new Set(eventos.map(e => e.motivo_tarea))]);
+
+    eventos.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+    gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+    const carneEvents = eventos.filter(e =>
+      (e.unidad === 'kg' && e.motivo_tarea !== 'control_lechero' && e.motivo_tarea !== 'control_peso') ||
+      (e.motivo_tarea === 'expedicion' && e.unidad !== 'L' && e.unidad !== 'Litros')
+    );
+    console.log('[DEBUG ProdView] carneEvents filtrados:', carneEvents.length, 'de', eventos.length);
+    const lecheEvents = eventos.filter(e =>
+      (e.unidad === 'L' || e.unidad === 'Litros') &&
+      (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero' || e.motivo_tarea === 'expedicion')
+    );
+    const ventaEvents = eventos.filter(e => e.motivo_tarea === 'expedicion' || e.rol_contable === 'VENTA');
+
+    // Extracto seco medio desde comercializacion_leche
+    const conLab = lecheEntregas.filter(e => e.laboratorio?.grasa != null);
+    const esTotal = conLab.reduce((s, e) => {
+      const es = e.laboratorio.extracto_seco || (e.laboratorio.grasa || 0) + (e.laboratorio.proteina || 0);
+      return s + es;
+    }, 0);
+    const esMedia = conLab.length > 0 ? esTotal / conLab.length : 0;
+
+    this._cachedData = {
+      carneEvents, lecheEvents, ventaEvents, gastosRecords,
+      kgTotal: carneEvents.reduce((s, e) => s + (e.valor_neto || 0), 0),
+      kgCount: carneEvents.length,
+      litrosTotal: lecheEvents.reduce((s, e) => s + (e.valor_neto || 0), 0),
+      litrosCount: lecheEvents.length,
+      ventasTotal: ventaEvents.reduce((s, e) => s + (e.importe_total || e.valor_neto || 0), 0),
+      gastosTotal: gastosRecords.reduce((s, g) => s + (g.monto || 0), 0),
+      extractoSecoMedio: esMedia,       // NUEVO
+      numAnaliticas: conLab.length,      // NUEVO
+    };
+
     this._renderTabActual();
-  },
+
+      },
 
   _cambiarTab(tab) {
     this._currentTab = tab;
-    document.querySelectorAll('.prod-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.prod-tab').forEach(b => {
+      b.classList.toggle('active', b.dataset.tab === tab);
+    });
     this._renderTabActual();
+    window.scrollTo(0, 0);
   },
 
   _renderTabActual() {
     const d = this._cachedData;
+    if (!d) return;
     const content = document.getElementById('prod-content');
-    const isCarne = this._currentTab === 'carne';
-    const color = isCarne ? 'var(--c-danger)' : 'var(--c-info)';
-    const events = isCarne ? d.carneEvents : d.lecheEvents;
+    if (!content) return;
+
+    switch (this._currentTab) {
+      case 'carne': this._renderCarne(content, d); break;
+      case 'leche': this._renderLeche(content, d); break;
+      default: this._renderCarne(content, d);
+    }
+  },
+
+  // ===================== SECCIONES POR TAB =====================
+
+  _renderSeccion(content, opts) {
+    const { icon, title, subtitle, color, colorDark, kpis, registrarLabel, listName, records, emptyMsg, registrarHandler } = opts;
+    const recordsHtml = records.length > 0
+      ? records.map(r => {
+        const borderCls = r.typeColor || color;
+        return `
+        <div class="card-registro" onclick="${r.onclick || ''}" style="--registro-color: ${borderCls};">
+          <div class="flex justify-between items-start">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-8">
+                <span class="text-xl" style="color:${borderCls}">${icon}</span>
+                <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${r.title}</h3>
+              </div>
+              <div class="flex flex-wrap gap-x-12 gap-y-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
+                <span class="flex items-center gap-4">${Icons.calendar()} ${r.date}</span>
+                ${r.zone ? `<span class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</span>` : ''}
+                ${r.meta ? `<span class="flex items-center gap-4">${Icons.documento()} ${r.meta}</span>` : ''}
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0 ml-8">
+              <span class="badge badge-sm font-950 tracking-tighter" style="background:${borderCls}20;color:${borderCls};border:1px solid ${borderCls}40;display:block;margin-bottom:6px; font-size: 0.9rem;">${r.value}</span>
+              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">${Icons.documento()} Ficha</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('')
+      : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro mb-10" style="--registro-color: ${color};">
-        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
-          <div class="flex justify-between items-center mb-6">
-            <span class="text-xs text-white font-black uppercase tracking-wider flex items-center gap-6">${isCarne ? Icons.carne() : Icons.leche()} Producción ${this._currentTab}</span>
-            <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
-          </div>
-          <div class="resumen-body flex flex-col">
-            <div class="py-10 border-bottom-222 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Total Acumulado</span>
-              <strong class="text-lg font-950" style="color: ${color};">${events.reduce((s, e) => s + (e.valor_neto || 0), 0).toLocaleString()} ${isCarne ? 'kg' : 'L'}</strong>
-            </div>
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Registros</span>
-              <strong class="text-lg font-950" style="color: #fff;">${events.length}</strong>
+      <div class="card-registro report-section p-16 mb-14" style="--registro-color: var(--c-success);">
+        <div class="flex justify-between items-center mb-16">
+          <div class="flex items-center gap-12">
+            <span class="text-3xl">${icon}</span>
+            <div>
+              <div class="text-white font-900 text-lg">${title}</div>
+              ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
             </div>
           </div>
         </div>
 
-        <div class="flex gap-8 items-center mb-12">
-          <div class="relative flex-1 min-w-0">
-            <input type="search" placeholder="Buscar pesada/control..." oninput="ProduccionView._filtrar(this.value)" class="search-input w-full">
+        ${kpis ? `
+        <div class="flex flex-wrap gap-4 mb-14">
+          ${kpis.map((k, idx) => {
+            const badgesCls = ['badge-gold', 'badge-blue', 'badge-green', 'badge-purple', 'badge-red'];
+            const cls = badgesCls[idx % badgesCls.length];
+            return `<span class="badge badge-sm ${cls}">${k.label}: ${k.value}</span>`;
+          }).join('')}
+        </div>` : ''}
+
+        <div class="card-registro" style="--registro-color: var(--c-white);">
+          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-4">
+            ${Icons.registros()} ${listName}
           </div>
         </div>
-
-        <div id="prod-lista" class="grid gap-10">
-          ${this._getRecordsHtml(events)}
+        <div class="grid gap-10">
+          ${recordsHtml}
         </div>
+      </div>
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" onclick="${registrarHandler}">
+        <span class="fab-label">Nuevo Registro ${registrarLabel}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
-  _getRecordsHtml(events, filtro = '') {
-    const f = filtro.toLowerCase();
-    const isCarne = this._currentTab === 'carne';
-    const color = isCarne ? 'var(--c-danger)' : 'var(--c-info)';
-    return events.filter(e => (e.snap_identificacion || '').toLowerCase().includes(f)).slice(0, 25).map(e => `
-      <div class="card-registro" onclick="ProduccionView._abrirOpcionesRegistro(${e.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-        <div class="flex-1 min-w-0 flex flex-col justify-center">
-          <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${color};">${isCarne ? Icons.carne() : Icons.leche()}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Control'}</div>
-          </div>
-          <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
-            <span>${new Date(e.fecha).toLocaleDateString()}</span><span>·</span><span>${e.snap_zona || 'Finca'}</span>
-          </div>
-        </div>
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">
-             <div style="background:${color}15; color:${color}; border: 1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-                ${(e.valor_neto || 0).toLocaleString()} ${isCarne ? 'kg' : 'L'}
-             </div>
-          </div>
-          <div class="bottom-part">
-            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-              Ficha ${Icons.flechaDerecha()}
-            </span>
-          </div>
-        </div>
-      </div>`).join('');
+  _renderCarne(content, d) {
+    this._renderSeccion(content, {
+      icon: Icons.carne(), title: 'Producción Cárnica (kg)', subtitle: 'Pesajes individuales y por lote',
+      color: 'var(--c-danger)', colorDark: '#b91c1c',
+      kpis: [
+        { label: 'Total kg', value: this._fmt(d.kgTotal) + ' kg' },
+        { label: 'Pesadas', value: d.kgCount }
+      ],
+      registrarLabel: 'Cárnica', listName: 'Lista PRO Cárnica',
+      registrarHandler: "App._abrirAsistenteProduccion('carne')",
+      records: d.carneEvents.slice(0, 30).map(e => {
+        const isInd = e.tipo_entidad === 'animal';
+        const label = isInd ? 'INDIVIDUAL' : 'LOTE';
+        const idDisplay = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} ${e.lote_animales_count === 1 ? 'animal' : 'animales'}` : (e.snap_tipo || 'S/N'));
+        return {
+          title: `${label}: ${idDisplay}`,
+          date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+          zone: e.snap_zona || '',
+          value: Number(e.valor_neto || 0).toLocaleString('es-ES') + ' kg',
+          typeColor: isInd ? 'var(--c-danger)' : 'var(--c-warning)',
+          onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
+        };
+      }),
+      emptyMsg: 'Sin registros cárnicos. Usa el botón "Nuevo" para añadir.'
+    });
   },
 
-  _filtrar(texto) {
-    const list = this._currentTab === 'carne' ? this._cachedData.carneEvents : this._cachedData.lecheEvents;
-    const div = document.getElementById('prod-lista');
-    if (div) div.innerHTML = this._getRecordsHtml(list, texto);
+  _renderLeche(content, d) {
+    this._renderSeccion(content, {
+      icon: Icons.leche(), title: 'Producción Láctea (L)', subtitle: 'Control lechero individual y de lote',
+      color: 'var(--c-info)', colorDark: '#1d4ed8',
+      kpis: [
+        { label: 'Total litros', value: this._fmt(d.litrosTotal) + ' L' },
+        { label: 'Registros', value: d.litrosCount },
+        { label: 'Extracto Seco Medio', value: d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D' },
+      ],
+      registrarLabel: 'Láctea', listName: 'Lista PRO Láctea',
+      registrarHandler: "App._abrirAsistenteProduccion('leche')",
+      records: d.lecheEvents.slice(0, 30).map(e => {
+        const isInd = e.tipo_entidad === 'animal';
+        const isLote = e.tipo_entidad === 'rebano';
+        const isTanque = e.tipo_entidad === 'finca' || e.motivo_tarea === 'expedicion';
+
+        let label = 'CONTROL';
+        if (isInd) label = 'INDIVIDUAL';
+        if (isLote) label = 'LOTE';
+        if (isTanque) label = 'TANQUE';
+
+        const idDisplayLeche = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} ${e.lote_animales_count === 1 ? 'animal' : 'animales'}` : (e.snap_tipo || 'S/N'));
+        return {
+          title: `${label}: ${idDisplayLeche}`,
+          date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+          zone: e.snap_zona || '',
+          value: Number(e.valor_neto || 0).toLocaleString('es-ES') + ' L',
+          typeColor: isInd ? 'var(--c-info)' : (isLote ? 'var(--c-purple)' : 'var(--c-success)'),
+          onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
+        };
+      }),
+      emptyMsg: 'Sin registros lácteos. Usa el botón "Nuevo" para añadir.'
+    });
+  },
+
+  _renderVentas(content, d) {
+    this._renderSeccion(content, {
+      icon: Icons.comercial(), title: 'Venta Masiva / Matadero', subtitle: 'Expediciones y ventas de ganado',
+      color: 'var(--c-warning)', colorDark: 'var(--c-warning)',
+      kpis: [
+        { label: 'Total ventas', value: this._fmt(d.ventasTotal) + ' €' },
+        { label: 'Expediciones', value: d.ventaEvents.length }
+      ],
+      registrarLabel: 'Venta', listName: 'Lista Ventas',
+      registrarHandler: "App._abrirAsistenteProduccion('venta_masiva')",
+      records: d.ventaEvents.slice(0, 20).map(e => ({
+        title: 'Expedición: ' + (e.snap_especie || 'Ganado'),
+        date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+        zone: e.snap_zona || '',
+        value: (e.importe_total || e.valor_neto || 0) + ' €',
+        onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
+      })),
+      emptyMsg: 'Sin ventas registradas. Usa "Registrar Venta" para añadir.'
+    });
+  },
+
+  _renderGastos(content, d) {
+    this._renderSeccion(content, {
+      icon: Icons.gastos(), title: 'Gastos Analíticos', subtitle: 'Costes operativos y de explotación',
+      color: 'var(--c-purple)', colorDark: '#6d28d9',
+      kpis: [
+        { label: 'Total gastos', value: this._fmt(d.gastosTotal) + ' €' },
+        { label: 'Registros', value: d.gastosRecords.length }
+      ],
+      registrarLabel: 'Gasto', listName: 'Lista Gastos',
+      registrarHandler: "App._abrirAsistenteProduccion('gasto')",
+      records: d.gastosRecords.slice(0, 20).map(g => ({
+        title: (g.concepto || g.categoria || 'Gasto'),
+        date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
+        zone: g.snap_zona || '',
+        value: (g.monto || 0) + ' €',
+        onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
+      })),
+      emptyMsg: 'Sin gastos registrados. Usa "Registrar Gasto" para añadir.'
+    });
   },
 
   async _abrirOpcionesRegistro(id) {
-    if (window.ExplotacionView && typeof window.ExplotacionView._abrirOpcionesRegistro === 'function') {
-      window.ExplotacionView._abrirOpcionesRegistro(id, this._currentTab);
+    try {
+      const evento = await window.db.get('registro_eventos', id);
+      if (!evento) return;
+
+      const [rebanos, finca] = await Promise.all([
+        window.db.getAll('rebanos'),
+        Fincas.getActive()
+      ]);
+      const zonas = finca?.zonas || [];
+
+      const overlay = document.createElement("div");
+      overlay.className = "wizard-full-screen";
+      overlay.style.justifyContent = "center";
+      overlay.style.alignItems = "center";
+      overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+      overlay.innerHTML = `
+          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
+              <h3 class="mt-0 text-gold">Editar Registro</h3>
+              <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
+
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Valor (${evento.unidad})</label>
+                    <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
+                </div>
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Fecha</label>
+                    <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
+                </div>
+              </div>
+
+              <div class="wizard-input-group">
+                  <label class="wizard-label">Identificación (Crotal/Lote)</label>
+                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
+              </div>
+
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Zona</label>
+                    <select id="edit-reg-zona" class="wizard-input wizard-select">
+                      <option value="">Sin zona</option>
+                      ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="wizard-input-group">
+                    <label class="wizard-label">Tipo Animal</label>
+                    <input type="text" id="edit-reg-tipo" value="${evento.snap_tipo || ''}" class="wizard-input">
+                </div>
+              </div>
+
+              <div class="wizard-input-group">
+                  <label class="wizard-label">Especie</label>
+                  <select id="edit-reg-especie" class="wizard-input wizard-select">
+                    <option value="Vacas" ${evento.snap_especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
+                    <option value="Ovejas" ${evento.snap_especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
+                    <option value="Cabras" ${evento.snap_especie === 'Cabras' ? 'selected' : ''}>Cabras</option>
+                  </select>
+              </div>
+
+              <div class="flex gap-10 mt-20">
+                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
+              </div>
+              <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+          </div>`;
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('#btn-save-reg').onclick = async () => {
+        const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
+        const fecha = overlay.querySelector('#edit-reg-fecha').value;
+        const ident = overlay.querySelector('#edit-reg-ident').value.trim();
+        const zona = overlay.querySelector('#edit-reg-zona').value;
+        const tipo = overlay.querySelector('#edit-reg-tipo').value.trim();
+        const especie = overlay.querySelector('#edit-reg-especie').value;
+
+        if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
+
+        evento.valor_neto = val;
+        evento.fecha = fecha;
+        evento.snap_identificacion = ident;
+        evento.snap_zona = zona;
+        evento.snap_tipo = tipo;
+        evento.snap_especie = especie;
+        evento.actualizadoEn = new Date().toISOString();
+
+        await window.db.put('registro_eventos', evento);
+        App.toast("Registro actualizado correctamente");
+        overlay.remove();
+        ProduccionView.render();
+      };
+
+      overlay.querySelector('#btn-del-reg').onclick = async () => {
+        if (!await Confirm.confirm("Eliminar Registro", "¿Eliminar este registro de forma permanente?", true)) return;
+        await window.db.delete('registro_eventos', id);
+        App.toast("Registro eliminado");
+        overlay.remove();
+        ProduccionView.render();
+      };
+    } catch (e) {
+      App.toastError(e.message);
     }
+  },
+
+  async _abrirOpcionesGasto(id) {
+    try {
+      const numId = Number(id);
+      const gasto = await window.db.get('gastos_ganaderia', numId);
+      if (!gasto) return;
+
+      const [rebanos, proveedores] = await Promise.all([
+        window.db.getAll('rebanos'),
+        window.db.getAll('proveedores')
+      ]);
+
+      const overlay = document.createElement("div");
+      overlay.className = "wizard-full-screen";
+      overlay.style.justifyContent = "center";
+      overlay.style.alignItems = "center";
+      overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+      overlay.innerHTML = `
+        <div class="card-registro p-25" style="max-width:400px; ;; --registro-color: var(--c-gray);">
+          <h3 class="mt-0 text-gold text-md">Editar Gasto</h3>
+
+          <div class="wizard-input-group mt-15">
+            <label class="wizard-label">Concepto</label>
+            <input type="text" id="edit-gasto-concepto" value="${gasto.concepto || ''}" class="wizard-input">
+          </div>
+
+          <div class="grid grid-cols-2 gap-10">
+            <div class="wizard-input-group">
+              <label class="wizard-label">Monto (€)</label>
+              <input type="number" id="edit-gasto-monto" value="${gasto.monto}" step="0.01" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">Fecha</label>
+              <input type="date" id="edit-gasto-fecha" value="${gasto.fecha}" class="wizard-input">
+            </div>
+          </div>
+
+          <div class="wizard-input-group">
+            <label class="wizard-label">Proveedor</label>
+            <select id="edit-gasto-prov" class="wizard-input wizard-select">
+              <option value="">Sin proveedor</option>
+              ${proveedores.map(p => `<option value="${p.id}" ${gasto.proveedorId === p.id ? 'selected' : ''}>${p.nombre}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="wizard-input-group">
+            <label class="wizard-label">Rebaño / Lote</label>
+            <select id="edit-gasto-reb" class="wizard-input wizard-select">
+              <option value="">Sin rebaño</option>
+              ${rebanos.map(r => `<option value="${r.id}" ${gasto.rebanoId === r.id ? 'selected' : ''}>${r.nombre}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="flex gap-10 mt-20">
+            <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-gasto">${Icons.guardar()} Guardar</button>
+            <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-gasto">${Icons.eliminar()} Borrar</button>
+          </div>
+          <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cerrar</button>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('#btn-save-gasto').onclick = async () => {
+        const concepto = document.getElementById('edit-gasto-concepto').value.trim();
+        const monto = parseFloat(document.getElementById('edit-gasto-monto').value);
+        const fecha = document.getElementById('edit-gasto-fecha').value;
+        const proveedorId = document.getElementById('edit-gasto-prov').value;
+        const rebanoId = document.getElementById('edit-gasto-reb').value;
+
+        if (!concepto || isNaN(monto)) return App.toastError("Concepto y monto obligatorios");
+
+        gasto.concepto = concepto;
+        gasto.monto = monto;
+        gasto.fecha = fecha;
+        gasto.proveedorId = proveedorId ? Number(proveedorId) : null;
+        gasto.rebanoId = rebanoId ? Number(rebanoId) : null;
+        gasto.actualizadoEn = new Date().toISOString();
+
+        await window.db.put('gastos_ganaderia', gasto);
+        App.toast("Gasto actualizado");
+        overlay.remove();
+        if (window.GastosView && GastosView._cachedData) GastosView.render();
+        else ProduccionView.render();
+      };
+
+      overlay.querySelector('#btn-del-gasto').onclick = async () => {
+        if (!await Confirm.confirm("Eliminar Gasto", "¿Eliminar este gasto de forma permanente?", true)) return;
+        await window.db.delete('gastos_ganaderia', numId);
+        App.toast("Gasto eliminado");
+        overlay.remove();
+        if (window.GastosView && GastosView._cachedData) GastosView.render();
+        else ProduccionView.render();
+      };
+
+    } catch (e) { App.toastError(e.message); }
+  },
+
+  _fmt(n) {
+    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
   }
 };
+
 window.ProduccionView = ProduccionView;

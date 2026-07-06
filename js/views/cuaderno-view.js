@@ -196,7 +196,7 @@ const CuadernoDigitalView = {
             <span>Total: ${info.total}</span>
           </div>
           <div class="text-gray text-82">
-            ${Icons.hembra()} ${info.hembras} ${info.hembras === 1 ? "hembra" : "hembras"} · ${Icons.macho()} ${info.machos} ${info.machos === 1 ? "macho" : "machos"}
+            ♀ ${info.hembras} ${info.hembras === 1 ? "hembra" : "hembras"} · ♂ ${info.machos} ${info.machos === 1 ? "macho" : "machos"}
           </div>
           <div class="mt-4 text-gray-500 text-75">
             ${Object.entries(info.categorias).map(([cat, cnt]) =>

@@ -30,7 +30,7 @@ const E2E = {
   _wait: (ms) => new Promise(r => setTimeout(r, ms)),
 
   _log(status, module, detail, category = '') {
-    const icon = status === 'PASS' ? `${Icons.check()}` : status === 'FAIL' ? `${Icons.cerrar()}` : status === 'WARN' ? `${Icons.alerta()}️` : '⏳';
+    const icon = status === 'PASS' ? '✅' : status === 'FAIL' ? '❌' : status === 'WARN' ? '⚠️' : '⏳';
     const cat = category ? ` [${category}]` : '';
     const line = `[${this._ts()}] ${icon} [${module}]${cat} ${detail}`;
     console.log(line);
@@ -311,7 +311,7 @@ const E2E = {
       // Verificar consola
       this._checkConsoleErrors(M);
 
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Animal ${crotal} (id=${nuevoId}) en ${elapsed.toFixed(0)}ms`);
+      this._log('PASS', M, `✅ COMPLETADO — Animal ${crotal} (id=${nuevoId}) en ${elapsed.toFixed(0)}ms`);
       return true;
 
     } catch (e) {
@@ -425,7 +425,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Gasto "${concepto}" ${monto}€ (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Gasto "${concepto}" ${monto}€ (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -530,7 +530,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Pesaje ${peso}kg animal ${animal.numero_identificacion} (id=${eventoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Pesaje ${peso}kg animal ${animal.numero_identificacion} (id=${eventoId})`);
       return true;
 
     } catch (e) {
@@ -630,7 +630,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Control ${litros}L hembra ${hembra.numero_identificacion} (id=${eventoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Control ${litros}L hembra ${hembra.numero_identificacion} (id=${eventoId})`);
       return true;
 
     } catch (e) {
@@ -728,7 +728,7 @@ const E2E = {
       this._checkLayoutIntegrity(M);
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Albarán leche ${cantidad}L matrícula ${matricula} (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Albarán leche ${cantidad}L matrícula ${matricula} (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -802,7 +802,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Tratamiento "${medicamento}" (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Tratamiento "${medicamento}" (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -877,7 +877,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Traslado ${crotal} → "${rebanoDestino.nombre}"`);
+      this._log('PASS', M, `✅ COMPLETADO — Traslado ${crotal} → "${rebanoDestino.nombre}"`);
       return true;
 
     } catch (e) {
@@ -944,7 +944,7 @@ const E2E = {
       this._checkLayoutIntegrity(M);
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Comprador "${nombre}" NIF:${nif} (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Comprador "${nombre}" NIF:${nif} (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -1002,7 +1002,7 @@ const E2E = {
       this._checkLayoutIntegrity(M);
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Proveedor "${nombre}" (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Proveedor "${nombre}" (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -1071,7 +1071,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Rebaño "${nombre}" (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Rebaño "${nombre}" (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -1135,7 +1135,7 @@ const E2E = {
       }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Evento IA para ${hembra.numero_identificacion} (id=${nuevoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Evento IA para ${hembra.numero_identificacion} (id=${nuevoId})`);
       return true;
 
     } catch (e) {
@@ -1215,7 +1215,7 @@ const E2E = {
       else { this._log('FAIL', M, 'NO aparece en filtro de ventas', 'LISTA'); return false; }
 
       this._checkConsoleErrors(M);
-      this._log('PASS', M, `${Icons.check()} COMPLETADO — Expedición ${animal.numero_identificacion} 662.75€ (id=${eventoId})`);
+      this._log('PASS', M, `✅ COMPLETADO — Expedición ${animal.numero_identificacion} 662.75€ (id=${eventoId})`);
       return true;
 
     } catch (e) {
@@ -1230,23 +1230,23 @@ const E2E = {
   // ============================================================
   async runAll() {
     console.log('\n' + '='.repeat(75));
-    console.log(`${Icons.fitosanitario()} E2E TEST SUITE v2.0 — Livestock Manager QA/UX`);
-    console.log(`${Icons.calendar()} ` + new Date().toLocaleString());
-    console.log(`${Icons.documento()} Validación: UI · Persistencia · Layout · Consola · Rendimiento`);
+    console.log('🧪 E2E TEST SUITE v2.0 — Livestock Manager QA/UX');
+    console.log('📅 ' + new Date().toLocaleString());
+    console.log('📋 Validación: UI · Persistencia · Layout · Consola · Rendimiento');
     console.log('='.repeat(75) + '\n');
 
     if (!window.db) {
-      console.error(`${Icons.cerrar()} ERROR: window.db no disponible. Espera a que la app cargue.`);
+      console.error('❌ ERROR: window.db no disponible. Espera a que la app cargue.');
       return;
     }
 
     const fincaId = await Fincas.getActiveId();
     if (!fincaId) {
-      console.error(`${Icons.cerrar()} ERROR: No hay finca activa. Configura una finca primero.`);
+      console.error('❌ ERROR: No hay finca activa. Configura una finca primero.');
       return;
     }
 
-    console.log(`${Icons.finca()} Finca activa: ${fincaId}\n`);
+    console.log(`📍 Finca activa: ${fincaId}\n`);
 
     const tests = [
       { name: 'Nuevo Rebaño', fn: () => this.testNuevoRebano() },
@@ -1288,23 +1288,23 @@ const E2E = {
     // REPORTE FINAL
     // ============================================================
     console.log('\n' + '='.repeat(75));
-    console.log(`${Icons.grafico()} REPORTE FINAL E2E v2.0`);
+    console.log('📊 REPORTE FINAL E2E v2.0');
     console.log('='.repeat(75));
     console.log(`⏱️  Tiempo total: ${(totalTime / 1000).toFixed(2)}s`);
-    console.log(`${Icons.check()} Éxitos: ${passed}/${tests.length}`);
-    console.log(`${Icons.cerrar()} Fallos: ${failed}/${tests.length}`);
-    console.log(`${Icons.tendencia()} Tasa de éxito: ${((passed / tests.length) * 100).toFixed(1)}%`);
+    console.log(`✅ Éxitos: ${passed}/${tests.length}`);
+    console.log(`❌ Fallos: ${failed}/${tests.length}`);
+    console.log(`📈 Tasa de éxito: ${((passed / tests.length) * 100).toFixed(1)}%`);
 
     // Rendimiento
     if (this._perfTimings.length > 0) {
-      console.log(`\n${Icons.rayo()} RENDIMIENTO (inserciones):`);
+      console.log('\n⚡ RENDIMIENTO (inserciones):');
       console.log('─'.repeat(50));
       const avg = this._perfTimings.reduce((s, t) => s + t.ms, 0) / this._perfTimings.length;
       const max = Math.max(...this._perfTimings.map(t => t.ms));
       const min = Math.min(...this._perfTimings.map(t => t.ms));
       this._perfTimings.forEach(t => {
         const bar = '█'.repeat(Math.max(1, Math.round(t.ms / 50)));
-        const flag = t.ms > 2000 ? ` ${Icons.alerta()}` : t.ms < 200 ? ` ${Icons.rayo()}` : '';
+        const flag = t.ms > 2000 ? ' 🐢' : t.ms < 200 ? ' ⚡' : '';
         console.log(`  ${t.module.padEnd(25)} ${t.ms.toFixed(0).padStart(5)}ms ${bar}${flag}`);
       });
       console.log(`  ${'─'.repeat(40)}`);
@@ -1314,16 +1314,16 @@ const E2E = {
     // Fallos detallados
     const failures = this._results.filter(r => r.status === 'FAIL');
     if (failures.length > 0) {
-      console.log(`\n${Icons.cerrar()} DETALLE DE FALLOS:`);
+      console.log('\n❌ DETALLE DE FALLOS:');
       console.log('─'.repeat(60));
       failures.forEach(f => {
         const cat = f.category ? ` [${f.category}]` : '';
-        console.log(`  ${Icons.cerrar()} [${f.module}]${cat} ${f.detail}`);
+        console.log(`  ❌ [${f.module}]${cat} ${f.detail}`);
       });
     }
 
     // Resumen por categoría
-    console.log(`\n${Icons.documento()} RESUMEN POR CATEGORÍA:`);
+    console.log('\n📋 RESUMEN POR CATEGORÍA:');
     console.log('─'.repeat(50));
     const categories = [...new Set(this._results.map(r => r.category).filter(Boolean))];
     categories.forEach(cat => {
@@ -1331,24 +1331,24 @@ const E2E = {
       const passCount = catResults.filter(r => r.status === 'PASS').length;
       const failCount = catResults.filter(r => r.status === 'FAIL').length;
       const warnCount = catResults.filter(r => r.status === 'WARN').length;
-      const icon = failCount === 0 ? `${Icons.check()}` : `${Icons.cerrar()}`;
-      console.log(`  ${icon} ${cat.padEnd(20)} ${passCount}${Icons.check()} ${failCount}${Icons.cerrar()} ${warnCount}${Icons.alerta()}️`);
+      const icon = failCount === 0 ? '✅' : '❌';
+      console.log(`  ${icon} ${cat.padEnd(20)} ${passCount}✅ ${failCount}❌ ${warnCount}⚠️`);
     });
 
     // Resumen por módulo
-    console.log(`\n${Icons.documento()} RESUMEN POR MÓDULO:`);
+    console.log('\n📋 RESUMEN POR MÓDULO:');
     console.log('─'.repeat(50));
     const modules = [...new Set(this._results.map(r => r.module))];
     modules.forEach(m => {
       const moduleResults = this._results.filter(r => r.module === m);
       const passCount = moduleResults.filter(r => r.status === 'PASS').length;
       const failCount = moduleResults.filter(r => r.status === 'FAIL').length;
-      const status = failCount === 0 ? `${Icons.check()}` : `${Icons.cerrar()}`;
+      const status = failCount === 0 ? '✅' : '❌';
       console.log(`  ${status} ${m}`);
     });
 
     console.log('\n' + '='.repeat(75));
-    console.log(failed === 0 ? `${Icons.estrella()} TODOS LOS TESTS PASARON` : `${Icons.alerta()}️ HAY TESTS FALLIDOS — Revisar detalle arriba`);
+    console.log(failed === 0 ? '🎉 TODOS LOS TESTS PASARON' : '⚠️ HAY TESTS FALLIDOS — Revisar detalle arriba');
     console.log('='.repeat(75) + '\n');
 
     return { passed, failed, total: tests.length, results: this._results, perfTimings: this._perfTimings };
@@ -1383,7 +1383,7 @@ const E2E = {
 
   // Limpiar datos de test
   async cleanup() {
-    console.log(`${Icons.eliminar()} Limpiando datos de test E2E...`);
+    console.log('🧹 Limpiando datos de test E2E...');
     const stores = ['animales', 'gastos_ganaderia', 'registro_eventos', 'comercializacion_leche', 'sanitarios_ganado', 'compradores', 'proveedores', 'rebanos', 'reproduccion_eventos'];
 
     for (const store of stores) {
@@ -1399,19 +1399,19 @@ const E2E = {
         }
 
         if (testItems.length > 0) {
-          console.log(`  ${Icons.eliminar()}  ${store}: ${testItems.length} registros eliminados`);
+          console.log(`  🗑️  ${store}: ${testItems.length} registros eliminados`);
         }
       } catch (e) {
-        console.warn(`  ${Icons.alerta()}️  Error limpiando ${store}: ${e.message}`);
+        console.warn(`  ⚠️  Error limpiando ${store}: ${e.message}`);
       }
     }
 
-    console.log(`${Icons.check()} Limpieza completada`);
+    console.log('✅ Limpieza completada');
   }
 };
 
 window.E2E = E2E;
-console.log(`${Icons.check()} E2E Test Suite v2.0 cargado.`);
+console.log('✅ E2E Test Suite v2.0 cargado.');
 console.log('   await E2E.runAll()          → Ejecutar todos los tests');
 console.log('   await E2E.run("animal")     → Test individual');
 console.log('   await E2E.cleanup()         → Limpiar datos de test');

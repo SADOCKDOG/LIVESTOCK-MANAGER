@@ -5,21 +5,21 @@
 
 const TestImportador = {
     async ejecutar() {
-        console.log(`${Icons.fitosanitario()} Iniciando pruebas de Importador...\n`);
+        console.log("🧪 Iniciando pruebas de Importador...\n");
 
         try {
             // Prueba 1: Leer archivo
-            console.log(`${Icons.check()} Prueba 1: Validación de esquema de finca`);
+            console.log("✓ Prueba 1: Validación de esquema de finca");
             const datosPrueba = {
                 nombre: "Finca Test",
                 propietario: "Propietario Test",
                 direccion: "Calle Test 123"
             };
             Importador.validarEsquemaFinca(datosPrueba);
-            console.log(`  ${Icons.check()} Esquema válido\n`);
+            console.log("  ✓ Esquema válido\n");
 
             // Prueba 2: Validar teléfono
-            console.log(`${Icons.check()} Prueba 2: Validación de teléfono`);
+            console.log("✓ Prueba 2: Validación de teléfono");
             const telefonos = [
                 { val: "+34 600 123 456", esperado: true },
                 { val: "600123456", esperado: true },
@@ -30,13 +30,13 @@ const TestImportador = {
             
             telefonos.forEach(test => {
                 const resultado = Importador.validarTelefono(test.val);
-                const status = resultado === test.esperado ? `${Icons.check()}` : `${Icons.cerrar()}`;
+                const status = resultado === test.esperado ? "✓" : "✗";
                 console.log(`  ${status} "${test.val}" → ${resultado}`);
             });
             console.log("");
 
             // Prueba 3: Extracción de datos
-            console.log(`${Icons.check()} Prueba 3: Extracción de datos de finca`);
+            console.log("✓ Prueba 3: Extracción de datos de finca");
             const fincaBackup = {
                 info: {
                     nombre: "El Chamorro",
@@ -67,7 +67,7 @@ const TestImportador = {
             console.log("");
 
             // Prueba 4: Validación de campos requeridos
-            console.log(`${Icons.check()} Prueba 4: Validación de campos requeridos`);
+            console.log("✓ Prueba 4: Validación de campos requeridos");
             const pruebas = [
                 { nombre: "", propietario: "Test", direccion: "Test", error: true },
                 { nombre: "Test", propietario: "", direccion: "Test", error: true },
@@ -78,17 +78,17 @@ const TestImportador = {
             pruebas.forEach((test, idx) => {
                 try {
                     Importador.validarEsquemaFinca(test);
-                    console.log(`  ${Icons.check()} Prueba ${idx + 1}: ${test.error ? "${Icons.cerrar()} Debería fallar" : "${Icons.check()} Pasó"}`);
+                    console.log(`  ✓ Prueba ${idx + 1}: ${test.error ? "❌ Debería fallar" : "✓ Pasó"}`);
                 } catch (e) {
-                    console.log(`  ${Icons.check()} Prueba ${idx + 1}: ${!test.error ? "${Icons.cerrar()} No debería fallar" : "${Icons.check()} Error esperado: " + e.message}`);
+                    console.log(`  ✓ Prueba ${idx + 1}: ${!test.error ? "❌ No debería fallar" : "✓ Error esperado: " + e.message}`);
                 }
             });
             console.log("");
 
-            console.log(`${Icons.check()} Todas las pruebas del Importador completadas correctamente\n`);
+            console.log("✅ Todas las pruebas del Importador completadas correctamente\n");
 
         } catch (error) {
-            console.error(`${Icons.cerrar()} Error en pruebas:`, error.message);
+            console.error("❌ Error en pruebas:", error.message);
         }
     }
 };
