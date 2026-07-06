@@ -3814,7 +3814,7 @@ const InformesView = {
       <p class="text-gray text-sm">Genera ficheros compatibles con REGA, SIA/PIGGAN y plataformas autonómicas.</p>
     </div>
     <div class="grid gap-15">
-      <div class="card-registro color-warning">
+      <div class="card-registro card-left-amber style="--registro-color: var(--c-amber);"" style="--registro-color: var(--c-amber);"--registro-color: var(--c-amber);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.informeRega()} REGA — Censo y Explotación</h4>
@@ -3823,7 +3823,7 @@ const InformesView = {
           <button class="btn btn-primary btn-download btn--amber" onclick="InformesView._exportREGA()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
-      <div class="card-registro color-info">
+      <div class="card-registro card-left-blue style="--registro-color: var(--c-info);"" style="--registro-color: var(--c-info);"--registro-color: var(--c-info);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.rotacion()} SIA/PIGGAN — Movimientos</h4>
@@ -3832,7 +3832,7 @@ const InformesView = {
           <button class="btn btn-primary btn-download btn--blue" onclick="InformesView._exportMovimientos()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
-      <div class="card-registro color-success">
+      <div class="card-registro card-left-green style="--registro-color: var(--c-success);"" style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.grafico()} PIGGAN — Producción</h4>
@@ -3841,7 +3841,7 @@ const InformesView = {
           <button class="btn btn-primary btn-download btn--green-dk" onclick="InformesView._exportProduccion()">${Icons.exportar()} Descargar</button>
         </div>
       </div>
-      <div class="card-registro color-purple card-tint-violet">
+      <div class="card-registro card-left-purple card-tint-violet style="--registro-color: var(--c-purple);"" style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
         <div class="flex justify-between items-center">
           <div>
             <h4 class="text-white mb-4">${Icons.paquete()} Exportación Completa</h4>

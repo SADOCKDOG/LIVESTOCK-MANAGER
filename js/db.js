@@ -517,7 +517,7 @@ window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
     // Intentar mostrar el error en pantalla si el DOM está listo
     const msg = "Error Base de Datos: " + err.message;
     if (document.getElementById('app-content')) {
-        document.getElementById('app-content').innerHTML = `<div class="error-fatal-msg">${msg}</div>`;
+        document.getElementById('app-content').innerHTML = `<div style="color:red; padding:20px; background:black; border:1px solid red;">${msg}</div>`;
     }
     throw err;
 });

@@ -209,34 +209,47 @@ const DocumentosView = {
           descHtml = doc.numero || 'Sin número registrado';
         }
 
-        let colorClass = App._getColorClass(color).replace('text-', 'color-');
-        if(colorClass === 'color-gray') colorClass = 'color-gray';
+        const acuseHtml = doc.acuseManual
+          ? `<div class="text-xs text-green mt-6">${Icons.adjuntar()} Acuse manual: <span class="font-900">${doc.acuseManual}</span></div>`
+          : `<div class="text-xs text-red mt-6">${Icons.adjuntar()} Acuse manual pendiente</div>`;
 
-        const acuseHtmlBadge = doc.acuseManual
-          ? `<span class="flex items-center gap-4 text-green">${Icons.adjuntar()} ACUSE: ${doc.acuseManual}</span>`
-          : `<span class="flex items-center gap-4 text-red">${Icons.adjuntar()} ACUSE PENDIENTE</span>`;
-
-        return App._cardRegistro({
-          colorClass: colorClass,
-          onClick: `DocumentosView._verDetalle(${doc.id}, '${doc.tipo}')`,
-          icon: doc.tipo === 'crotales' ? Icons.animales() : Icons.documento(),
-          title: doc.numero || 'S/N',
-          badge: esBorrador ? 'Borrador' : 'Presentado',
-          metadata: `
-            <div class="text-gray font-700 uppercase min-w-full block mb-2"><span class="${App._getColorClass(color)} font-900">${label}</span></div>
-            <span class="flex items-center gap-4">${Icons.calendar()} ${fecha}</span>
-            <span class="flex items-center gap-4">${descHtml}</span>
-            ${acuseHtmlBadge}
-            <div class="min-w-full block mt-6 flex gap-6 flex-wrap">
-              ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs text-warning" onclick="event.stopPropagation(); DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar</button>
-              ` : `
-                <button class="btn btn-sm btn-outline text-xs text-white" onclick="event.stopPropagation(); DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} PDF</button>
-              `}
-              <button class="btn btn-sm btn-outline text-xs text-white" onclick="event.stopPropagation(); DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Acuse</button>
+        return `
+          <div class="card-registro" style="--registro-color: ${color};">
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0">
+                <div class="font-800 text-sm" style="color:${color}; display:flex; align-items:center; gap:6px;">
+                  ${doc.tipo === 'crotales' ? Icons.animales() : Icons.documento()}
+                  ${label}
+                </div>
+                <div class="font-900 text-white mt-2">${doc.numero || 'S/N'}</div>
+              </div>
+              <div class="text-right">
+                <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-${esBorrador ? 'warning' : 'success'}); color: var(--c-${esBorrador ? 'warning' : 'success'}); background: ${esBorrador ? 'rgba(255,215,0,0.1)' : 'rgba(204,255,0,0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">
+                  ${esBorrador ? 'Borrador' : 'Presentado'}
+                </span>
+              </div>
             </div>
-          `
-        });
+            <div class="flex justify-between items-end w-full">
+              <div class="flex-1 min-w-0">
+                <div class="mt-6 text-xs text-ccc">
+                  ${descHtml}
+                </div>
+                ${acuseHtml}
+                <div class="mt-6 flex gap-3 flex-wrap">
+                  ${esBorrador ? `
+                    <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="DocumentosView._editarBorrador('${doc.tipo}', ${doc.id})">${Icons.editar()} Editar Borrador</button>
+                  ` : `
+                    <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._imprimirDoc('${doc.tipo}', ${doc.id})">${Icons.imprimir()} Imprimir PDF</button>
+                  `}
+                  <button class="btn btn-sm btn-outline text-xs" onclick="DocumentosView._registrarAcuse(${doc.id}, '${doc.tipo}', ${doc.isMovimiento ? 'true' : 'false'}, ${doc.isPedidoCrotales ? 'true' : 'false'})">${Icons.adjuntar()} Guardar acuse</button>
+                </div>
+              </div>
+              <div class="text-right">
+                <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">${Icons.documento()} Detalle</span>
+              </div>
+            </div>
+          </div>
+        `;
       }).join('')}
     </div>`;
   },
@@ -256,7 +269,7 @@ const DocumentosView = {
     overlay.innerHTML = `
       <div class="wizard-header-fixed text-center">
         <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-pesaje-close">${Icons.cerrar()}</button>
-        <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 text-lg justify-center"><span class="text-info">|</span> ${Icons.buscar()} CONSULTAR / IMPRIMIR</h3>
+        <h2 class="pesaje-titulo-h2">${Icons.buscar()} CONSULTAR / IMPRIMIR</h2>
       </div>
       <div class="wizard-content-scrollable">
         <div class="card-registro p-16 mb-16 border-222 card-dark-gradient" style="--registro-color: var(--c-info);">

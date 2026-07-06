@@ -5,586 +5,620 @@
  */
 
 const CompradoresView = {
-    _activeModule: 'compradores', // 'compradores' o 'contratos'
-    _currentTab: 'todos',
-    _cachedCompradores: null,
-    _cachedContratos: null,
-    _searchQuery: '',
+  _activeModule: 'compradores', // 'compradores' o 'contratos'
+  _currentTab: 'todos',
+  _filtroActivo: {
+    texto: '',
+    tipo: ''
+  },
+  async render() {
+    if (window.App) App.updateHeaderColor('compradores');
+    const main = document.getElementById("app-content");
 
-    async render() {
-        const main = document.getElementById("app-content");
+    // Cargar datos necesarios según el módulo activo
+    await this._cargarDatos();
 
-        main.innerHTML = `
-          <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
-          <div class="mb-14">
-            <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-              <span style="color: var(--c-purple); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GESTIÓN COMERCIAL
+    // Obtener datos para el resumen según el módulo activo
+    const resumenData = this._activeModule === 'compradores'
+      ? this._getResumenCompradores()
+      : this._getResumenContratos();
+
+    // Resumen mensual (últimos 6 meses) - específico para cada módulo
+    const hoy = new Date();
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const porMes = {};
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
+    }
+
+    // Llenar datos mensuales según el módulo
+    const monthlyData = this._activeModule === 'compradores'
+      ? this._getDatosMensualesCompradores(porMes, hoy)
+      : this._getDatosMensualesContratos(porMes, hoy);
+
+    const mesesHtml = Object.values(monthlyData).reverse().map(m => {
+      const max = Math.max(1, ...Object.values(monthlyData).map(m => m.total));
+      const pct = Math.max(0, Math.min(100, (m.total / max) * 100));
+      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
+      return `<div class="flex-1 text-center min-w-0">
+        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
+        <div class="rebaño-bar-wrap">
+          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
+        </div>
+        <div class="text-xs font-bold mt-2" style="color:${color};">${m.total}</div>
+      </div>`;
+    }).join('');
+
+    main.innerHTML = `
+      <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: var(--c-purple); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GESTIÓN COMERCIAL
+        </div>
+        <div class="comer-mode-switch" style="display: flex; gap: 8px;">
+          <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}"
+            style="--mode-color:var(--c-purple); color: ${this._activeModule === 'compradores' ? '#000' : 'var(--c-purple)'}; flex: 1; padding: 10px;"
+            onclick="CompradoresView._cambiarModulo('compradores')">
+            ${Icons.compradores()} Compradores
+          </button>
+          <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}"
+            style="--mode-color:var(--c-success); color: ${this._activeModule === 'contratos' ? '#000' : 'var(--c-success)'}; flex: 1; padding: 10px;"
+            onclick="CompradoresView._cambiarModulo('contratos')">
+            ${Icons.contratos()} Contratos
+          </button>
+        </div>
+      </div>
+
+      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
+      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
+          <span class="text-xs text-gray">${this._activeModule === 'compradores' ? this._cachedCompradores?.length || 0 : this._cachedContratos?.length || 0} total</span>
+        </div>
+        <div class="flex gap-6">${mesesHtml}</div>
+      </div>
+
+      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: ${this._activeModule === 'compradores' ? 'var(--c-purple)' : 'var(--c-success)'}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE ${this._activeModule === 'compradores' ? 'COMPRADORES' : 'CONTRATOS'}
+        </div>
+        <div id="resumen-comercial" class="space-y-6 text-white">
+          ${this._activeModule === 'compradores'
+            ? `
+              <div class="py-8 flex justify-between items-center border-bottom-222">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.compradores()} Total Compradores</span>
+                <strong class="text-xl font-950" style="color: var(--c-purple);">${this._cachedCompradores?.length || 0} ${this._cachedCompradores?.length === 1 ? "comprador" : "compradores"}</strong>
+              </div>
+              <div class="py-8 flex justify-between items-center border-bottom-222">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.documento()} Compradores Activos</span>
+                <strong class="text-xl font-950 text-green">${this._cachedCompradores?.filter(c => c.activo !== false).length || 0} ${this._cachedCompradores?.filter(c => c.activo !== false).length === 1 ? "comprador" : "compradores"}</strong>
+              </div>
+              <div class="py-8 flex justify-between items-center">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Valor Estimado</span>
+                <strong class="text-xl font-950 text-blue">$${resumenData.valorEstimado?.toLocaleString() || '0'}</strong>
+              </div>
+            `
+            : `
+              <div class="py-8 flex justify-between items-center border-bottom-222">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.contratos()} Total Contratos</span>
+                <strong class="text-xl font-950" style="color: var(--c-success);">${this._cachedContratos?.length || 0} ${this._cachedContratos?.length === 1 ? "contrato" : "contratos"}</strong>
+              </div>
+              <div class="py-8 flex justify-between items-center border-bottom-222">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.check()} Contratos Activos</span>
+                <strong class="text-xl font-950 text-green">${this._cachedContratos?.filter(c => c.activo !== false).length || 0} ${this._cachedContratos?.filter(c => c.activo !== false).length === 1 ? "contrato" : "contratos"}</strong>
+              </div>
+              <div class="py-8 flex justify-between items-center">
+                <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Valor Total</span>
+                <strong class="text-xl font-950 text-blue">$${resumenData.valorTotal?.toLocaleString() || '0'}</strong>
+              </div>
+            `}
+        </div>
+      </div>
+
+      <!-- Filtro de búsqueda integrado (controla el listado) -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
+        ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()} Lista de ${this._activeModule === 'compradores' ? 'Compradores' : 'Contratos'}
+      </div>
+      <div class="flex gap-8 items-center mb-12">
+        <div class="relative flex-1 min-w-0">
+          <input type="search" id="search-${this._activeModule}" placeholder="Buscar por nombre, NIF o ciudad..."
+                 oninput="CompradoresView._setFiltro('texto', this.value)"
+                 class="search-input w-full">
+        </div>
+        <select id="${this._activeModule}-filtro-tipo" class="form-select-gold"
+                onchange="CompradoresView._setFiltro('tipo', this.value)"
+                style="width:120px; min-width:110px; flex-shrink:0;">
+          <option value="">Todos los tipos</option>
+          ${this._activeModule === 'compradores'
+            ? `
+              <option value="cárnico" ${this._filtroActivo.tipo === 'cárnico' ? 'selected' : ''}>Carne</option>
+              <option value="láctico" ${this._filtroActivo.tipo === 'láctico' ? 'selected' : ''}>Leche</option>
+              <option value="híbrido" ${this._filtroActivo.tipo === 'híbrido' ? 'selected' : ''}>Híbrido</option>
+            `
+            : `
+              <option value="activo" ${this._filtroActivo.tipo === 'activo' ? 'selected' : ''}>Activo</option>
+              <option value="inactivo" ${this._filtroActivo.tipo === 'inactivo' ? 'selected' : ''}>Inactivo</option>
+            `}
+        </select>
+      </div>
+      <div id="${this._activeModule}-content"><div class="loader">Cargando ${this._activeModule === 'compradores' ? 'compradores' : 'contratos'}...</div></div>`;
+
+    // Actualizar datos filtrados para el módulo activo
+    if (this._activeModule === 'compradores') {
+      this._cachedData = { compradores: this._filtrarCompradores(this._cachedCompradores || []) };
+      this._renderListaCompradores(this._cachedData.compradores);
+    } else {
+      this._cachedData = { contratos: this._filtrarContratos(this._cachedContratos || []) };
+      this._renderListaContratos(this._cachedData.contratos);
+    }
+  },
+
+  _cambiarModulo(modulo) {
+    this._activeModule = modulo;
+    this._filtroActivo = { texto: '', tipo: '' }; // Reset filters when switching modules
+    document.getElementById('search-compradores')?.value = '';
+    document.getElementById('search-contratos')?.value = '';
+    document.getElementById('compradores-filtro-tipo')?.value = '';
+    document.getElementById('contratos-filtro-tipo')?.value = '';
+    this.render();
+  },
+
+  _setFiltro(type, value) {
+    this._filtroActivo[type] = value;
+    this._aplicarFiltros();
+  },
+
+  _aplicarFiltros() {
+    if (this._activeModule === 'compradores') {
+      const filtrados = this._filtrarCompradores(this._cachedCompradores || []);
+      this._cachedData = { compradores: filtrados };
+      this._renderListaCompradores(filtrados);
+    } else {
+      const filtrados = this._filtrarContratos(this._cachedContratos || []);
+      this._cachedData = { contratos: filtrados };
+      this._renderListaContratos(filtrados);
+    }
+  },
+
+  _filtrarCompradores(compradores) {
+    if (!compradores) return [];
+    let filtrados = compradores;
+
+    if (this._filtroActivo.tipo) {
+      filtrados = filtrados.filter(c => c.tipo_comprador === this._filtroActivo.tipo);
+    }
+
+    if (this._filtroActivo.texto.trim()) {
+      const q = this._filtroActivo.texto.toLowerCase();
+      filtrados = filtrados.filter(c =>
+        (c.nombre || '').toLowerCase().includes(q) ||
+        (c.nif_cif || '').toLowerCase().includes(q) ||
+        (c.ciudad || '').toLowerCase().includes(q)
+      );
+    }
+
+    return filtrados;
+  },
+
+  _filtrarContratos(contratos) {
+    if (!contratos) return [];
+    let filtrados = contratos;
+
+    if (this._filtroActivo.tipo) {
+      filtrados = filtrados.filter(c =>
+        this._filtroActivo.tipo === 'activo' ? c.activo !== false : c.activo === false
+      );
+    }
+
+    if (this._filtroActivo.texto.trim()) {
+      const q = this._filtroActivo.texto.toLowerCase();
+      filtrados = filtrados.filter(c =>
+        (c.numero_contrato || '').toLowerCase().includes(q) ||
+        (c.condiciones || '').toLowerCase().includes(q)
+      );
+    }
+
+    return filtrados;
+  },
+
+  async _cargarDatos() {
+    try {
+      // Cargar ambos conjuntos de datos siempre (se usan en resúmenes y filtrados)
+      const [compradores, contratos] = await Promise.all([
+        Compradores.list().catch(() => []),
+        Contratos.list().catch(() => [])
+      ]);
+
+      this._cachedCompradores = compradores;
+      this._cachedContratos = contratos;
+    } catch (e) {
+      console.error('[CompradoresView] Error:', e);
+      // Los datos se manejarán como arrays vacíos en los métodos de renderizado
+    }
+  },
+
+  _getResumenCompradores() {
+    const compradores = this._cachedCompradores || [];
+    const activos = compradores.filter(c => c.activo !== false).length;
+    const valorEstimado = compradores.reduce((sum, c) => {
+      // Valor estimado basado en historial de transacciones
+      // Esta sería una simplificación - en realidad vendría de un método dedicado
+      return sum + (c.historialCompra?.totalAnual || 0);
+    }, 0);
+
+    return {
+      totalCompradores: compradores.length,
+      compradoresActivos: activos,
+      valorEstimado: valorEstimado
+    };
+  },
+
+  _getResumenContratos() {
+    const contratos = this._cachedContratos || [];
+    const activos = contratos.filter(c => c.activo !== false).length;
+    const valorTotal = contratos.reduce((sum, c) => {
+      // Valor total del contrato
+      return sum + (c.valorTotal || 0);
+    }, 0);
+
+    return {
+      totalContratos: contratos.length,
+      contratosActivos: activos,
+      valorTotal: valorTotal
+    };
+  },
+
+  _getDatosMensualesCompradores(porMes, hoy) {
+    // Simular datos mensuales para compradores nuevos por mes
+    const compradores = this._cachedCompradores || [];
+    compradores.forEach(c => {
+      if (c.fechaRegistro) {
+        const fecha = new Date(c.fechaRegistro);
+        const key = fecha.getFullYear() + '-' + String(fecha.getMonth()+1).padStart(2,'0');
+        if (porMes[key]) porMes[key].total++;
+      }
+    });
+    return porMes;
+  },
+
+  _getDatosMensualesContratos(porMes, hoy) {
+    // Simular datos mensuales para contratos nuevos por mes
+    const contratos = this._cachedContratos || [];
+    contratos.forEach(c => {
+      if (c.fechaInicio) {
+        const fecha = new Date(c.fechaInicio);
+        const key = fecha.getFullYear() + '-' + String(fecha.getMonth()+1).padStart(2,'0');
+        if (porMes[key]) porMes[key].total++;
+      }
+    });
+    return porMes;
+  },
+
+  // Mantener todos los métodos existentes pero adaptarlos para usar los datos filtrados
+  _renderListaCompradores(lista) {
+    const contenedor = document.getElementById('compradores-content');
+    if (!contenedor) return;
+
+    if (lista.length === 0) {
+      contenedor.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">${Icons.edificio()}</div>
+          <p class="empty-state-text">${this._cachedCompradores?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
+          <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Registrar primer comprador</button>
+        </div>`;
+      return;
+    }
+
+    // Crear mapa de contratos por comprador para renderizar en la lista
+    const contratosPorComprador = {};
+    (this._cachedContratos || []).forEach(ct => {
+      if (!contratosPorComprador[ct.compradorId]) {
+        contratosPorComprador[ct.compradorId] = [];
+      }
+      contratosPorComprador[ct.compradorId].push(ct);
+    });
+
+    contenedor.innerHTML = `<div class="grid gap-12">${lista.map(c => {
+      const color = this._colorTipo(c.tipo_comprador);
+      const cContratos = contratosPorComprador[c.id] || [];
+
+      return `
+      <div class="card-registro" onclick="CompradoresView.renderDetalle(${c.id})"
+        style="--registro-color: ${color};">
+        <div class="flex flex-col gap-10">
+          <div class="flex justify-between items-start w-full">
+            <div class="flex items-center gap-10 min-w-0">
+              <div class="text-xl" style="color:${color}">${Icons.compradores()}</div>
+              <div class="text-xs">
+                <div class="font-950 text-white uppercase text-base tracking-tight" style="color:${color} !important;">${c.nombre}</div>
+                <div class="text-gray-500 mt-2 font-800 uppercase text-[0.65rem] tracking-wider flex items-center gap-6">
+                  ${[c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : '', c.ciudad ? Icons.zonas() + ' ' + c.ciudad.toUpperCase() : ''].filter(Boolean).join(' · ')}
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="badge badge-sm font-900 uppercase" style="background:color-mix(in srgb, ${color} 12%, transparent); color:${color}; border:1px solid color-mix(in srgb, ${color} 25%, transparent);">
+                  ${(c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido'}
+                </span>
+                ${c.activo === false ? '<div class="text-red text-[0.55rem] font-950 mt-4 uppercase tracking-widest">INACTIVO</div>' : ''}
+              </div>
             </div>
-            <div class="comer-mode-switch" style="display: flex; gap: 8px;">
-              <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}"
-                style="--mode-color:var(--c-purple); color: ${this._activeModule === 'compradores' ? '#000' : 'var(--c-purple)'}; flex: 1; padding: 10px;"
-                onclick="CompradoresView._cambiarModulo('compradores')">
-                ${Icons.compradores()} Compradores
-              </button>
-              <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}"
-                style="--mode-color:var(--c-success); color: ${this._activeModule === 'contratos' ? '#000' : 'var(--c-success)'}; flex: 1; padding: 10px;"
-                onclick="CompradoresView._cambiarModulo('contratos')">
-                ${Icons.contratos()} Contratos
-              </button>
+
+            <!-- Contratos asociados al comprador -->
+            <div class="mt-6 text-[0.62rem] text-aaa font-800 uppercase tracking-tighter style-border-top" style=" padding-top:10px;">
+              <span class="text-gray-600 font-900 mr-6">CONTRATOS VINCULADOS:</span>
+              ${cContratos.length === 0 ? '<span class="text-gray-700 italic">SIN CONTRATOS ASIGNADOS</span>' :
+                cContratos.map(ct => `
+                  <span class="badge" style="margin-left:4px; font-size:0.6rem; background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; padding:2px 8px; border-radius:30px; font-weight:900;">
+                    ${ct.numero_contrato}
+                  </span>
+                `).join('')
+              }
+            </div>
+
+            <div class="flex justify-end w-full mt-2">
+              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
             </div>
           </div>
+        </div>
+      `}).join('')}</div>`;
 
-          <div id="module-container">
-            <div class="loader">Cargando módulo...</div>
-          </div>
-        `;
+    // Botón Flotante de Acción con viñeta (se agrega después de la lista)
+    const fabContainer = document.createElement('div');
+    fabContainer.className = 'fab-container';
+    fabContainer.innerHTML = `
+      <span class="fab-label">Nuevo Comprador</span>
+      <button class="fab-btn">${Icons.fabPlus()}</button>
+    `;
+    fabContainer.onclick = () => CompradoresView.renderFormulario();
+    contenedor.appendChild(fabContainer);
+  },
 
-        await this._cargarDatos();
-    },
+  _renderListaContratos(lista) {
+    const contenedor = document.getElementById('contratos-content');
+    if (!contenedor) return;
 
-    async _cargarDatos() {
-        try {
-            const compradores = await Compradores.list().catch(() => []);
-            const contratos = await Contratos.list().catch(() => []);
+    if (lista.length === 0) {
+      contenedor.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">${Icons.contratos()}</div>
+          <p class="empty-state-text">Aún no hay contratos registrados.</p>
+          <button class="btn btn-create btn-sm" style="background:var(--c-success);" onclick="CompradoresView._nuevoContratoLibre()">${Icons.agregar()} Crear primer contrato</button>
+        </div>`;
+      return;
+    }
 
-            this._cachedCompradores = compradores;
-            this._cachedContratos = contratos;
+    // Crear mapa para resolver el nombre del comprador
+    const compradorMap = {};
+    (this._cachedCompradores || []).forEach(c => { compradorMap[c.id] = c; });
 
-            this._renderActiveModule();
-        } catch (e) {
-            console.error('[CompradoresView] Error:', e);
-            document.getElementById("module-container").innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error al cargar datos: ${e.message}</div>`;
-        }
-    },
+    contenedor.innerHTML = `<div class="grid gap-12">${lista.map(ct => {
+      const comp = compradorMap[ct.compradorId];
+      const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
 
-    _cambiarModulo(modulo) {
-        this._activeModule = modulo;
-        this._searchQuery = '';
-        this.render();
-    },
-
-    _renderActiveModule() {
-        const container = document.getElementById("module-container");
-        if (!container) return;
-
-        const themeColor = 'var(--c-purple)';
-
-        if (this._activeModule === 'compradores') {
-            const totalCompradores = this._cachedCompradores?.length || 0;
-            const activosCount = this._cachedCompradores?.filter(c => c.activo !== false).length || 0;
-            // Valor estimado: suma de ventas (carne + leche si existiera un campo de valor, o simplemente total registros)
-            // Según la regla: Total, Activos, Valor Estimado
-            const valorEstimado = (this._cachedContratos || []).reduce((acc, c) => acc + (c.activo ? 1 : 0), 0); // O alguna métrica real
-
-            container.innerHTML = `
-              <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
-                <div class="mb-10">
-                  <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
-                    <span class="${App._getColorClass(themeColor)}">|</span> ${Icons.compradores()} COMPRADORES
-                  </h3>
-                  <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
-                    ${totalCompradores} REGISTROS · RESUMEN DE GESTIÓN
-                  </div>
-                </div>
-
-                <!-- Card de RESUMEN -->
-                <div class="card card-total-3d card-resumen mb-20" style="background: rgba(255,255,255,0.02); padding: 12px;">
-                  <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-                    <span>RESUMEN</span>
-                    <button class="resumen-toggle" onclick="App.toggleResumen(this)">
-                      ${Icons.chevronAbajo()}
-                    </button>
-                  </div>
-                  <div class="resumen-body flex flex-col gap-6">
-                    <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
-                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.compradores()} TOTAL</span>
-                       <strong class="text-xl font-950" style="color: var(--c-info)">${totalCompradores}</strong>
-                    </div>
-                    <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
-                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
-                       <strong class="text-xl font-950" style="color: var(--c-success)">${activosCount}</strong>
-                    </div>
-                    <div class="flex justify-between items-center px-4 py-8">
-                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.dinero()} CONTRATOS ACTIVOS</span>
-                       <strong class="text-xl font-950" style="color: var(--c-warning)">${valorEstimado}</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Filtros / Tabs -->
-                <div class="flex gap-8 mb-20 overflow-x-auto pb-4 no-scrollbar">
-                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'todos' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('todos')">TODOS</button>
-                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'cárnico' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('cárnico')">CARNE</button>
-                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'láctico' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('láctico')">LECHE</button>
-                   <button class="badge badge-sm uppercase font-900 ${this._currentTab === 'híbrido' ? 'active' : ''}" onclick="CompradoresView._cambiarFiltro('híbrido')">HÍBRIDOS</button>
-                </div>
-
-                <div class="flex gap-8 mb-14">
-                  <input type="search" id="search-compradores" placeholder="Buscar por nombre, NIF o ciudad..."
-                    oninput="CompradoresView._filtrarCompradores(this.value)"
-                    class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
-                </div>
-
-                <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-                  ${Icons.documento()} LISTADO DE COMPRADORES
-                </div>
-                <div id="compr-lista"></div>
-              </div>
-
-              <!-- Botón Flotante de Acción -->
-              <div class="fab-container" onclick="CompradoresView.renderFormulario()">
-                <span class="fab-label">Nuevo Comprador</span>
-                <button class="fab-btn" style="--neon: ${themeColor}">${Icons.fabPlus()}</button>
-              </div>
-            `;
-            this._aplicarFiltrosCompradores();
-        } else {
-            // Módulo de Contratos
-            const themeColorContratos = 'var(--c-purple)';
-            const totalContratos = this._cachedContratos?.length || 0;
-            const activosContratos = this._cachedContratos?.filter(c => c.activo !== false).length || 0;
-
-            container.innerHTML = `
-              <div class="card-registro" style="--registro-color: ${themeColorContratos}; padding: 15px;">
-                <div class="flex justify-between items-start mb-10">
-                  <div>
-                    <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
-                      <span class="${App._getColorClass(themeColorContratos)}">|</span> ${Icons.contratos()} CONTRATOS
-                    </h3>
-                    <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
-                      ${totalContratos} REGISTROS · RESUMEN DE VIGENCIA
-                    </div>
-                  </div>
-                  <button class="resumen-toggle" onclick="App.toggleResumen(this)">
-                    ${Icons.chevronAbajo()}
-                  </button>
-                </div>
-
-                <!-- Card de RESUMEN -->
-                <div class="card card-total-3d card-resumen mb-20">
-                  <div class="resumen-body flex flex-col gap-6">
-                    <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
-                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.contratos()} TOTAL</span>
-                       <strong class="text-xl font-950" style="color: var(--c-info)">${totalContratos}</strong>
-                    </div>
-                    <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
-                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
-                       <strong class="text-xl font-950" style="color: var(--c-success)">${activosContratos}</strong>
-                    </div>
-                    <div class="flex justify-between items-center px-4 py-8">
-                       <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.alerta()} VENCIDOS</span>
-                       <strong class="text-xl font-950" style="color: var(--c-danger)">${totalContratos - activosContratos}</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex gap-8 mb-14">
-                  <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
-                    oninput="CompradoresView._filtrarContratos(this.value)"
-                    class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
-                </div>
-
-                <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
-                  ${Icons.documento()} LISTADO DE CONTRATOS
-                </div>
-                <div id="contratos-lista"></div>
-              </div>
-
-              <!-- Botón Flotante de Acción -->
-              <div class="fab-container" onclick="CompradoresView._nuevoContratoLibre()">
-                <span class="fab-label">Nuevo Contrato</span>
-                <button class="fab-btn" style="--neon: ${themeColorContratos}">${Icons.fabPlus()}</button>
-              </div>
-            `;
-            this._aplicarFiltrosContratos();
-        }
-    },
-
-    _getTabMeta(tab) {
-        const map = {
-            'todos': { color: 'var(--p-gold)', label: 'Todos' },
-            'cárnico': { color: 'var(--c-danger)', label: 'Cárnico' },
-            'láctico': { color: 'var(--c-info)', label: 'Lácteo' },
-            'híbrido': { color: 'var(--c-success)', label: 'Híbrido' }
-        };
-        return map[tab] || map.todos;
-    },
-
-    _cambiarFiltro(tab) {
-        this._currentTab = tab;
-        this.render();
-    },
-
-    _filtrarCompradores(value) {
-        this._searchQuery = value;
-        this._aplicarFiltrosCompradores();
-    },
-
-    _aplicarFiltrosCompradores() {
-        if (!this._cachedCompradores) return;
-        let filtrados = this._cachedCompradores;
-
-        if (this._currentTab !== 'todos') {
-            filtrados = filtrados.filter(c => c.tipo_comprador === this._currentTab);
-        }
-
-        if (this._searchQuery) {
-            const q = this._searchQuery.toLowerCase();
-            filtrados = filtrados.filter(c =>
-                (c.nombre || '').toLowerCase().includes(q) ||
-                (c.nif_cif || '').toLowerCase().includes(q) ||
-                (c.ciudad || '').toLowerCase().includes(q)
-            );
-        }
-        this._renderListaCompradores(filtrados);
-    },
-
-    _renderListaCompradores(lista) {
-        const contenedor = document.getElementById('compr-lista');
-        if (!contenedor) return;
-
-        let headerHtml = '';
-        if (this._currentTab === 'cárnico') {
-            headerHtml = `<div class="comprador-mode-header comprador-mode-header--carne">${Icons.carne()} Mostrando Mataderos y Tratantes Cárnicos</div>`;
-        } else if (this._currentTab === 'láctico') {
-            headerHtml = `<div class="comprador-mode-header comprador-mode-header--leche">${Icons.leche()} Mostrando Industrias Lácteas y Queserías</div>`;
-        } else if (this._currentTab === 'híbrido') {
-            headerHtml = `<div class="comprador-mode-header comprador-mode-header--hibrido">${Icons.rotacion()} Mostrando Operadores Híbridos (Carne y Leche)</div>`;
-        }
-
-        if (lista.length === 0) {
-            contenedor.innerHTML = headerHtml + `
-              <div class="empty-state">
-                <div class="empty-state-icon">${Icons.edificio()}</div>
-                <p class="empty-state-text">${this._cachedCompradores?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
-                <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Registrar primer comprador</button>
-              </div>`;
-            return;
-        }
-
-        // Crear mapa de contratos por comprador para renderizar en la lista
-        const contratosPorComprador = {};
-        (this._cachedContratos || []).forEach(ct => {
-            if (!contratosPorComprador[ct.compradorId]) {
-                contratosPorComprador[ct.compradorId] = [];
-            }
-            contratosPorComprador[ct.compradorId].push(ct);
-        });
-
-        contenedor.innerHTML = headerHtml + `<div class="grid gap-12">${lista.map(c => {
-          const color = this._colorTipo(c.tipo_comprador);
-          const cContratos = contratosPorComprador[c.id] || [];
-
-          const tipoLabel = (c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido';
-          return `
-          <div class="card-registro" onclick="CompradoresView.renderDetalle(${c.id})"
-            style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-            <div class="flex-1 min-w-0 flex flex-col gap-8 justify-center">
-              <div class="flex items-center gap-10 min-w-0">
-                <span class="text-xl" style="color:${color}">${Icons.compradores()}</span>
-                <div class="font-950 text-gold uppercase text-base tracking-tight">${c.nombre}</div>
-              </div>
-              <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase">
-                ${c.nif_cif ? `<span class="flex items-center gap-4">${Icons.documento()} ${c.nif_cif}</span>` : ''}
-                ${c.ciudad ? `<span class="flex items-center gap-4">${Icons.zonas()} ${c.ciudad.toUpperCase()}</span>` : ''}
-              </div>
-              <div class="text-[0.6rem] text-aaa font-800 uppercase tracking-tighter">
-                <span class="text-gray-600 font-900 mr-6">CONTRATOS:</span>
-                ${cContratos.length === 0 ? '<span class="text-gray-700 italic">SIN CONTRATOS ASIGNADOS</span>' :
-                  cContratos.map(ct => `
-                    <span class="badge" style="margin-left:4px; font-size:0.58rem; background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; padding:2px 8px; border-radius:30px; font-weight:900;">
-                      ${ct.numero_contrato}
-                    </span>
-                  `).join('')
-                }
-              </div>
-            </div>
-            <div class="flex flex-col items-end justify-between flex-shrink-0">
-              <div class="flex flex-col items-end gap-3">
-                <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
-                  ${tipoLabel}
-                </div>
-                ${c.activo === false ? '<div class="text-red text-[0.55rem] font-950 uppercase tracking-widest">INACTIVO</div>' : ''}
-              </div>
-              <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
-            </div>
-          </div>
-        `}).join('')}</div>`;
-    },
-
-    _renderRecientesCompradores() {
-        const container = document.getElementById('compr-recientes');
-        if (!container) return;
-        const recientes = (this._cachedCompradores || [])
-            .sort((a, b) => (b.id || 0) - (a.id || 0))
-            .slice(0, 5);
-
-        if (recientes.length === 0) {
-            container.innerHTML = `<div class="p-14 text-center bg-darker rounded border border-222"><span class="text-555 text-xs uppercase font-800 tracking-wider">Sin compradores recientes</span></div>`;
-            return;
-        }
-
-        container.innerHTML = `<div class="grid gap-6">${recientes.map(c => {
-            const color = this._colorTipo(c.tipo_comprador);
-            const tipoLabel = (c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador) || 'híbrido';
-            return `
-            <div class="card-registro" onclick="CompradoresView.renderDetalle(${c.id})"
-                 style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-                <div class="flex-1 min-w-0 flex flex-col justify-center">
-                    <div class="flex items-center gap-10 min-w-0">
-                        <span class="text-xl" style="color:${color}">${Icons.compradores()}</span>
-                        <div class="font-950 text-gold uppercase text-base tracking-tight">${c.nombre}</div>
-                    </div>
-                    <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
-                        ${c.nif_cif ? `<span class="flex items-center gap-4">${Icons.documento()} ${c.nif_cif}</span>` : ''}
-                        ${c.ciudad ? `<span class="flex items-center gap-4">${Icons.zonas()} ${c.ciudad.toUpperCase()}</span>` : ''}
-                    </div>
-                </div>
-                <div class="flex flex-col items-end justify-between flex-shrink-0">
-                    <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
-                        ${tipoLabel}
-                    </div>
-                    <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
-                </div>
-            </div>
-            `;
-        }).join('')}</div>`;
-    },
-
-    _filtrarContratos(value) {
-        this._searchQuery = value;
-        this._aplicarFiltrosContratos();
-    },
-
-    _aplicarFiltrosContratos() {
-        if (!this._cachedContratos) return;
-        let filtrados = this._cachedContratos;
-
-        if (this._searchQuery) {
-            const q = this._searchQuery.toLowerCase();
-            filtrados = filtrados.filter(ct =>
-                (ct.numero_contrato || '').toLowerCase().includes(q) ||
-                (ct.condiciones || '').toLowerCase().includes(q)
-            );
-        }
-        this._renderListaContratos(filtrados);
-    },
-
-    _renderListaContratos(lista) {
-        const contenedor = document.getElementById('contratos-lista');
-        if (!contenedor) return;
-
-        if (lista.length === 0) {
-            contenedor.innerHTML = `
-              <div class="empty-state">
-                <div class="empty-state-icon">${Icons.contratos()}</div>
-                <p class="empty-state-text">Aún no hay contratos registrados.</p>
-                <button class="btn btn-create btn-sm" style="background:var(--c-success);" onclick="CompradoresView._nuevoContratoLibre()">${Icons.agregar()} Crear primer contrato</button>
-              </div>`;
-            return;
-        }
-
-        // Crear mapa para resolver el nombre del comprador
-        const compradorMap = {};
-        (this._cachedCompradores || []).forEach(c => { compradorMap[c.id] = c; });
-
-        contenedor.innerHTML = `<div class="grid gap-12">${lista.map(ct => {
-          const comp = compradorMap[ct.compradorId];
-          const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
-
-          const estadoColor = ct.activo ? 'var(--c-success)' : '#6b7280';
-          return `
-          <div class="card-registro" onclick="CompradoresView._verContrato(${ct.id})" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-            <div class="flex-1 min-w-0 flex flex-col gap-8 justify-center">
-              <div class="flex items-center gap-10 min-w-0">
-                <span class="text-xl" style="color:${color}">${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}</span>
-                <div class="font-950 text-gold uppercase text-base tracking-tight">${ct.numero_contrato}</div>
-              </div>
-              <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase">
-                <span class="flex items-center gap-4" style="color:${color};">CONTRATO${ct.tipo ? ' ' + ((ct.tipo === 'láctico' ? 'lácteo' : ct.tipo)).toUpperCase() : ''}</span>
-                ${comp
-                  ? `<span class="flex items-center gap-4">${Icons.compradores()} ${comp.nombre}</span>`
-                  : `<span class="flex items-center gap-4 text-red">${Icons.alerta()} NO ASIGNADO</span>`}
-                <span class="flex items-center gap-4">${Icons.calendar()} ${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}${ct.fecha_fin ? ' → ' + new Date(ct.fecha_fin).toLocaleDateString() : ' → INDEFINIDO'}</span>
-              </div>
-            </div>
-            <div class="flex flex-col items-end justify-between flex-shrink-0">
-              <div style="background:${estadoColor}15; color:${estadoColor}; border:1px solid ${estadoColor}40; filter: drop-shadow(0 0 4px ${estadoColor}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+      return `
+      <div class="card-registro" style="--registro-color: ${color};">
+        <div class="flex justify-between items-start w-full">
+          <div>
+            <div class="font-950 text-[0.65rem] tracking-widest uppercase mb-4" style="color:${color}; display:flex; align-items:center; gap:8px;">
+              ${ct.tipo === 'leche' ? Icons.leche() : Icons.carne()}
+              CONTRATO${ct.tipo ? ' ' + ((ct.tipo === 'láctico' ? 'lácteo' : ct.tipo)).toUpperCase() : ''}
+              <span class="badge" style="background:${ct.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${ct.activo ? 'var(--c-success)' : '#555'}; border:1px solid ${ct.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
                 ${ct.activo ? 'ACTIVO' : 'INACTIVO'}
-              </div>
-              <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Ficha ${Icons.flechaDerecha()}</span>
+              </span>
+            </div>
+            <div class="font-black text-white text-lg mt-2 uppercase tracking-tight">${ct.numero_contrato}</div>
+          </div>
+          <div class="text-right text-[0.6rem] text-gray-500 font-800 uppercase tracking-widest">
+            Vigencia: <span class="text-ccc">${ct.fecha_inicio ? new Date(ct.fecha_inicio).toLocaleDateString() : '?'}</span>
+            ${ct.fecha_fin ? '<br>AL <span class="text-ccc">' + new Date(ct.fecha_fin).toLocaleDateString() + '</span>' : '<br><span class="text-aaa">(INDEFINIDO)</span>'}
+          </div>
+        </div>
+
+        <div class="mt-12 text-xs text-ccc bg-black p-10 rounded-sm border border-222">
+          <div class="uppercase font-800 text-[0.65rem] text-gray-500 mb-4 tracking-wider">COMPRADOR ASIGNADO:</div>
+          <div class="flex items-center gap-6">
+            ${comp ? `
+              <a href="#/comprador?id=${comp.id}" class="text-gold font-950 uppercase hover-underline text-sm flex items-center gap-4">${Icons.compradores()} ${comp.nombre}</a>
+            ` : `
+              <span class="text-red font-950 uppercase text-xs flex items-center gap-4">${Icons.alerta()} NO ASIGNADO / HUÉRFANO</span>
+            `}
+          </div>
+          ${ct.condiciones ? `<div class="mt-8 italic text-aaa border-top-222 pt-8 uppercase text-[0.6rem] leading-relaxed">Condiciones: ${ct.condiciones}</div>` : ''}
+          ${ct.precios && ct.precios.length > 0 ? `
+            <div class="mt-10 flex flex-wrap gap-4 border-top-222 pt-10">
+              ${ct.precios.map(pr => `
+                <span style="background:#111; border:1px solid #333; padding:4px 10px; border-radius:30px; font-size:0.6rem; font-weight:900; color:#aaa; text-transform:uppercase;">
+                  ${pr.producto}: <strong class="text-white ml-2">${pr.precio_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/${pr.unidad.toUpperCase()}</strong>
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="mt-16 flex gap-8">
+          <button class="widget-link-btn widget-link-btn--neon neon-info flex-1 px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._verContrato(${ct.id})">
+            ${Icons.editar()} <span class="widget-link-label text-[0.65rem]">EDITAR</span>
+          </button>
+          ${comp ? `<button class="widget-link-btn widget-link-btn--neon neon-warning flex-1 px-12 py-8 min-h-0 h-auto" onclick="location.hash='#/comprador?id=${comp.id}'">
+            ${Icons.compradores()} <span class="widget-link-label text-[0.65rem]">FICHA CLIENTE</span>
+          </button>` : ''}
+        </div>
+      </div>
+    `}).join('')}</div>`;
+
+    // Botón Flotante de Acción con viñeta (se agrega después de la lista)
+    const fabContainer = document.createElement('div');
+    fabContainer.className = 'fab-container';
+    fabContainer.innerHTML = `
+      <span class="fab-label">Nuevo Contrato</span>
+      <button class="fab-btn">${Icons.fabPlus()}</button>
+    `;
+    fabContainer.onclick = () => CompradoresView._nuevoContratoLibre();
+    contenedor.appendChild(fabContainer);
+  },
+
+  _colorTipo(tipo, bg = false, border = false) {
+    const colores = {
+      'cárnico': { text: 'var(--c-danger)', bg: 'rgba(255,68,68,0.1)', border: 'rgba(255,68,68,0.3)' },
+      'láctico': { text: 'var(--c-info)', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
+      'híbrido': { text: 'var(--c-success)', bg: 'rgba(204,255,0,0.1)', border: 'rgba(204,255,0,0.3)' }
+    };
+    const c = colores[tipo] || colores['híbrido'];
+    if (bg) return c.bg;
+    if (border) return c.border;
+    return c.text;
+  },
+
+  // Mantener todos los métodos existentes de detalle, formulario, etc.
+  async renderDetail(id) {
+    // Método wrapper para mantener compatibilidad con cualquier llamada
+    await this.renderDetalle(id);
+  },
+
+  async renderDetalle(id) {
+    const comprador = await Compradores.get(id);
+    if (!comprador) return App.toastError('Comprador no encontrado');
+
+    const [ventasCarne, entregasLeche, contratos, resumen] = await Promise.all([
+      Compradores.getVentasCarne(id),
+      Compradores.getEntregasLeche(id),
+      Contratos.list(id),
+      Compradores.getResumen(id)
+    ]);
+
+    const main = document.getElementById("app-content");
+    const colorComp = this._colorTipo(comprador.tipo_comprador);
+
+    main.innerHTML = `
+      <div class="mb-14">
+        <button onclick="location.hash='#/compradores'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+        </button>
+      </div>
+
+      <!-- Cabecera -->
+      <div class="card-registro p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
+        <div class="flex justify-between items-start mb-16">
+          <div>
+            <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight" style="color:${colorComp} !important;">${comprador.nombre}</h2>
+            <div class="flex gap-8 flex-wrap">
+              <span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, ${colorComp} 12%, transparent); color:${colorComp}; border:1px solid color-mix(in srgb, ${colorComp} 25%, transparent);">
+                ${(comprador.tipo_comprador === 'láctico' ? 'lácteo' : comprador.tipo_comprador) || 'híbrido'}
+              </span>
+              ${comprador.activo === false ? '<span class="badge badge-sm font-950 uppercase bg-red-900 border-red-500 text-white">INACTIVO</span>' : '<span class="badge badge-sm font-950 uppercase bg-green-900 border-green-500 text-white">ACTIVO</span>'}
             </div>
           </div>
-        `}).join('')}</div>`;
-    },
-
-    _colorTipo(tipo, bg = false, border = false) {
-        const colores = {
-            'cárnico': { text: 'var(--c-danger)', bg: 'rgba(255,68,68,0.1)', border: 'rgba(255,68,68,0.3)' },
-            'láctico': { text: 'var(--c-info)', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)' },
-            'híbrido': { text: 'var(--c-success)', bg: 'rgba(204,255,0,0.1)', border: 'rgba(204,255,0,0.3)' }
-        };
-        const c = colores[tipo] || colores['híbrido'];
-        if (bg) return c.bg;
-        if (border) return c.border;
-        return c.text;
-    },
-
-    // ============================================
-    // DETALLE COMPRADOR
-    // ============================================
-
-    async renderDetail(id) {
-        // Método wrapper para mantener compatibilidad con cualquier llamada
-        await this.renderDetalle(id);
-    },
-
-    async renderDetalle(id) {
-        const comprador = await Compradores.get(id);
-        if (!comprador) return App.toastError('Comprador no encontrado');
-
-        const [ventasCarne, entregasLeche, contratos, resumen] = await Promise.all([
-            Compradores.getVentasCarne(id),
-            Compradores.getEntregasLeche(id),
-            Contratos.list(id),
-            Compradores.getResumen(id)
-        ]);
-
-        const main = document.getElementById("app-content");
-        const colorComp = this._colorTipo(comprador.tipo_comprador);
-
-        main.innerHTML = `
-          <div class="mb-14">
-            <button onclick="location.hash='#/compradores'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-              <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
+          <div class="flex gap-8">
+            <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._eliminar(${id})">
+              ${Icons.eliminar()}
+            </button>
+            <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="CompradoresView.renderFormulario(${id})">
+              ${Icons.editar()}
             </button>
           </div>
+        </div>
 
-          <!-- Cabecera -->
-          <div class="card-registro p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
-            <div class="flex justify-between items-start mb-16">
-              <div>
-                <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 mb-4 text-xl">
-                  <span class="text-gold">|</span> ${comprador.nombre}
-                </h3>
-                <div class="flex gap-8 flex-wrap">
-                  <span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, ${colorComp} 12%, transparent); color:${colorComp}; border:1px solid color-mix(in srgb, ${colorComp} 25%, transparent);">
-                    ${(comprador.tipo_comprador === 'láctico' ? 'lácteo' : comprador.tipo_comprador) || 'híbrido'}
-                  </span>
-                  ${comprador.activo === false ? '<span class="badge badge-sm font-950 uppercase bg-red-900 border-red-500 text-white">INACTIVO</span>' : '<span class="badge badge-sm font-950 uppercase bg-green-900 border-green-500 text-white">ACTIVO</span>'}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-15 text-xs text-gray-500 uppercase font-800 tracking-wider bg-dark p-14 rounded-sm border border-222">
+          ${comprador.nif_cif ? `<div class="flex items-center gap-6">${Icons.documento()} <span class="text-aaa">NIF:</span> <strong class="text-white">${comprador.nif_cif}</strong></div>` : ''}
+          ${comprador.telefono ? `<div class="flex items-center gap-6">${Icons.info()} <span class="text-aaa">TEL:</span> <strong class="text-white">${comprador.telefono}</strong></div>` : ''}
+          ${comprador.email ? `<div class="flex items-center gap-6 lowercase">${Icons.enlace()} <span class="text-aaa uppercase">EMAIL:</span> <strong class="text-white">${comprador.email}</strong></div>` : ''}
+          ${comprador.ciudad ? `<div class="flex items-center gap-6">${Icons.zonas()} <span class="text-aaa">UBICACIÓN:</span> <strong class="text-white">${comprador.ciudad.toUpperCase()}${comprador.provincia ? ' ('+comprador.provincia.toUpperCase()+')' : ''}</strong></div>` : ''}
+          ${comprador.condiciones_pago ? `<div class="col-span-full flex items-center gap-6 mt-4 border-top-222 pt-8">${Icons.dinero()} <span class="text-aaa">PAGO:</span> <strong class="text-white">${comprador.condiciones_pago.toUpperCase()}</strong></div>` : ''}
+          ${comprador.rega ? `<div class="col-span-full flex items-center gap-6 text-gold font-900">${Icons.informeRega()} <span class="text-aaa">REGA DESTINO:</span> ${comprador.rega}</div>` : ''}
+        </div>
+
+        <!-- KPIS -->
+        <div class="grid grid-cols-3 gap-8 mb-16">
+          <div class="card-registro" style="--registro-color: var(--c-danger);">
+            <small class="s-lbl uppercase font-900">CARNE</small>
+            <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
+            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
+          </div>
+          <div class="card-registro" style="--registro-color: var(--c-amber);">
+            <small class="s-lbl uppercase font-900">LECHE</small>
+            <div class="s-val inf-val-lg text-amber font-950">${resumen.total_entregas_leche}</div>
+            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L</small>
+          </div>
+          <div class="card-registro" style="--registro-color: var(--c-purple);">
+            <small class="s-lbl uppercase font-900">CONTRATOS</small>
+            <div class="s-val inf-val-lg text-purple font-950">${contratos.length}</div>
+            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.contratos_activos} ACTIVOS</small>
+          </div>
+        </div>
+
+        <!-- Contratos activos -->
+        <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-success);">
+          <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-16 flex items-center gap-8">
+              ${Icons.contratos()} CONTRATOS VIGENTES
+          </div>
+          <div class="grid grid-cols-1 gap-10 max-w-240 mx-auto mb-20">
+            <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContrato(${id})">
+              ${Icons.agregar()}
+              <span class="widget-link-label">NUEVO CONTRATO</span>
+            </button>
+          </div>
+          <div class="grid gap-8">
+          ${contratos.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin contratos registrados.</p></div>' :
+            contratos.map(c => `
+              <div class="info-box-sm mb-4 bg-dark border border-222" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:4px solid ${c.activo ? 'var(--c-success)' : '#444'};">
+                <div class="flex justify-between items-center">
+                  <span class="text-white font-950 text-md uppercase tracking-tight">${c.numero_contrato}</span>
+                  <span class="badge" style="font-size:0.55rem; background:${c.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${c.activo ? 'var(--c-success)' : '#666'}; border:1px solid ${c.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; border-radius:30px; padding:2px 8px; font-weight:950; text-transform:uppercase;">${c.activo ? 'ACTIVO' : 'INACTIVO'}</span>
+                </div>
+                <div class="text-aaa font-800 text-[0.62rem] uppercase mt-4 tracking-wide flex flex-wrap gap-x-10 gap-y-2">
+                  <span class="flex items-center gap-4 text-blue">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()} ${c.tipo}</span>
+                  <span class="flex items-center gap-4">${Icons.calendar()} ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString() : '?'} ${c.fecha_fin ? '→ '+new Date(c.fecha_fin).toLocaleDateString() : ''}</span>
+                  ${c.precios?.length ? `<span class="flex items-center gap-4 text-gold">${Icons.dinero()} ${c.precios.length} PRECIOS</span>` : ''}
+                </div>
+              `).join('')}
+          </div>
+        </div>
+
+        <!-- Historial de Ventas Carne -->
+        <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-danger);">
+          <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
+              ${Icons.carne()} HISTORIAL CARNE
+          </div>
+          ${ventasCarne.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas.</p></div>' :
+            ventasCarne.slice(0, 30).map(v => `
+              <div class="history-row border-bottom-222 py-12">
+                <div>
+                  <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
+                  <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${v.pesoCanal || 0} kg CANAL · REND: <strong class="text-white">${v.rendimientoCanal || 0}%</strong></div>
+                </div>
+                <div class="text-right">
+                  <div class="text-red font-950 text-md">${v.precio_total ? v.precio_total.toLocaleString('es-ES') + ' €' : '—'}</div>
+                  <div class="badge badge-sm mt-2 uppercase font-950 text-[0.55rem] border-red-900 bg-red-900-opacity-20">${v.clasificacion?.seurop || 'S/C'}</div>
                 </div>
               </div>
-              <div class="flex gap-8">
-                <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._eliminar(${id})">
-                  ${Icons.eliminar()}
-                </button>
-                <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="CompradoresView.renderFormulario(${id})">
-                  ${Icons.editar()}
-                </button>
-              </div>
-            </div>
+            }.join('')}
+          ${ventasCarne.length > 30 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 30 de ${ventasCarne.length} registros</div>` : ''}
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-15 text-xs text-gray-500 uppercase font-800 tracking-wider bg-dark p-14 rounded-sm border border-222">
-              ${comprador.nif_cif ? `<div class="flex items-center gap-6">${Icons.documento()} <span class="text-aaa">NIF:</span> <strong class="text-white">${comprador.nif_cif}</strong></div>` : ''}
-              ${comprador.telefono ? `<div class="flex items-center gap-6">${Icons.info()} <span class="text-aaa">TEL:</span> <strong class="text-white">${comprador.telefono}</strong></div>` : ''}
-              ${comprador.email ? `<div class="flex items-center gap-6 lowercase">${Icons.enlace()} <span class="text-aaa uppercase">EMAIL:</span> <strong class="text-white">${comprador.email}</strong></div>` : ''}
-              ${comprador.ciudad ? `<div class="flex items-center gap-6">${Icons.zonas()} <span class="text-aaa">UBICACIÓN:</span> <strong class="text-white">${comprador.ciudad.toUpperCase()}${comprador.provincia ? ' ('+comprador.provincia.toUpperCase()+')' : ''}</strong></div>` : ''}
-              ${comprador.rega ? `<div class="col-span-full flex items-center gap-6 mt-4 border-top-222 pt-8">${Icons.dinero()} <span class="text-aaa">PAGO:</span> <strong class="text-white">${comprador.condiciones_pago.toUpperCase()}</strong></div>` : ''}
-              ${comprador.rega ? `<div class="col-span-full flex items-center gap-6 text-gold font-900">${Icons.informeRega()} <span class="text-aaa">REGA DESTINO:</span> ${comprador.rega}</div>` : ''}
-            </div>
+        <!-- Historial de Leche -->
+        <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-amber);">
+          <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
+              ${Icons.leche()} HISTORIAL LECHE
           </div>
-
-          <!-- KPIS -->
-          <div class="grid grid-cols-3 gap-8 mb-16">
-            <div class="card-registro" style="--registro-color: var(--c-danger);">
-              <small class="s-lbl uppercase font-900">CARNE</small>
-              <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
-              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
-            </div>
-            <div class="card-registro" style="--registro-color: var(--c-amber);">
-              <small class="s-lbl uppercase font-900">LECHE</small>
-              <div class="s-val inf-val-lg text-amber font-950">${resumen.total_entregas_leche}</div>
-              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L</small>
-            </div>
-            <div class="card-registro" style="--registro-color: var(--c-purple);">
-              <small class="s-lbl uppercase font-900">CONTRATOS</small>
-              <div class="s-val inf-val-lg text-purple font-950">${contratos.length}</div>
-              <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.contratos_activos} ACTIVOS</small>
-            </div>
-          </div>
-
-          <!-- Contratos activos -->
-          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-success);">
-            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-16 flex items-center gap-8">
-                ${Icons.contratos()} CONTRATOS VIGENTES
-            </div>
-            <div class="grid grid-cols-1 gap-10 max-w-240 mx-auto mb-20">
-              <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContrato(${id})">
-                ${Icons.agregar()}
-                <span class="widget-link-label">NUEVO CONTRATO</span>
-              </button>
-            </div>
-            <div class="grid gap-8">
-            ${contratos.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin contratos registrados.</p></div>' :
-              contratos.map(c => `
-                <div class="info-box-sm mb-4 bg-dark border border-222" onclick="CompradoresView._verContrato(${c.id})" style="cursor:pointer; border-left:4px solid ${c.activo ? 'var(--c-success)' : '#444'};">
-                  <div class="flex justify-between items-center">
-                    <span class="text-white font-950 text-md uppercase tracking-tight">${c.numero_contrato}</span>
-                    <span class="badge" style="font-size:0.55rem; background:${c.activo ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : '#222'}; color:${c.activo ? 'var(--c-success)' : '#666'}; border:1px solid ${c.activo ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : '#333'}; border-radius:30px; padding:2px 8px; font-weight:950; text-transform:uppercase;">${c.activo ? 'ACTIVO' : 'INACTIVO'}</span>
-                  </div>
-                  <div class="text-aaa font-800 text-[0.62rem] uppercase mt-4 tracking-wide flex flex-wrap gap-x-10 gap-y-2">
-                    <span class="flex items-center gap-4 text-blue">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()} ${c.tipo}</span>
-                    <span class="flex items-center gap-4">${Icons.calendar()} ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString() : '?'} ${c.fecha_fin ? '→ '+new Date(c.fecha_fin).toLocaleDateString() : ''}</span>
-                    ${c.precios?.length ? `<span class="flex items-center gap-4 text-gold">${Icons.dinero()} ${c.precios.length} PRECIOS</span>` : ''}
-                  </div>
+          ${entregasLeche.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin entregas registradas.</p></div>' :
+            entregasLeche.slice(0, 20).map(e => `
+              <div class="history-row border-bottom-222 py-12">
+                <div>
+                  <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
+                  <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${Icons.transportistas()} CISTERNA: <strong class="text-white">${e.matriculaCisterna || 'S/N'}</strong></div>
+                </div>
+                <div class="text-right">
+                  <div class="text-amber font-950 text-md">${(e.cantidad || 0).toLocaleString()} L</div>
+                  ${e.precio_final_unitario ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">${e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/L</div>` : ''}
                 </div>
               `).join('')}
-            </div>
-          </div>
+          ${entregasLeche.length > 20 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
+        </div>
 
-          <!-- Historial de Ventas Carne -->
-          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-danger);">
-            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-                ${Icons.carne()} HISTORIAL CARNE
-            </div>
-            ${ventasCarne.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas.</p></div>' :
-              ventasCarne.slice(0, 30).map(v => `
-                <div class="history-row border-bottom-222 py-12">
-                  <div>
-                    <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${v.fechaSacrificio ? new Date(v.fechaSacrificio).toLocaleDateString() : '-'}</div>
-                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${v.pesoCanal || 0} kg CANAL · REND: <strong class="text-white">${v.rendimientoCanal || 0}%</strong></div>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-red font-950 text-md">${v.precio_total ? v.precio_total.toLocaleString('es-ES') + ' €' : '—'}</div>
-                    <div class="badge badge-sm mt-2 uppercase font-950 text-[0.55rem] border-red-900 bg-red-900-opacity-20">${v.clasificacion?.seurop || 'S/C'}</div>
-                  </div>
-                </div>
-              `).join('')}
-            ${ventasCarne.length > 30 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 30 de ${ventasCarne.length} registros</div>` : ''}
-          </div>
-
-          <!-- Historial de Leche -->
-          <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-amber);">
-            <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-                ${Icons.leche()} HISTORIAL LECHE
-            </div>
-            ${entregasLeche.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin entregas registradas.</p></div>' :
-              entregasLeche.slice(0, 20).map(e => `
-                <div class="history-row border-bottom-222 py-12">
-                  <div>
-                    <div class="text-gold font-950 uppercase text-[0.7rem] flex items-center gap-6">${Icons.calendar()} ${e.fechaRecogida ? new Date(e.fechaRecogida).toLocaleDateString() : '-'}</div>
-                    <div class="text-aaa font-800 text-[0.62rem] uppercase mt-2 tracking-wide">${Icons.transportistas()} CISTERNA: <strong class="text-white">${e.matriculaCisterna || 'S/N'}</strong></div>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-amber font-950 text-md">${(e.cantidad || 0).toLocaleString()} L</div>
-                    ${e.precio_final_unitario ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">${e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/L</div>` : ''}
-                  </div>
-                </div>
-              `).join('')}
-            ${entregasLeche.length > 20 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
-          </div>
-
-          ${comprador.notas ? `
+        ${comprador.notas ? `
           <div class="card-registro card-accent card-accent-gold p-16 mb-40" style="--registro-color: var(--c-gold);">
             <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
             <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${comprador.notas}</p>
@@ -597,120 +631,120 @@ const CompradoresView = {
     // ============================================
 
     async renderFormulario(id) {
-        const esEdicion = !!id;
-        const c = esEdicion ? await Compradores.get(id) : {
-            nombre: '', nif_cif: '', direccion: '', codigo_postal: '', ciudad: '', provincia: '',
-            telefono: '', email: '', tipo_comprador: 'híbrido', tipo_operador: 'operador_comercial',
-            rega: '', comunidad_autonoma: '', condiciones_pago: '', notas: '', activo: true
-        };
+      const esEdicion = !!id;
+      const c = esEdicion ? await Compradores.get(id) : {
+          nombre: '', nif_cif: '', direccion: '', codigo_postal: '', ciudad: '', provincia: '',
+          telefono: '', email: '', tipo_comprador: 'híbrido', tipo_operador: 'operador_comercial',
+          rega: '', comunidad_autonoma: '', condiciones_pago: '', notas: '', activo: true
+      };
 
-        const main = document.getElementById("app-content");
-        main.innerHTML = `
-          <div class="mb-14">
-            <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-              <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
-            </button>
+      const main = document.getElementById("app-content");
+      main.innerHTML = `
+        <div class="mb-14">
+          <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+            <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
+          </button>
+        </div>
+        <div class="card-registro card-accent card-accent-amber p-20 bg-black" style="--registro-color: var(--c-amber);">
+          <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
+
+          <div class="wizard-input-group mb-15">
+              <label class="wizard-label uppercase font-900">Nombre / Razón Social *</label>
+              <input type="text" id="c-nombre" value="${c.nombre || ''}" class="wizard-input uppercase font-900" placeholder="EJ: GANADERÍAS DEL SUR S.L.">
           </div>
-          <div class="card-registro card-accent card-accent-amber p-20 bg-black" style="--registro-color: var(--c-amber);">
-            <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
 
-            <div class="wizard-input-group mb-15">
-                <label class="wizard-label uppercase font-900">Nombre / Razón Social *</label>
-                <input type="text" id="c-nombre" value="${c.nombre || ''}" class="wizard-input uppercase font-900" placeholder="EJ: GANADERÍAS DEL SUR S.L.">
+          <div class="grid grid-cols-2 gap-12 mb-15">
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">NIF / CIF *</label>
+              <input type="text" id="c-nif" value="${c.nif_cif || ''}" class="wizard-input uppercase font-800" placeholder="B12345678">
             </div>
-
-            <div class="grid grid-cols-2 gap-12 mb-15">
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">NIF / CIF *</label>
-                <input type="text" id="c-nif" value="${c.nif_cif || ''}" class="wizard-input uppercase font-800" placeholder="B12345678">
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">Tipo Comprador *</label>
-                <select id="c-tipo" class="wizard-input wizard-select font-900 uppercase">
-                  <option value="cárnico" ${c.tipo_comprador === 'cárnico' ? 'selected' : ''}>CÁRNICO</option>
-                  <option value="láctico" ${c.tipo_comprador === 'láctico' ? 'selected' : ''}>LÁCTEO</option>
-                  <option value="híbrido" ${c.tipo_comprador === 'híbrido' || !c.tipo_comprador ? 'selected' : ''}>HÍBRIDO / MIXTO</option>
-                </select>
-              </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">Tipo Comprador *</label>
+              <select id="c-tipo" class="wizard-input wizard-select font-900 uppercase">
+                <option value="cárnico" ${c.tipo_comprador === 'cárnico' ? 'selected' : ''}>CÁRNICO</option>
+                <option value="láctico" ${c.tipo_comprador === 'láctico' ? 'selected' : ''}>LÁCTEO</option>
+                <option value="híbrido" ${c.tipo_comprador === 'híbrido' || !c.tipo_comprador ? 'selected' : ''}>HÍBRIDO / MIXTO</option>
+              </select>
             </div>
+          </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-15">
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">Operador SIGGAN</label>
-                <select id="c-tipo-operador" class="wizard-input wizard-select font-800 uppercase">
-                  <option value="matadero" ${c.tipo_operador === 'matadero' ? 'selected' : ''}>MATADERO</option>
-                  <option value="industria_lactea" ${c.tipo_operador === 'industria_lactea' ? 'selected' : ''}>INDUSTRIA LÁCTEA</option>
-                  <option value="operador_comercial" ${!c.tipo_operador || c.tipo_operador === 'operador_comercial' ? 'selected' : ''}>OPERADOR COMERCIAL</option>
-                  <option value="tratante" ${c.tipo_operador === 'tratante' ? 'selected' : ''}>TRATANTE</option>
-                </select>
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">REGA Destino</label>
-                <input type="text" id="c-rega" value="${c.rega || ''}" class="wizard-input uppercase font-800 input-rega-std" placeholder="ES000000000000" maxlength="14">
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">CCAA</label>
-                <select id="c-ccaa" class="wizard-input wizard-select font-800 uppercase">
-                  <option value="">— SIN DEFINIR —</option>
-                  <option value="andalucia" ${c.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>ANDALUCÍA</option>
-                  <option value="extremadura" ${c.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>EXTREMADURA</option>
-                </select>
-              </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-15">
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">Operador SIGGAN</label>
+              <select id="c-tipo-operador" class="wizard-input wizard-select font-800 uppercase">
+                <option value="matadero" ${c.tipo_operador === 'matadero' ? 'selected' : ''}>MATADERO</option>
+                <option value="industria_lactea" ${c.tipo_operador === 'industria_lactea' ? 'selected' : ''}>INDUSTRIA LÁCTEA</option>
+                <option value="operador_comercial" ${!c.tipo_operador || c.tipo_operador === 'operador_comercial' ? 'selected' : ''}>OPERADOR COMERCIAL</option>
+                <option value="tratante" ${c.tipo_operador === 'tratante' ? 'selected' : ''}>TRATANTE</option>
+              </select>
             </div>
-
-            <div class="wizard-input-group mb-15">
-                <label class="wizard-label uppercase font-900">Dirección Postal</label>
-                <input type="text" id="c-dir" value="${c.direccion || ''}" class="wizard-input uppercase font-800">
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">REGA Destino</label>
+              <input type="text" id="c-rega" value="${c.rega || ''}" class="wizard-input uppercase font-800 input-rega-std" placeholder="ES000000000000" maxlength="14">
             </div>
-
-            <div class="grid grid-cols-3 gap-12 mb-15">
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">C.P.</label>
-                <input type="text" id="c-cp" value="${c.codigo_postal || ''}" class="wizard-input font-800">
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">Ciudad</label>
-                <input type="text" id="c-ciudad" value="${c.ciudad || ''}" class="wizard-input uppercase font-800">
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">Provincia</label>
-                <input type="text" id="c-prov" value="${c.provincia || ''}" class="wizard-input uppercase font-800">
-              </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">CCAA</label>
+              <select id="c-ccaa" class="wizard-input wizard-select font-800 uppercase">
+                <option value="">— SIN DEFINIR —</option>
+                <option value="andalucia" ${c.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>ANDALUCÍA</option>
+                <option value="extremadura" ${c.comunidad_autonoma === 'extremadura' ? 'selected' : ''}>EXTREMADURA</option>
+              </select>
             </div>
+          </div>
 
-            <div class="grid grid-cols-2 gap-12 mb-15">
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">Teléfono</label>
-                <input type="tel" id="c-tel" value="${c.telefono || ''}" class="wizard-input font-800">
-              </div>
-              <div class="wizard-input-group">
-                <label class="wizard-label uppercase font-900">Email</label>
-                <input type="email" id="c-email" value="${c.email || ''}" class="wizard-input font-800 lowercase">
-              </div>
+          <div class="wizard-input-group mb-15">
+              <label class="wizard-label uppercase font-900">Dirección Postal</label>
+              <input type="text" id="c-dir" value="${c.direccion || ''}" class="wizard-input uppercase font-800">
+          </div>
+
+          <div class="grid grid-cols-3 gap-12 mb-15">
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">C.P.</label>
+              <input type="text" id="c-cp" value="${c.codigo_postal || ''}" class="wizard-input font-800">
             </div>
-
-            <div class="wizard-input-group mb-15">
-                <label class="wizard-label uppercase font-900">Condiciones de Pago</label>
-                <input type="text" id="c-pago" value="${c.condiciones_pago || ''}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">Ciudad</label>
+              <input type="text" id="c-ciudad" value="${c.ciudad || ''}" class="wizard-input uppercase font-800">
             </div>
-
-            <div class="wizard-input-group mb-15">
-                <label class="wizard-label uppercase font-900">Notas / Observaciones</label>
-                <textarea id="c-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${c.notas || ''}</textarea>
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">Provincia</label>
+              <input type="text" id="c-prov" value="${c.provincia || ''}" class="wizard-input uppercase font-800">
             </div>
+          </div>
 
-            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
-              <input type="checkbox" id="c-activo" ${c.activo !== false ? 'checked' : ''} style="accent-color:var(--c-warning);">
-              <span class="uppercase font-950 tracking-widest text-[0.65rem]">Comprador activo en el sistema</span>
-            </label>
+          <div class="grid grid-cols-2 gap-12 mb-15">
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">Teléfono</label>
+              <input type="tel" id="c-tel" value="${c.telefono || ''}" class="wizard-input font-800">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900">Email</label>
+              <input type="email" id="c-email" value="${c.email || ''}" class="wizard-input font-800 lowercase">
+            </div>
+          </div>
 
-            <div class="grid grid-cols-2 gap-10 mt-20">
-                <button onclick="CompradoresView._guardar(${id || ''})" class="widget-link-btn widget-link-btn--neon neon-success">
-                  ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
-                </button>
-                <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="widget-link-btn widget-link-btn--neon neon-danger">
-                  ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
-                </button>
+          <div class="wizard-input-group mb-15">
+              <label class="wizard-label uppercase font-900">Condiciones de Pago</label>
+              <input type="text" id="c-pago" value="${c.condiciones_pago || ''}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
+          </div>
+
+          <div class="wizard-input-group mb-15">
+              <label class="wizard-label uppercase font-900">Notas / Observaciones</label>
+              <textarea id="c-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${c.notas || ''}</textarea>
+          </div>
+
+          <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
+            <input type="checkbox" id="c-activo" ${c.activo !== false ? 'checked' : ''} style="accent-color:var(--c-warning);">
+            <span class="uppercase font-950 tracking-widest text-[0.65rem]">Comprador activo en el sistema</span>
+          </label>
+
+          <div class="grid grid-cols-2 gap-10 mt-20">
+              <button onclick="CompradoresView._guardar(${id || ''})" class="widget-link-btn widget-link-btn--neon neon-success">
+                ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
+              </button>
+              <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="widget-link-btn widget-link-btn--neon neon-danger">
+                ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
+              </button>
             </div>
             ${esEdicion ? `<div class="mt-15 text-center"><button onclick="CompradoresView._eliminar(${id})" class="text-red font-900 text-[0.6rem] uppercase tracking-widest p-10 opacity-60 hover:opacity-100 transition-all">${Icons.eliminar()} Eliminar definitivamente</button></div>` : ''}
           </div>

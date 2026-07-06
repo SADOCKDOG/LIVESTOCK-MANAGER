@@ -20,13 +20,11 @@ const Pesajes = {
         let snap_tipo = "Sin Clasificar";
         let snap_especie = "General";
         let snap_identificacion = "";
-        let rebanoId = null;
 
         if (data.tipo_entidad === "animal") {
           const animal = await Animales.get(data.entidad_id);
           if (animal) {
             snap_especie = animal.especie || snap_especie;
-            rebanoId = animal.rebanoId || null;
             // snap_identificacion solo acepta crotales con formato normativo (XX + 12 dígitos)
             const crotalAnimal = (animal.numero_identificacion || "").trim().toUpperCase();
             snap_identificacion = ErrorHandler.isCrotalValido(crotalAnimal) ? crotalAnimal : "";
@@ -42,7 +40,6 @@ const Pesajes = {
             }
           }
         } else if (data.tipo_entidad === "rebano") {
-          rebanoId = Number(data.entidad_id);
           const rebano = await Rebanos.get(data.entidad_id);
           if (rebano) {
             snap_zona = rebano.zonaActual || snap_zona;
@@ -54,10 +51,23 @@ const Pesajes = {
           }
         }
 
+        // Validar el snap_identificacion que viene en data (si el llamante lo proporciona)
+        const snapIdEntrada = (data.snap_identificacion || "").trim().toUpperCase();
+        const snapIdFinal = (() => {
+          if (!snapIdEntrada) return snap_identificacion;
+          // Para entidades de tipo animal el identificador debe ser un crotal normativo
+          if (data.tipo_entidad === "animal") {
+            if (ErrorHandler.isCrotalValido(snapIdEntrada)) return snapIdEntrada;
+            console.warn("[Pesajes] snap_identificacion ignorado (no normativo):", snapIdEntrada, "— se usa el del registro del animal.");
+            return snap_identificacion;
+          }
+          // Para finca/tanque/otros se permite texto libre (ej. "TANQUE PRINCIPAL")
+          return snapIdEntrada;
+        })();
+
         // 2. Preparar el objeto consolidado
         const evento = {
           fincaId: fincaId,
-          rebanoId: data.rebanoId || rebanoId, // Preservar ID de rebaño para filtrado en vistas
           fecha: data.fecha || new Date().toISOString().split("T")[0],
           // Identidad
           entidad_id: Number(data.entidad_id),
@@ -109,22 +119,7 @@ const Pesajes = {
         const id = await window.db.add("registro_eventos", evento);
         console.log('[DEBUG Pesajes] evento guardado con id:', id, 'fincaId:', evento.fincaId, 'unidad:', evento.unidad);
 
-        // 4. Actualizar el peso_actual en la ficha del animal si aplica
-        if (data.tipo_entidad === "animal" && (data.motivo_tarea === "control" || data.motivo_tarea === "control_peso" || data.motivo_tarea === "control_lechero")) {
-          try {
-            const animal = await window.db.get("animales", Number(data.entidad_id));
-            if (animal) {
-              animal.peso_actual = Number(data.valor_neto);
-              animal.fecha_ultimo_pesaje = evento.fecha;
-              await window.db.put("animales", animal);
-              console.log(`[Pesajes] peso_actual actualizado para animal ${animal.id}: ${animal.peso_actual} ${evento.unidad}`);
-            }
-          } catch (e) {
-            console.warn("[Pesajes] No se pudo actualizar el peso_actual del animal:", e.message);
-          }
-        }
-
-        // 5. (Opcional) Guardar también en tablas legadas para compatibilidad con informes antiguos
+        // 4. (Opcional) Guardar también en tablas legadas para compatibilidad con informes antiguos
         //    NOTA: Si falla el guardado legacy no debe impedir el EventBus ni perder el registro principal
         if (data.tipo_entidad === "animal" && data.motivo_tarea === "control") {
           try {

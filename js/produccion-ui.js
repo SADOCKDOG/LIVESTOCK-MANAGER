@@ -1,4 +1,4 @@
-window.ProduccionUI = {
+const ProduccionUI = {
   iniciarAsistente(operacionPreseleccionada, options = {}) {
     window.__registroContext = {
       ...(window.__registroContext || {}),

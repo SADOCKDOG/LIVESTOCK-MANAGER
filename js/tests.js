@@ -33,18 +33,18 @@ class TestRunner {
     }
 
     async runAll() {
-        console.log(`\n${Icons.fitosanitario()} INICIANDO SUITE DE TESTS...\n`);
+        console.log('\n🧪 INICIANDO SUITE DE TESTS...\n');
         const startTime = performance.now();
 
         for (const test of this.tests) {
             try {
                 await test.fn();
                 this.results.passed++;
-                console.log(`${Icons.check()} [${test.suite}] ${test.name}`);
+                console.log(`✅ [${test.suite}] ${test.name}`);
             } catch (error) {
                 this.results.failed++;
                 this.results.errors.push({ test: test.name, suite: test.suite, error: error.message });
-                console.error(`${Icons.cerrar()} [${test.suite}] ${test.name}`);
+                console.error(`❌ [${test.suite}] ${test.name}`);
                 console.error(`   Error: ${error.message}`);
             }
         }
@@ -56,15 +56,15 @@ class TestRunner {
 
     printSummary(duration) {
         console.log('\n═══════════════════════════════════════');
-        console.log(`${Icons.grafico()} RESUMEN DE TESTS`);
+        console.log('📊 RESUMEN DE TESTS');
         console.log('═══════════════════════════════════════');
-        console.log(`${Icons.check()} Pasados: ${this.results.passed}`);
-        console.log(`${Icons.cerrar()} Fallidos: ${this.results.failed}`);
+        console.log(`✅ Pasados: ${this.results.passed}`);
+        console.log(`❌ Fallidos: ${this.results.failed}`);
         console.log(`⏱️  Tiempo total: ${duration}ms`);
         console.log('═══════════════════════════════════════\n');
 
         if (this.results.failed > 0) {
-            console.log(`${Icons.documento()} ERRORES DETALLADOS:`);
+            console.log('📋 ERRORES DETALLADOS:');
             this.results.errors.forEach((err, idx) => {
                 console.log(`\n${idx + 1}. ${err.suite} > ${err.test}`);
                 console.log(`   ${err.error}`);
@@ -76,7 +76,7 @@ class TestRunner {
 const runner = new TestRunner();
 
 // ═════════════════════════════════════════════════════════════════
-// ${Icons.check()} TESTS: MÓDULO FINCAS
+// ✅ TESTS: MÓDULO FINCAS
 // ═════════════════════════════════════════════════════════════════
 
 runner.describe('Módulo Fincas', () => {
@@ -131,7 +131,7 @@ runner.describe('Módulo Fincas', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════
-// ${Icons.check()} TESTS: MÓDULO REBAÑOS
+// ✅ TESTS: MÓDULO REBAÑOS
 // ═════════════════════════════════════════════════════════════════
 
 runner.describe('Módulo Rebaños', () => {
@@ -177,7 +177,7 @@ runner.describe('Módulo Rebaños', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════
-// ${Icons.check()} TESTS: MÓDULO ANIMALES
+// ✅ TESTS: MÓDULO ANIMALES
 // ═════════════════════════════════════════════════════════════════
 
 runner.describe('Módulo Animales', () => {
@@ -239,7 +239,7 @@ runner.describe('Módulo Animales', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════
-// ${Icons.check()} TESTS: MÓDULO PRODUCCIÓN
+// ✅ TESTS: MÓDULO PRODUCCIÓN
 // ═════════════════════════════════════════════════════════════════
 
 runner.describe('Módulo Producción', () => {
@@ -295,7 +295,7 @@ runner.describe('Módulo Producción', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════
-// ${Icons.check()} TESTS: MÓDULO CRYPTO
+// ✅ TESTS: MÓDULO CRYPTO
 // ═════════════════════════════════════════════════════════════════
 
 runner.describe('Módulo Crypto', () => {

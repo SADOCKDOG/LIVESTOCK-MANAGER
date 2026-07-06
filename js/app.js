@@ -8,96 +8,6 @@ const App = {
   _animalGuardado: false,
   _pesadaBatch: null,
   _config: null,
-
-  _getColorClass(color) {
-    if (!color) return 'text-gray';
-    const map = {
-      '#CCFF00': 'text-green',
-      '#FF4444': 'text-red',
-      '#3b82f6': 'text-blue',
-      '#FFD600': 'text-yellow',
-      '#F97316': 'text-orange',
-      '#A855F7': 'text-purple',
-      '#EC4899': 'text-pink',
-      '#94A3B8': 'text-gray',
-      '#6b7280': 'text-gray',
-      '#888': 'text-gray',
-      'var(--c-danger)': 'text-red',
-      'var(--c-info)': 'text-blue',
-      'var(--c-success)': 'text-green',
-      'var(--c-orange)': 'text-orange',
-      'var(--c-warning)': 'text-yellow',
-      'var(--p-gold)': 'text-gold'
-    };
-    return map[color] || 'text-gray';
-  },
-
-  _cardRegistro(opts) {
-    const colorClass = opts.colorClass || 'color-info';
-    const colorVar = opts.color || (colorClass === 'color-info' ? 'var(--c-info)' : (colorClass === 'color-success' ? 'var(--c-success)' : (colorClass === 'color-danger' ? 'var(--c-danger)' : (colorClass === 'color-warning' ? 'var(--c-warning)' : 'var(--c-purple)'))));
-
-    return `
-      <div class="card-registro ${colorClass}" style="display: flex; gap: 10px; align-items: stretch; cursor: pointer; --registro-color: ${colorVar};" onclick="${opts.onClick}">
-        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
-          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-            <span style="font-size: 1.25rem; color: var(--registro-color);">${opts.icon}</span>
-            <div style="font-weight: 950; text-transform: uppercase; font-size: 0.9rem; letter-spacing: -0.02em;" class="${opts.titleClass || 'text-white'}">${opts.title}</div>
-          </div>
-          ${opts.metadata ? `
-          <div style="display: flex; flex-wrap: wrap; gap: 12px; font-weight: 800; text-transform: uppercase; margin-top: 8px; font-size: 0.68rem; color: var(--text-s, #94A3B8); line-height: 1.4;">
-            ${opts.metadata}
-          </div>` : ''}
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0;">
-          <div class="top-part">
-            ${opts.badge ? `
-              <div style="background:var(--registro-color)15; color:var(--registro-color); border:1px solid var(--registro-color)40; filter: drop-shadow(0 0 4px var(--registro-color)); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
-                ${opts.badge}
-              </div>` : ''}
-          </div>
-          <div class="bottom-part" style="margin-top: auto;">
-            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-              FICHA ${Icons.flechaDerecha()}
-            </span>
-          </div>
-        </div>
-      </div>
-    `;
-  },
-
-  _getAnimalCardProps(a, rebano, extraMetadata = '') {
-    const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
-    const iconoSexo = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : Icons.reproduccion());
-    const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : 'var(--c-info)';
-    let colorClass = this._getColorClass(colorEspecie).replace('text-', 'color-');
-    if(colorClass === 'color-gray') colorClass = 'color-gray';
-
-    const rebanoNombre = rebano ? rebano.nombre : (a.rebanoId ? 'ID ' + a.rebanoId : 'Sin rebaño');
-
-    return {
-      colorClass: colorClass,
-      titleClass: 'text-gold',
-      onClick: `location.hash='/animal?id=${a.id}'`,
-      icon: Icons.animales(),
-      title: `${a.numero_identificacion || a.nombre || '#' + a.id} <span style="color:#888; margin-left: 8px;">${iconoSexo}</span>`,
-      badge: a.estado || 'activo',
-      metadata: `
-        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
-          <div style="color: #888; font-weight: 700; text-transform: uppercase;">
-            <span class="${this._getColorClass(colorEspecie)}" style="font-weight: 900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.65rem; align-items: center;">
-            <span style="display: flex; align-items: center; gap: 4px;">${Icons.calendar()} ${a.fecha_nacimiento ? new Date(a.fecha_nacimiento).toLocaleDateString() : '-'} ${edad !== null ? '('+edad+' años)' : ''}</span>
-            <span style="display: flex; align-items: center; gap: 4px; color: #FFF; font-weight: 900;">${Icons.peso()} ${a.peso_actual || a.peso_inicial || a.peso_nacimiento || '-'} kg</span>
-            <span style="display: flex; align-items: center; gap: 4px;">${Icons.rebanos()} ${rebanoNombre}</span>
-            <span style="display: flex; align-items: center; gap: 4px; color: var(--c-purple);">${Icons.paquete()} ${a.lote || '-'}</span>
-          </div>
-          ${extraMetadata ? `<div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); color: #FFF;">${extraMetadata}</div>` : ''}
-        </div>
-      `
-    };
-  },
-
   routes: {
     "/": "renderDashboard",
     "/ganaderia": "renderGanaderia",
@@ -116,7 +26,6 @@ const App = {
     "/albaran-leche": "renderDetalleLeche",
     "/venta-carne": "renderDetalleVentaCarne",
     "/gasto": "renderDetalleGasto",
-    "/sanitario": "renderDetalleSanitario",
     "/informes": "renderInformes",
     "/alertas": "renderAlertas",
     "/ajustes": "renderAjustes",
@@ -148,45 +57,36 @@ const App = {
       if (window.EventBus) {
         const eventosRefresh = [
           'tratamiento:added', 'tratamiento:deleted',
-          'animal:created', 'animal:updated', 'animal:deleted', 'animal:moved', 'animales:changed',
+          'animal:created', 'animal:updated', 'animal:deleted',
           'venta:created', 'venta:deleted',
-          'gasto:created', 'gasto:deleted',
+          'gasto:created',
           'leche:entrega',
           'pesaje:registrado',
           'reproduccion:evento',
           'comprador:created', 'comprador:deleted',
-          'proveedor:created', 'proveedor:deleted',
-          'contrato:created', 'contrato:deleted',
-          'movimiento:saved', 'movimiento:deleted',
-          'saneamiento:saved', 'saneamiento:deleted',
-          'transportista:created', 'transportista:deleted',
-          'alertas:updated',
+          'proveedor:created',
+          'contrato:created',
           'dashboard:refresh',
         ];
         eventosRefresh.forEach(event => {
           window.EventBus.on(event, () => {
+            // Si el wizard de pesajes está activo, no refrescar para evitar condiciones de carrera
             if (window._pesajesWizardActivo && event === 'pesaje:registrado') return;
-            
-            // Invalidar TODAS las cachés para que la próxima vez que se rendericen, carguen datos frescos
-            if (window.DashboardView) window.DashboardView._needsRefresh = true;
-            if (window.ExplotacionView) { window.ExplotacionView._cachedData = null; window.ExplotacionView._needsDataRefresh = true; }
-            if (window.ComercializacionView) { window.ComercializacionView._cachedData = null; window.ComercializacionView._needsDataRefresh = true; }
-            if (window.CarneView) { window.CarneView._cachedData = null; window.CarneView._needsDataRefresh = true; }
-            if (window.LecheView) { window.LecheView._cachedData = null; window.LecheView._needsDataRefresh = true; }
-            if (window.HibridoView) { window.HibridoView._cachedData = null; window.HibridoView._needsDataRefresh = true; }
-            if (window.AnimalesView) window.AnimalesView._cache = null;
-            if (window.GanaderiaView) { window.GanaderiaView._cachedData = null; window.GanaderiaView._needsDataRefresh = true; }
-            if (window.RebanosView) window.RebanosView._cachedData = null;
-            if (window.CompradoresView) window.CompradoresView._cachedData = null;
-            if (window.ProveedoresView) window.ProveedoresView._cachedData = null;
-            if (window.GastosView) window.GastosView._cachedData = null;
-            
-            const hash = window.location.hash || '#/';
-            const esFormulario = hash.includes('id=') || hash.includes('/animal') || hash.includes('/factura') || hash.includes('/gasto') || hash.includes('/sanitario') || hash.includes('/albaran-leche') || hash.includes('/venta-carne');
-            
-            // Si NO estamos en un formulario modal, forzar el renderizado de la ruta actual
-            if (!esFormulario) {
-              App.route();
+            const hash = window.location.hash.slice(1) || '/';
+            if (hash === '/' || hash === '') {
+              App.renderDashboard();
+            } else if (hash.startsWith('/ganaderia')) {
+              App.renderGanaderia();
+            } else if (hash.startsWith('/carne')) {
+              App.renderCarne();
+            } else if (hash.startsWith('/hibrido')) {
+              App.renderHibrido();
+            } else if (hash.startsWith('/leche')) {
+              App.renderLeche();
+            } else if (hash.startsWith('/gastos')) {
+              App.renderGastos();
+            } else if (hash.startsWith('/animales')) {
+              App.renderAnimales();
             }
           });
         });
@@ -393,8 +293,8 @@ const App = {
 
     grid.innerHTML = items.map(item => `
       <a href="#${item.path}" class="header-dropdown-item" onclick="App._toggleHeaderDropdown()">
-        <div class="icon ${App._getColorClass(window.getModuleColor(item.path))}">${item.icon}</div>
-        <span>${item.label}${item.path === '/alertas' ? ' <span id="dropdown-alertas-count" class="badge-alerta"></span>' : ''}</span>
+        <div class="icon" style="color: ${window.getModuleColor(item.path)}">${item.icon}</div>
+        <span>${item.label}${item.path === '/alertas' ? ' <span id="dropdown-alertas-count" style="display:none; background:var(--c-danger); color:#fff; border-radius:10px; padding:0 6px; font-size:0.65rem; font-weight:900; margin-left:4px; vertical-align:middle;"></span>' : ''}</span>
       </a>
     `).join('');
 
@@ -862,9 +762,9 @@ const App = {
     if (typeof msg !== 'string') return;
     if (typeof type === 'number') { duracionMs = type; type = ''; }
     if (!type) {
-      if (msg.includes(`${Icons.check()}`)) type = 'success';
-      else if (msg.includes(`${Icons.cerrar()}`)) type = 'error';
-      else if (msg.includes(`${Icons.alerta()}`)) type = 'warning';
+      if (msg.includes('✅')) type = 'success';
+      else if (msg.includes('❌')) type = 'error';
+      else if (msg.includes('⚠')) type = 'warning';
       else if (msg.includes('ℹ') || /^info\b/i.test(msg)) type = 'info';
     }
     const text = msg
@@ -878,8 +778,8 @@ const App = {
   toastError(msg) {
     if (typeof msg !== 'string') return;
     const text = msg.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}]/gu, '').replace(/\s{2,}/g, ' ').trim();
-    // Un ${Icons.alerta()}️ enviado por toastError es un aviso, no un error (G9)
-    if (msg.includes(`${Icons.alerta()}`)) {
+    // Un ⚠️ enviado por toastError es un aviso, no un error (G9)
+    if (msg.includes('⚠')) {
       window.Toast.warning(text || msg);
       return;
     }
@@ -905,35 +805,35 @@ const App = {
 
     const contentId = `albaran-print-${Date.now()}`;
     overlay.innerHTML = `
-            <div class="print-preview-container" id="${contentId}">
-                <div class="print-header">
-                    <img src="icons/Logo aplicación.png" class="print-logo">
-                    <div class="print-header-text">
-                        <h1 class="print-title">ALBARÁN DE EXPEDICIÓN</h1>
+            <div style="flex:1; width:100%; overflow-y:auto; margin: 0; background:white; color:black; padding:30px; border-radius:0; font-family:serif; box-sizing:border-box;" id="${contentId}">
+                <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:10px;">
+                    <img src="icons/Logo aplicación.png" style="height:50px; filter:grayscale(1);">
+                    <div style="text-align:right;">
+                        <h1 style="margin:0; font-size:1.5rem;">ALBARÁN DE EXPEDICIÓN</h1>
                         <p class="m-0">Nº: ${albaran.cabecera.numero_albaran
       }</p>
                         <p class="m-0">Fecha: ${albaran.cabecera.fecha_emision
       }</p>
                     </div>
                 </div>
-                <div class="print-grid">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px; margin-top:30px;">
                     <div>
-                        <h4 class="print-section-title">VENDEDOR (REGA)</h4>
+                        <h4 style="border-bottom:1px solid #ddd;">VENDEDOR (REGA)</h4>
                         <p><strong>${albaran.cabecera.vendedor.nombre
       }</strong><br>REGA: ${albaran.cabecera.vendedor.rega
       }<br>${albaran.cabecera.vendedor.direccion}</p>
                     </div>
                     <div>
-                        <h4 class="print-section-title">COMPRADOR</h4>
+                        <h4 style="border-bottom:1px solid #ddd;">COMPRADOR</h4>
                         <p><strong>${albaran.cabecera.comprador.nombre
       }</strong><br>NIF: ${albaran.cabecera.comprador.nif
       }<br>${albaran.cabecera.comprador.direccion}</p>
                     </div>
                 </div>
-                <div class="print-section-wrapper">
-                    <h3 class="print-table-title">DETALLES DE TRAZABILIDAD (${albaran.trazabilidad.tipo
+                <div style="margin-top:40px;">
+                    <h3 style="background:#eee; padding:5px; font-size: 1rem;">DETALLES DE TRAZABILIDAD (${albaran.trazabilidad.tipo
       })</h3>
-                    <table class="print-table">
+                    <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size: 0.9rem;">
                         ${tipo === "carne"
         ? `
                             <tr><td class="td-lbl">Documento ICA</td><td class="td-val">${albaran.trazabilidad.codigo_ica}</td></tr>
@@ -941,7 +841,7 @@ const App = {
                             <tr><td class="td-lbl">Establecimiento Destino</td><td class="td-val">${albaran.trazabilidad.matadero}</td></tr>
                             <tr><td class="td-lbl">Nº Albarán</td><td class="td-val">${albaran.trazabilidad.numero_albaran || 'N/A'}</td></tr>
                             <tr><td class="td-lbl">DIMOE</td><td class="td-val">${albaran.trazabilidad.dimoe || 'N/A'}</td></tr>
-                            <tr class="print-table-row-grey"><td colspan="2" class="td-lbl">TRANSPORTE</td></tr>
+                            <tr style="background:#f9f9f9;"><td colspan="2" class="td-lbl">TRANSPORTE</td></tr>
                             <tr><td class="td-lbl">Transportista</td><td class="td-val">${albaran.trazabilidad.transportista?.nombre || 'N/D'}</td></tr>
                             <tr><td class="td-lbl">NIF Transportista</td><td class="td-val">${albaran.trazabilidad.transportista?.nif || 'N/D'}</td></tr>
                             <tr><td class="td-lbl">Matrícula</td><td class="td-val">${albaran.trazabilidad.transportista?.matricula || 'N/D'}</td></tr>
@@ -954,13 +854,13 @@ const App = {
       }
                     </table>
                 </div>
-                <div class="print-footer">
+                <div style="margin-top:40px; text-align:center; font-size:0.8rem; border-top:1px solid #eee; padding-top:20px;">
                     <p>Documento generado electrónicamente por Livestock Manager Premium v${window.APP_INFO.version}</p>
                 </div>
             </div>
-            <div class="print-actions">
-                <button class="btn btn-primary btn-print" id="btn-descargar-pdf">DESCARGAR PDF</button>
-                <button class="btn btn-secondary btn-print" onclick="document.getElementById('albaran-preview-overlay').remove()">CERRAR</button>
+            <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
+                <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">DESCARGAR PDF</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('albaran-preview-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
             </div>
         `;
     document.body.appendChild(overlay);
@@ -977,7 +877,7 @@ const App = {
         `;
         loader.innerHTML = `
           <div class="pdf-loader">
-            <div class="pdf-loader-icon pdf-loader-icon-style">${Icons.documento()}</div>
+            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
             <div class="pdf-loader-title">Generando PDF</div>
             <div class="pdf-loader-desc">Albarán ${albaran.cabecera.numero_albaran}</div>
             <div class="pdf-loader-bar">
@@ -1124,29 +1024,6 @@ const App = {
   // ==========================================
   // HISTORIAL REPRODUCTIVO Y REFERENCIA
   // ==========================================
-  async _cargarHistorialPesajes(animalId) {
-    const container = document.getElementById('tabla-pesajes');
-    if (!container) return;
-    try {
-      const eventos = await Pesajes.obtenerHistorial(animalId, 'animal');
-      if (!eventos || eventos.length === 0) {
-        container.innerHTML = '<em class="text-333">Sin registros de pesada o producción</em>';
-        return;
-      }
-      container.innerHTML = eventos.slice(0, 10).map(e => {
-        const colorVal = e.unidad === 'kg' ? 'text-green' : (e.unidad === 'L' ? 'text-blue' : 'text-white');
-        return `<div class="flex justify-between items-center text-xs py-4 row-border-dark">
-          <span class="text-gold flex items-center gap-4">${Icons.calendar()} ${e.fecha || '—'}</span>
-          <span class="text-ccc font-900 uppercase">${e.motivo_tarea || 'Pesada'}</span>
-          <span class="${colorVal} font-bold uppercase">${e.valor_neto} ${e.unidad}</span>
-        </div>`;
-      }).join('');
-    } catch (e) {
-      console.warn('[App] Error cargando historial pesajes:', e);
-      container.innerHTML = '<em class="text-red">Error al cargar historial</em>';
-    }
-  },
-
   async _cargarHistorialReproduccion(animalId) {
     const container = document.getElementById('tabla-reproduccion');
     if (!container) return;
@@ -1191,7 +1068,7 @@ const App = {
       container.innerHTML = companeros.map(a => {
         const colorEsp = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : '#888';
         return `<div class="flex justify-between items-center text-xs py-4 row-border-dark">
-          <span class="animal-icon-span"><span class="${App._getColorClass(colorEsp)}">${Icons.animales()}</span> ${a.numero_identificacion || '#'.concat(a.id)}</span>
+          <span class="text-ccc flex items-center gap-6"><span style="color:${colorEsp}">${Icons.animales()}</span> ${a.numero_identificacion || '#'.concat(a.id)}</span>
           <span class="text-gray-600 font-900 uppercase text-[0.6rem] tracking-tighter">${a.especie || ''} · <strong class="text-white">${a.peso_actual || '—'} kg</strong></span>
         </div>`;
       }).join('');
@@ -1303,7 +1180,7 @@ const App = {
         // Crear botón de cancelar flotante en el body
         const cancelBtn = document.createElement('button');
         cancelBtn.id = 'scanner-cancel-btn';
-        cancelBtn.textContent = `${Icons.cerrar()} Cancelar Escaneo`;
+        cancelBtn.textContent = '✕ Cancelar Escaneo';
         cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#f97316; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
 
         const cleanupScanner = async () => {
@@ -1363,7 +1240,7 @@ const App = {
       <div id="scanner-container" class="flex-1 w-full overflow-hidden"></div>
       <div class="p-14 text-center bg-dark">
         <div class="text-white text-sm mb-8">Enfoca el código de barras o QR del crotal</div>
-        <button class="btn btn-primary btn-sm btn--red" onclick="App._cancelarScanWeb()">${Icons.cerrar()} Cancelar</button>
+        <button class="btn btn-primary btn-sm btn--red" onclick="App._cancelarScanWeb()">✕ Cancelar</button>
       </div>`;
     document.body.appendChild(overlay);
     window._scanOverlay = overlay;
@@ -1488,7 +1365,7 @@ const App = {
             <div class="font-950 text-white text-lg uppercase tracking-widest flex items-center gap-10">
                 <span class="text-violet">${Icons.reproduccion()}</span> GESTIÓN REPRO
             </div>
-            <button onclick="this.closest('.card').parentElement.remove()" class="btn-overlay-close text-gray">${Icons.cerrar()}</button>
+            <button onclick="this.closest('.card').parentElement.remove()" class="btn-overlay-close text-gray">✕</button>
           </div>
           <div class="mb-16 text-ccc text-xs uppercase font-800 tracking-wider bg-black p-10 rounded-sm border border-222">
             Animal: <strong class="text-white ml-4">${animal.numero_identificacion || '#'.concat(animal.id)}</strong>
@@ -1868,58 +1745,16 @@ const App = {
   async renderDetalleGasto(params) {
     const id = params.get("id");
     const g = await window.db.get("gastos_ganaderia", parseInt(id));
-    if (!g) return this.toastError("Registro de gasto no encontrado");
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20 px-4">
-        <button onclick="window.history.back()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
-        </button>
-        <h2 class="mt-15">${Icons.dinero()} Ficha de Gasto</h2>
-      </div>
-      <div class="report-section px-4">
-        <div class="card border-top-4-blue p-20">
-          <div class="wizard-input-group">
-            <label class="wizard-label">Concepto</label>
-            <input type="text" id="ge-con" value="${g.concepto || ''}" class="wizard-input uppercase font-800">
-          </div>
-          <div class="wizard-input-group mt-15">
-            <label class="wizard-label">Monto (€)</label>
-            <input type="number" id="ge-mon" value="${g.monto}" class="wizard-input font-900 text-lg">
-          </div>
-          <div class="flex gap-10 mt-25">
-            <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="App._guardarEdicionGasto(${id})">
-              ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
-            </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="App._eliminarGasto(${id})">
-              ${Icons.eliminar()} <span class="widget-link-label">BORRAR</span>
-            </button>
-          </div>
-        </div>
-      </div>`;
-  },
-
-  async renderDetalleSanitario(params) {
-    const id = params.get("id");
-    const s = await window.db.get("sanitarios_ganado", parseInt(id));
-    if (!s) return this.toastError("Registro sanitario no encontrado");
-    document.getElementById("app-content").innerHTML = `
-      <div class="mb-20 px-4">
-        <button onclick="window.history.back()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver</span>
-        </button>
-        <h2 class="mt-15">${Icons.sanidad()} Detalle Tratamiento</h2>
-      </div>
-      <div class="report-section px-4">
-        <div class="card-registro" style="--registro-color: var(--c-purple);">
-          <div class="font-950 text-gold uppercase text-lg mb-10">${s.medicamento || 'Tratamiento'}</div>
-          <div class="grid grid-cols-2 gap-10 text-xs text-gray uppercase font-800">
-            <div>Fecha: <strong class="text-white">${new Date(s.fecha).toLocaleDateString()}</strong></div>
-            <div>Tipo: <strong class="text-white">${s.tipo_tratamiento || 'N/D'}</strong></div>
-            <div>Espera Carne: <strong class="text-white">${s.tiempo_espera_carne_dias || 0} D</strong></div>
-            <div>Espera Leche: <strong class="text-white">${s.tiempo_espera_leche_dias || 0} D</strong></div>
-          </div>
-        </div>
-      </div>`;
+            <div class="mb-20"><a href="#/comercializacion?tab=gastos" class="text-gold" class="no-underline">← Volver</a><h2>Ficha de Gasto</h2></div>
+            <div class="card border-top-4-blue">
+                <label>Concepto</label><input type="text" id="ge-con" value="${g.concepto}" class="premium-input mb-10">
+                <label>Monto (€)</label><input type="number" id="ge-mon" value="${g.monto}" class="premium-input">
+                <div class="flex gap-10 mt-25">
+                    <button class="btn btn-primary flex-2 btn--blue" onclick="App._guardarEdicionGasto(${id})">${Icons.guardar()} GUARDAR</button>
+                    <button class="btn btn-secondary flex-1 btn--dark-red" onclick="App._eliminarGasto(${id})">${Icons.eliminar()} BORRAR</button>
+                </div>
+            </div>`;
   },
 
   async _guardarEdicionGasto(id) {
@@ -2321,7 +2156,7 @@ const App = {
 
   async _registrarTratamiento(rebanoId) {
     if (window.WizardTratamiento) {
-      await window.WizardTratamiento.registrar(rebanoId || null);
+      await window.WizardTratamiento.registrar(rebanoId);
     }
   },
 
@@ -2437,31 +2272,6 @@ const App = {
         if (migrFincas > 0) console.log(`[Migración] ${migrFincas} fincas migradas a v7`);
       } catch (e) {
         console.warn("[Migración fincas] Error:", e);
-      }
-
-      // v8: Migración de pesos actuales para animales (para visibilidad en cards)
-      const pesosMigrados = await window.db.get('meta', 'migracion_pesos_v8').catch(() => null);
-      if (!pesosMigrados) {
-          try {
-            const animales = await window.db.getAll('animales');
-            let migradosPesos = 0;
-            for (const a of animales) {
-              if (!a.peso_actual) {
-                const historial = await window.Pesajes.obtenerHistorial(a.id, 'animal');
-                const ultimoPesaje = historial.find(e => e.valor_neto && (e.motivo_tarea === 'control' || e.motivo_tarea === 'control_peso' || e.motivo_tarea === 'control_lechero' || e.motivo_tarea === 'alta_nacimiento' || e.motivo_tarea === 'alta_compra'));
-                if (ultimoPesaje) {
-                  a.peso_actual = ultimoPesaje.valor_neto;
-                  a.fecha_ultimo_pesaje = ultimoPesaje.fecha;
-                  await window.db.put('animales', a);
-                  migradosPesos++;
-                }
-              }
-            }
-            await window.db.put('meta', { key: 'migracion_pesos_v8', value: true });
-            if (migradosPesos > 0) console.log(`[Migración] ${migradosPesos} animales actualizados con peso_actual`);
-          } catch (e) {
-            console.warn("[Migración pesos] Error:", e);
-          }
       }
     } catch (e) {
       console.error("[App] Error en migraciones de fondo:", e);

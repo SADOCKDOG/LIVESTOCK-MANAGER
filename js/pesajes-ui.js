@@ -1,4 +1,4 @@
-window.PesajesUI = {
+const PesajesUI = {
     async abrirWizard(config) {
         const modoStr = config.modo || config.motivo || '';
         const esModoLeche = modoStr.startsWith('leche_');
@@ -279,9 +279,9 @@ window.PesajesUI = {
                             rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO',
                             snap_identificacion: a.numero_identificacion || 'S/N'
                         };
-                    if (esModoLote) _pesajesLote.push({ animalId: a.id, crotal: a.numero_identificacion, peso: val, especie: a.especie, raza: a.raza });
-                    else await Pesajes.registrar(payload);
-                }
+                        if (esModoLote) _pesajesLote.push({ animalId: a.id, crotal: a.numero_identificacion, peso: val, especie: a.especie, raza: a.raza });
+                        else await Pesajes.registrar(payload);
+                    }
                     a.pesoActual = val;
                     App.toast(`REGISTRADO: ${a.numero_identificacion} -> ${val}${unidadAbreviada}`);
                     if (entidades.length > 1 && currentAnimalIndex < entidades.length - 1) selectAnimal(currentAnimalIndex + 1);
@@ -307,9 +307,7 @@ window.PesajesUI = {
                             });
                         }
                     }
-                    if (window.EventBus) window.EventBus.emit('dashboard:refresh');
                     overlay.remove();
-                    window.App._needsDataRefresh = true;
                     await window.App.route();
                 } catch (e) { App.toastError("Error al finalizar: " + e.message); }
             };
