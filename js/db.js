@@ -2,6 +2,199 @@ console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
 const DB_VERSION = 14;
 
+// Clase para base de datos en memoria (Fallback para entornos sandboxed o sin permisos de IndexedDB, como Open Design Desktop)
+class InMemoryMockDB {
+    constructor() {
+        console.log("[DB] Inicializando base de datos simulada en memoria (InMemoryMockDB)");
+        this.objectStoreNames = {
+            names: [
+                'fincas', 'rebanos', 'animales', 'produccion_carne', 'produccion_leche', 
+                'ventas_ganado', 'sanitarios_ganado', 'gastos_ganaderia', 'config_especies', 
+                'config_tipos_produccion', 'comercializacion_carne', 'comercializacion_leche', 
+                'meta', 'registro_eventos', 'reproduccion_eventos', 'compradores', 'proveedores', 
+                'contratos_compra', 'transportistas', 'documentos_legales', 'notificaciones_rega', 
+                'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs', 
+                'config_costes_referencia', 'config_silos'
+            ],
+            contains(name) { return this.names.includes(name); }
+        };
+        this._stores = {};
+        this.objectStoreNames.names.forEach(name => {
+            this._stores[name] = [];
+        });
+        this._seedMockData();
+    }
+
+    _seedMockData() {
+        // Datos por defecto para que la aplicación muestre información visual premium
+        this._stores['fincas'] = [
+            { id: 1, nombre: 'Finca El Encinar', REGA: 'ES3712345678', rega: 'ES3712345678', codigo_REGA: 'ES3712345678', superficie: 150, municipio: 'Salamanca', creadoEn: new Date().toISOString() }
+        ];
+        this._stores['rebanos'] = [
+            { id: 1, fincaId: 1, codigo: 'REB-001', nombre: 'Lote Reproductoras Frisonas', especie: 'Vacas', zonaActual: 'Prado Alto', creadoEn: new Date().toISOString() },
+            { id: 2, fincaId: 1, codigo: 'REB-002', nombre: 'Terneros Limusín Cebo', especie: 'Vacas', zonaActual: 'Cercado Bajo', creadoEn: new Date().toISOString() }
+        ];
+        this._stores['animales'] = [
+            { id: 1, rebanoId: 1, numero_identificacion: 'ES0811122233', caravana: 'ES0811122233', especie: 'Vacas', raza: 'Frisona', sexo: 'Hembra', fecha_nacimiento: '2022-04-10', estado: 'activo', categoria: 'leche', creadoEn: new Date().toISOString() },
+            { id: 2, rebanoId: 1, numero_identificacion: 'ES0811122234', caravana: 'ES0811122234', especie: 'Vacas', raza: 'Limusina', sexo: 'Hembra', fecha_nacimiento: '2021-11-15', estado: 'activo', categoria: 'carne', creadoEn: new Date().toISOString() },
+            { id: 3, rebanoId: 2, numero_identificacion: 'ES0911122235', caravana: 'ES0911122235', especie: 'Ovejas', raza: 'Assaf', sexo: 'Hembra', fecha_nacimiento: '2023-01-20', estado: 'activo', categoria: 'leche', creadoEn: new Date().toISOString() }
+        ];
+        this._stores['config_especies'] = [
+            { id: 1, nombre: 'Vacas', consumoAguaL: 60, creadoEn: Date.now() },
+            { id: 2, nombre: 'Ovejas', consumoAguaL: 8, creadoEn: Date.now() },
+            { id: 3, nombre: 'Cabras', consumoAguaL: 8, creadoEn: Date.now() },
+            { id: 4, nombre: 'Cerdos', consumoAguaL: 12, creadoEn: Date.now() }
+        ];
+        this._stores['config_tipos_produccion'] = [
+            { id: 1, nombre: 'Cárnica', creadoEn: Date.now() },
+            { id: 2, nombre: 'Láctea', creadoEn: Date.now() },
+            { id: 3, nombre: 'Mixto', creadoEn: Date.now() },
+            { id: 4, nombre: 'Ibérico', creadoEn: Date.now() }
+        ];
+        this._stores['meta'] = [
+            { key: 'migracion_v8', value: true, migradoEn: new Date().toISOString() },
+            { key: 'migracion_v9', value: true, migradoEn: new Date().toISOString() },
+            { key: 'contador_albaran', valor: 10, actualizadoEn: new Date().toISOString() },
+            { key: 'contador_factura', valor: 5, actualizadoEn: new Date().toISOString() }
+        ];
+        this._stores['compradores'] = [
+            { id: 1, nombre: 'Matadero Central de Salamanca', nif_cif: 'A37123456', tipo_comprador: 'carne', activo: true, creadoEn: new Date().toISOString() },
+            { id: 2, nombre: 'Lácteas del Duero', nif_cif: 'B49123456', tipo_comprador: 'leche', activo: true, creadoEn: new Date().toISOString() }
+        ];
+        this._stores['proveedores'] = [
+            { id: 1, nombre: 'Piensos Salamanca S.A.', nif_cif: 'A37987654', activo: true, creadoEn: new Date().toISOString() },
+            { id: 2, nombre: 'Veterinaria VetCampo', nif_cif: 'B37111222', activo: true, creadoEn: new Date().toISOString() }
+        ];
+        this._stores['registro_eventos'] = [
+            { id: 1, fincaId: 1, entidad_id: 1, tipo_entidad: 'animal', snap_tipo: 'alta', motivo_tarea: 'Compra externa', fecha: new Date().toISOString().split('T')[0], creadoEn: new Date().toISOString() }
+        ];
+    }
+
+    async get(storeName, key) {
+        const store = this._stores[storeName] || [];
+        if (storeName === 'meta') {
+            return store.find(item => item.key === key);
+        }
+        return store.find(item => item.id == key);
+    }
+
+    async getAll(storeName) {
+        return [...(this._stores[storeName] || [])];
+    }
+
+    async add(storeName, item) {
+        const store = this._stores[storeName] || [];
+        let newId = 1;
+        if (store.length > 0) {
+            const ids = store.map(i => i.id).filter(id => typeof id === 'number');
+            if (ids.length > 0) {
+                newId = Math.max(...ids) + 1;
+            }
+        }
+        const newItem = { ...item };
+        if (storeName === 'meta') {
+            // no numeric id for meta
+        } else if (newItem.id === undefined) {
+            newItem.id = newId;
+        }
+        store.push(newItem);
+        return storeName === 'meta' ? newItem.key : newItem.id;
+    }
+
+    async put(storeName, item) {
+        const store = this._stores[storeName] || [];
+        if (storeName === 'meta') {
+            const idx = store.findIndex(i => i.key === item.key);
+            if (idx !== -1) {
+                store[idx] = { ...item };
+            } else {
+                store.push({ ...item });
+            }
+            return item.key;
+        }
+        const idx = store.findIndex(i => i.id == item.id);
+        if (idx !== -1) {
+            store[idx] = { ...item };
+        } else {
+            store.push({ ...item });
+        }
+        return item.id;
+    }
+
+    async delete(storeName, key) {
+        const store = this._stores[storeName] || [];
+        if (storeName === 'meta') {
+            this._stores[storeName] = store.filter(item => item.key !== key);
+        } else {
+            this._stores[storeName] = store.filter(item => item.id != key);
+        }
+    }
+
+    async count(storeName) {
+        const store = this._stores[storeName] || [];
+        return store.length;
+    }
+
+    async getFromIndex(storeName, indexName, value) {
+        const store = this._stores[storeName] || [];
+        const matched = store.find(item => {
+            if (indexName === 'caravana' || indexName === 'numero_identificacion') {
+                return item.numero_identificacion === value || item.caravana === value;
+            }
+            let itemVal = item[indexName];
+            if (typeof itemVal === 'string' && typeof value === 'string') {
+                return itemVal.toLowerCase() === value.toLowerCase();
+            }
+            return itemVal == value;
+        });
+        if (!matched) throw new Error("Key not found in index: " + indexName + " = " + value);
+        return matched;
+    }
+
+    async getAllFromIndex(storeName, indexName, value) {
+        const store = this._stores[storeName] || [];
+        return store.filter(item => {
+            let itemVal = item[indexName];
+            if (['fincaId', 'rebanoId', 'animalId'].includes(indexName)) {
+                return Number(itemVal) === Number(value);
+            }
+            if (typeof itemVal === 'string' && typeof value === 'string') {
+                return itemVal.toLowerCase() === value.toLowerCase();
+            }
+            return itemVal == value;
+        });
+    }
+
+    transaction(storeNames, mode) {
+        const self = this;
+        const names = Array.isArray(storeNames) ? storeNames : [storeNames];
+        const tx = {
+            done: Promise.resolve(),
+            objectStore(name) {
+                return {
+                    indexNames: {
+                        contains: (indexName) => {
+                            const knownIndexes = ['fincaId', 'rebanoId', 'animalId', 'caravana', 'numero_identificacion', 'nif_cif', 'activo', 'especie', 'rega', 'dib', 'categoria', 'madre_id', 'numero_albaran', 'dimoe', 'transportistaId', 'autorizacion_veterinaria', 'tipo', 'fecha_emision', 'numero'];
+                            return knownIndexes.includes(indexName);
+                        }
+                    },
+                    createIndex: () => {},
+                    get: async (key) => await self.get(name, key),
+                    getAll: async () => await self.getAll(name),
+                    add: async (item) => await self.add(name, item),
+                    put: async (item) => await self.put(name, item),
+                    delete: async (key) => await self.delete(name, key),
+                    count: async () => await self.count(name)
+                };
+            }
+        };
+        if (names.length === 1) {
+            tx.store = tx.objectStore(names[0]);
+        }
+        return tx;
+    }
+}
+
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
 
@@ -13,7 +206,8 @@ async function initDB() {
     const { openDB } = self.idb;
     console.log('[DB] Llamando a openDB...');
 
-    return await openDB(DB_NAME, DB_VERSION, {
+    try {
+        return await openDB(DB_NAME, DB_VERSION, {
         upgrade(db, oldVersion, newVersion, transaction) {
             console.log(`[DB] Upgrade: v${oldVersion} -> v${newVersion}`);
 
@@ -283,6 +477,10 @@ async function initDB() {
             }
         },
     });
+    } catch (e) {
+        console.warn("[DB] Error de IndexedDB (normal en entornos de iframe restringidos o sandboxed como Open Design). Usando base de datos simulada en memoria. Detalle:", e);
+        return new InMemoryMockDB();
+    }
 }
 
 async function populateDefaults(db) {
