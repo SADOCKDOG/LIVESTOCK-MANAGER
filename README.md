@@ -10,21 +10,36 @@
 
 ---
 
-## 1. Galería de la Aplicación
+## 1. Galería de la Aplicación (Tema "Industrial Premium")
 
-A continuación se presentan capturas de pantalla de la interfaz de usuario de Livestock Manager correspondientes a la versión v4.8.7:
+A continuación se presenta la secuencia completa de capturas de la interfaz de usuario de **Livestock Manager v5.0.0**, diseñada bajo la estética **Industrial Premium** (Modo Oscuro optimizado para OLED, alto contraste neón para operabilidad bajo luz solar directa en campo):
 
-| Panel de Inicio | Gestión de Fincas | Comercialización |
+### 1.1 Vistas y Módulos Principales
+| 0. Panel de Inicio | 1. Módulo Ganadero | 2. Explotación (ExPro) |
 | :---: | :---: | :---: |
-| <img src="manual/img/sc_01_inicio.png" width="220" alt="Inicio"> | <img src="manual/img/sc_02_expro.png" width="220" alt="Fincas"> | <img src="manual/img/sc_03_comer.png" width="220" alt="Comercialización"> |
+| <img src="manual/img/industrial/0_Inicio.png" width="240" alt="Panel de Inicio"> | <img src="manual/img/industrial/1_Ganaderia.png" width="240" alt="Módulo Ganadero"> | <img src="manual/img/industrial/2_Expro.png" width="240" alt="Explotación Ganadera"> |
 
-| Panel Ganadero | Visor de Manuales | Ajustes del Sistema |
+| 3. Comercial (CoMer) | 4. Menú Extendido (MÁS) | 5. Control de Zonas y Pastos |
 | :---: | :---: | :---: |
-| <img src="manual/img/sc_05_ganaderia.png" width="220" alt="Ganadería"> | <img src="manual/img/sc_06_manuales.png" width="220" alt="Manuales"> | <img src="manual/img/sc_07_ajustes.png" width="220" alt="Ajustes"> |
+| <img src="manual/img/industrial/3_Comer.png" width="240" alt="Panel Comercial"> | <img src="manual/img/industrial/4_Masr.png" width="240" alt="Menú Bottom Sheet"> | <img src="manual/img/industrial/5_Zonas.png" width="240" alt="Zonas de Pastoreo"> |
 
-| Asistente de Pesajes | Venta Masiva de Carne | Tratamientos Sanitarios |
+### 1.2 Líneas de Producción, Comercialización y Logística
+| 6. Control Lechero | 7. Control Cárnico y Cebadero | 8. Contratos de Compraventa |
 | :---: | :---: | :---: |
-| <img src="manual/img/sc_08_wizard_pesada_individual.png" width="220" alt="Pesajes"> | <img src="manual/img/sc_09_wizard_venta_masiva.png" width="220" alt="Ventas"> | <img src="manual/img/sc_11_wizard_tratamiento.png" width="220" alt="Sanidad"> |
+| <img src="manual/img/industrial/6_Leche.png" width="240" alt="Control de Ordeños"> | <img src="manual/img/industrial/7_Carnico.png" width="240" alt="Lotes de Cebo"> | <img src="manual/img/industrial/8_Comercial.png" width="240" alt="Contratos Lácteos"> |
+
+| 9. Directorio de Compradores | 10. Gestión de Transportistas | 11. Módulo de Gastos Operativos |
+| :---: | :---: | :---: |
+| <img src="manual/img/industrial/9_Compradores.png" width="240" alt="Clientes Compradores"> | <img src="manual/img/industrial/10_Transportista.png" width="240" alt="Transporte Autorizado"> | <img src="manual/img/industrial/11_Gastos.png" width="240" alt="Imputación de Gastos"> |
+
+### 1.3 Cuaderno de Campo, Documentación Oficial y Ajustes
+| 14. Cuaderno Digital (CUE) | 15. Documentación DIM_OE | 13. Declaraciones Oficiales |
+| :---: | :---: | :---: |
+| <img src="manual/img/industrial/14_CuadernoDigital.png" width="240" alt="Cuaderno Digital de Campo"> | <img src="manual/img/industrial/15_DocumentosDIMOE.png" width="240" alt="Documentación Oficial DIM_OE"> | <img src="manual/img/industrial/13_Exportaci%C3%B3n%20_Oficial.png" width="240" alt="Declaraciones Oficiales"> |
+
+| 12. Exportación de Datos | 16. Panel de Ajustes / RFID | |
+| :---: | :---: | :---: |
+| <img src="manual/img/industrial/12_Exportacion.png" width="240" alt="Exportación e Informes"> | <img src="manual/img/industrial/16_Ajustes.png" width="240" alt="Configuración y Lector RFID"> | *(Secuencia de 17 pantallas)* |
 
 ---
 
