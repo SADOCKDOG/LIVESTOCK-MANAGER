@@ -4,7 +4,7 @@
  * v1.1.0: Refactorizado a clases CSS para consistencia visual y soporte móvil.
  */
 
-const WizardManager = {
+window.WizardManager = {
     create(options) {
         const { id, title, steps, initialData, onComplete, onCancel } = options;
 

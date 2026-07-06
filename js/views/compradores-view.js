@@ -78,22 +78,23 @@ const CompradoresView = {
 
             container.innerHTML = `
               <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
-                <div class="flex justify-between items-start mb-10">
-                  <div>
-                    <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
-                      ${Icons.compradores()} COMPRADORES
-                    </h2>
-                    <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
-                      ${totalCompradores} REGISTROS · RESUMEN DE GESTIÓN
-                    </div>
+                <div class="mb-10">
+                  <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
+                    <span class="${App._getColorClass(themeColor)}">|</span> ${Icons.compradores()} COMPRADORES
+                  </h3>
+                  <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                    ${totalCompradores} REGISTROS · RESUMEN DE GESTIÓN
                   </div>
-                  <button class="resumen-toggle" onclick="App.toggleResumen(this)">
-                    ${Icons.chevronAbajo()}
-                  </button>
                 </div>
 
                 <!-- Card de RESUMEN -->
-                <div class="card card-total-3d card-resumen mb-20">
+                <div class="card card-total-3d card-resumen mb-20" style="background: rgba(255,255,255,0.02); padding: 12px;">
+                  <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+                    <span>RESUMEN</span>
+                    <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+                      ${Icons.chevronAbajo()}
+                    </button>
+                  </div>
                   <div class="resumen-body flex flex-col gap-6">
                     <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
                        <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.compradores()} TOTAL</span>
@@ -147,9 +148,9 @@ const CompradoresView = {
               <div class="card-registro" style="--registro-color: ${themeColorContratos}; padding: 15px;">
                 <div class="flex justify-between items-start mb-10">
                   <div>
-                    <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColorContratos}">
-                      ${Icons.contratos()} CONTRATOS
-                    </h2>
+                    <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
+                      <span class="${App._getColorClass(themeColorContratos)}">|</span> ${Icons.contratos()} CONTRATOS
+                    </h3>
                     <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
                       ${totalContratos} REGISTROS · RESUMEN DE VIGENCIA
                     </div>
@@ -463,7 +464,9 @@ const CompradoresView = {
           <div class="card-registro p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
             <div class="flex justify-between items-start mb-16">
               <div>
-                <h2 class="text-gold mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${comprador.nombre}</h2>
+                <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 mb-4 text-xl">
+                  <span class="text-gold">|</span> ${comprador.nombre}
+                </h3>
                 <div class="flex gap-8 flex-wrap">
                   <span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, ${colorComp} 12%, transparent); color:${colorComp}; border:1px solid color-mix(in srgb, ${colorComp} 25%, transparent);">
                     ${(comprador.tipo_comprador === 'láctico' ? 'lácteo' : comprador.tipo_comprador) || 'híbrido'}

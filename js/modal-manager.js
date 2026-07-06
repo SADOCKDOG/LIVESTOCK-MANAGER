@@ -119,7 +119,7 @@ const Toast = {
         else if (type === 'error') iconHtml = typeof Icons !== 'undefined' ? Icons.cerrar() : '';
         else if (type === 'info') iconHtml = typeof Icons !== 'undefined' ? Icons.info() : '';
 
-        t.innerHTML = (iconHtml ? `<span class="icon icon-sm" style="vertical-align:middle;margin-right:6px;">${iconHtml}</span>` : '') + this._escapeHtml(msg);
+        t.innerHTML = (iconHtml ? `<span class="icon icon-sm toast-icon-span">${iconHtml}</span>` : '') + this._escapeHtml(msg);
         
         // Animación de entrada fluida
         t.style.opacity = '0';

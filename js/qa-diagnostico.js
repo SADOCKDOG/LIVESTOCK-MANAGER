@@ -13,7 +13,7 @@ window.QADiagnostico = {
     let allGood = true;
 
     // 1. Verificar módulos
-    console.log('\n✓ Verificando módulos cargados...');
+    console.log(`\n${Icons.check()} Verificando módulos cargados...`);
     const modules = [
       'Fincas', 'Rebanos', 'Animales', 'Compradores', 'Proveedores',
       'Transportistas', 'Contratos', 'Sanitarios', 'Reproduccion', 'Gastos'
@@ -21,48 +21,48 @@ window.QADiagnostico = {
 
     modules.forEach(mod => {
       if (window[mod]) {
-        console.log(`  ✅ ${mod} cargado`);
+        console.log(`  ${Icons.check()} ${mod} cargado`);
       } else {
-        console.log(`  ❌ ${mod} NO cargado`);
+        console.log(`  ${Icons.cerrar()} ${mod} NO cargado`);
         allGood = false;
       }
     });
 
     // 2. Verificar IndexedDB
-    console.log('\n✓ Verificando IndexedDB...');
+    console.log(`\n${Icons.check()} Verificando IndexedDB...`);
     try {
       const dbs = await indexedDB.databases();
       const livestockDB = dbs.find(db => db.name === 'Livestock-Manager');
       if (livestockDB) {
-        console.log(`  ✅ IndexedDB "Livestock-Manager" existe`);
+        console.log(`  ${Icons.check()} IndexedDB "Livestock-Manager" existe`);
       } else {
-        console.log(`  ❌ IndexedDB "Livestock-Manager" NO existe`);
+        console.log(`  ${Icons.cerrar()} IndexedDB "Livestock-Manager" NO existe`);
         allGood = false;
       }
     } catch (e) {
-      console.log(`  ❌ Error al acceder IndexedDB: ${e.message}`);
+      console.log(`  ${Icons.cerrar()} Error al acceder IndexedDB: ${e.message}`);
       allGood = false;
     }
 
     // 3. Verificar finca activa
-    console.log('\n✓ Verificando finca activa...');
+    console.log(`\n${Icons.check()} Verificando finca activa...`);
     try {
       const fincaId = await Fincas.getActiveId();
       if (fincaId) {
         const finca = await Fincas.getActive();
-        console.log(`  ✅ Finca activa: ${finca.nombre} (ID: ${fincaId})`);
+        console.log(`  ${Icons.check()} Finca activa: ${finca.nombre} (ID: ${fincaId})`);
       } else {
-        console.log(`  ⚠️  No hay finca activa`);
+        console.log(`  ${Icons.alerta()}️  No hay finca activa`);
         console.log(`      → Ve a Ajustes → Cargar Demo CHAMORRO`);
         allGood = false;
       }
     } catch (e) {
-      console.log(`  ❌ Error al obtener finca: ${e.message}`);
+      console.log(`  ${Icons.cerrar()} Error al obtener finca: ${e.message}`);
       allGood = false;
     }
 
     // 4. Verificar datos en DB
-    console.log('\n✓ Verificando datos en DB...');
+    console.log(`\n${Icons.check()} Verificando datos en DB...`);
     try {
       const [fincas, rebanos, animales, compradores] = await Promise.all([
         Fincas.list().catch(() => []),
@@ -77,32 +77,32 @@ window.QADiagnostico = {
       console.log(`  • Compradores: ${compradores.length}`);
 
       if (fincas.length === 0 || rebanos.length === 0 || animales.length === 0) {
-        console.log(`  ⚠️  Datos incompletos — carga la demo nuevamente`);
+        console.log(`  ${Icons.alerta()}️  Datos incompletos — carga la demo nuevamente`);
         allGood = false;
       } else {
-        console.log(`  ✅ Datos cargados correctamente`);
+        console.log(`  ${Icons.check()} Datos cargados correctamente`);
       }
     } catch (e) {
-      console.log(`  ❌ Error al leer datos: ${e.message}`);
+      console.log(`  ${Icons.cerrar()} Error al leer datos: ${e.message}`);
       allGood = false;
     }
 
     // 5. Verificar QA Test Runner
-    console.log('\n✓ Verificando QA Test Runner...');
+    console.log(`\n${Icons.check()} Verificando QA Test Runner...`);
     if (window.QATestRunner) {
-      console.log(`  ✅ QATestRunner cargado`);
+      console.log(`  ${Icons.check()} QATestRunner cargado`);
     } else {
-      console.log(`  ❌ QATestRunner NO cargado`);
+      console.log(`  ${Icons.cerrar()} QATestRunner NO cargado`);
       allGood = false;
     }
 
     // Resumen
     console.log('\n╔════════════════════════════════════════╗');
     if (allGood) {
-      console.log('%c║  ✅ TODO LISTO PARA TESTS              ║', 'color: #10b981; font-weight: bold;');
+      console.log(`%c║  ${Icons.check()} TODO LISTO PARA TESTS              ║`, 'color: #10b981; font-weight: bold;');
       console.log('║  Ejecuta: window.QATestRunner.runAll() ║');
     } else {
-      console.log('%c║  ⚠️  PROBLEMAS DETECTADOS             ║', 'color: #f59e0b; font-weight: bold;');
+      console.log(`%c║  ${Icons.alerta()}️  PROBLEMAS DETECTADOS             ║`, 'color: #f59e0b; font-weight: bold;');
       console.log('║  Sigue las indicaciones arriba         ║');
     }
     console.log('╚════════════════════════════════════════╝');
@@ -111,4 +111,4 @@ window.QADiagnostico = {
   }
 };
 
-console.log('✅ QA Diagnóstico cargado. Usa: window.QADiagnostico.run()');
+console.log(`${Icons.check()} QA Diagnóstico cargado. Usa: window.QADiagnostico.run()`);

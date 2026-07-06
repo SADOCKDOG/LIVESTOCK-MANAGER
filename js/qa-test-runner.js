@@ -15,11 +15,11 @@ window.QATestRunner = {
   log(msg, type = 'info') {
     const timestamp = new Date().toLocaleTimeString();
     const prefix = {
-      info: '✓',
-      error: '✗',
-      warn: '⚠',
-      pass: '✅',
-      fail: '❌'
+      info: `${Icons.check()}`,
+      error: `${Icons.cerrar()}`,
+      warn: `${Icons.alerta()}`,
+      pass: `${Icons.check()}`,
+      fail: `${Icons.cerrar()}`
     }[type] || '○';
 
     const color = {
@@ -99,9 +99,9 @@ window.QATestRunner = {
       allPass &= await this.assertCount(eventos, 4, 'Eventos Reproducción');
 
       if (allPass) {
-        this.log('NIVEL 1: ✅ PASS', 'pass');
+        this.log(`NIVEL 1: ${Icons.check()} PASS`, 'pass');
       } else {
-        this.log('NIVEL 1: ❌ FAIL', 'fail');
+        this.log(`NIVEL 1: ${Icons.cerrar()} FAIL`, 'fail');
       }
       return allPass;
     } catch (e) {
@@ -213,9 +213,9 @@ window.QATestRunner = {
       }
 
       if (allPass) {
-        this.log('NIVEL 2: ✅ PASS', 'pass');
+        this.log(`NIVEL 2: ${Icons.check()} PASS`, 'pass');
       } else {
-        this.log('NIVEL 2: ❌ FAIL', 'fail');
+        this.log(`NIVEL 2: ${Icons.cerrar()} FAIL`, 'fail');
       }
       return allPass;
     } catch (e) {
@@ -311,9 +311,9 @@ window.QATestRunner = {
       }
 
       if (allPass) {
-        this.log('NIVEL 3: ✅ PASS', 'pass');
+        this.log(`NIVEL 3: ${Icons.check()} PASS`, 'pass');
       } else {
-        this.log('NIVEL 3: ❌ FAIL', 'fail');
+        this.log(`NIVEL 3: ${Icons.cerrar()} FAIL`, 'fail');
       }
       return allPass;
     } catch (e) {
@@ -354,17 +354,17 @@ window.QATestRunner = {
     console.log('\n');
     this.log('╔════════════════════════════════════════╗', 'info');
     this.log(`║  RESUMEN — ${duration}s${' '.repeat(22 - duration.toString().length)}║`, 'info');
-    this.log(`║  Nivel 1 (Smoke):    ${l1 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(22)}║`, l1 ? 'pass' : 'fail');
-    this.log(`║  Nivel 2 (Integridad): ${l2 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(20)}║`, l2 ? 'pass' : 'fail');
-    this.log(`║  Nivel 3 (CRUD):     ${l3 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(21)}║`, l3 ? 'pass' : 'fail');
-    this.log(`║  Nivel 4 (Flujos):   ${l4 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(21)}║`, l4 ? 'pass' : 'fail');
-    this.log(`║  Nivel 5 (Validación): ${l5 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(18)}║`, l5 ? 'pass' : 'fail');
-    this.log(`║  Nivel 6 (Performance): ${l6 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(17)}║`, l6 ? 'pass' : 'fail');
-    this.log(`║  Nivel 7 (Errores):  ${l7 ? '✅ PASS' : '❌ FAIL'}${' '.repeat(20)}║`, l7 ? 'pass' : 'fail');
+    this.log(`║  Nivel 1 (Smoke):    ${l1 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(22)}║`, l1 ? 'pass' : 'fail');
+    this.log(`║  Nivel 2 (Integridad): ${l2 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(20)}║`, l2 ? 'pass' : 'fail');
+    this.log(`║  Nivel 3 (CRUD):     ${l3 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(21)}║`, l3 ? 'pass' : 'fail');
+    this.log(`║  Nivel 4 (Flujos):   ${l4 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(21)}║`, l4 ? 'pass' : 'fail');
+    this.log(`║  Nivel 5 (Validación): ${l5 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(18)}║`, l5 ? 'pass' : 'fail');
+    this.log(`║  Nivel 6 (Performance): ${l6 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(17)}║`, l6 ? 'pass' : 'fail');
+    this.log(`║  Nivel 7 (Errores):  ${l7 ? '${Icons.check()} PASS' : '${Icons.cerrar()} FAIL'}${' '.repeat(20)}║`, l7 ? 'pass' : 'fail');
     this.log('╚════════════════════════════════════════╝', 'info');
 
     if (this.errors.length > 0) {
-      console.log('\n⚠️  ERRORES ENCONTRADOS:');
+      console.log(`\n${Icons.alerta()}️  ERRORES ENCONTRADOS:`);
       this.errors.forEach((err, i) => {
         console.log(`  ${i + 1}. ${err.label}: esperado ${err.expected}, obtuvo ${err.actual}`);
       });
@@ -447,9 +447,9 @@ window.QATestRunner = {
       }
 
       if (allPass) {
-        this.log('NIVEL 4: ✅ PASS', 'pass');
+        this.log(`NIVEL 4: ${Icons.check()} PASS`, 'pass');
       } else {
-        this.log('NIVEL 4: ❌ FAIL', 'fail');
+        this.log(`NIVEL 4: ${Icons.cerrar()} FAIL`, 'fail');
       }
       return allPass;
     } catch (e) {
@@ -513,9 +513,9 @@ window.QATestRunner = {
       }
 
       if (allPass) {
-        this.log('NIVEL 5: ✅ PASS', 'pass');
+        this.log(`NIVEL 5: ${Icons.check()} PASS`, 'pass');
       } else {
-        this.log('NIVEL 5: ❌ FAIL', 'fail');
+        this.log(`NIVEL 5: ${Icons.cerrar()} FAIL`, 'fail');
       }
       return allPass;
     } catch (e) {
@@ -537,7 +537,7 @@ window.QATestRunner = {
       await Compradores.list();
       const t2 = performance.now();
       const timeComp = (t2 - t1).toFixed(2);
-      this.log(`Compradores: ${timeComp}ms ${timeComp < 500 ? '✅ Fast' : '⚠️ Slow'}`, 'info');
+      this.log(`Compradores: ${timeComp}ms ${timeComp < 500 ? '${Icons.check()} Fast' : '${Icons.alerta()}️ Slow'}`, 'info');
 
       // === 6.2 Tiempo de carga de animales ===
       this.log('Test 6.2: Tiempo Animales.list()...', 'info');
@@ -545,7 +545,7 @@ window.QATestRunner = {
       await Animales.list();
       const t4 = performance.now();
       const timeAnim = (t4 - t3).toFixed(2);
-      this.log(`Animales: ${timeAnim}ms ${timeAnim < 500 ? '✅ Fast' : '⚠️ Slow'}`, 'info');
+      this.log(`Animales: ${timeAnim}ms ${timeAnim < 500 ? '${Icons.check()} Fast' : '${Icons.alerta()}️ Slow'}`, 'info');
 
       // === 6.3 Tiempo de guardar gasto ===
       this.log('Test 6.3: Tiempo Gastos.save()...', 'info');
@@ -564,14 +564,14 @@ window.QATestRunner = {
       const gastoId = await Gastos.save(gasto);
       const t6 = performance.now();
       const timeSave = (t6 - t5).toFixed(2);
-      this.log(`Gastos.save(): ${timeSave}ms ${timeSave < 300 ? '✅ Fast' : '⚠️ Slow'}`, 'info');
+      this.log(`Gastos.save(): ${timeSave}ms ${timeSave < 300 ? '${Icons.check()} Fast' : '${Icons.alerta()}️ Slow'}`, 'info');
 
       if (gastoId > 0) {
         await Gastos.delete(gastoId);
         allPass = true;
       }
 
-      this.log('NIVEL 6: ✅ PASS (métricas capturadas)', 'pass');
+      this.log(`NIVEL 6: ${Icons.check()} PASS (métricas capturadas)`, 'pass');
       return allPass;
     } catch (e) {
       this.log(`NIVEL 6 ERROR: ${e.message}`, 'error');
@@ -639,9 +639,9 @@ window.QATestRunner = {
       }
 
       if (allPass) {
-        this.log('NIVEL 7: ✅ PASS', 'pass');
+        this.log(`NIVEL 7: ${Icons.check()} PASS`, 'pass');
       } else {
-        this.log('NIVEL 7: ❌ FAIL', 'fail');
+        this.log(`NIVEL 7: ${Icons.cerrar()} FAIL`, 'fail');
       }
       return allPass;
     } catch (e) {
@@ -666,7 +666,7 @@ window.QATestRunner = {
     };
 
     if (!levelMap[n]) {
-      console.log(`❌ Nivel ${n} no existe (1-7)`);
+      console.log(`${Icons.cerrar()} Nivel ${n} no existe (1-7)`);
       return false;
     }
 
@@ -680,4 +680,4 @@ window.QATestRunner = {
 };
 
 // Auto-exportar para uso global
-console.log('✅ QA Test Runner cargado. Usa: window.QATestRunner.runAll() o .runLevel(1-7)');
+console.log(`${Icons.check()} QA Test Runner cargado. Usa: window.QATestRunner.runAll() o .runLevel(1-7)`);

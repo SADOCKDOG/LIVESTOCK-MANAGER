@@ -40,7 +40,7 @@ const ComercializacionView = {
     const meta = this._getTabMeta(this._currentTab);
 
     content.innerHTML = `
-      <div class="card-registro mb-10" style="--registro-color: ${meta.color};">
+      <div class="mb-10">
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="flex justify-between items-center mb-6">
             <span class="text-xs text-white font-black uppercase tracking-wider flex items-center gap-6">${meta.icon} Balance ${meta.label}</span>
@@ -64,6 +64,10 @@ const ComercializacionView = {
         <div id="comer-lista" class="grid gap-10">
           ${this._getRecordsHtml()}
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="${this._currentTab === 'carne' ? 'App._abrirWizardVentaMasiva()' : (this._currentTab === 'leche' ? 'App._abrirWizardAlbaranLeche()' : 'App._abrirFormularioGasto()')}">
+        <span class="fab-label">${this._currentTab === 'carne' ? 'Nueva Venta Carne' : (this._currentTab === 'leche' ? 'Nueva Entrega Leche' : 'Nuevo Gasto')}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 

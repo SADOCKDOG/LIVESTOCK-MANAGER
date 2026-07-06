@@ -35,6 +35,14 @@ const RebanosView = {
 
     let html = `
       <div class="report-section px-4">
+        <div class="flex items-center gap-12 mb-12">
+          <span class="text-3xl" style="color:var(--c-warning);">${Icons.rebanos()}</span>
+          <div>
+            <div class="text-white font-900 text-lg uppercase">Rebaños</div>
+            <div class="text-gray" style="font-size:0.68rem;">${rebanos.length} ${rebanos.length === 1 ? 'registro' : 'registros'} · ${rebanosActivos} activos</div>
+          </div>
+        </div>
+
         <!-- Card de RESUMEN Normalizada -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
@@ -137,29 +145,22 @@ const RebanosView = {
   _renderCard(r) {
     const animales = this._cache?.animales?.filter(a => a?.rebanoId === r?.id) || [];
     const activos = animales.filter(a => a?.estado === 'activo').length;
-    const colorEstado = r?.estado !== 'inactivo' ? '#CCFF00' : '#6b7280';
+    const colorEstado = r?.estado !== 'inactivo' ? 'var(--c-success)' : 'var(--text-gray)';
     const colorEspecie = window.ModoContextoHelper?.getEspecieColor(r?.especie) || colorEstado;
+    
+    let colorClass = App._getColorClass(colorEspecie).replace('text-', 'color-');
+    if(colorClass === 'color-gray') colorClass = 'color-gray';
 
-    return `
-      <div class="card-registro" onclick="location.hash='/rebano?id=${r?.id}'" style="--registro-color: ${colorEspecie}; display:flex; gap:10px; align-items:stretch;">
-        <div class="flex-1 min-w-0 flex flex-col justify-center">
-          <div class="flex items-center gap-10 min-w-0">
-            <div class="text-xl" style="color:${colorEspecie}">${Icons.rebanos()}</div>
-            <div class="text-xs">
-              <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color: var(--p-gold); font-weight: 950;">${r?.nombre}</div>
-              <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(r?.especie || 'N/D').toUpperCase()}</span> · ${(r?.tipo || 'Sin Tipo')}</div>
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div style="background:${colorEstado}15; color:${colorEstado}; border:1px solid ${colorEstado}40; filter: drop-shadow(0 0 4px ${colorEstado}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-            ${activos} Act.
-          </div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">
-            Ficha ${Icons.flechaDerecha()}
-          </div>
-        </div>
-      </div>`;
+    return App._cardRegistro({
+      colorClass: colorClass,
+      onClick: `location.hash='/rebano?id=${r?.id}'`,
+      icon: Icons.rebanos(),
+      title: r?.nombre,
+      badge: `${activos} Act.`,
+      metadata: `
+        <div class="text-gray font-700 uppercase min-w-full block mt-2"><span class="${App._getColorClass(colorEspecie)} font-900 opacity-90">${(r?.especie || 'N/D').toUpperCase()}</span> · ${(r?.tipo || 'Sin Tipo')}</div>
+      `
+    });
   },
 
   setFilter(f) {
@@ -179,7 +180,7 @@ const RebanosView = {
     const activos = animales.filter(a => a?.estado === 'activo').length;
 
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20 px-4"><a href="#/rebanos" class="link-back">${Icons.atras()} Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano?.nombre}</h2></div>
+      <div class="mb-20 px-4"><a href="#/rebanos" class="link-back">${Icons.atras()} Volver</a><h3 class="mt-10 flex items-center gap-8 uppercase font-900 tracking-wide text-white"><span class="text-orange">|</span> ${Icons.rebanos()} ${rebano?.nombre}</h3></div>
 
       <div class="report-section px-4">
         <div class="grid grid-cols-3 gap-8 mb-20">

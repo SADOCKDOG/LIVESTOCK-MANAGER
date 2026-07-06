@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - GanaderiaView v1.2.0
+ * Livestock Manager - GanaderiaView v1.3.0
  * Bloque consolidado de Ganadería con modo independiente (carne/leche/híbrido).
  * Refactored with Aglutinadora UI Pattern & Neon Branding.
  */
@@ -94,6 +94,7 @@ const GanaderiaView = {
       </div>
 
       <div class="report-section px-4">
+        <!-- Card de RESUMEN Normalizada -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
             <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} Balance ${meta.label}</span>
@@ -166,6 +167,10 @@ const GanaderiaView = {
               </div>
             </div>`).join('')}
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'ganaderia', modo_explotacion: this._activeMode })">
+        <span class="fab-label">Nuevo Registro</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
     `;
   },

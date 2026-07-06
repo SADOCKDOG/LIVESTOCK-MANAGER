@@ -18,9 +18,9 @@ const ConfigSistemaView = {
       <div class="p-16">
         <div class="mb-20">
           <a href="#/ajustes" class="link-back">← Volver a Ajustes</a>
-          <h2 class="mt-10 flex items-center gap-10 text-white font-900 uppercase">
-            ${Icons.ajustes()} Sistema y Seguridad
-          </h2>
+          <h3 class="mt-10 flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
+            <span class="text-white">|</span> ${Icons.ajustes()} Sistema y Seguridad
+          </h3>
           <p class="text-gray text-sm leading-relaxed">Gestión integral de la plataforma: apariencia, integridad de datos y registros de auditoría.</p>
         </div>
 
@@ -128,7 +128,7 @@ const ConfigSistemaView = {
           ${palette.map(c => `
             <button class="theme-dot ${config.colorTema === c.id ? 'active' : ''}"
               style="background:${c.hex};" onclick="ConfigSistemaView._action('cambiarColor', '${c.id}')">
-              ${config.colorTema === c.id ? '✓' : ''}
+              ${config.colorTema === c.id ? Icons.check() : ''}
             </button>
           `).join('')}
         </div>

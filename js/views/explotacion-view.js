@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - ExplotacionView v1.4.0
+ * Livestock Manager - ExplotacionView v1.6.0
  * Vista unificada del Módulo ExPro (Explotación y Producción)
  */
 const ExplotacionView = {
@@ -33,6 +33,7 @@ const ExplotacionView = {
     if (!force && !this._needsDataRefresh && this._cachedData && this._cachedFincaId === fincaId) return;
     if (this._loadingPromise) { await this._loadingPromise; return; }
 
+    this._needsDataRefresh = false; // Reset early to avoid double loads
     this._loadingPromise = (async () => {
       const finca = await Fincas?.getActive();
       const [rebanos, animales, eventosRaw, todosGastos, entregasLeche, ventasCarne] = await Promise.all([
@@ -51,9 +52,11 @@ const ExplotacionView = {
       const rebanosLeche = window.ModoContextoHelper?.filterRebanosByMode(rebanos, 'leche') || [];
       const rebanosHibrido = window.ModoContextoHelper?.filterRebanosByMode(rebanos, 'hibrido') || [];
 
+      // Pesajes: unidad kg
       const pesajes = eventos.filter(e => e.unidad === 'kg' && (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano'));
       pesajes.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
+      // Ordeños: unidad L o Litros
       const ordeños = eventos.filter(e => (e.unidad === 'L' || e.unidad === 'Litros') && (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero'));
       ordeños.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
@@ -69,7 +72,6 @@ const ExplotacionView = {
         todosGastos: todosGastos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha))
       };
       this._cachedFincaId = fincaId;
-      this._needsDataRefresh = false;
     })();
     await this._loadingPromise;
     this._loadingPromise = null;
@@ -132,20 +134,24 @@ const ExplotacionView = {
           ${Icons.documento()} ACTIVIDAD RECIENTE
         </div>
         <div class="grid gap-10">
-          ${(this._activeMode === 'leche' ? d.ordeños : d.pesajes).slice(0, 10).map(e => `
+          ${(this._activeMode === 'leche' ? d.ordeños : d.pesajes).slice(0, 15).map(e => `
             <div class="card-registro" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${meta.color};" onclick="ExplotacionView._abrirOpcionesRegistro(${e.id}, '${e.tipo_entidad || ''}', ${e.entidad_id || 0})">
               <div class="flex-1 min-w-0 flex flex-col justify-center">
                 <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${e.snap_identificacion || 'Registro'}</div>
-                <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${this._fmtFecha(e.fecha)}</div>
+                <div class="text-[0.6rem] text-gray font-800 uppercase mt-2">${this._fmtFecha(e.fecha)} · ${e.snap_zona || 'Finca'}</div>
               </div>
               <div class="flex flex-col items-end justify-between flex-shrink-0">
                 <div style="background:${meta.color}15; color:${meta.color}; border: 1px solid ${meta.color}40; filter: drop-shadow(0 0 4px ${meta.color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
-                  ${e.valor_neto} ${e.unidad}
+                  ${(e.valor_neto || 0).toLocaleString()} ${e.unidad || ''}
                 </div>
                 <span style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">Ficha ${Icons.flechaDerecha()}</span>
               </div>
             </div>`).join('')}
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="App._abrirAsistenteProduccion('${this._activeMode}', { origen_modulo: 'explotacion', modo_explotacion: this._activeMode })">
+        <span class="fab-label">${this._activeMode === 'leche' ? 'Registrar Ordeño' : 'Registrar Pesaje'}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
@@ -191,6 +197,10 @@ const ExplotacionView = {
               </div>
             </div>`).join('')}
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: var(--c-purple);" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion', modoExplotacion: this._activeMode })">
+        <span class="fab-label">Nuevo Gasto</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 

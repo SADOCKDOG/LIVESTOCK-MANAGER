@@ -39,8 +39,8 @@ const AnimalesView = {
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     const vendidos = animales.filter(a => a.estado === 'vendido').length;
-    // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas (patrón Gastos)
-    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-orange);">
+    // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas
+    html += `<div class="mb-10">
       <div class="flex items-center gap-12 mb-12">
         <span class="text-3xl" style="color:var(--c-orange);">${Icons.animales()}</span>
         <div>
@@ -128,41 +128,14 @@ const AnimalesView = {
 
   _renderCard(a, r) {
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
-    const iconoSexo = a.sexo === 'H' ? '♀' : (a.sexo === 'M' ? '♂' : '⚤');
+    const iconoSexo = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : Icons.reproduccion());
     const colorEstado = a.estado === 'activo' ? 'var(--c-success)' : a.estado === 'vendido' ? 'var(--c-warning)' : a.estado === 'baja' ? 'var(--c-danger)' : '#888';
     const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : colorEstado;
+    
+    let colorClass = App._getColorClass(colorEspecie).replace('text-', 'color-');
+    if(colorClass === 'color-gray') colorClass = 'color-gray'; // generic
 
-    const bgEstado = colorEstado === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
-                     colorEstado === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
-                     colorEstado === 'var(--c-danger)' ? 'rgba(255,68,68,0.1)' :
-                     'rgba(136,136,136,0.1)';
-
-    return `
-      <div class="card-registro" onclick="location.hash='/animal?id=${a.id}'" style="--registro-color: ${colorEspecie}; display:flex; gap:10px; align-items:stretch;">
-        <!-- Columna izquierda: información -->
-        <div class="flex-1 min-w-0 flex flex-col gap-8">
-          <div class="flex items-center gap-10 min-w-0">
-            <div class="text-xl" style="color:${colorEspecie}">${Icons.animales()}</div>
-            <div class="text-xs min-w-0">
-              <div class="mono font-bold uppercase text-base tracking-tight text-ellipsis" style="color:var(--p-gold);">${a.numero_identificacion || a.nombre || '#' + a.id} <span class="text-gray-400 ml-4">${iconoSexo}</span></div>
-              <div class="text-gray mt-2 font-700 uppercase"><span style="color:${colorEspecie}; opacity:0.9; font-weight:900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}</div>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase">
-            <div class="flex items-center gap-4">${Icons.rebanos()} ${r ? r.nombre : 'Sin Lote'}</div>
-            ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
-            ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
-          </div>
-        </div>
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div style="background:${bgEstado}; color:${colorEstado}; border:1px solid ${colorEstado}40; filter: drop-shadow(0 0 4px ${colorEstado}); padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">
-            ${a.estado || 'activo'}
-          </div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">
-            Ficha ${Icons.flechaDerecha()}
-          </div>
-        </div>
-      </div>`;
+    return App._cardRegistro(App._getAnimalCardProps(a, r));
   },
 
   _filtrar(texto) {

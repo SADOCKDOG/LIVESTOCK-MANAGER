@@ -14,7 +14,7 @@ const TrazabilidadView = {
 
     const animal = await Animales.get(animalId).catch(() => null);
     if (!animal) {
-      main.innerHTML = `<div class="card-registro error-card" style="--registro-color: var(--c-danger);"><h2>Error</h2><p>Animal no encontrado (ID: ${animalId})</p></div>`;
+      main.innerHTML = `<div class="card-registro error-card" style="--registro-color: var(--c-danger);"><h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 mb-8"><span class="text-red">|</span> Error</h3><p>Animal no encontrado (ID: ${animalId})</p></div>`;
       return;
     }
 
