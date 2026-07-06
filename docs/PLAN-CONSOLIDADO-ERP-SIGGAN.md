@@ -449,51 +449,56 @@ El proyecto Android en `/android/` está listo para:
 
 ---
 
-### Fase 2 — Gastos: eliminar triplicación
+### Fase 2 — Gastos: dueño único en ExPro (CORREGIDA - GAP 1)
 
-**Objetivo:** El **alta** de gasto vive solo en ExPro; CoMer muestra gastos en **lectura** para márgenes; ruta `/gastos` redirige a ExPro.
+**Objetivo:** El **alta** de gasto vive solo en ExPro; CoMer muestra gastos en **lectura** para márgenes; **`/gastos` mantiene GastosView** (analítica completa).
 
 **Archivos:**
-- Modify: `js/views/comercializacion-view.js` (tab Gastos: quitar FAB alta → dejar listado lectura)
-- Modify: `js/app.js` (ruta `/gastos` → redirige a `#/explotacion?sub=gastos`)
+- Modify: `js/views/comercializacion-view.js` (tab Gastos: quitar FAB alta → dejar listado lectura + enlaces)
+- **NO MODIFY:** `js/app.js` (ruta `/gastos` sigue apuntando a GastosView)
 
 **Pasos:**
-- [ ] **Paso 1:** En `comercializacion-view.js` `_renderGastos()`, sustituir "Registrar Gasto" por enlace "Registrar en Explotación" → `#/explotacion?sub=gastos`. Mantener listado de gastos en lectura.
-- [ ] **Paso 2:** En `app.js`, hacer que `/gastos` redirija a `#/explotacion?sub=gastos`.
-- [ ] **Paso 3:** Verificar que ExPro sigue siendo el único punto de alta de gasto.
-- [ ] **Paso 4:** `SigganQA.runAll()` (18/18) y commit (`refactor: gastos con dueno unico en ExPro`).
+- [x] **Paso 1:** En `comercializacion-view.js` `_renderGastos()`, sustituir FAB por dos enlaces: "Registrar Gasto" → `#/explotacion?sub=gastos` y "Ver Analítica" → `#/gastos`.
+- [x] **Paso 2:** ~~En `app.js`, hacer que `/gastos` redirija a `#/explotacion?sub=gastos`.~~ **REVERTIDO:** `/gastos` sigue renderizando GastosView.
+- [x] **Paso 3:** Verificar que ExPro es el único punto de alta de gasto.
+- [x] **Paso 4:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Un único punto de alta de gasto (ExPro); CoMer en lectura; ruta `/gastos` redirige.
+**Verificación:** Un único punto de alta de gasto (ExPro); CoMer en lectura con enlaces; `/gastos` muestra GastosView (analítica).
 
 **NO SE TOCA:**
-- `gastos-view.js` (se mantiene como vista independiente accesible desde "Más")
+- `gastos-view.js` (se mantiene como vista analítica completa accesible desde "Más" y `/gastos`)
 - La lógica de `Gastos.save()` ni `_ensureData` de ninguna vista
+
+**GAP 1 RESUELTO:** GastosView mantiene su capa analítica (gráficos, KPIs por categoría, evolución mensual).
 
 ---
 
-### Fase 3 — Sanidad: acceso desde Ganadería
+### Fase 3 — Sanidad: acceso desde Ganadería (CORREGIDA - GAP 2)
 
-**Objetivo:** Añadir acceso rápido a "Nuevo tratamiento" desde Ganadería, sin eliminar los accesos existentes en ExPro/Carne/Leche/Híbrido.
+**Objetivo:** Añadir acceso rápido a "Nuevo tratamiento" desde Ganadería, **con selector de rebaño previo** (Ganadería tiene múltiples rebaños).
 
 **Archivos:**
-- Modify: `js/views/ganaderia-view.js` (añadir botón "Nuevo tratamiento" → `wizard-tratamiento`)
+- Modify: `js/views/ganaderia-view.js` (añadir botón + modal selector de rebaño)
 
 **Pasos:**
-- [ ] **Paso 1:** En `ganaderia-view.js`, añadir en el panel de acciones (junto al FAB "Nuevo Registro") un botón "Nuevo tratamiento" que abra `WizardTratamiento.registrar()` con el rebaño activo del modo.
-- [ ] **Paso 2:** Verificar que el botón funciona y produce el mismo registro que los accesos desde ExPro/Carne/Leche/Híbrido.
-- [ ] **Paso 3:** `SigganQA.runAll()` (18/18) y commit (`feat: acceso a tratamiento desde Ganaderia`).
+- [ ] **Paso 1:** En `ganaderia-view.js`, añadir botón "Nuevo tratamiento" que abra un **modal selector de rebaño** (listar rebaños del modo activo).
+- [ ] **Paso 2:** Al seleccionar rebaño, invocar `WizardTratamiento.registrar(rebanoId)` con el ID seleccionado.
+- [ ] **Paso 3:** Verificar que el botón funciona y produce el mismo registro que los accesos desde ExPro/Carne/Leche/Híbrido.
+- [ ] **Paso 4:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Alta de tratamiento accesible desde Ganadería; los accesos existentes en ExPro/Carne/Leche/Híbrido siguen funcionando.
+**Verificación:** Alta de tratamiento accesible desde Ganadería con selector de rebaño; los accesos existentes siguen funcionando.
 
 **NO SE TOCA:**
 - Los botones "Tratamiento" en ExPro, CarneView, LecheView, HibridoView
 - `wizard-tratamiento.js` ni `sanitarios.js`
 
+**GAP 2 RESUELTO:** El modal selector de rebaño evita el crash por `rebanoId` nulo cuando hay múltiples rebaños en el modo.
+
 ---
 
-### Fase 4 — Selector de modo global
+### Fase 4 — Selector de modo global (CORREGIDA - GAP 3)
 
-**Objetivo:** Unificar el modo carne/leche/híbrido en un filtro de contexto persistente que consumen Ganadería, ExPro y CoMer.
+**Objetivo:** Unificar el modo carne/leche/híbrido en un filtro de contexto persistente. **CoMer mapea híbrido → leche** (no tiene tab híbrido).
 
 **Archivos:**
 - Modify: `js/app.js` (estado global `App.modoActivo` + persistencia)
@@ -503,38 +508,45 @@ El proyecto Android en `/android/` está listo para:
 - [ ] **Paso 1:** Introducir `App.modoActivo` persistido en localStorage con método `App.setModo(modo)` que emite evento `modo:changed`.
 - [ ] **Paso 2:** En `ganaderia-view.js`, sustituir `_changeMode()` por `App.setModo()`; leer `App.modoActivo` al renderizar.
 - [ ] **Paso 3:** En `explotacion-view.js`, sustituir `_cambiarModo()` por `App.setModo()`; escuchar evento `modo:changed` para re-render.
-- [ ] **Paso 4:** En `comercializacion-view.js`, leer `App.modoActivo` para el tab por defecto.
-- [ ] **Paso 5:** Verificación manual: cambiar modo en Ganadería, confirmar que ExPro refleja el cambio.
-- [ ] **Paso 6:** `SigganQA.runAll()` (18/18) y commit (`refactor: selector de modo global`).
+- [ ] **Paso 4:** En `comercializacion-view.js`, leer `App.modoActivo` para el tab por defecto con **mapeo**: `híbrido → leche` (CoMer no tiene tab híbrido).
+- [ ] **Paso 5:** Verificación manual: cambiar modo en Ganadería, confirmar que ExPro refleja el cambio y CoMer abre tab correcto.
+- [ ] **Paso 6:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Un solo control de modo; coherente entre los 3 hubs.
+**Verificación:** Un solo control de modo; coherente entre los 3 hubs; CoMer no crashea con modo híbrido.
 
 **NO SE TOCA:**
 - La lógica interna de cada vista (`_ensureData`, `_renderCarne`, etc.)
 - `ModoContextoHelper` (se mantiene como helper de filtrado de rebaños)
 
+**GAP 3 RESUELTO:** CoMer mapea `híbrido → leche` para evitar renderizar pestaña inexistente.
+
 ---
 
-### Fase 5 — Paneles resumen en Ganadería
+### Fase 5 — Paneles resumen en Ganadería (CORREGIDA - Rendimiento)
 
-**Objetivo:** Añadir en Ganadería paneles resumen de Sanidad, Reproducción y Movimientos, usando los datos ya cargados.
+**Objetivo:** Añadir en Ganadería paneles resumen de Sanidad, Reproducción y Movimientos, **usando índices con límite** (no `getAll()` completo).
 
 **Archivos:**
 - Modify: `js/views/ganaderia-view.js` (añadir 3 bloques HTML tras el censo)
 
 **Pasos:**
-- [ ] **Paso 1:** En `ganaderia-view.js`, ampliar el `Promise.all` inicial para cargar `sanitarios_ganado`, `reproduccion_eventos`, `movimientos_ganado`.
-- [ ] **Paso 2:** Añadir bloque "Sanidad Activa" (últimos 3 tratamientos con `App._cardRegistro`).
-- [ ] **Paso 3:** Añadir bloque "Reproducción Reciente" (últimos 5 eventos con `App._cardRegistro`).
-- [ ] **Paso 4:** Añadir bloque "Movimientos Oficiales" (últimas 3 guías con `App._cardRegistro`).
+- [ ] **Paso 1:** En `ganaderia-view.js`, cargar datos con **cursors/limit** en lugar de `getAll()`:
+  - `sanitarios_ganado`: últimos 3 (ordenados por fecha DESC)
+  - `reproduccion_eventos`: últimos 5 (ordenados por fecha DESC)
+  - `movimientos_ganado`: últimos 3 (ordenados por fecha DESC)
+- [ ] **Paso 2:** Añadir bloque "Sanidad Activa" (3 tratamientos con `App._cardRegistro`).
+- [ ] **Paso 3:** Añadir bloque "Reproducción Reciente" (5 eventos con `App._cardRegistro`).
+- [ ] **Paso 4:** Añadir bloque "Movimientos Oficiales" (3 guías con `App._cardRegistro`).
 - [ ] **Paso 5:** Verificación manual con demo CHAMORRO: confirmar que los paneles muestran datos.
-- [ ] **Paso 6:** `SigganQA.runAll()` (18/18) y commit (`feat: paneles resumen en Ganaderia`).
+- [ ] **Paso 6:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Ganadería muestra 3 paneles adicionales con datos de la demo; los accesos existentes siguen funcionando.
+**Verificación:** Ganadería muestra 3 paneles adicionales; rendimiento aceptable (>1000 registros).
 
 **NO SE TOCA:**
 - La estructura existente de modo, accesos rápidos, balance, rebaños, censo
 - `_ensureData` ni selectores HTML
+
+**OBSERVACIÓN RENDIMIENTO RESUELTA:** Uso de índices con límite evita cargar históricos completos en memoria.
 
 ---
 
@@ -584,7 +596,22 @@ El proyecto Android en `/android/` está listo para:
 | Crear vista propia de Reproducción | Ya es accesible desde Informes. Los paneles resumen en Ganadería son suficientes. |
 | Crear vista propia de Movimientos | Ya es accesible desde Documentos. Los paneles resumen en Ganadería son suficientes. |
 | Crear módulo Almacén independiente | Ya está implementado en ExPro → sub-módulo Almacén. |
-| Eliminar GastosView (`/gastos`) | Se mantiene como vista independiente accesible desde "Más". Solo se redirige la ruta para evitar duplicación de alta. |
+| Eliminar GastosView (`/gastos`) | **GAP 1:** GastosView contiene analítica completa (gráficos, KPIs por categoría). Se mantiene accesible desde "Más" y `/gastos`. El alta se centraliza en ExPro. |
+| Redirigir `/gastos` a ExPro | **GAP 1:** GastosView no es una simple lista; tiene evolución mensual, desglose por categoría y KPIs. ExPro solo tiene lista plana. |
+| Lanzar WizardTratamiento sin selector | **GAP 2:** Ganadería tiene múltiples rebaños. Se requiere modal selector de rebaño previo. |
+| Mapear modo híbrido a tab CoMer | **GAP 3:** CoMer no tiene tab híbrido. Se mapea `híbrido → leche` para evitar crash. |
+| Cargar históricos completos en Ganadería | **Rendimiento:** Se usan índices con límite (últimos 3/5) en lugar de `getAll()`. |
+
+---
+
+## 4B. GAPs CRÍTICOS DETECTADOS Y RESUELTOS
+
+| GAP | Fase | Problema | Solución | Estado |
+|---|---|---|---|---|
+| **GAP 1** | Fase 2 | Redirección `/gastos` hacía inaccesible GastosView (analítica completa) | Mantener `/gastos` → GastosView; CoMer muestra enlaces a ExPro (alta) y `/gastos` (analítica) | ✅ Corregido |
+| **GAP 2** | Fase 3 | WizardTratamiento requiere `rebanoId` único; Ganadería tiene múltiples rebaños | Añadir modal selector de rebaño previo al wizard | ✅ Plan actualizado |
+| **GAP 3** | Fase 4 | CoMer no tiene tab "híbrido"; modo global híbrido causaría crash | Mapear `híbrido → leche` en CoMer | ✅ Plan actualizado |
+| **Rendimiento** | Fase 5 | `getAll()` en históricos médicos/reproductivos ralentiza a largo plazo | Usar índices con límite (últimos 3/5 registros) | ✅ Plan actualizado |
 
 ---
 
@@ -603,10 +630,10 @@ Ganadería (Centro Operativo):
   ├── Balance: Lotes · Censo · Zonas
   ├── Rebaños del modo
   ├── Censo reciente
-  ├── [FASE 5] Sanidad Activa (3 últimos tratamientos)
-  ├── [FASE 5] Reproducción Reciente (5 últimos eventos)
-  ├── [FASE 5] Movimientos Oficiales (3 últimas guías)
-  └── [FASE 3] FAB "Nuevo tratamiento" → WizardTratamiento
+  ├── [FASE 5] Sanidad Activa (3 últimos tratamientos — con límite)
+  ├── [FASE 5] Reproducción Reciente (5 últimos eventos — con límite)
+  ├── [FASE 5] Movimientos Oficiales (3 últimas guías — con límite)
+  └── [FASE 3] Botón "Nuevo tratamiento" → Modal selector rebaño → WizardTratamiento
 
 ExPro (Centro Producción):
   ├── Explotación (Carne/Leche/Híbrido — modo GLOBAL):
@@ -622,7 +649,8 @@ ExPro (Centro Producción):
 CoMer (Centro Comercial):
   ├── Carne: Ventas (SEUROP, DIMOE, trámite) → [FASE 6] acceso Compradores
   ├── Leche: Entregas (lab, MOFA, INFOLAC) → [FASE 6] acceso Compradores
-  └── Gastos: Lectura (márgenes) → [FASE 2] sin FAB alta; [FASE 6] acceso Proveedores
+  └── Gastos: Lectura (márgenes) → [FASE 2] sin FAB alta; enlaces a ExPro (alta) y /gastos (analítica)
+  └── [FASE 4] Modo híbrido mapeado a tab Leche (no tiene tab híbrido)
 
 Más (Sheet) — sin cambios:
   Leche · Cárnico · Híbrido · Comercial · Compradores · Proveedores ·
