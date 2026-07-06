@@ -1,21 +1,16 @@
-﻿/**
+/**
  * Livestock Manager - LecheView v3.0.0
  * Vista del Módulo de Leche con las 4 pestañas modulares de gestión unificada
  */
 
 const LecheView = {
   _currentTab: 'patrimonio',
-  _cachedData: null,
-
-  _fmtFecha(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
-    } catch (e) { return '-'; }
+  _filtroActivo: {
+    texto: '',
+    tipo: ''
   },
-
   async render() {
+    if (window.App) App.updateHeaderColor('leche');
     const main = document.getElementById('app-content');
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
@@ -33,11 +28,11 @@ const LecheView = {
     entregas.sort((a, b) => new Date(b.fechaRecogida || b.fecha || 0) - new Date(a.fechaRecogida || a.fecha || 0));
 
     // Filtrar rebanos lecheros
-    const rebanosLeche = rebanos.filter(r => 
-      r.tipo.toLowerCase().includes('leche') || 
-      r.tipo.toLowerCase().includes('láct') || 
-      r.tipo.toLowerCase().includes('mixt') || 
-      r.tipo.toLowerCase().includes('híbr') || 
+    const rebanosLeche = rebanos.filter(r =>
+      r.tipo.toLowerCase().includes('leche') ||
+      r.tipo.toLowerCase().includes('láct') ||
+      r.tipo.toLowerCase().includes('mixt') ||
+      r.tipo.toLowerCase().includes('híbr') ||
       r.tipo.toLowerCase().includes('doble')
     );
     const rebanosLecheIds = rebanosLeche.map(r => r.id);
@@ -46,7 +41,7 @@ const LecheView = {
     const animalesLeche = animales.filter(a => rebanosLecheIds.includes(a.rebanoId));
 
     // Filtrar controles diarios individuales/lote
-    const controlesDiarios = eventos.filter(e => 
+    const controlesDiarios = eventos.filter(e =>
       (e.unidad === 'L' || e.unidad === 'Litros') &&
       (e.motivo_tarea === 'produccion_leche' || e.motivo_tarea === 'control_lechero') &&
       (rebanosLecheIds.includes(e.rebanoId) || e.snap_tipo?.toLowerCase()?.includes('leche') || e.snap_tipo?.toLowerCase()?.includes('láct') || e.snap_tipo?.toLowerCase()?.includes('mixt'))
@@ -82,7 +77,7 @@ const LecheView = {
     const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
     const importeTotal = entregas.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
     const alertas = entregas.filter(e => e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true).length;
-    
+
     // Controles diarios KPIs
     const totalLitrosControles = controlesDiarios.reduce((s, c) => s + (c.valor_neto || 0), 0);
     const numControles = controlesDiarios.length;
@@ -91,10 +86,10 @@ const LecheView = {
     const conLab = entregas.filter(e => e.laboratorio);
     const grasaMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.grasa || 0), 0) / conLab.length : 0;
     const protMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.proteina || 0), 0) / conLab.length : 0;
-    
+
     // Costes alimentación leche
-    const gastosAlim = todosGastos.filter(g => 
-      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+    const gastosAlim = todosGastos.filter(g =>
+      (g.categoria || '').toLowerCase() === 'alimentacion' ||
       (g.categoria || '').toLowerCase() === 'alimentación' ||
       (g.concepto || '').toLowerCase().includes('pienso') ||
       (g.concepto || '').toLowerCase().includes('forraje') ||
@@ -102,19 +97,8 @@ const LecheView = {
     );
     const totalGastosAlim = gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
 
-    main.innerHTML = `
-      <div class="mb-14">
-        <div class="scroll-shadow-container scroll-tabs-row mb-10">
-          <div class="leche-tabs">
-            <button class="leche-tab active" data-tab="patrimonio" onclick="LecheView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
-            <button class="leche-tab" data-tab="comercializacion" onclick="LecheView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
-            <button class="leche-tab" data-tab="legislacion" onclick="LecheView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
-          </div>
-        </div>
-      </div>
-      <div id="leche-content"><div class="loader">Cargando datos lácteos...</div></div>`;
-
-    this._cachedData = {
+    // Guardar datos brutos para filtrado
+    this._cachedDataRaw = {
       fincaId,
       siloEventos: eventos.filter(e => e.tipo_entidad === 'silo_pienso'),
       entregas,
@@ -144,9 +128,244 @@ const LecheView = {
           { label: 'Alertas Lácteas', value: alertas + tratamientosSupresionLeche.length, color: alertas + tratamientosSupresionLeche.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
           { label: 'Tratamientos Act.', value: sanitariosLeche.length }
         ]
-      }
+      },
+      litrosTotal,
+      numEntregas,
+      importeTotal,
+      totalLitrosControles,
+      numControles,
+      grasaMedia,
+      protMedia,
+      totalGastosAlim
     };
 
+    // Resumen mensual (últimos 6 meses) - basado en fechas de entregas
+    const hoy = new Date();
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const porMes = {};
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
+    }
+    // Contar entregas por mes
+    const rawData = this._cachedDataRaw ? this._cachedDataRaw.entregas : [];
+    rawData.forEach(e => {
+      if (e.fechaRecogida) {
+        const fechaStr = e.fechaRecogida;
+        const key = fechaStr.substring(0, 7); // YYYY-MM
+        if (porMes[key]) porMes[key].total++;
+      }
+    });
+    const mesesHtml = Object.values(porMes).reverse().map(m => {
+      const max = Math.max(1, ...Object.values(porMes).map(m => m.total));
+      const pct = Math.max(0, Math.min(100, (m.total / max) * 100));
+      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
+      return `<div class="flex-1 text-center min-w-0">
+        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
+        <div class="leche-bar-wrap">
+          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
+        </div>
+        <div class="text-xs font-bold mt-2" style="color:${color};">${m.total}</div>
+      </div>`;
+    }).join('');
+
+    // Aplicar filtros iniciales
+    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
+
+    main.innerHTML = `
+      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
+      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-info); background:rgba(59,130,246,0.03);">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
+          <span class="text-xs text-gray">${filteredData.entregas.length} total</span>
+        </div>
+        <div class="flex gap-6">${mesesHtml}</div>
+      </div>
+
+      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE LECHE
+        </div>
+        <div id="resumen-leche" class="space-y-6 text-white">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.edificio()} Patrimonio Lechero</span>
+            <strong class="text-xl font-950" style="color: var(--c-info);">${filteredData.animalesLeche.length} ${filteredData.animalesLeche.length === 1 ? "cabeza" : "cabezas"}</strong>
+          </div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.calculo()} Producción Diaria</span>
+            <strong class="text-xl font-950 text-green">${filteredData.totalLitrosControles.toLocaleString()} L</strong>
+          </div>
+          <div class="py-8 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Facturación Leche</span>
+            <strong class="text-xl font-950 text-blue">$${filteredData.importeTotal.toLocaleString()}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro de búsqueda integrado (controla el listado) -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
+        ${Icons.documento()} Historial de Entregas y Controles
+      </div>
+      <div class="flex gap-8 items-center mb-12">
+        <div class="relative flex-1 min-w-0">
+          <input type="search" id="search-leche" placeholder="Buscar por matricula, fecha o concepto..."
+                 oninput="LecheView._setFiltro('texto', this.value)"
+                 class="search-input w-full">
+        </div>
+        <select id="leche-filtro-tipo" class="form-select-info"
+                onchange="LecheView._setFiltro('tipo', this.value)"
+                style="width:120px; min-width:110px; flex-shrink:0;">
+          <option value="">Todos los tipos</option>
+          <option value="entrega" ${this._filtroActivo.tipo === 'entrega' ? 'selected' : ''}>Entregas</option>
+          <option value="control" ${this._filtroActivo.tipo === 'control' ? 'selected' : ''}>Controles Diarios</option>
+          <option value="tratamiento" ${this._filtroActivo.tipo === 'tratamiento' ? 'selected' : ''}>Tratamientos</option>
+          <option value="gasto" ${this._filtroActivo.tipo === 'gasto' ? 'selected' : ''}>Gastos</option>
+        </select>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-14">
+        <div class="scroll-shadow-container scroll-tabs-row mb-10">
+          <div class="leche-tabs">
+            <button class="leche-tab ${this._currentTab === 'patrimonio' ? 'active' : ''}" data-tab="patrimonio" onclick="LecheView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
+            <button class="leche-tab ${this._currentTab === 'comercializacion' ? 'active' : ''}" data-tab="comercializacion" onclick="LecheView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
+            <button class="leche-tab ${this._currentTab === 'legislacion' ? 'active' : ''}" data-tab="legislacion" onclick="LecheView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
+          </div>
+        </div>
+      </div>
+      <div id="leche-content"><div class="loader">Cargando datos lácteos...</div></div>
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" style="--fab-neon-color: var(--c-info);" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'leche' })">
+        <span class="fab-label">Nuevo Registro</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
+
+    // Actualizar datos filtrados para el contenido
+    this._cachedData = filteredData;
+    this._renderTabActual();
+  },
+
+  _aplicarFiltrosToData(data) {
+    // Aplicar filtros a los datos según el tipo seleccionado
+    let filteredData = { ...data };
+
+    // Filtrar por tipo de registro
+    if (this._filtroActivo.tipo) {
+      switch (this._filtroActivo.tipo) {
+        case 'entrega':
+          filteredData.entregas = data.entregas.filter(e =>
+            (e.matriculaCisterna || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (e.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (e.estadoAnalitica || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'control':
+          filteredData.controlesDiarios = data.controlesDiarios.filter(c =>
+            (c.snap_identificacion || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (c.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'tratamiento':
+          filteredData.sanitariosLeche = data.sanitariosLeche.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (s.tipo_tratamiento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          filteredData.tratamientosSupresionLeche = data.tratamientosSupresionLeche.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'gasto':
+          filteredData.gastosAlim = data.gastosAlim.filter(g =>
+            (g.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        default:
+          // Si no se especifica tipo, aplicar búsqueda de texto a todos los campos relevantes
+          if (this._filtroActivo.texto.trim()) {
+            const q = this._filtroActivo.texto.toLowerCase();
+            filteredData.entregas = data.entregas.filter(e =>
+              (e.matriculaCisterna || '').toLowerCase().includes(q) ||
+              (e.concepto || '').toLowerCase().includes(q) ||
+              (e.estadoAnalitica || '').toLowerCase().includes(q)
+            );
+            filteredData.controlesDiarios = data.controlesDiarios.filter(c =>
+              (c.snap_identificacion || '').toLowerCase().includes(q) ||
+              (c.concepto || '').toLowerCase().includes(q)
+            );
+            filteredData.sanitariosLeche = data.sanitariosLeche.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q) ||
+              (s.tipo_tratamiento || '').toLowerCase().includes(q)
+            );
+            filteredData.tratamientosSupresionLeche = data.tratamientosSupresionLeche.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q)
+            );
+            filteredData.gastosAlim = data.gastosAlim.filter(g =>
+              (g.concepto || '').toLowerCase().includes(q)
+            );
+          }
+          break;
+      }
+    } else if (this._filtroActivo.texto.trim()) {
+      // Si no hay tipo seleccionado pero sí texto, aplicar búsqueda general
+      const q = this._filtroActivo.texto.toLowerCase();
+      filteredData.entregas = data.entregas.filter(e =>
+        (e.matriculaCisterna || '').toLowerCase().includes(q) ||
+        (e.concepto || '').toLowerCase().includes(q) ||
+        (e.estadoAnalitica || '').toLowerCase().includes(q)
+      );
+      filteredData.controlesDiarios = data.controlesDiarios.filter(c =>
+        (c.snap_identificacion || '').toLowerCase().includes(q) ||
+        (c.concepto || '').toLowerCase().includes(q)
+      );
+      filteredData.sanitariosLeche = data.sanitariosLeche.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q) ||
+        (s.tipo_tratamiento || '').toLowerCase().includes(q)
+      );
+      filteredData.tratamientosSupresionLeche = data.tratamientosSupresionLeche.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q)
+      );
+      filteredData.gastosAlim = data.gastosAlim.filter(g =>
+        (g.concepto || '').toLowerCase().includes(q)
+      );
+    }
+
+    // Recalcular KPIs basados en datos filtrados
+    const litrosTotal = filteredData.entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
+    const numEntregas = filteredData.entregas.length;
+    const importeTotal = filteredData.entregas.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
+    const alertas = filteredData.entregas.filter(e => e.estadoAnalitica === 'Alerta Crítica' || e.antibioticos === true).length;
+
+    const totalLitrosControles = filteredData.controlesDiarios.reduce((s, c) => s + (c.valor_neto || 0), 0);
+    const numControles = filteredData.controlesDiarios.length;
+
+    const conLab = filteredData.entregas.filter(e => e.laboratorio);
+    const grasaMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.grasa || 0), 0) / conLab.length : 0;
+    const protMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.proteina || 0), 0) / conLab.length : 0;
+
+    return {
+      ...filteredData,
+      litrosTotal,
+      numEntregas,
+      importeTotal,
+      alertas,
+      totalLitrosControles,
+      numControles,
+      grasaMedia,
+      protMedia
+    };
+  },
+
+  _setFiltro(type, value) {
+    this._filtroActivo[type] = value;
+    this._aplicarFiltros();
+  },
+
+  _aplicarFiltros() {
+    if (!this._cachedDataRaw) return;
+    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
+    this._cachedData = filteredData;
     this._renderTabActual();
   },
 
@@ -201,7 +420,7 @@ const LecheView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card report-section leche-report-card border-top-3px border-top-3px-orange">
+      <div class="card-registro report-section leche-report-card border-top-3px border-top-3px-orange" style="--registro-color: var(--c-orange);">
         <div class="leche-report-title">
           <span class="leche-report-icon">${Icons.edificio()}</span>
           <div class="leche-report-title-text">
@@ -221,7 +440,7 @@ const LecheView = {
         <div class="leche-list-header">
           ${Icons.documento()} Rebaños Lácteos Activos (${d.rebanosLeche.length})
         </div>
-        <div class="grid gap-10">
+        <div class="gap-10">
           ${d.rebanosLeche.length > 0
             ? d.rebanosLeche.map(r => `
                 <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: ${window.ModoContextoHelper.getEspecieColor(r.especie) || '#6B7280'};">
@@ -250,8 +469,6 @@ const LecheView = {
     `;
     content.innerHTML = html;
   },
-
-
 
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
@@ -285,8 +502,8 @@ const LecheView = {
         ${d.entregas.length > 0
           ? d.entregas.slice(0, 15).map(e => this._cardEntrega(e)).join('')
           : `<div class="empty-state"><p class="empty-state-text">Sin entregas a cisterna.</p></div>`
-      }
-    </div>
+        }
+      </div>
     `;
     content.innerHTML = html;
   },
@@ -320,7 +537,7 @@ const LecheView = {
         <div class="leche-list-header">
           ${Icons.documento()} Historial Sanitario Lácteo (${d.sanitariosLeche.length})
         </div>
-        <div class="grid gap-10">
+        <div class="gap-10">
           ${d.sanitariosLeche.length > 0
             ? d.sanitariosLeche.slice(0, 15).map(s => {
                 const enSup = d.tratamientosSupresionLeche.some(ts => ts.id === s.id);
@@ -383,29 +600,29 @@ const LecheView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px; ">
+          <div class="card-registro p-25" style="--registro-color: var(--c-orange); max-width:420px; ">
               <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">
-                    <label class="wizard-label">Litros (L)</label>
-                    <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
+                  <label class="wizard-label">Litros (L)</label>
+                  <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
                 </div>
                 <div class="wizard-input-group">
-                    <label class="wizard-label">Fecha</label>
-                    <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
+                  <label class="wizard-label">Fecha</label>
+                  <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
                 </div>
               </div>
 
               <div class="wizard-input-group">
-                  <label class="wizard-label">Identificación (Crotal/Lote)</label>
-                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
+                <label class="wizard-label">Identificación (Crotal/Lote)</label>
+                <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
               </div>
 
               <div class="flex gap-10 mt-20">
-                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
-                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
+                <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
               <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
           </div>`;
@@ -447,21 +664,21 @@ const LecheView = {
       App.toastError("No hay rebaños lecheros en esta finca para tratar.");
       return;
     }
-    
+
     if (d.rebanosLeche.length === 1) {
       await window.WizardTratamiento.registrar(d.rebanosLeche[0].id);
       return;
     }
-    
+
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
     overlay.style.justifyContent = "center";
     overlay.style.alignItems = "center";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+    overlay.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; ">
+      <div class="card-registro p-25" style="--registro-color: var(--c-orange); max-width:380px; ">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Lácteo</h3>
-        <label class="wizard-label mb-10">Selecciona el rebaño lechero a tratar:</label>
+        <label class="wizard-label mb-10">Selecciona el rebaño lechero a traiter:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
         </select>
@@ -472,14 +689,14 @@ const LecheView = {
       </div>
     `;
     document.body.appendChild(overlay);
-    
+
     overlay.querySelector('#btn-treat-next').onclick = async () => {
       const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
       overlay.remove();
       await window.WizardTratamiento.registrar(rebId);
       setTimeout(() => LecheView.render(), 1000);
     };
-  },
+  }
 };
 
 window.LecheView = LecheView;

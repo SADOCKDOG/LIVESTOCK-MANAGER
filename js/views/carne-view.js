@@ -1,25 +1,20 @@
-﻿/**
+/**
  * Livestock Manager - CarneView v2.0.0
  * Vista del Módulo de Carne con los 4 bloques unificados de gestión
  */
 
 const CarneView = {
   _currentTab: 'patrimonio',
-  _cachedData: null,
-
-  _fmtFecha(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
-    } catch (e) { return '-'; }
+  _filtroActivo: {
+    texto: '',
+    tipo: ''
   },
-
   async render() {
+    if (window.App) App.updateHeaderColor('carne');
     const main = document.getElementById('app-content');
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
-    
+
     // Cargar datos
     const [rebanos, animales, eventos, ventasCarne, todosSanitarios, todosGastos] = await Promise.all([
       window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
@@ -31,11 +26,11 @@ const CarneView = {
     ]);
 
     // Filtrar rebanos cárnicos o mixtos
-    const rebanosCarne = rebanos.filter(r => 
-      r.tipo.toLowerCase().includes('carne') || 
-      r.tipo.toLowerCase().includes('cárn') || 
-      r.tipo.toLowerCase().includes('mixt') || 
-      r.tipo.toLowerCase().includes('híbr') || 
+    const rebanosCarne = rebanos.filter(r =>
+      r.tipo.toLowerCase().includes('carne') ||
+      r.tipo.toLowerCase().includes('cárn') ||
+      r.tipo.toLowerCase().includes('mixt') ||
+      r.tipo.toLowerCase().includes('híbr') ||
       r.tipo.toLowerCase().includes('doble')
     );
     const rebanosIds = rebanosCarne.map(r => r.id);
@@ -44,8 +39,8 @@ const CarneView = {
     const animalesCarne = animales.filter(a => rebanosIds.includes(a.rebanoId));
 
     // Filtrar pesajes (unidad kg) de carne
-    const pesajes = eventos.filter(e => 
-      e.unidad === 'kg' && 
+    const pesajes = eventos.filter(e =>
+      e.unidad === 'kg' &&
       (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano') &&
       (rebanosIds.includes(e.rebanoId) || e.snap_tipo?.toLowerCase()?.includes('carne') || e.snap_tipo?.toLowerCase()?.includes('cárn') || e.snap_tipo?.toLowerCase()?.includes('mixt'))
     );
@@ -129,8 +124,8 @@ const CarneView = {
     const rendimientoMedio = ventasCarne.length > 0 ? (ventasCarne.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventasCarne.length) : 0;
 
     // Costes y Almacén
-    const gastosAlim = todosGastos.filter(g => 
-      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+    const gastosAlim = todosGastos.filter(g =>
+      (g.categoria || '').toLowerCase() === 'alimentacion' ||
       (g.categoria || '').toLowerCase() === 'alimentación' ||
       (g.concepto || '').toLowerCase().includes('pienso') ||
       (g.concepto || '').toLowerCase().includes('forraje') ||
@@ -140,23 +135,9 @@ const CarneView = {
     const mofaCarne = totalVentasEuros - totalGastosAlim;
     const ratioMofaCarne = totalVentasEuros > 0 ? (mofaCarne / totalVentasEuros) * 100 : 0;
 
-    // Generar la cabecera
-    main.innerHTML = `
-      <!-- Tabs -->
-      <div class="mb-14">
-        <div class="scroll-shadow-container scroll-tabs-row mb-10">
-          <div class="carne-tabs">
-            <button class="carne-tab active" data-tab="patrimonio" onclick="CarneView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
-            <button class="carne-tab" data-tab="comercializacion" onclick="CarneView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
-            <button class="carne-tab" data-tab="legislacion" onclick="CarneView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
-          </div>
-        </div>
-      </div>
-      <div id="carne-content"><div class="loader">Cargando datos...</div></div>`;
-
-    this._cachedData = {
+    // Guardar datos brutos para filtrado
+    this._cachedDataRaw = {
       fincaId,
-      siloEventos: eventos.filter(e => e.tipo_entidad === 'silo_pienso'),
       rebanosCarne,
       animalesCarne,
       pesajes,
@@ -165,29 +146,251 @@ const CarneView = {
       tratamientosSupresion,
       gmdList,
       gastosAlim,
-      kpis: {
-        patrimonio: [
-          { label: 'Censo Cárnico', value: animalesCarne.length + ' cabezas' },
-          { label: 'Lotes/Rebaños', value: rebanosCarne.length },
-          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: 'var(--c-success)' }
-        ],
-        explotacion: [
-          { label: 'Pesajes', value: numPesajes },
-          { label: 'GMD Medio', value: gmdMedio.toFixed(2) + ' kg/d' },
-          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' }
-        ],
-        comercializacion: [
-          { label: 'Ventas Matadero', value: totalVentasEuros.toLocaleString() + ' €', color: 'var(--c-success)' },
-          { label: 'Total kg Sacrificados', value: totalKgMatadero.toLocaleString() + ' kg' },
-          { label: 'Rendimiento Canal', value: rendimientoMedio.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' }
-        ],
-        legislacion: [
-          { label: 'Alertas Supresión', value: tratamientosSupresion.length, color: tratamientosSupresion.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
-          { label: 'Controles Sanitarios', value: sanitariosCarne.length }
-        ]
-      }
+      eventos,
+      valorPatrimonioTotal,
+      totalKgPesados,
+      numPesajes,
+      totalVentasEuros,
+      totalKgMatadero,
+      rendimientoMedio,
+      totalGastosAlim,
+      mofaCarne,
+      ratioMofaCarne
     };
 
+    // Resumen mensual (últimos 6 meses) - basado en fechas de ventas
+    const hoy = new Date();
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const porMes = {};
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
+    }
+    // Contar ventas por mes
+    const rawData = this._cachedDataRaw ? this._cachedDataRaw.ventasCarne : [];
+    rawData.forEach(v => {
+      if (v.fechaSacrificio) {
+        const fechaStr = v.fechaSacrificio;
+        const key = fechaStr.substring(0, 7); // YYYY-MM
+        if (porMes[key]) porMes[key].total++;
+      }
+    });
+    const mesesHtml = Object.values(porMes).reverse().map(m => {
+      const max = Math.max(1, ...Object.values(porMes).map(m => m.total));
+      const pct = Math.max(0, Math.min(100, (m.total / max) * 100));
+      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
+      return `<div class="flex-1 text-center min-w-0">
+        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
+        <div class="carne-bar-wrap">
+          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
+        </div>
+        <div class="text-xs font-bold mt-2" style="color:${color};">${m.total}</div>
+      </div>`;
+    }).join('');
+
+    // Aplicar filtros iniciales
+    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
+
+    main.innerHTML = `
+      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
+      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-danger); background:rgba(255,68,68,0.03);">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
+          <span class="text-xs text-gray">${filteredData.ventasCarne.length} total</span>
+        </div>
+        <div class="flex gap-6">${mesesHtml}</div>
+      </div>
+
+      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: var(--c-danger); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE CARNE
+        </div>
+        <div id="resumen-carne" class="space-y-6 text-white">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.edificio()} Patrimonio Ganadero</span>
+            <strong class="text-xl font-950" style="color: var(--c-danger);">${Math.round(filteredData.valorPatrimonioTotal).toLocaleString()} €</strong>
+          </div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.documento()} Censo Cárnico</span>
+            <strong class="text-xl font-950 text-green">${filteredData.animalesCarne.length} ${filteredData.animalesCarne.length === 1 ? "cabeza" : "cabezas"}</strong>
+          </div>
+          <div class="py-8 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.transportistas()} Ventas Matadero</span>
+            <strong class="text-xl font-950 text-blue">$${filteredData.totalVentasEuros.toLocaleString()}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro de búsqueda integrado (controla el listado) -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
+        ${Icons.documento()} Historial de Ventas y Movimientos
+      </div>
+      <div class="flex gap-8 items-center mb-12">
+        <div class="relative flex-1 min-w-0">
+          <input type="search" id="search-carne" placeholder="Buscar por número de albarán, concepto o medicamento..."
+                 oninput="CarneView._setFiltro('texto', this.value)"
+                 class="search-input w-full">
+        </div>
+        <select id="carne-filtro-tipo" class="form-select-danger"
+                onchange="CarneView._setFiltro('tipo', this.value)"
+                style="width:120px; min-width:110px; flex-shrink:0;">
+          <option value="">Todos los tipos</option>
+          <option value="venta" ${this._filtroActivo.tipo === 'venta' ? 'selected' : ''}>Ventas</option>
+          <option value="pesaje" ${this._filtroActivo.tipo === 'pesaje' ? 'selected' : ''}>Pesajes</option>
+          <option value="tratamiento" ${this._filtroActivo.tipo === 'tratamiento' ? 'selected' : ''}>Tratamientos</option>
+          <option value="gasto" ${this._filtroActivo.tipo === 'gasto' ? 'selected' : ''}>Gastos</option>
+        </select>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-14">
+        <div class="scroll-shadow-container scroll-tabs-row mb-10">
+          <div class="carne-tabs">
+            <button class="carne-tab ${this._currentTab === 'patrimonio' ? 'active' : ''}" data-tab="patrimonio" onclick="CarneView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
+            <button class="carne-tab ${this._currentTab === 'comercializacion' ? 'active' : ''}" data-tab="comercializacion" onclick="CarneView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
+            <button class="carne-tab ${this._currentTab === 'legislacion' ? 'active' : ''}" data-tab="legislacion" onclick="CarneView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
+          </div>
+        </div>
+      </div>
+      <div id="carne-content"><div class="loader">Cargando datos...</div></div>
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" style="--fab-neon-color: var(--c-danger);" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'carne' })">
+        <span class="fab-label">Nuevo Registro</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
+
+    // Actualizar datos filtrados para el contenido
+    this._cachedData = filteredData;
+    this._renderTabActual();
+  },
+
+  _aplicarFiltrosToData(data) {
+    // Aplicar filtros a los datos según el tipo seleccionado
+    let filteredData = { ...data };
+
+    // Filtrar por tipo de registro
+    if (this._filtroActivo.tipo) {
+      switch (this._filtroActivo.tipo) {
+        case 'venta':
+          filteredData.ventasCarne = data.ventasCarne.filter(v =>
+            (v.numero_albaran || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (v.razonSocial || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (v.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'pesaje':
+          filteredData.pesajes = data.pesajes.filter(p =>
+            (p.snap_identificacion || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (p.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'tratamiento':
+          filteredData.sanitariosCarne = data.sanitariosCarne.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (s.tipo_tratamiento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          filteredData.tratamientosSupresion = data.tratamientosSupresion.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'gasto':
+          filteredData.gastosAlim = data.gastosAlim.filter(g =>
+            (g.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        default:
+          // Si no se especifica tipo, aplicar búsqueda de texto a todos los campos relevantes
+          if (this._filtroActivo.texto.trim()) {
+            const q = this._filtroActivo.texto.toLowerCase();
+            filteredData.ventasCarne = data.ventasCarne.filter(v =>
+              (v.numero_albaran || '').toLowerCase().includes(q) ||
+              (v.razonSocial || '').toLowerCase().includes(q) ||
+              (v.concepto || '').toLowerCase().includes(q)
+            );
+            filteredData.pesajes = data.pesajes.filter(p =>
+              (p.snap_identificacion || '').toLowerCase().includes(q) ||
+              (p.concepto || '').toLowerCase().includes(q)
+            );
+            filteredData.sanitariosCarne = data.sanitariosCarne.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q) ||
+              (s.tipo_tratamiento || '').toLowerCase().includes(q)
+            );
+            filteredData.tratamientosSupresion = data.tratamientosSupresion.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q)
+            );
+            filteredData.gastosAlim = data.gastosAlim.filter(g =>
+              (g.concepto || '').toLowerCase().includes(q)
+            );
+          }
+          break;
+      }
+    } else if (this._filtroActivo.texto.trim()) {
+      // Si no hay tipo seleccionado pero sí texto, aplicar búsqueda General
+      const q = this._filtroActivo.texto.toLowerCase();
+      filteredData.ventasCarne = data.ventasCarne.filter(v =>
+        (v.numero_albaran || '').toLowerCase().includes(q) ||
+        (v.razonSocial || '').toLowerCase().includes(q) ||
+        (v.concepto || '').toLowerCase().includes(q)
+      );
+      filteredData.pesajes = data.pesajes.filter(p =>
+        (p.snap_identificacion || '').toLowerCase().includes(q) ||
+        (p.concepto || '').toLowerCase().includes(q)
+      );
+      filteredData.sanitariosCarne = data.sanitariosCarne.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q) ||
+        (s.tipo_tratamiento || '').toLowerCase().includes(q)
+      );
+      filteredData.tratamientosSupresion = data.tratamientosSupresion.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q)
+      );
+      filteredData.gastosAlim = data.gastosAlim.filter(g =>
+        (g.concepto || '').toLowerCase().includes(q)
+      );
+    }
+
+    // Recalcular KPIs basados en datos filtrados
+    const pesoMedioFinca = filteredData.animalesCarne.length > 0 ?
+      (filteredData.animalesCarne.reduce((s, a) => s + (a.peso_actual || 0), 0) / filteredData.animalesCarne.length) : 350;
+    const valorEstimadoCabeza = pesoMedioFinca * 3.20;
+    const valorPatrimonioTotal = filteredData.animalesCarne.length * valorEstimadoCabeza;
+
+    const totalKgPesados = filteredData.pesajes.reduce((s, e) => s + (e.valor_neto || 0), 0);
+    const numPesajes = filteredData.pesajes.length;
+
+    const totalVentasEuros = filteredData.ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
+    const totalKgMatadero = filteredData.ventasCarne.reduce((s, v) => s + (v.pesoCanal || 0), 0);
+    const rendimientoMedio = filteredData.ventasCarne.length > 0 ?
+      (filteredData.ventasCarne.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / filteredData.ventasCarne.length) : 0;
+
+    const totalGastosAlim = filteredData.gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
+    const mofaCarne = totalVentasEuros - totalGastosAlim;
+    const ratioMofaCarne = totalVentasEuros > 0 ? (mofaCarne / totalVentasEuros) * 100 : 0;
+
+    return {
+      ...filteredData,
+      valorPatrimonioTotal,
+      totalKgPesados,
+      numPesajes,
+      totalVentasEuros,
+      totalKgMatadero,
+      rendimientoMedio,
+      totalGastosAlim,
+      mofaCarne,
+      ratioMofaCarne
+    };
+  },
+
+  _setFiltro(type, value) {
+    this._filtroActivo[type] = value;
+    this._aplicarFiltros();
+  },
+
+  _aplicarFiltros() {
+    if (!this._cachedDataRaw) return;
+    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
+    this._cachedData = filteredData;
     this._renderTabActual();
   },
 
@@ -228,7 +431,7 @@ const CarneView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card report-section p-16 border-top-3px border-top-3px-orange">
+      <div class="card-registro report-section p-16 border-top-3px border-top-3px-orange" style="--registro-color: var(--c-warning);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl">${Icons.edificio()}</span>
@@ -394,20 +597,10 @@ const CarneView = {
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8">
-                          <span class="text-xl" style="color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis uppercase font-900">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
-                        </div>
-                        <div class="flex wrap gap-6 mt-6 text-[0.65rem] text-gray font-800 uppercase tracking-tight">
-                          <span class="flex items-center gap-4">${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
-                          <span>·</span>
-                          <span>Espera Carne: <strong class="text-white bg-red-900 px-4 rounded-sm">${s.tiempo_espera_carne_dias || 0} ${(s.tiempo_espera_carne_dias || 0) === 1 ? 'DÍA' : 'DÍAS'}</strong></span>
-                        </div>
+                          <span>
                       </div>
-                      <div class="text-right flex-shrink-0 ml-8">
-                        <span class="badge badge-sm font-950 tracking-tighter" style="background:${enSup ? 'rgba(255,68,68,0.2)' : 'rgba(168,85,247,0.15)'}; color:${enSup ? 'var(--c-danger)' : 'var(--c-purple)'}; border:1px solid color-mix(in srgb, ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'} 38%, transparent);">${enSup ? 'EN SUPRESIÓN' : 'LIBRE'}</span>
-                      </div>
-                    </div>
-                  </div>`;
+                  </div>
+                `;
               }).join('')
             : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin tratamientos sanitarios registrados.</span></div>`
           }
@@ -415,6 +608,14 @@ const CarneView = {
       </div>
     `;
     content.innerHTML = html;
+  },
+
+  _fmtFecha(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
+    } catch (e) { return '-'; }
   },
 
   async _abrirOpcionesRegistro(id) {
@@ -434,18 +635,18 @@ const CarneView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;">
+          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
               <h3 class="mt-0 text-gold">Editar Registro Cárnico</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">
-                    <label class="wizard-label">Peso (${evento.unidad})</label>
-                    <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
+                  <label class="wizard-label">Peso (${evento.unidad})</label>
+                  <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
                 </div>
                 <div class="wizard-input-group">
-                    <label class="wizard-label">Fecha</label>
-                    <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
+                  <label class="wizard-label">Fecha</label>
+                  <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
                 </div>
               </div>
 
@@ -456,10 +657,10 @@ const CarneView = {
 
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">
-                    <label class="wizard-label">Zona</label>
-                    <select id="edit-reg-zona" class="wizard-input wizard-select">
-                      <option value="">Sin zona</option>
-                      ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}</option>`).join('')}
+                  <label class="wizard-label">Zona</label>
+                  <select id="edit-reg-zona" class="wizard-input wizard-select">
+                    <option value="">Sin zona</option>
+                    ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}"}).join('')}
                     </select>
                 </div>
               </div>
@@ -467,8 +668,9 @@ const CarneView = {
               <div class="flex gap-10 mt-20">
                   <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
-              </div>
-              <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+                </div>
+                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+            </div>
           </div>`;
       document.body.appendChild(overlay);
 
@@ -510,19 +712,19 @@ const CarneView = {
       App.toastError("No hay rebaños de carne en esta finca para tratar.");
       return;
     }
-    
+
     if (d.rebanosCarne.length === 1) {
       await window.WizardTratamiento.registrar(d.rebanosCarne[0].id);
       return;
     }
-    
+
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
     overlay.style.justifyContent = "center";
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; ">
+      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-gray);">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Cárnico</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño de carne a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
@@ -535,14 +737,14 @@ const CarneView = {
       </div>
     `;
     document.body.appendChild(overlay);
-    
+
     overlay.querySelector('#btn-treat-next').onclick = async () => {
       const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
       overlay.remove();
       await window.WizardTratamiento.registrar(rebId);
       setTimeout(() => CarneView.render(), 1000);
     };
-  },
+  }
 };
 
 window.CarneView = CarneView;

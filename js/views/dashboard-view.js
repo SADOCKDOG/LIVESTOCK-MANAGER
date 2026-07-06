@@ -205,6 +205,11 @@ const DashboardView = {
           </div>
         </div>
       </div>
+
+      <div class="fab-container" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'dashboard' })">
+        <span class="fab-label">Nueva Actividad</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>
     `;
   },
 

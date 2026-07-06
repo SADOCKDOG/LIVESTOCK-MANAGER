@@ -1,21 +1,16 @@
-﻿/**
- * Livestock Manager - HibridoView v2.0.0
+/**
+ * Livestock Manager - HibridoView v3.0.0
  * Vista de Consola Híbrida/Mixta con las 4 pestañas modulares de gestión unificada
  */
 
 const HibridoView = {
   _currentTab: 'patrimonio',
-  _cachedData: null,
-
-  _fmtFecha(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
-    } catch (e) { return '-'; }
+  _filtroActivo: {
+    texto: '',
+    tipo: ''
   },
-
   async render() {
+    if (window.App) App.updateHeaderColor('hibrido');
     const main = document.getElementById('app-content');
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
@@ -35,7 +30,7 @@ const HibridoView = {
     const animalesFinca = animales.filter(a => rebanosIds.includes(a.rebanoId));
 
     // 1. Producción mixta consolidada
-    const proConsolidada = eventos.filter(e => 
+    const proConsolidada = eventos.filter(e =>
       (e.unidad === 'kg' || e.unidad === 'L' || e.unidad === 'Litros') &&
       (e.tipo_entidad === 'animal' || e.tipo_entidad === 'rebano')
     );
@@ -51,7 +46,7 @@ const HibridoView = {
     const supresionesLeche = [];
     sanitariosFinca.forEach(s => {
       const fechaApli = new Date(s.fecha);
-      
+
       // Carne
       const dCarne = s.tiempo_espera_carne_dias || 0;
       if (dCarne > 0) {
@@ -84,8 +79,8 @@ const HibridoView = {
     const totalIngresosLeche = entregasLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
     const totalIngresosConsolidados = totalIngresosCarne + totalIngresosLeche;
 
-    const gastosAlim = todosGastos.filter(g => 
-      (g.categoria || '').toLowerCase() === 'alimentacion' || 
+    const gastosAlim = todosGastos.filter(g =>
+      (g.categoria || '').toLowerCase() === 'alimentacion' ||
       (g.categoria || '').toLowerCase() === 'alimentación' ||
       (g.concepto || '').toLowerCase().includes('pienso') ||
       (g.concepto || '').toLowerCase().includes('forraje') ||
@@ -99,19 +94,40 @@ const HibridoView = {
     const pctCarne = totalIngresosConsolidados > 0 ? (totalIngresosCarne / totalIngresosConsolidados) * 100 : 0;
     const pctLeche = totalIngresosConsolidados > 0 ? (totalIngresosLeche / totalIngresosConsolidados) * 100 : 0;
 
-    main.innerHTML = `
-      <div class="mb-14">
-        <div class="scroll-shadow-container" style="margin:0 -12px 10px -12px; padding:0 12px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; white-space:nowrap;">
-          <div class="hibrido-tabs">
-            <button class="hibrido-tab active" data-tab="patrimonio" onclick="HibridoView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
-            <button class="hibrido-tab" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
-            <button class="hibrido-tab" data-tab="legislacion" onclick="HibridoView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
-          </div>
-        </div>
-      </div>
-      <div id="hibrido-content"><div class="loader">Cargando consola híbrida...</div></div>`;
+    // Resumen mensual (últimos 6 meses) - basado en fechas de ventas carne y entregas leche
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const porMes = {};
+    const hoyFecha = new Date();
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(hoyFecha.getFullYear(), hoyFecha.getMonth() - i, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
+    }
 
-    this._cachedData = {
+    // Contar ingresos por mes (carne + leche)
+    [...ventasCarne, ...entregasLeche].forEach(item => {
+      const fechaStr = item.fechaSacrificio || item.fechaRecogida || item.fecha;
+      if (fechaStr) {
+        const key = fechaStr.substring(0, 7); // YYYY-MM
+        if (porMes[key]) porMes[key].total++;
+      }
+    });
+
+    const mesesHtml = Object.values(porMes).reverse().map(m => {
+      const max = Math.max(1, ...Object.values(porMes).map(m => m.total));
+      const pct = Math.max(0, Math.min(100, (m.total / max) * 100));
+      const color = pct > 70 ? 'var(--c-danger)' : pct > 40 ? 'var(--c-warning)' : 'var(--c-success)';
+      return `<div class="flex-1 text-center min-w-0">
+        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label}</div>
+        <div class="hibrido-bar-wrap">
+          <div style="position:absolute;bottom:0;width:100%;height:${pct}%;background:${color};border-radius:6px;opacity:0.8;transition:height 0.3s;"></div>
+        </div>
+        <div class="text-xs font-bold mt-2" style="color:${color};">${m.total}</div>
+      </div>`;
+    }).join('');
+
+    // Guardar datos brutos para filtrado
+    this._cachedDataRaw = {
       fincaId,
       siloEventos: eventos.filter(e => e.tipo_entidad === 'silo_pienso'),
       rebanos,
@@ -123,6 +139,7 @@ const HibridoView = {
       supresionesCarne,
       supresionesLeche,
       gastosAlim,
+      finca,
       kpis: {
         patrimonio: [
           { label: 'Censo Mixto', value: animalesFinca.length + ' cabezas' },
@@ -143,9 +160,220 @@ const HibridoView = {
           { label: 'Supresiones Carne', value: supresionesCarne.length, color: supresionesCarne.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
           { label: 'Supresiones Leche', value: supresionesLeche.length, color: supresionesLeche.length > 0 ? 'var(--c-info)' : 'var(--c-success)' }
         ]
-      }
+      },
+      totalIngresosCarne,
+      totalIngresosLeche,
+      totalIngresosConsolidados,
+      totalGastosAlim,
+      mofaConsolidado,
+      pctCarne,
+      pctLeche
     };
 
+    // Aplicar filtros iniciales
+    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
+
+    main.innerHTML = `
+      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
+      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-info); background:rgba(59,130,246,0.03);">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
+          <span class="text-xs text-gray">${filteredData.ventasCarne.length + filteredData.entregasLeche.length} total</span>
+        </div>
+        <div class="flex gap-6">${mesesHtml}</div>
+      </div>
+
+      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
+      <div class="mb-14">
+        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
+          <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE CONSOLIDADO
+        </div>
+        <div id="resumen-hibrido" class="space-y-6 text-white">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.edificio()} Patrimonio Ganadero</span>
+            <strong class="text-xl font-950" style="color: var(--c-info);">${filteredData.animalesFinca.length} ${filteredData.animalesFinca.length === 1 ? "cabeza" : "cabezas"}</strong>
+          </div>
+          <div class="py-8 flex justify-between items-center border-bottom-222">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Márgenes Económicos</span>
+            <strong class="text-xl font-950" style="color: ${filteredData.mofaConsolidado >= 0 ? 'var(--c-success)' : 'var(--c-danger)'};">${filteredData.mofaConsolidado.toLocaleString()} €</strong>
+          </div>
+          <div class="py-8 flex justify-between items-center">
+            <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.alerta()} Estado Sanitario</span>
+            <strong class="text-xl font-950" style="color: ${filteredData.supresionesCarne.length + filteredData.supresionesLeche.length > 0 ? 'var(--c-danger)' : 'var(--c-success)'};">${filteredData.supresionesCarne.length + filteredData.supresionesLeche.length}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtro de búsqueda integrado (controla el listado) -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
+        ${Icons.documento()} Historial Consolidado: Ventas Carne, Entregas Leche, Tratamientos
+      </div>
+      <div class="flex gap-8 items-center mb-12">
+        <div class="relative flex-1 min-w-0">
+          <input type="search" id="search-hibrido" placeholder="Buscar por concepto, vehículo, lote o medicamento..."
+                 oninput="HibridoView._setFiltro('texto', this.value)"
+                 class="search-input w-full">
+        </div>
+        <select id="hibrido-filtro-tipo" class="form-select-info"
+                onchange="HibridoView._setFiltro('tipo', this.value)"
+                style="width:140px; min-width:130px; flex-shrink:0;">
+          <option value="">Todos los tipos</option>
+          <option value="carne" ${this._filtroActivo.tipo === 'carne' ? 'selected' : ''}>Ventas Carne</option>
+          <option value="leche" ${this._filtroActivo.tipo === 'leche' ? 'selected' : ''}>Entregas Leche</option>
+          <option value="tratamiento" ${this._filtroActivo.tipo === 'tratamiento' ? 'selected' : ''}>Tratamientos</option>
+          <option value="gasto" ${this._filtroActivo.tipo === 'gasto' ? 'selected' : ''}>Gastos</option>
+        </select>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-14">
+        <div class="scroll-shadow-container scroll-tabs-row mb-10">
+          <div class="hibrido-tabs">
+            <button class="hibrido-tab ${this._currentTab === 'patrimonio' ? 'active' : ''}" data-tab="patrimonio" onclick="HibridoView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
+            <button class="hibrido-tab ${this._currentTab === 'comercializacion' ? 'active' : ''}" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
+            <button class="hibrido-tab ${this._currentTab === 'legislacion' ? 'active' : ''}" data-tab="legislacion" onclick="HibridoView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
+          </div>
+        </div>
+      </div>
+      <div id="hibrido-content"><div class="loader">Cargando datos de la consola híbrida...</div></div>
+      <!-- Botón Flotante de Acción con viñeta -->
+      <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'hibrido' })">
+        <span class="fab-label">Registrar Actividad</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
+      </div>`;
+
+    // Actualizar datos filtrados para el contenido
+    this._cachedData = filteredData;
+    this._renderTabActual();
+  },
+
+  _aplicarFiltrosToData(data) {
+    // Aplicar filtros a los datos según el tipo seleccionado
+    let filteredData = { ...data };
+
+    // Filtrar por tipo de registro
+    if (this._filtroActivo.tipo) {
+      switch (this._filtroActivo.tipo) {
+        case 'carne':
+          filteredData.ventasCarne = data.ventasCarne.filter(v =>
+            (v.numero_albaran || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (v.razonSocial || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (v.matriculaCisterna || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'leche':
+          filteredData.entregasLeche = data.entregasLeche.filter(e =>
+            (e.matriculaCisterna || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (e.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (e.razonSocialComprador || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'tratamiento':
+          filteredData.sanitariosFinca = data.sanitariosFinca.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase()) ||
+            (s.tipo_tratamiento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          filteredData.supresionesCarne = data.supresionesCarne.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          filteredData.supresionesLeche = data.supresionesLeche.filter(s =>
+            (s.medicamento || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        case 'gasto':
+          filteredData.gastosAlim = data.gastosAlim.filter(g =>
+            (g.concepto || '').toLowerCase().includes(this._filtroActivo.texto.toLowerCase())
+          );
+          break;
+        default:
+          // Si no se especifica tipo, aplicar búsqueda de texto a todos los campos relevantes
+          if (this._filtroActivo.texto.trim()) {
+            const q = this._filtroActivo.texto.toLowerCase();
+            filteredData.ventasCarne = data.ventasCarne.filter(v =>
+              (v.numero_albaran || '').toLowerCase().includes(q) ||
+              (v.razonSocial || '').toLowerCase().includes(q) ||
+              (v.matriculaCisterna || '').toLowerCase().includes(q)
+            );
+            filteredData.entregasLeche = data.entregasLeche.filter(e =>
+              (e.matriculaCisterna || '').toLowerCase().includes(q) ||
+              (e.concepto || '').toLowerCase().includes(q) ||
+              (e.razonSocialComprador || '').toLowerCase().includes(q)
+            );
+            filteredData.sanitariosFinca = data.sanitariosFinca.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q) ||
+              (s.tipo_tratamiento || '').toLowerCase().includes(q)
+            );
+            filteredData.supresionesCarne = data.supresionesCarne.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q)
+            );
+            filteredData.supresionesLeche = data.supresionesLeche.filter(s =>
+              (s.medicamento || '').toLowerCase().includes(q)
+            );
+            filteredData.gastosAlim = data.gastosAlim.filter(g =>
+              (g.concepto || '').toLowerCase().includes(q)
+            );
+          }
+          break;
+      }
+    } else if (this._filtroActivo.texto.trim()) {
+      // Si no hay tipo seleccionado pero sí texto, aplicar búsqueda general
+      const q = this._filtroActivo.texto.toLowerCase();
+      filteredData.ventasCarne = data.ventasCarne.filter(v =>
+        (v.numero_albaran || '').toLowerCase().includes(q) ||
+        (v.razonSocial || '').toLowerCase().includes(q) ||
+        (v.matriculaCisterna || '').toLowerCase().includes(q)
+      );
+      filteredData.entregasLeche = data.entregasLeche.filter(e =>
+        (e.matriculaCisterna || '').toLowerCase().includes(q) ||
+        (e.concepto || '').toLowerCase().includes(q) ||
+        (e.razonSocialComprador || '').toLowerCase().includes(q)
+      );
+      filteredData.sanitariosFinca = data.sanitariosFinca.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q) ||
+        (s.tipo_tratamiento || '').toLowerCase().includes(q)
+      );
+      filteredData.supresionesCarne = data.supresionesCarne.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q)
+      );
+      filteredData.supresionesLeche = data.supresionesLeche.filter(s =>
+        (s.medicamento || '').toLowerCase().includes(q)
+      );
+      filteredData.gastosAlim = data.gastosAlim.filter(g =>
+        (g.concepto || '').toLowerCase().includes(q)
+      );
+    }
+
+    // Recalcular KPIs basados en datos filtrados
+    const totalIngresosCarne = filteredData.ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
+    const totalIngresosLeche = filteredData.entregasLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
+    const totalIngresosConsolidados = totalIngresosCarne + totalIngresosLece;
+    const totalGastosAlim = filteredData.gastosAlim.reduce((s, g) => s + (g.monto || 0), 0);
+    const mofaConsolidado = totalIngresosConsolidados - totalGastosAlim;
+    const ratioMofaConsolidado = totalIngresosConsolidados > 0 ? (mofaConsolidado / totalIngresosConsolidados) * 100 : 0;
+    const pctCarne = totalIngresosConsolidados > 0 ? (totalIngresosCarne / totalIngresosConsolidados) * 100 : 0;
+    const pctLeche = totalIngresosConsolidados > 0 ? (totalIngresosLeche / totalIngresosConsolidados) * 100 : 0;
+
+    return {
+      ...filteredData,
+      totalIngresosCarne,
+      totalIngresosLeche,
+      totalIngresosConsolidados,
+      totalGastosAlim,
+      mofaConsolidado,
+      pctCarne,
+      pctLeche
+    };
+  },
+
+  _setFiltro(type, value) {
+    this._filtroActivo[type] = value;
+    this._aplicarFiltros();
+  },
+
+  _aplicarFiltros() {
+    if (!this._cachedDataRaw) return;
+    const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
+    this._cachedData = filteredData;
     this._renderTabActual();
   },
 
@@ -183,6 +411,14 @@ const HibridoView = {
     </div>`;
   },
 
+  _fmtFecha(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
+    } catch (e) { return '-'; }
+  },
+
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
@@ -208,30 +444,31 @@ const HibridoView = {
           ${Icons.documento()} Rebaños Mixtos Activos (${d.rebanos.length})
         </div>
         <div class="grid gap-10">
-          ${d.rebanos.map(r => `
-            <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: var(--c-warning);">
-              <div class="flex justify-between items-start">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-6">
-                    <span class="text-xl">${Icons.rebanos()}</span>
-                    <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
+          ${d.rebanos.length > 0
+            ? d.rebanos.map(r => `
+                <div class="card-registro" onclick="location.hash='/rebano?id=${r.id}'" style="--registro-color: var(--c-warning);">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-6">
+                        <span class="text-xl">${Icons.rebanos()}</span>
+                        <h3 class="section-h3 m-0 text-ellipsis">${r.nombre}</h3>
+                      </div>
+                      <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
+                        <span>Aptitud: ${r.tipo} · Especie: ${r.especie}</span>
+                      </div>
+                    </div>
+                    <div class="text-right flex-shrink-0 ml-8">
+                      <span class="badge badge-sm badge-gold block mb-4">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
+                    </div>
                   </div>
-                  <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                    <span>Aptitud: ${r.tipo} · Especie: ${r.especie}</span>
-                  </div>
-                </div>
-                <div class="text-right flex-shrink-0 ml-8">
-                  <span class="badge badge-sm badge-gold" class="block mb-4">${(c => c + " " + (c === 1 ? "cabeza" : "cabezas"))(d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length)}</span>
-                </div>
-              </div>
-            </div>`).join('') || `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin rebaños mixtos activos.</span></div>`}
+                </div>`).join('')
+            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin rebaños mixtos activos.</span></div>`
+          }
         </div>
       </div>
     `;
     content.innerHTML = html;
   },
-
-
 
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
@@ -421,7 +658,7 @@ const HibridoView = {
         overlay.style.alignItems = "center";
         overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
         overlay.innerHTML = `
-            <div class="card p-25" style="max-width:420px; ">
+            <div class="card-registro p-25" style="max-width:420px; ; --registro-color: var(--c-gray);">
                 <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
                 <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
@@ -486,19 +723,19 @@ const HibridoView = {
       App.toastError("No hay rebaños en esta finca para tratar.");
       return;
     }
-    
+
     if (d.rebanos.length === 1) {
       await window.WizardTratamiento.registrar(d.rebanos[0].id);
       return;
     }
-    
+
     const overlay = document.createElement("div");
     overlay.className = "wizard-full-screen";
     overlay.style.justifyContent = "center";
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card p-25" style="max-width:380px; ">
+      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-gray);">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Veterinario</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
@@ -511,7 +748,7 @@ const HibridoView = {
       </div>
     `;
     document.body.appendChild(overlay);
-    
+
     overlay.querySelector('#btn-treat-next').onclick = async () => {
       const rebId = parseInt(overlay.querySelector('#w-treat-reb').value);
       overlay.remove();

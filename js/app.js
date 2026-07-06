@@ -7,6 +7,97 @@
 const App = {
   _animalGuardado: false,
   _pesadaBatch: null,
+  _config: null,
+
+  _getColorClass(color) {
+    if (!color) return 'text-gray';
+    const map = {
+      '#CCFF00': 'text-green',
+      '#FF4444': 'text-red',
+      '#3b82f6': 'text-blue',
+      '#FFD600': 'text-yellow',
+      '#F97316': 'text-orange',
+      '#A855F7': 'text-purple',
+      '#EC4899': 'text-pink',
+      '#94A3B8': 'text-gray',
+      '#6b7280': 'text-gray',
+      '#888': 'text-gray',
+      'var(--c-danger)': 'text-red',
+      'var(--c-info)': 'text-blue',
+      'var(--c-success)': 'text-green',
+      'var(--c-orange)': 'text-orange',
+      'var(--c-warning)': 'text-yellow',
+      'var(--p-gold)': 'text-gold'
+    };
+    return map[color] || 'text-gray';
+  },
+
+  _cardRegistro(opts) {
+    const colorClass = opts.colorClass || 'color-info';
+    const colorVar = opts.color || (colorClass === 'color-info' ? 'var(--c-info)' : (colorClass === 'color-success' ? 'var(--c-success)' : (colorClass === 'color-danger' ? 'var(--c-danger)' : (colorClass === 'color-warning' ? 'var(--c-warning)' : 'var(--c-purple)'))));
+
+    return `
+      <div class="card-registro ${colorClass}" style="display: flex; gap: 10px; align-items: stretch; cursor: pointer; --registro-color: ${colorVar};" onclick="${opts.onClick}">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+            <span style="font-size: 1.25rem; color: var(--registro-color);">${opts.icon}</span>
+            <div style="font-weight: 950; text-transform: uppercase; font-size: 0.9rem; letter-spacing: -0.02em;" class="${opts.titleClass || 'text-white'}">${opts.title}</div>
+          </div>
+          ${opts.metadata ? `
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; font-weight: 800; text-transform: uppercase; margin-top: 8px; font-size: 0.68rem; color: var(--text-s, #94A3B8); line-height: 1.4;">
+            ${opts.metadata}
+          </div>` : ''}
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0;">
+          <div class="top-part">
+            ${opts.badge ? `
+              <div style="background:var(--registro-color)15; color:var(--registro-color); border:1px solid var(--registro-color)40; filter: drop-shadow(0 0 4px var(--registro-color)); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
+                ${opts.badge}
+              </div>` : ''}
+          </div>
+          <div class="bottom-part" style="margin-top: auto;">
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+              FICHA ${Icons.flechaDerecha()}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  _getAnimalCardProps(a, rebano, extraMetadata = '') {
+    const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+    const iconoSexo = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : Icons.reproduccion());
+    const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : 'var(--c-info)';
+    let colorClass = this._getColorClass(colorEspecie).replace('text-', 'color-');
+    if(colorClass === 'color-gray') colorClass = 'color-gray';
+
+    const rebanoNombre = rebano ? rebano.nombre : (a.rebanoId ? 'ID ' + a.rebanoId : 'Sin rebaño');
+
+    return {
+      colorClass: colorClass,
+      titleClass: 'text-gold',
+      onClick: `location.hash='/animal?id=${a.id}'`,
+      icon: Icons.animales(),
+      title: `${a.numero_identificacion || a.nombre || '#' + a.id} <span style="color:#888; margin-left: 8px;">${iconoSexo}</span>`,
+      badge: a.estado || 'activo',
+      metadata: `
+        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+          <div style="color: #888; font-weight: 700; text-transform: uppercase;">
+            <span class="${this._getColorClass(colorEspecie)}" style="font-weight: 900;">${(a.especie || 'N/D').toUpperCase()}</span> · ${(a.raza || 'Sin Raza')}
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.65rem; align-items: center;">
+            <span style="display: flex; align-items: center; gap: 4px;">${Icons.calendar()} ${a.fecha_nacimiento ? new Date(a.fecha_nacimiento).toLocaleDateString() : '-'} ${edad !== null ? '('+edad+' años)' : ''}</span>
+            <span style="display: flex; align-items: center; gap: 4px; color: #FFF; font-weight: 900;">${Icons.peso()} ${a.peso_actual || a.peso_inicial || a.peso_nacimiento || '-'} kg</span>
+            <span style="display: flex; align-items: center; gap: 4px;">${Icons.rebanos()} ${rebanoNombre}</span>
+            <span style="display: flex; align-items: center; gap: 4px; color: var(--c-purple);">${Icons.paquete()} ${a.lote || '-'}</span>
+          </div>
+          ${extraMetadata ? `<div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); color: #FFF;">${extraMetadata}</div>` : ''}
+        </div>
+      `
+    };
+  },
+
   routes: {
     "/": "renderDashboard",
     "/ganaderia": "renderGanaderia",
@@ -28,6 +119,7 @@ const App = {
     "/informes": "renderInformes",
     "/alertas": "renderAlertas",
     "/ajustes": "renderAjustes",
+    "/sistema": "renderConfigSistema",
     "/compradores": "renderCompradores",
     "/comprador": "renderComprador",
     "/proveedores": "renderProveedores",
@@ -51,41 +143,41 @@ const App = {
       // Inicializar servicios del sistema
       if (window.CacheService) window.CacheService.init();
 
-      // Escuchar eventos para refresco automático del dashboard
       if (window.EventBus) {
         const eventosRefresh = [
           'tratamiento:added', 'tratamiento:deleted',
-          'animal:created', 'animal:updated', 'animal:deleted',
+          'animal:created', 'animal:updated', 'animal:deleted', 'animal:moved', 'animales:changed',
           'venta:created', 'venta:deleted',
-          'gasto:created',
+          'gasto:created', 'gasto:deleted',
           'leche:entrega',
           'pesaje:registrado',
           'reproduccion:evento',
           'comprador:created', 'comprador:deleted',
-          'proveedor:created',
-          'contrato:created',
+          'proveedor:created', 'proveedor:deleted',
+          'contrato:created', 'contrato:deleted',
+          'movimiento:saved', 'movimiento:deleted',
+          'saneamiento:saved', 'saneamiento:deleted',
+          'transportista:created', 'transportista:deleted',
+          'alertas:updated',
           'dashboard:refresh',
         ];
         eventosRefresh.forEach(event => {
           window.EventBus.on(event, () => {
-            // Si el wizard de pesajes está activo, no refrescar para evitar condiciones de carrera
             if (window._pesajesWizardActivo && event === 'pesaje:registrado') return;
-            const hash = window.location.hash.slice(1) || '/';
-            if (hash === '/' || hash === '') {
-              App.renderDashboard();
-            } else if (hash.startsWith('/ganaderia')) {
-              App.renderGanaderia();
-            } else if (hash.startsWith('/carne')) {
-              App.renderCarne();
-            } else if (hash.startsWith('/hibrido')) {
-              App.renderHibrido();
-            } else if (hash.startsWith('/leche')) {
-              App.renderLeche();
-            } else if (hash.startsWith('/gastos')) {
-              App.renderGastos();
-            } else if (hash.startsWith('/animales')) {
-              App.renderAnimales();
-            }
+
+            if (window.DashboardView) window.DashboardView._needsRefresh = true;
+            if (window.ExplotacionView) { window.ExplotacionView._cachedData = null; window.ExplotacionView._needsDataRefresh = true; }
+            if (window.ComercializacionView) { window.ComercializacionView._cachedData = null; window.ComercializacionView._needsDataRefresh = true; }
+            if (window.CarneView) { window.CarneView._cachedData = null; window.CarneView._needsDataRefresh = true; }
+            if (window.LecheView) { window.LecheView._cachedData = null; window.LecheView._needsDataRefresh = true; }
+            if (window.HibridoView) { window.HibridoView._cachedData = null; window.HibridoView._needsDataRefresh = true; }
+            if (window.AnimalesView) window.AnimalesView._cache = null;
+            if (window.GanaderiaView) { window.GanaderiaView._cachedData = null; window.GanaderiaView._needsDataRefresh = true; }
+
+            const hash = window.location.hash || '#/';
+            const esFormulario = hash.includes('id=') || hash.includes('/animal') || hash.includes('/gasto') || hash.includes('/sanitario');
+
+            if (!esFormulario) this.route();
           });
         });
       }
@@ -104,7 +196,9 @@ const App = {
       App._initScrollShadows();
       // Cargar preferencias visuales
       try {
-        const cfg = await window.db.get('meta', 'appConfig');
+        const storedCfg = await window.db.get('meta', 'appConfig');
+        this._config = storedCfg?.value || {};
+        const cfg = storedCfg;
         const mostrar = cfg?.value?.mostrarContextos;
         if (mostrar === false || mostrar === undefined) {
           document.body.classList.add('hide-context');
@@ -116,6 +210,32 @@ const App = {
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
         if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
+
+        // Cargar intensidad y color de haz
+        const hazInt = cfg?.value?.hazLuzIntensidad ?? 45;
+        document.documentElement.style.setProperty('--haz-intensity', hazInt + '%');
+        document.documentElement.style.setProperty('--haz-intensity-num', hazInt);
+
+        const hazColor = cfg?.value?.hazLuzColor || '';
+        if (hazColor) {
+          document.documentElement.style.setProperty('--haz-luz-color', hazColor);
+        } else {
+          document.documentElement.style.removeProperty('--haz-luz-color');
+        }
+
+        const fColor = cfg?.value?.fabColor || '';
+        if (fColor) {
+          document.documentElement.style.setProperty('--fab-neon-color', fColor);
+        } else {
+          document.documentElement.style.removeProperty('--fab-neon-color');
+        }
+
+        const fInt = cfg?.value?.fabIntensidad ?? 60;
+        document.documentElement.style.setProperty('--fab-intensity', fInt + '%');
+        document.documentElement.style.setProperty('--fab-intensity-num', fInt);
+
+        const bOpacity = cfg?.value?.bannerOpacity ?? 0.4;
+        document.documentElement.style.setProperty('--banner-opacity', bOpacity);
       } catch (_) {}
       await App.route();
     } catch (error) {
@@ -154,7 +274,7 @@ const App = {
     const finca = await Fincas.getActive();
     const headerEl = document.getElementById("nombre-finca-header");
     if (headerEl && finca) {
-      headerEl.innerHTML = finca.nombre;
+      headerEl.innerHTML = finca.rega || finca.codigo_REGA || 'SIN REGA';
       headerEl.onclick = () => (location.hash = "/ajustes");
       headerEl.style.cursor = "pointer";
     }
@@ -410,8 +530,17 @@ const App = {
   /** Actualiza el color neon de la cabecera según el mapa único MODULE_COLORS.
    *  Con mode explícito (carne/leche/...) usa ese módulo; sin mode, el color de la ruta actual. */
   updateHeaderColor(mode) {
-    const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
-    const color = window.getModuleColor(path);
+    const cfg = this._config;
+    let color;
+    const isFixed = cfg?.glowMarcoFijo ?? false;
+    const fixedColor = cfg?.glowMarcoFijoColor ?? '#FFFFFF';
+
+    if (isFixed) {
+      color = fixedColor;
+    } else {
+      const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
+      color = window.getModuleColor(path);
+    }
     document.documentElement.style.setProperty('--header-neon-color', color);
   },
 
@@ -422,6 +551,72 @@ const App = {
     const sheet = document.getElementById("nav-more-sheet");
     if (!sheet) return;
     sheet.classList.toggle("open");
+  },
+
+  /** Colapsa/expande la card de resumen (chevron esquina superior derecha). Reutilizable en todas las vistas. */
+  toggleResumen(btn) {
+    const card = btn && btn.closest('.card-resumen');
+    if (card) card.classList.toggle('collapsed');
+  },
+
+  /**
+   * Genera el HTML de una tarjeta de registro estandarizada.
+   * @param {Object} opts - Opciones de la tarjeta.
+   */
+  _cardRegistro(opts) {
+    const color = opts.color || 'var(--c-primary)';
+    const onClick = opts.onClick ? `onclick="${opts.onClick}"` : '';
+    const href = opts.href ? `href="${opts.href}"` : '';
+    const tag = opts.href ? 'a' : 'div';
+
+    return `
+      <${tag} ${href} ${onClick} class="card-registro ${opts.className || ''}" style="--registro-color: ${color}; ${opts.style || ''}">
+        <div class="flex flex-col">
+          <div class="flex justify-between items-start gap-6 mb-4">
+            <div class="min-w-0 flex-1">
+              <div class="registro-titulo">${opts.title || ''}</div>
+              <div class="registro-sub">${opts.subtitle || ''}</div>
+              ${opts.content || ''}
+            </div>
+            ${opts.rightSide || ''}
+          </div>
+          <div class="flex justify-between items-end w-full">
+            <div class="flex-1 min-w-0">
+              ${opts.footerLeft || ''}
+            </div>
+            <div class="text-right">
+              ${opts.footerRight || ''}
+            </div>
+          </div>
+        </div>
+      </${tag}>
+    `;
+  },
+
+  /**
+   * Mapea un animal y su rebaño a propiedades de card-registro.
+   */
+  _getAnimalCardProps(a, rebano) {
+    const estado = a.estado || 'activo';
+    const color = estado === 'activo' ? 'var(--c-success)' : (estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)');
+    const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
+    const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+
+    return {
+      title: `<span class="text-lg font-black text-gold uppercase tracking-tight">${a.numero_identificacion || a.nombre || `#${a.id}`}</span>`,
+      subtitle: `<div class="flex items-center gap-6 mt-2">${sexoIcon} <span class="text-gray-400" style="font-size:0.7rem;">${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}</span></div>`,
+      content: `
+        <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase mt-4">
+          <div class="flex items-center gap-4">${Icons.rebanos()} ${rebano ? rebano.nombre : 'Sin Lote'}</div>
+          ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
+          ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
+        </div>
+      `,
+      rightSide: `<span class="badge" style="background:${color}15; color:${color}; border:1px solid ${color}30; font-size:0.8rem; padding:4px 10px; border-radius:8px; font-weight:800;">${estado.toUpperCase()}</span>`,
+      footerRight: `<span class="btn-ficha-mini">Ficha ${Icons.siguiente()}</span>`,
+      color: color,
+      href: `#/animal?id=${a.id}`
+    };
   },
 
   async _onCompradorChangeWizard(selectEl) {
@@ -1971,6 +2166,14 @@ const App = {
       await AjustesView.render();
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Error: Vista Ajustes no disponible</div>';
+    }
+  },
+
+  async renderConfigSistema(params) {
+    if (window.ConfigSistemaView) {
+      await ConfigSistemaView.render(params);
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Error: Módulo de Sistema no disponible</div>';
     }
   },
 
