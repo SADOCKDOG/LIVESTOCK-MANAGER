@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
+    <script>
+      // Sandbox Guard: Previene errores de seguridad al acceder a navigator.serviceWorker en entornos iframe restringidos
+      try {
+        var _testSW = navigator.serviceWorker;
+      } catch (e) {
+        console.warn("[Sandbox Guard] navigator.serviceWorker no es accesible. Redefiniendo para evitar caídas de scripts.");
+        try {
+          Object.defineProperty(Navigator.prototype, 'serviceWorker', {
+            get: function() { return undefined; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (err) {
+          try {
+            delete Navigator.prototype.serviceWorker;
+          } catch (err2) {
+            console.error("[Sandbox Guard] No se pudo desactivar serviceWorker:", err2);
+          }
+        }
+      }
+    </script>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
