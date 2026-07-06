@@ -37,7 +37,7 @@ const App = {
     const colorVar = opts.color || (colorClass === 'color-info' ? 'var(--c-info)' : (colorClass === 'color-success' ? 'var(--c-success)' : (colorClass === 'color-danger' ? 'var(--c-danger)' : (colorClass === 'color-warning' ? 'var(--c-warning)' : 'var(--c-purple)'))));
 
     return `
-      <div class="card-registro ${colorClass}" style="display: flex; gap: 10px; align-items: stretch; cursor: pointer; --registro-color: ${colorVar};" onclick="${opts.onClick}">
+      <div class="card-registro ${colorClass}" style="display: flex; gap: 10px; align-items: stretch; cursor: pointer; --registro-color: ${colorVar}; border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);" onclick="${opts.onClick}">
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
           <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
             <span style="font-size: 1.25rem; color: var(--registro-color);">${opts.icon}</span>
@@ -56,7 +56,7 @@ const App = {
               </div>` : ''}
           </div>
           <div class="bottom-part" style="margin-top: auto;">
-            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
+            <span style="color:var(--p-gold); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
               FICHA ${Icons.flechaDerecha()}
             </span>
           </div>
@@ -570,7 +570,7 @@ const App = {
     const tag = opts.href ? 'a' : 'div';
 
     return `
-      <${tag} ${href} ${onClick} class="card-registro ${opts.className || ''}" style="--registro-color: ${color}; ${opts.style || ''}">
+      <${tag} ${href} ${onClick} class="card-registro ${opts.className || ''}" style="--registro-color: ${color}; border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color); ${opts.style || ''}">
         <div class="flex flex-col">
           <div class="flex justify-between items-start gap-6 mb-4">
             <div class="min-w-0 flex-1">
@@ -595,10 +595,15 @@ const App = {
 
   /**
    * Mapea un animal y su rebaño a propiedades de card-registro.
+   * El color del borde izquierdo corresponde al color de la especie.
+   * El badge superior derecho muestra el estado con su color semántico y brillo neón.
    */
   _getAnimalCardProps(a, rebano) {
     const estado = a.estado || 'activo';
-    const color = estado === 'activo' ? 'var(--c-success)' : (estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)');
+    // Color del badge según estado (éxito, warning, danger)
+    const estadoColor = estado === 'activo' ? 'var(--c-success)' : (estado === 'vendido' ? 'var(--c-warning)' : 'var(--c-danger)');
+    // Color del borde izquierdo según especie
+    const colorEspecie = window.ModoContextoHelper ? window.ModoContextoHelper.getEspecieColor(a.especie) : 'var(--c-info)';
     const sexoIcon = a.sexo === 'H' ? Icons.hembra() : (a.sexo === 'M' ? Icons.macho() : '');
     const edad = a.fecha_nacimiento ? Math.floor((new Date() - new Date(a.fecha_nacimiento)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
 
@@ -607,14 +612,34 @@ const App = {
       subtitle: `<div class="flex items-center gap-6 mt-2">${sexoIcon} <span class="text-gray-400" style="font-size:0.7rem;">${(a.especie || 'N/D')} · ${(a.raza || 'N/D')}</span></div>`,
       content: `
         <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase mt-4">
-          <div class="flex items-center gap-4">${Icons.rebanos()} ${rebano ? rebano.nombre : 'Sin Lote'}</div>
-          ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? "AÑO" : "AÑOS"}</div>` : ''}
+          <div class="flex items-center gap-4">${Icons.rebanos()} ${rebano ? rebano.nombre : 'Sin asignar'}</div>
+          ${a.alerta ? `<div class="flex items-center gap-4">${Icons.alerta()} <span style="color:var(--c-warning);">${a.alerta}</span></div>` : ''}
+          ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? 'AÑO' : 'AÑOS'}</div>` : ''}
+          <div class="flex items-center gap-4">${Icons.peso()} ${a.peso_actual || a.peso_inicial || a.peso_nacimiento || '-'} kg</div>
+          ${a.notificado_rega ? `<div class="flex items-center gap-4">${Icons.check()} <span style="color:var(--c-success);">Alta comunicada</span></div>` : ''}
           ${a.categoria ? `<div class="flex items-center gap-4 text-aaa">${Icons.documento()} ${a.categoria}</div>` : ''}
         </div>
       `,
-      rightSide: `<span class="badge" style="background:${color}15; color:${color}; border:1px solid ${color}30; font-size:0.8rem; padding:4px 10px; border-radius:8px; font-weight:800;">${estado.toUpperCase()}</span>`,
-      footerRight: `<span class="btn-ficha-mini">Ficha ${Icons.siguiente()}</span>`,
-      color: color,
+      rightSide: `<span class="badge" style="
+          background:${estadoColor}15;
+          color:${estadoColor};
+          border:1px solid ${estadoColor}40;
+          filter: drop-shadow(0 0 4px ${estadoColor});
+          box-shadow: 0 0 6px color-mix(in srgb, ${estadoColor} 50%, transparent);
+          font-size:0.8rem;
+          padding:4px 10px;
+          border-radius:8px;
+          font-weight:800;">
+          ${estado.toUpperCase()}
+        </span>`,
+      footerRight: `<span class="btn-ficha-mini" style="
+          color:var(--text-s);
+          font-size:0.65rem;
+          font-weight:600;
+          text-transform:uppercase;">
+          Ficha ${Icons.siguiente()}
+        </span>`,
+      color: colorEspecie,
       href: `#/animal?id=${a.id}`
     };
   },

@@ -13,7 +13,7 @@ const AnimalesView = {
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
     if (rebanos.length === 0)
-      return (main.innerHTML = `<div class="card-registro empty-state" style="--registro-color: var(--c-white);"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
+      return (main.innerHTML = `<div class="card-registro empty-state" style="--registro-color: var(--text-s); border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
 
     const rebanoMap = {};
     rebanos.forEach(r => { rebanoMap[r.id] = r; });
@@ -24,7 +24,7 @@ const AnimalesView = {
     let html = '';
 
     if (animales.length === 0) {
-      html += `<div class="card-registro empty-state" style="--registro-color: var(--c-orange);">
+      html += `<div class="card-registro empty-state" style="--registro-color: var(--c-orange); border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);">
         <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
         <div class="text-center mt-20">
@@ -40,7 +40,7 @@ const AnimalesView = {
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     const vendidos = animales.filter(a => a.estado === 'vendido').length;
     // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas (patrón Gastos)
-    html += `<div class="card-registro mb-10" style="--registro-color: var(--c-orange);">
+    html += `<div class="card mb-10" style="--registro-color: var(--c-orange); border-top:0; border-right:0; border-bottom:0; border-left:2px solid var(--registro-color); box-shadow: -2px 0 8px -2px color-mix(in srgb, var(--registro-color) 60%, transparent), 0 2px 6px -1px color-mix(in srgb, var(--registro-color) 40%, transparent);">
       <div class="flex items-center gap-12 mb-12">
         <span class="text-3xl" style="color:var(--c-orange);">${Icons.animales()}</span>
         <div>
@@ -99,7 +99,7 @@ const AnimalesView = {
         <span class="fab-label">Nuevo Animal</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
-      <div class="card-registro mt-10" style="--registro-color: var(--c-white);">
+      <div class="card-registro mt-10" style="--registro-color: var(--text-s); border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);">
         <div id="animales-empty-search" class="empty-state-search d-none">
           <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
           <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
