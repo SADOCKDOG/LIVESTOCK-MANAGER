@@ -2002,7 +2002,13 @@ const App = {
   },
 
   async renderGastos() {
-    if (window.GastosView) { await GastosView.render(); }
+    // FASE 2: Redirigir a Explotación > Gastos (dueño único de registro)
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'gastos';
+      await ExplotacionView.render();
+    } else if (window.GastosView) {
+      await GastosView.render();
+    }
   },
 
   async renderComercializacion(params) {
