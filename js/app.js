@@ -88,7 +88,7 @@ const App = {
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.65rem; align-items: center;">
             <span style="display: flex; align-items: center; gap: 4px;">${Icons.calendar()} ${a.fecha_nacimiento ? new Date(a.fecha_nacimiento).toLocaleDateString() : '-'} ${edad !== null ? '('+edad+' años)' : ''}</span>
-            <span style="display: flex; align-items: center; gap: 4px; color: #FFF; font-weight: 900;">${Icons.peso()} ${a.peso_actual || a.peso_nacimiento || '-'} kg</span>
+            <span style="display: flex; align-items: center; gap: 4px; color: #FFF; font-weight: 900;">${Icons.peso()} ${a.peso_actual || a.peso_inicial || a.peso_nacimiento || '-'} kg</span>
             <span style="display: flex; align-items: center; gap: 4px;">${Icons.rebanos()} ${rebanoNombre}</span>
             <span style="display: flex; align-items: center; gap: 4px; color: var(--c-purple);">${Icons.paquete()} ${a.lote || '-'}</span>
           </div>
@@ -1124,6 +1124,29 @@ const App = {
   // ==========================================
   // HISTORIAL REPRODUCTIVO Y REFERENCIA
   // ==========================================
+  async _cargarHistorialPesajes(animalId) {
+    const container = document.getElementById('tabla-pesajes');
+    if (!container) return;
+    try {
+      const eventos = await Pesajes.obtenerHistorial(animalId, 'animal');
+      if (!eventos || eventos.length === 0) {
+        container.innerHTML = '<em class="text-333">Sin registros de pesada o producción</em>';
+        return;
+      }
+      container.innerHTML = eventos.slice(0, 10).map(e => {
+        const colorVal = e.unidad === 'kg' ? 'text-green' : (e.unidad === 'L' ? 'text-blue' : 'text-white');
+        return `<div class="flex justify-between items-center text-xs py-4 row-border-dark">
+          <span class="text-gold flex items-center gap-4">${Icons.calendar()} ${e.fecha || '—'}</span>
+          <span class="text-ccc font-900 uppercase">${e.motivo_tarea || 'Pesada'}</span>
+          <span class="${colorVal} font-bold uppercase">${e.valor_neto} ${e.unidad}</span>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      console.warn('[App] Error cargando historial pesajes:', e);
+      container.innerHTML = '<em class="text-red">Error al cargar historial</em>';
+    }
+  },
+
   async _cargarHistorialReproduccion(animalId) {
     const container = document.getElementById('tabla-reproduccion');
     if (!container) return;
@@ -1887,7 +1910,7 @@ const App = {
         <h2 class="mt-15">${Icons.sanidad()} Detalle Tratamiento</h2>
       </div>
       <div class="report-section px-4">
-        <div class="card-registro color-purple">
+        <div class="card-registro" style="--registro-color: var(--c-purple);">
           <div class="font-950 text-gold uppercase text-lg mb-10">${s.medicamento || 'Tratamiento'}</div>
           <div class="grid grid-cols-2 gap-10 text-xs text-gray uppercase font-800">
             <div>Fecha: <strong class="text-white">${new Date(s.fecha).toLocaleDateString()}</strong></div>
@@ -2414,6 +2437,31 @@ const App = {
         if (migrFincas > 0) console.log(`[Migración] ${migrFincas} fincas migradas a v7`);
       } catch (e) {
         console.warn("[Migración fincas] Error:", e);
+      }
+
+      // v8: Migración de pesos actuales para animales (para visibilidad en cards)
+      const pesosMigrados = await window.db.get('meta', 'migracion_pesos_v8').catch(() => null);
+      if (!pesosMigrados) {
+          try {
+            const animales = await window.db.getAll('animales');
+            let migradosPesos = 0;
+            for (const a of animales) {
+              if (!a.peso_actual) {
+                const historial = await window.Pesajes.obtenerHistorial(a.id, 'animal');
+                const ultimoPesaje = historial.find(e => e.valor_neto && (e.motivo_tarea === 'control' || e.motivo_tarea === 'control_peso' || e.motivo_tarea === 'control_lechero' || e.motivo_tarea === 'alta_nacimiento' || e.motivo_tarea === 'alta_compra'));
+                if (ultimoPesaje) {
+                  a.peso_actual = ultimoPesaje.valor_neto;
+                  a.fecha_ultimo_pesaje = ultimoPesaje.fecha;
+                  await window.db.put('animales', a);
+                  migradosPesos++;
+                }
+              }
+            }
+            await window.db.put('meta', { key: 'migracion_pesos_v8', value: true });
+            if (migradosPesos > 0) console.log(`[Migración] ${migradosPesos} animales actualizados con peso_actual`);
+          } catch (e) {
+            console.warn("[Migración pesos] Error:", e);
+          }
       }
     } catch (e) {
       console.error("[App] Error en migraciones de fondo:", e);

@@ -134,6 +134,11 @@
       for (var a = 0; a < animDefs.length; a++) {
         try {
           var aid = await Animales.save(animDefs[a]);
+          var animalGuardado = await Animales.get(aid);
+          if (animalGuardado && animDefs[a].peso_inicial) {
+              animalGuardado.peso_actual = animDefs[a].peso_inicial;
+              await Animales.save(animalGuardado);
+          }
           anims.push(Object.assign({ id: aid }, animDefs[a]));
         } catch (e) { console.log('[SEED] Error animal:', e.message); }
         await sleep(120);

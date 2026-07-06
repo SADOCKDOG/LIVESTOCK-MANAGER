@@ -109,7 +109,22 @@ const Pesajes = {
         const id = await window.db.add("registro_eventos", evento);
         console.log('[DEBUG Pesajes] evento guardado con id:', id, 'fincaId:', evento.fincaId, 'unidad:', evento.unidad);
 
-        // 4. (Opcional) Guardar también en tablas legadas para compatibilidad con informes antiguos
+        // 4. Actualizar el peso_actual en la ficha del animal si aplica
+        if (data.tipo_entidad === "animal" && (data.motivo_tarea === "control" || data.motivo_tarea === "control_peso" || data.motivo_tarea === "control_lechero")) {
+          try {
+            const animal = await window.db.get("animales", Number(data.entidad_id));
+            if (animal) {
+              animal.peso_actual = Number(data.valor_neto);
+              animal.fecha_ultimo_pesaje = evento.fecha;
+              await window.db.put("animales", animal);
+              console.log(`[Pesajes] peso_actual actualizado para animal ${animal.id}: ${animal.peso_actual} ${evento.unidad}`);
+            }
+          } catch (e) {
+            console.warn("[Pesajes] No se pudo actualizar el peso_actual del animal:", e.message);
+          }
+        }
+
+        // 5. (Opcional) Guardar también en tablas legadas para compatibilidad con informes antiguos
         //    NOTA: Si falla el guardado legacy no debe impedir el EventBus ni perder el registro principal
         if (data.tipo_entidad === "animal" && data.motivo_tarea === "control") {
           try {
