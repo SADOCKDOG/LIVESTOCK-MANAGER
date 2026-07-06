@@ -3,11 +3,12 @@
  * Normativa: .agent/AGENTS.md · Se carga ANTES de styles.css en index.html.
  * Mapa de colores de módulo en JS: js/module-colors.js (window.MODULE_COLORS).
  */
+/* stylelint-disable color-no-hex */
 
 :root {
     /* ── MARCA ── */
-    --p-cork: #CCFF00;        /* Neon Lime */
-    --p-cork-dark: #AACC00;
+    --p-cork: #CF0;        /* Neon Lime */
+    --p-cork-dark: #AC0;
     --p-gold: #FFD600;        /* Amarillo Neón */
     --p-gold-dark: #B89900;
 
@@ -26,14 +27,14 @@
     --font-mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', 'Fira Code', monospace;
 
     /* ── TEXTO ── */
-    --text-p: #FFFFFF;        /* Pure White */
+    --text-p: #FFF;        /* Pure White */
     --text-s: #94A3B8;        /* Steel Grey */
-    --text-d: #666666;        /* Deshabilitado / placeholder */
+    --text-d: #666;        /* Deshabilitado / placeholder */
 
     /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
-    --c-success: #CCFF00;     /* Éxito / Zonas / Híbrido */
+    --c-success: #CF0;     /* Éxito / Zonas / Híbrido */
     --c-warning: #FFD600;     /* Aviso / Alertas / Informes */
-    --c-danger:  #FF4444;     /* Peligro / Carne / Gastos */
+    --c-danger:  #F44;     /* Peligro / Carne / Gastos */
     --c-info:    #3b82f6;     /* Info / Leche / Listas */
     --c-accent:  #8b5cf6;     /* legado: reproducción */
 
@@ -69,7 +70,7 @@
     --radius: 16px;           /* alias legacy = --r-lg */
 
     /* ── SOMBRAS ── */
-    --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+    --shadow-md: 0 4px 20px rgb(0 0 0 / 50%);
 
     /* ── SAFE AREAS (Android vertical) ── */
     --safe-top: env(safe-area-inset-top);

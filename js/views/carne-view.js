@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - CarneView v3.3.0
+ * Livestock Manager - CarneView v3.4.0
  * Vista del Módulo de Carne refactorizada bajo patrón "Aglutinadora"
  */
 const CarneView = {
@@ -28,8 +28,8 @@ const CarneView = {
 
     const rebanosCarne = rebanos?.filter(r => (r?.tipo || '').toLowerCase().match(/carne|cárn|mixt|híbr|doble/)) || [];
     const rebanosIds = new Set(rebanosCarne.map(r => r.id));
-    const animalesCarne = animales?.filter(a => rebanosIds.has(a?.rebanoId)) || [];
-    const sanitariosCarne = sanitariosGanado?.filter(s => rebanosIds.has(s?.rebanoId)) || [];
+    const animalesCarne = animales.filter(a => rebanosIds.has(a?.rebanoId));
+    const sanitariosCarne = sanitariosGanado.filter(s => rebanosIds.has(s?.rebanoId));
 
     const totalVentas = ventasCarne?.reduce((s, v) => s + (v?.importe_total || v?.valor_neto || 0), 0) || 0;
     const totalGastoAlim = todosGastos?.filter(g =>
@@ -85,7 +85,7 @@ const CarneView = {
     let icon = this._currentTab === 'patrimonio' ? Icons.edificio() : (this._currentTab === 'comercializacion' ? Icons.transportistas() : Icons.documento());
 
     content.innerHTML = `
-      <div class="card-registro mb-10 mx-4" style="--registro-color: ${color};">
+      <div class="mb-10 mx-4">
         <div class="flex items-center gap-12 mb-12">
           <span class="text-3xl" style="color:${color};">${icon}</span>
           <div>
@@ -117,6 +117,10 @@ const CarneView = {
         <div id="carne-lista" class="grid gap-10">
           ${this._getRecordsHtml()}
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${this._currentTab === 'patrimonio' ? 'location.hash=&apos;/animal&apos;' : (this._currentTab === 'comercializacion' ? 'App._abrirWizardVentaMasiva()' : 'App._registrarTratamientoRebano(null)')}">
+        <span class="fab-label">${this._currentTab === 'patrimonio' ? 'Nuevo Animal' : (this._currentTab === 'comercializacion' ? 'Nueva Venta Carne' : 'Nuevo Tratamiento')}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
@@ -124,21 +128,17 @@ const CarneView = {
     const d = this._cachedData;
     const f = filtro.toLowerCase();
     if (this._currentTab === 'patrimonio') {
-      return d.animalesCarne.filter(a => (a.nombre || a.numero_identificacion || '').toLowerCase().includes(f)).slice(0, 15).map(a => this._cardRegistro({
-        icon: Icons.animales(), title: a.nombre || a.numero_identificacion || 'Animal', color: 'var(--c-info)', onClick: `location.hash='/animal?id=${a.id}'`,
-        metadata: `<span>${a.raza || 'Sin raza'}</span><span>·</span><span>Lote: ${a.rebanoId}</span>`,
-        badge: `ID ${a.id}`
-      })).join('');
+      return d.animalesCarne.filter(a => (a.nombre || a.numero_identificacion || '').toLowerCase().includes(f)).slice(0, 15).map(a => this._renderCardAnimal(a)).join('');
     } else if (this._currentTab === 'comercializacion') {
-      return d.ventasCarne.filter(v => (v.razonSocial || '').toLowerCase().includes(f)).slice(0, 15).map(v => this._cardRegistro({
-        icon: Icons.documento(), title: v.razonSocial || 'Matadero', color: 'var(--c-success)', onClick: `App._abrirDetalleVentaCarne(${v.id})`,
+      return d.ventasCarne.filter(v => (v.razonSocial || '').toLowerCase().includes(f)).slice(0, 20).map(v => App._cardRegistro({
+        color: 'var(--c-success)', icon: Icons.documento(), title: v.razonSocial || 'Matadero', onClick: `App._abrirDetalleVentaCarne(${v.id})`,
         metadata: `<span>${this._fmtFecha(v.fechaSacrificio)}</span>`,
         badge: `${Math.round(v.importe_total || 0).toLocaleString()} €`
       })).join('');
     } else {
       return d.sanitariosCarne.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => {
           const enSup = (s.tiempo_espera_carne_dias || 0) > 0;
-          return this._cardRegistro({
+          return App._cardRegistro({
             icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: enSup ? 'var(--c-danger)' : 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
             metadata: `<span>${this._fmtFecha(s.fecha)}</span><span>·</span><span>Espera: ${s.tiempo_espera_carne_dias || 0}d</span>`,
             badge: enSup ? 'SUPRESIÓN' : 'LIBRE'
@@ -147,36 +147,13 @@ const CarneView = {
     }
   },
 
+  _renderCardAnimal(a) {
+    return App._cardRegistro(App._getAnimalCardProps(a, null));
+  },
+
   _filtrar(texto) {
     const lista = document.getElementById('carne-lista');
     if (lista) lista.innerHTML = this._getRecordsHtml(texto);
-  },
-
-  _cardRegistro(opts) {
-    const color = opts.color || 'var(--c-info)';
-    return `
-      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-        <div class="flex-1 min-w-0 flex flex-col justify-center">
-          <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${color};">${opts.icon}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${opts.title}</div>
-          </div>
-          <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
-        </div>
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">
-            ${opts.badge ? `
-              <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-                ${opts.badge}
-              </div>` : ''}
-          </div>
-          <div class="bottom-part">
-            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-              Ficha ${Icons.flechaDerecha()}
-            </span>
-          </div>
-        </div>
-      </div>`;
   }
 };
 window.CarneView = CarneView;

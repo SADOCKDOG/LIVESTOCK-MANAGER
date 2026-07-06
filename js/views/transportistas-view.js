@@ -28,9 +28,9 @@ const TransportistasView = {
             <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
               <div class="flex justify-between items-start mb-10">
                 <div>
-                  <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
-                    ${Icons.transportistas()} LOGÍSTICA
-                  </h2>
+                    <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
+                      <span class="${App._getColorClass(themeColor)}">|</span> ${Icons.transportistas()} TRANSPORTISTAS
+                    </h3>
                   <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
                     ${todos.length} REGISTROS · RESUMEN DE FLOTA
                   </div>
@@ -182,7 +182,9 @@ const TransportistasView = {
                 <div class="flex items-center gap-8 mb-14">
                     <button onclick="TransportistasView.render()" class="link-back" style="background:none; border:none; cursor:pointer; padding:4px 8px;">← Volver</button>
                     <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,var(--c-info),var(--c-info));"></span>
-                    <h2 class="m-0 font-900 text-sm text-blue-400">${Icons.transportistas()} ${t.nombre}</h2>
+                    <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 text-sm">
+                        <span class="text-blue-400">|</span> ${Icons.transportistas()} ${t.nombre}
+                    </h3>
                 </div>
 
                 <div class="card p-16 mb-14">
@@ -190,7 +192,9 @@ const TransportistasView = {
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-8 mb-4">
                             <span style="width:4px; height:20px; border-radius:2px; background:linear-gradient(135deg,var(--c-info),var(--c-info));"></span>
-                            <h2 class="m-0 font-950 text-gold uppercase text-xl">${t.nombre}</h2>
+                            <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 text-xl">
+                                <span class="text-gold">|</span> ${t.nombre}
+                            </h3>
                         </div>
                         <div class="flex gap-8 flex-wrap">
                           <span class="badge badge-sm uppercase" style="background:${t.activo ? 'color-mix(in srgb, var(--c-success) 8%, transparent)' : 'color-mix(in srgb, var(--c-danger) 8%, transparent)'}; color:${t.activo ? 'var(--c-success)' : 'var(--c-danger)'}; border:1px solid ${t.activo ? 'color-mix(in srgb, var(--c-success) 21%, transparent)' : 'color-mix(in srgb, var(--c-danger) 21%, transparent)'};">

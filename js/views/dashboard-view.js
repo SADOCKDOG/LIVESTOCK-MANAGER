@@ -460,7 +460,7 @@ const DashboardView = {
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">L/DÍA</div>
               <div style="font-weight: 800; border: 1px solid ${kpiColorHex}; color: ${kpiColorHex}; background: color-mix(in srgb, ${kpiColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}</div>
-              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${totalHembras} ♀</div>
+              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${totalHembras} ${Icons.hembra()}</div>
             </div>
               <div>
                 <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PIENSO (g/L)</div>

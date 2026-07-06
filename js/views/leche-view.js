@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - LecheView v3.3.0
+ * Livestock Manager - LecheView v3.4.0
  * Vista del Módulo de Leche refactorizada bajo patrón "Aglutinadora"
  */
 const LecheView = {
@@ -94,7 +94,7 @@ const LecheView = {
     let icon = this._currentTab === 'patrimonio' ? Icons.edificio() : (this._currentTab === 'comercializacion' ? Icons.transportistas() : Icons.documento());
 
     content.innerHTML = `
-      <div class="card-registro mb-10 mx-4" style="--registro-color: ${color};">
+      <div class="mb-10 mx-4">
         <div class="flex items-center gap-12 mb-12">
           <span class="text-3xl" style="color:${color};">${icon}</span>
           <div>
@@ -126,6 +126,10 @@ const LecheView = {
         <div id="leche-lista" class="grid gap-10">
           ${this._getRecordsHtml()}
         </div>
+      </div>
+      <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${this._currentTab === 'patrimonio' ? 'location.hash=&apos;/animal&apos;' : (this._currentTab === 'comercializacion' ? 'App._abrirWizardAlbaranLeche()' : 'App._registrarTratamientoRebano(null)')}">
+        <span class="fab-label">${this._currentTab === 'patrimonio' ? 'Nuevo Animal' : (this._currentTab === 'comercializacion' ? 'Nueva Entrega Leche' : 'Nuevo Tratamiento')}</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
@@ -139,7 +143,7 @@ const LecheView = {
     } else {
       return d.sanitariosLeche.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => {
           const enSup = (s.tiempo_espera_leche_dias || 0) > 0;
-          return this._cardRegistro({
+          return App._cardRegistro({
             icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: enSup ? 'var(--c-danger)' : 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
             metadata: `<span>${this._fmtFecha(s.fecha)}</span><span>·</span><span>Espera: ${s.tiempo_espera_leche_dias || 0}d</span>`,
             badge: enSup ? 'SUPRESIÓN' : 'LIBRE'
@@ -149,19 +153,12 @@ const LecheView = {
   },
 
   _renderCardAnimal(a) {
-    return this._cardRegistro({
-      icon: Icons.animales(),
-      title: a.nombre || a.numero_identificacion || 'Animal',
-      color: window.ModoContextoHelper?.getEspecieColor(a.especie) || 'var(--c-info)',
-      onClick: `location.hash='/animal?id=${a.id}'`,
-      metadata: `<span>Nac: ${this._fmtFecha(a.fecha_nacimiento)}</span><span>·</span><span>${a.raza || 'Sin raza'}</span>`,
-      badge: `#${a.id}`
-    });
+    return App._cardRegistro(App._getAnimalCardProps(a, null));
   },
 
   _cardEntrega(e) {
-      return this._cardRegistro({
-        icon: Icons.leche(), title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`, color: 'var(--c-success)', onClick: `location.hash='/albaran-leche?id=${e.id}'`,
+      return App._cardRegistro({
+        color: 'var(--c-success)', icon: Icons.leche(), title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`, onClick: `location.hash='/albaran-leche?id=${e.id}'`,
         metadata: `<span>${this._fmtFecha(e.fechaRecogida || e.fecha)}</span>`,
         badge: `${(e.cantidad || 0).toLocaleString()} L`
       });
@@ -170,34 +167,8 @@ const LecheView = {
   _filtrar(texto) {
     const lista = document.getElementById('leche-lista');
     if (lista) lista.innerHTML = this._getRecordsHtml(texto);
-  },
-
-  _cardRegistro(opts) {
-    const color = opts.color || 'var(--c-info)';
-    return `
-      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-        <div class="flex-1 min-w-0 flex flex-col justify-center">
-          <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${color};">${opts.icon}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${opts.title}</div>
-          </div>
-          <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
-        </div>
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">
-            ${opts.badge ? `
-              <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-                ${opts.badge}
-              </div>` : ''}
-          </div>
-          <div class="bottom-part">
-            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-              Ficha ${Icons.flechaDerecha()}
-            </span>
-          </div>
-        </div>
-      </div>`;
-  },
+  }
+,
 
   async _abrirAsistenteTratamientoLeche() {
     const d = this._cachedData;

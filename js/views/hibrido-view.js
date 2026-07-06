@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - HibridoView v2.3.0
+ * Livestock Manager - HibridoView v2.4.0
  * Consola Híbrida/Mixta refactorizada bajo patrón "Aglutinadora"
  */
 const HibridoView = {
@@ -86,7 +86,7 @@ const HibridoView = {
     let icon = Icons.edificio();
 
     content.innerHTML = `
-      <div class="card-registro mb-10 mx-4" style="--registro-color: ${color};">
+      <div class="mb-10 mx-4">
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="flex justify-between items-center mb-6">
             <span class="text-xs text-white font-black uppercase tracking-wider flex items-center gap-6">${icon} Resumen ${this._currentTab}</span>
@@ -110,6 +110,11 @@ const HibridoView = {
         <div id="hibrido-lista" class="grid gap-10">
           ${this._getRecordsHtml()}
         </div>
+      </div>
+
+      <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'hibrido' })">
+        <span class="fab-label">Registrar Actividad</span>
+        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
@@ -119,9 +124,9 @@ const HibridoView = {
     if (this._currentTab === 'patrimonio') {
       return d.rebanos.filter(r => (r.nombre || '').toLowerCase().includes(f)).map(r => {
         const activosCount = d.animalesFinca.filter(a => a.rebanoId === r.id && (a.estado || "").toLowerCase() === "activo").length;
-        return this._cardRegistro({
-          icon: Icons.rebanos(), title: r.nombre, color: 'var(--c-warning)', onClick: `location.hash='/rebano?id=${r.id}'`,
-          metadata: `<span>${r.tipo}</span><span>·</span><span>${r.especie}</span>`,
+        return App._cardRegistro({
+          color: 'var(--c-warning)', icon: Icons.rebanos(), title: r.nombre, onClick: `location.hash='/rebano?id=${r.id}'`,
+          metadata: `<span>${r.tipo}</span><span style="margin: 0 4px;">·</span><span>${r.especie}</span>`,
           badge: `${activosCount} cab.`
         });
       }).join('');
@@ -130,8 +135,8 @@ const HibridoView = {
       list.sort((a, b) => new Date(b.fecha || b.fechaSacrificio || 0) - new Date(a.fecha || a.fechaSacrificio || 0));
       return list.filter(i => (i.razonSocial || 'Entrega').toLowerCase().includes(f)).slice(0, 15).map(i => {
         const iColor = i.t === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
-        return this._cardRegistro({
-          icon: i.t === 'carne' ? Icons.carne() : Icons.leche(), title: i.razonSocial || 'Entrega Mixta', color: iColor, onClick: i.t === 'carne' ? `App._abrirDetalleVentaCarne(${i.id})` : `location.hash='/albaran-leche?id=${i.id}'`,
+        return App._cardRegistro({
+          color: iColor, icon: i.t === 'carne' ? Icons.carne() : Icons.leche(), title: i.razonSocial || 'Entrega Mixta', onClick: i.t === 'carne' ? `App._abrirDetalleVentaCarne(${i.id})` : `location.hash='/albaran-leche?id=${i.id}'`,
           metadata: `<span>${this._fmtFecha(i.fecha || i.fechaSacrificio)}</span>`,
           badge: `${Math.round(i.importe_total || 0).toLocaleString()} €`
         });
@@ -139,8 +144,8 @@ const HibridoView = {
     } else {
       return d.sanitariosFinca.filter(s => (s.medicamento || '').toLowerCase().includes(f)).slice(0, 15).map(s => {
         const enSup = (s.tiempo_espera_carne_dias || 0) > 0 || (s.tiempo_espera_leche_dias || 0) > 0;
-        return this._cardRegistro({
-          icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', color: enSup ? 'var(--c-danger)' : 'var(--c-purple)', onClick: `location.hash='/sanitario?id=${s.id}'`,
+        return App._cardRegistro({
+          color: enSup ? 'var(--c-danger)' : 'var(--c-purple)', icon: Icons.sanidad(), title: s.medicamento || 'Tratamiento', onClick: `location.hash='/sanitario?id=${s.id}'`,
           metadata: `<span>${this._fmtFecha(s.fecha)}</span>`,
           badge: enSup ? 'SUPRESIÓN' : 'LIBRE'
         });
@@ -151,33 +156,6 @@ const HibridoView = {
   _filtrar(texto) {
     const lista = document.getElementById('hibrido-lista');
     if (lista) lista.innerHTML = this._getRecordsHtml(texto);
-  },
-
-  _cardRegistro(opts) {
-    const color = opts.color || 'var(--c-info)';
-    return `
-      <div class="card-registro" onclick="${opts.onClick}" style="display:flex; gap:10px; align-items:stretch; --registro-color: ${color}; cursor:pointer;">
-        <div class="flex-1 min-w-0 flex flex-col justify-center">
-          <div class="flex items-center gap-10 min-w-0">
-            <span class="text-xl" style="color:${color};">${opts.icon}</span>
-            <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${opts.title}</div>
-          </div>
-          <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">${opts.metadata}</div>
-        </div>
-        <div class="flex flex-col items-end justify-between flex-shrink-0">
-          <div class="top-part">
-            ${opts.badge ? `
-              <div style="background:${color}15; color:${color}; border:1px solid ${color}40; filter: drop-shadow(0 0 4px ${color}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">
-                ${opts.badge}
-              </div>` : ''}
-          </div>
-          <div class="bottom-part">
-            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-              Ficha ${Icons.flechaDerecha()}
-            </span>
-          </div>
-        </div>
-      </div>`;
   }
 };
 window.HibridoView = HibridoView;

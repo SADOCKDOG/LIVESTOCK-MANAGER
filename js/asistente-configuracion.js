@@ -408,7 +408,7 @@ const AsistenteConfiguracion = {
         overlay.innerHTML = `
             <div class="tour-flotante-backdrop"></div>
             <div class="tour-flotante-card" id="tour-card">
-                <button class="tour-btn-cerrar" id="tour-cerrar">✕</button>
+                <button class="tour-btn-cerrar" id="tour-cerrar">${Icons.cerrar()}</button>
                 <div class="tour-body" id="tour-body">
                     <div class="tour-icono">${pasos[0].icono}</div>
                     <h3 class="tour-titulo">${pasos[0].titulo}</h3>
@@ -421,7 +421,7 @@ const AsistenteConfiguracion = {
                         ${pasos.map((_, i) => `<span class="tour-dot ${i === 0 ? 'activo' : ''}" data-index="${i}"></span>`).join('')}
                     </div>
                     <button class="tour-btn tour-btn-next" id="tour-next">Siguiente →</button>
-                    <button class="tour-btn tour-btn-fin d-none" id="tour-fin">✓ ¡Comenzar!</button>
+                    <button class="tour-btn tour-btn-fin d-none" id="tour-fin">${Icons.check()} ¡Comenzar!</button>
                 </div>
             </div>
         `;

@@ -1,61 +1,318 @@
-async _renderLista(lista) {
-    const container = document.getElementById('contratos-lista-standalone');
-    if (!container) return;
+const ContratosView = {
+    _searchQuery: '',
 
-    if (lista.length === 0) {
-      container.innerHTML = `<div class="empty-state"><p class="empty-state-text">No hay contratos que coincidan</p></div>`;
-      return;
-    }
+    async render() {
+        const main = document.getElementById("app-content");
+        const themeColor = 'var(--c-purple)';
+        const contratos = await Contratos.list().catch(() => []);
+        const activos = contratos.filter(c => c.activo !== false);
 
-    const compradores = await Compradores.list().catch(() => []);
-    const compMap = {};
-    compradores.forEach(c => compMap[c.id] = c);
-
-    container.innerHTML = `<div class="grid gap-12">${lista.map(c => {
-        const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-purple)');
-        const comp = compMap[c.compradorId];
-
-        return `
-        <div class="card-registro" onclick="ContratosView.renderFormulario({get: (k) => k === 'id' ? ${c.id} : null})"
-             style="--registro-color: ${color}; display:flex; gap:10px; align-items:stretch;">
-            <!-- BLOQUE IZQUIERDO: Identificación y Datos -->
-            <div class="flex-1 min-w-0 flex flex-col justify-center">
-                <!-- Encabezado de la Card -->
-                <div class="flex items-center gap-10 min-w-0">
-                    <span class="text-xl" style="color:${color};">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()}</span>
-                    <div class="font-950 uppercase text-[0.9rem] tracking-tight"
-                         style="color:var(--p-gold); font-weight: 950;">
-                        ${c.numero_contrato}
-                    </div>
+        main.innerHTML = `
+          <div class="card-registro" style="--registro-color: ${themeColor}; padding: 15px;">
+            <div class="flex justify-between items-start mb-10">
+              <div>
+                <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
+                  <span class="${App._getColorClass(themeColor)}">|</span> ${Icons.contratos()} CONTRATOS
+                </h3>
+                <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
+                  GESTIÓN COMERCIAL Y VIGENCIA
                 </div>
-                <!-- Metadatos Secundarios -->
-                <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.62rem] text-gray font-800 uppercase mt-4">
-                    ${comp ? `<span>${Icons.compradores()} ${comp.nombre}</span>` : `<span>${Icons.edificio()} SIN COMPRADOR</span>`}
-                    <span>·</span>
-                    <span>${Icons.calendar()} ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString() : '—'}</span>
-                </div>
+              </div>
+              <button class="resumen-toggle" onclick="App.toggleResumen(this)">
+                ${Icons.chevronAbajo()}
+              </button>
             </div>
-            <!-- BLOQUE DERECHO: Estado y Acción -->
-            <div class="flex flex-col items-end justify-between flex-shrink-0">
-                <!-- Parte Superior: Viñeta Iluminada (Status Badge) -->
-                <div class="top-part">
-                    <div style="background:${c.activo ? 'var(--c-success)' : 'var(--c-danger')}15;
-                                color:${c.activo ? 'var(--c-success)' : 'var(--c-danger)'};
-                                border:1px solid ${c.activo ? 'var(--c-success)' : 'var(--c-danger)'}40;
-                                filter:drop-shadow(0 0 4px ${c.activo ? 'var(--c-success)' : 'var(--c-danger)'});
-                                padding:2px 8px; border-radius:6px; font-size:0.6rem;
-                                font-weight:900; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">
-                        ${c.activo ? 'ACTIVO' : 'INACTIVO'}
-                    </div>
+
+            <!-- Card de RESUMEN -->
+            <div class="card card-total-3d card-resumen mb-20">
+              <div class="resumen-body flex flex-col gap-6">
+                <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
+                   <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.contratos()} TOTAL</span>
+                   <strong class="text-xl font-950" style="color: var(--c-info)">${contratos.length}</strong>
                 </div>
-                <!-- Parte Inferior: Link de Acción -->
-                <div class="bottom-part">
-                    <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase;">
-                        FICHA ${Icons.flechaDerecha()}
-                    </span>
+                <div class="flex justify-between items-center px-4 py-8 border-bottom-222">
+                   <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.check()} ACTIVOS</span>
+                   <strong class="text-xl font-950" style="color: var(--c-success)">${activos.length}</strong>
                 </div>
+                <div class="flex justify-between items-center px-4 py-8">
+                   <span class="text-gray text-[0.7rem] font-800 uppercase">${Icons.alerta()} VENCIDOS</span>
+                   <strong class="text-xl font-950" style="color: var(--c-danger)">${contratos.length - activos.length}</strong>
+                </div>
+              </div>
             </div>
-        </div>
+
+            <div class="flex gap-8 mb-14">
+              <input type="search" id="search-contratos" placeholder="Buscar por Nº Contrato o condiciones..."
+                oninput="ContratosView._filtrar(this.value)"
+                class="search-input flex-1 uppercase font-700" value="${this._searchQuery}">
+            </div>
+
+            <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.75rem]">
+              ${Icons.documento()} LISTADO DE CONTRATOS
+            </div>
+            <div id="contratos-lista-standalone"></div>
+          </div>
+
+          <!-- Botón Flotante de Acción -->
+          <div class="fab-container" onclick="ContratosView.renderFormulario()">
+            <span class="fab-label">Nuevo Contrato</span>
+            <button class="fab-btn" style="--neon: ${themeColor}">${Icons.fabPlus()}</button>
+          </div>
         `;
-    }).join('')}</div>`;
-  },
+
+        this._renderLista(contratos);
+    },
+
+    _filtrar(val) {
+        this._searchQuery = val;
+        Contratos.list().then(list => {
+            const q = val.toLowerCase();
+            const filtered = list.filter(c =>
+                (c.numero_contrato || '').toLowerCase().includes(q) ||
+                (c.condiciones || '').toLowerCase().includes(q)
+            );
+            this._renderLista(filtered);
+        });
+    },
+
+    async _renderLista(lista) {
+        const container = document.getElementById('contratos-lista-standalone');
+        if (!container) return;
+
+        if (lista.length === 0) {
+            container.innerHTML = `<div class="empty-state"><p class="empty-state-text">No hay contratos que coincidan</p></div>`;
+            return;
+        }
+
+        const compradores = await Compradores.list().catch(() => []);
+        const compMap = {};
+        compradores.forEach(c => compMap[c.id] = c);
+
+        container.innerHTML = `<div class="grid gap-12">${lista.map(c => {
+            const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-purple)');
+            const comp = compMap[c.compradorId];
+
+            let colorClass = App._getColorClass(color).replace('text-', 'color-');
+            if(colorClass === 'color-gray') colorClass = 'color-gray';
+
+            return App._cardRegistro({
+              colorClass: colorClass,
+              onClick: `ContratosView.renderFormulario({get: (k) => k === 'id' ? ${c.id} : null})`,
+              icon: c.tipo === 'leche' ? Icons.leche() : Icons.carne(),
+              title: c.numero_contrato,
+              badge: c.activo ? 'ACTIVO' : 'INACTIVO',
+              metadata: `
+                <span class="flex items-center gap-4 ${App._getColorClass(color)}">CONTRATO ${c.tipo.toUpperCase()}</span>
+                <span class="flex items-center gap-4">${Icons.compradores()} ${comp ? comp.nombre : 'SIN COMPRADOR'}</span>
+              `
+            });
+        }).join('')}</div>`;
+    },
+
+    // ============================================
+    // FORMULARIO DE CONTRATO (nuevo / editar)
+    // ============================================
+
+    async renderFormulario(params) {
+        const id = params?.get ? params.get('id') : null;
+        const compradorId = params?.get ? params.get('compradorId') : null;
+        const esEdicion = !!id;
+
+        let contrato = esEdicion ? await Contratos.get(id) : {
+            compradorId: Number(compradorId) || null,
+            numero_contrato: '',
+            fecha_inicio: new Date().toISOString().split('T')[0],
+            fecha_fin: '',
+            tipo: 'carne',
+            precios: [],
+            iva_pct: 10,
+            retencion_pct: 0,
+            condiciones: '',
+            notas: '',
+            activo: true
+        };
+
+        const compradores = await Compradores.list().catch(() => []);
+
+        const main = document.getElementById("app-content");
+        main.innerHTML = `
+          <div class="mb-14">
+            <button onclick="location.hash='#/compradores'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+              <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
+            </button>
+          </div>
+          <div class="card-registro card-accent card-accent-purple p-20 bg-black" style="--registro-color: var(--c-purple);">
+            <div class="section-header-theme mb-20" style="--theme-color: var(--c-purple)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR CONTRATO' : 'NUEVO CONTRATO'}</div>
+
+            <div class="wizard-input-group mb-15">
+              <label class="wizard-label uppercase font-900">COMPRADOR / CLIENTE *</label>
+              <select id="ct-comprador" class="wizard-input wizard-select font-900 uppercase">
+                <option value="">— SELECCIONAR COMPRADOR —</option>
+                ${compradores.map(c =>
+                  `<option value="${c.id}" ${Number(contrato.compradorId) === c.id ? 'selected' : ''}>${c.nombre.toUpperCase()}${c.tipo_comprador ? ' (' + ((c.tipo_comprador === 'láctico' ? 'lácteo' : c.tipo_comprador)).toUpperCase() + ')' : ''}</option>`
+                ).join('')}
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-12 mb-15">
+              <div class="wizard-input-group">
+                <label class="wizard-label uppercase font-900">Nº CONTRATO *</label>
+                <input type="text" id="ct-numero" value="${contrato.numero_contrato || ''}" class="wizard-input uppercase font-950 text-gold" placeholder="EJ: CT-2024-001">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label uppercase font-900">TIPO CONTRATO</label>
+                <select id="ct-tipo" class="wizard-input wizard-select font-900 uppercase">
+                  <option value="carne" ${contrato.tipo === 'carne' ? 'selected' : ''}>CARNE</option>
+                  <option value="leche" ${contrato.tipo === 'leche' ? 'selected' : ''}>LECHE</option>
+                  <option value="mixto" ${contrato.tipo === 'mixto' ? 'selected' : ''}>MIXTO / OTRO</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-12 mb-15">
+              <div class="wizard-input-group">
+                <label class="wizard-label uppercase font-900">FECHA INICIO *</label>
+                <input type="date" id="ct-inicio" value="${contrato.fecha_inicio || ''}" class="wizard-input font-800 uppercase">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label uppercase font-900">FECHA VENCIMIENTO</label>
+                <input type="date" id="ct-fin" value="${contrato.fecha_fin || ''}" class="wizard-input font-800 uppercase">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-12 mb-15">
+              <div class="wizard-input-group">
+                <label class="wizard-label uppercase font-900">IVA (%)</label>
+                <input type="number" id="ct-iva" value="${contrato.iva_pct !== undefined ? contrato.iva_pct : 10}" class="wizard-input font-900 text-lg" step="0.1">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label uppercase font-900">RETENCIÓN REAGP (%)</label>
+                <input type="number" id="ct-ret" value="${contrato.retencion_pct !== undefined ? contrato.retencion_pct : 0}" class="wizard-input font-900 text-lg" step="0.1">
+              </div>
+            </div>
+
+            <div class="wizard-input-group mb-20">
+                <label class="wizard-label uppercase font-900">CONDICIONES PARTICULARES</label>
+                <textarea id="ct-cond" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${contrato.condiciones || ''}</textarea>
+            </div>
+
+            <!-- TABLA DE PRECIOS -->
+            <div class="mt-20 mb-20 p-16 bg-black border border-222 rounded-sm">
+              <div class="flex justify-between items-center mb-16 border-bottom-222 pb-10">
+                <h3 class="text-gold font-950 uppercase text-[0.7rem] m-0 tracking-widest">${Icons.dinero()} TABLA DE PRECIOS PACTADOS</h3>
+                <button onclick="ContratosView._addPrecioRow()" class="widget-link-btn widget-link-btn--neon neon-success px-12 py-4 min-h-0 h-auto">
+                   <span class="text-[0.6rem] font-950 uppercase">${Icons.agregar()} AÑADIR</span>
+                </button>
+              </div>
+              <div id="ct-precios-container" class="grid gap-10">
+                ${contrato.precios && contrato.precios.length > 0 ?
+                  contrato.precios.map((pr, i) => this._renderPrecioRow(pr, i)).join('') :
+                  '<div class="empty-state border-none p-10"><p class="empty-state-text uppercase font-900 text-[0.6rem]">Sin precios definidos. Pulsa "AÑADIR".</p></div>'
+                }
+              </div>
+            </div>
+
+            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-25">
+              <input type="checkbox" id="ct-activo" ${contrato.activo !== false ? 'checked' : ''} style="accent-color:var(--c-purple);">
+              <span class="uppercase font-950 tracking-widest text-[0.65rem]">Contrato vigente y activo</span>
+            </label>
+
+            <div class="grid grid-cols-2 gap-10 mt-20">
+                <button onclick="ContratosView._guardar('${id || ''}')" class="widget-link-btn widget-link-btn--neon neon-success">
+                  ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
+                </button>
+                <button onclick="location.hash='#/compradores'" class="widget-link-btn widget-link-btn--neon neon-danger">
+                  ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
+                </button>
+            </div>
+            ${esEdicion ? `<div class="mt-15 text-center"><button onclick="ContratosView._eliminarContrato(${contrato.id})" class="text-red font-900 text-[0.6rem] uppercase tracking-widest p-10 opacity-60 hover:opacity-100 transition-all">${Icons.eliminar()} Anular contrato permanentemente</button></div>` : ''}
+          </div>
+          <div class="pb-40"></div>
+        `;
+    },
+
+    _renderPrecioRow(pr, index) {
+        const uid = pr.id || Date.now() + index;
+        return `
+          <div class="precio-row grid grid-cols-[2fr_1fr_1fr_40px] gap-8 items-end bg-dark p-10 rounded-sm border border-333" data-precioid="${uid}">
+            <div>
+              <label class="text-[0.55rem] text-gray-500 font-950 uppercase tracking-widest mb-4 d-block">PRODUCTO</label>
+              <input type="text" class="precio-producto wizard-input font-800 uppercase p-8 text-xs" value="${pr.producto || ''}" placeholder="EJ: CANAL OVINO">
+            </div>
+            <div>
+              <label class="text-[0.55rem] text-gray-500 font-950 uppercase tracking-widest mb-4 d-block">PRECIO (€)</label>
+              <input type="number" class="precio-valor wizard-input font-950 text-green p-8 text-sm" value="${pr.precio_unitario || ''}" step="0.001">
+            </div>
+            <div>
+              <label class="text-[0.55rem] text-gray-500 font-950 uppercase tracking-widest mb-4 d-block">UNIDAD</label>
+              <select class="precio-unidad wizard-input wizard-select font-900 p-8 text-[0.65rem]">
+                <option value="kg" ${pr.unidad === 'kg' ? 'selected' : ''}>€/kg</option>
+                <option value="L" ${pr.unidad === 'L' ? 'selected' : ''}>€/L</option>
+                <option value="unidad" ${pr.unidad === 'unidad' ? 'selected' : ''}>€/UD</option>
+                <option value="cabeza" ${pr.unidad === 'cabeza' ? 'selected' : ''}>€/CAB</option>
+              </select>
+            </div>
+            <button onclick="this.closest('.precio-row').remove()" class="btn btn-danger p-10" style="height:38px; display:flex; align-items:center; justify-content:center;">${Icons.eliminar()}</button>
+          </div>`;
+    },
+
+    _addPrecioRow() {
+        const container = document.getElementById('ct-precios-container');
+        if (!container) return;
+        const emptyMsg = container.querySelector('.empty-state');
+        if (emptyMsg) emptyMsg.remove();
+        container.insertAdjacentHTML('beforeend', this._renderPrecioRow({ producto: '', precio_unitario: '', unidad: 'kg' }, Date.now()));
+    },
+
+    _getPrecios() {
+        const rows = document.querySelectorAll('.precio-row');
+        return Array.from(rows).map(row => ({
+            id: parseInt(row.dataset.precioid) || Date.now(),
+            producto: row.querySelector('.precio-producto')?.value || '',
+            precio_unitario: parseFloat(row.querySelector('.precio-valor')?.value) || 0,
+            unidad: row.querySelector('.precio-unidad')?.value || 'kg'
+        })).filter(p => p.producto && p.precio_unitario > 0);
+    },
+
+    async _guardar(id) {
+        try {
+            const compradorId = parseInt(document.getElementById('ct-comprador').value) || null;
+            const data = {
+                id: id ? Number(id) : undefined,
+                compradorId: compradorId,
+                numero_contrato: document.getElementById('ct-numero').value.trim(),
+                tipo: document.getElementById('ct-tipo').value,
+                fecha_inicio: document.getElementById('ct-inicio').value,
+                fecha_fin: document.getElementById('ct-fin').value || null,
+                iva_pct: parseFloat(document.getElementById('ct-iva').value) || 0,
+                retencion_pct: parseFloat(document.getElementById('ct-ret').value) || 0,
+                condiciones: document.getElementById('ct-cond').value.trim(),
+                precios: this._getPrecios(),
+                activo: document.getElementById('ct-activo').checked
+            };
+
+            if (!data.numero_contrato) return App.toastError('El número de contrato es obligatorio');
+            if (!data.compradorId) return App.toastError('Selecciona un comprador');
+
+            await Contratos.save(data);
+            App.toast(id ? 'Contrato actualizado' : 'Contrato creado', 'success');
+            
+            location.hash = '#/compradores';
+        } catch (e) {
+            App.toastError(e.message);
+        }
+    },
+
+    async _eliminarContrato(id) {
+        if (!await Confirm.confirm("Eliminar Contrato", "¿Deseas eliminar este contrato permanentemente? Esta acción es irreversible.")) return;
+        try {
+            await Contratos.delete(id);
+            App.toast("Contrato eliminado");
+            location.hash = '#/compradores';
+        } catch (e) {
+            App.toastError("Error: " + e.message);
+        }
+    }
+};
+
+window.ContratosView = ContratosView;

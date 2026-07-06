@@ -50,7 +50,7 @@ const ZonasView = {
 
         <!-- Card de RESUMEN Normalizada -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+          <div class="flex justify-between items-center mb-6">
             <span class="flex items-center gap-6" style="color: ${themeColor}">${Icons.zonas()} Resumen Ocupación</span>
             <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
@@ -98,17 +98,15 @@ const ZonasView = {
       }
       const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      html += `
-        <div class="card-registro" onclick="location.hash='/zona?index=${item.realIndex}'" style="--registro-color: ${colorCenso}; display:flex; gap:10px; align-items:stretch;">
-          <div class="flex-1 min-w-0 flex flex-col justify-center">
-              <div class="flex items-center gap-10 min-w-0">
-                <div class="text-xl" style="color:${colorCenso}">${Icons.zonas()}</div>
-                <div class="text-xs">
-                  <div class="font-950 uppercase text-[0.9rem] tracking-tight" style="color:var(--p-gold); font-weight: 950;">${z.nombre}</div>
-                  <div class="text-gray mt-2 font-700 uppercase" style="font-size:0.6rem;">${z.usoPrincipal || 'Pastos'} · ${superficie ? Number(superficie).toLocaleString('es-ES') + ' ha' : 'S/S'}</div>
-                </div>
-              </div>
-
+      html += App._cardRegistro({
+        color: colorCenso,
+        icon: Icons.zonas(),
+        title: z.nombre,
+        onClick: `location.hash='/zona?index=${item.realIndex}'`,
+        badge: estadoTexto,
+        metadata: `
+          <div style="width: 100%;">
+            <div class="text-gray mt-2 font-700 uppercase" style="font-size:0.6rem;">${z.usoPrincipal || 'Pastos'} · ${superficie ? Number(superficie).toLocaleString('es-ES') + ' ha' : 'S/S'}</div>
             <div class="p-8 rounded bg-black border border-222 mt-8">
               <div class="flex justify-between font-950 text-[0.55rem] mb-4 uppercase">
                 <span class="text-gray">CARGA: ${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} UGM</span>
@@ -118,22 +116,13 @@ const ZonasView = {
                 <div style="width:${Math.min(pct, 100)}%; height:100%; background:${colorCenso}; border-radius:4px; box-shadow:0 0 8px ${colorCenso}44;"></div>
               </div>
             </div>
-
             <div class="flex flex-wrap gap-x-12 gap-y-2 text-[0.6rem] text-aaa font-800 uppercase mt-4">
               ${z.codigo_pac ? `<div class="flex items-center gap-4">${Icons.documento()} PAC: ${z.codigo_pac}</div>` : ''}
               <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
             </div>
           </div>
-
-          <div class="flex flex-col items-end justify-between flex-shrink-0">
-            <div style="background:${colorCenso}15; color:${colorCenso}; border: 1px solid ${colorCenso}40; filter: drop-shadow(0 0 4px ${colorCenso}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; white-space:nowrap;">
-              ${estadoTexto}
-            </div>
-            <div style="font-size: 0.7rem; font-weight: 800; color: var(--c-warning); text-transform: uppercase;">
-              Ficha ${Icons.flechaDerecha()}
-            </div>
-          </div>
-        </div>`;
+        `
+      });
     }
 
     html += `</div></div>`;

@@ -19,9 +19,9 @@ const ProveedoresView = {
         main.innerHTML = `
           <div class="report-section px-4">
             <div class="mb-14">
-              <h2 class="flex items-center gap-8 uppercase font-900 tracking-tighter m-0" style="color: ${themeColor}">
-                ${Icons.proveedores()} PROVEEDORES
-              </h2>
+              <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0">
+                <span class="${App._getColorClass(themeColor)}">|</span> ${Icons.proveedores()} PROVEEDORES
+              </h3>
               <div class="text-gray text-[0.65rem] font-800 uppercase mt-2">
                 RESUMEN DE GESTIÓN Y LISTADO
               </div>
@@ -153,7 +153,9 @@ const ProveedoresView = {
             <div class="card-registro border-top-3px border-top-3px-orange mb-16" style="--registro-color: var(--c-success);">
               <div class="flex justify-between items-start mb-16">
                 <div>
-                  <h2 class="text-gold mt-0 mb-4 text-xl font-black uppercase tracking-tight" style="color:var(--p-gold);">${proveedor.nombre}</h2>
+                  <h3 class="flex items-center gap-8 uppercase font-900 tracking-wide text-white m-0 mb-4 text-xl">
+                    <span class="text-gold">|</span> ${proveedor.nombre}
+                  </h3>
                   <div style="background:${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}15; color:${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}; border: 1px solid ${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}40; filter: drop-shadow(0 0 4px ${proveedor.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}); padding: 2px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; display: inline-block;">
                     ${proveedor.activo === false ? 'INACTIVO' : 'ACTIVO'}
                   </div>
