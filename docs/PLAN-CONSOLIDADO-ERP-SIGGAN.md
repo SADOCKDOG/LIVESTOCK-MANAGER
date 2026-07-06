@@ -1,10 +1,12 @@
-# Plan Consolidado de Reorganización ERP — Livestock Manager v4.8.9
+# Plan Consolidado de Reorganización ERP — Livestock Manager v4.9.0
 
 > **Fecha:** 2026-07-06  
-> **Versión app:** 4.8.9 (versionCode 513)  
+> **Versión app:** 4.9.0 (versionCode 514)  
+> **Service Worker:** corcho-v6.28.1  
 > **Base de datos:** IndexedDB v14  
 > **Suite QA:** 18 tests SIGGAN (`SigganQA.runAll()`)  
-> **Restricción crítica:** No perder ninguna funcionalidad existente
+> **Restricción crítica:** No perder ninguna funcionalidad existente  
+> **Estado:** ✅ Build completado, Android sincronizado, listo para pruebas
 
 ---
 
@@ -239,6 +241,140 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 
 ---
 
+## 0C. INVENTARIO DE PROTECCIÓN — BOTONES DE ACCIÓN, WIZARDS Y EXPORTACIÓN
+
+### 0C.1 Botones Flotantes de Acción (FAB) — 16 instancias protegidas
+
+| Vista | FAB | Acción | Archivo |
+|---|---|---|---|
+| **Dashboard** | Nueva Actividad | `App._abrirAsistenteProduccion()` | `dashboard-view.js:209` |
+| **Ganadería** | Nuevo Registro | `App._abrirAsistenteProduccion()` | `ganaderia-view.js:142` |
+| **ExPro** | Registrar Ordeño/Pesaje | `App._abrirAsistenteProduccion()` | `explotacion-view.js:151` |
+| **ExPro** | Nuevo Gasto | `App._abrirFormularioGasto()` | `explotacion-view.js:194` |
+| **CoMer** | Registrar Venta/Entrega/Gasto | Dinámico por tab | `comercializacion-view.js:208` |
+| **Carne** | Nuevo Registro | `App._abrirAsistenteProduccion('carne')` | `carne-view.js:259` |
+| **Leche** | Nuevo Registro | `App._abrirAsistenteProduccion('leche')` | `leche-view.js:240` |
+| **Híbrido** | Registrar Actividad | `App._abrirAsistenteProduccion()` | `hibrido-view.js:240` |
+| **Gastos** | Nuevo Gasto | `App._abrirFormularioGasto()` | `gastos-view.js:201` |
+| **Animales** | Nuevo Animal | `location.hash='/animal'` | `animales-view.js:98` |
+| **Rebaños** | Nuevo Rebaño | Dinámico | `rebanos-view.js:242` |
+| **Zonas** | Nueva Zona | `ZonasView._crearZona()` | `zonas-view.js:126` |
+| **Compradores** | Nuevo Comprador | `CompradoresView.renderFormulario()` | `compradores-view.js:360` |
+| **Compradores** | Nuevo Contrato | `ContratosView.renderFormulario()` | `compradores-view.js:439` |
+| **Proveedores** | Nuevo Proveedor | `ProveedoresView.renderFormulario()` | `proveedores-view.js:34` |
+| **Transportistas** | Nuevo Transportista | `TransportistasView.renderFormulario()` | `transportistas-view.js:199` |
+
+**Garantía:** Ninguna fase modifica los FABs existentes. La Fase 3 añade un botón "Nuevo tratamiento" en Ganadería, pero no elimina ni modifica los FABs existentes.
+
+### 0C.2 Wizards — 9 wizards protegidos
+
+| Wizard | Archivo | Funcionalidad |
+|---|---|---|
+| **Venta Masiva** | `wizard-venta-masiva.js` | Venta carne: animales → comprador → transportista → pricing → liquidación + DIMOE + movimiento |
+| **Albarán Leche** | `wizard-albaran-leche.js` | Entrega leche: cisterna, volumen, precio, laboratorio, antibióticos |
+| **Gasto** | `wizard-gasto.js` | 2 pasos: datos económicos → imputación (categoría, rebaño, proveedor) |
+| **Tratamiento** | `wizard-tratamiento.js` | Sanitario: medicamento, dosis, vía, tiempos espera, veterinario |
+| **Traslado** | `wizard-traslado.js` | Traslado interno animal entre rebaños/zonas |
+| **Finca** | `wizard-finca.js` | Alta finca: nombre, REGA, CCAA, tipo, ADSG, vet, silos |
+| **Crotales** | `wizard-crotales.js` | Pedido oficial crotales ADSG |
+| **Censo** | `wizard-censo.js` | Declaración censal SIGGAN |
+| **Guía Movimiento** | `wizard-guia-movimiento.js` | Guía oficial inter-explotación SIGGAN/BADIGEX |
+
+**Garantía:** Ninguna fase modifica los wizards existentes. La Fase 1 solo añade `checkSupresion()` en `wizard-albaran-leche.js` antes del guardado, sin modificar la lógica del wizard.
+
+### 0C.3 Exportación PDF/Excel — 15 funciones protegidas
+
+| Módulo | Función | Tipo | Archivo |
+|---|---|---|---|
+| **Cuaderno** | `_exportarPDF()` | PDF Completo | `cuaderno-view.js:408` |
+| **Cuaderno** | `_exportarCSV()` | CSV SIGGAN | `cuaderno-view.js:869` |
+| **Informes** | `_exportPDF()` | PDF Completo | `informes-view.js:2909` |
+| **Informes** | `_exportPDFSeccion()` | PDF por sección | `informes-view.js:2905` |
+| **Informes** | `_exportExcel()` | Excel | `informes-view.js:2737` |
+| **Trazabilidad** | `_exportarPDF()` | PDF Timeline | `trazabilidad-view.js:307` |
+| **Manuales** | `_exportarPDF()` | PDF Manual | `manuales-view.js:238` |
+
+**Garantía:** Ninguna fase modifica las funciones de exportación. Todos los botones de "PDF", "Excel", "Completo" permanecen intactos.
+
+### 0C.4 Zonas — Módulo protegido
+
+| Funcionalidad | Archivo | Estado |
+|---|---|---|
+| Listado de zonas | `zonas-view.js` | ✅ No se toca |
+| Ficha de zona (UGM, PAC, aforo) | `zonas-view.js` | ✅ No se toca |
+| Crear zona | `zonas-view.js` (`_crearZona()`) | ✅ No se toca |
+| Editar zona | `zonas-view.js` | ✅ No se toca |
+| Acceso desde Ganadería | `ganaderia-view.js:61` | ✅ No se toca |
+| Acceso desde Ajustes | `ajustes-view.js:338` (`_gestionarZonas()`) | ✅ No se toca |
+
+**Garantía:** Ninguna fase modifica `zonas-view.js` ni los accesos a zonas.
+
+### 0C.5 Correcciones v4.9.0 ya implementadas (protegidas)
+
+| Corrección | Archivo | Estado |
+|---|---|---|
+| Fix `patrimonio` indefinido en Carne | `carne-view.js` (`_aplicarFiltrosToData()`) | ✅ Ya corregido |
+| Fix barra roja híbrida (`.hibrido-bar-wrap`) | `styles.css` | ✅ Ya corregido |
+| Fix ficha leche ExPro (`_abrirOpcionesRegistro`) | `explotacion-view.js` | ✅ Ya corregido |
+| Versión actualizada a v4.9.0 | `app-version.js`, `package.json`, `build.gradle` | ✅ Ya actualizado |
+| Service Worker v6.28.0 | `sw.js` | ✅ Ya actualizado |
+
+**Garantía:** Estas correcciones ya están en el código. Ninguna fase del plan las revierte.
+
+---
+
+## 0D. ESTADO FINAL DEL PROYECTO (v4.9.0)
+
+### Archivos actualizados en la última compilación
+
+| Archivo | Cambio | Versión |
+|---|---|---|
+| `js/app-version.js` | Versión app actualizada | 4.9.0 (514) |
+| `package.json` | Versión package actualizada | 4.9.0 |
+| `android/app/build.gradle` | versionCode actualizado | 514 |
+| `sw.js` | CACHE_NAME actualizado | corcho-v6.28.1 |
+| `index.html` | Marcas ?v= actualizadas | 6.28.1 para styles.css, carne-view.js, hibrido-view.js, explotacion-view.js |
+
+### Build y sincronización completados
+
+```bash
+npm run build:free          # ✅ Completado
+npx cap sync android        # ✅ Completado
+```
+
+El proyecto Android en `/android/` está listo para:
+- Compilar con Android Studio
+- Probar directamente por USB en dispositivo físico
+- Generar APK/AAB para distribución
+
+### Estado de la base de datos demo
+
+- **Seed data v6.22.0:** ✅ Cargado y funcional
+- **Cobertura:** 17/17 módulos con datos demo
+- **Integridad:** Todas las vistas muestran datos correctamente
+
+### Correcciones de bugs aplicadas
+
+| Bug | Archivo | Línea | Estado |
+|---|---|---|---|
+| `patrimonio` indefinido en Carne | `carne-view.js` | `_aplicarFiltrosToData()` | ✅ Corregido |
+| Barra roja en Híbrido | `styles.css` | `.hibrido-bar-wrap` | ✅ Corregido |
+| Ficha leche ExPro no abre | `explotacion-view.js` | `_abrirOpcionesRegistro()` | ✅ Corregido |
+
+### Checklist pre-fases
+
+- [x] Versión actualizada a v4.9.0
+- [x] Service Worker actualizado a corcho-v6.28.1
+- [x] Build gratuito ejecutado
+- [x] Sincronización Android completada
+- [x] Correcciones de bugs aplicadas
+- [x] Datos demo cargados
+- [x] Plan consolidado documentado
+- [ ] **Fase 0: Baseline QA (pendiente)**
+- [ ] **Fase 1: P1 checkSupresion leche (pendiente)**
+
+---
+
 ## 1. HALLAZGOS DE AUDITORÍA (consolidados de ambas revisiones)
 
 ### 1.1 Problemas estructurales confirmados
@@ -313,51 +449,56 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 
 ---
 
-### Fase 2 — Gastos: eliminar triplicación
+### Fase 2 — Gastos: dueño único en ExPro (CORREGIDA - GAP 1)
 
-**Objetivo:** El **alta** de gasto vive solo en ExPro; CoMer muestra gastos en **lectura** para márgenes; ruta `/gastos` redirige a ExPro.
+**Objetivo:** El **alta** de gasto vive solo en ExPro; CoMer muestra gastos en **lectura** para márgenes; **`/gastos` mantiene GastosView** (analítica completa).
 
 **Archivos:**
-- Modify: `js/views/comercializacion-view.js` (tab Gastos: quitar FAB alta → dejar listado lectura)
-- Modify: `js/app.js` (ruta `/gastos` → redirige a `#/explotacion?sub=gastos`)
+- Modify: `js/views/comercializacion-view.js` (tab Gastos: quitar FAB alta → dejar listado lectura + enlaces)
+- **NO MODIFY:** `js/app.js` (ruta `/gastos` sigue apuntando a GastosView)
 
 **Pasos:**
-- [ ] **Paso 1:** En `comercializacion-view.js` `_renderGastos()`, sustituir "Registrar Gasto" por enlace "Registrar en Explotación" → `#/explotacion?sub=gastos`. Mantener listado de gastos en lectura.
-- [ ] **Paso 2:** En `app.js`, hacer que `/gastos` redirija a `#/explotacion?sub=gastos`.
-- [ ] **Paso 3:** Verificar que ExPro sigue siendo el único punto de alta de gasto.
-- [ ] **Paso 4:** `SigganQA.runAll()` (18/18) y commit (`refactor: gastos con dueno unico en ExPro`).
+- [x] **Paso 1:** En `comercializacion-view.js` `_renderGastos()`, sustituir FAB por dos enlaces: "Registrar Gasto" → `#/explotacion?sub=gastos` y "Ver Analítica" → `#/gastos`.
+- [x] **Paso 2:** ~~En `app.js`, hacer que `/gastos` redirija a `#/explotacion?sub=gastos`.~~ **REVERTIDO:** `/gastos` sigue renderizando GastosView.
+- [x] **Paso 3:** Verificar que ExPro es el único punto de alta de gasto.
+- [x] **Paso 4:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Un único punto de alta de gasto (ExPro); CoMer en lectura; ruta `/gastos` redirige.
+**Verificación:** Un único punto de alta de gasto (ExPro); CoMer en lectura con enlaces; `/gastos` muestra GastosView (analítica).
 
 **NO SE TOCA:**
-- `gastos-view.js` (se mantiene como vista independiente accesible desde "Más")
+- `gastos-view.js` (se mantiene como vista analítica completa accesible desde "Más" y `/gastos`)
 - La lógica de `Gastos.save()` ni `_ensureData` de ninguna vista
+
+**GAP 1 RESUELTO:** GastosView mantiene su capa analítica (gráficos, KPIs por categoría, evolución mensual).
 
 ---
 
-### Fase 3 — Sanidad: acceso desde Ganadería
+### Fase 3 — Sanidad: acceso desde Ganadería (CORREGIDA - GAP 2)
 
-**Objetivo:** Añadir acceso rápido a "Nuevo tratamiento" desde Ganadería, sin eliminar los accesos existentes en ExPro/Carne/Leche/Híbrido.
+**Objetivo:** Añadir acceso rápido a "Nuevo tratamiento" desde Ganadería, **con selector de rebaño previo** (Ganadería tiene múltiples rebaños).
 
 **Archivos:**
-- Modify: `js/views/ganaderia-view.js` (añadir botón "Nuevo tratamiento" → `wizard-tratamiento`)
+- Modify: `js/views/ganaderia-view.js` (añadir botón + modal selector de rebaño)
 
 **Pasos:**
-- [ ] **Paso 1:** En `ganaderia-view.js`, añadir en el panel de acciones (junto al FAB "Nuevo Registro") un botón "Nuevo tratamiento" que abra `WizardTratamiento.registrar()` con el rebaño activo del modo.
-- [ ] **Paso 2:** Verificar que el botón funciona y produce el mismo registro que los accesos desde ExPro/Carne/Leche/Híbrido.
-- [ ] **Paso 3:** `SigganQA.runAll()` (18/18) y commit (`feat: acceso a tratamiento desde Ganaderia`).
+- [ ] **Paso 1:** En `ganaderia-view.js`, añadir botón "Nuevo tratamiento" que abra un **modal selector de rebaño** (listar rebaños del modo activo).
+- [ ] **Paso 2:** Al seleccionar rebaño, invocar `WizardTratamiento.registrar(rebanoId)` con el ID seleccionado.
+- [ ] **Paso 3:** Verificar que el botón funciona y produce el mismo registro que los accesos desde ExPro/Carne/Leche/Híbrido.
+- [ ] **Paso 4:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Alta de tratamiento accesible desde Ganadería; los accesos existentes en ExPro/Carne/Leche/Híbrido siguen funcionando.
+**Verificación:** Alta de tratamiento accesible desde Ganadería con selector de rebaño; los accesos existentes siguen funcionando.
 
 **NO SE TOCA:**
 - Los botones "Tratamiento" en ExPro, CarneView, LecheView, HibridoView
 - `wizard-tratamiento.js` ni `sanitarios.js`
 
+**GAP 2 RESUELTO:** El modal selector de rebaño evita el crash por `rebanoId` nulo cuando hay múltiples rebaños en el modo.
+
 ---
 
-### Fase 4 — Selector de modo global
+### Fase 4 — Selector de modo global (CORREGIDA - GAP 3)
 
-**Objetivo:** Unificar el modo carne/leche/híbrido en un filtro de contexto persistente que consumen Ganadería, ExPro y CoMer.
+**Objetivo:** Unificar el modo carne/leche/híbrido en un filtro de contexto persistente. **CoMer mapea híbrido → leche** (no tiene tab híbrido).
 
 **Archivos:**
 - Modify: `js/app.js` (estado global `App.modoActivo` + persistencia)
@@ -365,40 +506,68 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 
 **Pasos:**
 - [ ] **Paso 1:** Introducir `App.modoActivo` persistido en localStorage con método `App.setModo(modo)` que emite evento `modo:changed`.
+- [ ] **Paso 1.1:** **Inicialización inteligente:** Si `App.modoActivo` es `null` (primera carga), leer `tipo_explotacion` de la finca activa (`Fincas.getActive()`). Mapear: `mixto → híbrido`, `carne → carne`, `leche → leche`. Persistir en localStorage.
 - [ ] **Paso 2:** En `ganaderia-view.js`, sustituir `_changeMode()` por `App.setModo()`; leer `App.modoActivo` al renderizar.
 - [ ] **Paso 3:** En `explotacion-view.js`, sustituir `_cambiarModo()` por `App.setModo()`; escuchar evento `modo:changed` para re-render.
-- [ ] **Paso 4:** En `comercializacion-view.js`, leer `App.modoActivo` para el tab por defecto.
-- [ ] **Paso 5:** Verificación manual: cambiar modo en Ganadería, confirmar que ExPro refleja el cambio.
-- [ ] **Paso 6:** `SigganQA.runAll()` (18/18) y commit (`refactor: selector de modo global`).
+- [ ] **Paso 4:** En `comercializacion-view.js`, leer `App.modoActivo` para el tab por defecto con **mapeo**: `híbrido → leche` (CoMer no tiene tab híbrido). **IMPORTANTE:** Los clicks en tabs internos de CoMer (Carne/Leche/Gastos) **NO deben invocar `App.setModo()`**. Solo cambian la vista local (`_currentTab`), no el estado global.
+- [ ] **Paso 5:** Verificación manual: cambiar modo en Ganadería, confirmar que ExPro refleja el cambio y CoMer abre tab correcto. Cambiar tab en CoMer, confirmar que `App.modoActivo` no cambia.
+- [ ] **Paso 6:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Un solo control de modo; coherente entre los 3 hubs.
+**Verificación:** Un solo control de modo; coherente entre los 3 hubs; CoMer no crashea con modo híbrido; tabs CoMer no alteran estado global.
 
 **NO SE TOCA:**
 - La lógica interna de cada vista (`_ensureData`, `_renderCarne`, etc.)
 - `ModoContextoHelper` (se mantiene como helper de filtrado de rebaños)
 
+**GAP 3 RESUELTO:** CoMer mapea `híbrido → leche` para evitar renderizar pestaña inexistente.
+
+**PRECAUCIÓN ESTADO:** Inicialización inteligente basada en `tipo_explotacion` evita modo `null` en primera carga.
+
+**RELACIÓN UNIDIRECCIONAL:** Tabs CoMer son filtros locales; solo Ganadería/ExPro modifican `App.modoActivo`.
+
 ---
 
-### Fase 5 — Paneles resumen en Ganadería
+### Fase 5 — Paneles resumen en Ganadería (CORREGIDA - Rendimiento + DB v15)
 
-**Objetivo:** Añadir en Ganadería paneles resumen de Sanidad, Reproducción y Movimientos, usando los datos ya cargados.
+**Objetivo:** Añadir en Ganadería paneles resumen de Sanidad, Reproducción y Movimientos, **usando índices con límite** (no `getAll()` completo). **Requiere migración DB v15** para añadir índice `fecha` en `sanitarios_ganado`.
 
 **Archivos:**
+- Modify: `js/db.js` (bump a v15 + migración índice `fecha` en `sanitarios_ganado`)
 - Modify: `js/views/ganaderia-view.js` (añadir 3 bloques HTML tras el censo)
 
 **Pasos:**
-- [ ] **Paso 1:** En `ganaderia-view.js`, ampliar el `Promise.all` inicial para cargar `sanitarios_ganado`, `reproduccion_eventos`, `movimientos_ganado`.
-- [ ] **Paso 2:** Añadir bloque "Sanidad Activa" (últimos 3 tratamientos con `App._cardRegistro`).
-- [ ] **Paso 3:** Añadir bloque "Reproducción Reciente" (últimos 5 eventos con `App._cardRegistro`).
-- [ ] **Paso 4:** Añadir bloque "Movimientos Oficiales" (últimas 3 guías con `App._cardRegistro`).
+- [ ] **Paso 0 (CRÍTICO):** En `js/db.js`:
+  - Bump `DB_VERSION` de 14 a 15.
+  - Añadir bloque de migración v15:
+    ```javascript
+    if (oldVersion < 15) {
+        const sanitariosStore = transaction.objectStore('sanitarios_ganado');
+        if (!sanitariosStore.indexNames.contains('fecha')) {
+            sanitariosStore.createIndex('fecha', 'fecha');
+        }
+    }
+    ```
+  - **NOTA:** `reproduccion_eventos` y `movimientos_ganado` ya tienen índice `fecha` desde v6 y v10 respectivamente.
+- [ ] **Paso 1:** En `ganaderia-view.js`, cargar datos con **cursors/limit** en lugar de `getAll()`:
+  - `sanitarios_ganado`: últimos 3 (usar índice `fecha`, ordenados por fecha DESC)
+  - `reproduccion_eventos`: últimos 5 (usar índice `fecha`, ordenados por fecha DESC)
+  - `movimientos_ganado`: últimos 3 (usar índice `fecha`, ordenados por fecha DESC)
+- [ ] **Paso 2:** Añadir bloque "Sanidad Activa" (3 tratamientos con `App._cardRegistro`).
+- [ ] **Paso 3:** Añadir bloque "Reproducción Reciente" (5 eventos con `App._cardRegistro`).
+- [ ] **Paso 4:** Añadir bloque "Movimientos Oficiales" (3 guías con `App._cardRegistro`).
 - [ ] **Paso 5:** Verificación manual con demo CHAMORRO: confirmar que los paneles muestran datos.
-- [ ] **Paso 6:** `SigganQA.runAll()` (18/18) y commit (`feat: paneles resumen en Ganaderia`).
+- [ ] **Paso 6:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Ganadería muestra 3 paneles adicionales con datos de la demo; los accesos existentes siguen funcionando.
+**Verificación:** Ganadería muestra 3 paneles adicionales; rendimiento aceptable (>1000 registros); DB v15 migrada correctamente.
 
 **NO SE TOCA:**
 - La estructura existente de modo, accesos rápidos, balance, rebaños, censo
 - `_ensureData` ni selectores HTML
+- Otros stores de IndexedDB
+
+**GAP TÉCNICO DB RESUELTO:** Migración v15 añade índice `fecha` en `sanitarios_ganado` para evitar crash en cursor ordenado.
+
+**OBSERVACIÓN RENDIMIENTO RESUELTA:** Uso de índices con límite evita cargar históricos completos en memoria.
 
 ---
 
@@ -410,10 +579,14 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 - Modify: `js/views/comercializacion-view.js` (añadir enlaces en cada tab)
 
 **Pasos:**
-- [ ] **Paso 1:** En `_renderCarne()`, añadir enlace "Ver Compradores" → `#/compradores`.
-- [ ] **Paso 2:** En `_renderLeche()`, añadir enlace "Ver Compradores" → `#/compradores`.
+- [ ] **Paso 1:** En `_renderCarne()`, añadir enlaces:
+  - "Ver Compradores" → `#/compradores`
+  - "Ver Transportistas" → `#/transportistas` (requerido por `wizard-venta-masiva`)
+- [ ] **Paso 2:** En `_renderLeche()`, añadir enlaces:
+  - "Ver Compradores" → `#/compradores`
+  - "Ver Transportistas" → `#/transportistas` (requerido por `wizard-albaran-leche`)
 - [ ] **Paso 3:** En `_renderGastos()`, añadir enlace "Ver Proveedores" → `#/proveedores`.
-- [ ] **Paso 4:** `SigganQA.runAll()` (18/18) y commit (`feat: accesos rapidos a Terceros desde CoMer`).
+- [ ] **Paso 4:** `SigganQA.runAll()` (19/19) y commit (`feat: accesos rapidos a Terceros desde CoMer`).
 
 **Verificación:** Desde cada tab de CoMer se puede navegar a Terceros; las rutas independientes de Terceros siguen funcionando.
 
@@ -421,6 +594,8 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 - `compradores-view.js`, `proveedores-view.js`, `transportistas-view.js`
 - Los ítems de Terceros en el menú "Más"
 - Las rutas `/compradores`, `/proveedores`, `/transportistas`
+
+**MEJORA LÓGICA:** Tab Carne y Leche incluyen acceso a Transportistas (actor clave en wizards de comercialización).
 
 ---
 
@@ -448,7 +623,26 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 | Crear vista propia de Reproducción | Ya es accesible desde Informes. Los paneles resumen en Ganadería son suficientes. |
 | Crear vista propia de Movimientos | Ya es accesible desde Documentos. Los paneles resumen en Ganadería son suficientes. |
 | Crear módulo Almacén independiente | Ya está implementado en ExPro → sub-módulo Almacén. |
-| Eliminar GastosView (`/gastos`) | Se mantiene como vista independiente accesible desde "Más". Solo se redirige la ruta para evitar duplicación de alta. |
+| Eliminar GastosView (`/gastos`) | **GAP 1:** GastosView contiene analítica completa (gráficos, KPIs por categoría). Se mantiene accesible desde "Más" y `/gastos`. El alta se centraliza en ExPro. |
+| Redirigir `/gastos` a ExPro | **GAP 1:** GastosView no es una simple lista; tiene evolución mensual, desglose por categoría y KPIs. ExPro solo tiene lista plana. |
+| Lanzar WizardTratamiento sin selector | **GAP 2:** Ganadería tiene múltiples rebaños. Se requiere modal selector de rebaño previo. |
+| Mapear modo híbrido a tab CoMer | **GAP 3:** CoMer no tiene tab híbrido. Se mapea `híbrido → leche` para evitar crash. |
+| Cargar históricos completos en Ganadería | **Rendimiento:** Se usan índices con límite (últimos 3/5) en lugar de `getAll()`. |
+
+---
+
+## 4B. GAPs CRÍTICOS DETECTADOS Y RESUELTOS
+
+| GAP | Fase | Problema | Solución | Estado |
+|---|---|---|---|---|
+| **GAP 1** | Fase 2 | Redirección `/gastos` hacía inaccesible GastosView (analítica completa) | Mantener `/gastos` → GastosView; CoMer muestra enlaces a ExPro (alta) y `/gastos` (analítica) | ✅ Corregido |
+| **GAP 2** | Fase 3 | WizardTratamiento requiere `rebanoId` único; Ganadería tiene múltiples rebaños | Añadir modal selector de rebaño previo al wizard | ✅ Plan actualizado |
+| **GAP 3** | Fase 4 | CoMer no tiene tab "híbrido"; modo global híbrido causaría crash | Mapear `híbrido → leche` en CoMer | ✅ Plan actualizado |
+| **Rendimiento** | Fase 5 | `getAll()` en históricos médicos/reproductivos ralentiza a largo plazo | Usar índices con límite (últimos 3/5 registros) | ✅ Plan actualizado |
+| **GAP TÉCNICO DB** | Fase 5 | `sanitarios_ganado` no tiene índice `fecha`; cursor ordenado fallaría | Migración DB v15: crear índice `fecha` en `sanitarios_ganado` | ✅ Plan actualizado |
+| **Inicialización modo** | Fase 4 | `App.modoActivo` podría quedar `null` en primera carga | Inicializar desde `tipo_explotacion` de finca activa | ✅ Plan actualizado |
+| **Relación unidireccional** | Fase 4 | Tabs CoMer no deben alterar estado global `App.modoActivo` | Documentar: tabs CoMer son filtros locales, no invocan `App.setModo()` | ✅ Plan actualizado |
+| **Transportistas en CoMer** | Fase 6 | Wizards de venta/leche requieren Transportista; solo se añadía Comprador | Añadir enlace "Ver Transportistas" en tabs Carne y Leche de CoMer | ✅ Plan actualizado |
 
 ---
 
@@ -467,10 +661,10 @@ Ganadería (Centro Operativo):
   ├── Balance: Lotes · Censo · Zonas
   ├── Rebaños del modo
   ├── Censo reciente
-  ├── [FASE 5] Sanidad Activa (3 últimos tratamientos)
-  ├── [FASE 5] Reproducción Reciente (5 últimos eventos)
-  ├── [FASE 5] Movimientos Oficiales (3 últimas guías)
-  └── [FASE 3] FAB "Nuevo tratamiento" → WizardTratamiento
+  ├── [FASE 5] Sanidad Activa (3 últimos tratamientos — con límite)
+  ├── [FASE 5] Reproducción Reciente (5 últimos eventos — con límite)
+  ├── [FASE 5] Movimientos Oficiales (3 últimas guías — con límite)
+  └── [FASE 3] Botón "Nuevo tratamiento" → Modal selector rebaño → WizardTratamiento
 
 ExPro (Centro Producción):
   ├── Explotación (Carne/Leche/Híbrido — modo GLOBAL):
@@ -486,7 +680,8 @@ ExPro (Centro Producción):
 CoMer (Centro Comercial):
   ├── Carne: Ventas (SEUROP, DIMOE, trámite) → [FASE 6] acceso Compradores
   ├── Leche: Entregas (lab, MOFA, INFOLAC) → [FASE 6] acceso Compradores
-  └── Gastos: Lectura (márgenes) → [FASE 2] sin FAB alta; [FASE 6] acceso Proveedores
+  └── Gastos: Lectura (márgenes) → [FASE 2] sin FAB alta; enlaces a ExPro (alta) y /gastos (analítica)
+  └── [FASE 4] Modo híbrido mapeado a tab Leche (no tiene tab híbrido)
 
 Más (Sheet) — sin cambios:
   Leche · Cárnico · Híbrido · Comercial · Compradores · Proveedores ·

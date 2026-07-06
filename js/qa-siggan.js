@@ -1038,6 +1038,32 @@ const SigganQA = {
       
       this._assert(prohibidoLecheActivo, M, 'Validación de prohibidoLeche detectado en sanitarios', 'VALIDACION');
 
+      // FASE 1 — P1: Verificar que MotorTrazabilidad.checkSupresion() bloquea correctamente
+      if (window.MotorTrazabilidad && typeof window.MotorTrazabilidad.checkSupresion === 'function') {
+        const animales = await window.db.getAll('animales').catch(() => []);
+        const animalDelRebano = animales.find(a => a.rebanoId === rebanoId && a.estado === 'activo');
+        
+        if (animalDelRebano) {
+          const resultado = await window.MotorTrazabilidad.checkSupresion(
+            window.db,
+            animalDelRebano.id,
+            new Date().toISOString().split('T')[0],
+            'leche'
+          );
+          
+          this._assert(
+            resultado.apto === false,
+            M,
+            `checkSupresion() bloquea venta de leche: apto=${resultado.apto}, motivo="${resultado.motivo?.substring(0, 50)}..."`,
+            'BLOQUEO_SUPRESION'
+          );
+        } else {
+          this._log('WARN', M, 'No hay animales activos en el rebaño para probar checkSupresion', 'BLOQUEO_SUPRESION');
+        }
+      } else {
+        this._log('WARN', M, 'MotorTrazabilidad.checkSupresion no disponible', 'BLOQUEO_SUPRESION');
+      }
+
       // Limpiar: eliminar el sanitario de prueba
       try {
         await window.db.delete('sanitarios_ganado', sanitarioId);
