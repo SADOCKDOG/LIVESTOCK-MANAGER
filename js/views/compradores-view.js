@@ -352,7 +352,8 @@ const CompradoresView = {
         footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>`,
         color: color,
         onClick: `CompradoresView.renderDetalle(${c.id})`
-      })).join('')}</div>`;
+      });
+    }).join('')}</div>`;
 
     // Botón Flotante de Acción con viñeta (se agrega después de la lista)
     const fabContainer = document.createElement('div');
@@ -430,7 +431,8 @@ const CompradoresView = {
           </div>
         `,
         color: color
-      })).join('')}</div>`;
+      });
+    }).join('')}</div>`;
 
     // Botón Flotante de Acción con viñeta (se agrega después de la lista)
     const fabContainer = document.createElement('div');
