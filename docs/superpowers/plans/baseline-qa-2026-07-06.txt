@@ -1,0 +1,83 @@
+================================================================================
+BASELINE DE REGRESIÓN — Livestock Manager v4.9.0
+Fecha: 2026-07-06
+================================================================================
+
+VERIFICACIÓN DE ARCHIVOS CLAVE
+-------------------------------
+✅ js/app-version.js         → v4.9.0 (versionCode 514)
+✅ sw.js                     → CACHE_NAME = 'corcho-v6.28.1'
+✅ js/qa-siggan.js           → 19 tests SIGGAN (sintaxis OK)
+✅ js/seed-data.js           → v6.22.0 (sintaxis OK)
+✅ js/views/carne-view.js    → Fix patrimonio aplicado (sintaxis OK)
+✅ js/views/hibrido-view.js  → Fix barra roja aplicado (sintaxis OK)
+✅ js/views/explotacion-view.js → Fix ficha leche aplicado (sintaxis OK)
+
+SUITE QA SIGGAN (19 tests)
+---------------------------
+TEST 01: testValidacionREGA        → Validación formato REGA por CCAA
+TEST 02: testCatalogosSiggan       → Catálogos normativos cerrados
+TEST 03: testLibroMovimientos      → Movimientos oficiales con guía
+TEST 04: testLibroSaneamientos     → Campañas ADSG/TBC/brucelosis
+TEST 05: testLibroTratamientos     → Tratamientos con tiempos de espera
+TEST 06: testExportacion           → Exportación CSV/XML REGA/SIA
+TEST 07: testCuadernoView          → Cuaderno Digital RD 787/2023
+TEST 08: testRendimiento           → Rendimiento DB (1000+ eventos)
+TEST 09: testValidacionCrotal      → Crotal normativo ES+12 dígitos
+TEST 10: testTrasladoInterno       → Traslado interno + aforo zona
+TEST 11: testPartoGenealogia       → Parto → alta cría + genealogía
+TEST 12: testEventosCenso          → Altas/bajas en libro de registro
+TEST 13: testZonasUGM              → Zonas: UGM, carga ganadera, PAC
+TEST 14: testTipoExplotacionREGA   → Tipo explotación REGA en rebaños
+TEST 15: testVentaLecheBlocking    → Bloqueo venta leche por supresión
+TEST 16: testSANDACHClassificacion → Clasificación SANDACH por motivo baja
+TEST 17: testNotificacionesREGA    → Notificaciones REGA al alta
+TEST 18: testCoberturaDemo         → Cobertura demo CHAMORRO (17/17 módulos)
+TEST 19: testModoInterno           → Modo interno SIGGAN (documentos)
+
+ESTADO ACTUAL DEL PROYECTO
+---------------------------
+Versión App:              v4.9.0
+Version Code:             514
+Service Worker:           corcho-v6.28.1
+Base de Datos:            IndexedDB v14
+Seed Data:                v6.22.0 (CHAMORRO)
+Build:                    Completado (npm run build:free)
+Android Sync:             Completado (npx cap sync android)
+
+CORRECCIONES APLICADAS EN v4.9.0
+---------------------------------
+✅ Fix patrimonio indefinido en Carne (carne-view.js)
+✅ Fix barra roja en Híbrido (styles.css .hibrido-bar-wrap)
+✅ Fix ficha leche ExPro no abre (explotacion-view.js)
+✅ Versión actualizada a v4.9.0
+✅ Service Worker actualizado a corcho-v6.28.1
+
+INSTRUCCIONES PARA EJECUTAR TESTS
+----------------------------------
+1. Abrir la app en navegador o dispositivo Android
+2. Cargar datos demo CHAMORRO (si no están cargados):
+   await SeedData.run(true)
+3. Ejecutar suite completa:
+   await SigganQA.runAll()
+4. Verificar que los 19 tests pasan en verde
+5. Ejecutar cobertura de módulos:
+   await SigganQA.run("coverage")
+6. Verificar que 17/17 módulos tienen datos demo
+
+CRITERIO DE ÉXITO
+-----------------
+✅ Los 19 tests SIGGAN pasan sin errores
+✅ 17/17 módulos tienen datos demo
+✅ No hay errores en consola del navegador
+✅ Las 3 vistas hub (Ganadería, ExPro, CoMer) cargan correctamente
+✅ Las vistas Carne/Leche/Híbrido muestran sus 3 tabs
+
+PRÓXIMO PASO: FASE 1 (P1 - Bloqueo sanitario en venta de leche)
+-----------------------------------------------------------------
+Archivo a modificar: js/views/wizards/wizard-albaran-leche.js
+Acción: Añadir checkSupresion() antes de guardar albarán de leche
+Riesgo: Bajo
+Desplegable sola: Sí
+
+================================================================================

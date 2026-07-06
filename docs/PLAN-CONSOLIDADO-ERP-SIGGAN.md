@@ -1,10 +1,12 @@
-# Plan Consolidado de Reorganización ERP — Livestock Manager v4.8.9
+# Plan Consolidado de Reorganización ERP — Livestock Manager v4.9.0
 
 > **Fecha:** 2026-07-06  
-> **Versión app:** 4.8.9 (versionCode 513)  
+> **Versión app:** 4.9.0 (versionCode 514)  
+> **Service Worker:** corcho-v6.28.1  
 > **Base de datos:** IndexedDB v14  
 > **Suite QA:** 18 tests SIGGAN (`SigganQA.runAll()`)  
-> **Restricción crítica:** No perder ninguna funcionalidad existente
+> **Restricción crítica:** No perder ninguna funcionalidad existente  
+> **Estado:** ✅ Build completado, Android sincronizado, listo para pruebas
 
 ---
 
@@ -236,6 +238,140 @@ Estos módulos forman la **capa transversal de cumplimiento y BI**. Ninguna fase
 | Alertas | `alertas-service.js` | Ninguna | ✅ No se toca |
 | Trazabilidad | `trazabilidad-view.js`, `trazabilidad.js` | Fase 1 (P1) | Solo se añade `checkSupresion()` en wizard-albaran-leche, no se modifica la vista |
 | Exportación | `export-service.js` | Ninguna | ✅ No se toca |
+
+---
+
+## 0C. INVENTARIO DE PROTECCIÓN — BOTONES DE ACCIÓN, WIZARDS Y EXPORTACIÓN
+
+### 0C.1 Botones Flotantes de Acción (FAB) — 16 instancias protegidas
+
+| Vista | FAB | Acción | Archivo |
+|---|---|---|---|
+| **Dashboard** | Nueva Actividad | `App._abrirAsistenteProduccion()` | `dashboard-view.js:209` |
+| **Ganadería** | Nuevo Registro | `App._abrirAsistenteProduccion()` | `ganaderia-view.js:142` |
+| **ExPro** | Registrar Ordeño/Pesaje | `App._abrirAsistenteProduccion()` | `explotacion-view.js:151` |
+| **ExPro** | Nuevo Gasto | `App._abrirFormularioGasto()` | `explotacion-view.js:194` |
+| **CoMer** | Registrar Venta/Entrega/Gasto | Dinámico por tab | `comercializacion-view.js:208` |
+| **Carne** | Nuevo Registro | `App._abrirAsistenteProduccion('carne')` | `carne-view.js:259` |
+| **Leche** | Nuevo Registro | `App._abrirAsistenteProduccion('leche')` | `leche-view.js:240` |
+| **Híbrido** | Registrar Actividad | `App._abrirAsistenteProduccion()` | `hibrido-view.js:240` |
+| **Gastos** | Nuevo Gasto | `App._abrirFormularioGasto()` | `gastos-view.js:201` |
+| **Animales** | Nuevo Animal | `location.hash='/animal'` | `animales-view.js:98` |
+| **Rebaños** | Nuevo Rebaño | Dinámico | `rebanos-view.js:242` |
+| **Zonas** | Nueva Zona | `ZonasView._crearZona()` | `zonas-view.js:126` |
+| **Compradores** | Nuevo Comprador | `CompradoresView.renderFormulario()` | `compradores-view.js:360` |
+| **Compradores** | Nuevo Contrato | `ContratosView.renderFormulario()` | `compradores-view.js:439` |
+| **Proveedores** | Nuevo Proveedor | `ProveedoresView.renderFormulario()` | `proveedores-view.js:34` |
+| **Transportistas** | Nuevo Transportista | `TransportistasView.renderFormulario()` | `transportistas-view.js:199` |
+
+**Garantía:** Ninguna fase modifica los FABs existentes. La Fase 3 añade un botón "Nuevo tratamiento" en Ganadería, pero no elimina ni modifica los FABs existentes.
+
+### 0C.2 Wizards — 9 wizards protegidos
+
+| Wizard | Archivo | Funcionalidad |
+|---|---|---|
+| **Venta Masiva** | `wizard-venta-masiva.js` | Venta carne: animales → comprador → transportista → pricing → liquidación + DIMOE + movimiento |
+| **Albarán Leche** | `wizard-albaran-leche.js` | Entrega leche: cisterna, volumen, precio, laboratorio, antibióticos |
+| **Gasto** | `wizard-gasto.js` | 2 pasos: datos económicos → imputación (categoría, rebaño, proveedor) |
+| **Tratamiento** | `wizard-tratamiento.js` | Sanitario: medicamento, dosis, vía, tiempos espera, veterinario |
+| **Traslado** | `wizard-traslado.js` | Traslado interno animal entre rebaños/zonas |
+| **Finca** | `wizard-finca.js` | Alta finca: nombre, REGA, CCAA, tipo, ADSG, vet, silos |
+| **Crotales** | `wizard-crotales.js` | Pedido oficial crotales ADSG |
+| **Censo** | `wizard-censo.js` | Declaración censal SIGGAN |
+| **Guía Movimiento** | `wizard-guia-movimiento.js` | Guía oficial inter-explotación SIGGAN/BADIGEX |
+
+**Garantía:** Ninguna fase modifica los wizards existentes. La Fase 1 solo añade `checkSupresion()` en `wizard-albaran-leche.js` antes del guardado, sin modificar la lógica del wizard.
+
+### 0C.3 Exportación PDF/Excel — 15 funciones protegidas
+
+| Módulo | Función | Tipo | Archivo |
+|---|---|---|---|
+| **Cuaderno** | `_exportarPDF()` | PDF Completo | `cuaderno-view.js:408` |
+| **Cuaderno** | `_exportarCSV()` | CSV SIGGAN | `cuaderno-view.js:869` |
+| **Informes** | `_exportPDF()` | PDF Completo | `informes-view.js:2909` |
+| **Informes** | `_exportPDFSeccion()` | PDF por sección | `informes-view.js:2905` |
+| **Informes** | `_exportExcel()` | Excel | `informes-view.js:2737` |
+| **Trazabilidad** | `_exportarPDF()` | PDF Timeline | `trazabilidad-view.js:307` |
+| **Manuales** | `_exportarPDF()` | PDF Manual | `manuales-view.js:238` |
+
+**Garantía:** Ninguna fase modifica las funciones de exportación. Todos los botones de "PDF", "Excel", "Completo" permanecen intactos.
+
+### 0C.4 Zonas — Módulo protegido
+
+| Funcionalidad | Archivo | Estado |
+|---|---|---|
+| Listado de zonas | `zonas-view.js` | ✅ No se toca |
+| Ficha de zona (UGM, PAC, aforo) | `zonas-view.js` | ✅ No se toca |
+| Crear zona | `zonas-view.js` (`_crearZona()`) | ✅ No se toca |
+| Editar zona | `zonas-view.js` | ✅ No se toca |
+| Acceso desde Ganadería | `ganaderia-view.js:61` | ✅ No se toca |
+| Acceso desde Ajustes | `ajustes-view.js:338` (`_gestionarZonas()`) | ✅ No se toca |
+
+**Garantía:** Ninguna fase modifica `zonas-view.js` ni los accesos a zonas.
+
+### 0C.5 Correcciones v4.9.0 ya implementadas (protegidas)
+
+| Corrección | Archivo | Estado |
+|---|---|---|
+| Fix `patrimonio` indefinido en Carne | `carne-view.js` (`_aplicarFiltrosToData()`) | ✅ Ya corregido |
+| Fix barra roja híbrida (`.hibrido-bar-wrap`) | `styles.css` | ✅ Ya corregido |
+| Fix ficha leche ExPro (`_abrirOpcionesRegistro`) | `explotacion-view.js` | ✅ Ya corregido |
+| Versión actualizada a v4.9.0 | `app-version.js`, `package.json`, `build.gradle` | ✅ Ya actualizado |
+| Service Worker v6.28.0 | `sw.js` | ✅ Ya actualizado |
+
+**Garantía:** Estas correcciones ya están en el código. Ninguna fase del plan las revierte.
+
+---
+
+## 0D. ESTADO FINAL DEL PROYECTO (v4.9.0)
+
+### Archivos actualizados en la última compilación
+
+| Archivo | Cambio | Versión |
+|---|---|---|
+| `js/app-version.js` | Versión app actualizada | 4.9.0 (514) |
+| `package.json` | Versión package actualizada | 4.9.0 |
+| `android/app/build.gradle` | versionCode actualizado | 514 |
+| `sw.js` | CACHE_NAME actualizado | corcho-v6.28.1 |
+| `index.html` | Marcas ?v= actualizadas | 6.28.1 para styles.css, carne-view.js, hibrido-view.js, explotacion-view.js |
+
+### Build y sincronización completados
+
+```bash
+npm run build:free          # ✅ Completado
+npx cap sync android        # ✅ Completado
+```
+
+El proyecto Android en `/android/` está listo para:
+- Compilar con Android Studio
+- Probar directamente por USB en dispositivo físico
+- Generar APK/AAB para distribución
+
+### Estado de la base de datos demo
+
+- **Seed data v6.22.0:** ✅ Cargado y funcional
+- **Cobertura:** 17/17 módulos con datos demo
+- **Integridad:** Todas las vistas muestran datos correctamente
+
+### Correcciones de bugs aplicadas
+
+| Bug | Archivo | Línea | Estado |
+|---|---|---|---|
+| `patrimonio` indefinido en Carne | `carne-view.js` | `_aplicarFiltrosToData()` | ✅ Corregido |
+| Barra roja en Híbrido | `styles.css` | `.hibrido-bar-wrap` | ✅ Corregido |
+| Ficha leche ExPro no abre | `explotacion-view.js` | `_abrirOpcionesRegistro()` | ✅ Corregido |
+
+### Checklist pre-fases
+
+- [x] Versión actualizada a v4.9.0
+- [x] Service Worker actualizado a corcho-v6.28.1
+- [x] Build gratuito ejecutado
+- [x] Sincronización Android completada
+- [x] Correcciones de bugs aplicadas
+- [x] Datos demo cargados
+- [x] Plan consolidado documentado
+- [ ] **Fase 0: Baseline QA (pendiente)**
+- [ ] **Fase 1: P1 checkSupresion leche (pendiente)**
 
 ---
 

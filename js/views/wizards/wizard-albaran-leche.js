@@ -335,6 +335,70 @@ window.AlbaranLecheWizard = {
             creadoEn: borrador ? borrador.creadoEn : new Date().toISOString(),
           };
 
+          // ═══════════════════════════════════════════════════════════════════
+          // FASE 1 — P1: BLOQUEO SANITARIO AUTOMÁTICO EN VENTA DE LECHE
+          // Verifica que ningún animal del rebaño tenga supresión activa
+          // ═══════════════════════════════════════════════════════════════════
+          if (window.MotorTrazabilidad && window.MotorTrazabilidad.checkSupresion) {
+            try {
+              // Obtener animales del rebaño lechero activo
+              const rebanos = await window.db.getAll('rebanos').catch(() => []);
+              const rebanosLecheros = rebanos.filter(r => 
+                (r.tipo || '').toLowerCase().includes('lech') || 
+                (r.tipo || '').toLowerCase().includes('láct') ||
+                (r.tipo || '').toLowerCase().includes('mixt')
+              );
+              
+              let animalesARiesgo = [];
+              for (const reb of rebanosLecheros) {
+                const animales = await window.db.getAll('animales').catch(() => []);
+                const animalesDelRebano = animales.filter(a => a.rebanoId === reb.id && a.estado === 'activo');
+                animalesARiesgo.push(...animalesDelRebano);
+              }
+
+              // Verificar supresión para cada animal
+              const fechaEntrega = dataLeche.fecha || new Date().toISOString().split('T')[0];
+              let bloqueoDetectado = null;
+
+              for (const animal of animalesARiesgo) {
+                const resultado = await window.MotorTrazabilidad.checkSupresion(
+                  window.db,
+                  animal.id,
+                  fechaEntrega,
+                  'leche'
+                );
+
+                if (!resultado.apto) {
+                  bloqueoDetectado = {
+                    animal: animal.numero_identificacion || animal.crotal || `ID ${animal.id}`,
+                    rebaño: animalesARiesgo.find(a => a.id === animal.id)?.rebanoId,
+                    motivo: resultado.motivo,
+                    diasRestantes: resultado.diasRestantes,
+                    fechaLiberacion: resultado.fechaLiberacion
+                  };
+                  break; // Primer bloqueo detectado, abortar
+                }
+              }
+
+              // Si hay bloqueo, abortar el guardado
+              if (bloqueoDetectado) {
+                const mensaje = `⚠️ BLOQUEO SANITARIO DETECTADO\n\n` +
+                  `Animal: ${bloqueoDetectado.animal}\n` +
+                  `${bloqueoDetectado.motivo}\n\n` +
+                  `Días restantes: ${bloqueoDetectado.diasRestantes}\n` +
+                  `Fecha liberación: ${bloqueoDetectado.fechaLiberacion}\n\n` +
+                  `No es posible registrar esta entrega de leche hasta que expire el periodo de supresión.`;
+                
+                App.toastError(mensaje);
+                return; // Abortar el guardado
+              }
+            } catch (error) {
+              console.warn('[Leche] Error verificando supresión:', error);
+              // Si hay error en la verificación, continuar con advertencia
+              App.toast('Advertencia: No se pudo verificar el estado sanitario', 'warning');
+            }
+          }
+
           let idL;
           if (dataLeche.id) {
             reg.id = Number(dataLeche.id);
