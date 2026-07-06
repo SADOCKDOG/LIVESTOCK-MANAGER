@@ -506,13 +506,14 @@ El proyecto Android en `/android/` está listo para:
 
 **Pasos:**
 - [ ] **Paso 1:** Introducir `App.modoActivo` persistido en localStorage con método `App.setModo(modo)` que emite evento `modo:changed`.
+- [ ] **Paso 1.1:** **Inicialización inteligente:** Si `App.modoActivo` es `null` (primera carga), leer `tipo_explotacion` de la finca activa (`Fincas.getActive()`). Mapear: `mixto → híbrido`, `carne → carne`, `leche → leche`. Persistir en localStorage.
 - [ ] **Paso 2:** En `ganaderia-view.js`, sustituir `_changeMode()` por `App.setModo()`; leer `App.modoActivo` al renderizar.
 - [ ] **Paso 3:** En `explotacion-view.js`, sustituir `_cambiarModo()` por `App.setModo()`; escuchar evento `modo:changed` para re-render.
-- [ ] **Paso 4:** En `comercializacion-view.js`, leer `App.modoActivo` para el tab por defecto con **mapeo**: `híbrido → leche` (CoMer no tiene tab híbrido).
-- [ ] **Paso 5:** Verificación manual: cambiar modo en Ganadería, confirmar que ExPro refleja el cambio y CoMer abre tab correcto.
+- [ ] **Paso 4:** En `comercializacion-view.js`, leer `App.modoActivo` para el tab por defecto con **mapeo**: `híbrido → leche` (CoMer no tiene tab híbrido). **IMPORTANTE:** Los clicks en tabs internos de CoMer (Carne/Leche/Gastos) **NO deben invocar `App.setModo()`**. Solo cambian la vista local (`_currentTab`), no el estado global.
+- [ ] **Paso 5:** Verificación manual: cambiar modo en Ganadería, confirmar que ExPro refleja el cambio y CoMer abre tab correcto. Cambiar tab en CoMer, confirmar que `App.modoActivo` no cambia.
 - [ ] **Paso 6:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Un solo control de modo; coherente entre los 3 hubs; CoMer no crashea con modo híbrido.
+**Verificación:** Un solo control de modo; coherente entre los 3 hubs; CoMer no crashea con modo híbrido; tabs CoMer no alteran estado global.
 
 **NO SE TOCA:**
 - La lógica interna de cada vista (`_ensureData`, `_renderCarne`, etc.)
@@ -520,31 +521,51 @@ El proyecto Android en `/android/` está listo para:
 
 **GAP 3 RESUELTO:** CoMer mapea `híbrido → leche` para evitar renderizar pestaña inexistente.
 
+**PRECAUCIÓN ESTADO:** Inicialización inteligente basada en `tipo_explotacion` evita modo `null` en primera carga.
+
+**RELACIÓN UNIDIRECCIONAL:** Tabs CoMer son filtros locales; solo Ganadería/ExPro modifican `App.modoActivo`.
+
 ---
 
-### Fase 5 — Paneles resumen en Ganadería (CORREGIDA - Rendimiento)
+### Fase 5 — Paneles resumen en Ganadería (CORREGIDA - Rendimiento + DB v15)
 
-**Objetivo:** Añadir en Ganadería paneles resumen de Sanidad, Reproducción y Movimientos, **usando índices con límite** (no `getAll()` completo).
+**Objetivo:** Añadir en Ganadería paneles resumen de Sanidad, Reproducción y Movimientos, **usando índices con límite** (no `getAll()` completo). **Requiere migración DB v15** para añadir índice `fecha` en `sanitarios_ganado`.
 
 **Archivos:**
+- Modify: `js/db.js` (bump a v15 + migración índice `fecha` en `sanitarios_ganado`)
 - Modify: `js/views/ganaderia-view.js` (añadir 3 bloques HTML tras el censo)
 
 **Pasos:**
+- [ ] **Paso 0 (CRÍTICO):** En `js/db.js`:
+  - Bump `DB_VERSION` de 14 a 15.
+  - Añadir bloque de migración v15:
+    ```javascript
+    if (oldVersion < 15) {
+        const sanitariosStore = transaction.objectStore('sanitarios_ganado');
+        if (!sanitariosStore.indexNames.contains('fecha')) {
+            sanitariosStore.createIndex('fecha', 'fecha');
+        }
+    }
+    ```
+  - **NOTA:** `reproduccion_eventos` y `movimientos_ganado` ya tienen índice `fecha` desde v6 y v10 respectivamente.
 - [ ] **Paso 1:** En `ganaderia-view.js`, cargar datos con **cursors/limit** en lugar de `getAll()`:
-  - `sanitarios_ganado`: últimos 3 (ordenados por fecha DESC)
-  - `reproduccion_eventos`: últimos 5 (ordenados por fecha DESC)
-  - `movimientos_ganado`: últimos 3 (ordenados por fecha DESC)
+  - `sanitarios_ganado`: últimos 3 (usar índice `fecha`, ordenados por fecha DESC)
+  - `reproduccion_eventos`: últimos 5 (usar índice `fecha`, ordenados por fecha DESC)
+  - `movimientos_ganado`: últimos 3 (usar índice `fecha`, ordenados por fecha DESC)
 - [ ] **Paso 2:** Añadir bloque "Sanidad Activa" (3 tratamientos con `App._cardRegistro`).
 - [ ] **Paso 3:** Añadir bloque "Reproducción Reciente" (5 eventos con `App._cardRegistro`).
 - [ ] **Paso 4:** Añadir bloque "Movimientos Oficiales" (3 guías con `App._cardRegistro`).
 - [ ] **Paso 5:** Verificación manual con demo CHAMORRO: confirmar que los paneles muestran datos.
 - [ ] **Paso 6:** `SigganQA.runAll()` (19/19) y commit.
 
-**Verificación:** Ganadería muestra 3 paneles adicionales; rendimiento aceptable (>1000 registros).
+**Verificación:** Ganadería muestra 3 paneles adicionales; rendimiento aceptable (>1000 registros); DB v15 migrada correctamente.
 
 **NO SE TOCA:**
 - La estructura existente de modo, accesos rápidos, balance, rebaños, censo
 - `_ensureData` ni selectores HTML
+- Otros stores de IndexedDB
+
+**GAP TÉCNICO DB RESUELTO:** Migración v15 añade índice `fecha` en `sanitarios_ganado` para evitar crash en cursor ordenado.
 
 **OBSERVACIÓN RENDIMIENTO RESUELTA:** Uso de índices con límite evita cargar históricos completos en memoria.
 
@@ -558,10 +579,14 @@ El proyecto Android en `/android/` está listo para:
 - Modify: `js/views/comercializacion-view.js` (añadir enlaces en cada tab)
 
 **Pasos:**
-- [ ] **Paso 1:** En `_renderCarne()`, añadir enlace "Ver Compradores" → `#/compradores`.
-- [ ] **Paso 2:** En `_renderLeche()`, añadir enlace "Ver Compradores" → `#/compradores`.
+- [ ] **Paso 1:** En `_renderCarne()`, añadir enlaces:
+  - "Ver Compradores" → `#/compradores`
+  - "Ver Transportistas" → `#/transportistas` (requerido por `wizard-venta-masiva`)
+- [ ] **Paso 2:** En `_renderLeche()`, añadir enlaces:
+  - "Ver Compradores" → `#/compradores`
+  - "Ver Transportistas" → `#/transportistas` (requerido por `wizard-albaran-leche`)
 - [ ] **Paso 3:** En `_renderGastos()`, añadir enlace "Ver Proveedores" → `#/proveedores`.
-- [ ] **Paso 4:** `SigganQA.runAll()` (18/18) y commit (`feat: accesos rapidos a Terceros desde CoMer`).
+- [ ] **Paso 4:** `SigganQA.runAll()` (19/19) y commit (`feat: accesos rapidos a Terceros desde CoMer`).
 
 **Verificación:** Desde cada tab de CoMer se puede navegar a Terceros; las rutas independientes de Terceros siguen funcionando.
 
@@ -569,6 +594,8 @@ El proyecto Android en `/android/` está listo para:
 - `compradores-view.js`, `proveedores-view.js`, `transportistas-view.js`
 - Los ítems de Terceros en el menú "Más"
 - Las rutas `/compradores`, `/proveedores`, `/transportistas`
+
+**MEJORA LÓGICA:** Tab Carne y Leche incluyen acceso a Transportistas (actor clave en wizards de comercialización).
 
 ---
 
@@ -612,6 +639,10 @@ El proyecto Android en `/android/` está listo para:
 | **GAP 2** | Fase 3 | WizardTratamiento requiere `rebanoId` único; Ganadería tiene múltiples rebaños | Añadir modal selector de rebaño previo al wizard | ✅ Plan actualizado |
 | **GAP 3** | Fase 4 | CoMer no tiene tab "híbrido"; modo global híbrido causaría crash | Mapear `híbrido → leche` en CoMer | ✅ Plan actualizado |
 | **Rendimiento** | Fase 5 | `getAll()` en históricos médicos/reproductivos ralentiza a largo plazo | Usar índices con límite (últimos 3/5 registros) | ✅ Plan actualizado |
+| **GAP TÉCNICO DB** | Fase 5 | `sanitarios_ganado` no tiene índice `fecha`; cursor ordenado fallaría | Migración DB v15: crear índice `fecha` en `sanitarios_ganado` | ✅ Plan actualizado |
+| **Inicialización modo** | Fase 4 | `App.modoActivo` podría quedar `null` en primera carga | Inicializar desde `tipo_explotacion` de finca activa | ✅ Plan actualizado |
+| **Relación unidireccional** | Fase 4 | Tabs CoMer no deben alterar estado global `App.modoActivo` | Documentar: tabs CoMer son filtros locales, no invocan `App.setModo()` | ✅ Plan actualizado |
+| **Transportistas en CoMer** | Fase 6 | Wizards de venta/leche requieren Transportista; solo se añadía Comprador | Añadir enlace "Ver Transportistas" en tabs Carne y Leche de CoMer | ✅ Plan actualizado |
 
 ---
 
