@@ -65,7 +65,7 @@ const ComercializacionView = {
           ${this._getRecordsHtml()}
         </div>
       </div>
-      <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="${this._currentTab === 'carne' ? 'App._abrirWizardVentaMasiva()' : (this._currentTab === 'leche' ? 'App._abrirWizardAlbaranLeche()' : 'App._abrirFormularioGasto()')}">
+      <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="${this._currentTab === 'carne' ? 'App._abrirWizardVentaMasiva()' : (this._currentTab === 'leche' ? 'App._abrirWizardAlbaranLeche()' : 'App._abrirFormularioGasto({ origenModulo: &apos;comercializacion&apos; })')}">
         <span class="fab-label">${this._currentTab === 'carne' ? 'Nueva Venta Carne' : (this._currentTab === 'leche' ? 'Nueva Entrega Leche' : 'Nuevo Gasto')}</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

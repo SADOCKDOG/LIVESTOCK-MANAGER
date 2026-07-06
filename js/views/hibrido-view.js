@@ -112,8 +112,8 @@ const HibridoView = {
         </div>
       </div>
 
-      <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'hibrido' })">
-        <span class="fab-label">Registrar Actividad</span>
+      <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${this._currentTab === 'patrimonio' ? 'location.hash=&apos;/rebano&apos;' : (this._currentTab === 'comercializacion' ? 'App._abrirAsistenteProduccion(null, { origen_modulo: &apos;hibrido&apos; })' : 'App._registrarTratamiento(null)')}">
+        <span class="fab-label">${this._currentTab === 'patrimonio' ? 'Nuevo Rebaño' : (this._currentTab === 'comercializacion' ? 'Registrar Venta/Leche' : 'Nuevo Tratamiento')}</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },

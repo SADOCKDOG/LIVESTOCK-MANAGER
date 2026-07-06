@@ -127,7 +127,7 @@ const LecheView = {
           ${this._getRecordsHtml()}
         </div>
       </div>
-      <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${this._currentTab === 'patrimonio' ? 'location.hash=&apos;/animal&apos;' : (this._currentTab === 'comercializacion' ? 'App._abrirWizardAlbaranLeche()' : 'App._registrarTratamientoRebano(null)')}">
+      <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${this._currentTab === 'patrimonio' ? 'location.hash=&apos;/animal&apos;' : (this._currentTab === 'comercializacion' ? 'App._abrirWizardAlbaranLeche()' : 'App._registrarTratamiento(null)')}">
         <span class="fab-label">${this._currentTab === 'patrimonio' ? 'Nuevo Animal' : (this._currentTab === 'comercializacion' ? 'Nueva Entrega Leche' : 'Nuevo Tratamiento')}</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
