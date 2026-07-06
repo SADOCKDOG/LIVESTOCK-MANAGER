@@ -386,6 +386,10 @@ const AnimalesView = {
           </div>
 
           ${!esNuevo ? `
+            <div class="card-registro card-accent card-accent-blue p-16 mb-20" style="--registro-color: var(--c-info);">
+               <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">PESAJES / PRODUCCIÓN</div>
+               <div id="tabla-pesajes" class="text-aaa text-xs uppercase font-800">Cargando...</div>
+            </div>
             <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
                <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">COMPAÑEROS LOTE</div>
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
@@ -419,6 +423,9 @@ const AnimalesView = {
         </div>
       </div>`;
 
+    if (!esNuevo) {
+      App._cargarHistorialPesajes(id);
+    }
     if (!esNuevo && window.Reproduccion) {
       App._cargarHistorialReproduccion(id);
     }
