@@ -140,11 +140,11 @@ const LecheView = {
     };
 
     // Resumen mensual (últimos 6 meses) - basado en fechas de entregas
-    const hoy = new Date();
+    const hoyMensual = new Date();
     const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const porMes = {};
     for (let i = 0; i < 6; i++) {
-      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const d = new Date(hoyMensual.getFullYear(), hoyMensual.getMonth() - i, 1);
       const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
       porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
     }

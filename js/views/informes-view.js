@@ -1648,10 +1648,10 @@ const InformesView = {
               <span class="text-gray text-[0.62rem] uppercase font-800 block">Crías (<12 meses)</span>
               <strong class="text-white text-md mt-4 block">${(() => {
                 let count = 0;
-                const hoy = new Date();
+                const hoyAge = new Date();
                 (animales || []).forEach(a => {
                   if ((a.estado === 'activo' || a.estado === 'Activo') && a.fechaNacimiento) {
-                    const edadMeses = (hoy - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
+                    const edadMeses = (hoyAge - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
                     if (edadMeses < 12) count++;
                   }
                 });
@@ -1662,10 +1662,10 @@ const InformesView = {
               <span class="text-gray text-[0.62rem] uppercase font-800 block">Jóvenes (12-24 meses)</span>
               <strong class="text-white text-md mt-4 block">${(() => {
                 let count = 0;
-                const hoy = new Date();
+                const hoyAge = new Date();
                 (animales || []).forEach(a => {
                   if ((a.estado === 'activo' || a.estado === 'Activo') && a.fechaNacimiento) {
-                    const edadMeses = (hoy - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
+                    const edadMeses = (hoyAge - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
                     if (edadMeses >= 12 && edadMeses < 24) count++;
                   }
                 });
@@ -1676,12 +1676,12 @@ const InformesView = {
               <span class="text-gray text-[0.62rem] uppercase font-800 block">Adultos (>24 meses)</span>
               <strong class="text-white text-md mt-4 block">${(() => {
                 let count = 0;
-                const hoy = new Date();
+                const hoyAge = new Date();
                 (animales || []).forEach(a => {
                   if (a.estado === 'activo' || a.estado === 'Activo') {
                     if (!a.fechaNacimiento) count++;
                     else {
-                      const edadMeses = (hoy - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
+                      const edadMeses = (hoyAge - new Date(a.fechaNacimiento)) / (1000 * 60 * 60 * 24 * 30.4);
                       if (edadMeses >= 24) count++;
                     }
                   }

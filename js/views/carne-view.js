@@ -159,11 +159,11 @@ const CarneView = {
     };
 
     // Resumen mensual (últimos 6 meses) - basado en fechas de ventas
-    const hoy = new Date();
+    const hoyMensual = new Date();
     const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const porMes = {};
     for (let i = 0; i < 6; i++) {
-      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const d = new Date(hoyMensual.getFullYear(), hoyMensual.getMonth() - i, 1);
       const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
       porMes[key] = { label: meses[d.getMonth()] + ' ' + d.getFullYear(), total: 0 };
     }
@@ -660,7 +660,7 @@ const CarneView = {
                   <label class="wizard-label">Zona</label>
                   <select id="edit-reg-zona" class="wizard-input wizard-select">
                     <option value="">Sin zona</option>
-                    ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}"}).join('')}
+                    ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}</option>`).join('')}
                     </select>
                 </div>
               </div>
