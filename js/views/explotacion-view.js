@@ -198,7 +198,13 @@ const ExplotacionView = {
   },
 
   async _abrirOpcionesRegistro(eventId, modo) {
-    App?.toast(`Visualizando registro #${eventId} en modo ${modo}`);
+    if (modo === 'leche') {
+      if (window.ProduccionView) await window.ProduccionView._abrirOpcionesRegistro(eventId);
+    } else if (modo === 'carne') {
+      if (window.CarneView) await window.CarneView._abrirOpcionesRegistro(eventId);
+    } else {
+      App?.toast(`Visualizando registro #${eventId} en modo ${modo}`);
+    }
   }
 };
 

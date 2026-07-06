@@ -3314,7 +3314,10 @@ label {
 
 /* === Batch 4 — misc === */
 .resize-none     { resize: none; }
-.gasto-bar-wrap  { height: 40px; background: #1a1a1a; border-radius: 6px; overflow: hidden; position: relative; }
+.gasto-bar-wrap,
+.carne-bar-wrap,
+.leche-bar-wrap,
+.hibrido-bar-wrap { height: 40px; background: #1a1a1a; border-radius: 6px; overflow: hidden; position: relative; }
 .hint-box-green  { background: rgba(204,255,0,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--c-success); flex-shrink: 0; }
 
 /* === Batch 5 — max-width containers === */

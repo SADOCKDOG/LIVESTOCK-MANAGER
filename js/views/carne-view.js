@@ -370,7 +370,22 @@ const CarneView = {
 
     return {
       ...filteredData,
-      kpis: data.kpis,
+      kpis: {
+        patrimonio: [
+          { label: 'Censo Cárnico', value: filteredData.animalesCarne.length + ' cabezas' },
+          { label: 'Lotes Cárnicos', value: filteredData.rebanosCarne.length },
+          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: 'var(--c-warning)' }
+        ],
+        comercializacion: [
+          { label: 'Ventas Matadero', value: filteredData.ventasCarne.length },
+          { label: 'Kg Canal', value: totalKgMatadero.toLocaleString() + ' kg' },
+          { label: 'Facturación', value: totalVentasEuros.toLocaleString() + ' €', color: 'var(--c-success)' }
+        ],
+        legislacion: [
+          { label: 'Alertas', value: filteredData.tratamientosSupresion.length, color: filteredData.tratamientosSupresion.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
+          { label: 'Tratamientos Act.', value: filteredData.sanitariosCarne.length }
+        ]
+      },
       valorPatrimonioTotal,
       totalKgPesados,
       numPesajes,
