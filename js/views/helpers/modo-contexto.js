@@ -73,7 +73,7 @@ const ModoContextoHelper = {
     const e = especie.toLowerCase();
     if (e.includes('vaca') || e.includes('bovin')) return 'var(--c-danger)'; // Red
     if (e.includes('oveja') || e.includes('ovin')) return 'var(--c-info)'; // Blue
-    if (e.includes('cabra') || e.includes('caprin')) return '#a855f7'; // Purple
+    if (e.includes('cabra') || e.includes('caprin')) return '#4FADF5'; // Purple
     if (e.includes('cerdo') || e.includes('porcin')) return 'var(--c-success)'; // Green
     if (e.includes('equin') || e.includes('caball')) return 'var(--c-orange)';
     if (e.includes('avicol') || e.includes('ave')) return 'var(--c-warning)'; // Amber

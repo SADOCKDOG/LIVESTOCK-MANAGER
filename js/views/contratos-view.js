@@ -11,6 +11,7 @@ const ContratosView = {
   async render() {
     if (window.App) App.updateHeaderColor('contratos');
     const main = document.getElementById("app-content");
+    const moduleColor = window.getModuleColor ? getModuleColor('/contrato') : '#4FADF5';
 
     // Cargar datos
     const contratos = await Contratos.list().catch(() => []);
@@ -60,24 +61,39 @@ const ContratosView = {
     }).join('');
 
     main.innerHTML = `
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${totalContratos} total</span>
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">
+          ${Icons.contratos()}
+        </span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> Contratos de Compra
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            Gestión de Contratos de Suministro y Venta
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución Mensual (Estandarizada como Card de Fondo OLED sin bordes de color) -->
+      <div class="card mb-14 p-12 card-resumen" style="background:rgba(59,130,246,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex justify-between items-center" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span><span style="color: ${moduleColor}; margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
+          <span class="text-xs text-gray font-bold lowercase" style="font-variant: normal;">(${totalContratos} total)</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
 
-      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-purple); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE CONTRATOS
+      <!-- Balance Consolidado (Estandarizado en Card de Fondo OLED sin bordes de color) -->
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(59,130,246,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span style="color: ${moduleColor}; margin-right:4px;">|</span> ${Icons.contratos()} RESUMEN DE CONTRATOS
         </div>
-        <div id="resumen-contratos" class="space-y-6 text-white">
+        <div class="flex flex-col">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.contratos()} Total Contratos</span>
-            <strong class="text-xl font-950" style="color: var(--c-purple);">${totalContratos} ${totalContratos === 1 ? "contrato" : "contratos"}</strong>
+            <strong class="text-xl font-950" style="color: ${moduleColor};">${totalContratos} ${totalContratos === 1 ? "contrato" : "contratos"}</strong>
           </div>
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.check()} Contratos Activos</span>
@@ -85,24 +101,24 @@ const ContratosView = {
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Valor Total Contratos</span>
-            <strong class="text-xl font-950 text-blue">$${this._calcularValorTotalContratos(contratos).toLocaleString()}</strong>
+            <strong class="text-xl font-950 text-blue">€${this._calcularValorTotalContratos(contratos).toLocaleString()}</strong>
           </div>
         </div>
       </div>
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
-        ${Icons.contratos()} Lista de Contratos
+      <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
+        <span style="color: ${moduleColor};">|</span> ${Icons.contratos()} Lista de Contratos
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
           <input type="search" id="search-contratos" placeholder="Buscar por número, comprador o condiciones..."
                  oninput="ContratosView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="contratos-filtro-estado" class="form-select-purple"
+        <select id="contratos-filtro-estado" class="form-select"
                 onchange="ContratosView._setFiltro('tipo', this.value)"
-                style="width:100px; min-width:90px; flex-shrink:0;">
+                style="width:110px; min-width:100px; flex-shrink:0;">
           <option value="todos" ${this._filtroActivo.tipo === 'todos' ? 'selected' : ''}>Todos</option>
           <option value="activo" ${this._filtroActivo.tipo === 'activo' ? 'selected' : ''}>Activo</option>
           <option value="inactivo" ${this._filtroActivo.tipo === 'inactivo' ? 'selected' : ''}>Inactivo</option>
@@ -172,41 +188,32 @@ const ContratosView = {
       return;
     }
 
-    container.innerHTML = contratos.map(c => {
+    container.innerHTML = `<div class="grid gap-12">${contratos.map(c => {
       const comprador = compradorMap[c.compradorId];
       const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
 
-      return `
-      <div class="card-registro" onclick="location.hash='#/contrato?id=${c.id}'"
-           style="--registro-color: ${color};">
-        <div class="flex justify-between items-start">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-6 mb-4">
-              <span class="text-lg font-black text-gold uppercase tracking-tight">${c.numero_contrato}</span>
-              <span class="text-gray-400" style="font-size:0.7rem;">${c.tipo === 'leche' ? Icons.leche() : Icons.carne()}</span>
-            </div>
-            <div class="flex flex-wrap gap-x-8 gap-y-1 text-[0.6rem] text-gray font-700 uppercase mt-2 leading-tight">
-              <span>${comprador ? `${comprador.nombre} (${comprador.tipo_comprador || '-'})` : 'SIN COMPRADOR'}</span>
-              ${c.fecha_inicio ? `<span>${c.fecha_inicio}</span>` : ''}
-              ${c.fecha_fin ? `<span>${c.fecha_fin}</span>` : '<span style="color:#6b7280;">(INDEFINIDO)</span>'}
-            </div>
+      return App._cardRegistro({
+        title: c.numero_contrato,
+        icon: c.tipo === 'leche' ? Icons.leche() : Icons.carne(),
+        subtitle: comprador ? `${comprador.nombre} (${(comprador.tipo_comprador === 'láctico' ? 'lácteo' : comprador.tipo_comprador) || '-'})` : 'SIN COMPRADOR',
+        content: `
+          <div class="mt-4 flex flex-wrap gap-x-8 gap-y-1 text-[0.62rem] text-gray font-700 uppercase leading-tight">
+            <span class="flex items-center gap-2">${Icons.calendar()} INICIO: ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString('es-ES') : '?'}</span>
+            <span class="flex items-center gap-2">${Icons.calendar()} FIN: ${c.fecha_fin ? new Date(c.fecha_fin).toLocaleDateString('es-ES') : 'INDEFINIDO'}</span>
           </div>
+        `,
+        rightSide: `
           <div class="text-right">
-            <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-${c.activo !== false ? 'success' : 'danger'}); color: var(--c-${c.activo !== false ? 'success' : 'danger'}); background: ${c.activo !== false ? 'rgba(204,255,0,0.1)' : 'rgba(255,68,68,0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">
-              ${c.activo !== false ? 'Activo' : 'Inactivo'}
+            <span class="badge badge-sm font-950 uppercase" style="background:${c.activo !== false ? 'color-mix(in srgb, var(--c-success) 12%, transparent)' : 'color-mix(in srgb, var(--c-danger) 12%, transparent)'}; color:${c.activo !== false ? 'var(--c-success)' : 'var(--c-danger)'}; border:1px solid ${c.activo !== false ? 'color-mix(in srgb, var(--c-success) 25%, transparent)' : 'color-mix(in srgb, var(--c-danger) 25%, transparent)'}; font-size:0.55rem; padding:2px 8px; border-radius:30px; font-weight:950; text-transform:uppercase; letter-spacing:0.5px;">
+              ${c.activo !== false ? 'ACTIVO' : 'INACTIVO'}
             </span>
           </div>
-        </div>
-        <div class="flex justify-between items-end w-full">
-          <div class="flex-1 min-w-0">
-            <!-- Espacio para información adicional si es necesario -->
-          </div>
-          <div class="text-right">
-            <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+        `,
+        footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha ➔</span>`,
+        color: color,
+        onClick: `location.hash='#/contrato?id=${c.id}'`
+      });
+    }).join('')}</div>`;
 
     // Botón Flotante de Acción con viñeta (se agrega después de la lista)
     const fabContainer = document.createElement('div');

@@ -1,0 +1,28 @@
+Token,Value,Description
+--p-cork,#CF0,Neon Lime (Main Brand Color)
+--p-cork-dark,#AC0,Neon Lime Dark
+--p-cork-glow,rgba(204, 255, 0, 0.15),Neon Lime Glow effect shadow
+--p-gold,#FFD600,Neon Yellow (Warning / Medium Alerts)
+--p-gold-dark,#B89900,Neon Yellow Dark
+--p-gold-glow,rgba(255, 214, 0, 0.15),Neon Yellow Glow effect shadow
+--bg,#141517,Graphite (OLED Black Background)
+--surface,#1E2023,Deep Graphite (Cards and Surfaces)
+--surface-light,#262A2E,Elevation Surface (Active elements)
+--border-graphite,#2E3238,Industrial panel border color
+--text-p,#FFF,Pure White (Primary legible text)
+--text-s,#94A3B8,Steel Grey (Secondary explanatory text)
+--c-success,#CF0,Success and active production color
+--c-warning,#FFD600,Warning / In-treatment / Celo color
+--c-danger,#F44,Danger / Quarantined / Withdrawal alert color
+--c-info,#3B82F6,Commercial and financials color (Deep Blue)
+--font-body,Inter,Primary Body text font family
+--font-display,Archivo Expanded,Primary industrial title font family
+--font-mono,IBM Plex Mono,Crotal / REGA technical data font family
+--font-weight-title,900,Robust heavyweight for display titles
+--radius-card,16px,Standard Card Corner Radius
+--radius-badge,9999px,Pill and Badge Corner Radius
+--sp-1,4px,Micro spacing unit
+--sp-2,8px,Small spacing unit
+--sp-3,12px,Medium spacing unit
+--sp-4,16px,Standard spacing unit (Base)
+--sp-5,24px,Large spacing unit (Layout margin)

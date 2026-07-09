@@ -42,7 +42,7 @@ const AjustesView = {
 
     main.innerHTML = `
       ${isFree ? `
-      <div class="card-registro mb-25 p-20" style="--registro-color: var(--c-warning); background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
+      <div class="card mb-25 p-20" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1a2e 50%,#0d0d1a 100%);border:1px solid rgba(217,119,6,0.3);border-radius:16px;overflow:hidden;position:relative;">
         <div class="flex items-center gap-15">
           <div style="flex-shrink:0;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--c-warning),#b45309);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(217,119,6,0.3);">
             ${Icons.premium()}
@@ -58,8 +58,10 @@ const AjustesView = {
       </div>` : ''}
 
       <!-- ===================== CONFIGURACIÓN DEL SISTEMA Y SEGURIDAD ===================== -->
-      <div class="card-registro" style="--registro-color: var(--c-purple);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.ajustes()} Sistema y Seguridad</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-purple);">|</span> ${Icons.ajustes()} SISTEMA Y SEGURIDAD
+        </h3>
         <p class="text-gray mt-5 text-sm leading-relaxed">
           Centro de control técnico. Gestiona la apariencia OLED, integridad de datos (Backups) y registros de auditoría.
         </p>
@@ -99,8 +101,10 @@ const AjustesView = {
 
       <!-- ===================== GESTOR DE FINCA ACTIVA ===================== -->
       ${activeFinca ? `
-      <div class="card-registro" style="--registro-color: var(--c-success);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.finca()} Finca Activa</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-success);">|</span> ${Icons.finca()} FINCA ACTIVA
+        </h3>
         <div class="info-box mt-15 mb-20">
           <div class="grid grid-cols-2 gap-8 text-85">
             <div><span class="text-gray">Finca:</span> <strong class="text-white">${activeFinca.nombre}</strong></div>
@@ -120,8 +124,10 @@ const AjustesView = {
       </div>` : ''}
 
       <!-- ===================== MIS FINCAS ===================== -->
-      <div class="card-registro" style="--registro-color: var(--c-warning);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.finca()} Mis Fincas</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-warning);">|</span> ${Icons.finca()} MIS FINCAS
+        </h3>
         <p class="text-gray mt-5 text-sm">Cambia la explotación activa o añade nuevas.</p>
         <div class="grid gap-10 mt-15">${fincas.map((f) => `
           <div class="flex justify-between items-center rounded-sm bg-black border border-222 p-12">
@@ -136,8 +142,10 @@ const AjustesView = {
       </div>
 
       <!-- ===================== ADSG Y SANIDAD ===================== -->
-      <div class="card-registro" style="--registro-color: var(--c-info);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.sanidad()} Sanidad Ganadera (ADSG)</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-info);">|</span> ${Icons.sanidad()} SANIDAD GANADERA (ADSG)
+        </h3>
         <div class="grid gap-10 mt-15">
           ${adsgs.map(a => `
             <div class="flex justify-between items-center rounded-sm bg-black border border-222 p-12">
@@ -149,8 +157,10 @@ const AjustesView = {
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
-      <div class="card-registro" style="--registro-color: var(--c-success);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.objetivo()} Objetivos de Explotación</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-success);">|</span> ${Icons.objetivo()} OBJETIVOS DE EXPLOTACIÓN
+        </h3>
         <p class="text-gray mt-5 text-sm">Metas de rendimiento para el Panel de Eficiencia Técnica.</p>
         <div class="grid grid-cols-2 gap-10 mt-15">
           <div class="wizard-input-group"><label class="wizard-label">GMD (kg/día)</label><input type="number" value="${config.objGmd || 0.8}" step="0.1" class="wizard-input" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
@@ -159,15 +169,19 @@ const AjustesView = {
       </div>
 
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
-      <div class="card-registro" style="--registro-color: var(--c-warning);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.reproduccion()} Especies y Razas</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-orange);">|</span> ${Icons.reproduccion()} ESPECIES Y RAZAS
+        </h3>
         <div id="especies-container" class="mt-15">${this._renderEspecies(config)}</div>
         <button class="btn btn-create btn-full mt-15" onclick="AjustesView._agregarEspecie()">${Icons.agregar()} Añadir Especie</button>
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
-      <div class="card-registro" style="--registro-color: var(--c-danger);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.campana()} Configuración de Alertas</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-danger);">|</span> ${Icons.campana()} CONFIGURACIÓN DE ALERTAS
+        </h3>
         <div class="grid gap-10 mt-15">
           ${[
             { id: 'alertSanidad', label: 'Alertas Sanitarias', def: true },
@@ -181,8 +195,10 @@ const AjustesView = {
       </div>
 
       <!-- ===================== AYUDA Y SOPORTE ===================== -->
-      <div class="card-registro" style="--registro-color: var(--p-gold);">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg">${Icons.libro()} Ayuda y Soporte</h3>
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-purple);">|</span> ${Icons.libro()} AYUDA Y SOPORTE
+        </h3>
         <div class="grid grid-cols-1 gap-10 mt-15">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._abrirManual()">
             ${Icons.libro()} <span class="widget-link-label">Manual de Usuario</span>
@@ -369,16 +385,16 @@ const AjustesView = {
   async _abrirWizardRetroiluminacion() {
     const config = await this._loadConfig();
     const colors = [
-      { name: 'Neon Lime', hex: '#CCFF00' },
-      { name: 'Neon Red', hex: '#FF4444' },
-      { name: 'Neon Blue', hex: '#3b82f6' },
-      { name: 'Neon Gold', hex: '#FFD600' },
-      { name: 'Neon Orange', hex: '#F97316' },
-      { name: 'Neon Purple', hex: '#A855F7' },
-      { name: 'Neon Pink', hex: '#EC4899' },
+      { name: 'Neon Lime', hex: '#C5FA50' },
+      { name: 'Neon Red', hex: '#E8555F' },
+      { name: 'Neon Blue', hex: '#4FADF5' },
+      { name: 'Neon Gold', hex: '#FFFC55' },
+      
+      
+      
       { name: 'Neon Green', hex: '#10b981' },
       { name: 'Neon Indigo', hex: '#8b5cf6' },
-      { name: 'Steel Grey', hex: '#94A3B8' },
+      { name: 'Steel Grey', hex: '#B1B1B1' },
       { name: 'White Backlit', hex: '#FFFFFF' }
     ];
 

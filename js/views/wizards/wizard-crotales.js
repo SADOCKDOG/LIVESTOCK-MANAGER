@@ -266,7 +266,7 @@ window.WizardCrotales = {
       <div id="pdf-viewer-content" style="flex:1;overflow:auto;background:#fff;">${html}</div>
       <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;">
         <button class="btn btn-primary" id="btn-pdf-share" style="width:auto;padding:0 30px;background:#10b981;color:#fff;font-weight:bold;">${Icons.exportar()} COMPARTIR</button>
-        <button class="btn btn-primary" id="btn-pdf-print" style="width:auto;padding:0 30px;background:#3b82f6;color:#fff;font-weight:bold;">${Icons.documento()} IMPRIMIR</button>
+        <button class="btn btn-primary" id="btn-pdf-print" style="width:auto;padding:0 30px;background:#4FADF5;color:#fff;font-weight:bold;">${Icons.documento()} IMPRIMIR</button>
         <button class="btn btn-secondary" onclick="document.getElementById('pdf-viewer-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
       </div>`;
     document.body.appendChild(overlay);

@@ -13,7 +13,7 @@ const AnimalesView = {
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
     if (rebanos.length === 0)
-      return (main.innerHTML = `<div class="card-registro empty-state" style="--registro-color: var(--text-s); border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
+      return (main.innerHTML = `<div class="card text-center p-40" style="border:1px solid var(--text-s); background:rgba(255,255,255,0.01);"><p class="empty-state-text">Crea un rebaño primero.</p></div>`);
 
     const rebanoMap = {};
     rebanos.forEach(r => { rebanoMap[r.id] = r; });
@@ -24,8 +24,8 @@ const AnimalesView = {
     let html = '';
 
     if (animales.length === 0) {
-      html += `<div class="card-registro empty-state" style="--registro-color: var(--c-orange); border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);">
-        <div class="empty-state-icon" style="color:var(--c-orange);">${Icons.animales()}</div>
+      html += `<div class="card text-center p-40" style="border:1px solid var(--c-orange); background:rgba(255,255,255,0.01); margin-top:20px;">
+        <div class="empty-state-icon" style="color:var(--c-orange); font-size:2rem; margin-bottom:12px;">${Icons.animales()}</div>
         <p class="empty-state-text">Aún no hay animales registrados.</p>
         <div class="text-center mt-20">
             <button class="btn btn-create btn-lg" onclick="location.hash='/animal'">
@@ -39,15 +39,22 @@ const AnimalesView = {
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     const vendidos = animales.filter(a => a.estado === 'vendido').length;
-    // Card AGLUTINADORA: cabecera + resumen de datos + histórico de fichas (patrón Gastos)
-    html += `<div class="card mb-10" style="--registro-color: var(--c-orange); border-top:0; border-right:0; border-bottom:0; border-left:2px solid var(--registro-color); box-shadow: -2px 0 8px -2px color-mix(in srgb, var(--registro-color) 60%, transparent), 0 2px 6px -1px color-mix(in srgb, var(--registro-color) 40%, transparent);">
-      <div class="flex items-center gap-12 mb-12">
-        <span class="text-3xl" style="color:var(--c-orange);">${Icons.animales()}</span>
+    const moduleColor = window.getModuleColor('/animales');
+    html += `
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.animales()}</span>
         <div>
-          <div class="text-white font-900 text-lg">Censo de Animales</div>
-          <div class="text-gray" style="font-size:0.68rem;">${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos</div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> Censo de Animales
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            ${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos
+          </div>
         </div>
       </div>
+
+
       <!-- Resumen de datos registrados (colapsable) -->
       <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
@@ -71,16 +78,18 @@ const AnimalesView = {
         </div>
       </div>
       <!-- Filtro de búsqueda integrado (controla el histórico) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">${Icons.documento()} Lista de Animales</div>
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
+        ${Icons.documento()} Lista de Animales
+      </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
           <input type="search" id="search-animales" placeholder="Buscar por crotal, raza o rebaño..."
                  oninput="AnimalesView._filtrar(this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="animales-filtro-especie" class="form-select-gold"
+        <select id="animales-filtro-especie" class="form-select"
                 onchange="AnimalesView._setFiltro('especie', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
+                style="width:120px; min-width:110px; flex-shrink:0; padding:12px; min-height:44px;">
           <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
           <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>
           <option value="Ovejas" ${this._filtroActivo.especie === 'Ovejas' ? 'selected' : ''}>Ovejas</option>
@@ -93,17 +102,15 @@ const AnimalesView = {
       const props = App._getAnimalCardProps(a, rebanoMap[a.rebanoId]);
       html += App._cardRegistro(props);
     });
-    html += `</div></div>
+    html += `</div>
       <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="location.hash='/animal'">
         <span class="fab-label">Nuevo Animal</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
-      <div class="card-registro mt-10" style="--registro-color: var(--text-s); border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color);">
-        <div id="animales-empty-search" class="empty-state-search d-none">
-          <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
-          <p class="text-gray-500 uppercase font-900 text-xs">No se encontraron animales con ese criterio.</p>
-        </div>
+      <div id="animales-empty-search" class="card mt-10 p-12 text-center d-none" style="background: rgba(255,255,255,0.01);">
+        <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
+        <p class="text-gray-500 uppercase font-900 text-xs" style="margin: 0;">No se encontraron animales con ese criterio.</p>
       </div>
 `;
 
@@ -239,8 +246,8 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.info()} DATOS GENERALES</div>
+          <div class="card p-16 mb-20" style="border: 1px solid var(--c-amber); background: rgba(255,255,255,0.02);">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-amber); margin-right: 4px;">|</span> ${Icons.info()} DATOS GENERALES</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">ESPECIE</label>
@@ -284,8 +291,8 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card-registro card-accent card-accent-blue p-16 mb-20" style="--registro-color: var(--c-info);">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
+          <div class="card p-16 mb-20" style="border: 1px solid #4FADF5; background: rgba(255,255,255,0.02);">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-info); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: #4FADF5; margin-right: 4px;">|</span> ${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
               <select id="a-categoria" class="wizard-input font-800">
@@ -317,8 +324,8 @@ const AnimalesView = {
           </div>
 
           <!-- LIBRO DE REGISTRO SIGGAN -->
-          <div class="card-registro card-accent card-accent-green p-16 mb-20" style="--registro-color: var(--c-success);">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success)">${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
+          <div class="card p-16 mb-20" style="border: 1px solid var(--c-success); background: rgba(255,255,255,0.02);">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-success); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-success); margin-right: 4px;">|</span> ${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">PAÍS DE NACIMIENTO</label>
@@ -373,18 +380,18 @@ const AnimalesView = {
             </div>
           </div>
 
-          <div class="card-registro card-accent card-accent-gold p-16 mb-20" style="--registro-color: var(--c-gold);">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">${Icons.documento()} OBSERVACIONES</div>
+          <div class="card p-16 mb-20" style="border: 1px solid var(--c-gold); background: rgba(255,255,255,0.02);">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-gold); margin-right: 4px;">|</span> ${Icons.documento()} OBSERVACIONES</div>
             <textarea id="a-notas" placeholder="NOTAS ADICIONALES..." class="wizard-input min-h-80 uppercase font-700" style="resize:none; font-size:0.8rem;">${a.notas || ""}</textarea>
           </div>
 
           ${!esNuevo ? `
-            <div class="card-registro card-accent card-accent-amber p-16 mb-20" style="--registro-color: var(--c-amber);">
-               <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange)">COMPAÑEROS LOTE</div>
+            <div class="card p-16 mb-20" style="border: 1px solid var(--c-amber); background: rgba(255,255,255,0.02);">
+               <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-amber); margin-right: 4px;">|</span> COMPAÑEROS LOTE</div>
                <div id="tabla-referencia" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
-            <div class="card-registro card-accent card-accent-purple p-16 mb-20" style="--registro-color: var(--c-purple);">
-               <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple)">HISTORIAL REPRO</div>
+            <div class="card p-16 mb-20" style="border: 1px solid var(--c-purple); background: rgba(255,255,255,0.02);">
+               <div class="section-header-theme mb-12" style="--theme-color: var(--c-purple); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-purple); margin-right: 4px;">|</span> HISTORIAL REPRO</div>
                <div id="tabla-reproduccion" class="text-aaa text-xs uppercase font-800">Cargando...</div>
             </div>
             <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mb-20">
@@ -709,7 +716,7 @@ const AnimalesView = {
     } catch (e) {
       App.toastError(e.message);
     }
-  }
+  },
 };
 
 window.AnimalesView = AnimalesView;

@@ -118,6 +118,24 @@ window.WizardFinca = {
                 </div>
               </div>
 
+              <div class="grid grid-cols-2 gap-8">
+                <div class="wizard-input-group"><label class="wizard-label">CALIFICACIÓN SANITARIA</label>
+                  <select id="w-f-calif" class="wizard-input wizard-select">
+                    <option value="sin_calificar" ${data.calificacion_sanitaria === 'sin_calificar' ? 'selected' : ''}>Sin calificar</option>
+                    <option value="indemne" ${data.calificacion_sanitaria === 'indemne' ? 'selected' : ''}>Oficialmente indemne (T3/M3/B4)</option>
+                    <option value="calificada" ${data.calificacion_sanitaria === 'calificada' ? 'selected' : ''}>Calificada</option>
+                    <option value="en_proceso" ${data.calificacion_sanitaria === 'en_proceso' ? 'selected' : ''}>En proceso</option>
+                    <option value="positiva" ${data.calificacion_sanitaria === 'positiva' ? 'selected' : ''}>Con positivos</option>
+                  </select>
+                </div>
+                <div class="wizard-input-group"><label class="wizard-label">GUÍA 365 DÍAS (SANEADA)</label>
+                  <select id="w-f-guia365" class="wizard-input wizard-select">
+                    <option value="false" ${data.guia_365_habilitada !== true ? 'selected' : ''}>Inactiva / No autorizada</option>
+                    <option value="true" ${data.guia_365_habilitada === true ? 'selected' : ''}>Activa / Autorizada</option>
+                  </select>
+                </div>
+              </div>
+
               <hr class="border-333 my-16">
               <h4 class="text-red text-sm mt-0 mb-12 flex items-center gap-6">${Icons.sanidad()} ADSG (Agrupación Defensa Sanitaria)</h4>
 
@@ -141,6 +159,8 @@ window.WizardFinca = {
           data.comunidad_autonoma = document.getElementById('w-f-ccaa')?.value || data.comunidad_autonoma;
           data.tipo_explotacion = document.getElementById('w-f-tipo')?.value || data.tipo_explotacion;
           data.sistema_explotacion = document.getElementById('w-f-sist')?.value || data.sistema_explotacion;
+          data.calificacion_sanitaria = document.getElementById('w-f-calif')?.value || data.calificacion_sanitaria || 'sin_calificar';
+          data.guia_365_habilitada = document.getElementById('w-f-guia365')?.value === 'true';
           data.adsg_nombre = document.getElementById('w-f-adsg')?.value.trim() || data.adsg_nombre;
           data.adsg_codigo = document.getElementById('w-f-adsg-cod')?.value.trim() || data.adsg_codigo;
           data.adsg_veterinario = document.getElementById('w-f-adsg-vet')?.value.trim() || data.adsg_veterinario;

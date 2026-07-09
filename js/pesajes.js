@@ -116,7 +116,14 @@ const Pesajes = {
             fecha: evento.fecha,
             rol_contable: evento.rol_contable,
         }));
-        const id = await window.db.add("registro_eventos", evento);
+        let id;
+        if (data.id) {
+          id = Number(data.id);
+          evento.id = id;
+          await window.db.put("registro_eventos", evento);
+        } else {
+          id = await window.db.add("registro_eventos", evento);
+        }
         console.log('[DEBUG Pesajes] evento guardado con id:', id, 'fincaId:', evento.fincaId, 'unidad:', evento.unidad);
 
         // 4. (Opcional) Guardar también en tablas legadas para compatibilidad con informes antiguos

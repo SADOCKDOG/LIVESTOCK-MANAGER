@@ -13,10 +13,18 @@ const ProveedoresView = {
 
     async render() {
         const main = document.getElementById("app-content");
+        const moduleColor = window.getModuleColor ? getModuleColor('/proveedores') : 'var(--c-purple)';
         main.innerHTML = `
-          <div class="mb-14">
-            <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-              <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> PROVEEDORES
+          <!-- Cabecera de Sección Estandarizada -->
+          <div class="flex items-center gap-12 mb-14">
+            <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.proveedores()}</span>
+            <div>
+              <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+                <span style="color:${moduleColor}; margin-right:4px;">|</span> Proveedores
+              </h1>
+              <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+                Gestión de Proveedores y Servicios
+              </div>
             </div>
           </div>
 
@@ -25,7 +33,7 @@ const ProveedoresView = {
             <div class="flex gap-8 mb-14">
               <input type="search" id="search-proveedores" placeholder="Buscar por nombre, NIF o ciudad..."
                 oninput="ProveedoresView._filtrar(this.value)"
-                class="search-input flex-1">
+                class="form-input search-input flex-1" style="margin-top:0;">
             </div>
           </div>
           <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
@@ -49,8 +57,8 @@ const ProveedoresView = {
         const kpisEl = document.getElementById('prov-kpis');
         if (kpisEl) {
             kpisEl.innerHTML = `
-              <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-accent); width:100%;">
-                <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.proveedores()} BALANCE PROVEEDORES</div>
+              <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(168,85,247,0.015); width:100%;">
+                <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;"><span style="color: var(--c-purple); margin-right:4px;">|</span> ${Icons.proveedores()} BALANCE PROVEEDORES</div>
                 <div class="flex flex-col">
                   <div class="py-8 flex justify-between items-center border-bottom-222">
                     <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.proveedores()} Proveedores</span>
@@ -124,7 +132,7 @@ const ProveedoresView = {
           `,
           footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>`,
           color: 'var(--c-purple)',
-          onClick: `ProveedoresView.renderDetalle(${p.id})`
+          onClick: `location.hash='#/proveedor?id=${p.id}'`
         })).join('')}</div>`;
     },
 
@@ -150,7 +158,7 @@ const ProveedoresView = {
           </div>
 
           <!-- Cabecera -->
-          <div class="card-registro" style="--registro-color: var(--c-success);">
+          <div class="card p-24 mb-14" style="background: var(--surface);">
             <div class="flex justify-between items-start mb-16">
               <div>
                 <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight">${proveedor.nombre}</h2>
@@ -181,16 +189,16 @@ const ProveedoresView = {
 
           <!-- KPIs -->
           <div class="grid grid-cols-3 gap-8 mb-16">
-            <div class="summary-cell summary-cell-kpi border-left-green">
+            <div class="summary-cell summary-cell-kpi">
               <small class="s-lbl uppercase font-900">TOTAL GASTADO</small>
               <div class="s-val inf-val-lg text-green font-950">${resumen.total_gastado.toLocaleString()}€</div>
             </div>
-            <div class="summary-cell summary-cell-kpi border-left-blue">
+            <div class="summary-cell summary-cell-kpi">
               <small class="s-lbl uppercase font-900">REGISTROS</small>
               <div class="s-val inf-val-lg text-blue font-950">${resumen.total_gastos}</div>
               <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">MEDIA: ${resumen.gasto_promedio.toLocaleString('es-ES', { maximumFractionDigits: 1 })}€</small>
             </div>
-            <div class="summary-cell summary-cell-kpi border-left-red">
+            <div class="summary-cell summary-cell-kpi">
               <small class="s-lbl uppercase font-900">GASTO ANUAL</small>
               <div class="s-val inf-val-lg text-red font-950">${resumen.gasto_anual.toLocaleString()}€</div>
               <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">ÚLTIMOS 12M</small>
@@ -198,9 +206,9 @@ const ProveedoresView = {
           </div>
 
           <!-- Desglose por categoría -->
-          <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-info);">
+          <div class="card p-16 mb-16 border-222 bg-black">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-                ${Icons.grafico()} GASTOS POR CATEGORÍA
+                <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.grafico()} GASTOS POR CATEGORÍA
             </div>
             ${Object.keys(resumen.por_categoria).length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text font-800 text-xs">Sin gastos registrados.</p></div>' :
               Object.entries(resumen.por_categoria).map(([cat, info]) => `
@@ -215,9 +223,9 @@ const ProveedoresView = {
           </div>
 
           <!-- Historial de Gastos -->
-          <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-warning);">
+          <div class="card p-16 mb-20 border-222 bg-black">
             <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-                ${Icons.dinero()} ÚLTIMOS REGISTROS
+                <span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.dinero()} ÚLTIMOS REGISTROS
             </div>
             ${gastos.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text font-800 text-xs">Sin gastos registrados.</p></div>' :
               gastos.slice(0, 30).map(g => `
@@ -236,8 +244,8 @@ const ProveedoresView = {
           </div>
 
           ${proveedor.notas ? `
-          <div class="card-registro card-accent card-accent-gold p-16 mb-40" style="--registro-color: var(--p-gold);">
-            <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
+          <div class="card card-accent card-accent-gold p-16 mb-40">
+            <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10"><span style="color: var(--p-gold); margin-right: 4px;">|</span> ${Icons.documento()} OBSERVACIONES</div>
             <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${proveedor.notas}</p>
           </div>` : '<div class="pb-40"></div>'}
         `;
@@ -265,8 +273,8 @@ const ProveedoresView = {
               <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
             </button>
           </div>
-          <div class="card-registro card-accent card-accent-green p-20 bg-black" style="--registro-color: var(--c-success);">
-            <div class="section-header-theme mb-20" style="--theme-color: var(--c-success)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
+          <div class="card card-accent card-accent-green p-20 bg-black">
+            <div class="section-header-theme mb-20" style="--theme-color: var(--c-success)"><span style="color: var(--c-success); margin-right: 4px;">|</span> ${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
 
             <div class="wizard-input-group mb-15">
                 <label class="wizard-label">NOMBRE / RAZÓN SOCIAL *</label>

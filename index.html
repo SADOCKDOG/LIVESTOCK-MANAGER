@@ -2,23 +2,41 @@
 <html lang="es">
   <head>
     <script>
-      // Sandbox Guard: Previene errores de seguridad al acceder a navigator.serviceWorker en entornos iframe restringidos
+      // Sandbox Guard Ultra-Robustecido para entornos iframe restringidos (Open Design Desktop)
+      // Evita de forma síncrona caídas críticas al consultar serviceWorker e indexedDB
       try {
         var _testSW = navigator.serviceWorker;
       } catch (e) {
-        console.warn("[Sandbox Guard] navigator.serviceWorker no es accesible. Redefiniendo para evitar caídas de scripts.");
+        console.warn("[Sandbox Guard] navigator.serviceWorker bloqueado en sandbox. Redefiniendo de forma segura...");
         try {
-          Object.defineProperty(Navigator.prototype, 'serviceWorker', {
+          Object.defineProperty(navigator, 'serviceWorker', {
             get: function() { return undefined; },
-            configurable: true,
-            enumerable: true
+            configurable: true
           });
         } catch (err) {
           try {
-            delete Navigator.prototype.serviceWorker;
+            Object.defineProperty(Navigator.prototype, 'serviceWorker', {
+              get: function() { return undefined; },
+              configurable: true,
+              enumerable: true
+            });
           } catch (err2) {
-            console.error("[Sandbox Guard] No se pudo desactivar serviceWorker:", err2);
+            console.error("[Sandbox Guard] No se pudo redefinir serviceWorker en el prototipo:", err2);
           }
+        }
+      }
+
+      try {
+        var _testIDB = window.indexedDB;
+      } catch (e) {
+        console.warn("[Sandbox Guard] window.indexedDB bloqueado en sandbox. Redefiniendo para evitar caídas síncronas...");
+        try {
+          Object.defineProperty(window, 'indexedDB', {
+            get: function() { return undefined; },
+            configurable: true
+          });
+        } catch (err) {
+          console.error("[Sandbox Guard] No se pudo redefinir indexedDB de forma segura:", err);
         }
       }
     </script>
@@ -35,8 +53,8 @@
       content="black-translucent"
     />
     <title>Livestock Manager</title>
-    <link rel="stylesheet" href="css/design-tokens.css?v=5.3.7" />
-    <link rel="stylesheet" href="css/styles.css?v=6.28.4" />
+    <link rel="stylesheet" href="css/design-tokens.css?v=5.3.8" />
+    <link rel="stylesheet" href="css/styles.css?v=6.28.5" />
     <link rel="stylesheet" href="css/layout.css?v=1.0.0" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/Logo aplicación.png" />
@@ -75,8 +93,10 @@
         </div>
 
         <!-- Right: Viñeta de Finca (REGA con haz de luz) -->
-        <div id="finca-badge" class="rega-badge-container" onclick="App.route('/fincas')">
-            <span id="nombre-finca-header">Cargando...</span>
+        <div class="flex items-center gap-10 justify-end" style="justify-self: end; display: flex; align-items: flex-end; padding-bottom: 8px;">
+            <div id="finca-badge" class="rega-badge-container" onclick="App.route('/fincas')" style="margin-left: 4px;">
+                <span id="nombre-finca-header">Cargando...</span>
+            </div>
         </div>
       <!-- Dropdown del Header -->
       <div id="header-dropdown-menu" class="header-dropdown-overlay" onclick="App._toggleHeaderDropdown()">
@@ -278,6 +298,36 @@
             </svg>
             <span>Informes</span>
           </a>
+          <a href="#/wizards" class="more-sheet-item border-accent" onclick="App._toggleMenuNavegacion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+            <span>Asistentes</span>
+          </a>
+          <a href="#/silos" class="more-sheet-item border-warning" onclick="App._toggleMenuNavegacion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+              <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+            </svg>
+            <span>Silos</span>
+          </a>
+          <a href="#/pesadas" class="more-sheet-item border-info" onclick="App._toggleMenuNavegacion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 12h8"></path>
+              <path d="M12 8v8"></path>
+            </svg>
+            <span>Pesadas</span>
+          </a>
+          <a href="#/fitosanitario" class="more-sheet-item border-success" onclick="App._toggleMenuNavegacion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+              <path d="M2 12h20"></path>
+            </svg>
+            <span>Fitosanitario</span>
+          </a>
           <a href="#/informes" class="more-sheet-item border-info" onclick="App._toggleMenuNavegacion(); setTimeout(()=>InformesView._cambiarTab('ventas'),100)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="3" width="20" height="18" rx="2" ry="2"></rect>
@@ -403,13 +453,16 @@
     <script src="js/views/comercializacion-view.js?v=6.28.4"></script>
     <script src="js/views/informes-view.js?v=6.28"></script>
     <script src="js/views/trazabilidad-view.js?v=6.28"></script>
-    <script src="js/views/alertas-view.js?v=6.28"></script>
     <script src="js/views/cuaderno-view.js?v=6.28"></script>
     <script src="js/views/documentos-view.js?v=6.28"></script>
     <script src="js/views/albaranes-ventas-view.js?v=6.28"></script>
     <script src="js/views/manuales-view.js?v=6.28"></script>
     <script src="js/views/ajustes-view.js?v=6.28"></script>
     <script src="js/views/config-sistema-view.js?v=6.28"></script>
+    <script src="js/views/silos-view.js?v=6.28"></script>
+    <script src="js/views/pesadas-view.js?v=6.28"></script>
+    <script src="js/views/wizards-view.js?v=6.28"></script>
+    <script src="js/views/fitosanitarios-view.js?v=6.28"></script>
 
     <!-- Helpers de UI -->
     <script src="js/views/helpers/modo-contexto.js?v=6.28"></script>
@@ -482,7 +535,7 @@
     <script src="js/views/transportistas-view.js?v=6.28"></script>
 
     <!-- 6º Arrancar el Controlador de la Aplicación (Orquestador Central) -->
-    <script src="js/app.js?v=6.28.4"></script>
+    <script src="js/app.js?v=6.28.5"></script>
 
     <!-- E2E Test Suite (solo en desarrollo) -->
     <script src="js/e2e-test-suite.js?v=6.28"></script>
@@ -500,14 +553,18 @@
     <script src="js/seed-data.js?v=6.28"></script>
 
     <script>
-      window.isNative = window.hasOwnProperty("Capacitor");
+      window.isNative = !!window.Capacitor;
       try {
-        if (!window.isNative && "serviceWorker" in navigator) {
+        if (!window.isNative && navigator.serviceWorker && typeof navigator.serviceWorker.register === 'function') {
           window.addEventListener("load", () => {
-            navigator.serviceWorker
-              .register("./sw.js")
-              .then((reg) => console.log("SW OK"))
-              .catch((err) => console.error("SW Error:", err));
+            try {
+              navigator.serviceWorker
+                .register("./sw.js")
+                .then((reg) => console.log("SW OK"))
+                .catch((err) => console.error("SW Error:", err));
+            } catch (err) {
+              console.warn("Error al registrar el Service Worker:", err);
+            }
           });
         }
       } catch (e) {

@@ -361,7 +361,7 @@ const Charts = {
                     datasets: [{
                         label: 'Ingresos ($)',
                         data: Object.values(ventasPorMes),
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: '#4FADF5',
                         borderColor: '#1d4ed8',
                         borderWidth: 2
                     }]
@@ -414,8 +414,8 @@ const Charts = {
                     datasets: [{
                         data: Object.values(gastosPorConcepto),
                         backgroundColor: [
-                            '#ef4444', '#f97316', '#f59e0b', '#10b981',
-                            '#3b82f6', '#8b5cf6', '#ec4899'
+                            '#ef4444', '#E8555F', '#f59e0b', '#10b981',
+                            '#4FADF5', '#8b5cf6', '#4FADF5'
                         ],
                         borderWidth: 2,
                         borderColor: '#121212'

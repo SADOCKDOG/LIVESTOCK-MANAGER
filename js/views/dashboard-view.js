@@ -131,10 +131,10 @@ const DashboardView = {
         <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,var(--c-warning),var(--c-warning));border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
       </div>
       ` : ''}
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
       <!-- Resumen General -->
-      <div class="card-registro" style="--registro-color: var(--c-info); grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-        <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
+      <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+        <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
         <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: var(--text-s); text-shadow: none;">cab.</span></div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
           <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
@@ -153,9 +153,9 @@ const DashboardView = {
       </div>
 
       <!-- Balance Económico -->
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-info); grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> BALANCE ECONÓMICO</h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> BALANCE ECONÓMICO</h3>
           <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">INGRESOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.ingresos || 0).toLocaleString()}€</div></div>
@@ -168,9 +168,10 @@ const DashboardView = {
       ${this._renderIndicadoresLacteos(indicadoresLeche)}
 
       <!-- Calendario Preventivo -->
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
+</h3>
           ${alertaEpoca.sugerencias?.length > 0 ? `
           <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
             ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
@@ -182,23 +183,23 @@ const DashboardView = {
       </div>
 
       <!-- Accesos Rápidos -->
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-info); grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ACCESOS RÁPIDOS</h3>
-          <div class="grid grid-cols-2 gap-8">
-            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px;">
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ACCESOS RÁPIDOS</h3>
+          <div class="grid grid-cols-12 gap-8">
+            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px; grid-column: span 4;">
               ${Icons.animales()}
               <span class="widget-link-label">Animales</span>
             </a>
-            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info" style="height: 60px;">
+            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info" style="height: 60px; grid-column: span 3;">
               ${Icons.rebanos()}
               <span class="widget-link-label">Rebaños</span>
             </a>
-            <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40; height: 60px;">
+            <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40; height: 60px; grid-column: span 3;">
               ${modoIcon}
               <span class="widget-link-label">${modoLabel}</span>
             </a>
-            <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success" style="height: 60px;">
+            <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success" style="height: 60px; grid-column: span 2;">
               ${Icons.tendencia()}
               <span class="widget-link-label">Informes</span>
             </a>
@@ -206,7 +207,7 @@ const DashboardView = {
         </div>
       </div>
 
-      <div class="fab-container" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'dashboard' })">
+      <div class="fab-container" onclick="App._abrirSubmenuRegistros({ origen_modulo: 'dashboard' })">
         <span class="fab-label">Nueva Actividad</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>
@@ -216,9 +217,9 @@ const DashboardView = {
   _renderAlertasSanitarias(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-danger); grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; border-top: none !important; background: rgba(255,255,255,0.02);">
-          <h3 style=\"color: var(--c-danger); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card-registro" style="--registro-color: var(--c-danger); grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center; border-top: none !important; background: rgba(255,255,255,0.02);">
+          <h3 style="color: var(--c-danger); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
@@ -243,9 +244,9 @@ const DashboardView = {
   _renderAlertasTrazabilidad(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
-          <h3 style=\"color: var(--c-orange); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
+          <h3 style="color: var(--c-orange); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
@@ -267,9 +268,9 @@ const DashboardView = {
   _renderAlertasAdministrativas(alertas) {
     if (!alertas.length) return '';
     return `
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
-          <h3 style=\"color: var(--c-purple); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
+          <h3 style="color: var(--c-purple); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 4).map(a => {
               let iconoSVG = Icons.info();
@@ -337,9 +338,9 @@ const DashboardView = {
     if (!indicadores) return '';
     const { numEntregas, litrosTotal, precioFinalMedio, mofaTotal, mofaRatio, conLab, esMedia, meses } = indicadores;
     return `
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-info); grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">MOFA</div>
@@ -443,9 +444,9 @@ const DashboardView = {
   _renderKPIsDiariosCard(kpis) {
     if (!kpis || (!kpis.litrosPorOveja && !kpis.eficienciaPienso && !kpis.pctBajas)) {
       return `
-        <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-          <div class="card-registro" style="--registro-color: var(--c-info); grid-column: span 2; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
-          <h3 style=\"color: var(--c-purple); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> <span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> KPIs Diarios</h3>
+        <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+          <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center;">
+          <h3 style="color: var(--text-s); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIs Diarios</h3>
             <div style="color: var(--text-s); font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
           </div>
         </div>`;
@@ -458,9 +459,9 @@ const DashboardView = {
     const bajasColorHex = pctBajas != null ? (pctBajas <= 3 ? 'var(--c-success)' : pctBajas <= 8 ? 'var(--c-warning)' : 'var(--c-danger)') : 'var(--text-s)';
 
     return `
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card-registro" style="--registro-color: var(--c-info); grid-column: span 2; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 800; letter-spacing: 0.1em;"><span style=\"color: var(--header-neon-color, var(--c-success)); margin-right: 4px;\">|</span> KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
+      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
               <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">L/DÍA</div>

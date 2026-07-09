@@ -109,6 +109,47 @@ const ExplotacionView = {
 
   _renderModoExplotacion(container, d) {
     const meta = window.ModoContextoHelper?.getModeMeta(this._activeMode) || { color: 'var(--c-info)', icon: Icons.leche(), label: 'Lácteo' };
+    
+    const ccaa = d.finca?.comunidad_autonoma || '';
+    const configCCAA = window.ComunidadesService?.getConfiguracionCCAA ? window.ComunidadesService.getConfiguracionCCAA(ccaa) : null;
+    const supportsGuia365 = configCCAA?.guia_automatica_si_saneada || false;
+
+    let guia365BannerHtml = '';
+    if (supportsGuia365) {
+      const isSaneada = d.finca?.calificacion_sanitaria === 'indemne' || d.finca?.calificacion_sanitaria === 'calificada';
+      const isGuia365Active = d.finca?.guia_365_habilitada && isSaneada;
+
+      guia365BannerHtml = `
+        <div class="card p-12 mb-14 border-222 animate-fade-in" style="background: linear-gradient(135deg, rgba(20,20,20,0.8), rgba(10,10,10,0.9)); border-left: 4px solid ${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'}; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+          <div class="flex items-center justify-between gap-10">
+            <div class="flex items-center gap-10">
+              <div class="flex items-center justify-center rounded-sm" style="width:36px; height:36px; background:#181818; color:${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'}; border:1px solid #222; font-weight:900; font-size: 0.8rem;">
+                365
+              </div>
+              <div>
+                <div class="text-xs font-black text-white uppercase tracking-wider">GUÍA SANITARIA 365 DÍAS (SIGGAN)</div>
+                <div class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-tight mt-2 flex items-center gap-6">
+                  <span>${configCCAA?.label || 'Andalucía'}</span>
+                  <span>•</span>
+                  <span>ESTADO: <strong style="color:${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'};">${isGuia365Active ? 'AUTORIZADA / ACTIVA' : 'INACTIVA (REQUIERE SANEAMIENTO)'}</strong></span>
+                </div>
+              </div>
+            </div>
+            <button onclick="window.WizardFinca.editar()" class="widget-link-btn widget-link-btn--neon neon-info px-10 py-6 min-h-0 h-auto" style="font-size:0.6rem; font-weight:800; text-transform:uppercase;">
+              ${Icons.editar()} Ajustes
+            </button>
+          </div>
+          ${!isGuia365Active ? `
+          <div class="text-[0.55rem] text-gray-500 font-bold uppercase tracking-wide mt-8 border-top-222 pt-8">
+            Para auto-autorizar guías anuales de 365 días en Andalucía, la explotación debe estar calificada sanitariamente como Oficialmente Indemne (T3/M3/B4) y tener habilitada la opción en ajustes.
+          </div>` : `
+          <div class="text-[0.55rem] text-gray-400 font-bold uppercase tracking-wide mt-8 border-top-222 pt-8 flex items-center gap-4">
+            <span style="color:var(--c-success);">✓</span> Emisión automática de guías habilitada por saneamiento. No requiere confirmación previa por lote.
+          </div>`}
+        </div>
+      `;
+    }
+
     container.innerHTML = `
       <div class="mb-14 px-4">
         <div class="expro-mode-switch">
@@ -117,6 +158,7 @@ const ExplotacionView = {
         </div>
       </div>
       <div class="report-section px-4">
+        ${guia365BannerHtml}
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
             <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} Balance ${meta.label}</span>
@@ -135,7 +177,7 @@ const ExplotacionView = {
         </div>
 
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
-          ${Icons.documento()} ACTIVIDAD RECIENTE
+          <span style="color: ${meta.color}; margin-right: 4px;">|</span> ${Icons.documento()} ACTIVIDAD RECIENTE
         </div>
         <div class="grid gap-10">
           ${(this._activeMode === 'leche' ? d.ordeños : d.pesajes).slice(0, 50).map(e => App._cardRegistro({
@@ -178,7 +220,7 @@ const ExplotacionView = {
         </div>
 
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
-          ${Icons.documento()} HISTORIAL DE GASTOS
+          <span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.documento()} HISTORIAL DE GASTOS
         </div>
         <div class="grid gap-10">
           ${gastos.slice(0, 15).map(g => App._cardRegistro({
