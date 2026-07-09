@@ -3614,3 +3614,78 @@ body.glow-tarjetas-off .status-badge {
     max-height: 70vh;
     overflow-y: auto;
 }
+
+/* -- BENTO DE REGISTRO RÁPIDO PREMIUM (.card-registro-quick) -- */
+.card-registro-quick {
+    grid-column: span 4;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-md) !important;
+    padding: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+.card-registro-quick:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: var(--quick-color) !important;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--quick-color) 25%, transparent),
+                inset 0 0 10px color-mix(in srgb, var(--quick-color) 10%, transparent) !important;
+    transform: translateY(-2px) !important;
+}
+.card-registro-quick:active {
+    transform: scale(0.96) !important;
+}
+.card-registro-quick .quick-icon-wrapper {
+    width: 38px !important;
+    height: 38px !important;
+    background: #0C0C0C !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--quick-color) !important;
+    flex-shrink: 0 !important;
+    transition: all 0.2s !important;
+}
+.card-registro-quick:hover .quick-icon-wrapper {
+    border-color: var(--quick-color) !important;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--quick-color) 40%, transparent) !important;
+}
+.card-registro-quick .quick-text-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    text-align: left !important;
+}
+.card-registro-quick .quick-title {
+    color: #FFF !important;
+    font-size: 0.75rem !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+    line-height: 1.2 !important;
+}
+.card-registro-quick .quick-desc {
+    color: var(--text-s) !important;
+    font-size: 0.58rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.2px !important;
+    margin-top: 3px !important;
+    line-height: 1.2 !important;
+}
+
+/* Responsivo para dispositivos móviles */
+@media (max-width: 768px) {
+    .card-registro-quick {
+        grid-column: span 12 !important;
+    }
+}
+

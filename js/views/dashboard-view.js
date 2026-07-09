@@ -131,29 +131,88 @@ const DashboardView = {
         <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,var(--c-warning),var(--c-warning));border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
       </div>
       ` : ''}
+      <!-- Registro Rápido Bento Grid (Propuesta de visualización Premium Integrada) -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <!-- Resumen General -->
-        <div class="card card--short" style="grid-column: span 5; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
-          <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: var(--text-s); text-shadow: none;">cab.</span></div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">ACTIVOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalActivos || activos}</div></div>
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">VENDIDOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-danger); color: var(--c-danger); background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalVendidos}</div></div>
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px;">
+          
+          <div class="flex justify-between items-center mb-16 pb-8" style="border-bottom: 1px solid #222;">
+            <div>
+              <h2 class="text-white font-900 text-sm uppercase tracking-wider" style="margin:0; font-family:'IBM Plex Sans Condensed', sans-serif; display:flex; align-items:center; gap:8px;">
+                <span style="color: var(--header-neon-color, var(--c-success)); font-weight:900;">|</span> REGISTRO RÁPIDO DE ACTIVIDAD
+              </h2>
+              <div class="text-gray mt-2" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+                Acceso directo a operaciones de campo diarias sin intermediarios
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <!-- Balance Económico -->
-        <div class="card" style="grid-column: span 4; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> BALANCE ECONÓMICO</h3>
-          <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">INGRESOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.ingresos || 0).toLocaleString()}€</div></div>
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">GASTOS</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid var(--c-danger); color: var(--c-danger); background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
-            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">RENT.</div><div style="font-size: 1rem; font-weight: 800; border: 1px solid ${parseFloat(pctRent) > 0 ? 'var(--c-success)' : 'var(--c-danger)'}; color: ${parseFloat(pctRent) > 0 ? 'var(--c-success)' : 'var(--c-danger)'}; background: ${parseFloat(pctRent) > 0 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 68, 68, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctRent}%</div></div>
+          <div class="grid grid-cols-12 gap-12">
+            
+            <!-- Control Lechero -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-info);">
+              <div class="quick-icon-wrapper">${Icons.leche()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Control Lechero</span>
+                <span class="quick-desc">Ordeño y lactación</span>
+              </div>
+            </div>
+
+            <!-- Pesaje Ganado -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-danger);">
+              <div class="quick-icon-wrapper">${Icons.carne()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Pesaje Ganado</span>
+                <span class="quick-desc">Pesos de lotes o individual</span>
+              </div>
+            </div>
+
+            <!-- Tratamiento Sanitario -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirTratamientoSanitarioDirecto()" style="--quick-color: var(--p-gold);">
+              <div class="quick-icon-wrapper">${Icons.sanidad()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Tratamiento</span>
+                <span class="quick-desc">Fármacos y veterinaria</span>
+              </div>
+            </div>
+
+            <!-- Gasto Analítico -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirFormularioGasto({ origenModulo: 'dashboard' })" style="--quick-color: var(--c-success);">
+              <div class="quick-icon-wrapper">${Icons.dinero()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Gasto Analítico</span>
+                <span class="quick-desc">Costes y facturas</span>
+              </div>
+            </div>
+
+            <!-- Alta de Animal -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirAltaAnimalDirecto()" style="--quick-color: var(--c-purple);">
+              <div class="quick-icon-wrapper">${Icons.animales()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Alta Animal</span>
+                <span class="quick-desc">Crotal o chip nativo</span>
+              </div>
+            </div>
+
+            <!-- Silos y Alimento -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirEntradaAlimentoSiloDirecto()" style="--quick-color: #4FADF5;">
+              <div class="quick-icon-wrapper">${Icons.fitosanitario()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Silos & Pienso</span>
+                <span class="quick-desc">Cargas y consumos</span>
+              </div>
+            </div>
+
+            <!-- Venta Masiva / Matadero -->
+            <div class="card-registro-quick col-span-12" onclick="App._abrirWizardVentaMasiva()" style="--quick-color: var(--c-warning);">
+              <div class="quick-icon-wrapper">${Icons.libroVentas()}</div>
+              <div class="quick-text-wrapper">
+                <span class="quick-title">Venta Masiva o Carga de Matadero</span>
+                <span class="quick-desc">Gestión integral de salidas comerciales, guías de traslado y guías de transporte</span>
+              </div>
+            </div>
+
           </div>
+
         </div>
       </div>
 
@@ -182,30 +241,6 @@ const DashboardView = {
         </div>
       </div>
 
-      <!-- Accesos Rápidos -->
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ACCESOS RÁPIDOS</h3>
-          <div class="grid grid-cols-12 gap-8">
-            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px; grid-column: span 6;">
-              ${Icons.animales()}
-              <span class="widget-link-label">Animales</span>
-            </a>
-            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info" style="height: 60px; grid-column: span 6;">
-              ${Icons.rebanos()}
-              <span class="widget-link-label">Rebaños</span>
-            </a>
-            <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40; height: 60px; grid-column: span 6;">
-              ${modoIcon}
-              <span class="widget-link-label">${modoLabel}</span>
-            </a>
-            <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success" style="height: 60px; grid-column: span 6;">
-              ${Icons.tendencia()}
-              <span class="widget-link-label">Informes</span>
-            </a>
-          </div>
-        </div>
-      </div>
 
       <div class="fab-container" onclick="App._abrirSubmenuRegistros({ origen_modulo: 'dashboard' })">
         <span class="fab-label">Nueva Actividad</span>
