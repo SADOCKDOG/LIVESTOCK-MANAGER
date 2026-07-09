@@ -46,7 +46,7 @@ const AnimalesView = {
         <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.animales()}</span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> Censo de Animales
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> CENSO DE ANIMALES
           </h1>
           <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
             ${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos
@@ -58,7 +58,7 @@ const AnimalesView = {
       <!-- Resumen de datos registrados (colapsable) -->
       <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-          <span class="flex items-center gap-6">${Icons.animales()} Resumen del Censo</span>
+          <span class="flex items-center gap-6">${Icons.animales()} RESUMEN DEL CENSO</span>
           <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
         </div>
         <div class="resumen-body flex flex-col">
@@ -195,7 +195,9 @@ const AnimalesView = {
       notas: "",
       rfid_codigo: "",
       fecha_identificacion: "",
-      tipo_identificacion: "Completa (EID + Visual)"
+      tipo_identificacion: "Completa (EID + Visual)",
+      tipo: "",
+      peso_inicial: ""
     };
     if (!esNuevo) a = await Animales.get(id);
 
@@ -223,7 +225,7 @@ const AnimalesView = {
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
         <div class="wizard-header-fixed flex justify-between items-center border-top-5-gold">
-          <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg">${Icons.animales()} FICHA ANIMAL</h1>
+          <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.animales()} FICHA ANIMAL</h1>
           <div class="flex gap-10">
             <button onclick="App._leerChipNFC('a-rfid', 'a-crotal')" class="widget-link-btn widget-link-btn--neon neon-accent px-12 py-6 min-h-0 h-auto">
               <span class="text-[0.65rem] font-900 uppercase">NFC</span>
@@ -277,7 +279,7 @@ const AnimalesView = {
                 </select>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-12">
+            <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">NACIMIENTO</label>
                 <input type="date" id="a-fecha" value="${a.fecha_nacimiento || ""}" class="wizard-input font-800">
@@ -287,6 +289,16 @@ const AnimalesView = {
                 <select id="a-tipoalta" class="wizard-input font-800" onchange="AnimalesView._onTipoAltaChange(this)">
                   ${tiposAlta.map((t) => `<option value="${t.value}" ${a.tipoAlta === t.value ? "selected" : ""}>${t.label.toUpperCase()}</option>`).join("")}
                 </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">TIPO / VARIEDAD (VARIEDAD ESPECIE)</label>
+                <input type="text" id="a-tipo" value="${a.tipo || ""}" class="wizard-input uppercase font-800" placeholder="EJ: VACONA, CORDERA, TERNERO">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">PESO INICIAL (kg)</label>
+                <input type="number" step="0.1" id="a-pesoinicial" value="${a.peso_inicial || ""}" class="wizard-input font-800" placeholder="EJ: 25.0">
               </div>
             </div>
           </div>
@@ -340,7 +352,7 @@ const AnimalesView = {
             </div>
             <div id="a-procedencia-section" class="wizard-input-group mb-12" style="display:${esCompra ? 'block' : 'none'};">
               <label class="wizard-label">REGA DE PROCEDENCIA (ORIGEN)</label>
-              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="ES041230000123" class="wizard-input font-800 input-rega-std" maxlength="14">
+              <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="ES041230000123" class="wizard-input font-800 input-rega-std text-gold" maxlength="14">
             </div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">MADRE (GENEALOGÍA)</label>
@@ -540,6 +552,8 @@ const AnimalesView = {
         especie: document.getElementById("a-especie").value,
         sexo: document.getElementById("a-sexo").value,
         raza: document.getElementById("a-raza").value.trim(),
+        tipo: document.getElementById("a-tipo").value.trim(),
+        peso_inicial: parseFloat(document.getElementById("a-pesoinicial").value) || null,
         rebanoId: rebanoIdFinal,
         tipoAlta: document.getElementById("a-tipoalta").value,
         categoria: document.getElementById("a-categoria")?.value || "",
@@ -582,7 +596,7 @@ const AnimalesView = {
 
       const nuevoId = await Animales.save(data);
       this._animalGuardado = true;
-      App.toast("Animal guardado correctamente");
+      App.toast("Animal guardado correctamente", "success");
 
       // Gap 11: Si está marcado "Notificado a REGA", registrar notificación
       if (data.notificado_rega && window.NotificacionesREGA) {
@@ -711,7 +725,7 @@ const AnimalesView = {
     if (!await Confirm.confirm("Anular Animal", "¿Anular ficha del animal? Se conservará histórico para auditoría.", true)) return;
     try {
       await Animales.delete(id, motivo.trim());
-      App.toast("Animal anulado");
+      App.toast("Animal anulado", "success");
       location.hash = "#/animales";
     } catch (e) {
       App.toastError(e.message);

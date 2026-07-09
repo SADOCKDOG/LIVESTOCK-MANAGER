@@ -149,7 +149,7 @@ const ComercializacionView = {
     return `
       <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-          <span class="flex items-center gap-6"><span style="color: ${meta.color}; margin-right: 4px;">|</span> ${meta.icon} Balance ${meta.label}</span>
+          <span class="flex items-center gap-6"><span style="color: ${meta.color}; margin-right: 4px;">|</span> ${meta.icon} BALANCE ${meta.label.toUpperCase()}</span>
           <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
         </div>
         <div class="resumen-body flex flex-col">
@@ -215,7 +215,7 @@ const ComercializacionView = {
     this._renderSeccion(content, {
       icon: Icons.carne(), title: 'Ventas Carne', color: 'var(--c-danger)',
       registrarLabel: 'REGISTRAR VENTA',
-      listName: 'Lista de Ventas',
+      listName: 'LISTA DE VENTAS',
       registrarHandler: "App._abrirWizardVentaMasiva()",
       records: d.ventas.slice(0, 50).map(v => ({
         title: v.razonSocial || 'Matadero',
@@ -231,7 +231,7 @@ const ComercializacionView = {
     this._renderSeccion(content, {
       icon: Icons.leche(), title: 'Entregas Leche', color: 'var(--c-info)',
       registrarLabel: 'REGISTRAR RETIRADA',
-      listName: 'Lista de Entregas',
+      listName: 'LISTA DE ENTREGAS',
       registrarHandler: "App._abrirWizardAlbaranLeche()",
       records: d.entregas.slice(0, 50).map(e => ({
         title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`,
@@ -259,7 +259,7 @@ const ComercializacionView = {
     content.innerHTML = `
       <div class="card p-14 border-222" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
-          <span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.gastos()} Lista de Gastos (solo lectura)
+          <span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.gastos()} LISTA DE GASTOS (SOLO LECTURA)
         </div>
         <div class="grid gap-10">
           ${recordsHtml}
@@ -267,7 +267,7 @@ const ComercializacionView = {
       </div>
       <div class="card p-14 mb-14 border-222" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-white font-900 uppercase tracking-wider mb-6 flex items-center gap-6">
-          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} Gestión de Gastos
+          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} GESTIÓN DE GASTOS
         </div>
         <p class="text-xs text-gray mb-10">
           Los gastos se registran en el módulo de <strong class="text-white">Explotación</strong>. La vista analítica completa está en <strong class="text-white">Gastos</strong>.

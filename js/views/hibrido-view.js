@@ -175,7 +175,7 @@ const HibridoView = {
 
     main.innerHTML = `
       <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card mb-14 p-12" style="border: 1px solid var(--c-info); background: rgba(59, 130, 246, 0.015);">
+      <div class="card mb-14 p-12" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-black uppercase"><span style="color: var(--c-info); margin-right: 4px;">|</span> EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
           <span class="text-xs text-gray">${filteredData.ventasCarne.length + filteredData.entregasLeche.length} total</span>
@@ -423,12 +423,12 @@ const HibridoView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card p-16 mb-14" style="border: 1px solid var(--c-warning); background: rgba(255, 214, 0, 0.01);">
+      <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex items-center gap-12 mb-16">
           <span class="text-3xl" style="color: var(--c-warning);">${Icons.edificio()}</span>
           <div>
             <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-              <span style="color: var(--c-warning); margin-right:4px;">|</span> Patrimonio Ganadero Consolidado
+              <span style="color: var(--c-warning); margin-right:4px;">|</span> PATRIMONIO GANADERO CONSOLIDADO
             </h2>
             <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Organización ganadera de doble aptitud</div>
           </div>
@@ -502,13 +502,13 @@ const HibridoView = {
     lList.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
     const html = `
-      <div class="card p-16 mb-14" style="border: 1px solid var(--c-success); background: rgba(204, 255, 0, 0.015);">
+      <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
             <div>
               <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-success); margin-right:4px;">|</span> Logística y Ventas Consolidado
+                <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS CONSOLIDADO
               </h2>
               <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Logística, transporte, compradores, contratos y ventas consolidado</div>
             </div>
@@ -586,13 +586,13 @@ const HibridoView = {
 
     const html = `
       ${alertasHtml}
-      <div class="card p-16 mb-14" style="border: 1px solid var(--c-purple); background: rgba(168, 85, 247, 0.01);">
+      <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl" style="color: var(--c-purple);">${Icons.documento()}</span>
             <div>
               <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-purple); margin-right:4px;">|</span> Sanidad y Legislación Consolidado
+                <span style="color: var(--c-purple); margin-right:4px;">|</span> SANIDAD Y LEGISLACIÓN CONSOLIDADO
               </h2>
               <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Cuaderno de explotación consolidado, Letra Q y supresiones</div>
             </div>
@@ -666,7 +666,7 @@ const HibridoView = {
         overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
         overlay.innerHTML = `
             <div class="card p-25" style="max-width:420px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
-                <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> Editar Registro Lácteo</h3>
+                <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> EDITAR REGISTRO LÁCTEO</h3>
                 <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
                 <div class="grid grid-cols-2 gap-10">
@@ -706,7 +706,7 @@ const HibridoView = {
           evento.actualizadoEn = new Date().toISOString();
 
           await window.db.put('registro_eventos', evento);
-          App.toast("Registro lácteo actualizado");
+          App.toast("Registro lácteo actualizado", "success");
           overlay.remove();
           HibridoView.render();
         };
@@ -714,7 +714,7 @@ const HibridoView = {
         overlay.querySelector('#btn-del-reg').onclick = async () => {
           if (!await Confirm.confirm("Eliminar Control", "¿Eliminar este control de forma permanente?", true)) return;
           await window.db.delete('registro_eventos', id);
-          App.toast("Registro lácteo eliminado");
+          App.toast("Registro lácteo eliminado", "success");
           overlay.remove();
           HibridoView.render();
         };
@@ -743,7 +743,7 @@ const HibridoView = {
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:380px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.sanidad()} Aplicar Tratamiento Veterinario</h3>
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.sanidad()} APLICAR TRATAMIENTO VETERINARIO</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanos.map(r => `<option value="${r.id}">${r.nombre} (${r.tipo} · ${r.especie})</option>`).join('')}

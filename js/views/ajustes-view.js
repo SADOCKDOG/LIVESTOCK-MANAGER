@@ -250,23 +250,23 @@ const AjustesView = {
     const num = parseFloat(val);
     if (isNaN(num)) return;
     await this._saveConfig({ [key]: num });
-    App.toast(`Objetivo actualizado: ${num}`);
+    App.toast(`Objetivo actualizado: ${num}`, "info");
   },
 
   async _toggleAlerta(id, checked) {
     await this._saveConfig({ [id]: checked });
-    App.toast(checked ? 'Alerta activada' : 'Alerta desactivada');
+    App.toast(checked ? 'Alerta activada' : 'Alerta desactivada', "info");
   },
 
   async _toggleAutoBackup(checked) {
     await this._saveConfig({ autoBackup: checked });
-    App.toast(checked ? 'Backup automático activado' : 'Backup automático desactivado');
+    App.toast(checked ? 'Backup automático activado' : 'Backup automático desactivado', "info");
   },
 
   async _toggleTema(checked) {
     await this._saveConfig({ temaOscuro: checked });
     document.documentElement.style.colorScheme = checked ? 'dark' : 'light';
-    App.toast(checked ? 'Modo oscuro' : 'Modo claro');
+    App.toast(checked ? 'Modo oscuro' : 'Modo claro', "info");
   },
 
   async _toggleGlowMarco(checked) {
@@ -287,7 +287,7 @@ const AjustesView = {
   async _toggleGlowTarjetas(checked) {
     await this._saveConfig({ glowTarjetas: checked });
     document.body.classList.toggle('glow-tarjetas-off', !checked);
-    App.toast(checked ? 'Haces de luz de tarjetas activados' : 'Haces de luz de tarjetas desactivados');
+    App.toast(checked ? 'Haces de luz de tarjetas activados' : 'Haces de luz de tarjetas desactivados', "info");
   },
 
   async _toggleContextos(checked) {
@@ -298,7 +298,7 @@ const AjustesView = {
   async _cambiarColor(tema) {
     await this._saveConfig({ colorTema: tema });
     document.body.setAttribute('data-tema', tema);
-    App.toast(`Tema ${tema} aplicado`);
+    App.toast(`Tema ${tema} aplicado`, "success");
   },
 
   async _guardarPreferencia(key, val) {
@@ -338,23 +338,21 @@ const AjustesView = {
     if (!await Confirm.confirm("Limpiar Caché", "¿Limpiar caché local? Se recargarán los datos.", true)) return;
     if (window.CacheService) CacheService.clearAll();
     localStorage.removeItem('seed_data_completed');
-    App.toast('Caché limpiada');
+    App.toast('Caché limpiada', "success");
   },
 
   async _cambiarFincaActiva(id) {
     await Fincas.setActiveId(id);
-    App.toast('Finca activa cambiada');
+    App.toast('Finca activa cambiada', "success");
     App.renderAjustes();
   },
 
   async _editarFincaPrincipal() {
-    const finca = await Fincas.getActive();
-    if (!finca) return;
-    const nombre = await Confirm.prompt('Editar Finca', 'Nuevo nombre:', finca.nombre);
-    if (!nombre) return;
-    finca.nombre = nombre.trim();
-    await Fincas.save(finca);
-    App.renderAjustes();
+    if (window.WizardFinca) {
+      await window.WizardFinca.editar();
+    } else {
+      App.toastError("Wizard de Finca no disponible");
+    }
   },
 
   async _gestionarZonas() { location.hash = '#/zonas'; },

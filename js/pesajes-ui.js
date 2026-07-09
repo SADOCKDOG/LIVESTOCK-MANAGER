@@ -238,9 +238,22 @@ const PesajesUI = {
                     </div>
 
                     ${motivo === 'expedicion' && !esModoLeche ? `
-                    <div class="pesaje-precio-box">
-                        <label class="text-xs text-success uppercase font-extrabold tracking-wider d-block mb-12">${Icons.dinero()} PRECIO LIQUIDACIÓN (€/kg CANAL)</label>
-                        <input type="number" id="w-precio" value="5.50" step="0.01" class="wizard-input h-50 text-2xl font-black text-green">
+                    <div class="card card-accent card-accent-green p-16 border-222 bg-black">
+                        <div class="section-header-theme mb-12" style="--theme-color: var(--c-success);">${Icons.dinero()} LIQUIDACIÓN MATADERO / VENTA</div>
+                        <div class="grid grid-cols-2 gap-10 mb-12">
+                            <div class="wizard-input-group">
+                                <label class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 d-block">PRECIO (€/kg CANAL)</label>
+                                <input type="number" id="w-precio" value="5.50" step="0.01" class="wizard-input h-50 text-xl font-950 text-white border-green">
+                            </div>
+                            <div class="wizard-input-group">
+                                <label class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 d-block">PESO CANAL (kg)</label>
+                                <input type="number" id="w-peso-canal" placeholder="OPCIONAL..." step="0.1" class="wizard-input h-50 text-xl font-950 text-white">
+                            </div>
+                        </div>
+                        <div class="wizard-input-group">
+                            <label class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 d-block">Nº ALBARÁN / REF. FACTURA</label>
+                            <input type="text" id="w-documento-ref" placeholder="Ej: FAC-2026-004..." class="wizard-input h-45 uppercase font-900">
+                        </div>
                     </div>
                     ` : ''}
 
@@ -401,6 +414,8 @@ const PesajesUI = {
                             id: a.pesajeId || undefined,
                             entidad_id: a.id, tipo_entidad: 'animal', motivo_tarea: motivo || 'control', fecha, valor_neto: val,
                             precio_unitario: (motivo === 'expedicion') ? parseFloat(overlay.querySelector('#w-precio')?.value || 0) : 0,
+                            valor_canal: (motivo === 'expedicion') ? parseFloat(overlay.querySelector('#w-peso-canal')?.value || 0) : 0,
+                            documento_ref: (motivo === 'expedicion') ? (overlay.querySelector('#w-documento-ref')?.value.trim() || '') : '',
                             matricula: isLogistico ? overlay.querySelector('#w-matricula')?.value.toUpperCase() : '',
                             peso_bruto: isLogistico ? parseFloat(overlay.querySelector('#w-bruto')?.value || 0) : 0,
                             tara: isLogistico ? parseFloat(overlay.querySelector('#w-tara')?.value || 0) : 0,
@@ -486,6 +501,8 @@ const PesajesUI = {
                     if (esModoLote && !esModoLeche && _pesajesLote.length > 0) {
                         const fecha = overlay.querySelector('#w-fecha')?.value;
                         const precio = parseFloat(overlay.querySelector('#w-precio')?.value || 0);
+                        const canal = (motivo === 'expedicion') ? parseFloat(overlay.querySelector('#w-peso-canal')?.value || 0) : 0;
+                        const docRef = (motivo === 'expedicion') ? (overlay.querySelector('#w-documento-ref')?.value.trim() || '') : '';
                         const matricula = overlay.querySelector('#w-matricula')?.value || '';
                         const bruto = isLogistico ? parseFloat(overlay.querySelector('#w-bruto')?.value || 0) : 0;
                         const tara = isLogistico ? parseFloat(overlay.querySelector('#w-tara')?.value || 0) : 0;
@@ -494,7 +511,7 @@ const PesajesUI = {
                             await Pesajes.registrar({
                                 id: p.id || undefined,
                                 entidad_id: p.animalId, tipo_entidad: 'animal', motivo_tarea: motivo || 'control', fecha, valor_neto: p.peso,
-                                precio_unitario: precio, matricula: matricula, peso_bruto: bruto, tara: tara, rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO',
+                                precio_unitario: precio, valor_canal: canal, documento_ref: docRef, matricula: matricula, peso_bruto: bruto, tara: tara, rol_contable: motivo === 'expedicion' ? 'VENTA' : 'INVENTARIO',
                                 snap_identificacion: p.crotal, snap_zona: reb?.zonaActual, snap_especie: reb?.especie, snap_tipo: reb?.tipo
                             });
                         }

@@ -181,7 +181,7 @@ const LecheView = {
           <span class="text-2xl" style="color:var(--c-info); display:inline-flex; align-items:center;">${Icons.leche()}</span>
           <div>
             <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-              <span style="color:var(--c-info); margin-right:4px;">|</span> Resumen de Leche
+              <span style="color:var(--c-info); margin-right:4px;">|</span> RESUMEN DE LECHE
             </h1>
           </div>
         </div>
@@ -418,11 +418,11 @@ const LecheView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card report-section leche-report-card" style="border: 1px solid var(--c-orange);">
+      <div class="card report-section leche-report-card" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="leche-report-title">
           <span class="leche-report-icon" style="color: var(--c-orange);">${Icons.edificio()}</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-orange);">|</span> Patrimonio y Ganadería</div>
+            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-orange);">|</span> PATRIMONIO Y GANADERÍA</div>
             <div class="leche-report-title-sub">Gestión de censo y rebaños lácteos</div>
           </div>
         </div>
@@ -471,11 +471,11 @@ const LecheView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card" style="border: 1px solid var(--c-success);">
+      <div class="card" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="leche-report-title">
           <span class="leche-report-icon" style="color: var(--c-success);">${Icons.transportistas()}</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-success);">|</span> Logística y Transporte, Comercialización Ventas</div>
+            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-success);">|</span> LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS</div>
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
           </div>
         </div>
@@ -510,11 +510,11 @@ const LecheView = {
   _renderLegislacion(content, d) {
     const html = `
       ${this._inyectarAlertaSupresion(d)}
-      <div class="card" style="border: 1px solid var(--c-purple);">
+      <div class="card" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="leche-report-title">
           <span class="leche-report-icon" style="color: var(--c-purple);">${Icons.documento()}</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-purple);">|</span> Registros Legislación, Cumplimiento Sanitario</div>
+            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-purple);">|</span> REGISTROS LEGISLACIÓN, CUMPLIMIENTO SANITARIO</div>
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
           </div>
         </div>
@@ -599,7 +599,7 @@ const LecheView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
           <div class="card p-25" style="border: 1px solid var(--c-orange); max-width:420px; ">
-              <h3 class="mt-0 uppercase font-900 text-white"><span style="color: var(--c-orange);">|</span> Editar Registro Lácteo</h3>
+              <h3 class="mt-0 uppercase font-900 text-white"><span style="color: var(--c-orange);">|</span> EDITAR REGISTRO LÁCTEO</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -639,7 +639,7 @@ const LecheView = {
         evento.actualizadoEn = new Date().toISOString();
 
         await window.db.put('registro_eventos', evento);
-        App.toast("Registro lácteo actualizado");
+        App.toast("Registro lácteo actualizado", "success");
         overlay.remove();
         LecheView.render();
       };
@@ -647,7 +647,7 @@ const LecheView = {
       overlay.querySelector('#btn-del-reg').onclick = async () => {
         if (!await Confirm.confirm("Eliminar Control", "¿Eliminar este control de forma permanente?", true)) return;
         await window.db.delete('registro_eventos', id);
-        App.toast("Registro lácteo eliminado");
+        App.toast("Registro lácteo eliminado", "success");
         overlay.remove();
         LecheView.render();
       };
@@ -675,7 +675,7 @@ const LecheView = {
     overlay.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
       <div class="card p-25" style="border: 1px solid var(--c-orange); max-width:380px; ">
-        <h3 class="mt-0 text-white font-900 uppercase flex items-center gap-8"><span style="color: var(--c-orange);">|</span> Aplicar Tratamiento Lácteo</h3>
+        <h3 class="mt-0 text-white font-900 uppercase flex items-center gap-8"><span style="color: var(--c-orange);">|</span> APLICAR TRATAMIENTO LÁCTEO</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño lechero a traiter:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}

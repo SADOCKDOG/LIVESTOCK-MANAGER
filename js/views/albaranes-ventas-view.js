@@ -157,7 +157,7 @@ const AlbaranesVentasView = {
         <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.comercial()}</span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> Comercialización
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> COMERCIALIZACIÓN
           </h1>
           <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
             Albaranes, Ventas y Entregas
@@ -201,7 +201,7 @@ const AlbaranesVentasView = {
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
       <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
-        <span style="color: ${moduleColor};">|</span> ${Icons.documento()} Historial de Albaranes y Ventas
+        <span style="color: ${moduleColor};">|</span> ${Icons.documento()} HISTORIAL DE ALBARANES Y VENTAS
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
@@ -323,7 +323,7 @@ const AlbaranesVentasView = {
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:380px; width:100%; border: 1px solid var(--c-info); background: #1e1e1e;">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.agregar()} Nuevo Albarán o Venta</h3>
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.agregar()} NUEVO ALBARÁN O VENTA</h3>
         <label class="wizard-label mb-10">Selecciona el tipo de documento a generar:</label>
         <div class="wizard-input-group">
           <select id="av-tipo-doc" class="wizard-input wizard-select mb-15">

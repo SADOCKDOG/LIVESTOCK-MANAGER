@@ -7,7 +7,7 @@ const SilosView = {
     _cachedSilos: [],
 
     async render() {
-        const main = document.getElementById('app-content');
+        const main = document.getElementById('expro-tab-content') || document.getElementById('app-content');
         main.innerHTML = `<div class="text-center p-40"><div class="loader">Cargando silos...</div></div>`;
 
         try {
@@ -65,7 +65,7 @@ const SilosView = {
             <div class="flex items-center justify-between mb-20 gap-10">
                 <div>
                     <h1 class="text-xl font-black uppercase tracking-wider mb-2" style="font-family:'Archivo Expanded', sans-serif;">
-                        ${Icons.explotacion()} CONTROL DE SILOS
+                        <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.explotacion()} CONTROL DE SILOS
                     </h1>
                     <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Telemetría de alimentación y almacenamiento</p>
                 </div>
@@ -188,7 +188,7 @@ const SilosView = {
         <div class="card card-accent card-accent-success p-20 max-w-[500px] w-full mx-10 overflow-y-auto max-h-[90vh]" style="background:#0C0C0C; border:1px solid #222;">
             <div class="flex justify-between items-center mb-15">
                 <h3 class="text-md font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">
-                    ${Icons.finca()} FICHA TÉCNICA DE SILO
+                    <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.finca()} FICHA TÉCNICA DE SILO
                 </h3>
                 <button onclick="ModalManager.close('ficha-silo-modal')" class="widget-link-btn widget-link-btn--neon neon-danger p-6 min-h-0 h-auto">
                     ${Icons.cerrar()}
@@ -232,7 +232,7 @@ const SilosView = {
             <!-- Historial de operaciones -->
             <div class="mb-20">
                 <h4 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-10 flex items-center gap-6">
-                    ${Icons.historial()} HISTORIAL DE MOVIMIENTOS
+                    <span style="color:var(--p-gold);">|</span> ${Icons.historial()} HISTORIAL DE MOVIMIENTOS
                 </h4>
                 <div class="flex flex-col gap-6" style="max-height: 200px; overflow-y: auto; padding-right: 4px;">
                     ${eventosSilo.length === 0 ? `
@@ -315,7 +315,7 @@ const SilosView = {
         const html = `
         <div class="card card-accent card-accent-gold p-16 max-w-[400px] w-full mx-10">
             <h3 class="text-md font-black uppercase tracking-wider mb-10 text-white" style="font-family:'Archivo Expanded', sans-serif;">
-                ${Icons.sanidad()} REGISTRAR CARGA EN SILO
+                <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.sanidad()} REGISTRAR CARGA EN SILO
             </h3>
             <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Espacio disponible: <b>${maxCarga.toLocaleString()} kg</b></p>
             
@@ -404,7 +404,7 @@ const SilosView = {
         const html = `
         <div class="card card-accent card-accent-red p-16 max-w-[400px] w-full mx-10">
             <h3 class="text-md font-black uppercase tracking-wider mb-10 text-white" style="font-family:'Archivo Expanded', sans-serif;">
-                ${Icons.balanza()} REGISTRAR CONSUMO DE PIENSO
+                <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.balanza()} REGISTRAR CONSUMO DE PIENSO
             </h3>
             <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Nivel actual: <b>${silo.cantidadActual.toLocaleString()} kg</b></p>
             
@@ -488,7 +488,7 @@ const SilosView = {
         const html = `
         <div class="card card-dark-gradient p-16 max-w-[450px] w-full mx-10" style="border:1px solid #333; background:#181818;">
             <h3 class="text-md font-black uppercase tracking-wider mb-15 text-white" style="font-family:'Archivo Expanded', sans-serif;">
-                ${esEdicion ? Icons.editar() + ' EDITAR SILO' : Icons.agregar() + ' NUEVO SILO'}
+                <span style="color:var(--p-gold); margin-right:4px;">|</span> ${esEdicion ? Icons.editar() + ' EDITAR SILO' : Icons.agregar() + ' NUEVO SILO'}
             </h3>
             
             <div class="flex flex-col gap-15 mb-20">

@@ -136,7 +136,7 @@ const CompradoresView = {
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
       <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
-        <span style="color: ${activeColor};">|</span> ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()} Lista de ${this._activeModule === 'compradores' ? 'Compradores' : 'Contratos'}
+        <span style="color: ${activeColor};">|</span> ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()} LISTA DE ${this._activeModule === 'compradores' ? 'COMPRADORES' : 'CONTRATOS'}
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
@@ -800,7 +800,7 @@ const CompradoresView = {
         if (!await Confirm.confirm("Eliminar Comprador", "¿Eliminar este comprador permanentemente?", true)) return;
         try {
             await Compradores.delete(id);
-            App.toast('Comprador eliminado');
+            App.toast('Comprador eliminado', "success");
             location.hash = '#/compradores';
         } catch (e) {
             App.toastError(e.message);

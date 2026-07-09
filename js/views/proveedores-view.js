@@ -12,7 +12,7 @@ const ProveedoresView = {
     },
 
     async render() {
-        const main = document.getElementById("app-content");
+        const main = document.getElementById("expro-tab-content") || document.getElementById("app-content");
         const moduleColor = window.getModuleColor ? getModuleColor('/proveedores') : 'var(--c-purple)';
         main.innerHTML = `
           <!-- Cabecera de Sección Estandarizada -->
@@ -20,7 +20,7 @@ const ProveedoresView = {
             <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.proveedores()}</span>
             <div>
               <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-                <span style="color:${moduleColor}; margin-right:4px;">|</span> Proveedores
+                <span style="color:${moduleColor}; margin-right:4px;">|</span> PROVEEDORES
               </h1>
               <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
                 Gestión de Proveedores y Servicios

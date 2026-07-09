@@ -193,10 +193,27 @@ window.WizardGuiaMovimiento = {
                 <input type="text" id="w-mv-matricula" value="${data.matricula}" class="wizard-input uppercase font-900" placeholder="0000AAA">
               </div>
             </div>
-            <label class="flex items-center gap-10 text-xs text-white cursor-pointer bg-black border border-222 p-12 rounded-sm mb-12">
-              <input type="checkbox" id="w-mv-desins" ${data.desinsectacion_certificada ? 'checked' : ''} style="accent-color:var(--p-gold);">
-              <span class="uppercase font-900 text-[0.6rem] tracking-tight leading-tight">DESINSECTACIÓN CERTIFICADA (48H PREVIAS)</span>
-            </label>
+            <div class="p-12 mb-12 bg-black border border-222 rounded-sm">
+              <div class="text-[0.62rem] text-gold uppercase font-950 tracking-wider mb-8 flex items-center gap-4">${Icons.documento()} CERTIFICADO DE DESINFECCIÓN</div>
+              <div class="grid grid-cols-2 gap-10 mb-8">
+                <div class="wizard-input-group">
+                  <label class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 d-block">Nº TALÓN DESINFECCIÓN</label>
+                  <input type="text" id="w-mv-desinf-talon" value="${data.desinfeccion_numero_talon || ''}" placeholder="Ej: DES-998822" class="wizard-input h-35 text-xs font-800 uppercase">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 d-block">FECHA DESINFECCIÓN</label>
+                  <input type="date" id="w-mv-desinf-fecha" value="${data.desinfeccion_fecha || ''}" class="wizard-input h-35 text-xs font-800">
+                </div>
+              </div>
+              <label class="flex items-center gap-8 text-[0.6rem] text-aaa cursor-pointer">
+                <input type="checkbox" id="w-mv-desins" ${data.desinsectacion_certificada ? 'checked' : ''} style="accent-color:var(--p-gold);">
+                <span class="uppercase font-900 tracking-tight leading-tight">DESINSECTACIÓN CERTIFICADA (48H PREVIAS)</span>
+              </label>
+            </div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">VETERINARIO / INSPECTOR AUTORIZANTE</label>
+              <input type="text" id="w-mv-vet-autorizante" value="${data.veterinario_autorizante || ''}" placeholder="Ej: DR. ALFONSO GÓMEZ (COL. 2808)" class="wizard-input uppercase font-800">
+            </div>
             ${conf && conf.requiere_desinsectacion_movimiento ? `
             <div class="p-10 bg-red-900 border border-red-500 rounded-sm mb-12">
               <div class="text-[0.55rem] text-white uppercase font-950 tracking-widest">${Icons.alerta()} ${conf.label} EXIGE CERTIFICADO DE DESINSECTACIÓN</div>
@@ -211,6 +228,9 @@ window.WizardGuiaMovimiento = {
           data.transportista_nombre = document.getElementById('w-mv-transp-nom')?.value.trim() || '';
           data.matricula = document.getElementById('w-mv-matricula')?.value.trim() || '';
           data.desinsectacion_certificada = !!document.getElementById('w-mv-desins')?.checked;
+          data.desinfeccion_numero_talon = document.getElementById('w-mv-desinf-talon')?.value.trim() || '';
+          data.desinfeccion_fecha = document.getElementById('w-mv-desinf-fecha')?.value || '';
+          data.veterinario_autorizante = document.getElementById('w-mv-vet-autorizante')?.value.trim() || '';
           data.notas = document.getElementById('w-mv-notas')?.value.trim() || '';
         },
         validate: async (data) => {
@@ -291,6 +311,9 @@ window.WizardGuiaMovimiento = {
         transportista_nombre: borrador ? borrador.transportista_nombre : '',
         matricula: borrador ? borrador.matricula : '',
         desinsectacion_certificada: borrador ? !!borrador.desinsectacion_certificada : false,
+        desinfeccion_numero_talon: borrador ? (borrador.desinfeccion_numero_talon || '') : '',
+        desinfeccion_fecha: borrador ? (borrador.desinfeccion_fecha || '') : '',
+        veterinario_autorizante: borrador ? (borrador.veterinario_autorizante || '') : '',
         estado_tramite: borrador ? borrador.estado_tramite : 'borrador',
         fecha_presentacion: borrador ? borrador.fecha_presentacion : '',
         numero_registro_oficial: borrador ? borrador.numero_registro_oficial : '',
@@ -323,6 +346,9 @@ window.WizardGuiaMovimiento = {
             matricula,
             fecha: data.fecha,
             desinsectacion_certificada: data.desinsectacion_certificada,
+            desinfeccion_numero_talon: data.desinfeccion_numero_talon,
+            desinfeccion_fecha: data.desinfeccion_fecha,
+            veterinario_autorizante: data.veterinario_autorizante,
             comunidad_autonoma: ccaa,
             estado_tramite: data.estado_tramite || 'borrador',
             fecha_presentacion: data.fecha_presentacion || '',
@@ -341,6 +367,9 @@ window.WizardGuiaMovimiento = {
             numero_registro_oficial: mov.numero_registro_oficial || '',
             acuse_recibo: mov.acuse_recibo || '',
             plataforma: mov.plataforma || '',
+            desinfeccion_numero_talon: mov.desinfeccion_numero_talon || '',
+            desinfeccion_fecha: mov.desinfeccion_fecha || '',
+            veterinario_autorizante: mov.veterinario_autorizante || '',
             created_at: new Date().toISOString(),
           }).catch(() => {});
           App.toast("Guía de movimiento registrada", 'success');
@@ -381,9 +410,11 @@ window.WizardGuiaMovimiento = {
         ${crotalesHtml}
       </div>
       <div style="margin-bottom:20px;font-size:0.9rem;">
-        <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">TRANSPORTE</h4>
+        <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">TRANSPORTE Y BIOSEGURIDAD</h4>
         <p><strong>Transportista:</strong> ${mov.transportista_nombre || '\u2014'} \u00B7 <strong>Matr\u00EDcula:</strong> ${mov.matricula || '\u2014'}<br>
-        <strong>Desinsectaci\u00F3n:</strong> ${mov.desinsectacion_certificada ? 'S\u00ED' : 'No'}</p>
+        <strong>Desinsectaci\u00F3n Camil.:</strong> ${mov.desinsectacion_certificada ? 'S\u00CD (Certificada)' : 'No'}<br>
+        ${mov.desinfeccion_numero_talon ? `<strong>Nº Tal\u00F3n Desinfecci\u00F3n:</strong> ${mov.desinfeccion_numero_talon} \u00B7 <strong>Fecha Desinf.:</strong> ${mov.desinfeccion_fecha || '\u2014'}<br>` : ''}
+        ${mov.veterinario_autorizante ? `<strong>Veterinario Oficial Autorizante:</strong> ${mov.veterinario_autorizante}` : ''}</p>
       </div>
       <div style="margin-bottom:20px;font-size:0.9rem;">
         <h4 style="border-bottom:1px solid #ddd;padding-bottom:4px;">TRAMITACI\u00D3N</h4>

@@ -371,6 +371,9 @@ const Icons = {
       '<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>'
     );
   },
+  hibrido() {
+    return this.rotacion();
+  },
   edificio() {
     return this._svg(
       '<rect x="4" y="2" width="16" height="20" rx="2"/>' +
@@ -495,7 +498,6 @@ const Icons = {
     );
   },
 
-  // ── Indicadores de estado ──
   statusCritico() {
     return this._svg('<circle cx="12" cy="12" r="6" fill="#ef4444" stroke="none"/>');
   },
@@ -507,6 +509,30 @@ const Icons = {
   },
   statusInactivo() {
     return this._svg('<circle cx="12" cy="12" r="6" fill="#6b7280" stroke="none"/>');
+  },
+
+  // Iconos adicionales para bottom sheets y navegación unificada
+  silos() {
+    return this._svg(
+      '<ellipse cx="12" cy="5" rx="9" ry="3"/>' +
+      '<path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>' +
+      '<path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>'
+    );
+  },
+  pesadas() {
+    return this._svg(
+      '<line x1="12" y1="3" x2="12" y2="21"/>' +
+      '<path d="M5 7h14"/>' +
+      '<path d="M5 7l-3 6a3 3 0 0 0 6 0z"/>' +
+      '<path d="M19 7l-3 6a3 3 0 0 0 6 0z"/>'
+    );
+  },
+  fitosanitario() {
+    return this._svg(
+      '<path d="M9 2h6"/>' +
+      '<path d="M10 2v6.5L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9.5V2"/>' +
+      '<line x1="7" y1="14" x2="17" y2="14"/>'
+    );
   }
 };
 

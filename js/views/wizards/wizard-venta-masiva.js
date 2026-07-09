@@ -29,6 +29,7 @@ window.VentaMasivaWizard = {
       pCanal: borrador ? borrador.pCanal : 0,
       gTrans: borrador ? borrador.gTrans : 0,
       gMata: borrador ? borrador.gMata : 0,
+      precioUnitario: borrador ? (borrador.precioUnitario || 0) : 0,
       seleccionados: borrador ? (borrador.animalId || []) : [],
       _compradores: compradoresList,
       _compradoresLoaded: true,
@@ -257,7 +258,11 @@ window.VentaMasivaWizard = {
                     <input type="number" id="w-v-pc" value="${data.pCanal}" class="wizard-input font-900 text-lg text-green">
                   </div>
               </div>
-              <div class="grid grid-cols-2 gap-15">
+              <div class="grid grid-cols-3 gap-10">
+                  <div class="wizard-input-group">
+                    <label class="wizard-label">PRECIO (€/kg canal)</label>
+                    <input type="number" step="0.01" id="w-v-preciounitario" value="${data.precioUnitario || ''}" placeholder="EJ: 2.80" class="wizard-input font-950 text-gold bg-black">
+                  </div>
                   <div class="wizard-input-group">
                     <label class="wizard-label">TRANSPORTE (€)</label>
                     <input type="number" id="w-v-gt" value="${data.gTrans}" class="wizard-input font-800">
@@ -272,6 +277,7 @@ window.VentaMasivaWizard = {
         onChange: async (data) => {
           data.pVivo = parseFloat(document.getElementById('w-v-pv')?.value) || 0;
           data.pCanal = parseFloat(document.getElementById('w-v-pc')?.value) || 0;
+          data.precioUnitario = parseFloat(document.getElementById('w-v-preciounitario')?.value) || 0;
           data.gTrans = parseFloat(document.getElementById('w-v-gt')?.value) || 0;
           data.gMata = parseFloat(document.getElementById('w-v-gm')?.value) || 0;
         },
@@ -279,6 +285,9 @@ window.VentaMasivaWizard = {
           if (data.pCanal >= data.pVivo && data.pVivo > 0) {
             App.toastError("El peso canal no puede ser mayor o igual que el peso vivo.");
             return false;
+          }
+          if (data.pCanal > 0 && data.precioUnitario <= 0) {
+            App.toastWarning("Has dejado el Precio Unitario en 0€. Se emitirá la factura como pendiente de fijar.");
           }
           return true;
         }
@@ -632,6 +641,7 @@ window.VentaMasivaWizard = {
               Gasto_Transporte: N > 0 ? finalData.gTrans / N : 0,
               Gasto_Matanza: N > 0 ? finalData.gMata / N : 0,
               clasificacion: { seurop: finalData.seurop },
+              precioUnitario: finalData.precioUnitario || 0,
               transportistaId: finalData.transportistaId || null,
               nombreTransportista: finalData.nombreTransportista || '',
               nifTransportista: finalData.nifTransportista || '',

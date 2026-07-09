@@ -83,7 +83,7 @@ const PesadasView = {
             <!-- Encabezado con estilo premium -->
             <div class="mb-20">
                 <h1 class="text-xl font-black uppercase tracking-wider mb-2" style="font-family:'Archivo Expanded', sans-serif;">
-                    ${Icons.balanza()} HISTORIAL DE PESAJES
+                    <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.balanza()} HISTORIAL DE PESAJES
                 </h1>
                 <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Control de crecimiento cárnico y producción lechera</p>
             </div>
@@ -133,7 +133,7 @@ const PesadasView = {
             <!-- Historial de Pesajes -->
             <div class="card p-16" style="background:#141414; border:1px solid #222;">
                 <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-15 flex items-center gap-6">
-                    ${Icons.historial()} HISTORIAL DE REGISTROS (${pesajesFiltrados.length})
+                    <span style="color:var(--p-gold);">|</span> ${Icons.historial()} HISTORIAL DE REGISTROS (${pesajesFiltrados.length})
                 </h3>
 
                 ${pesajesFiltrados.length === 0 ? `

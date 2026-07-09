@@ -61,7 +61,7 @@ const RebanosView = {
         <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.rebanos()}</span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> Rebaños / Lotes
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> REBAÑOS / LOTES
           </h1>
           <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
             ${rebanos.length} ${rebanos.length === 1 ? 'registro' : 'registros'} · ${rebanosActivos} activos
@@ -114,7 +114,7 @@ const RebanosView = {
         </div>
         <!-- Filtro de búsqueda integrado (controla el listado) -->
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
-          ${Icons.rebanos()} Lista de Rebaños
+          ${Icons.rebanos()} LISTA DE REBAÑOS
         </div>
         <div class="flex gap-8 items-center mb-12">
           <div class="relative flex-1 min-w-0">
@@ -222,7 +222,7 @@ const RebanosView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card" style="border: 1px solid ${color};">
+      <div class="card" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex items-center gap-12 mb-12">
           <span class="text-3xl" style="color: ${color};">${icon}</span>
           <div>
@@ -403,7 +403,7 @@ const RebanosView = {
       </div>
 
       <!-- Sanidad -->
-      <div class="card mb-20 card-dark-gradient p-12 pb-24" style="border: 1px solid var(--c-success);">
+      <div class="card mb-20 card-dark-gradient p-12 pb-24" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="section-header-theme" style="--theme-color: var(--c-success); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-success); margin-right: 4px;">|</span> SANIDAD</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12 mb-16">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._registrarTratamiento(${id})">
@@ -415,7 +415,7 @@ const RebanosView = {
       </div>
 
       <!-- Animales -->
-      <div class="card p-12 mb-16 card-dark-gradient pb-24" style="border: 1px solid var(--c-info);">
+      <div class="card p-12 mb-16 card-dark-gradient pb-24" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="section-header-theme" style="--theme-color: var(--c-info); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-info); margin-right: 4px;">|</span> ANIMALES (${animales.length})</div>
         <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-12">
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="App._abrirSelectorAnimales(${id})">
@@ -459,9 +459,13 @@ const RebanosView = {
       let html = '';
       filtrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
       filtrados.forEach(t => {
+        const dosisStr = t.dosis ? ` · Dosis: <strong class="text-white">${t.dosis}</strong>` : '';
+        const duracionStr = t.duracion_dias ? ` · Duración: <strong class="text-white">${t.duracion_dias} D</strong>` : '';
+        const aplicadorStr = t.aplicadoPor ? ` · Aplicado por: <strong class="text-white">${t.aplicadoPor.toUpperCase()}</strong>` : '';
+        const vetStr = t.veterinario_prescriptor ? ` · Vet: <strong class="text-gold">${t.veterinario_prescriptor}</strong>` : '';
         html += `<div class="info-box-sm border-left-green mt-8 bg-black">
           <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(t.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0} D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">PROHIBIDO LECHE</strong>' : ''}</div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0} D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">PROHIBIDO LECHE</strong>' : ''}${dosisStr}${duracionStr}${aplicadorStr}${vetStr}</div>
         </div>`;
       });
       container.innerHTML = html;
@@ -484,7 +488,7 @@ const RebanosView = {
       r.notas = document.getElementById("r-edit-notas").value.trim();
       if (!r.nombre) return App.toastError("Nombre requerido");
       await Rebanos.save(r);
-      App.toast("Rebaño actualizado");
+      App.toast("Rebaño actualizado", "success");
       App.renderRebanos();
     } catch (e) {
       App.toastError(e.message);
@@ -564,14 +568,14 @@ const RebanosView = {
               <label class="wizard-label">TIPO DE EXPLOTACIÓN REGA (RD 787/2023)</label>
               <select id="w-reb-tipo-explotacion" class="wizard-input font-800" style="border-color: var(--c-success);">
                 <option value="">— SELECCIONAR —</option>
-                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_expotacion_rega === t ? "selected" : ""}>${t.toUpperCase()}</option>`).join("")}
+                ${tiposExplotacionREGA.map((t) => `<option value="${t}" ${data.tipo_explotacion_rega === t ? "selected" : ""}\>${t.toUpperCase()}</option>`).join("")}
               </select>
               <small class="text-aaa uppercase font-700 text-[0.55rem] mt-4 block">Dato normativo obligatorio para SIGGAN/BADIGEX</small>
             </div>
           </div>
         `,
         onChange: async (data) => {
-          data.tipo_expotacion_rega = document.getElementById('w-reb-tipo-expotacion')?.value || data.tipo_expotacion_rega;
+          data.tipo_explotacion_rega = document.getElementById('w-reb-tipo-explotacion')?.value || data.tipo_explotacion_rega;
         }
       },
       {
@@ -613,7 +617,7 @@ const RebanosView = {
         }
       }
     ];
-
+ 
     window.WizardManager.create({
       id: 'wizard-nuevo-rebano',
       title: 'NUEVO REBAÑO',
@@ -636,14 +640,14 @@ const RebanosView = {
             especie: finalData.especie,
             tipo: finalData.tipo,
             zonaActual: finalData.zonaActual,
-            tipo_expotacion_rega: finalData.tipo_expotacion_rega,
+            tipo_explotacion_rega: finalData.tipo_explotacion_rega,
             capacidad_total: Number(finalData.capacidad_total) || 0,
             codigo_lote: finalData.codigo_lote,
             fecha_constitucion: finalData.fecha_constitucion,
             notas: finalData.notas,
             estado: "activo",
           });
-          App.toast("Rebaño creado exitosamente");
+          App.toast("Rebaño creado exitosamente", "success");
           App.route();
         } catch (e) {
           App.toastError(e.message);
@@ -659,7 +663,7 @@ const RebanosView = {
     if (!await Confirm.confirm("Anular Rebaño", "¿Anular este rebaño? Se conservará histórico de auditoría.", true)) return;
     try {
       await Rebanos.delete(id);
-      App.toast("Rebaño anulado");
+      App.toast("Rebaño anulado", "success");
       location.hash = "#/rebanos";
     } catch (e) {
       App.toastError(e.message);

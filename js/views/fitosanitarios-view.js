@@ -7,7 +7,7 @@ const FitosanitariosView = {
     _cachedRegistros: [],
 
     async render() {
-        const main = document.getElementById('app-content');
+        const main = document.getElementById('expro-tab-content') || document.getElementById('app-content');
         main.innerHTML = `<div class="text-center p-40"><div class="loader">Generando Libro Fitosanitario...</div></div>`;
 
         try {
@@ -44,7 +44,7 @@ const FitosanitariosView = {
             <div class="flex items-center justify-between mb-20 gap-10">
                 <div>
                     <h1 class="text-xl font-black uppercase tracking-wider mb-2" style="font-family:'Archivo Expanded', sans-serif;">
-                        ${Icons.fitosanitario()} LIBRO FITOSANITARIO
+                        <span style="color:#C5FA50; margin-right:4px;">|</span> ${Icons.fitosanitario()} LIBRO FITOSANITARIO
                     </h1>
                     <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Cuaderno de campo y tratamientos de parcelas (RD 787/2023)</p>
                 </div>
@@ -80,7 +80,7 @@ const FitosanitariosView = {
             <!-- Historial de Aplicaciones -->
             <div class="card p-16" style="background:#141414; border:1px solid #222;">
                 <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-15 flex items-center gap-6">
-                    ${Icons.historial()} TRATAMIENTOS Y COMPRAS REGISTRADAS
+                    <span style="color:#C5FA50;">|</span> ${Icons.historial()} TRATAMIENTOS Y COMPRAS REGISTRADAS
                 </h3>
 
                 ${this._cachedRegistros.length === 0 ? `
@@ -150,7 +150,7 @@ const FitosanitariosView = {
         <div class="card card-accent card-accent-purple p-20 max-w-[500px] w-full mx-10 overflow-y-auto max-h-[90vh]" style="background:#0C0C0C; border:1px solid #222;">
             <div class="flex justify-between items-center mb-15">
                 <h3 class="text-md font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">
-                    ${Icons.fitosanitario()} FICHA DE TRATAMIENTO
+                    <span style="color:#C5FA50; margin-right:4px;">|</span> ${Icons.fitosanitario()} FICHA DE TRATAMIENTO
                 </h3>
                 <button onclick="ModalManager.close('ficha-tratamiento-modal')" class="widget-link-btn widget-link-btn--neon neon-danger p-6 min-h-0 h-auto">
                     ${Icons.cerrar()}
@@ -171,7 +171,7 @@ const FitosanitariosView = {
             <!-- Datos de Control Normativo (RD 787/2023) -->
             <div class="card p-12 mb-20" style="background:#111; border:1px solid #222;">
                 <h4 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-10 flex items-center gap-6">
-                    ${Icons.cuaderno()} CONTROL NORMATIVO Y REGISTROS
+                    <span style="color:#C5FA50;">|</span> ${Icons.cuaderno()} CONTROL NORMATIVO Y REGISTROS
                 </h4>
                 <div class="grid grid-cols-2 gap-10 text-[0.65rem] font-black uppercase">
                     <div style="background:#080808; padding:8px; border:1px solid #1c1c1c; border-radius:4px;">
@@ -198,7 +198,7 @@ const FitosanitariosView = {
             <!-- Datos Económicos -->
             <div class="card p-12 mb-20" style="background:#111; border:1px solid #222;">
                 <h4 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-10 flex items-center gap-6">
-                    ${Icons.dinero()} DATOS ECONÓMICOS
+                    <span style="color:#C5FA50;">|</span> ${Icons.dinero()} DATOS ECONÓMICOS
                 </h4>
                 <div class="flex justify-between items-center text-xs font-black uppercase">
                     <div>

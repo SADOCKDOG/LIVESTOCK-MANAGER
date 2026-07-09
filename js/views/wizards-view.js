@@ -12,7 +12,7 @@ const WizardsView = {
             <!-- Encabezado con estilo premium -->
             <div class="mb-20">
                 <h1 class="text-xl font-black uppercase tracking-wider mb-2" style="font-family:'Archivo Expanded', sans-serif;">
-                    ${Icons.rebanos()} ASISTENTES OPERATIVOS
+                    <span style="color:var(--p-cork); margin-right:4px;">|</span> ${Icons.rebanos()} ASISTENTES OPERATIVOS
                 </h1>
                 <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Acceso rápido a flujos de trabajo multi-paso guiados</p>
             </div>
@@ -20,7 +20,7 @@ const WizardsView = {
             <!-- Categoría 1: Ganadería y Sanidad (Rojo Coral) -->
             <div class="mb-25">
                 <h3 class="text-xs font-black uppercase tracking-widest mb-12 flex items-center gap-6" style="color:#E8555F;">
-                    ${Icons.sanidad()} GANADERÍA Y BIENESTAR ANIMAL
+                    <span style="color:#E8555F;">|</span> ${Icons.sanidad()} GANADERÍA Y BIENESTAR ANIMAL
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                     <!-- Wizard Tratamiento -->
@@ -61,7 +61,7 @@ const WizardsView = {
             <!-- Categoría 2: Explotación y Control Normativo (Verde Lima) -->
             <div class="mb-25">
                 <h3 class="text-xs font-black uppercase tracking-widest mb-12 flex items-center gap-6" style="color:#C5FA50;">
-                    ${Icons.explotacion()} GESTIÓN DE EXPLOTACIÓN (EXPRO)
+                    <span style="color:#C5FA50;">|</span> ${Icons.explotacion()} GESTIÓN DE EXPLOTACIÓN (EXPRO)
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                     <!-- Wizard Finca -->
@@ -102,7 +102,7 @@ const WizardsView = {
             <!-- Categoría 3: Comercialización y Márgenes (Azul Cyan) -->
             <div class="mb-25">
                 <h3 class="text-xs font-black uppercase tracking-widest mb-12 flex items-center gap-6" style="color:#4FADF5;">
-                    ${Icons.comercial()} COMERCIALIZACIÓN Y FINANZAS (COMER)
+                    <span style="color:#4FADF5;">|</span> ${Icons.comercial()} COMERCIALIZACIÓN Y FINANZAS (COMER)
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                     <!-- Wizard Albarán Leche -->

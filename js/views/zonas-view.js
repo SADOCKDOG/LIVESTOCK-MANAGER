@@ -7,7 +7,7 @@
 const ZonasView = {
   async render() {
     if (window.App) App.updateHeaderColor('zonas');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("expro-tab-content") || document.getElementById("app-content");
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
     const zonasConIndice = (finca.zonas || [])
@@ -99,7 +99,7 @@ const ZonasView = {
           <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.zonas()}</span>
           <div>
             <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-              <span style="color:${moduleColor}; margin-right:4px;">|</span> Zonas / Parcelas
+              <span style="color:${moduleColor}; margin-right:4px;">|</span> ZONAS / PARCELAS
             </h1>
             <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
               ${zonasConIndice.length} ${zonasConIndice.length === 1 ? 'registro' : 'registros'} · ${totalOcupacion} cabezas
@@ -126,7 +126,7 @@ const ZonasView = {
 
         <!-- Histórico de registros -->
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
-          ${Icons.documento()} Lista de Zonas
+          ${Icons.documento()} LISTA DE ZONAS
         </div>
         <div class="grid gap-12">${fichasHtml}</div>`;
     }
@@ -161,8 +161,8 @@ const ZonasView = {
     const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10">${Icons.zonas()} Detalle Zona</h2></div>
-      <div class="card-registro border-top-3px border-top-3px-orange" style="--registro-color: var(--c-success);">
+      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10 font-900 uppercase tracking-wider"><span style="color: var(--neon);">|</span> ${Icons.zonas()} DETALLE ZONA</h2></div>
+      <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
           <input type="text" id="z-edit-nombre" value="${zona.nombre}" class="premium-input"></div>
@@ -174,6 +174,8 @@ const ZonasView = {
           </div>
           <div><label class="form-label">Código PAC (Parcela Agraria)</label>
           <input type="text" id="z-edit-pac" value="${zona.codigo_pac || ""}" placeholder="Ej: ES01A123456789" class="premium-input"></div>
+          <div><label class="form-label">Uso Principal de la Parcela</label>
+          <input type="text" id="z-edit-uso" value="${zona.usoPrincipal || ""}" placeholder="Ej: Pasto libre, Engorde, Cultivo..." class="premium-input"></div>
           <div><label class="form-label">Distancia a Fuente de Agua (m)</label>
           <input type="number" id="z-edit-agua" value="${zona.distancia_agua_m || ""}" placeholder="Metros" class="premium-input"></div>
           <div class="text-gray text-xs mt-8">
@@ -197,14 +199,26 @@ const ZonasView = {
       const finca = await Fincas.getActive();
       const zona = finca.zonas[index];
       zona.nombre = document.getElementById("z-edit-nombre").value.trim();
-      zona.aforoMax = parseInt(document.getElementById("z-edit-aforo").value) || 0;
-      zona.superficieGrafica = parseFloat(document.getElementById("z-edit-superficie").value) || 0;
+      
+      const aforo = parseInt(document.getElementById("z-edit-aforo").value) || 0;
+      zona.aforoMax = aforo;
+      zona.aforo_maximo = aforo;
+      
+      const sup = parseFloat(document.getElementById("z-edit-superficie").value) || 0;
+      zona.superficieGrafica = sup;
+      zona.superficie = sup;
+      
       zona.codigo_pac = document.getElementById("z-edit-pac").value.trim();
+      
+      const uso = document.getElementById("z-edit-uso").value.trim();
+      zona.usoPrincipal = uso;
+      zona.uso = uso;
+      
       zona.distancia_agua_m = parseInt(document.getElementById("z-edit-agua").value) || 0;
       zona.localizacion = document.getElementById("z-edit-localizacion").value.trim();
       if (!zona.nombre) return App.toastError("Nombre requerido");
       await Fincas.save(finca);
-      App.toast("Zona actualizada");
+      App.toast("Zona actualizada", "success");
       location.hash = "#/zonas";
     } catch (e) {
       App.toastError(e.message);
@@ -278,18 +292,20 @@ const ZonasView = {
       onComplete: async (finalData) => {
         try {
           const finca = await Fincas.getActive();
-          if (!finca.zonas) finca.zonas = [];
           finca.zonas.push({
             nombre: finalData.nombre,
             aforoMax: finalData.aforoMax,
+            aforo_maximo: finalData.aforoMax,
             superficieGrafica: finalData.superficie,
+            superficie: finalData.superficie,
             usoPrincipal: finalData.usoPrincipal,
+            uso: finalData.usoPrincipal,
             codigo_pac: finalData.codigo_pac,
             distancia_agua_m: finalData.distancia_agua_m,
             creadoEn: Date.now(),
           });
           await Fincas.save(finca);
-          App.toast("Zona creada");
+          App.toast("Zona creada", "success");
           App.route();
         } catch (e) {
           App.toastError(e.message);
@@ -328,7 +344,7 @@ const ZonasView = {
         observaciones: motivo.trim(),
         creadoEn: new Date().toISOString(),
       }).catch(() => {});
-      App.toast("Zona anulada");
+      App.toast("Zona anulada", "success");
       location.hash = "#/zonas";
     } catch (e) {
       App.toastError(e.message);

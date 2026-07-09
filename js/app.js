@@ -130,6 +130,7 @@ const App = {
       }
 
       await App.updateHeader();
+      App._inyectarIconosEstaticos();
       App._setupHeaderBackButton();
       App._setupHeaderContextClick();
       App._setupHardwareBackButton();
@@ -197,6 +198,18 @@ const App = {
     pStyles.id = "app-production-styles";
     pStyles.textContent = "#produccion-content .report-section{max-width:100%;overflow:hidden;}";
     document.head.appendChild(pStyles);
+  },
+
+  /** Inyecta de forma masiva los iconos SVGs de la librería en elementos estáticos HTML con el atributo data-icon */
+  _inyectarIconosEstaticos() {
+    if (!window.Icons) return;
+    document.querySelectorAll('[data-icon]').forEach(el => {
+      if (el.querySelector('svg')) return; // Evitar duplicar
+      const name = el.getAttribute('data-icon');
+      if (typeof window.Icons[name] === 'function') {
+        el.insertAdjacentHTML('afterbegin', window.Icons[name]());
+      }
+    });
   },
 
   /** Inicializa sombras de scroll automáticas en contenedores .scroll-shadow-container */
@@ -2189,7 +2202,10 @@ const App = {
   },
 
   async renderZonas() {
-    if (window.ZonasView) { await ZonasView.render(); }
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'zonas';
+      await this.renderExplotacion();
+    }
   },
 
   async renderDetalleZona(params) {
@@ -2208,14 +2224,21 @@ const App = {
     if (window.LecheView) { await LecheView.render(); }
   },
 
-  async renderExplotacion() {
-    if (window.ExplotacionView) { await ExplotacionView.render(); }
+  async renderExplotacion(params) {
+    if (window.ExplotacionView) {
+      const tab = params?.get ? params.get('tab') : null;
+      if (tab) {
+        ExplotacionView._activeSubModule = tab;
+      }
+      await ExplotacionView.render();
+    }
   },
 
-  async renderGastos() {
-    // GAP 1 FIX: GastosView contiene analítica completa (gráficos, KPIs por categoría)
-    // El alta de gastos se centraliza en ExPro, pero la vista analítica sigue accesible
-    if (window.GastosView) { await GastosView.render(); }
+  async renderGastos(params) {
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'gastos';
+      await this.renderExplotacion(params);
+    }
   },
 
   async renderComercializacion(params) {
@@ -2272,10 +2295,9 @@ const App = {
   },
 
   async renderSilos() {
-    if (window.SilosView) {
-      await SilosView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando gestión de silos...</div>';
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'silos';
+      await this.renderExplotacion();
     }
   },
 
@@ -2296,10 +2318,9 @@ const App = {
   },
 
   async renderFitosanitarios() {
-    if (window.FitosanitariosView) {
-      await FitosanitariosView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando registro fitosanitario...</div>';
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'fitosanitarios';
+      await this.renderExplotacion();
     }
   },
 
@@ -2371,10 +2392,9 @@ const App = {
   },
 
   async renderProveedores() {
-    if (window.ProveedoresView && typeof ProveedoresView.render === 'function') {
-      await ProveedoresView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando módulo de proveedores...</div>';
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'proveedores';
+      await this.renderExplotacion();
     }
   },
 
@@ -2415,10 +2435,9 @@ const App = {
   },
 
   async renderConfigSistema(params) {
-    if (window.ConfigSistemaView) {
-      await ConfigSistemaView.render(params);
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Error: Módulo de Sistema no disponible</div>';
+    if (window.ExplotacionView) {
+      ExplotacionView._activeSubModule = 'ajustes';
+      await this.renderExplotacion(params);
     }
   },
 

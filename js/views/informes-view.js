@@ -129,7 +129,7 @@ const InformesView = {
                 id="inf-cat-${catKey}"
                 style="${isActive ? `--tab-color:${col}; background:${col}15; border-color:${col}; color:${col} !important; box-shadow: 0 0 12px ${col}50;` : `--tab-color:${col};`}"
                 onclick="InformesView._cambiarCategoria('${catKey}')">
-          ${cat.icon} ${cat.label}
+          ${cat.icon} ${cat.label.toUpperCase()}
         </button>
       `;
     }
@@ -153,7 +153,7 @@ const InformesView = {
                 data-tab="${tabKey}"
                 style="${isActive ? `--tab-color:${activeColor}; background:${activeColor}18; border-color:${activeColor}; color:${activeColor} !important; box-shadow: 0 0 8px ${activeColor}40;` : ''}"
                 onclick="InformesView._cambiarTab('${tabKey}')">
-          ${subTabIcon} ${tabLabel}
+          ${subTabIcon} ${tabLabel.toUpperCase()}
         </button>
       `;
     }

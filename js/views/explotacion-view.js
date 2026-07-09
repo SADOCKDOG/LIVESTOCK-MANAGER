@@ -88,23 +88,64 @@ const ExplotacionView = {
     const main = document.getElementById('app-content');
     const fincaId = await Fincas?.getActiveId();
     if (!fincaId) { main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">Sin finca activa.</p></div>`; return; }
-    await this._ensureData(fincaId, !!options?.force || this._needsDataRefresh);
 
-    const d = this._cachedData;
-    if (window.App?.updateHeaderColor) App.updateHeaderColor(this._activeMode);
+    if (window.App?.updateHeaderColor) App.updateHeaderColor('explotacion');
+
+    // Inicializar sub-módulo activo por defecto si no está definido o es el antiguo legado 'explotacion'
+    if (!this._activeSubModule || this._activeSubModule === 'explotacion') {
+      this._activeSubModule = 'zonas';
+    }
 
     main.innerHTML = `
-      <div class="mb-14 px-4">
-        <div class="comer-mode-switch">
-          <button class="comer-mode-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('explotacion')">${Icons.finca()} Explotación</button>
-          <button class="comer-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} Gastos</button>
+      <!-- Cabecera Maestra ExPro Consolidada -->
+      <div class="flex items-center gap-12 mb-14 px-4">
+        <span class="text-2xl" style="color:var(--c-success); display:inline-flex; align-items:center;">${Icons.finca()}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:var(--c-success); margin-right:4px;">|</span> EXPLOTACIÓN & SOPORTE
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            GESTIÓN DE INFRAESTRUCTURA, INSUMOS Y SOPORTE TERRESTRE
+          </div>
         </div>
       </div>
-      <div id="expro-main-content"></div>`;
 
-    const container = document.getElementById('expro-main-content');
-    if (this._activeSubModule === 'explotacion') this._renderModoExplotacion(container, d);
-    else this._renderGastosView(container, d);
+      <!-- Barra de Navegación Multipestaña Horizontal ExPro (Scrollable) -->
+      <div class="mb-14 px-4" style="overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; box-sizing: border-box;">
+        <div class="expro-mode-switch" style="display: inline-flex; width: auto; min-width: 100%; gap: 6px; padding: 4px; background: #121212; border: 1px solid #27272a; border-radius: 24px;">
+          <button class="expro-mode-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" style="--mode-color:var(--c-success); flex: none; padding: 8px 16px; border-radius: 18px;" onclick="ExplotacionView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
+          <button class="expro-mode-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" style="--mode-color:var(--c-success); flex: none; padding: 8px 16px; border-radius: 18px;" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
+          <button class="expro-mode-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-success); flex: none; padding: 8px 16px; border-radius: 18px;" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
+          <button class="expro-mode-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-success); flex: none; padding: 8px 16px; border-radius: 18px;" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
+          <button class="expro-mode-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" style="--mode-color:var(--c-success); flex: none; padding: 8px 16px; border-radius: 18px;" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
+          <button class="expro-mode-btn ${this._activeSubModule === 'ajustes' ? 'active' : ''}" style="--mode-color:var(--c-success); flex: none; padding: 8px 16px; border-radius: 18px;" onclick="ExplotacionView._cambiarSubModulo('ajustes')">${Icons.ajustes()} SISTEMA</button>
+        </div>
+      </div>
+      
+      <!-- Contenedor Dinámico para la pestaña activa -->
+      <div id="expro-tab-content"></div>`;
+
+    // Delegación dinámica de renderizado
+    switch (this._activeSubModule) {
+      case 'zonas':
+        if (window.ZonasView) await ZonasView.render();
+        break;
+      case 'silos':
+        if (window.SilosView) await SilosView.render();
+        break;
+      case 'fitosanitarios':
+        if (window.FitosanitariosView) await FitosanitariosView.render();
+        break;
+      case 'gastos':
+        if (window.GastosView) await GastosView.render();
+        break;
+      case 'proveedores':
+        if (window.ProveedoresView) await ProveedoresView.render();
+        break;
+      case 'ajustes':
+        if (window.ConfigSistemaView) await ConfigSistemaView.render();
+        break;
+    }
   },
 
   _renderModoExplotacion(container, d) {
@@ -153,15 +194,15 @@ const ExplotacionView = {
     container.innerHTML = `
       <div class="mb-14 px-4">
         <div class="expro-mode-switch">
-          <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} Carne</button>
-          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} Leche</button>
+          <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} CARNE</button>
+          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} LECHE</button>
         </div>
       </div>
       <div class="report-section px-4">
         ${guia365BannerHtml}
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} Balance ${meta.label}</span>
+            <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} BALANCE ${meta.label.toUpperCase()}</span>
             <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
           <div class="resumen-body flex flex-col">
@@ -208,7 +249,7 @@ const ExplotacionView = {
       <div class="report-section px-4">
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color: var(--c-danger)">${Icons.dinero()} Resumen Gastos</span>
+            <span class="flex items-center gap-6" style="color: var(--c-danger)">${Icons.dinero()} RESUMEN GASTOS</span>
             <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
           <div class="resumen-body flex flex-col">

@@ -68,10 +68,10 @@ const ContratosView = {
         </span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> Contratos de Compra
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> CONTRATOS DE COMPRA
           </h1>
           <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            Gestión de Contratos de Suministro y Venta
+            GESTIÓN DE CONTRATOS DE SUMINISTRO Y VENTA
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ const ContratosView = {
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
       <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
-        <span style="color: ${moduleColor};">|</span> ${Icons.contratos()} Lista de Contratos
+        <span style="color: ${moduleColor};">|</span> ${Icons.contratos()} LISTA DE CONTRATOS
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
@@ -219,7 +219,7 @@ const ContratosView = {
     const fabContainer = document.createElement('div');
     fabContainer.className = 'fab-container';
     fabContainer.innerHTML = `
-      <span class="fab-label">Nuevo Contrato</span>
+      <span class="fab-label">NUEVO CONTRATO</span>
       <button class="fab-btn">${Icons.fabPlus()}</button>
     `;
     fabContainer.onclick = () => {
@@ -257,7 +257,7 @@ const ContratosView = {
     main.innerHTML = `
       <div class="mb-14">
         <button onclick="location.hash='#/contratos'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Volver a Contratos</span>
+          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} VOLVER A CONTRATOS</span>
         </button>
       </div>
       <div class="card-registro card-accent card-accent-purple p-20 bg-black" style="--registro-color: var(--c-purple);">
@@ -426,11 +426,15 @@ const ContratosView = {
     if (!await Confirm.confirm("Eliminar Contrato", "¿Deseas eliminar este contrato permanentemente? Esta acción es irreversible.")) return;
     try {
       await Contratos.delete(id);
-      App.toast("Contrato eliminado");
+      App.toast("Contrato eliminado", "success");
       location.hash = '#/contratos';
     } catch (e) {
       App.toastError("Error: " + e.message);
     }
+  },
+
+  async renderFormulario(params) {
+    return this.renderDetalle(params);
   }
 };
 
