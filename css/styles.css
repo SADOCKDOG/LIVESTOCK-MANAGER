@@ -2750,7 +2750,7 @@ label {
 }
 .btn-create, .btn-add, .btn--create, .btn--add {
     background: linear-gradient(135deg, var(--c-success) 0%, var(--c-success) 100%) !important;
-    color: #fff !important;
+    color: #000 !important;
     border: none !important;
 }
 .wizard-btn-danger, .btn--wizard-danger {
@@ -3490,8 +3490,8 @@ body.hide-context .card-dark-gradient.compact { padding-bottom: 12px !important;
 body.hide-context .card-total-3d.compact { padding-bottom: 12px !important; }
 
 /* === Botones modo-specific (carne/leche/hibrido) === */
-.btn-create--carne  { background: linear-gradient(135deg, var(--c-danger) 0%, #991b1b 100%) !important; color: #fff !important; border: none !important; }
-.btn-create--leche  { background: linear-gradient(135deg, var(--c-info) 0%, #1d4ed8 100%) !important; color: #fff !important; border: none !important; }
+.btn-create--carne  { background: linear-gradient(135deg, var(--c-danger) 0%, #991b1b 100%) !important; color: #000 !important; border: none !important; }
+.btn-create--leche  { background: linear-gradient(135deg, var(--c-info) 0%, #1d4ed8 100%) !important; color: #000 !important; border: none !important; }
 .btn-create--hibrido { background: linear-gradient(135deg, var(--c-success) 0%, var(--p-cork-dark) 100%) !important; color: #000 !important; border: none !important; }
 .btn-tratamiento--carne   { background: var(--c-danger) !important; border-color: var(--c-danger) !important; color: #fff !important; }
 .btn-tratamiento--leche   { background: var(--c-info) !important; border-color: var(--c-info) !important; color: #fff !important; }
