@@ -153,7 +153,7 @@ const DocumentosView = {
         <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
       </div>
 
-      <div class="card p-16" style="border: 1px solid var(--c-info); background: rgba(59, 130, 246, 0.015); width:100%;">
+      <div class="card p-16" style="border: 1px solid #27272a; background: #1E1E1E; width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} ÚLTIMOS DOCUMENTOS</div>
         <div id="docs-lista">${this._renderLista(docsRecientes, ventaMap)}</div>
         ${docs.length > 5 ? `<div class="text-center mt-6 pt-6 border-top-222"><span class="text-[0.6rem] text-gray font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa "Consultar / Imprimir" para ver todos</span></div>` : ''}

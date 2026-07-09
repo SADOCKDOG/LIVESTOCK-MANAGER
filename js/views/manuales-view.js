@@ -164,7 +164,7 @@ const ManualesView = {
     main.innerHTML = `
       <div class="page-container">
         <div class="page-header">
-          <h2 class="page-title">${Icons.libro()} Manuales</h2>
+          <h2 class="page-title"><span style="color:var(--c-purple); margin-right:6px;">|</span> ${Icons.libro()} MANUALES</h2>
           <p class="page-subtitle">Guías de usuario y ejemplos prácticos</p>
         </div>
         <div id="manuales-list" class="flex flex-col gap-14 pb-20">

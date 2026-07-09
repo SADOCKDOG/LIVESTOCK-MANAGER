@@ -418,7 +418,7 @@ const AsistenteConfiguracion = {
                 <div class="tour-footer">
                     <button class="tour-btn tour-btn-prev" id="tour-prev" disabled>← Anterior</button>
                     <div class="tour-dots" id="tour-dots">
-                        ${pasos.map((_, i) => `<span class="tour-dot ${i === 0 ? 'activo' : ''}" data-index="${i}"></span>`).join('')}
+                        ${pasos.map((_, i) => `<span class="tour-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
                     </div>
                     <button class="tour-btn tour-btn-next" id="tour-next">Siguiente →</button>
                     <button class="tour-btn tour-btn-fin d-none" id="tour-fin">✓ ¡Comenzar!</button>
@@ -460,7 +460,7 @@ const AsistenteConfiguracion = {
             }
 
             dots.forEach((dot, i) => {
-                dot.classList.toggle('activo', i === idx);
+                dot.classList.toggle('active', i === idx);
             });
         };
 

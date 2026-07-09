@@ -200,7 +200,7 @@ const CarneView = {
           <span class="text-2xl" style="color:var(--c-danger); display:inline-flex; align-items:center;">${Icons.carne()}</span>
           <div>
             <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-              <span style="color:var(--c-danger); margin-right:4px;">|</span> Resumen de Carne
+              <span style="color:var(--c-danger); margin-right:4px;">|</span> RESUMEN DE CARNE
             </h1>
           </div>
         </div>
@@ -444,13 +444,13 @@ const CarneView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card p-16 mb-14" style="border: 1px solid var(--c-warning); background: rgba(255, 214, 0, 0.01);">
+      <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl" style="color: var(--c-warning);">${Icons.edificio()}</span>
             <div>
               <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-warning); margin-right:4px;">|</span> Patrimonio y Ganadería
+                <span style="color: var(--c-warning); margin-right:4px;">|</span> PATRIMONIO Y GANADERÍA
               </h2>
               <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Gestión de censo y lotes de carne</div>
             </div>
@@ -502,13 +502,13 @@ const CarneView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card p-16 mb-14" style="border: 1px solid var(--c-success); background: rgba(204, 255, 0, 0.015);">
+      <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
             <div>
               <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-success); margin-right:4px;">|</span> Logística y Ventas
+                <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS
               </h2>
               <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Logística, vehículos, compradores, contratos y ventas</div>
             </div>
@@ -578,13 +578,13 @@ const CarneView = {
 
     const html = `
       ${supresionesHtml}
-      <div class="card p-16 mb-14" style="border: 1px solid var(--c-purple); background: rgba(168, 85, 247, 0.01);">
+      <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
             <span class="text-3xl" style="color: var(--c-purple);">${Icons.documento()}</span>
             <div>
               <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-purple); margin-right:4px;">|</span> Sanidad y Legislación
+                <span style="color: var(--c-purple); margin-right:4px;">|</span> SANIDAD Y LEGISLACIÓN
               </h2>
               <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Cuaderno sanitario, supresión y documentos obligatorios</div>
             </div>
@@ -667,7 +667,7 @@ const CarneView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
           <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-gray); background: #1e1e1e; width: 100%;">
-              <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> Editar Registro Cárnico</h3>
+              <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> EDITAR REGISTRO CÁRNICO</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -683,7 +683,7 @@ const CarneView = {
 
               <div class="wizard-input-group">
                   <label class="wizard-label">Identificación (Crotal/Lote)</label>
-                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
+                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input text-gold">
               </div>
 
               <div class="grid grid-cols-2 gap-10">
@@ -720,7 +720,7 @@ const CarneView = {
         evento.actualizadoEn = new Date().toISOString();
 
         await window.db.put('registro_eventos', evento);
-        App.toast("Registro de pesaje actualizado");
+        App.toast("Registro de pesaje actualizado", "success");
         overlay.remove();
         CarneView.render();
       };
@@ -728,7 +728,7 @@ const CarneView = {
       overlay.querySelector('#btn-del-reg').onclick = async () => {
         if (!await Confirm.confirm("Eliminar Pesaje", "¿Eliminar este pesaje de forma permanente?", true)) return;
         await window.db.delete('registro_eventos', id);
-        App.toast("Registro de pesaje eliminado");
+        App.toast("Registro de pesaje eliminado", "success");
         overlay.remove();
         CarneView.render();
       };
@@ -756,7 +756,7 @@ const CarneView = {
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
       <div class="card p-25" style="max-width:380px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.sanidad()} Aplicar Tratamiento Cárnico</h3>
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.sanidad()} APLICAR TRATAMIENTO CÁRNICO</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño de carne a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosCarne.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}

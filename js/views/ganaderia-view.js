@@ -53,7 +53,7 @@ const GanaderiaView = {
         <span class="text-2xl" style="color:var(--c-success); display:inline-flex; align-items:center;">${Icons.rebanos()}</span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:var(--c-success); margin-right:4px;">|</span> Módulos Ganaderos
+            <span style="color:var(--c-success); margin-right:4px;">|</span> MÓDULOS GANADEROS
           </h1>
         </div>
       </div>
@@ -79,7 +79,7 @@ const GanaderiaView = {
         <span class="text-2xl" style="color:${meta.color}; display:inline-flex; align-items:center;">${meta.icon}</span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${meta.color}; margin-right:4px;">|</span> Explotación Ganadera
+            <span style="color:${meta.color}; margin-right:4px;">|</span> EXPLOTACIÓN GANADERA
           </h1>
         </div>
       </div>

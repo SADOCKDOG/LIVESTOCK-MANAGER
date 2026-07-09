@@ -9,7 +9,7 @@ const ConfigSistemaView = {
 
   async render(params) {
     if (window.App) App.updateHeaderColor('ajustes');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("expro-tab-content") || document.getElementById("app-content");
     const config = await AjustesView._loadConfig();
     const tab = params?.get?.('tab') || this._currentTab;
     this._currentTab = tab;
@@ -62,7 +62,7 @@ const ConfigSistemaView = {
     const palette = this._getStandardPalette();
     container.innerHTML = `
       <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.foto()} Apariencia Base</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.foto()} APARIENCIA BASE</div>
         <div class="grid gap-12">
           <label class="wizard-check-label">
             <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleTema', this.checked)">
@@ -82,7 +82,7 @@ const ConfigSistemaView = {
       </div>
 
       <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--p-cork); margin-right: 4px;">|</span> ${Icons.ajustes()} Retroiluminación</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--p-cork); margin-right: 4px;">|</span> ${Icons.ajustes()} RETROILUMINACIÓN</div>
         <div class="grid gap-10">
           <label class="wizard-check-label">
             <input type="checkbox" ${config.glowMarco !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleGlowMarco', this.checked)">
@@ -107,7 +107,7 @@ const ConfigSistemaView = {
       </div>
 
       <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.calendar()} Formatos de Sistema</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.calendar()} FORMATOS DE SISTEMA</div>
         <div class="grid grid-cols-1 gap-15">
           <div class="wizard-input-group">
             <label class="wizard-label">FORMATO DE FECHA</label>
@@ -127,7 +127,7 @@ const ConfigSistemaView = {
       </div>
 
       <div class="card p-14" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--p-gold); margin-right: 4px;">|</span> ${Icons.estrella()} Color de Acento Global</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--p-gold); margin-right: 4px;">|</span> ${Icons.estrella()} COLOR DE ACENTO GLOBAL</div>
         <div class="flex flex-wrap gap-8 justify-center theme-dots-container">
           ${palette.map(c => `
             <button class="theme-dot ${config.colorTema === c.id ? 'active' : ''}"
@@ -148,7 +148,7 @@ const ConfigSistemaView = {
 
     container.innerHTML = `
       <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} Información del Sistema</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} INFORMACIÓN DEL SISTEMA</div>
         <div class="info-box bg-black p-15">
           <div class="grid grid-cols-2 gap-y-10 text-[0.7rem] uppercase font-800">
             <div class="text-gray">Versión App:</div><div class="text-white text-right">v${window.APP_INFO.version}</div>
@@ -160,7 +160,7 @@ const ConfigSistemaView = {
       </div>
 
       <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.guardar()} Copias de Seguridad</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.guardar()} COPIAS DE SEGURIDAD</div>
         <p class="text-[0.65rem] text-aaa mb-15 uppercase font-800">Protege tu información exportando un archivo JSON de seguridad.</p>
         <div class="grid grid-cols-2 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App.exportBackup()">
@@ -179,7 +179,7 @@ const ConfigSistemaView = {
       </div>
 
       <div class="card p-14" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-danger); margin-right: 4px;">|</span> ${Icons.eliminar()} Mantenimiento</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-danger); margin-right: 4px;">|</span> ${Icons.eliminar()} MANTENIMIENTO</div>
         <button class="widget-link-btn widget-link-btn--neon neon-danger w-full mb-10" onclick="AjustesView._limpiarCache()">
           ${Icons.eliminar()} Limpiar Caché del Sistema
         </button>
@@ -218,7 +218,7 @@ const ConfigSistemaView = {
 
     container.innerHTML = `
       <div class="card p-14" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
-        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} Registro de Actividad</div>
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} REGISTRO DE ACTIVIDAD</div>
         <p class="text-xs text-gray mb-15 leading-relaxed">Historial de cambios críticos, eliminaciones y rectificaciones realizadas en la explotación actual.</p>
         <div class="mh-400 overflow-y-auto pr-4">
           ${logsHtml}

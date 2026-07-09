@@ -74,7 +74,7 @@ const TransportistasView = {
         <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.transportistas()}</span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> Transportistas
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> TRANSPORTISTAS
           </h1>
           <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
             Gestión de Transportistas y Logística
@@ -114,7 +114,7 @@ const TransportistasView = {
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
       <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
-        <span style="color: ${moduleColor};">|</span> ${Icons.transportistas()} Lista de Transportistas
+        <span style="color: ${moduleColor};">|</span> ${Icons.transportistas()} LISTA DE TRANSPORTISTAS
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">

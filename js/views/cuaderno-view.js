@@ -165,7 +165,7 @@ const CuadernoDigitalView = {
 
       <!-- 1. EXPLOTACIÓN -->
       <div class="card" style="margin-bottom: 20px;">
-        <h3 class="section-h3 text-gold" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-warning); margin-right: 4px;">|</span> 1. ${Icons.home()} Datos de la Explotación</h3>
+        <h3 class="section-h3 text-gold" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-warning); margin-right: 4px;">|</span> 1. ${Icons.home()} DATOS DE LA EXPLOTACIÓN</h3>
         <div class="grid grid-cols-2 gap-6 text-85">
           <div><span class="text-gray">Nombre:</span> <strong class="text-white">${f.nombre || '—'}</strong></div>
           <div><span class="text-gray">Código REGA:</span> <strong class="text-gold">${f.codigo_REGA || f.rega || '—'}</strong></div>
@@ -186,7 +186,7 @@ const CuadernoDigitalView = {
 
       <!-- 2. CENSO -->
       <div class="card" style="margin-bottom: 20px;">
-        <h3 class="section-h3 text-blue-400" id="seccion-censo" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-info); margin-right: 4px;">|</span> 2. ${Icons.rebanos()} Censo Actual <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
+        <h3 class="section-h3 text-blue-400" id="seccion-censo" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-info); margin-right: 4px;">|</span> 2. ${Icons.rebanos()} CENSO ACTUAL <span class="text-gray font-normal text-2xs">(${d.year})</span></h3>
         <div class="text-3xl font-black text-white mb-10">${d.totalActivos} ${d.totalActivos === 1 ? 'animal activo' : 'animales activos'}</div>
         ${Object.entries(d.censo).length === 0 ? '<p class="empty-state-text mb-0">Sin animales registrados.</p>' : ''}
         ${Object.entries(d.censo).map(([especie, info]) => `
@@ -209,7 +209,7 @@ const CuadernoDigitalView = {
 
       <!-- 3.b ENTRADAS / SALIDAS / NACIMIENTOS / MUERTES (SIGGAN) -->
       <div class="card" style="margin-bottom: 20px;">
-        <h3 class="section-h3 text-purple-400" id="seccion-siggan-movs" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-purple); margin-right: 4px;">|</span> 3.b ${Icons.documento()} Libro de Registro SIGGAN (${d.year})</h3>
+        <h3 class="section-h3 text-purple-400" id="seccion-siggan-movs" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-purple); margin-right: 4px;">|</span> 3.b ${Icons.documento()} LIBRO DE REGISTRO SIGGAN (${d.year})</h3>
         <div class="grid grid-cols-4 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
             <div class="text-green font-black text-2xl">${d.entradas.length}</div>
@@ -234,7 +234,7 @@ const CuadernoDigitalView = {
               <span class="text-gray">${m.fecha || '—'}</span>
               <span class="${m.tipo === 'entrada' ? 'text-green' : 'text-amber'}">${(m.tipo || '').toUpperCase()}</span>
               <span class="text-ccc">Guía: ${m.numero_guia || '—'}</span>
-              <span class="text-gray-500">${m.rega_origen || '—'} → ${m.rega_destino || '—'}</span>
+              <span class="text-gold font-800">${m.rega_origen || '—'} → ${m.rega_destino || '—'}</span>
             </div>`
           ).join('') || '<p class="empty-state-text mb-0">Sin movimientos inter-explotación registrados.</p>'}
         </div>
@@ -242,7 +242,7 @@ const CuadernoDigitalView = {
 
       <!-- 3. MOVIMIENTOS -->
       <div class="card" style="margin-bottom: 20px;">
-        <h3 class="section-h3 text-purple-400" id="seccion-movimientos" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-purple); margin-right: 4px;">|</span> 3. ${Icons.rotacion()} Movimientos y Eventos</h3>
+        <h3 class="section-h3 text-purple-400" id="seccion-movimientos" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-purple); margin-right: 4px;">|</span> 3. ${Icons.rotacion()} MOVIMIENTOS Y EVENTOS</h3>
         <div class="grid grid-cols-3 gap-10 mb-12">
           <div class="rounded-sm p-10 text-center bg-dark">
             <div class="text-green font-black text-2xl">${d.eventos.length}</div>

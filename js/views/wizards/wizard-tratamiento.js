@@ -9,6 +9,7 @@ window.WizardTratamiento = {
       return;
     }
 
+    const animales = rebanoId ? await window.Animales.list(Number(rebanoId)).catch(() => []) : [];
     const catalogo = window.CatalogoSanitario.obtenerCatalogo();
 
     // Catálogos SIGGAN para el libro de tratamientos veterinarios
@@ -70,6 +71,13 @@ window.WizardTratamiento = {
             <div class="wizard-input-group mb-16">
               <label class="wizard-label">FECHA APLICACIÓN</label>
               <input type="date" id="w-san-fecha" class="wizard-input font-800" value="${data.fecha}">
+            </div>
+            <div class="wizard-input-group mb-16">
+              <label class="wizard-label">DESTINATARIO (INDIVIDUAL O COLECTIVO)</label>
+              <select id="w-san-animal" class="wizard-input font-800" style="color: var(--p-gold) !important;">
+                <option value="">TODOS LOS ANIMALES DEL REBAÑO (TRATAMIENTO MASIVO)</option>
+                ${animales.map(an => `<option value="${an.id}" ${data.animalId == an.id ? 'selected' : ''}>${(an.numero_identificacion || ('#' + an.id)).toUpperCase()} · ${an.raza || 'SIN RAZA'}</option>`).join('')}
+              </select>
             </div>
 
             <div class="border-top-222 pt-12">
@@ -167,6 +175,14 @@ window.WizardTratamiento = {
           data.tiempo_espera_carne_dias = parseInt(document.getElementById('w-san-carne')?.value) || 0;
           data.tiempo_espera_leche_dias = parseInt(document.getElementById('w-san-leche')?.value) || 0;
           data.fecha = document.getElementById('w-san-fecha')?.value || data.fecha;
+
+          const animalVal = document.getElementById('w-san-animal')?.value;
+          data.animalId = animalVal ? Number(animalVal) : null;
+          if (data.animalId) {
+            data.num_animales_tratados = 1;
+            const inputNumAn = document.getElementById('w-san-num-animales');
+            if (inputNumAn) inputNumAn.value = 1;
+          }
         },
         validate: async (data) => {
           if (!data.medicamento) {
@@ -179,7 +195,7 @@ window.WizardTratamiento = {
       {
         // PASO 2: Libro de Tratamientos Veterinarios (SIGGAN)
         content: (data) => `
-          <div class="card card-accent card-accent-blue p-16 mt-10">
+          <div class="card card-accent card-accent-blue p-16 mt-10" style="max-height: 65vh; overflow-y: auto;">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.libroVentas()} LIBRO DE TRATAMIENTOS</div>
             <p class="text-aaa uppercase font-900 text-[0.55rem] tracking-widest mb-12 opacity-80 text-center">DATOS EXIGIDOS POR RD 1749/1998 Y SIGGAN</p>
 
@@ -189,6 +205,36 @@ window.WizardTratamiento = {
                 ${motivosTrat.map(m => `<option value="${m.value}" ${data.motivo_tratamiento === m.value ? 'selected' : ''}>${m.label.toUpperCase()}</option>`).join('')}
               </select>
             </div>
+            
+            <div class="p-12 mb-12 bg-black border border-222 rounded-sm">
+              <div class="text-[0.62rem] text-gold uppercase font-950 tracking-wider mb-8 flex items-center gap-4">${Icons.documento()} DOSIFICACIÓN Y DURACIÓN</div>
+              <div class="grid grid-cols-2 gap-10 mb-8">
+                <div class="wizard-input-group">
+                  <label class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 d-block">DOSIS RECOMENDADA</label>
+                  <input type="text" id="w-san-dosis" value="${data.dosis || ''}" placeholder="Ej: 1 ml/50kg" class="wizard-input h-35 text-xs font-800">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 d-block">DURACIÓN (DÍAS)</label>
+                  <input type="number" id="w-san-duracion" value="${data.duracion_dias || 1}" min="1" class="wizard-input h-35 text-xs font-800">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                  <label class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 d-block">APLICADO POR</label>
+                  <select id="w-san-aplicado" class="wizard-input h-35 text-xs font-800">
+                    <option value="titular" ${data.aplicadoPor === 'titular' ? 'selected' : ''}>TITULAR / GANADERO</option>
+                    <option value="veterinario" ${data.aplicadoPor === 'veterinario' ? 'selected' : ''}>VETERINARIO DE REPRODUCCIÓN</option>
+                    <option value="adsg" ${data.aplicadoPor === 'adsg' ? 'selected' : ''}>VETERINARIO DE LA ADSG</option>
+                    <option value="otro" ${data.aplicadoPor === 'otro' ? 'selected' : ''}>OTRO PERSONAL AUTORIZADO</option>
+                  </select>
+                </div>
+                <div class="wizard-input-group">
+                  <label class="text-[0.55rem] text-gray uppercase font-800 tracking-wider mb-4 d-block">FECHA FIN</label>
+                  <input type="date" id="w-san-fecha-fin" value="${data.fecha_fin_tratamiento || ''}" class="wizard-input h-35 text-xs font-800">
+                </div>
+              </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº ANIMALES</label>
@@ -233,6 +279,11 @@ window.WizardTratamiento = {
         `,
         onChange: async (data) => {
           data.motivo_tratamiento = document.getElementById('w-san-motivo')?.value || data.motivo_tratamiento;
+          data.dosis = document.getElementById('w-san-dosis')?.value.trim() || '';
+          const durVal = document.getElementById('w-san-duracion')?.value;
+          data.duracion_dias = durVal ? parseInt(durVal, 10) : 1;
+          data.aplicadoPor = document.getElementById('w-san-aplicado')?.value || 'titular';
+          data.fecha_fin_tratamiento = document.getElementById('w-san-fecha-fin')?.value || '';
           data.num_animales_tratados = parseInt(document.getElementById('w-san-num-animales')?.value, 10) || 1;
           data.via_administracion = document.getElementById('w-san-via')?.value || data.via_administracion;
           data.lote_medicamento = document.getElementById('w-san-lote')?.value.trim() || '';
@@ -249,6 +300,7 @@ window.WizardTratamiento = {
       title: 'TRATAMIENTO SANITARIO',
       initialData: {
         rebanoId: rebanoId,
+        animalId: options.animalId || null,
         medicamento: "",
         tipo_tratamiento: "Otro",
         fecha: new Date().toISOString().split("T")[0],
@@ -256,6 +308,10 @@ window.WizardTratamiento = {
         tiempo_espera_leche_dias: 0,
         prohibidoLeche: false,
         motivo_tratamiento: 'profilaxis',
+        dosis: '',
+        duracion_dias: 1,
+        aplicadoPor: 'titular',
+        fecha_fin_tratamiento: '',
         num_animales_tratados: 1,
         via_administracion: 'intramuscular',
         lote_medicamento: '',

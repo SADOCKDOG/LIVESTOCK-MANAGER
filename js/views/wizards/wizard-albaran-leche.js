@@ -79,11 +79,24 @@ window.AlbaranLecheWizard = {
                 <label class="wizard-label">TEMPERATURA (°C)</label>
                 <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input font-950 text-xl" style="color:${data.temp <= 4 ? 'var(--c-success)' : 'var(--c-danger)'};">
               </div>
-            </div>
-
-            <div class="wizard-input-group mb-12">
+                    <div class="wizard-input-group mb-12">
               <label class="wizard-label">NÚMERO MUESTRA LETRA Q</label>
               <input type="text" id="w-l-q" value="${data.q}" placeholder="CÓDIGO MUESTRA..." class="wizard-input uppercase font-800">
+            </div>
+
+            <div class="grid grid-cols-3 gap-10 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">Nº MUESTREO OFICIAL</label>
+                <input type="text" id="w-l-muestreo" value="${data.numero_muestreo_oficial || ''}" placeholder="OPCIONAL..." class="wizard-input uppercase font-800 text-xs">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">HORA ORDEÑO</label>
+                <input type="time" id="w-l-hora-ordeno" value="${data.hora_ordeno || ''}" class="wizard-input font-800 text-xs">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">HORA CARGA</label>
+                <input type="time" id="w-l-hora-carga" value="${data.hora_carga || ''}" class="wizard-input font-800 text-xs">
+              </div>
             </div>
 
             <div class="grid grid-cols-2 gap-10 mb-12">
@@ -97,8 +110,8 @@ window.AlbaranLecheWizard = {
               <div class="wizard-input-group">
                 <label class="wizard-label">COMUNIDAD AUTÓNOMA</label>
                 <select id="w-l-ccaa" class="wizard-input font-800 text-xs">
-                  <option value="">— SELECCIONAR —</option>
-                  ${opcionesCCAA.map(o => `<option value="${o.value}" ${data.comunidad_autonoma === o.value ? 'selected' : ''}>${o.label.toUpperCase()}</option>`).join('')}
+                   <option value="">— SELECCIONAR —</option>
+                   ${opcionesCCAA.map(o => `<option value="${o.value}" ${data.comunidad_autonoma === o.value ? 'selected' : ''}>${o.label.toUpperCase()}</option>`).join('')}
                 </select>
               </div>
             </div>
@@ -121,6 +134,9 @@ window.AlbaranLecheWizard = {
           data.matricula = document.getElementById('w-l-mat')?.value.trim() || data.matricula;
           data.temp = parseFloat(document.getElementById('w-l-temp')?.value) || 0;
           data.q = document.getElementById('w-l-q')?.value.trim() || data.q;
+          data.numero_muestreo_oficial = document.getElementById('w-l-muestreo')?.value.trim() || '';
+          data.hora_ordeno = document.getElementById('w-l-hora-ordeno')?.value || '';
+          data.hora_carga = document.getElementById('w-l-hora-carga')?.value || '';
           data.contrato_numero = document.getElementById('w-l-ctr')?.value.trim() || data.contrato_numero;
           data.comunidad_autonoma = document.getElementById('w-l-ccaa')?.value || data.comunidad_autonoma;
           data.cadena_frio_cumplida = document.getElementById('w-l-frio')?.checked || false;
@@ -181,6 +197,29 @@ window.AlbaranLecheWizard = {
               <input type="date" id="w-l-fec-an" value="${data.fecha_analisis || ''}" class="wizard-input font-800">
             </div>
 
+            <div class="p-10 bg-black border border-222 rounded-sm mb-12">
+              <label class="flex items-center gap-10 text-xs text-white cursor-pointer">
+                <input type="checkbox" id="w-l-antb" ${data.antibioticos ? 'checked' : ''} style="accent-color:var(--c-danger);">
+                <span class="uppercase font-950 text-[0.6rem] tracking-tight text-red flex items-center gap-4">
+                  <span style="color:var(--c-danger);">|</span> RESIDUOS DE ANTIBIÓTICOS DETECTADOS (ALERTA CRÍTICA)
+                </span>
+              </label>
+            </div>
+
+            <div class="border-top-222 pt-12 mt-12 mb-12">
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-warning); font-size: 0.65rem;">MÁRGENES Y COSTES DE ALIMENTACIÓN</div>
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                  <label class="wizard-label">COSTE DIARIO RACIÓN (€)</label>
+                  <input type="number" id="w-l-coste-diario" value="${data.coste_alimentacion_diario || ''}" placeholder="Ej: 45.20" step="0.01" class="wizard-input font-800">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="wizard-label">COSTE TOTAL PERÍODO (€)</label>
+                  <input type="number" id="w-l-coste-periodo" value="${data.coste_alimentacion_periodo || ''}" placeholder="Ej: 350.00" step="0.01" class="wizard-input font-800">
+                </div>
+              </div>
+            </div>
+
             <div class="border-top-222 pt-12 mt-12">
               <div class="grid grid-cols-2 gap-10 mb-12">
                 <div class="wizard-input-group">
@@ -215,6 +254,9 @@ window.AlbaranLecheWizard = {
           data.fecha_analisis = document.getElementById('w-l-fec-an')?.value || data.fecha_analisis;
           data.pb = parseFloat(document.getElementById('w-l-pb')?.value) || 0;
           data.primas_penalizaciones = parseFloat(document.getElementById('w-l-prim')?.value) || 0;
+          data.antibioticos = document.getElementById('w-l-antb')?.checked || false;
+          data.coste_alimentacion_diario = parseFloat(document.getElementById('w-l-coste-diario')?.value) || 0;
+          data.coste_alimentacion_periodo = parseFloat(document.getElementById('w-l-coste-periodo')?.value) || 0;
         },
         validate: async (data) => {
           return true;

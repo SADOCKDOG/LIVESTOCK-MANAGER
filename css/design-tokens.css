@@ -40,16 +40,16 @@
     --c-sombra: #2D2D26;     /* Sombra de corral - profundidad y elevación */
 
     /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
-    --c-success: #C5FA50;     /* Éxito / Zonas / Híbrido (Manteniendo por compatibilidad) */
-    --c-warning: #FFFC55;     /* Aviso / Alertas / Informes (Manteniendo por compatibilidad) */
-    --c-danger:  #E8555F;     /* Peligro / Carne / Gastos (Manteniendo por compatibilidad) */
-    --c-info:    #4FADF5;     /* Info / Leche / Listas (Manteniendo por compatibilidad) */
+    --c-success: #CCFF00;     /* Verde Lima Neón - Éxito / Zonas / Híbrido */
+    --c-warning: #FFD600;     /* Amarillo Neón - Alertas / Warning */
+    --c-danger:  #FF4444;     /* Rojo Neón - Peligro / Carne / Gastos */
+    --c-info:    #3b82f6;     /* Azul Neón - Info / Leche / Listas */
     --c-accent:  #7EEFEF;     /* Acento / Genética (Cyan Claro de apoyo) */
 
     /* ── COLORES DE MÓDULO (Tricolor corporativo simplificado) ── */
-    --c-orange: #E8555F;      /* Animales / Cuaderno Digital (Rojo Coral) */
-    --c-purple: #4FADF5;      /* Proveedores / Manuales / Documentos-Trámites (Cyan) */
-    --c-pink:   #4FADF5;      /* Transportistas / Logística (Cyan) */
+    --c-orange: #F97316;      /* Naranja Neón - Animales / Cuaderno Digital */
+    --c-purple: #A855F7;      /* Violeta Neón - Proveedores / Manuales / Documentos-Trámites */
+    --c-pink:   #EC4899;      /* Rosa Neón - Transportistas / Logística */
 
     /* ── TIPOGRAFÍA (escala semántica única) ── */
     --fs-display: 1.6rem;     /* KPI grande / cifra destacada */

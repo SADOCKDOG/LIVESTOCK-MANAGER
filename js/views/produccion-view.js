@@ -287,7 +287,7 @@ const ProduccionView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
           <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-orange);">
-              <h3 class="mt-0 uppercase font-900 text-white"><span style="color: var(--c-orange);">|</span> Editar Registro</h3>
+              <h3 class="mt-0 uppercase font-900 text-white"><span style="color: var(--c-orange);">|</span> EDITAR REGISTRO</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -391,7 +391,7 @@ const ProduccionView = {
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
         <div class="card p-25" style="max-width:400px; border: 1px solid var(--c-orange);">
-          <h3 class="mt-0 uppercase font-900 text-white text-md"><span style="color: var(--c-orange);">|</span> Editar Gasto</h3>
+          <h3 class="mt-0 uppercase font-900 text-white text-md"><span style="color: var(--c-orange);">|</span> EDITAR GASTO</h3>
 
           <div class="wizard-input-group mt-15">
             <label class="wizard-label">Concepto</label>

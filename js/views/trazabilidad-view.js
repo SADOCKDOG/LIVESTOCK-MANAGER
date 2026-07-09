@@ -114,6 +114,8 @@ const TrazabilidadView = {
         ${animal.dib ? `<strong>DIB:</strong> <span class="text-white font-bold">${animal.dib}</span><br>` : ''}
         <strong>Especie:</strong> ${animal.especie || 'N/D'}<br>
         <strong>Raza:</strong> ${animal.raza || 'N/D'}<br>
+        ${animal.tipo ? `<strong>Variedad/Clase:</strong> ${animal.tipo}<br>` : ''}
+        ${animal.peso_inicial ? `<strong>Peso Inicial:</strong> ${animal.peso_inicial} kg<br>` : ''}
         <strong>Sexo:</strong> ${animal.sexo || 'N/D'}<br>
         <strong>Categoría:</strong> ${animal.categoria || 'Sin categoría'}<br>
         ${animal.procedencia_tipo ? `<strong>Procedencia:</strong> ${animal.procedencia_tipo}${animal.explotacion_origen ? ' ('+animal.explotacion_origen+')' : ''}<br>` : ''}
@@ -270,12 +272,14 @@ const TrazabilidadView = {
           <div class="traz-meta-grid">
             <div><span class="text-gray">Especie:</span> ${animal.especie || 'N/D'}</div>
             <div><span class="text-gray">Raza:</span> ${animal.raza || 'N/D'}</div>
+            ${animal.tipo ? `<div><span class="text-gray">Variedad:</span> ${animal.tipo}</div>` : ''}
+            ${animal.peso_inicial ? `<div><span class="text-gray">Peso Inicial:</span> ${animal.peso_inicial} kg</div>` : ''}
             <div><span class="text-gray">Sexo:</span> ${animal.sexo || 'N/D'}</div>
             <div><span class="text-gray">Edad:</span> ${edad}</div>
             <div><span class="text-gray">Categoría:</span> ${animal.categoria || 'Sin categoría'}</div>
             <div><span class="text-gray">DIB:</span> ${animal.dib || '<span class="text-red">No registrado</span>'}</div>
             ${rebano ? `<div><span class="text-gray">Rebaño:</span> ${rebano.nombre || 'N/D'}</div>` : ''}
-            ${animal.procedencia_tipo ? `<div><span class="text-gray">Procedencia:</span> ${animal.procedencia_tipo}${animal.explotacion_origen ? ' ('+animal.explotacion_origen+')' : ''}</div>` : ''}
+            ${animal.procedencia_tipo ? `<div><span class="text-gray">Procedencia:</span> ${animal.procedencia_tipo}${animal.explotacion_origen ? ` (<span class="text-gold font-900">${animal.explotacion_origen}</span>)` : ''}</div>` : ''}
           </div>
         </div>
 
@@ -289,7 +293,7 @@ const TrazabilidadView = {
 
         <!-- Timeline -->
         <div class="mt-16">
-          <h3 class="text-white mb-15 font-900 uppercase tracking-wider"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.calendar()} Línea de Vida</h3>
+          <h3 class="text-white mb-15 font-900 uppercase tracking-wider"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.calendar()} LÍNEA DE VIDA</h3>
           ${timeline.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.buscar()}</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>` : ''}
           <div id="trazabilidad-timeline" class="relative">
             <div class="traz-timeline-line"></div>
@@ -374,6 +378,10 @@ const TrazabilidadView = {
         <table style="width:100%;border-collapse:collapse;margin-bottom:15px;">
           <tr><td style="padding:4px 8px;font-weight:bold;color:var(--p-gold);font-size:14px;">${animal.numero_identificacion || '—'}</td><td style="text-align:right;padding:4px 8px;"><span style="background:${animal.estado === 'activo' ? '#065f46' : '#7f1d1d'};color:#fff;padding:2px 10px;border-radius:10px;font-size:10px;">${animal.estado || ''}</span></td></tr>
           <tr><td style="padding:3px 8px;color:#888;">Especie: <strong style="color:#333;">${animal.especie || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Raza: <strong style="color:#333;">${animal.raza || 'N/D'}</strong></td></tr>
+          ${animal.tipo || animal.peso_inicial ? `<tr>
+            <td style="padding:3px 8px;color:#888;">${animal.tipo ? `Variedad: <strong style="color:#333;">${animal.tipo}</strong>` : ''}</td>
+            <td style="padding:3px 8px;color:#888;">${animal.peso_inicial ? `Peso Inicial: <strong style="color:#333;">${animal.peso_inicial} kg</strong>` : ''}</td>
+          </tr>` : ''}
           <tr><td style="padding:3px 8px;color:#888;">Sexo: <strong style="color:#333;">${animal.sexo || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Edad: <strong style="color:#333;">${edad}</strong></td></tr>
           <tr><td style="padding:3px 8px;color:#888;">DIB: <strong style="color:#333;">${animal.dib || 'No registrado'}</strong></td><td style="padding:3px 8px;color:#888;">${rebano ? 'Rebaño: <strong style="color:#333;">'+rebano.nombre+'</strong>' : ''}</td></tr>
         </table>

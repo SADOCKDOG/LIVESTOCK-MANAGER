@@ -21,7 +21,7 @@ const GastosView = {
   ],
 
   async render() {
-    const main = document.getElementById('app-content');
+    const main = document.getElementById('expro-tab-content') || document.getElementById('app-content');
     // Cargar datos primero
     const gastosRecords = await Gastos.list(await Fincas.getActiveId());
 
@@ -67,7 +67,7 @@ const GastosView = {
     main.innerHTML = `
       <div class="card mb-14 p-12 card-resumen" style="background:rgba(168,85,247,0.015); width:100%;">
         <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase"><span style="color: var(--c-purple); margin-right:4px;">|</span> Evolución Mensual (últimos 6 meses)</span>
+          <span class="text-xs text-gray font-bold uppercase"><span style="color: var(--c-purple); margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
           <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
@@ -98,7 +98,7 @@ const GastosView = {
       <div class="mb-14">
         <div class="tabs-scroll gasto-tabs scroll-shadow-container">
           ${this._CATEGORIAS.map(c => `
-            <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="GastosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label}</button>
+            <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="GastosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label.toUpperCase()}</button>
           `).join('')}
         </div>
       </div>

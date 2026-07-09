@@ -488,7 +488,7 @@ const DashboardView = {
       return `
         <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
           <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIs Diarios</h3>
+          <h3 style="color: var(--text-s); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIS DIARIOS</h3>
             <div style="color: var(--text-s); font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
           </div>
         </div>`;
