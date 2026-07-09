@@ -3618,8 +3618,8 @@ body.glow-tarjetas-off .status-badge {
 /* -- BENTO DE REGISTRO RÁPIDO PREMIUM (.card-registro-quick) -- */
 .card-registro-quick {
     grid-column: span 4;
-    background: rgba(255, 255, 255, 0.02) !important;
-    border: 1px solid var(--border) !important;
+    background: color-mix(in srgb, var(--quick-color) 4%, rgba(255, 255, 255, 0.02)) !important;
+    border: 1px solid color-mix(in srgb, var(--quick-color) 20%, var(--border)) !important;
     border-radius: var(--r-md) !important;
     padding: 12px !important;
     display: flex !important;
@@ -3632,14 +3632,14 @@ body.glow-tarjetas-off .status-badge {
     -webkit-tap-highlight-color: transparent !important;
 }
 .card-registro-quick:hover {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: color-mix(in srgb, var(--quick-color) 8%, rgba(255, 255, 255, 0.03)) !important;
     border-color: var(--quick-color) !important;
-    box-shadow: 0 0 15px color-mix(in srgb, var(--quick-color) 25%, transparent),
-                inset 0 0 10px color-mix(in srgb, var(--quick-color) 10%, transparent) !important;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--quick-color) 35%, transparent),
+                inset 0 0 8px color-mix(in srgb, var(--quick-color) 15%, transparent) !important;
     transform: translateY(-2px) !important;
 }
 .card-registro-quick:active {
-    transform: scale(0.96) !important;
+    transform: scale(0.95) !important;
 }
 .card-registro-quick .quick-icon-wrapper {
     width: 38px !important;
@@ -3680,6 +3680,21 @@ body.glow-tarjetas-off .status-badge {
     letter-spacing: 0.2px !important;
     margin-top: 3px !important;
     line-height: 1.2 !important;
+}
+.card-registro-quick .quick-arrow-indicator {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--text-s) !important;
+    font-size: 0.65rem !important;
+    margin-left: auto !important;
+    transition: all 0.2s !important;
+    opacity: 0.5 !important;
+}
+.card-registro-quick:hover .quick-arrow-indicator {
+    color: var(--quick-color) !important;
+    transform: translateX(3px) !important;
+    opacity: 1 !important;
 }
 
 /* Responsivo para dispositivos móviles */
