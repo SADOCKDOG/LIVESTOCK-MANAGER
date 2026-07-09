@@ -518,6 +518,40 @@ const App = {
     if (card) card.classList.toggle('collapsed');
   },
 
+  /** Evalúa el scroll de las pestañas premium para mostrar/ocultar indicadores de deslizamiento */
+  evaluarScrollPestanas(el) {
+    const wrapper = el.parentElement;
+    if (!wrapper) return;
+    const flechaIzq = wrapper.querySelector('.pestana-flecha-izq');
+    const flechaDer = wrapper.querySelector('.pestana-flecha-der');
+    
+    if (flechaIzq) {
+      flechaIzq.style.opacity = el.scrollLeft > 10 ? '1' : '0';
+      flechaIzq.style.pointerEvents = el.scrollLeft > 10 ? 'auto' : 'none';
+    }
+    if (flechaDer) {
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const tieneMasScroll = el.scrollLeft < maxScroll - 10;
+      flechaDer.style.opacity = tieneMasScroll ? '1' : '0';
+      flechaDer.style.pointerEvents = tieneMasScroll ? 'auto' : 'none';
+    }
+  },
+
+  /** Inicializa y fuerza la primera evaluación del scroll de las pestañas premium, autocentrando la activa */
+  inicializarScrollPestanas(el) {
+    if (!el) return;
+    // Escuchar el evento de scroll dinámicamente si no está en línea
+    el.addEventListener('scroll', () => this.evaluarScrollPestanas(el));
+    setTimeout(() => {
+      this.evaluarScrollPestanas(el);
+      // Buscar el botón activo y autocentrarlo con scroll behavior smooth
+      const activeBtn = el.querySelector('.pestanas-premium-btn.active');
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }, 150);
+  },
+
   /**
    * Genera el HTML de una tarjeta de registro estandarizada.
    * @param {Object} opts - Opciones de la tarjeta.
@@ -2181,12 +2215,21 @@ const App = {
     if (window.DashboardView) { await DashboardView.render(); }
   },
 
-  async renderGanaderia() {
-    if (window.GanaderiaView) { await GanaderiaView.render(); }
+  async renderGanaderia(params) {
+    if (window.GanaderiaView) {
+      const tab = params?.get ? params.get('tab') : null;
+      if (tab) {
+        GanaderiaView._activeSubModule = tab;
+      }
+      await GanaderiaView.render();
+    }
   },
 
   async renderRebanos() {
-    if (window.RebanosView) { await RebanosView.render(); }
+    if (window.GanaderiaView) {
+      GanaderiaView._activeSubModule = 'rebanos';
+      await this.renderGanaderia();
+    }
   },
 
   async renderDetalleRebano(params) {
@@ -2194,11 +2237,17 @@ const App = {
   },
 
   async renderCarne() {
-    if (window.CarneView) { await CarneView.render(); }
+    if (window.GanaderiaView) {
+      GanaderiaView._activeSubModule = 'carne';
+      await this.renderGanaderia();
+    }
   },
 
   async renderHibrido() {
-    if (window.HibridoView) { await HibridoView.render(); }
+    if (window.GanaderiaView) {
+      GanaderiaView._activeSubModule = 'hibrido';
+      await this.renderGanaderia();
+    }
   },
 
   async renderZonas() {
@@ -2213,7 +2262,10 @@ const App = {
   },
 
   async renderAnimales() {
-    if (window.AnimalesView) { await AnimalesView.render(); }
+    if (window.GanaderiaView) {
+      GanaderiaView._activeSubModule = 'animales';
+      await this.renderGanaderia();
+    }
   },
 
   async renderDetalleAnimal(params) {
@@ -2221,7 +2273,10 @@ const App = {
   },
 
   async renderLeche() {
-    if (window.LecheView) { await LecheView.render(); }
+    if (window.GanaderiaView) {
+      GanaderiaView._activeSubModule = 'leche';
+      await this.renderGanaderia();
+    }
   },
 
   async renderExplotacion(params) {

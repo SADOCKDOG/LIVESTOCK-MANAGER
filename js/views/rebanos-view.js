@@ -12,7 +12,7 @@ const RebanosView = {
   },
   async render() {
     if (window.App) App.updateHeaderColor('rebanos');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("ganaderia-tab-content") || document.getElementById("app-content");
     const rebanos = await Rebanos.list();
     const eventos = await window.db.getAll('registro_eventos').catch(() => []);
     const totalRebanos = rebanos.length;

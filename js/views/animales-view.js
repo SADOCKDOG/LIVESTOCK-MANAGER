@@ -9,7 +9,7 @@ const AnimalesView = {
 
   async render() {
     if (window.App) App.updateHeaderColor('animales');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("ganaderia-tab-content") || document.getElementById("app-content");
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
     if (rebanos.length === 0)

@@ -11,7 +11,7 @@ const LecheView = {
   },
   async render() {
     if (window.App) App.updateHeaderColor('leche');
-    const main = document.getElementById('app-content');
+    const main = document.getElementById("ganaderia-tab-content") || document.getElementById("app-content");
     const fincaId = await Fincas.getActiveId();
     const finca = await Fincas.getActive();
 
