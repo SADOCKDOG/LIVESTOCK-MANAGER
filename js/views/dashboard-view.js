@@ -151,64 +151,71 @@ const DashboardView = {
             <!-- Control Lechero -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-info);">
               <div class="quick-icon-wrapper">${Icons.leche()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Control Lechero</span>
                 <span class="quick-desc">Ordeño y lactación</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
             <!-- Pesaje Ganado -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-danger);">
               <div class="quick-icon-wrapper">${Icons.carne()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Pesaje Ganado</span>
                 <span class="quick-desc">Pesos de lotes o individual</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
             <!-- Tratamiento Sanitario -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirTratamientoSanitarioDirecto()" style="--quick-color: var(--p-gold);">
               <div class="quick-icon-wrapper">${Icons.sanidad()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Tratamiento</span>
                 <span class="quick-desc">Fármacos y veterinaria</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
             <!-- Gasto Analítico -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirFormularioGasto({ origenModulo: 'dashboard' })" style="--quick-color: var(--c-success);">
               <div class="quick-icon-wrapper">${Icons.dinero()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Gasto Analítico</span>
                 <span class="quick-desc">Costes y facturas</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
             <!-- Alta de Animal -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirAltaAnimalDirecto()" style="--quick-color: var(--c-purple);">
               <div class="quick-icon-wrapper">${Icons.animales()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Alta Animal</span>
                 <span class="quick-desc">Crotal o chip nativo</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
             <!-- Silos y Alimento -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirEntradaAlimentoSiloDirecto()" style="--quick-color: #4FADF5;">
               <div class="quick-icon-wrapper">${Icons.fitosanitario()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Silos & Pienso</span>
                 <span class="quick-desc">Cargas y consumos</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
             <!-- Venta Masiva / Matadero -->
             <div class="card-registro-quick col-span-12" onclick="App._abrirWizardVentaMasiva()" style="--quick-color: var(--c-warning);">
               <div class="quick-icon-wrapper">${Icons.libroVentas()}</div>
-              <div class="quick-text-wrapper">
+              <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Venta Masiva o Carga de Matadero</span>
                 <span class="quick-desc">Gestión integral de salidas comerciales, guías de traslado y guías de transporte</span>
               </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
           </div>
