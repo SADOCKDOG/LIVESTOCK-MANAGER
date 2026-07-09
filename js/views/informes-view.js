@@ -1457,7 +1457,7 @@ const InformesView = {
           <div class="grid grid-cols-2 gap-10 mb-14">
             <div class="info-box border-left-green">
               <small class="s-lbl">REGA</small>
-              <div class="inf-val-md text-green">${finca.codigo_REGA || finca.rega || 'N/D'}</div>
+              <div class="inf-val-md text-gold">${finca.codigo_REGA || finca.rega || 'N/D'}</div>
             </div>
             <div class="info-box border-left-blue">
               <small class="s-lbl">PROPIETARIO</small>
@@ -1590,7 +1590,7 @@ const InformesView = {
           <div class="inf-card-title">${Icons.finca()} Datos de la Explotación</div>
           <div class="grid grid-cols-2 gap-8 text-sm">
             <div><span class="text-gray">Nombre:</span> <strong>${finca.nombre || 'N/D'}</strong></div>
-            <div><span class="text-gray">REGA:</span> <strong class="text-green">${finca.codigo_REGA || finca.rega || 'N/D'}</strong></div>
+            <div><span class="text-gray">REGA:</span> <strong class="text-gold">${finca.codigo_REGA || finca.rega || 'N/D'}</strong></div>
             <div><span class="text-gray">CEA:</span> <strong>${finca.codigo_CEA || finca.cea || 'N/D'}</strong></div>
             <div><span class="text-gray">Propietario:</span> <strong>${finca.propietario || 'N/D'}</strong></div>
             <div><span class="text-gray">NIF/CIF:</span> <strong>${finca.nif_cif || 'N/D'}</strong></div>
@@ -3303,7 +3303,7 @@ const InformesView = {
       <h3 class="pdf-sec" style="color:#d97706;">${Icons.informeRega({ class: 'icon' })} Informe REGA</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Nombre Explotación</td><td class="pdf-kv">${finca.nombre || 'N/D'}</td></tr>
-        <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv" style="color:var(--p-gold); font-weight:bold;">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">CEA</td><td class="pdf-kv">${finca.codigo_CEA || finca.cea || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">Propietario</td><td class="pdf-kv">${finca.propietario || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">NIF/CIF</td><td class="pdf-kv">${finca.nif_cif || 'N/D'}</td></tr>
@@ -3487,7 +3487,7 @@ const InformesView = {
       <h3 class="pdf-sec" style="color:#d97706;">${Icons.finca({ class: 'icon' })} Ficha de Explotación</h3>
       <table class="pdf-tbl pdf-tbl-md mb-10">
         <tr><td class="pdf-kv pdf-b">Nombre</td><td class="pdf-kv">${finca.nombre || 'N/D'}</td></tr>
-        <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
+        <tr><td class="pdf-kv pdf-b">REGA</td><td class="pdf-kv" style="color:var(--p-gold); font-weight:bold;">${finca.codigo_REGA || finca.rega || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">Propietario</td><td class="pdf-kv">${finca.propietario || 'N/D'}</td></tr>
         <tr><td class="pdf-kv pdf-b">Municipio</td><td class="pdf-kv">${finca.municipio || ''}, ${finca.provincia || ''}</td></tr>
         <tr><td class="pdf-kv pdf-b">CCAA</td><td class="pdf-kv">${finca.comunidad_autonoma || finca.comunidad || 'N/D'}</td></tr>

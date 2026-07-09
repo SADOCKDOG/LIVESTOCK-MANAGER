@@ -3610,10 +3610,6 @@ body.glow-tarjetas-off .status-badge {
 
 
 /* Evitar que la primera tarjeta del dashboard se corte */
-.card--short se corte */
-.card--short {
-    max-height: 70vh;
-/* Evitar que la primera tarjeta del dashboard se corte */
 .card--short {
     max-height: 70vh;
     overflow-y: auto;

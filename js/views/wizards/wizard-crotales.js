@@ -222,7 +222,7 @@ window.WizardCrotales = {
           <div style="flex:1;">
             <h4 style="border-bottom:1px solid #ddd;padding-bottom:5px;margin-top:0;">DATOS DE LA EXPLOTACIÓN</h4>
             <p><strong>Nombre Finca:</strong> ${finca.nombre}<br>
-            <strong>Código REGA:</strong> ${finca.codigo_REGA || finca.rega || 'No especificado'}<br>
+            <strong>Código REGA:</strong> <span class="text-gold" style="color:var(--p-gold); font-weight:bold;">${finca.codigo_REGA || finca.rega || 'No especificado'}</span><br>
             <strong>Dirigido a (ADSG/OCA):</strong> ${data.adsg_nombre}</p>
           </div>
         </div>

@@ -431,7 +431,7 @@ const RebanosView = {
               <div class="flex-1 min-w-0 flex items-center gap-10">
                 <span style="color:${colorEsp}">${Icons.animales()}</span>
                 <div class="text-xs min-w-0">
-                  <div class="text-white font-900 uppercase" style="color:${colorEsp} !important;">${a.numero_identificacion || a.nombre || '#' + a.id}</div>
+                  <div class="text-gold font-900 uppercase" style="color:var(--p-gold) !important;">${a.numero_identificacion || a.nombre || '#' + a.id}</div>
                   <div class="text-gray-500 font-800 text-[0.6rem] uppercase mt-2">${a.raza || 'S/R'} · <span style="color:${colorEsp}; opacity:0.7;">${a.categoria || ''}</span></div>
                 </div>
               </div>
