@@ -133,7 +133,7 @@ const DashboardView = {
       ` : ''}
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <!-- Resumen General -->
-        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+        <div class="card card--short" style="grid-column: span 5; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
           <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: var(--text-s); text-shadow: none;">cab.</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
