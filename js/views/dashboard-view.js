@@ -132,29 +132,19 @@ const DashboardView = {
       </div>
       ` : ''}
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-      <!-- Resumen General -->
-      <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
-        <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
-        <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: var(--text-s); text-shadow: none;">cab.</span></div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
-          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
-          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">ACTIVOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalActivos || activos}</div></div>
-          <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">VENDIDOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-danger); color: var(--c-danger); background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalVendidos}</div></div>
+        <!-- Resumen General -->
+        <div class="card" style="grid-column: span 6; margin-bottom: 0; padding: 24px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${finca.nombre || 'RESUMEN GANADERO'}</h3>
+          <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px; color: var(--header-neon-color, var(--p-gold)); text-shadow: 0 0 15px rgba(255,255,255,0.15);">${totalCenso || animales.length} <span style="font-size: 0.4em; font-weight: 700; color: var(--text-s); text-shadow: none;">cab.</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">REBAÑOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${rebanos.length}</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">ACTIVOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204, 255, 0, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalActivos || activos}</div></div>
+            <div><div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">VENDIDOS</div><div style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-danger); color: var(--c-danger); background: rgba(255, 68, 68, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${totalVendidos}</div></div>
+          </div>
         </div>
-      </div> </div>
 
-      ${this._renderKPIsDiariosCard(kpisDiarios)}
-
-      <!-- Alertas -->
-      <div id="dash-alertas-container">
-        ${this._renderAlertasSanitarias(alertasSanitarias)}
-        ${this._renderAlertasTrazabilidad(alertasTrazabilidad)}
-        ${this._renderAlertasAdministrativas(alertasAdministrativas)}
-      </div>
-
-      <!-- Balance Económico -->
-      <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+        <!-- Balance Económico -->
+        <div class="card" style="grid-column: span 6; margin-bottom: 0; padding: 24px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
           <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> BALANCE ECONÓMICO</h3>
           <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
@@ -165,13 +155,21 @@ const DashboardView = {
         </div>
       </div>
 
+      ${this._renderKPIsDiariosCard(kpisDiarios)}
+
+      <!-- Alertas -->
+      <div id="dash-alertas-container">
+        ${this._renderAlertasSanitarias(alertasSanitarias)}
+        ${this._renderAlertasTrazabilidad(alertasTrazabilidad)}
+        ${this._renderAlertasAdministrativas(alertasAdministrativas)}
+      </div>
+
       ${this._renderIndicadoresLacteos(indicadoresLeche)}
 
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
-</h3>
           ${alertaEpoca.sugerencias?.length > 0 ? `
           <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
             ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}

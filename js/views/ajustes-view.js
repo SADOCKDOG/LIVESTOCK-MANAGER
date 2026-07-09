@@ -284,6 +284,12 @@ const AjustesView = {
     document.body.classList.toggle('glow-botones-off', !checked);
   },
 
+  async _toggleGlowTarjetas(checked) {
+    await this._saveConfig({ glowTarjetas: checked });
+    document.body.classList.toggle('glow-tarjetas-off', !checked);
+    App.toast(checked ? 'Haces de luz de tarjetas activados' : 'Haces de luz de tarjetas desactivados');
+  },
+
   async _toggleContextos(checked) {
     await this._saveConfig({ mostrarContextos: checked });
     document.body.classList.toggle('hide-context', !checked);
@@ -416,12 +422,17 @@ const AjustesView = {
               <input type="checkbox" id="w-glow-botones" ${data.glowBotones !== false ? 'checked' : ''}>
               <span>BOTONES DINÁMICOS</span>
             </label>
+            <label class="wizard-check-label">
+              <input type="checkbox" id="w-glow-tarjetas" ${data.glowTarjetas !== false ? 'checked' : ''}>
+              <span>HACES DE LUZ EN TARJETAS</span>
+            </label>
           </div>
         `,
         onChange: (data) => {
           data.glowMarco = document.getElementById('w-glow-marco').checked;
           data.glowLaterales = document.getElementById('w-glow-laterales').checked;
           data.glowBotones = document.getElementById('w-glow-botones').checked;
+          data.glowTarjetas = document.getElementById('w-glow-tarjetas').checked;
         }
       },
       {
@@ -569,13 +580,25 @@ const AjustesView = {
       onComplete: async (finalData) => {
         await this._saveConfig(finalData);
         if (window.App && window.App.updateHeaderColor) window.App.updateHeaderColor();
+        
+        // Aplicar todas las combinaciones del wizard de forma inmediata
+        document.body.classList.toggle('glow-marco-off', finalData.glowMarco === false);
+        document.body.classList.toggle('glow-laterales-off', finalData.glowLaterales === false);
+        document.body.classList.toggle('glow-botones-off', finalData.glowBotones === false);
+        document.body.classList.toggle('glow-tarjetas-off', finalData.glowTarjetas === false);
+
         // Inyectar variables
         document.documentElement.style.setProperty('--haz-intensity', finalData.hazLuzIntensidad + '%');
         document.documentElement.style.setProperty('--haz-intensity-num', finalData.hazLuzIntensidad);
         if (finalData.hazLuzColor) document.documentElement.style.setProperty('--haz-luz-color', finalData.hazLuzColor);
         else document.documentElement.style.removeProperty('--haz-luz-color');
-        if (finalData.fabColor) document.documentElement.style.setProperty('--fab-neon-color', finalData.fabColor);
-        else document.documentElement.style.removeProperty('--fab-neon-color');
+        if (finalData.fabColor) {
+          document.documentElement.style.setProperty('--fab-user-color', finalData.fabColor);
+          document.documentElement.style.setProperty('--fab-neon-color', finalData.fabColor);
+        } else {
+          document.documentElement.style.removeProperty('--fab-user-color');
+          document.documentElement.style.removeProperty('--fab-neon-color');
+        }
         if (finalData.bannerOpacity !== undefined) document.documentElement.style.setProperty('--banner-opacity', finalData.bannerOpacity);
         App.toast("Configuración guardada", 'success');
         this.render();

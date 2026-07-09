@@ -151,6 +151,7 @@ const App = {
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
         if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
+        if (cfg?.value?.glowTarjetas === false) document.body.classList.add('glow-tarjetas-off');
 
         // Cargar intensidad y color de haz
         const hazInt = cfg?.value?.hazLuzIntensidad ?? 45;
@@ -166,8 +167,10 @@ const App = {
 
         const fColor = cfg?.value?.fabColor || '';
         if (fColor) {
+          document.documentElement.style.setProperty('--fab-user-color', fColor);
           document.documentElement.style.setProperty('--fab-neon-color', fColor);
         } else {
+          document.documentElement.style.removeProperty('--fab-user-color');
           document.documentElement.style.removeProperty('--fab-neon-color');
         }
 
@@ -951,6 +954,13 @@ const App = {
       const methodName = App.routes[path];
       if (methodName && typeof App[methodName] === "function") {
         await App[methodName](params);
+        
+        // Restablecer el scroll al inicio de la página en cada navegación
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (main) main.scrollTop = 0;
+
         // Animación de entrada entre rutas
         main.classList.add('route-enter');
         main.addEventListener('animationend', () => main.classList.remove('route-enter'), { once: true });
