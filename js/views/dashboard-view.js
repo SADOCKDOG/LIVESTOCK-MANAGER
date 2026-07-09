@@ -170,7 +170,7 @@ const DashboardView = {
 
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
-        <div class="card" style="grid-column: span 5; margin-bottom: 0; padding: 24px; text-align: center;">
+        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
           ${alertaEpoca.sugerencias?.length > 0 ? `
           <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
@@ -187,19 +187,19 @@ const DashboardView = {
         <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ACCESOS RÁPIDOS</h3>
           <div class="grid grid-cols-12 gap-8">
-            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px; grid-column: span 4;">
+            <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-danger" style="height: 60px; grid-column: span 6;">
               ${Icons.animales()}
               <span class="widget-link-label">Animales</span>
             </a>
-            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info" style="height: 60px; grid-column: span 3;">
+            <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info" style="height: 60px; grid-column: span 6;">
               ${Icons.rebanos()}
               <span class="widget-link-label">Rebaños</span>
             </a>
-            <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40; height: 60px; grid-column: span 3;">
+            <a href="#/${modoAuto}" class="widget-link-btn widget-link-btn--neon" style="--neon-color:${modoColor};--neon-glow:${modoColor}B0;--neon-inner:${modoColor}40; height: 60px; grid-column: span 6;">
               ${modoIcon}
               <span class="widget-link-label">${modoLabel}</span>
             </a>
-            <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success" style="height: 60px; grid-column: span 2;">
+            <a href="#/informes" class="widget-link-btn widget-link-btn--neon neon-success" style="height: 60px; grid-column: span 6;">
               ${Icons.tendencia()}
               <span class="widget-link-label">Informes</span>
             </a>
