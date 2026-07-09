@@ -422,7 +422,7 @@ const DocumentosView = {
     const doc = (this._cachedDocs || []).find(d => d.id === docId && d.tipo === tipo);
     if (!doc) { App.toastError('Documento no encontrado'); return; }
     
-    const colors = { dimoe: '#10b981', factura: '#4FADF5', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#d97706' };
+    const colors = { dimoe: '#10b981', factura: '#4FADF5', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#FFFC55' };
     const labels = { dimoe: 'DIMOE (Guía)', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido Crotales' };
     const color = colors[doc.tipo] || '#666';
     const label = labels[doc.tipo] || doc.tipo;
