@@ -174,21 +174,18 @@ const LecheView = {
     const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
 
     main.innerHTML = `
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-info); background:rgba(59,130,246,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${filteredData.entregas.length} total</span>
-        </div>
-        <div class="flex gap-6">${mesesHtml}</div>
-      </div>
 
       <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
       <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE LECHE
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color:var(--c-info); display:inline-flex; align-items:center;">${Icons.leche()}</span>
+          <div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+              <span style="color:var(--c-info); margin-right:4px;">|</span> Resumen de Leche
+            </h1>
+          </div>
         </div>
-        <div id="resumen-leche" class="space-y-6 text-white">
+        <div id="resumen-leche" class="space-y-6 text-white card p-12" style="background: rgba(255,255,255,0.01);">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.edificio()} Patrimonio Lechero</span>
             <strong class="text-xl font-950" style="color: var(--c-info);">${filteredData.animalesLeche.length} ${filteredData.animalesLeche.length === 1 ? "cabeza" : "cabezas"}</strong>
@@ -199,7 +196,7 @@ const LecheView = {
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Facturación Leche</span>
-            <strong class="text-xl font-950 text-blue">$${filteredData.importeTotal.toLocaleString()}</strong>
+            <strong class="text-xl font-950 text-blue">${filteredData.importeTotal.toLocaleString()} €</strong>
           </div>
         </div>
       </div>
@@ -212,11 +209,11 @@ const LecheView = {
         <div class="relative flex-1 min-w-0">
           <input type="search" id="search-leche" placeholder="Buscar por matricula, fecha o concepto..."
                  oninput="LecheView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="leche-filtro-tipo" class="form-select-info"
+        <select id="leche-filtro-tipo" class="form-select"
                 onchange="LecheView._setFiltro('tipo', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
+                style="width:120px; min-width:110px; flex-shrink:0; padding:12px; min-height:44px;">
           <option value="">Todos los tipos</option>
           <option value="entrega" ${this._filtroActivo.tipo === 'entrega' ? 'selected' : ''}>Entregas</option>
           <option value="control" ${this._filtroActivo.tipo === 'control' ? 'selected' : ''}>Controles Diarios</option>
@@ -421,11 +418,11 @@ const LecheView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card-registro report-section leche-report-card border-top-3px border-top-3px-orange" style="--registro-color: var(--c-orange);">
+      <div class="card report-section leche-report-card" style="border: 1px solid var(--c-orange);">
         <div class="leche-report-title">
-          <span class="leche-report-icon">${Icons.edificio()}</span>
+          <span class="leche-report-icon" style="color: var(--c-orange);">${Icons.edificio()}</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Patrimonio y Ganadería</div>
+            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-orange);">|</span> Patrimonio y Ganadería</div>
             <div class="leche-report-title-sub">Gestión de censo y rebaños lácteos</div>
           </div>
         </div>
@@ -474,11 +471,11 @@ const LecheView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card-registro" style="--registro-color: var(--c-success);">
+      <div class="card" style="border: 1px solid var(--c-success);">
         <div class="leche-report-title">
-          <span class="leche-report-icon">${Icons.transportistas()}</span>
+          <span class="leche-report-icon" style="color: var(--c-success);">${Icons.transportistas()}</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Logística y Transporte, Comercialización Ventas</div>
+            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-success);">|</span> Logística y Transporte, Comercialización Ventas</div>
             <div class="leche-report-title-sub">Logística, cisternas, compradores, contratos y ventas</div>
           </div>
         </div>
@@ -513,11 +510,11 @@ const LecheView = {
   _renderLegislacion(content, d) {
     const html = `
       ${this._inyectarAlertaSupresion(d)}
-      <div class="card-registro" style="--registro-color: var(--c-purple);">
+      <div class="card" style="border: 1px solid var(--c-purple);">
         <div class="leche-report-title">
-          <span class="leche-report-icon">${Icons.documento()}</span>
+          <span class="leche-report-icon" style="color: var(--c-purple);">${Icons.documento()}</span>
           <div class="leche-report-title-text">
-            <div class="leche-report-title-main">Registros Legislación, Cumplimiento Sanitario</div>
+            <div class="leche-report-title-main" style="text-transform: uppercase; font-weight: 900;"><span style="color: var(--c-purple);">|</span> Registros Legislación, Cumplimiento Sanitario</div>
             <div class="leche-report-title-sub">Cuaderno de explotación, control oficial Letra Q y supresiones</div>
           </div>
         </div>
@@ -601,8 +598,8 @@ const LecheView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card-registro p-25" style="--registro-color: var(--c-orange); max-width:420px; ">
-              <h3 class="mt-0 text-gold">Editar Registro Lácteo</h3>
+          <div class="card p-25" style="border: 1px solid var(--c-orange); max-width:420px; ">
+              <h3 class="mt-0 uppercase font-900 text-white"><span style="color: var(--c-orange);">|</span> Editar Registro Lácteo</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -677,8 +674,8 @@ const LecheView = {
     overlay.style.alignItems = "center";
     overlay.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card-registro p-25" style="--registro-color: var(--c-orange); max-width:380px; ">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Lácteo</h3>
+      <div class="card p-25" style="border: 1px solid var(--c-orange); max-width:380px; ">
+        <h3 class="mt-0 text-white font-900 uppercase flex items-center gap-8"><span style="color: var(--c-orange);">|</span> Aplicar Tratamiento Lácteo</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño lechero a traiter:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosLeche.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
@@ -697,7 +694,8 @@ const LecheView = {
       await window.WizardTratamiento.registrar(rebId);
       setTimeout(() => LecheView.render(), 1000);
     };
-  }
+  },
+
 };
 
 window.LecheView = LecheView;

@@ -8,18 +8,19 @@ const App = {
   _animalGuardado: false,
   _pesadaBatch: null,
   _config: null,
+  _dirtyChecker: null,
 
   _getColorClass(color) {
     if (!color) return 'text-gray';
     const map = {
-      '#CCFF00': 'text-green',
-      '#FF4444': 'text-red',
-      '#3b82f6': 'text-blue',
-      '#FFD600': 'text-yellow',
-      '#F97316': 'text-orange',
-      '#A855F7': 'text-purple',
-      '#EC4899': 'text-pink',
-      '#94A3B8': 'text-gray',
+      '#C5FA50': 'text-green',
+      '#E8555F': 'text-red',
+      '#4FADF5': 'text-blue',
+      '#FFFC55': 'text-yellow',
+      '#E8555F': 'text-orange',
+      '#4FADF5': 'text-purple',
+      '#4FADF5': 'text-pink',
+      '#B1B1B1': 'text-gray',
       '#6b7280': 'text-gray',
       '#888': 'text-gray',
       'var(--c-danger)': 'text-red',
@@ -67,6 +68,10 @@ const App = {
     "/documentos": "renderDocumentos",
     "/manuales": "renderManuales",
     "/albaranes-ventas": "renderAlbaranesVentas",
+    "/silos": "renderSilos",
+    "/pesadas": "renderPesadas",
+    "/wizards": "renderWizards",
+    "/fitosanitario": "renderFitosanitarios",
   },
 
   async init() {
@@ -172,6 +177,7 @@ const App = {
 
         const bOpacity = cfg?.value?.bannerOpacity ?? 0.4;
         document.documentElement.style.setProperty('--banner-opacity', bOpacity);
+
       } catch (_) {}
       await App.route();
     } catch (error) {
@@ -181,6 +187,7 @@ const App = {
       ).innerHTML = `<div class="card error-card"><h2>Error</h2><p>${error.message}</p></div>`;
     }
   },
+
 
   _injectGlobalStyles() {
     const pStyles = document.createElement("style");
@@ -581,10 +588,40 @@ const App = {
     }
 
     return `
-      <${tag} ${href} ${onClick} class="${className}" style="display:flex; gap:10px; align-items:stretch; cursor:pointer; --registro-color: ${color}; border-top:0; border-right:0; border-bottom:0; border-left:4px solid var(--registro-color); ${customStyle}">
+      <${tag} ${href} ${onClick} class="${className}" style="display:flex; gap:10px; align-items:stretch; cursor:pointer; --registro-color: ${color}; border-top:0; border-right:0; border-bottom:0; ${customStyle}">
         <!-- BLOQUE IZQUIERDO -->
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           ${leftColumnContent}
+        </div>
+        <!-- POSTE DE CERCA (reemplaza borde izquierdo simple) -->
+        <div class="fence-post" style="
+          width: 4px;
+          flex-shrink: 0;
+          background: linear-gradient(
+            to bottom,
+            var(--registro-color) 0%,
+            color-mix(in srgb, var(--registro-color) 80%, black) 50%,
+            var(--registro-color) 100%
+          );
+          border-radius: 2px;
+          position: relative;
+          overflow: hidden;
+        ">
+          <div class="fence-post-texture" style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 2px,
+              rgba(255,255,255,0.1) 2px,
+              rgba(255,255,255,0.1) 4px
+            );
+            opacity: 0.3;
+          "></div>
         </div>
         <!-- BLOQUE DERECHO -->
         <div class="flex flex-col items-end justify-between flex-shrink-0">
@@ -1209,6 +1246,132 @@ const App = {
     }
   },
 
+  async _abrirSubmenuRegistros(options = {}) {
+    const html = `
+    <div class="bottom-sheet-overlay animate-fade-in" id="submenu-registros-overlay" onclick="App._cerrarSubmenuRegistros()" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:11000; display:flex; align-items:flex-end; justify-content:center;">
+      <div class="bottom-sheet-content animate-slide-up" onclick="event.stopPropagation()" style="background:#0C0C0C; border-top:2px solid var(--c-success); border-top-left-radius:24px; border-top-right-radius:24px; width:100%; max-width:500px; padding:24px; box-shadow: 0 -10px 40px rgba(204,255,0,0.15); max-height:85vh; overflow-y:auto; box-sizing:border-box;">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-20 pb-10" style="border-bottom:1px solid #222;">
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif; display:flex; align-items:center; gap:8px;">
+              ${Icons.rotacion()} REGISTRO RÁPIDO
+            </h3>
+            <p class="text-[0.6rem] font-bold text-gray uppercase mt-2 mb-0">Seleccione la operación que desea registrar</p>
+          </div>
+          <button onclick="App._cerrarSubmenuRegistros()" class="widget-link-btn widget-link-btn--neon neon-danger p-6 min-h-0 h-auto" style="border:none; background:transparent;">
+            ${Icons.cerrar()}
+          </button>
+        </div>
+
+        <!-- Grid de Accesos Directos -->
+        <div class="grid grid-cols-2 gap-12 mb-20">
+          
+          <!-- Ordeño / Leche -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer;" onclick="App._cerrarSubmenuRegistros(); App._abrirAsistenteProduccion('leche', { origen_modulo: 'submenu' });">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#0C0C0C; color:var(--c-info); border:1px solid #222;">
+              ${Icons.leche()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">CONTROL LECHERO</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Ordeños y pesas lactación</p>
+          </div>
+
+          <!-- Pesaje / Peso -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer;" onclick="App._cerrarSubmenuRegistros(); App._abrirAsistenteProduccion('carne', { origen_modulo: 'submenu' });">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#0C0C0C; color:var(--c-danger); border:1px solid #222;">
+              ${Icons.carne()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">PESAJE GANADO</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Registrar peso individual o lote</p>
+          </div>
+
+          <!-- Sanidad / Tratamiento -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer;" onclick="App._cerrarSubmenuRegistros(); App._abrirTratamientoSanitarioDirecto();">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#0C0C0C; color:var(--p-gold); border:1px solid #222;">
+              ${Icons.sanidad()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">TRATAMIENTO</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Veterinario y supresión</p>
+          </div>
+
+          <!-- Gasto Analítico -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer;" onclick="App._cerrarSubmenuRegistros(); App._abrirFormularioGasto({ origenModulo: 'submenu' });">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#0C0C0C; color:var(--c-success); border:1px solid #222;">
+              ${Icons.dinero()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">GASTO ANALÍTICO</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Imputar coste o factura</p>
+          </div>
+
+          <!-- Alta de Animal -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer;" onclick="App._cerrarSubmenuRegistros(); App._abrirAltaAnimalDirecto();">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#0C0C0C; color:var(--c-purple); border:1px solid #222;">
+              ${Icons.animales()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">ALTA ANIMAL</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Dar de alta crotal / chip</p>
+          </div>
+
+          <!-- Silo / Entrada Alimento -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer;" onclick="App._cerrarSubmenuRegistros(); App._abrirEntradaAlimentoSiloDirecto();">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#0C0C0C; color:#4FADF5; border:1px solid #222;">
+              ${Icons.fitosanitario()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">SILOS & ALIMENTO</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Carga o consumo de pienso</p>
+          </div>
+
+          <!-- Venta Masiva / Matadero -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer; grid-column: span 2;" onclick="App._cerrarSubmenuRegistros(); App._abrirWizardVentaMasiva();">
+            <div class="flex items-center gap-10">
+              <div class="flex items-center justify-center rounded-sm" style="width:36px; height:36px; background:#0C0C0C; color:var(--c-warning); border:1px solid #222; flex-shrink:0;">
+                ${Icons.libroVentas()}
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">VENTA MASIVA / MATADERO</h4>
+                <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Salida comercial o carga para matadero</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    `;
+
+    App._cerrarSubmenuRegistros();
+
+    const overlayEl = document.createElement('div');
+    overlayEl.innerHTML = html;
+    document.body.appendChild(overlayEl.firstElementChild);
+  },
+
+  _cerrarSubmenuRegistros() {
+    const el = document.getElementById('submenu-registros-overlay');
+    if (el) el.remove();
+  },
+
+  async _abrirTratamientoSanitarioDirecto() {
+    if (window.WizardTratamiento && typeof window.WizardTratamiento.abrir === 'function') {
+      await window.WizardTratamiento.abrir();
+    } else {
+      App.toastError("Wizard de Tratamiento no disponible");
+    }
+  },
+
+  async _abrirAltaAnimalDirecto() {
+    location.hash = '#/animales';
+    setTimeout(() => {
+      if (window.AnimalesView && typeof window.AnimalesView.renderFormulario === 'function') {
+        window.AnimalesView.renderFormulario();
+      }
+    }, 200);
+  },
+
+  async _abrirEntradaAlimentoSiloDirecto() {
+    location.hash = '#/silos';
+  },
+
   // ==========================================
   // HISTORIAL REPRODUCTIVO Y REFERENCIA
   // ==========================================
@@ -1369,7 +1532,7 @@ const App = {
         const cancelBtn = document.createElement('button');
         cancelBtn.id = 'scanner-cancel-btn';
         cancelBtn.textContent = '✕ Cancelar Escaneo';
-        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#f97316; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
+        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#E8555F; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
 
         const cleanupScanner = async () => {
           document.body.classList.remove('scanner-active');
@@ -1661,8 +1824,8 @@ const App = {
     if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
     const ok = tipo === 'ok';
     el.style.background = ok ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
-    el.style.color = ok ? '#CCFF00' : '#f97316';
-    el.style.border = `1px solid ${ok ? '#CCFF00' : '#f97316'}`;
+    el.style.color = ok ? '#C5FA50' : '#E8555F';
+    el.style.border = `1px solid ${ok ? '#C5FA50' : '#E8555F'}`;
     el.innerHTML = `<div class="flex items-center gap-8 font-900 uppercase text-[0.65rem] tracking-wider">${ok ? Icons.check() : Icons.alerta()} ${msg}</div>`;
     el.style.display = 'block';
   },
@@ -1699,12 +1862,12 @@ const App = {
           const sexo = row.querySelector('.cria-sexo')?.value || 'H';
           if (input) input.style.border = '';
           if (!crotal) {
-            if (input) { input.style.border = '2px solid #f97316'; input.focus(); }
+            if (input) { input.style.border = '2px solid #E8555F'; input.focus(); }
             this._reproMsg('Indica el crotal de todas las crías vivas', 'error');
             return;
           }
           if (window.ErrorHandler && !window.ErrorHandler.isCrotalValido(crotal)) {
-            if (input) { input.style.border = '2px solid #f97316'; input.focus(); }
+            if (input) { input.style.border = '2px solid #E8555F'; input.focus(); }
             this._reproMsg(`Crotal inválido: ${crotal}. Formato: ES + 12 dígitos (ej: ES123456789012)`, 'error');
             return;
           }
@@ -2095,6 +2258,38 @@ const App = {
       await ManualesView.render();
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Cargando manuales...</div>';
+    }
+  },
+
+  async renderSilos() {
+    if (window.SilosView) {
+      await SilosView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando gestión de silos...</div>';
+    }
+  },
+
+  async renderPesadas() {
+    if (window.PesadasView) {
+      await PesadasView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando histórico de pesajes...</div>';
+    }
+  },
+
+  async renderWizards() {
+    if (window.WizardsView) {
+      await WizardsView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando asistentes...</div>';
+    }
+  },
+
+  async renderFitosanitarios() {
+    if (window.FitosanitariosView) {
+      await FitosanitariosView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando registro fitosanitario...</div>';
     }
   },
 

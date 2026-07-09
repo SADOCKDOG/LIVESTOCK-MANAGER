@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Wizard Gasto Analítico — Livestock Manager Premium
  * Proporciona una interfaz unificada para imputación de costes.
  * v2.0.0: Diseño modular por pasos (Basic -> Imputación/Normativo)
@@ -153,14 +153,16 @@ window.GastoWizard = {
 
     window.WizardManager.create({
       id: 'wizard-nuevo-gasto',
-      title: 'GASTO ANALÍTICO',
+      title: options.id ? 'EDITAR GASTO ANALÍTICO' : 'GASTO ANALÍTICO',
       initialData: {
-        concepto: "",
-        monto: 0,
+        id: options.id || null,
+        fecha: options.fecha || new Date().toISOString().split("T")[0],
+        concepto: options.concepto || "",
+        monto: options.monto || 0,
         categoria: options.category || options.categoria || "Alimentacion",
         rebanoId: options.rebanoId || null,
         snap_zona: options.snap_zona || null,
-        proveedorId: null,
+        proveedorId: options.proveedorId || null,
         origenModulo: options.origenModulo || 'general',
         modoExplotacion: options.modoExplotacion || null,
         controlNormativo: options.controlNormativo || {},
@@ -173,12 +175,15 @@ window.GastoWizard = {
             concepto: data.concepto,
             monto: data.monto,
             categoria: data.categoria,
-            fecha: new Date().toISOString().split("T")[0],
+            fecha: data.fecha || new Date().toISOString().split("T")[0],
             fincaId: fincaId,
             proveedorId: data.proveedorId || null,
             origen_modulo: data.origenModulo || 'general',
             modo_explotacion: data.modoExplotacion || null
           };
+          if (data.id) {
+            gasto.id = data.id;
+          }
           if (data.categoria === "Alimentacion" || data.categoria === "Sanidad") {
             const r = rebanos.find((x) => x.id === data.rebanoId);
             if (r) {

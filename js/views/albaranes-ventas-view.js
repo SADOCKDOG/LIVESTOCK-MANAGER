@@ -74,7 +74,7 @@ const AlbaranesVentasView = {
       main.innerHTML = this._renderHTML(filteredData);
     } catch (e) {
       console.error('[AlbaranesVentasView] Error:', e);
-      main.innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red" style="border: 1px solid var(--c-danger); background: rgba(255, 68, 68, 0.05);">Error: ${e.message}</div>`;
     }
   },
 
@@ -115,14 +115,7 @@ const AlbaranesVentasView = {
   },
 
   _renderHTML(registros) {
-    const tipos = ['todos', 'leche', 'carne'];
-    const labels = {
-      todos: `${Icons.comercial()} Todos`,
-      leche: `${Icons.leche()} Leche`,
-      carne: `${Icons.carne()} Carne`
-    };
-
-    // Calcular estadísticas sumarias
+    const moduleColor = window.getModuleColor ? getModuleColor('/comercializacion') : '#C5FA50';
     const totalVentas = registros.length;
     const totalLeche = registros.filter(r => r.tipo === 'leche').reduce((acc, r) => acc + (r.importe || 0), 0);
     const totalCarne = registros.filter(r => r.tipo === 'carne').reduce((acc, r) => acc + (r.importe || 0), 0);
@@ -159,66 +152,79 @@ const AlbaranesVentasView = {
     }).join('');
 
     return `
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-info); background:rgba(59,130,246,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${registros.length} total</span>
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.comercial()}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> Comercialización
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            Albaranes, Ventas y Entregas
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución Mensual (Estandarizada como Card de Fondo OLED sin bordes de color) -->
+      <div class="card mb-14 p-12 card-resumen" style="background:rgba(204,255,0,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex justify-between items-center" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span><span style="color: ${moduleColor}; margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
+          <span class="text-xs text-gray font-bold lowercase" style="font-variant: normal;">(${registros.length} total)</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
 
-      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE ALBARANES Y VENTAS
+      <!-- Balance Consolidado (Estandarizado en Card de Fondo OLED sin bordes de color) -->
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(204,255,0,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span style="color: ${moduleColor}; margin-right:4px;">|</span> ${Icons.comercial()} RESUMEN DE ALBARANES Y VENTAS
         </div>
-        <div id="resumen-albaranes" class="space-y-6 text-white">
+        <div class="flex flex-col">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.documento()} Total Registros</span>
-            <strong class="text-xl font-950" style="color: var(--c-info);">${registros.length} ${registros.length === 1 ? "registro" : "registros"}</strong>
+            <strong class="text-xl font-950" style="color: ${moduleColor};">${registros.length}</strong>
           </div>
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Facturación Total</span>
             <strong class="text-xl font-950 text-green">${totalImporte.toLocaleString()} €</strong>
           </div>
-          <div class="py-8 flex justify-between items-center">
+          <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.leche()} Ventas Leche</span>
-            <strong class="text-xl font-950 text-amber">${totalLeche.toLocaleString()} €</strong>
+            <strong class="text-xl font-950" style="color: #4FADF5;">${totalLeche.toLocaleString()} €</strong>
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.carne()} Ventas Carne</span>
-            <strong class="text-xl font-950 text-gold">${totalCarne.toLocaleString()} €</strong>
+            <strong class="text-xl font-950 text-red">${totalCarne.toLocaleString()} €</strong>
           </div>
         </div>
       </div>
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
-        ${Icons.documento()} Historial de Albaranes y Ventas
+      <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
+        <span style="color: ${moduleColor};">|</span> ${Icons.documento()} Historial de Albaranes y Ventas
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
           <input type="search" id="albaran-search" placeholder="Buscar por comprador, número de albarán, concepto..."
                  oninput="AlbaranesVentasView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="albaran-filtro-tipo" class="form-select-info"
+        <select id="albaran-filtro-tipo" class="form-select"
                 onchange="AlbaranesVentasView._setFiltro('tipo', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
+                style="width:130px; min-width:110px; flex-shrink:0;">
           <option value="">Todos los tipos</option>
           <option value="leche" ${this._filtroActivo.tipo === 'leche' ? 'selected' : ''}>Entregas Leche</option>
           <option value="carne" ${this._filtroActivo.tipo === 'carne' ? 'selected' : ''}>Ventas Carne</option>
         </select>
       </div>
 
-      <!-- Tabs -->
+      <!-- Tabs de comercialización estandarizados -->
       <div class="mb-14">
         <div class="scroll-shadow-container scroll-tabs-row mb-10">
-          <div class="albaranes-tabs">
-            <button class="albaranes-tab ${this._currentTab === 'todos' ? 'active' : ''}" data-tab="todos" onclick="AlbaranesVentasView._cambiarTab('todos')">${Icons.comercial()} Todo</button>
-            <button class="albaranes-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="AlbaranesVentasView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-            <button class="albaranes-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="AlbaranesVentasView._cambiarTab('carne')">${Icons.carne()} Carne</button>
+          <div class="comer-tabs">
+            <button class="comer-tab ${this._currentTab === 'todos' ? 'active' : ''}" data-tab="todos" onclick="AlbaranesVentasView._cambiarTab('todos')">${Icons.comercial()} Todo</button>
+            <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="AlbaranesVentasView._cambiarTab('leche')">${Icons.leche()} Leche</button>
+            <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="AlbaranesVentasView._cambiarTab('carne')">${Icons.carne()} Carne</button>
           </div>
         </div>
       </div>
@@ -234,7 +240,7 @@ const AlbaranesVentasView = {
   },
 
   _renderLista() {
-    const filtrados = this._cambiarTab === 'todos'
+    const filtrados = this._currentTab === 'todos'
       ? this._cachedData
       : this._cachedData.filter(r => r.tipo === this._currentTab);
 
@@ -243,7 +249,7 @@ const AlbaranesVentasView = {
       return;
     }
 
-    const colors = { leche: 'var(--c-warning)', carne: 'var(--c-warning)' };
+    const colors = { leche: 'var(--c-info)', carne: 'var(--c-danger)' };
     const badgeColors = {
       borrador: 'var(--c-warning)',
       presentado: 'var(--c-success)',
@@ -253,47 +259,40 @@ const AlbaranesVentasView = {
 
     document.getElementById('albaranes-lista').innerHTML = `<div class="grid gap-10">
       ${filtrados.map(reg => {
-        const color = colors[reg.tipo] || '#666';
-        const badgeColor = badgeColors[reg.estado] || '#666';
+        const color = colors[reg.tipo] || 'var(--c-info)';
+        const badgeColor = badgeColors[reg.estado] || 'var(--c-info)';
         const fecha = this._fmtFecha(reg.fecha);
         const esBorrador = reg.estado === 'borrador';
 
-        return `
-          <div class="card-registro" style="--registro-color: ${color};">
-            <div class="flex justify-between items-start">
-              <div>
-                <div class="font-800 text-xs" style="color:${color}; display:flex; align-items:center; gap:6px;">
-                  ${reg.tipo === 'leche' ? Icons.leche() : Icons.carne()}
-                  ${reg.tipo.toUpperCase()}
-                  <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${badgeColor}; color: ${badgeColor};
-                      background: ${badgeColor === 'var(--c-warning)' ? 'rgba(255,215,0,0.1)' :
-                                badgeColor === 'var(--c-success)' ? 'rgba(204,255,0,0.1)' :
-                                badgeColor === 'var(--c-info)' ? 'rgba(204,255,0,0.1)' :
-                                badgeColor === 'var(--c-danger)' ? 'rgba(244,67,54,0.1)' :
-                                'rgba(204,255,0,0.1)'};
-                      padding: 6px 12px; border-radius: 8px; display: inline-block;">
-                      ${reg.estado.toUpperCase()}
-                  </span>
-                </div>
-                <div class="font-900 text-white text-base mt-4">${reg.titulo} (${reg.numero})</div>
-              </div>
-              <div class="text-xs text-ccc">${fecha}</div>
+        return App._cardRegistro({
+          title: reg.numero,
+          icon: reg.tipo === 'leche' ? Icons.leche() : Icons.carne(),
+          subtitle: `${reg.titulo} · ${reg.comprador}`,
+          color: color,
+          rightSide: `
+            <div class="text-right">
+              <span class="badge badge-sm uppercase" style="background:color-mix(in srgb, ${badgeColor} 8%, transparent); color:${badgeColor}; border:1px solid color-mix(in srgb, ${badgeColor} 21%, transparent);">
+                ${reg.estado}
+              </span>
             </div>
-            <div class="mt-8 grid grid-cols-2 gap-4 text-xs text-ccc">
-              <div>Comprador: <span class="text-white font-800">${reg.comprador}</span></div>
-              <div>Importe: <span class="text-green font-950">${(reg.importe || 0).toFixed(2)} €</span></div>
-              <div>Volumen: <span class="text-gold font-800">${(reg.cantidad || 0).toLocaleString()} ${reg.unidad}</span></div>
+          `,
+          content: `
+            <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase mt-4">
+              <div class="flex items-center gap-4">${Icons.calendario()} ${fecha}</div>
+              <div class="flex items-center gap-4">${Icons.paquete()} ${reg.cantidad.toLocaleString()} ${reg.unidad}</div>
+              <div class="flex items-center gap-4 text-green font-950">${reg.importe.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</div>
             </div>
-            <div class="mt-10 flex gap-6">
-              ${esBorrador ? `
-                <button class="btn btn-sm btn-outline text-xs" style="color:var(--c-warning); border-color:var(--c-warning);" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id})">${Icons.editar()} Editar Borrador</button>
-              ` : `
-                <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id})">${Icons.exportar()} Imprimir Albarán</button>
-              `}
-              <button class="btn btn-sm btn-outline text-xs" onclick="AlbaranesVentasView._verDetalle(${reg.id}, '${reg.tipo}')">${Icons.documento()} Ver Detalle</button>
-            </div>
-          </div>
-        `;
+          `,
+          footerLeft: esBorrador ? `
+            <button class="btn btn-sm btn-success text-xs mt-6" onclick="AlbaranesVentasView._editarBorrador('${reg.tipo}', ${reg.id}); event.stopPropagation();">${Icons.editar()} Editar</button>
+          ` : `
+            <button class="btn btn-sm btn-outline text-xs mt-6" onclick="AlbaranesVentasView._imprimirDoc('${reg.tipo}', ${reg.id}); event.stopPropagation();">${Icons.exportar()} Imprimir</button>
+          `,
+          footerRight: `
+            <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>
+          `,
+          onClick: `AlbaranesVentasView._verDetalle(${reg.id}, '${reg.tipo}')`
+        });
       }).join('')}
     </div>`;
   },
@@ -323,8 +322,8 @@ const AlbaranesVentasView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-info);">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.agregar()} Nuevo Albarán o Venta</h3>
+      <div class="card p-25" style="max-width:380px; width:100%; border: 1px solid var(--c-info); background: #1e1e1e;">
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.agregar()} Nuevo Albarán o Venta</h3>
         <label class="wizard-label mb-10">Selecciona el tipo de documento a generar:</label>
         <div class="wizard-input-group">
           <select id="av-tipo-doc" class="wizard-input wizard-select mb-15">
@@ -416,10 +415,10 @@ const AlbaranesVentasView = {
       }
 
       overlay.innerHTML = `
-        <div class="card-registro" style="--registro-color: var(--c-info); max-width:550px;width:100%;padding:24px;">
+        <div class="card" style="border: 1px solid var(--c-info); background: #1e1e1e; max-width:550px;width:100%;padding:24px;">
           <div class="flex justify-between items-center mb-14">
             <div>
-              <div class="font-800 text-sm" style="color:${color};">${tipo === 'leche' ? 'ENTREGA DE LECHE' : 'VENTA DE ANIMALES'}</div>
+              <div class="font-800 text-sm" style="color:${color};"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${tipo === 'leche' ? 'ENTREGA DE LECHE' : 'VENTA DE ANIMALES'}</div>
               <div class="font-900 text-white text-lg">${reg.numero_albaran || reg.numero_infolac || `Registro #${reg.id}`}</div>
             </div>
             <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;">${Icons.cerrar()}</button>

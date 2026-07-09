@@ -45,10 +45,16 @@ const GanaderiaView = {
     if (window.App && App.updateHeaderColor) App.updateHeaderColor(this._activeMode);
 
     main.innerHTML = `
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-success); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> MÓDULOS
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:var(--c-success); display:inline-flex; align-items:center;">${Icons.rebanos()}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:var(--c-success); margin-right:4px;">|</span> Módulos Ganaderos
+          </h1>
         </div>
+      </div>
+      <div class="mb-14">
         <div class="grid grid-cols-3 gap-10">
           <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-orange">
             ${Icons.animales()}
@@ -65,10 +71,16 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> EXPLOTACIÓN
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${meta.color}; display:inline-flex; align-items:center;">${meta.icon}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${meta.color}; margin-right:4px;">|</span> Explotación Ganadera
+          </h1>
         </div>
+      </div>
+      <div class="mb-14">
         <div class="ganaderia-mode-switch" style="max-width: 100%;">
           <button class="ganaderia-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: var(--mode-color);" onclick="GanaderiaView._changeMode('carne')">${Icons.carne()} Cárnico</button>
           <button class="ganaderia-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info); color: var(--mode-color);" onclick="GanaderiaView._changeMode('leche')">${Icons.leche()} Lácteo</button>
@@ -76,8 +88,8 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="card-registro mb-14 border-bottom-222 pb-10" style="--registro-color: ${meta.color};">
-        <div class="text-xs text-grey font-black uppercase tracking-wider mb-6 flex items-center gap-6">
+      <div class="card mb-14 p-12" style="background: rgba(255,255,255,0.015); border:1px solid rgba(255,255,255,0.03);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
           ${meta.icon} BALANCE DE RENDIMIENTO GANADERO (${meta.label})
         </div>
         <div class="flex flex-col">
@@ -96,9 +108,7 @@ const GanaderiaView = {
         </div>
       </div>
 
-
-
-      <div class="card-registro p-14 mb-14 border-222" style="--registro-color: ${meta.color};">
+      <div class="card p-14 mb-14 border-222" style="background: rgba(255,255,255,0.01);">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Rebaños del modo ${meta.label}
         </div>
@@ -107,7 +117,7 @@ const GanaderiaView = {
     ? rebanosModo.slice(0, 8).map(r => App._cardRegistro({
         title: r.nombre || 'Rebaño',
         subtitle: `Tipo: ${r.tipo || 'N/D'}`,
-        footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>`,
+        footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha ➔</span>`,
         color: meta.color,
         href: `#/rebano?id=${r.id}`
     })).join('')
@@ -116,7 +126,7 @@ const GanaderiaView = {
         </div>
       </div>
 
-      <div class="card-registro p-14 border-222" style="--registro-color: ${meta.color};">
+      <div class="card p-14 border-222" style="background: rgba(255,255,255,0.01);">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
           ${Icons.documento()} Censo reciente (${animalesModo.length} total · ${especies.size} ${especies.size === 1 ? "especie" : "especies"})
         </div>
@@ -139,7 +149,7 @@ const GanaderiaView = {
       </div>
 
       <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="App._abrirAsistenteProduccion(null, { origen_modulo: 'ganaderia', modo_explotacion: this._activeMode })">
+      <div class="fab-container" onclick="App._abrirSubmenuRegistros({ origen_modulo: 'ganaderia' })">
         <span class="fab-label">Nuevo Registro</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>

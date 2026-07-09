@@ -1,4 +1,4 @@
-﻿/**
+/**
  * TrazabilidadView - Livestock Manager Premium v4.0
  * Panel de Trazabilidad 360°: Timeline completo del ciclo de vida de un animal.
  */
@@ -281,15 +281,15 @@ const TrazabilidadView = {
 
         <!-- KPIs rápidos -->
         <div class="traz-stats-grid">
-          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-success);"><div class="kpi-value text-green text-xl">${totalPesajes}</div><div class="kpi-label text-60">PESAJES</div></div>
-          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-info);"><div class="kpi-value text-blue text-xl">${totalSanitarios}</div><div class="kpi-label text-60">TRATAMIENTOS</div></div>
-          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-purple);"><div class="kpi-value text-violet text-xl">${totalReproduccion}</div><div class="kpi-label text-60">REPRODUCCIÓN</div></div>
-          <div class="card-registro p-10 text-center mb-0" style="--registro-color: var(--c-warning);"><div class="kpi-value text-amber text-xl">${totalEventos}</div><div class="kpi-label text-60">EVENTOS</div></div>
+          <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><div class="kpi-value text-xl font-950" style="color: var(--c-success);">${totalPesajes}</div><div class="kpi-label text-60 uppercase text-gray" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">PESAJES</div></div>
+          <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><div class="kpi-value text-xl font-950" style="color: var(--c-info);">${totalSanitarios}</div><div class="kpi-label text-60 uppercase text-gray" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">TRATAMIENTOS</div></div>
+          <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><div class="kpi-value text-xl font-950" style="color: var(--c-purple);">${totalReproduccion}</div><div class="kpi-label text-60 uppercase text-gray" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">REPRODUCCIÓN</div></div>
+          <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><div class="kpi-value text-xl font-950" style="color: var(--c-warning);">${totalEventos}</div><div class="kpi-label text-60 uppercase text-gray" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">EVENTOS</div></div>
         </div>
 
         <!-- Timeline -->
         <div class="mt-16">
-          <h3 class="text-white mb-15">${Icons.calendar()} Línea de Vida</h3>
+          <h3 class="text-white mb-15 font-900 uppercase tracking-wider"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.calendar()} Línea de Vida</h3>
           ${timeline.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.buscar()}</div><p class="empty-state-text">No hay datos de trazabilidad para este animal.</p></div>` : ''}
           <div id="trazabilidad-timeline" class="relative">
             <div class="traz-timeline-line"></div>
@@ -345,10 +345,10 @@ const TrazabilidadView = {
       const renderItemHtml = (item) => {
         const colors = {
           nacimiento: { bg: '#065f46', border: '#10b981', dot: '#10b981' },
-          sanitario: { bg: '#1e3a5f', border: '#3b82f6', dot: '#3b82f6' },
+          sanitario: { bg: '#1e3a5f', border: '#4FADF5', dot: '#4FADF5' },
           reproduccion: { bg: '#3b1f6e', border: '#a78bfa', dot: '#a78bfa' },
           pesaje: { bg: '#5c3d0e', border: '#f59e0b', dot: '#f59e0b' },
-          evento: { bg: '#4a1942', border: '#ec4899', dot: '#ec4899' },
+          evento: { bg: '#4a1942', border: '#4FADF5', dot: '#4FADF5' },
           venta: { bg: '#4a0e0e', border: '#ef4444', dot: '#ef4444' },
         };
         const c = colors[item.tipo] || { bg: '#1a1a1a', border: '#555', dot: '#555' };

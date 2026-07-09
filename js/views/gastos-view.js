@@ -65,18 +65,18 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
+      <div class="card mb-14 p-12 card-resumen" style="background:rgba(168,85,247,0.015); width:100%;">
         <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">Evolución Mensual (últimos 6 meses)</span>
+          <span class="text-xs text-gray font-bold uppercase"><span style="color: var(--c-purple); margin-right:4px;">|</span> Evolución Mensual (últimos 6 meses)</span>
           <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
 
       <!-- Balance Consolidado de Gastos por Categoría -->
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d" style="--registro-color: var(--c-purple); background: rgba(255,68,68, 0.015);">
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(168,85,247,0.015); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-          ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
+          <span style="color: var(--c-purple); margin-right:4px;">|</span> ${Icons.dinero()} BALANCE GLOBAL DE GASTOS
         </div>
         <div class="flex flex-col">
           ${this._CATEGORIAS.filter(c => c.key !== 'todos').map(c => {
@@ -168,19 +168,18 @@ const GastosView = {
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro" style="--registro-color: ${color};">
+      <div class="card">
         <div class="flex items-center gap-12 mb-12">
-          <span class="text-3xl">${icon}</span>
-          <div>
-            <div class="text-white font-900 text-lg">${title}</div>
-            ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
+          <div class="text-white font-900 uppercase text-lg tracking-wider">
+            <span style="color: ${color}; margin-right: 6px;">|</span> ${title.toUpperCase()}
           </div>
         </div>
+        ${subtitle ? `<div class="text-gray mb-12" style="font-size:0.68rem; margin-top: -6px; padding-left: 14px;">${subtitle}</div>` : ''}
         ${kpis ? `
         <!-- KPIs Gastos Unificados en Filas -->
         <div class="card p-12 mb-14 border-222 card-total-3d" style=" background: rgba(255, 255, 255, 0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">
-            ${Icons.dinero()} BALANCE DE GASTOS
+            <span style="color: ${color}; margin-right:4px;">|</span> ${Icons.dinero()} BALANCE DE GASTOS
           </div>
           <div class="flex flex-col">
             ${kpis.map((k, index) => `
@@ -192,7 +191,7 @@ const GastosView = {
           </div>
         </div>
         ` : ''}
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-12 pb-5" style="padding-left: 14px;">
           ${Icons.documento()} ${listName}
         </div>
         ${recordsHtml}

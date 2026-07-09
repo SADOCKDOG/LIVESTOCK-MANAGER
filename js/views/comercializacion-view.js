@@ -147,9 +147,9 @@ const ComercializacionView = {
     const meta = this._getTabMeta(tab);
 
     return `
-      <div class="card-registro p-12 mb-14 border-222 card-total-3d card-resumen" style="--registro-color: ${meta.color}; width:100%;">
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-          <span class="flex items-center gap-6">${meta.icon} Balance ${meta.label}</span>
+          <span class="flex items-center gap-6"><span style="color: ${meta.color}; margin-right: 4px;">|</span> ${meta.icon} Balance ${meta.label}</span>
           <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
         </div>
         <div class="resumen-body flex flex-col">
@@ -197,9 +197,9 @@ const ComercializacionView = {
       : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro p-14 border-222" style="--registro-color: ${color};">
+      <div class="card p-14 border-222" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
-          ${Icons.documento()} ${listName}
+          <span style="color: ${color}; margin-right: 4px;">|</span> ${Icons.documento()} ${listName}
         </div>
         <div class="grid gap-10">
           ${recordsHtml}
@@ -257,17 +257,17 @@ const ComercializacionView = {
       : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} Sin gastos registrados.</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro p-14 border-222" style="--registro-color: var(--c-purple);">
+      <div class="card p-14 border-222" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
-          ${Icons.gastos()} Lista de Gastos (solo lectura)
+          <span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.gastos()} Lista de Gastos (solo lectura)
         </div>
         <div class="grid gap-10">
           ${recordsHtml}
         </div>
       </div>
-      <div class="card-registro p-14 mb-14 border-222" style="--registro-color: var(--c-info);">
+      <div class="card p-14 mb-14 border-222" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-white font-900 uppercase tracking-wider mb-6 flex items-center gap-6">
-          ${Icons.info()} Gestión de Gastos
+          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} Gestión de Gastos
         </div>
         <p class="text-xs text-gray mb-10">
           Los gastos se registran en el módulo de <strong class="text-white">Explotación</strong>. La vista analítica completa está en <strong class="text-white">Gastos</strong>.

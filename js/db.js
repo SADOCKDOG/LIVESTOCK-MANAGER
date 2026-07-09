@@ -198,6 +198,17 @@ class InMemoryMockDB {
 async function initDB() {
     console.log('[DB] Ejecutando initDB...');
 
+    // Sandbox guard para IndexedDB: Verificar disponibilidad real antes de llamar a librerías
+    try {
+        if (typeof indexedDB === 'undefined' || !indexedDB) {
+            console.warn("[DB] indexedDB no está definido o está bloqueado. Usando base de datos en memoria (InMemoryMockDB).");
+            return new InMemoryMockDB();
+        }
+    } catch (e) {
+        console.warn("[DB] Error de seguridad síncrono al consultar indexedDB. Usando base de datos en memoria (InMemoryMockDB). Detalle:", e.message);
+        return new InMemoryMockDB();
+    }
+
     if (!self.idb || !self.idb.openDB) {
         console.error("[DB] self.idb no detectado!");
         throw new Error('Librería de base de datos no encontrada (idb-local.js)');

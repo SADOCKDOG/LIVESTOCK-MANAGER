@@ -7,41 +7,49 @@
 
 :root {
     /* ── MARCA ── */
-    --p-cork: #CF0;        /* Neon Lime */
-    --p-cork-dark: #AC0;
-    --p-gold: #FFD600;        /* Amarillo Neón */
-    --p-gold-dark: #B89900;
+    --p-cork: #8B7355;        /* Tierra seca - marrón polvoriento de corrales */
+    --p-cork-dark: #6D5B42;
+    --p-gold: #FF8C42;        /* Cielo atardecer - naranja suave (reemplaza amarillo oro) */
+    --p-gold-dark: #CC7033;
 
-    /* ── BASE OLED (Grafito neutro frío — mejor contraste de datos neón) ── */
-    --bg: #141517;            /* Graphite */
-    --surface: #1E2023;       /* Deep Graphite */
-    --surface-light: #262A2E; /* Elevación */
-    --surface-input: #16181A;
-    --border: #2C2F33;        /* Border Graphite */
-    --border-input: #2C2F33;
+    /* ── BASE OLED (Dark Pro — contraste de datos neón) ── */
+    --bg: #0C0C0C;            /* Graphite Ultra Dark */
+    --surface: #1E1E1E;       /* Tarjetas Dark Pro */
+    --surface-light: #2A2A2A; /* Elevación / Sub-superficies */
+    --surface-input: #121212;
+    --border: #27272A;        /* Borde sutil */
+    --border-input: #27272A;
 
     /* ── FAMILIAS TIPOGRÁFICAS (identidad) ──
-       body Inter · títulos Archivo Expanded · datos/identificadores IBM Plex Mono */
-    --font-body:    'Inter', system-ui, -apple-system, sans-serif;
-    --font-display: 'Archivo Expanded', 'Archivo', 'Inter', sans-serif;
+       body IBM Plex Sans Condensed · títulos Cormorant Garamond · datos/identificadores IBM Plex Mono */
+    --font-body:    'IBM Plex Sans Condensed', system-ui, -apple-system, sans-serif;
+    --font-display: 'Cormorant Garamond', 'Cormorant Garamond', 'Archivo', 'Inter', sans-serif;
     --font-mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', 'Fira Code', monospace;
 
     /* ── TEXTO ── */
     --text-p: #FFF;        /* Pure White */
-    --text-s: #94A3B8;        /* Steel Grey */
+    --text-s: #B1B1B1;        /* Gris Acero (Numeros, texto y viñetas.jpg) */
     --text-d: #666;        /* Deshabilitado / placeholder */
 
-    /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
-    --c-success: #CF0;     /* Éxito / Zonas / Híbrido */
-    --c-warning: #FFD600;     /* Aviso / Alertas / Informes */
-    --c-danger:  #F44;     /* Peligro / Carne / Gastos */
-    --c-info:    #3b82f6;     /* Info / Leche / Listas */
-    --c-accent:  #8b5cf6;     /* legado: reproducción */
+    /* ── COLORES AMBIENTALISTAS (Rancho) ── */
+    --c-tierra: #8B7355;     /* Tierra seca - corrales y senderos */
+    --c-pasto: #6B8E23;      /* Pasto seco - pastizales */
+    --c-cielo: #FF8C42;      /* Cielo atardecer - altas horas */
+    --c-sangre: #8B0000;     /* Sangre de bodega - alertas críticas */
+    --c-papel: #F8F4E9;      /* Papel de campo - cuadernos y registros */
+    --c-sombra: #2D2D26;     /* Sombra de corral - profundidad y elevación */
 
-    /* ── COLORES DE MÓDULO (ampliación oficial 2026-07) ── */
-    --c-orange: #F97316;      /* Animales / Cuaderno Digital */
-    --c-purple: #A855F7;      /* Proveedores / Manuales / Documentos-Trámites */
-    --c-pink:   #EC4899;      /* Transportistas / Logística */
+    /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
+    --c-success: #C5FA50;     /* Éxito / Zonas / Híbrido (Manteniendo por compatibilidad) */
+    --c-warning: #FFFC55;     /* Aviso / Alertas / Informes (Manteniendo por compatibilidad) */
+    --c-danger:  #E8555F;     /* Peligro / Carne / Gastos (Manteniendo por compatibilidad) */
+    --c-info:    #4FADF5;     /* Info / Leche / Listas (Manteniendo por compatibilidad) */
+    --c-accent:  #7EEFEF;     /* Acento / Genética (Cyan Claro de apoyo) */
+
+    /* ── COLORES DE MÓDULO (Tricolor corporativo simplificado) ── */
+    --c-orange: #E8555F;      /* Animales / Cuaderno Digital (Rojo Coral) */
+    --c-purple: #4FADF5;      /* Proveedores / Manuales / Documentos-Trámites (Cyan) */
+    --c-pink:   #4FADF5;      /* Transportistas / Logística (Cyan) */
 
     /* ── TIPOGRAFÍA (escala semántica única) ── */
     --fs-display: 1.6rem;     /* KPI grande / cifra destacada */

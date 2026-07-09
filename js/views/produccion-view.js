@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Livestock Manager - ProduccionView v3.1.0
  * Vista de Producción con tabs — Cárnica y Láctea.
  * NOTA: Ventas y Gastos se gestionan desde Comercial (antes "Ventas Carne").
@@ -104,63 +104,64 @@ const ProduccionView = {
     const recordsHtml = records.length > 0
       ? records.map(r => {
         const borderCls = r.typeColor || color;
-        return `
-        <div class="card-registro" onclick="${r.onclick || ''}" style="--registro-color: ${borderCls};">
-          <div class="flex justify-between items-start">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-8">
-                <span class="text-xl" style="color:${borderCls}">${icon}</span>
-                <h3 class="section-h3 m-0 text-ellipsis font-900 uppercase">${r.title}</h3>
-              </div>
-              <div class="flex flex-wrap gap-x-12 gap-y-4 mt-6 text-[0.65rem] text-gray uppercase font-800 tracking-tight">
-                <span class="flex items-center gap-4">${Icons.calendar()} ${r.date}</span>
-                ${r.zone ? `<span class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</span>` : ''}
-                ${r.meta ? `<span class="flex items-center gap-4">${Icons.documento()} ${r.meta}</span>` : ''}
-              </div>
-            </div>
-            <div class="text-right flex-shrink-0 ml-8">
-              <span class="badge badge-sm font-950 tracking-tighter" style="background:${borderCls}20;color:${borderCls};border:1px solid ${borderCls}40;display:block;margin-bottom:6px; font-size: 0.9rem;">${r.value}</span>
-              <span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">${Icons.documento()} Ficha</span>
-            </div>
-          </div>
-        </div>`;
+        return App._cardRegistro({
+          color: borderCls,
+          onClick: r.onclick,
+          icon: icon,
+          title: r.title,
+          metadata: `
+            <span class="flex items-center gap-4">${Icons.calendar()} ${r.date}</span>
+            ${r.zone ? `<span class="flex items-center gap-4">${Icons.zonas()} ${r.zone}</span>` : ''}
+            ${r.meta ? `<span class="flex items-center gap-4">${Icons.documento()} ${r.meta}</span>` : ''}
+          `,
+          badge: r.value,
+          footerRight: `
+            <span style="color:var(--c-warning); font-weight:800; font-size:0.7rem; text-transform:uppercase; white-space:nowrap;">
+              FICHA ${Icons.flechaDerecha()}
+            </span>
+          `
+        });
       }).join('')
       : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} ${emptyMsg}</span></div>`;
 
     content.innerHTML = `
-      <div class="card-registro report-section p-16 mb-14" style="--registro-color: var(--c-success);">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl">${icon}</span>
-            <div>
-              <div class="text-white font-900 text-lg">${title}</div>
-              ${subtitle ? `<div class="text-gray" style="font-size:0.68rem;">${subtitle}</div>` : ''}
-            </div>
-          </div>
-        </div>
-
-        ${kpis ? `
-        <div class="flex flex-wrap gap-4 mb-14">
-          ${kpis.map((k, idx) => {
-            const badgesCls = ['badge-gold', 'badge-blue', 'badge-green', 'badge-purple', 'badge-red'];
-            const cls = badgesCls[idx % badgesCls.length];
-            return `<span class="badge badge-sm ${cls}">${k.label}: ${k.value}</span>`;
-          }).join('')}
-        </div>` : ''}
-
-        <div class="card-registro" style="--registro-color: var(--c-white);">
-          <div class="text-xs text-gray uppercase font-extrabold tracking-wider mb-4">
-            ${Icons.registros()} ${listName}
-          </div>
-        </div>
-        <div class="grid gap-10">
-          ${recordsHtml}
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${color}; display:inline-flex; align-items:center;">${icon}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${color}; margin-right:4px;">|</span> ${title}
+          </h1>
+          ${subtitle ? `<div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">${subtitle}</div>` : ''}
         </div>
       </div>
+
+      <!-- Resumen de datos registrados (colapsable/estático) -->
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.015);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+          <span class="flex items-center gap-6">${icon} Resumen de Métricas</span>
+        </div>
+        <div class="resumen-body flex flex-wrap gap-4 mt-6">
+          ${kpis ? kpis.map((k, idx) => {
+            const badgesCls = ['badge-gold', 'badge-blue', 'badge-green', 'badge-purple', 'badge-red'];
+            const cls = badgesCls[idx % badgesCls.length];
+            return `<span class="badge badge-sm ${cls}" style="font-size:0.7rem; padding:4px 10px; border-radius:8px; font-weight:900;">${k.label}: ${k.value}</span>`;
+          }).join('') : ''}
+        </div>
+      </div>
+
+      <!-- Listado de registros -->
+      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px; margin-top: 15px;">
+        ${Icons.documento()} ${listName}
+      </div>
+      <div class="grid gap-10 mb-20">
+        ${recordsHtml}
+      </div>
+
       <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="${registrarHandler}">
         <span class="fab-label">Nuevo Registro ${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
+        <button class="fab-btn" style="--fab-color: ${color};">${Icons.fabPlus()}</button>
       </div>`;
   },
 
@@ -285,8 +286,8 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
-              <h3 class="mt-0 text-gold">Editar Registro</h3>
+          <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-orange);">
+              <h3 class="mt-0 uppercase font-900 text-white"><span style="color: var(--c-orange);">|</span> Editar Registro</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -389,8 +390,8 @@ const ProduccionView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-        <div class="card-registro p-25" style="max-width:400px; ;; --registro-color: var(--c-gray);">
-          <h3 class="mt-0 text-gold text-md">Editar Gasto</h3>
+        <div class="card p-25" style="max-width:400px; border: 1px solid var(--c-orange);">
+          <h3 class="mt-0 uppercase font-900 text-white text-md"><span style="color: var(--c-orange);">|</span> Editar Gasto</h3>
 
           <div class="wizard-input-group mt-15">
             <label class="wizard-label">Concepto</label>

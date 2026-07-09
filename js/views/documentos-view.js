@@ -81,7 +81,7 @@ const DocumentosView = {
       this._setupFilters();
     } catch (e) {
       console.error('[Documentos] Error:', e);
-      main.innerHTML = `<div class="card-registro text-center p-40 text-red" style="--registro-color: var(--c-danger);">Error: ${e.message}</div>`;
+      main.innerHTML = `<div class="card text-center p-40 text-red" style="border: 1px solid var(--c-danger); background: rgba(255, 68, 68, 0.05);">Error: ${e.message}</div>`;
     }
   },
 
@@ -103,8 +103,8 @@ const DocumentosView = {
     const docsRecientes = docs.slice(0, 5);
 
     const bannerInterno = `
-      <div class="card-registro card-dark-gradient border-222 modo-interno-banner mb-14" style="--registro-color: var(--c-warning);"> 
-        <div class="section-header-theme" style="--theme-color: var(--c-warning);">${Icons.alerta()} MODO INTERNO SIGGAN</div>
+      <div class="card p-12 mb-14 card-resumen" style="background: rgba(255, 214, 0, 0.015); border-left: none;"> 
+        <div class="section-header-theme" style="--theme-color: var(--c-warning);"><span style="color: var(--c-warning); margin-right:4px;">|</span> ${Icons.alerta()} MODO INTERNO SIGGAN</div>
         <p class="text-xs text-aaa mt-6">
           Genera la documentación desde Livestock Manager y sube los ficheros a SIGGAN/BADIGEX de forma manual. Registra aquí el número de acuse o el justificante recibido para mantener la trazabilidad interna.
         </p>
@@ -112,8 +112,8 @@ const DocumentosView = {
 
     return `
       ${bannerInterno}
-      <div class="card-registro" style="--registro-color: var(--c-info); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} DOCUMENTOS</div>
+      <div class="card p-12 mb-14 border-222 card-resumen" style="background: rgba(168,85,247,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6"><span style="color: #4FADF5; margin-right:4px;">|</span> ${Icons.documento()} DOCUMENTOS</div>
         <div class="grid grid-cols-5 gap-4 mb-6">
           <div class="bg-dark rounded-lg p-6 text-center border border-222">
             <div class="text-[0.5rem] text-gray uppercase font-800 tracking-wider">TOTAL</div>
@@ -138,9 +138,9 @@ const DocumentosView = {
         </div>
       </div>
 
-      <div class="card-registro p-12 mb-14 border-222 card-dark-gradient border-top-theme pb-24" style="--theme-color: var(--p-gold); --registro-color: var(--p-gold);">
-        <div class="section-header-theme">ACCIONES</div>
-        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto">
+      <div class="card p-12 mb-14 border-222 card-dark-gradient card-resumen pb-24" style="background: rgba(168,85,247,0.015); width:100%;">
+        <div class="section-header-theme" style="--theme-color: #4FADF5; font-weight:900;"><span style="color: #4FADF5; margin-right:4px;">|</span> ACCESOS Y ACCIONES</div>
+        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto mt-10">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="DocumentosView._abrirAsistenteConsulta()">
             ${Icons.buscar()}
             <span class="widget-link-label">Consultar / Imprimir</span>
@@ -153,8 +153,8 @@ const DocumentosView = {
         <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
       </div>
 
-      <div class="card-registro" style="--registro-color: var(--c-info); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6">${Icons.documento()} ÚLTIMOS DOCUMENTOS</div>
+      <div class="card p-16" style="border: 1px solid var(--c-info); background: rgba(59, 130, 246, 0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} ÚLTIMOS DOCUMENTOS</div>
         <div id="docs-lista">${this._renderLista(docsRecientes, ventaMap)}</div>
         ${docs.length > 5 ? `<div class="text-center mt-6 pt-6 border-top-222"><span class="text-[0.6rem] text-gray font-900 uppercase tracking-wider">${docs.length - 5} documentos más · usa "Consultar / Imprimir" para ver todos</span></div>` : ''}
       </div>
@@ -272,8 +272,8 @@ const DocumentosView = {
         <h2 class="pesaje-titulo-h2">${Icons.buscar()} CONSULTAR / IMPRIMIR</h2>
       </div>
       <div class="wizard-content-scrollable">
-        <div class="card-registro p-16 mb-16 border-222 card-dark-gradient" style="--registro-color: var(--c-info);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 text-center">SELECCIONA TIPO DE DOCUMENTO</div>
+        <div class="card p-16 mb-16 border-222 card-dark-gradient" style="border: 1px solid var(--c-info); background: #1e1e1e;">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-8 text-center"><span style="color: var(--c-info); margin-right: 4px;">|</span> SELECCIONA TIPO DE DOCUMENTO</div>
           <div class="grid grid-cols-2 gap-8">
             ${[
               { id: 'dimoe', label: 'DIMOE (Guías)', icon: Icons.exportar(), color: 'var(--c-success)' },
@@ -422,7 +422,7 @@ const DocumentosView = {
     const doc = (this._cachedDocs || []).find(d => d.id === docId && d.tipo === tipo);
     if (!doc) { App.toastError('Documento no encontrado'); return; }
     
-    const colors = { dimoe: '#10b981', factura: '#3b82f6', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#d97706' };
+    const colors = { dimoe: '#10b981', factura: '#4FADF5', certificado: '#f59e0b', dib: '#8b5cf6', crotales: '#d97706' };
     const labels = { dimoe: 'DIMOE (Guía)', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido Crotales' };
     const color = colors[doc.tipo] || '#666';
     const label = labels[doc.tipo] || doc.tipo;
@@ -455,10 +455,10 @@ const DocumentosView = {
       : `<span class="text-red">${Icons.adjuntar()} Acuse manual pendiente</span>`;
 
     overlay.innerHTML = `
-      <div class="card-registro" style="max-width:520px;width:100%;padding:24px;; --registro-color: var(--c-gray);">
+      <div class="card" style="max-width:520px;width:100%;padding:24px; border: 1px solid var(--c-gray); background: #1e1e1e;">
         <div class="flex justify-between items-start mb-10">
           <div>
-            <div class="font-800 text-sm" style="color:${color};">${label}</div>
+            <div class="font-800 text-sm" style="color:${color};"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${label}</div>
             <div class="font-900 text-white text-lg">${doc.numero || 'S/N'}</div>
             <div class="text-xs text-ccc mt-2">${this._fmtFecha(doc.createdAt || doc.fecha)}</div>
           </div>
@@ -523,10 +523,10 @@ const DocumentosView = {
     const docLabels = { dimoe: 'Guía DIMOE', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido de Crotales' };
     const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : (docLabels[tipo] || 'Documento');
     overlay.innerHTML = `
-      <div class="card-registro" style="max-width:520px;width:100%;padding:24px;; --registro-color: var(--c-gray);">
+      <div class="card" style="max-width:520px;width:100%;padding:24px; border: 1px solid var(--c-gray); background: #1e1e1e;">
         <div class="flex justify-between items-center mb-8">
           <div>
-            <div class="font-900 text-sm" style="color:var(--c-warning);">${docLabel}</div>
+            <div class="font-900 text-sm" style="color:var(--c-warning);"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${docLabel}</div>
             <div class="text-xs text-aaa">Introduce el número de acuse o referencia oficial</div>
           </div>
           <button id="acuse-close" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;">${Icons.cerrar()}</button>

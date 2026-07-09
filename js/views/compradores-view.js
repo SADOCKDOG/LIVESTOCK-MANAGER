@@ -51,46 +51,62 @@ const CompradoresView = {
       </div>`;
     }).join('');
 
+    const colorCompradores = window.getModuleColor ? getModuleColor('/compradores') : '#4FADF5';
+    const colorContratos = window.getModuleColor ? getModuleColor('/contrato') : '#4FADF5';
+    const activeColor = this._activeModule === 'compradores' ? colorCompradores : colorContratos;
+
     main.innerHTML = `
-      <!-- Selector superior de módulos (Gestión de Compradores y Contratos) -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-purple); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> GESTIÓN COMERCIAL
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${activeColor}; display:inline-flex; align-items:center;">
+          ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()}
+        </span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${activeColor}; margin-right:4px;">|</span> GESTIÓN COMERCIAL
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            ${this._activeModule === 'compradores' ? 'Gestión de Clientes y Compradores' : 'Gestión de Contratos de Compraventa'}
+          </div>
         </div>
-        <div class="comer-mode-switch" style="display: flex; gap: 8px;">
+      </div>
+
+      <!-- Selector superior de submódulos (Gestión de Compradores y Contratos) -->
+      <div class="mb-14">
+        <div class="comer-mode-switch" style="display: flex; gap: 8px; width: 100%;">
           <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}"
-            style="--mode-color:var(--c-purple); color: ${this._activeModule === 'compradores' ? '#000' : 'var(--c-purple)'}; flex: 1; padding: 10px;"
+            style="--mode-color:${colorCompradores}; flex: 1; padding: 10px;"
             onclick="CompradoresView._cambiarModulo('compradores')">
             ${Icons.compradores()} Compradores
           </button>
           <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}"
-            style="--mode-color:var(--c-success); color: ${this._activeModule === 'contratos' ? '#000' : 'var(--c-success)'}; flex: 1; padding: 10px;"
+            style="--mode-color:${colorContratos}; flex: 1; padding: 10px;"
             onclick="CompradoresView._cambiarModulo('contratos')">
             ${Icons.contratos()} Contratos
           </button>
         </div>
       </div>
 
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-purple); background:rgba(255,68,68,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${this._activeModule === 'compradores' ? this._cachedCompradores?.length || 0 : this._cachedContratos?.length || 0} total</span>
+      <!-- Evolución Mensual (Estandarizada como Card de Fondo OLED sin bordes de color) -->
+      <div class="card mb-14 p-12 card-resumen" style="background:rgba(59,130,246,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex justify-between items-center" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span><span style="color: ${activeColor}; margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
+          <span class="text-xs text-gray font-bold lowercase" style="font-variant: normal;">(${this._activeModule === 'compradores' ? this._cachedCompradores?.length || 0 : this._cachedContratos?.length || 0} total)</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
 
-      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: ${this._activeModule === 'compradores' ? 'var(--c-purple)' : 'var(--c-success)'}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE ${this._activeModule === 'compradores' ? 'COMPRADORES' : 'CONTRATOS'}
+      <!-- Balance Consolidado (Estandarizado en Card de Fondo OLED sin bordes de color) -->
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(59,130,246,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span style="color: ${activeColor}; margin-right:4px;">|</span> ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()} RESUMEN DE ${this._activeModule === 'compradores' ? 'COMPRADORES' : 'CONTRATOS'}
         </div>
-        <div id="resumen-comercial" class="space-y-6 text-white">
+        <div class="flex flex-col">
           ${this._activeModule === 'compradores'
             ? `
               <div class="py-8 flex justify-between items-center border-bottom-222">
                 <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.compradores()} Total Compradores</span>
-                <strong class="text-xl font-950" style="color: var(--c-purple);">${this._cachedCompradores?.length || 0} ${this._cachedCompradores?.length === 1 ? "comprador" : "compradores"}</strong>
+                <strong class="text-xl font-950" style="color: ${activeColor};">${this._cachedCompradores?.length || 0} ${this._cachedCompradores?.length === 1 ? "comprador" : "compradores"}</strong>
               </div>
               <div class="py-8 flex justify-between items-center border-bottom-222">
                 <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.documento()} Compradores Activos</span>
@@ -98,13 +114,13 @@ const CompradoresView = {
               </div>
               <div class="py-8 flex justify-between items-center">
                 <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Valor Estimado</span>
-                <strong class="text-xl font-950 text-blue">$${resumenData.valorEstimado?.toLocaleString() || '0'}</strong>
+                <strong class="text-xl font-950 text-blue">€${resumenData.valorEstimado?.toLocaleString() || '0'}</strong>
               </div>
             `
             : `
               <div class="py-8 flex justify-between items-center border-bottom-222">
                 <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.contratos()} Total Contratos</span>
-                <strong class="text-xl font-950" style="color: var(--c-success);">${this._cachedContratos?.length || 0} ${this._cachedContratos?.length === 1 ? "contrato" : "contratos"}</strong>
+                <strong class="text-xl font-950" style="color: ${activeColor};">${this._cachedContratos?.length || 0} ${this._cachedContratos?.length === 1 ? "contrato" : "contratos"}</strong>
               </div>
               <div class="py-8 flex justify-between items-center border-bottom-222">
                 <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.check()} Contratos Activos</span>
@@ -112,26 +128,26 @@ const CompradoresView = {
               </div>
               <div class="py-8 flex justify-between items-center">
                 <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.dinero()} Valor Total</span>
-                <strong class="text-xl font-950 text-blue">$${resumenData.valorTotal?.toLocaleString() || '0'}</strong>
+                <strong class="text-xl font-950 text-blue">€${resumenData.valorTotal?.toLocaleString() || '0'}</strong>
               </div>
             `}
         </div>
       </div>
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
-        ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()} Lista de ${this._activeModule === 'compradores' ? 'Compradores' : 'Contratos'}
+      <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
+        <span style="color: ${activeColor};">|</span> ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()} Lista de ${this._activeModule === 'compradores' ? 'Compradores' : 'Contratos'}
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
           <input type="search" id="search-${this._activeModule}" placeholder="Buscar por nombre, NIF o ciudad..."
                  oninput="CompradoresView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="${this._activeModule}-filtro-tipo" class="form-select-gold"
+        <select id="${this._activeModule}-filtro-tipo" class="form-select"
                 onchange="CompradoresView._setFiltro('tipo', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
-          <option value="">Todos los tipos</option>
+                style="width:110px; min-width:100px; flex-shrink:0;">
+          <option value="">Todos</option>
           ${this._activeModule === 'compradores'
             ? `
               <option value="cárnico" ${this._filtroActivo.tipo === 'cárnico' ? 'selected' : ''}>Carne</option>
@@ -351,7 +367,7 @@ const CompradoresView = {
         `,
         footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>`,
         color: color,
-        onClick: `CompradoresView.renderDetalle(${c.id})`
+        onClick: `location.hash='#/comprador?id=${c.id}'`
       });
     }).join('')}</div>`;
 
@@ -485,10 +501,10 @@ const CompradoresView = {
       </div>
 
       <!-- Cabecera -->
-      <div class="card-registro p-20 border-top-3px bg-black" style="border-top-color:${colorComp};">
+      <div class="card p-20 bg-black" style="border: 1px solid #27272a;">
         <div class="flex justify-between items-start mb-16">
           <div>
-            <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight" style="color:${colorComp} !important;">${comprador.nombre}</h2>
+            <h2 class="text-white mt-0 mb-4 text-2xl font-black uppercase tracking-tight" style="color:${colorComp} !important;"><span style="color:${colorComp}; margin-right: 6px;">|</span> ${comprador.nombre}</h2>
             <div class="flex gap-8 flex-wrap">
               <span class="badge badge-sm font-950 uppercase" style="background:color-mix(in srgb, ${colorComp} 12%, transparent); color:${colorComp}; border:1px solid color-mix(in srgb, ${colorComp} 25%, transparent);">
                 ${(comprador.tipo_comprador === 'láctico' ? 'lácteo' : comprador.tipo_comprador) || 'híbrido'}
@@ -516,28 +532,28 @@ const CompradoresView = {
         </div>
 
         <!-- KPIS -->
-        <div class="grid grid-cols-3 gap-8 mb-16">
-          <div class="card-registro" style="--registro-color: var(--c-danger);">
-            <small class="s-lbl uppercase font-900">CARNE</small>
+        <div class="grid grid-cols-3 gap-8 mb-16 mt-16">
+          <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
+            <small class="s-lbl uppercase font-900" style="color: var(--c-danger);">CARNE</small>
             <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
             <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
           </div>
-          <div class="card-registro" style="--registro-color: var(--c-amber);">
-            <small class="s-lbl uppercase font-900">LECHE</small>
+          <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
+            <small class="s-lbl uppercase font-900" style="color: var(--c-warning);">LECHE</small>
             <div class="s-val inf-val-lg text-amber font-950">${resumen.total_entregas_leche}</div>
             <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L</small>
           </div>
-          <div class="card-registro" style="--registro-color: var(--c-purple);">
-            <small class="s-lbl uppercase font-900">CONTRATOS</small>
+          <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
+            <small class="s-lbl uppercase font-900" style="color: var(--c-purple);">CONTRATOS</small>
             <div class="s-val inf-val-lg text-purple font-950">${contratos.length}</div>
             <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.contratos_activos} ACTIVOS</small>
           </div>
         </div>
 
         <!-- Contratos activos -->
-        <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-success);">
+        <div class="card p-16 mb-16 border-222 bg-black">
           <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-16 flex items-center gap-8">
-              ${Icons.contratos()} CONTRATOS VIGENTES
+              <span style="color: var(--c-success);">|</span> ${Icons.contratos()} CONTRATOS VIGENTES
           </div>
           <div class="grid grid-cols-1 gap-10 max-w-240 mx-auto mb-20">
             <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="CompradoresView._nuevoContrato(${id})">
@@ -563,9 +579,9 @@ const CompradoresView = {
         </div>
 
         <!-- Historial de Ventas Carne -->
-        <div class="card-registro p-16 mb-16 border-222 bg-black" style="--registro-color: var(--c-danger);">
+        <div class="card p-16 mb-16 border-222 bg-black">
           <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-              ${Icons.carne()} HISTORIAL CARNE
+              <span style="color: var(--c-danger);">|</span> ${Icons.carne()} HISTORIAL CARNE
           </div>
           ${ventasCarne.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas.</p></div>' :
             ventasCarne.slice(0, 30).map(v => `
@@ -584,9 +600,9 @@ const CompradoresView = {
         </div>
 
         <!-- Historial de Leche -->
-        <div class="card-registro p-16 mb-20 border-222 bg-black" style="--registro-color: var(--c-amber);">
+        <div class="card p-16 mb-20 border-222 bg-black">
           <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-              ${Icons.leche()} HISTORIAL LECHE
+              <span style="color: var(--c-warning);">|</span> ${Icons.leche()} HISTORIAL LECHE
           </div>
           ${entregasLeche.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin entregas registradas.</p></div>' :
             entregasLeche.slice(0, 20).map(e => `
@@ -599,13 +615,14 @@ const CompradoresView = {
                   <div class="text-amber font-950 text-md">${(e.cantidad || 0).toLocaleString()} L</div>
                   ${e.precio_final_unitario ? `<div class="text-gray-600 uppercase font-900 text-[0.55rem] tracking-widest mt-2">${e.precio_final_unitario.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} €/L</div>` : ''}
                 </div>
-              `).join('')}
+              </div>
+            `).join('')}
           ${entregasLeche.length > 20 ? `<div class="text-center text-gray-700 font-900 text-[0.55rem] uppercase tracking-widest mt-15">Mostrando 20 de ${entregasLeche.length} registros</div>` : ''}
         </div>
 
         ${comprador.notas ? `
-          <div class="card-registro card-accent card-accent-gold p-16 mb-40" style="--registro-color: var(--c-gold);">
-            <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10">${Icons.documento()} OBSERVACIONES</div>
+          <div class="card p-16 mb-40" style="border: 1px solid #27272a;">
+            <div class="text-gold font-950 text-[0.65rem] uppercase tracking-widest mb-10"><span style="color: var(--c-gold);">|</span> OBSERVACIONES</div>
             <p class="text-aaa text-xs uppercase font-700 leading-relaxed m-0">${comprador.notas}</p>
           </div>` : '<div class="pb-40"></div>'}
         `;
@@ -630,8 +647,8 @@ const CompradoresView = {
             <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
           </button>
         </div>
-        <div class="card-registro card-accent card-accent-amber p-20 bg-black" style="--registro-color: var(--c-amber);">
-          <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)">${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
+        <div class="card p-20 bg-black" style="border: 1px solid #27272a;">
+          <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)"><span style="color: var(--c-amber); margin-right: 6px;">|</span> ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
 
           <div class="wizard-input-group mb-15">
               <label class="wizard-label uppercase font-900">Nombre / Razón Social *</label>

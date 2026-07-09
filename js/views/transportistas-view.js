@@ -22,6 +22,7 @@ const TransportistasView = {
   async render() {
     if (window.App) App.updateHeaderColor('transportistas');
     const main = document.getElementById("app-content");
+    const moduleColor = window.getModuleColor ? getModuleColor('/transportistas') : 'var(--c-pink)';
 
     // Cargar datos
     const transportistas = await Transportistas.list().catch(() => []);
@@ -68,52 +69,65 @@ const TransportistasView = {
     }).join('');
 
     main.innerHTML = `
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-info); background:rgba(59,130,246,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${transportistas.length} total</span>
+      <!-- Cabecera de Sección Estandarizada -->
+      <div class="flex items-center gap-12 mb-14">
+        <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.transportistas()}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${moduleColor}; margin-right:4px;">|</span> Transportistas
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            Gestión de Transportistas y Logística
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución Mensual (Estandarizada como Card de Fondo OLED sin bordes de color) -->
+      <div class="card mb-14 p-12 card-resumen" style="background:rgba(236,72,153,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex justify-between items-center" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span><span style="color: ${moduleColor}; margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
+          <span class="text-xs text-gray font-bold lowercase" style="font-variant: normal;">(${transportistas.length} total)</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
 
-      <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
-      <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-info); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE TRANSPORTISTAS
+      <!-- Balance Consolidado (Estandarizado en Card de Fondo OLED sin bordes de color) -->
+      <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(236,72,153,0.015); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
+          <span style="color: ${moduleColor}; margin-right:4px;">|</span> ${Icons.transportistas()} RESUMEN DE TRANSPORTISTAS
         </div>
-        <div id="resumen-transportistas" class="space-y-6 text-white">
+        <div class="flex flex-col">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.transportistas()} Total Transportistas</span>
-            <strong class="text-xl font-950" style="color: var(--c-info);">${transportistas.length} ${transportistas.length === 1 ? "transportista" : "transportistas"}</strong>
+            <strong class="text-xl font-950" style="color: ${moduleColor};">${transportistas.length}</strong>
           </div>
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.check()} Transportistas Activos</span>
-            <strong class="text-xl font-950 text-green">${activoCount} ${activoCount === 1 ? "transportista" : "transportistas"}</strong>
+            <strong class="text-xl font-950 text-green">${activoCount}</strong>
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.xmark()} Inactivos</span>
-            <strong class="text-xl font-950 text-red">${inactivoCount} ${inactivoCount === 1 ? "transportista" : "transportistas"}</strong>
+            <strong class="text-xl font-950 text-red">${inactivoCount}</strong>
           </div>
         </div>
       </div>
 
       <!-- Filtro de búsqueda integrado (controla el listado) -->
-      <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">
-        ${Icons.transportistas()} Lista de Transportistas
+      <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
+        <span style="color: ${moduleColor};">|</span> ${Icons.transportistas()} Lista de Transportistas
       </div>
       <div class="flex gap-8 items-center mb-12">
         <div class="relative flex-1 min-w-0">
           <input type="search" id="search-transportistas" placeholder="Buscar por nombre, NIF o matrícula..."
                  oninput="TransportistasView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="transportistas-filtro-estado" class="form-select-info"
+        <select id="transportistas-filtro-estado" class="form-select"
                 onchange="TransportistasView._setFiltro('tipo', this.value)"
-                style="width:100px; min-width:90px; flex-shrink:0;">
+                style="width:110px; min-width:100px; flex-shrink:0;">
           <option value="todos" ${this._filtroActivo.tipo === 'todos' ? 'selected' : ''}>Todos</option>
-          <option value="activo" ${this._filtroActivo.tipo === 'activo' ? 'selected' : ''}>Activo</option>
-          <option value="inactivo" ${this._filtroActivo.tipo === 'inactivo' ? 'selected' : ''}>Inactivo</option>
+          <option value="activo" ${this._filtroActivo.tipo === 'activo' ? 'selected' : ''}>Activos</option>
+          <option value="inactivo" ${this._filtroActivo.tipo === 'inactivo' ? 'selected' : ''}>Inactivos</option>
         </select>
       </div>
       <div id="transportistas-content"><div class="loader">Cargando transportistas...</div></div>`;

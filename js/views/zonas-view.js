@@ -89,17 +89,24 @@ const ZonasView = {
           onClick: `location.hash='/zona?index=${item.realIndex}'`
         });
       }
-      // Card AGLUTINADORA: cabecera + resumen colapsable (ocupación global) + histórico de fichas
+      // Cabecera de Sección Estandarizada + Resumen Colapsable sin anidación
+      const moduleColor = window.getModuleColor('/zonas');
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
       const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
-      html += `<div class="card-registro mb-10" style="--registro-color: var(--c-success);">
-        <div class="flex items-center gap-12 mb-12">
-          <span class="text-3xl" style="color:var(--c-success);">${Icons.zonas()}</span>
+      html += `
+        <!-- Cabecera de Sección Estandarizada -->
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.zonas()}</span>
           <div>
-            <div class="text-white font-900 text-lg">Zonas / Parcelas</div>
-            <div class="text-gray" style="font-size:0.68rem;">${zonasConIndice.length} ${zonasConIndice.length === 1 ? 'registro' : 'registros'} · ${totalOcupacion} cabezas</div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+              <span style="color:${moduleColor}; margin-right:4px;">|</span> Zonas / Parcelas
+            </h1>
+            <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+              ${zonasConIndice.length} ${zonasConIndice.length === 1 ? 'registro' : 'registros'} · ${totalOcupacion} cabezas
+            </div>
           </div>
         </div>
+
         <!-- Resumen de ocupación (colapsable) -->
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
@@ -116,10 +123,12 @@ const ZonasView = {
             </div>
           </div>
         </div>
+
         <!-- Histórico de registros -->
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5">${Icons.documento()} Lista de Zonas</div>
-        <div class="grid gap-12">${fichasHtml}</div>
-      </div>`;
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
+          ${Icons.documento()} Lista de Zonas
+        </div>
+        <div class="grid gap-12">${fichasHtml}</div>`;
     }
     main.innerHTML = html + `
       <!-- Botón Flotante de Acción con viñeta -->

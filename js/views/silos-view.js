@@ -1,0 +1,604 @@
+/**
+ * Livestock Manager - SilosView v1.0.0
+ * Vista para la gestión y calibración de silos de pienso y almacenamiento de alimento.
+ */
+
+const SilosView = {
+    _cachedSilos: [],
+
+    async render() {
+        const main = document.getElementById('app-content');
+        main.innerHTML = `<div class="text-center p-40"><div class="loader">Cargando silos...</div></div>`;
+
+        try {
+            await this._cargarSilos();
+            this._renderContenido(main);
+        } catch (e) {
+            console.error('[SilosView] Error:', e);
+            main.innerHTML = `<div class="card text-center p-40 text-red">Error al cargar la gestión de silos: ${e.message}</div>`;
+        }
+    },
+
+    async _cargarSilos() {
+        try {
+            this._cachedSilos = await window.db.getAll('config_silos');
+            
+            // Si está vacío, agregar un silo de muestra para que el usuario no empiece de cero
+            if (this._cachedSilos.length === 0) {
+                const muestraSilos = [
+                    {
+                        nombre: 'Silo Principal 1',
+                        capacidad: 12000,
+                        cantidadActual: 8400,
+                        alimento: 'Pienso Lactancia Vacas',
+                        fechaUltimaCarga: new Date().toISOString().split('T')[0],
+                        creadoEn: new Date().toISOString()
+                    },
+                    {
+                        nombre: 'Silo Secundario 2',
+                        capacidad: 6000,
+                        cantidadActual: 1500,
+                        alimento: 'Pienso Recría Novillas',
+                        fechaUltimaCarga: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString().split('T')[0],
+                        creadoEn: new Date().toISOString()
+                    }
+                ];
+                for (let s of muestraSilos) {
+                    await window.db.add('config_silos', s);
+                }
+                this._cachedSilos = await window.db.getAll('config_silos');
+            }
+        } catch (err) {
+            console.warn('[SilosView] No se pudo acceder a config_silos:', err);
+            this._cachedSilos = [];
+        }
+    },
+
+    _renderContenido(container) {
+        const totalCapacidad = this._cachedSilos.reduce((acc, s) => acc + (Number(s.capacidad) || 0), 0);
+        const totalActual = this._cachedSilos.reduce((acc, s) => acc + (Number(s.cantidadActual) || 0), 0);
+        const pctMedio = totalCapacidad > 0 ? Math.round((totalActual / totalCapacidad) * 100) : 0;
+
+        container.innerHTML = `
+        <div class="p-16 max-w-[900px] mx-auto animate-fade-in" style="min-height: calc(100vh - 120px);">
+            <!-- Encabezado con estilo premium -->
+            <div class="flex items-center justify-between mb-20 gap-10">
+                <div>
+                    <h1 class="text-xl font-black uppercase tracking-wider mb-2" style="font-family:'Archivo Expanded', sans-serif;">
+                        ${Icons.explotacion()} CONTROL DE SILOS
+                    </h1>
+                    <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Telemetría de alimentación y almacenamiento</p>
+                </div>
+                <button class="btn btn-primary btn-sm flex items-center gap-6" onclick="SilosView._abrirFormularioSilo()" style="min-height:44px; padding: 0 16px;">
+                    ${Icons.agregar()} <span class="font-950 uppercase tracking-wider text-xs">NUEVO SILO</span>
+                </button>
+            </div>
+
+            <!-- KPIs superiores (OLED dark design) -->
+            <div class="grid grid-cols-3 gap-10 mb-20">
+                <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">CAPACIDAD TOTAL</span>
+                    <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${totalCapacidad.toLocaleString()} kg</span>
+                </div>
+                <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">ALMACENADO</span>
+                    <span class="text-white font-black text-sm block style="font-family:'IBM Plex Mono', monospace;" style="color:var(--p-gold);">${totalActual.toLocaleString()} kg</span>
+                </div>
+                <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">OCUPACIÓN MEDIA</span>
+                    <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--c-success);">${pctMedio}%</span>
+                </div>
+            </div>
+
+            <!-- Listado de Silos -->
+            <div class="flex flex-col gap-15">
+                ${this._cachedSilos.map(s => this._renderSiloCard(s)).join('')}
+            </div>
+        </div>
+        `;
+    },
+
+    _renderSiloCard(s) {
+        const pct = s.capacidad > 0 ? Math.round((s.cantidadActual / s.capacidad) * 100) : 0;
+        // Calcular dashoffset para un círculo de radio 54 (perímetro = 2 * PI * 54 = 339.3)
+        // 100% ocupado es dashoffset 0. 0% ocupado es dashoffset 339.3
+        const r = 54;
+        const circ = 2 * Math.PI * r; // ~339.29
+        const offset = circ - (pct / 100) * circ;
+
+        let colorAlerta = 'var(--c-success)'; // verde
+        if (pct < 15) colorAlerta = 'var(--c-danger)'; // rojo coral
+        else if (pct < 35) colorAlerta = 'var(--p-gold)'; // amarillo oro
+
+        return `
+        <div class="card card-dark-gradient p-16 relative overflow-hidden flex flex-col md:flex-row gap-15 items-center justify-between animate-fade-in" id="silo-card-${s.id}" style="border:1px solid #222; background:#181818;">
+            <div class="flex flex-col md:flex-row items-center gap-15 w-full md:w-auto">
+                <!-- Telemetría circular táctil -->
+                <div class="silo-gauge-container relative" onclick="SilosView._recalibrarSilo(${s.id})" style="cursor: pointer; width: 120px; height: 120px;" title="Presiona para calibrar sensores">
+                    <svg width="120" height="120" viewBox="0 0 120 120" class="transform -rotate-90">
+                        <circle cx="60" cy="60" r="${r}" fill="none" stroke="#222" stroke-width="10"></circle>
+                        <circle class="fill-circle" id="silo-circle-${s.id}" cx="60" cy="60" r="${r}" fill="none" 
+                                stroke="${colorAlerta}" stroke-width="10" stroke-linecap="round"
+                                stroke-dasharray="${circ}" stroke-dashoffset="${offset}" style="transition: stroke-dashoffset 0.8s ease, stroke 0.8s ease;"></circle>
+                    </svg>
+                    <div class="gauge-overlay" style="position:absolute; inset:0; display:flex; flex-col; items-center; justify-content:center; flex-direction:column; text-align:center;">
+                        <span class="gauge-overlay-text text-white font-black text-lg block m-0" style="font-family:'IBM Plex Mono', monospace; line-height:1;" id="silo-pct-text-${s.id}">${pct}%</span>
+                        <small class="text-[0.5rem] text-gray-500 font-950 uppercase tracking-widest block mt-2">NIVEL</small>
+                    </div>
+                </div>
+
+                <!-- Detalles del silo -->
+                <div class="text-center md:text-left w-full md:w-auto" onclick="SilosView._abrirFichaSilo(${s.id})" style="cursor: pointer; flex: 1;" title="Ver ficha del silo">
+                    <div class="flex items-center justify-center md:justify-start gap-8 mb-6">
+                        <h2 class="text-sm font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">${s.nombre.toUpperCase()}</h2>
+                        ${pct < 15 ? `<span class="badge badge-red text-[0.55rem] font-950 uppercase tracking-wider animate-pulse">BAJO STOCK</span>` : ''}
+                        <span style="font-size: 0.6rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px; margin-left: auto; display: inline-block;">Ficha →</span>
+                    </div>
+                    <p class="text-xs font-900 uppercase tracking-widest text-gray-400 mb-8">${s.alimento.toUpperCase()}</p>
+                    <div class="grid grid-cols-2 gap-x-15 gap-y-4" style="font-family:'IBM Plex Mono', monospace;">
+                        <div>
+                            <span class="text-gray-500 font-900 text-[0.55rem] tracking-wider uppercase block">CANTIDAD</span>
+                            <span class="text-white font-black text-xs block" id="silo-cant-text-${s.id}">${s.cantidadActual.toLocaleString()} / ${s.capacidad.toLocaleString()} kg</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 font-900 text-[0.55rem] tracking-wider uppercase block">ÚLTIMA CARGA</span>
+                            <span class="text-white font-bold text-xs block">${s.fechaUltimaCarga || 'S/D'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones móviles grandes -->
+            <div class="flex gap-10 w-full md:w-auto justify-end mt-10 md:mt-0 flex-wrap">
+                <button class="btn btn-sm btn-dark flex items-center gap-6 justify-center" onclick="SilosView._abrirLlenarSilo(${s.id})" style="min-height:50px; flex:1; min-width:90px; border:1px solid #333;">
+                    ${Icons.sanidad()} <span class="font-950 uppercase tracking-wider text-[0.65rem]">CARGAR</span>
+                </button>
+                <button class="btn btn-sm btn-dark flex items-center gap-6 justify-center" onclick="SilosView._abrirConsumirSilo(${s.id})" style="min-height:50px; flex:1; min-width:90px; border:1px solid #333;">
+                    ${Icons.balanza()} <span class="font-950 uppercase tracking-wider text-[0.65rem]">CONSUMO</span>
+                </button>
+                <button class="btn btn-sm btn-dark flex items-center justify-center p-0" onclick="SilosView._abrirFormularioSilo(${s.id})" style="min-height:50px; width:50px; border:1px solid #333;" title="Editar Silo">
+                    ${Icons.editar()}
+                </button>
+                <button class="btn btn-sm btn-dark flex items-center justify-center p-0 text-red" onclick="SilosView._eliminarSilo(${s.id})" style="min-height:50px; width:50px; border:1px solid #333;" title="Eliminar Silo">
+                    ${Icons.eliminar()}
+                </button>
+            </div>
+        </div>
+        `;
+    },
+
+    async _abrirFichaSilo(id) {
+        const silo = this._cachedSilos.find(s => s.id === Number(id));
+        if (!silo) return;
+
+        // Cargar eventos del silo
+        const todosEventos = await window.db.getAllFromIndex('registro_eventos', 'fincaId', silo.fincaId).catch(() => []);
+        const eventosSilo = todosEventos.filter(e => Number(e.unidad_destino) === silo.id).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+        const pct = silo.capacidad > 0 ? Math.round((silo.cantidadActual / silo.capacidad) * 100) : 0;
+        let colorAlerta = 'var(--c-success)';
+        if (pct < 15) colorAlerta = 'var(--c-danger)';
+        else if (pct < 35) colorAlerta = 'var(--p-gold)';
+
+        const r = 54;
+        const circ = 2 * Math.PI * r;
+        const offset = circ - (pct / 100) * circ;
+
+        const html = `
+        <div class="card card-accent card-accent-success p-20 max-w-[500px] w-full mx-10 overflow-y-auto max-h-[90vh]" style="background:#0C0C0C; border:1px solid #222;">
+            <div class="flex justify-between items-center mb-15">
+                <h3 class="text-md font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">
+                    ${Icons.finca()} FICHA TÉCNICA DE SILO
+                </h3>
+                <button onclick="ModalManager.close('ficha-silo-modal')" class="widget-link-btn widget-link-btn--neon neon-danger p-6 min-h-0 h-auto">
+                    ${Icons.cerrar()}
+                </button>
+            </div>
+
+            <!-- Cabecera Telemetría -->
+            <div class="flex items-center gap-15 mb-20 bg-[#141414] p-12 rounded-sm border border-222">
+                <div class="silo-gauge-container relative" style="width: 80px; height: 80px;">
+                    <svg width="80" height="80" viewBox="0 0 120 120" class="transform -rotate-90">
+                        <circle cx="60" cy="60" r="${r}" fill="none" stroke="#222" stroke-width="12"></circle>
+                        <circle cx="60" cy="60" r="${r}" fill="none" 
+                                stroke="${colorAlerta}" stroke-width="12" stroke-linecap="round"
+                                stroke-dasharray="${circ}" stroke-dashoffset="${offset}"></circle>
+                    </svg>
+                    <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                        <span class="text-white font-black text-xs block m-0" style="font-family:'IBM Plex Mono', monospace;">${pct}%</span>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">${silo.nombre.toUpperCase()}</h2>
+                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mt-2 mb-4">${silo.alimento.toUpperCase()}</p>
+                    <span class="badge badge-sm font-950 uppercase" style="background:${pct < 15 ? 'rgba(255,68,68,0.1)' : 'rgba(204,255,0,0.1)'}; color:${pct < 15 ? 'var(--c-danger)' : 'var(--c-success)'}; border:1px solid ${pct < 15 ? 'rgba(255,68,68,0.25)' : 'rgba(204,255,0,0.25)'};">
+                        ${pct < 15 ? 'STOCK BAJO' : 'STOCK ESTABLE'}
+                    </span>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="grid grid-cols-2 gap-10 mb-20">
+                <div class="card p-10 text-center" style="background:#111; border:1px solid #222;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-2 d-block">CAPACIDAD MÁXIMA</span>
+                    <span class="text-white font-black text-xs block" style="font-family:'IBM Plex Mono', monospace;">${silo.capacidad.toLocaleString()} kg</span>
+                </div>
+                <div class="card p-10 text-center" style="background:#111; border:1px solid #222;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-2 d-block">STOCK ACTUAL</span>
+                    <span class="text-white font-black text-xs block" style="font-family:'IBM Plex Mono', monospace; color:${colorAlerta};">${silo.cantidadActual.toLocaleString()} kg</span>
+                </div>
+            </div>
+
+            <!-- Historial de operaciones -->
+            <div class="mb-20">
+                <h4 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-10 flex items-center gap-6">
+                    ${Icons.historial()} HISTORIAL DE MOVIMIENTOS
+                </h4>
+                <div class="flex flex-col gap-6" style="max-height: 200px; overflow-y: auto; padding-right: 4px;">
+                    ${eventosSilo.length === 0 ? `
+                        <div class="text-center py-15 text-gray-500 font-bold uppercase text-[0.6rem]">Sin movimientos registrados</div>
+                    ` : eventosSilo.map(e => {
+                        const isCarga = e.tipo_evento === 'carga_silo';
+                        return `
+                        <div class="flex justify-between items-center p-8 rounded-sm border border-222" style="background:#141414; border: 1px solid #1c1c1c;">
+                            <div>
+                                <span class="text-[0.6rem] font-black text-white uppercase block">${isCarga ? 'CARGA ALIMENTO' : 'CONSUMO RACIÓN'}</span>
+                                <span class="text-[0.55rem] font-bold text-gray-500 block mt-2">${e.fecha}</span>
+                            </div>
+                            <strong class="text-xs font-black" style="font-family:'IBM Plex Mono', monospace; color:${isCarga ? 'var(--c-success)' : 'var(--c-danger)'};">
+                                ${isCarga ? '+' : '-'}${e.detalles.match(/\d+(\.\d+)?/)?.[0] || '0'} kg
+                            </strong>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            <!-- Botones Rápidos -->
+            <div class="grid grid-cols-3 gap-8 border-top-222 pt-15">
+                <button class="btn btn-sm btn-dark flex items-center gap-6 justify-center" onclick="ModalManager.close('ficha-silo-modal'); SilosView._abrirLlenarSilo(${silo.id});" style="min-height:44px; padding:0 6px;">
+                    <span class="font-950 uppercase tracking-wider text-[0.6rem]">CARGAR</span>
+                </button>
+                <button class="btn btn-sm btn-dark flex items-center gap-6 justify-center" onclick="ModalManager.close('ficha-silo-modal'); SilosView._abrirConsumirSilo(${silo.id});" style="min-height:44px; padding:0 6px;">
+                    <span class="font-950 uppercase tracking-wider text-[0.6rem]">CONSUMO</span>
+                </button>
+                <button class="btn btn-sm btn-dark flex items-center gap-6 justify-center" onclick="ModalManager.close('ficha-silo-modal'); SilosView._abrirFormularioSilo(${silo.id});" style="min-height:44px; padding:0 6px;">
+                    <span class="font-950 uppercase tracking-wider text-[0.6rem]">EDITAR</span>
+                </button>
+            </div>
+        </div>
+        `;
+        ModalManager.show('ficha-silo-modal', html, { closeOnOverlayClick: true });
+    },
+
+    async _recalibrarSilo(id) {
+        const silo = this._cachedSilos.find(s => s.id === Number(id));
+        if (!silo) return;
+
+        Toast.show(`Iniciando calibración telemétrica de sensores de ${silo.nombre}...`, 'warn');
+
+        const circle = document.getElementById(`silo-circle-${id}`);
+        const pctText = document.getElementById(`silo-pct-text-${id}`);
+        const cantText = document.getElementById(`silo-cant-text-${id}`);
+
+        if (!circle || !pctText) return;
+
+        // Fase 1: Simular calibración de sensores (movimiento rápido de la aguja)
+        circle.style.strokeDashoffset = '339.29'; // 0%
+        pctText.textContent = '0%';
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        circle.style.strokeDashoffset = '0'; // 100%
+        pctText.textContent = 'CAL';
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Fase 2: Regresar al valor real guardado
+        const realPct = silo.capacidad > 0 ? Math.round((silo.cantidadActual / silo.capacidad) * 100) : 0;
+        const r = 54;
+        const circ = 2 * Math.PI * r;
+        const offset = circ - (realPct / 100) * circ;
+
+        circle.style.strokeDashoffset = offset;
+        pctText.textContent = `${realPct}%`;
+
+        Toast.show(`Calibración de ${silo.nombre} completada con éxito. Sensores ópticos estables.`, 'success');
+    },
+
+    _abrirLlenarSilo(id) {
+        const silo = this._cachedSilos.find(s => s.id === Number(id));
+        if (!silo) return;
+
+        const maxCarga = silo.capacidad - silo.cantidadActual;
+
+        const html = `
+        <div class="card card-accent card-accent-gold p-16 max-w-[400px] w-full mx-10">
+            <h3 class="text-md font-black uppercase tracking-wider mb-10 text-white" style="font-family:'Archivo Expanded', sans-serif;">
+                ${Icons.sanidad()} REGISTRAR CARGA EN SILO
+            </h3>
+            <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Espacio disponible: <b>${maxCarga.toLocaleString()} kg</b></p>
+            
+            <div class="flex flex-col gap-12 mb-20">
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD DE ALIMENTO A CARGAR (kg)</label>
+                    <input type="number" id="load-amount" class="wizard-input font-bold" min="1" max="${maxCarga}" value="${Math.max(0, maxCarga)}" style="font-family:'IBM Plex Mono', monospace;">
+                </div>
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FECHA DE CARGA</label>
+                    <input type="date" id="load-date" class="wizard-input font-bold" value="${new Date().toISOString().split('T')[0]}">
+                </div>
+            </div>
+
+            <div class="flex gap-10 justify-end">
+                <button class="btn btn-dark" onclick="ModalManager.close('load-silo-modal')">CANCELAR</button>
+                <button class="btn btn-primary" onclick="SilosView._guardarCargaSilo(${id})">REGISTRAR</button>
+            </div>
+        </div>
+        `;
+        ModalManager.show('load-silo-modal', html, { closeOnOverlayClick: true });
+    },
+
+    async _guardarCargaSilo(id) {
+        const silo = this._cachedSilos.find(s => s.id === Number(id));
+        if (!silo) return;
+
+        const amountInput = document.getElementById('load-amount');
+        const dateInput = document.getElementById('load-date');
+
+        const amount = Number(amountInput?.value) || 0;
+        const date = dateInput?.value || new Date().toISOString().split('T')[0];
+
+        if (amount <= 0) {
+            Toast.show('Ingresa una cantidad válida a cargar', 'warn');
+            return;
+        }
+
+        const nuevaCantidad = Math.min(silo.capacidad, silo.cantidadActual + amount);
+        silo.cantidadActual = nuevaCantidad;
+        silo.fechaUltimaCarga = date;
+
+        await window.db.put('config_silos', silo);
+        ModalManager.close('load-silo-modal');
+
+        // Registrar evento de carga en la finca para balance alimenticio y trazabilidad
+        try {
+            const activeFincaId = await Fincas.getActiveId();
+            const nuevoGasto = {
+                fincaId: activeFincaId,
+                categoria: 'Alimentacion',
+                concepto: `Recarga Silo: ${silo.nombre} (+${amount.toLocaleString()} kg de ${silo.alimento})`,
+                monto: 0, // No genera costo directo a menos que se defina factura, o el usuario puede editarlo después en gastos
+                fecha: date,
+                siloId: id,
+                creadoEn: new Date().toISOString()
+            };
+            await window.db.add('gastos_ganaderia', nuevoGasto);
+            
+            // También registrar evento telemétrico de silo_pienso
+            const eventoSilo = {
+                fincaId: activeFincaId,
+                tipo: 'silo_carga',
+                tipo_entidad: 'silo_pienso',
+                entidad_id: id,
+                fecha: date,
+                motivo_tarea: 'alimentacion',
+                valor_neto: amount,
+                unidad: 'kg',
+                observaciones: `Carga registrada en ${silo.nombre}. Nivel final: ${nuevaCantidad.toLocaleString()} kg.`,
+                creadoEn: new Date().toISOString()
+            };
+            await window.db.add('registro_eventos', eventoSilo);
+        } catch (e) {
+            console.error('[SilosView] No se pudo guardar el evento de carga:', e);
+        }
+
+        Toast.show(`Silo cargado correctamente. Iniciando sincronización de telemetría...`, 'success');
+        this.render();
+    },
+
+    _abrirConsumirSilo(id) {
+        const silo = this._cachedSilos.find(s => s.id === Number(id));
+        if (!silo) return;
+
+        const html = `
+        <div class="card card-accent card-accent-red p-16 max-w-[400px] w-full mx-10">
+            <h3 class="text-md font-black uppercase tracking-wider mb-10 text-white" style="font-family:'Archivo Expanded', sans-serif;">
+                ${Icons.balanza()} REGISTRAR CONSUMO DE PIENSO
+            </h3>
+            <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Nivel actual: <b>${silo.cantidadActual.toLocaleString()} kg</b></p>
+            
+            <div class="flex flex-col gap-12 mb-20">
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD CONSUMIDA (kg)</label>
+                    <input type="number" id="consume-amount" class="wizard-input font-bold" min="1" max="${silo.cantidadActual}" value="${Math.min(silo.cantidadActual, 200)}" style="font-family:'IBM Plex Mono', monospace;">
+                </div>
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FECHA DE CONSUMO</label>
+                    <input type="date" id="consume-date" class="wizard-input font-bold" value="${new Date().toISOString().split('T')[0]}">
+                </div>
+            </div>
+
+            <div class="flex gap-10 justify-end">
+                <button class="btn btn-dark" onclick="ModalManager.close('consume-silo-modal')">CANCELAR</button>
+                <button class="btn btn-primary" onclick="SilosView._guardarConsumoSilo(${id})" style="background-color:var(--c-danger); border-color:var(--c-danger);">REGISTRAR CONSUMO</button>
+            </div>
+        </div>
+        `;
+        ModalManager.show('consume-silo-modal', html, { closeOnOverlayClick: true });
+    },
+
+    async _guardarConsumoSilo(id) {
+        const silo = this._cachedSilos.find(s => s.id === Number(id));
+        if (!silo) return;
+
+        const amountInput = document.getElementById('consume-amount');
+        const dateInput = document.getElementById('consume-date');
+
+        const amount = Number(amountInput?.value) || 0;
+        const date = dateInput?.value || new Date().toISOString().split('T')[0];
+
+        if (amount <= 0 || amount > silo.cantidadActual) {
+            Toast.show('Ingresa una cantidad de consumo válida', 'warn');
+            return;
+        }
+
+        const nuevaCantidad = silo.cantidadActual - amount;
+        silo.cantidadActual = nuevaCantidad;
+
+        await window.db.put('config_silos', silo);
+        ModalManager.close('consume-silo-modal');
+
+        // Registrar evento de consumo de telemetría de silo_pienso
+        try {
+            const activeFincaId = await Fincas.getActiveId();
+            const eventoSilo = {
+                fincaId: activeFincaId,
+                tipo: 'silo_consumo',
+                tipo_entidad: 'silo_pienso',
+                entidad_id: id,
+                fecha: date,
+                motivo_tarea: 'alimentacion',
+                valor_neto: amount,
+                unidad: 'kg',
+                observaciones: `Consumo registrado en ${silo.nombre}. Restante: ${nuevaCantidad.toLocaleString()} kg.`,
+                creadoEn: new Date().toISOString()
+            };
+            await window.db.add('registro_eventos', eventoSilo);
+        } catch (e) {
+            console.error('[SilosView] No se pudo guardar el evento de consumo:', e);
+        }
+
+        Toast.show(`Consumo de pienso de silo registrado correctamente.`, 'success');
+        this.render();
+    },
+
+    _abrirFormularioSilo(id = null) {
+        const esEdicion = id !== null;
+        const silo = esEdicion ? this._cachedSilos.find(s => s.id === Number(id)) : {
+            nombre: '',
+            capacidad: 10000,
+            cantidadActual: 5000,
+            alimento: 'Pienso Lactancia',
+            fechaUltimaCarga: new Date().toISOString().split('T')[0]
+        };
+
+        if (!silo) return;
+
+        const html = `
+        <div class="card card-dark-gradient p-16 max-w-[450px] w-full mx-10" style="border:1px solid #333; background:#181818;">
+            <h3 class="text-md font-black uppercase tracking-wider mb-15 text-white" style="font-family:'Archivo Expanded', sans-serif;">
+                ${esEdicion ? Icons.editar() + ' EDITAR SILO' : Icons.agregar() + ' NUEVO SILO'}
+            </h3>
+            
+            <div class="flex flex-col gap-15 mb-20">
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">NOMBRE DEL SILO</label>
+                    <input type="text" id="silo-form-nombre" class="wizard-input font-bold uppercase" placeholder="Ej: Silo Norte 1" value="${silo.nombre}">
+                </div>
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">TIPO DE ALIMENTO ALOJADO</label>
+                    <input type="text" id="silo-form-alimento" class="wizard-input font-bold uppercase" placeholder="Ej: Pienso Vacas Lactancia" value="${silo.alimento}">
+                </div>
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CAPACIDAD MAX (kg)</label>
+                        <input type="number" id="silo-form-capacidad" class="wizard-input font-bold" value="${silo.capacidad}">
+                    </div>
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD ACTUAL (kg)</label>
+                        <input type="number" id="silo-form-actual" class="wizard-input font-bold" value="${silo.cantidadActual}">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FECHA ÚLTIMA CARGA</label>
+                    <input type="date" id="silo-form-fecha" class="wizard-input font-bold" value="${silo.fechaUltimaCarga}">
+                </div>
+            </div>
+
+            <div class="flex gap-10 justify-end">
+                <button class="btn btn-dark" onclick="ModalManager.close('silo-form-modal')">CANCELAR</button>
+                <button class="btn btn-primary" onclick="SilosView._guardarFormularioSilo(${id})">GUARDAR SILO</button>
+            </div>
+        </div>
+        `;
+        ModalManager.show('silo-form-modal', html, { closeOnOverlayClick: true });
+    },
+
+    async _guardarFormularioSilo(id = null) {
+        const nombreInput = document.getElementById('silo-form-nombre');
+        const alimentoInput = document.getElementById('silo-form-alimento');
+        const capacidadInput = document.getElementById('silo-form-capacidad');
+        const actualInput = document.getElementById('silo-form-actual');
+        const fechaInput = document.getElementById('silo-form-fecha');
+
+        const nombre = (nombreInput?.value || '').trim();
+        const alimento = (alimentoInput?.value || '').trim();
+        const capacidad = Number(capacidadInput?.value) || 0;
+        const cantidadActual = Number(actualInput?.value) || 0;
+        const fechaUltimaCarga = fechaInput?.value || new Date().toISOString().split('T')[0];
+
+        if (!nombre) {
+            Toast.show('El nombre del silo es obligatorio', 'warn');
+            return;
+        }
+        if (!alimento) {
+            Toast.show('El tipo de alimento es obligatorio', 'warn');
+            return;
+        }
+        if (capacidad <= 0) {
+            Toast.show('La capacidad debe ser mayor que 0', 'warn');
+            return;
+        }
+        if (cantidadActual < 0 || cantidadActual > capacidad) {
+            Toast.show('La cantidad actual debe estar entre 0 y la capacidad máxima', 'warn');
+            return;
+        }
+
+        const data = {
+            nombre,
+            alimento,
+            capacidad,
+            cantidadActual,
+            fechaUltimaCarga,
+            creadoEn: new Date().toISOString()
+        };
+
+        try {
+            if (id !== null) {
+                data.id = Number(id);
+                await window.db.put('config_silos', data);
+                Toast.show('Silo actualizado con éxito', 'success');
+            } else {
+                await window.db.add('config_silos', data);
+                Toast.show('Silo creado con éxito', 'success');
+            }
+            ModalManager.close('silo-form-modal');
+            this.render();
+        } catch (e) {
+            console.error('[SilosView] Error al guardar silo:', e);
+            Toast.show('Error al guardar silo: ' + e.message, 'danger');
+        }
+    },
+
+    async _eliminarSilo(id) {
+        const confirmado = await Confirm.confirm(
+            'ELIMINAR SILO',
+            '¿Está seguro de que desea eliminar este silo? Se perderán todas sus calibraciones de sensores.',
+            true
+        );
+
+        if (confirmado) {
+            try {
+                await window.db.delete('config_silos', Number(id));
+                Toast.show('Silo eliminado con éxito', 'success');
+                this.render();
+            } catch (e) {
+                console.error('[SilosView] Error al eliminar silo:', e);
+                Toast.show('Error al eliminar silo', 'danger');
+            }
+        }
+    }
+};
+
+window.SilosView = SilosView;

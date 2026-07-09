@@ -193,21 +193,18 @@ const CarneView = {
     const filteredData = this._aplicarFiltrosToData(this._cachedDataRaw);
 
     main.innerHTML = `
-      <!-- Plantilla estandarizada: Agregado + Filtros + Lista + FAB -->
-      <div class="card-registro mb-14 p-12" style="--registro-color: var(--c-danger); background:rgba(255,68,68,0.03);">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
-          <span class="text-xs text-gray">${filteredData.ventasCarne.length} total</span>
-        </div>
-        <div class="flex gap-6">${mesesHtml}</div>
-      </div>
 
       <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
       <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: var(--c-danger); font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> RESUMEN DE CARNE
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color:var(--c-danger); display:inline-flex; align-items:center;">${Icons.carne()}</span>
+          <div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+              <span style="color:var(--c-danger); margin-right:4px;">|</span> Resumen de Carne
+            </h1>
+          </div>
         </div>
-        <div id="resumen-carne" class="space-y-6 text-white">
+        <div id="resumen-carne" class="space-y-6 text-white card p-12" style="background: rgba(255,255,255,0.01);">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.edificio()} Patrimonio Ganadero</span>
             <strong class="text-xl font-950" style="color: var(--c-danger);">${Math.round(filteredData.valorPatrimonioTotal).toLocaleString()} €</strong>
@@ -218,7 +215,7 @@ const CarneView = {
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.transportistas()} Ventas Matadero</span>
-            <strong class="text-xl font-950 text-blue">$${filteredData.totalVentasEuros.toLocaleString()}</strong>
+            <strong class="text-xl font-950 text-blue">${filteredData.totalVentasEuros.toLocaleString()} €</strong>
           </div>
         </div>
       </div>
@@ -231,11 +228,11 @@ const CarneView = {
         <div class="relative flex-1 min-w-0">
           <input type="search" id="search-carne" placeholder="Buscar por número de albarán, concepto o medicamento..."
                  oninput="CarneView._setFiltro('texto', this.value)"
-                 class="search-input w-full">
+                 class="form-input search-input w-full" style="margin-top:0;">
         </div>
-        <select id="carne-filtro-tipo" class="form-select-danger"
+        <select id="carne-filtro-tipo" class="form-select"
                 onchange="CarneView._setFiltro('tipo', this.value)"
-                style="width:120px; min-width:110px; flex-shrink:0;">
+                style="width:120px; min-width:110px; flex-shrink:0; padding:12px; min-height:44px;">
           <option value="">Todos los tipos</option>
           <option value="venta" ${this._filtroActivo.tipo === 'venta' ? 'selected' : ''}>Ventas</option>
           <option value="pesaje" ${this._filtroActivo.tipo === 'pesaje' ? 'selected' : ''}>Pesajes</option>
@@ -447,13 +444,15 @@ const CarneView = {
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
-      <div class="card-registro report-section p-16 border-top-3px border-top-3px-orange" style="--registro-color: var(--c-warning);">
+      <div class="card p-16 mb-14" style="border: 1px solid var(--c-warning); background: rgba(255, 214, 0, 0.01);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.edificio()}</span>
+            <span class="text-3xl" style="color: var(--c-warning);">${Icons.edificio()}</span>
             <div>
-              <div class="text-white font-900 text-lg">Patrimonio y Ganadería</div>
-              <div class="text-gray text-2xs">Gestión de censo y lotes de carne</div>
+              <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
+                <span style="color: var(--c-warning); margin-right:4px;">|</span> Patrimonio y Ganadería
+              </h2>
+              <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Gestión de censo y lotes de carne</div>
             </div>
           </div>
         </div>
@@ -503,13 +502,15 @@ const CarneView = {
   // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
   _renderComercializacion(content, d) {
     const html = `
-      <div class="card-registro" style="--registro-color: var(--c-success);">
+      <div class="card p-16 mb-14" style="border: 1px solid var(--c-success); background: rgba(204, 255, 0, 0.015);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.transportistas()}</span>
+            <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
             <div>
-              <div class="text-white font-900 text-lg">Logística y Transporte, Comercialización Ventas</div>
-              <div class="text-gray text-2xs">Logística, vehículos, compradores, contratos y ventas</div>
+              <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
+                <span style="color: var(--c-success); margin-right:4px;">|</span> Logística y Ventas
+              </h2>
+              <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Logística, vehículos, compradores, contratos y ventas</div>
             </div>
           </div>
           <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
@@ -577,13 +578,15 @@ const CarneView = {
 
     const html = `
       ${supresionesHtml}
-      <div class="card-registro" style="--registro-color: var(--c-purple);">
+      <div class="card p-16 mb-14" style="border: 1px solid var(--c-purple); background: rgba(168, 85, 247, 0.01);">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
-            <span class="text-3xl">${Icons.documento()}</span>
+            <span class="text-3xl" style="color: var(--c-purple);">${Icons.documento()}</span>
             <div>
-              <div class="text-white font-900 text-lg">Registros Legislación, Cumplimiento Sanitario</div>
-              <div class="text-gray text-2xs">Cuaderno sanitario, supresión y documentos obligatorios (DIMOE)</div>
+              <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
+                <span style="color: var(--c-purple); margin-right:4px;">|</span> Sanidad y Legislación
+              </h2>
+              <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Cuaderno sanitario, supresión y documentos obligatorios</div>
             </div>
           </div>
           <div class="flex gap-4">
@@ -612,11 +615,23 @@ const CarneView = {
                   <div class="card-registro" style="--registro-color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
                     <div class="flex justify-between items-start">
                       <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-8">
-                          <span>
+                        <div class="flex items-center gap-6">
+                          <span class="text-xl" style="color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">${Icons.sanidad()}</span>
+                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray uppercase font-800">
+                          <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
+                          <span>·</span>
+                          <span>Rebaño: <strong class="text-ccc">${s.rebanoId}</strong></span>
+                          <span>·</span>
+                          <span>Espera: <strong class="text-ccc">${s.tiempo_espera_carne_dias || 0} días</strong></span>
+                        </div>
                       </div>
-                  </div>
-                `;
+                      <div class="text-right flex-shrink-0 ml-8">
+                        ${enSup ? `<span class="badge badge-sm badge-red block">SUPRESIÓN ACTIVA</span>` : `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">COMPLETO</span>`}
+                      </div>
+                    </div>
+                  </div>`;
               }).join('')
             : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin tratamientos sanitarios registrados.</span></div>`
           }
@@ -651,8 +666,8 @@ const CarneView = {
       overlay.style.alignItems = "center";
       overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
       overlay.innerHTML = `
-          <div class="card-registro p-25" style="max-width:420px;  overflow-y:auto; max-height:90vh;; --registro-color: var(--c-gray);">
-              <h3 class="mt-0 text-gold">Editar Registro Cárnico</h3>
+          <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-gray); background: #1e1e1e; width: 100%;">
+              <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> Editar Registro Cárnico</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
 
               <div class="grid grid-cols-2 gap-10">
@@ -740,8 +755,8 @@ const CarneView = {
     overlay.style.alignItems = "center";
     overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
     overlay.innerHTML = `
-      <div class="card-registro p-25" style="max-width:380px; ; --registro-color: var(--c-gray);">
-        <h3 class="mt-0 text-white font-900 flex items-center gap-8">${Icons.sanidad()} Aplicar Tratamiento Cárnico</h3>
+      <div class="card p-25" style="max-width:380px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.sanidad()} Aplicar Tratamiento Cárnico</h3>
         <label class="wizard-label mb-10">Selecciona el rebaño de carne a tratar:</label>
         <select id="w-treat-reb" class="wizard-input wizard-select mb-15">
           ${d.rebanosCarne.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
@@ -760,7 +775,8 @@ const CarneView = {
       await window.WizardTratamiento.registrar(rebId);
       setTimeout(() => CarneView.render(), 1000);
     };
-  }
+  },
+
 };
 
 window.CarneView = CarneView;

@@ -61,8 +61,8 @@ const ConfigSistemaView = {
   async _renderInterfaz(container, config) {
     const palette = this._getStandardPalette();
     container.innerHTML = `
-      <div class="card-registro mb-16" style="--registro-color: var(--c-purple);">
-        <div class="section-header-theme mb-15">${Icons.foto()} Apariencia Base</div>
+      <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.foto()} Apariencia Base</div>
         <div class="grid gap-12">
           <label class="wizard-check-label">
             <input type="checkbox" ${config.temaOscuro !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleTema', this.checked)">
@@ -81,8 +81,8 @@ const ConfigSistemaView = {
         </div>
       </div>
 
-      <div class="card-registro mb-16" style="--registro-color: var(--p-cork);">
-        <div class="section-header-theme mb-15">${Icons.ajustes()} Retroiluminación</div>
+      <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--p-cork); margin-right: 4px;">|</span> ${Icons.ajustes()} Retroiluminación</div>
         <div class="grid gap-10">
           <label class="wizard-check-label">
             <input type="checkbox" ${config.glowMarco !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleGlowMarco', this.checked)">
@@ -102,8 +102,8 @@ const ConfigSistemaView = {
         </div>
       </div>
 
-      <div class="card-registro mb-16" style="--registro-color: var(--c-info);">
-        <div class="section-header-theme mb-15">${Icons.calendar()} Formatos de Sistema</div>
+      <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.calendar()} Formatos de Sistema</div>
         <div class="grid grid-cols-1 gap-15">
           <div class="wizard-input-group">
             <label class="wizard-label">FORMATO DE FECHA</label>
@@ -122,8 +122,8 @@ const ConfigSistemaView = {
         </div>
       </div>
 
-      <div class="card-registro" style="--registro-color: var(--p-gold);">
-        <div class="section-header-theme mb-15">${Icons.estrella()} Color de Acento Global</div>
+      <div class="card p-14" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--p-gold); margin-right: 4px;">|</span> ${Icons.estrella()} Color de Acento Global</div>
         <div class="flex flex-wrap gap-8 justify-center theme-dots-container">
           ${palette.map(c => `
             <button class="theme-dot ${config.colorTema === c.id ? 'active' : ''}"
@@ -143,8 +143,8 @@ const ConfigSistemaView = {
     const animales = await Animales.list().catch(() => []);
 
     container.innerHTML = `
-      <div class="card-registro mb-16" style="--registro-color: var(--c-info);">
-        <div class="section-header-theme mb-15">${Icons.info()} Información del Sistema</div>
+      <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} Información del Sistema</div>
         <div class="info-box bg-black p-15">
           <div class="grid grid-cols-2 gap-y-10 text-[0.7rem] uppercase font-800">
             <div class="text-gray">Versión App:</div><div class="text-white text-right">v${window.APP_INFO.version}</div>
@@ -155,8 +155,8 @@ const ConfigSistemaView = {
         </div>
       </div>
 
-      <div class="card-registro mb-16" style="--registro-color: var(--c-warning);">
-        <div class="section-header-theme mb-15">${Icons.guardar()} Copias de Seguridad</div>
+      <div class="card p-14 mb-16" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${Icons.guardar()} Copias de Seguridad</div>
         <p class="text-[0.65rem] text-aaa mb-15 uppercase font-800">Protege tu información exportando un archivo JSON de seguridad.</p>
         <div class="grid grid-cols-2 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App.exportBackup()">
@@ -174,8 +174,8 @@ const ConfigSistemaView = {
         </label>
       </div>
 
-      <div class="card-registro" style="--registro-color: var(--c-danger);">
-        <div class="section-header-theme mb-15">${Icons.eliminar()} Mantenimiento</div>
+      <div class="card p-14" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-danger); margin-right: 4px;">|</span> ${Icons.eliminar()} Mantenimiento</div>
         <button class="widget-link-btn widget-link-btn--neon neon-danger w-full mb-10" onclick="AjustesView._limpiarCache()">
           ${Icons.eliminar()} Limpiar Caché del Sistema
         </button>
@@ -213,8 +213,8 @@ const ConfigSistemaView = {
     }).join('') : '<div class="text-center p-20 text-gray-600 font-900 text-xs uppercase">Sin registros de auditoría recientes</div>';
 
     container.innerHTML = `
-      <div class="card-registro" style="--registro-color: var(--c-info);">
-        <div class="section-header-theme mb-15">${Icons.documento()} Registro de Actividad</div>
+      <div class="card p-14" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a;">
+        <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} Registro de Actividad</div>
         <p class="text-xs text-gray mb-15 leading-relaxed">Historial de cambios críticos, eliminaciones y rectificaciones realizadas en la explotación actual.</p>
         <div class="mh-400 overflow-y-auto pr-4">
           ${logsHtml}
@@ -227,16 +227,16 @@ const ConfigSistemaView = {
 
   _getStandardPalette() {
     return [
-      { id: 'gold',   hex: '#fbbf24' },
-      { id: 'blue',   hex: '#3b82f6' },
+      { id: 'gold',   hex: '#FFFC55' },
+      { id: 'blue',   hex: '#4FADF5' },
       { id: 'green',  hex: '#10b981' },
-      { id: 'purple', hex: '#A855F7' },
+      
       { id: 'red',    hex: '#ef4444' },
-      { id: 'orange', hex: '#F97316' },
-      { id: 'pink',   hex: '#EC4899' },
+      
+      
       { id: 'indigo', hex: '#8b5cf6' },
-      { id: 'lime',   hex: '#CCFF00' },
-      { id: 'steel',  hex: '#94A3B8' }
+      { id: 'lime',   hex: '#C5FA50' },
+      { id: 'steel',  hex: '#B1B1B1' }
     ];
   },
 
