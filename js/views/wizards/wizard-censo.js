@@ -209,7 +209,7 @@ window.WizardCenso = {
         </div>
         <div class="text-base mb-20">
           <p style="margin:0;"><strong>Explotación:</strong> ${finca.nombre || '—'} &nbsp;·&nbsp;
-          <strong>REGA:</strong> ${regaPropia}<br>
+          <strong>REGA:</strong> <span class="text-gold" style="color:var(--p-gold); font-weight:bold;">${regaPropia}</span><br>
           <strong>Titular:</strong> ${finca.propietario || '—'} &nbsp;·&nbsp;
           <strong>NIF/CIF:</strong> ${finca.nif_cif || finca.nif || '—'}<br>
           <strong>Provincia:</strong> ${finca.provincia || '—'} &nbsp;·&nbsp;

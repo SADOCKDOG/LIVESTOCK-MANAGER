@@ -264,7 +264,7 @@ const TrazabilidadView = {
         <!-- Datos Básicos del Animal -->
         <div class="card-registro p-16 mb-16" style="--registro-color: var(--c-info);">
           <div class="flex justify-between items-center mb-10 flex-wrap gap-8">
-            <strong class="text-amber text-lg">${animal.numero_identificacion || '—'}</strong>
+            <strong class="text-gold text-lg">${animal.numero_identificacion || '—'}</strong>
             <span style="background:${animal.estado === 'activo' || animal.estado === 'Activo' ? '#065f46' : '#7f1d1d'}; color:white; padding:3px 12px; border-radius:20px; font-size:0.75rem;">${animal.estado || '—'}</span>
           </div>
           <div class="traz-meta-grid">
@@ -369,10 +369,10 @@ const TrazabilidadView = {
       pdfEl.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d97706;padding-bottom:15px;margin-bottom:20px;">
           <div><h1 style="margin:0;font-size:18px;color:#d97706;">Trazabilidad 360°</h1><p style="margin:2px 0 0;font-size:10px;color:#888;">${fecha}</p></div>
-          <div style="text-align:right;font-size:10px;color:#888;">${finca?.nombre || ''}<br>${finca?.codigo_REGA || ''}</div>
+          <div style="text-align:right;font-size:10px;color:#888;">${finca?.nombre || ''}<br><span style="color:var(--p-gold);font-weight:bold;">${finca?.codigo_REGA || ''}</span></div>
         </div>
         <table style="width:100%;border-collapse:collapse;margin-bottom:15px;">
-          <tr><td style="padding:4px 8px;font-weight:bold;color:#d97706;font-size:14px;">${animal.numero_identificacion || '—'}</td><td style="text-align:right;padding:4px 8px;"><span style="background:${animal.estado === 'activo' ? '#065f46' : '#7f1d1d'};color:#fff;padding:2px 10px;border-radius:10px;font-size:10px;">${animal.estado || ''}</span></td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;color:var(--p-gold);font-size:14px;">${animal.numero_identificacion || '—'}</td><td style="text-align:right;padding:4px 8px;"><span style="background:${animal.estado === 'activo' ? '#065f46' : '#7f1d1d'};color:#fff;padding:2px 10px;border-radius:10px;font-size:10px;">${animal.estado || ''}</span></td></tr>
           <tr><td style="padding:3px 8px;color:#888;">Especie: <strong style="color:#333;">${animal.especie || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Raza: <strong style="color:#333;">${animal.raza || 'N/D'}</strong></td></tr>
           <tr><td style="padding:3px 8px;color:#888;">Sexo: <strong style="color:#333;">${animal.sexo || 'N/D'}</strong></td><td style="padding:3px 8px;color:#888;">Edad: <strong style="color:#333;">${edad}</strong></td></tr>
           <tr><td style="padding:3px 8px;color:#888;">DIB: <strong style="color:#333;">${animal.dib || 'No registrado'}</strong></td><td style="padding:3px 8px;color:#888;">${rebano ? 'Rebaño: <strong style="color:#333;">'+rebano.nombre+'</strong>' : ''}</td></tr>

@@ -168,7 +168,7 @@ const CuadernoDigitalView = {
         <h3 class="section-h3 text-gold" style="border-bottom: none; padding-bottom: 0; margin-bottom: 18px;"><span style="color: var(--c-warning); margin-right: 4px;">|</span> 1. ${Icons.home()} Datos de la Explotación</h3>
         <div class="grid grid-cols-2 gap-6 text-85">
           <div><span class="text-gray">Nombre:</span> <strong class="text-white">${f.nombre || '—'}</strong></div>
-          <div><span class="text-gray">Código REGA:</span> <strong class="text-white">${f.codigo_REGA || f.rega || '—'}</strong></div>
+          <div><span class="text-gray">Código REGA:</span> <strong class="text-gold">${f.codigo_REGA || f.rega || '—'}</strong></div>
           <div><span class="text-gray">CEA:</span> <strong class="text-white">${f.cea || '—'}</strong></div>
           <div><span class="text-gray">NIF:</span> <strong class="text-white">${f.nif || '—'}</strong></div>
           <div><span class="text-gray">Provincia:</span> <strong class="text-white">${f.provincia || '—'}</strong></div>
@@ -744,7 +744,7 @@ const CuadernoDigitalView = {
 
     <h2>1. Datos de la Explotación</h2>
     <table>
-      <tr><td width="30%"><b>Nombre</b></td><td>${f.nombre || '—'}</td><td width="30%"><b>REGA</b></td><td>${f.codigo_REGA || f.rega || '—'}</td></tr>
+      <tr><td width="30%"><b>Nombre</b></td><td>${f.nombre || '—'}</td><td width="30%"><b>REGA</b></td><td style="color:var(--p-gold); font-weight:bold;">${f.codigo_REGA || f.rega || '—'}</td></tr>
       <tr><td><b>CEA</b></td><td>${f.cea || '—'}</td><td><b>NIF</b></td><td>${f.nif || '—'}</td></tr>
       <tr><td><b>Provincia</b></td><td>${f.provincia || '—'}</td><td><b>Municipio</b></td><td>${f.municipio || '—'}</td></tr>
       <tr><td><b>CC.AA.</b></td><td>${(window.ComunidadesService && ComunidadesService.getConfiguracionCCAA(f.comunidad_autonoma)?.label) || f.comunidad_autonoma || '—'}</td><td><b>Tipo/Sistema</b></td><td>${f.tipo_explotacion || '—'} / ${f.sistema_explotacion ? f.sistema_explotacion.charAt(0).toUpperCase() + f.sistema_explotacion.slice(1) : '—'}</td></tr>
@@ -790,13 +790,13 @@ const CuadernoDigitalView = {
     ${d.nacimientos.length > 0 ? `
     <table>
       <tr><th>Crotal</th><th>Especie</th><th>Sexo</th><th>Fecha nac.</th><th>Madre</th></tr>
-      ${d.nacimientos.map(a => `<tr><td>${a.numero_identificacion || a.crotal || a.identificacion || '—'}</td><td>${a.especie || '—'}</td><td>${a.sexo || '—'}</td><td>${a.fecha_nacimiento || a.fecha_alta || '—'}</td><td>${crotalPorId[a.madre_id] || a.madre_id || '—'}</td></tr>`).join('')}
+      ${d.nacimientos.map(a => `<tr><td style="color:var(--p-gold); font-weight:bold;">${a.numero_identificacion || a.crotal || a.identificacion || '—'}</td><td>${a.especie || '—'}</td><td>${a.sexo || '—'}</td><td>${a.fecha_nacimiento || a.fecha_alta || '—'}</td><td>${crotalPorId[a.madre_id] || a.madre_id || '—'}</td></tr>`).join('')}
     </table>` : '<p>Sin nacimientos registrados.</p>'}
     <h3 style="font-size:11px; margin:8px 0 4px;">4.2 Muertes y Bajas</h3>
     ${d.muertes.length > 0 ? `
     <table>
       <tr><th>Crotal</th><th>Especie</th><th>Fecha baja</th><th>Motivo</th></tr>
-      ${d.muertes.map(a => `<tr><td>${a.numero_identificacion || a.crotal || a.identificacion || '—'}</td><td>${a.especie || '—'}</td><td>${a.fecha_baja || '—'}</td><td>${a.motivo_baja || '—'}</td></tr>`).join('')}
+      ${d.muertes.map(a => `<tr><td style="color:var(--p-gold); font-weight:bold;">${a.numero_identificacion || a.crotal || a.identificacion || '—'}</td><td>${a.especie || '—'}</td><td>${a.fecha_baja || '—'}</td><td>${a.motivo_baja || '—'}</td></tr>`).join('')}
     </table>` : '<p>Sin bajas registradas.</p>'}
 
     <h2>5. Eventos Generales</h2>

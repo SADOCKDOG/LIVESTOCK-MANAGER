@@ -108,7 +108,7 @@ const AjustesView = {
         <div class="info-box mt-15 mb-20">
           <div class="grid grid-cols-2 gap-8 text-85">
             <div><span class="text-gray">Finca:</span> <strong class="text-white">${activeFinca.nombre}</strong></div>
-            <div><span class="text-gray">REGA:</span> <strong class="text-white">${activeFinca.codigo_REGA || activeFinca.rega || "N/D"}</strong></div>
+            <div><span class="text-gray">REGA:</span> <strong class="text-gold">${activeFinca.codigo_REGA || activeFinca.rega || "N/D"}</strong></div>
             <div><span class="text-gray">CCAA:</span> <strong class="text-white">${activeFinca.comunidad_autonoma ? activeFinca.comunidad_autonoma.toUpperCase() : 'N/D'}</strong></div>
             <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
           </div>
@@ -133,7 +133,7 @@ const AjustesView = {
           <div class="flex justify-between items-center rounded-sm bg-black border border-222 p-12">
             <div>
               <div class="font-bold text-white uppercase text-sm">${f.nombre}</div>
-              <div class="text-gray text-xs mt-4">REGA: ${f.codigo_REGA || f.rega || "N/D"}</div>
+              <div class="text-gray text-xs mt-4">REGA: <span class="text-gold font-bold">${f.codigo_REGA || f.rega || "N/D"}</span></div>
             </div>
             <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary btn-sm">Activar</button>` : `<span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204,255,0,0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">ACTIVA</span>`}</div>
           </div>`).join("")}

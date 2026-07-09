@@ -379,7 +379,7 @@ const DocumentosView = {
         <div id="doc-pdf-content" style="flex:1;padding:40px;font-family:serif;overflow-y:auto;">
           <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:20px;margin-bottom:30px;">
             <h1 style="margin:0;font-size:1.4rem;text-transform:uppercase;">${label}</h1>
-            <p style="color:#555;margin:5px 0 0 0;">${finca.nombre} · ${finca.codigo_REGA || finca.rega || ''}</p>
+            <p style="color:#555;margin:5px 0 0 0;">${finca.nombre} · <span class="text-gold" style="color:var(--p-gold); font-weight:bold;">${finca.codigo_REGA || finca.rega || ''}</span></p>
           </div>
           <div style="margin-bottom:20px;font-size:0.9rem;">
             <p><strong>Número:</strong> ${doc.numero || 'S/N'}</p>

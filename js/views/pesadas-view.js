@@ -163,7 +163,7 @@ const PesadasView = {
                     ${iconoMedida}
                 </div>
                 <div>
-                    <div class="text-xs font-black text-white uppercase tracking-wider">${p.nombreAnimal}</div>
+                    <div class="text-xs font-black text-gold uppercase tracking-wider">${p.nombreAnimal}</div>
                     <div class="flex items-center gap-6 text-[0.6rem] font-bold text-gray-500 uppercase tracking-tight mt-2">
                         <span>${p.fecha}</span>
                         <span>•</span>
