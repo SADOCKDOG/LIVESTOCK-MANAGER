@@ -146,7 +146,7 @@ const DashboardView = {
 
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <!-- Balance Económico -->
-        <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
+        <div class="card" style="grid-column: span 4; margin-bottom: 0; padding: 24px; text-align: center;">
           <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> BALANCE ECONÓMICO</h3>
           <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 20px;" class="${balanceTotal >= 0 ? 'text-lime' : 'text-red'}">${balanceTotal.toLocaleString()} <span style="font-size: 0.4em; font-weight: 700;" class="text-grey">€</span></div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
@@ -166,7 +166,7 @@ const DashboardView = {
         ${this._renderAlertasAdministrativas(alertasAdministrativas)}
       </div>
 
-      ${this._renderIndicadoresLacteos(indicadoresLeche)}
+      ${`<div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease; grid-column: span 3;">${this._renderIndicadoresLacteos(indicadoresLeche)}</div>`}
 
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
