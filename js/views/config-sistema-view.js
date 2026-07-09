@@ -96,6 +96,10 @@ const ConfigSistemaView = {
             <input type="checkbox" ${config.glowBotones !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleGlowBotones', this.checked)">
             <span>Resplandor en Botones</span>
           </label>
+          <label class="wizard-check-label">
+            <input type="checkbox" ${config.glowTarjetas !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleGlowTarjetas', this.checked)">
+            <span>Haces de Luz de todas las tarjetas</span>
+          </label>
           <button class="widget-link-btn widget-link-btn--neon neon-success w-full mt-10" onclick="AjustesView._abrirWizardRetroiluminacion()">
             ${Icons.ajustes()} Wizard de Iluminación Avanzado
           </button>
