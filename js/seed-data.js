@@ -579,7 +579,8 @@
           });
 
           // Registrar también en movimientos_ganado para que aparezcan en el listado de Guías DIMOE unificado de documentos-view.js
-          const movId1 = await window.db.add('movimientos_ganado', {
+          await window.db.put('movimientos_ganado', {
+            id: 9901,
             demo: true,
             fincaId: fincaId,
             tipo: 'salida',
@@ -606,7 +607,8 @@
             creadoEn: new Date().toISOString()
           });
 
-          await window.db.add('movimientos_ganado', {
+          await window.db.put('movimientos_ganado', {
+            id: 9902,
             demo: true,
             fincaId: fincaId,
             tipo: 'salida',
