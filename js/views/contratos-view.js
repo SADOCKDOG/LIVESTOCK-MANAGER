@@ -10,7 +10,7 @@ const ContratosView = {
   },
   async render() {
     if (window.App) App.updateHeaderColor('contratos');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("comercializacion-tab-content") || document.getElementById("app-content");
     const moduleColor = window.getModuleColor ? getModuleColor('/contrato') : '#4FADF5';
 
     // Cargar datos

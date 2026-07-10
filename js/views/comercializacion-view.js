@@ -1,24 +1,19 @@
 /**
- * Livestock Manager - ComercializacionView v2.5.0
- * Vista de Comercialización unificada con tabs tipo ProduccionView/GastosView.
- * Carne / Leche / Gastos con KPIs, botón registrar, listados filtrados.
+ * Livestock Manager - ComercializacionView v3.0.0
+ * Consola unificada de Comercialización (CoMer) multipestaña con soporte premium.
+ * Agrupa: Leche, Carne, Clientes, Contratos y Logística.
  */
 
 const ComercializacionView = {
-  _currentTab: 'leche',
+  _activeSubModule: 'leche', // 'leche', 'carne', 'compradores', 'contratos', 'transportistas'
   _cachedData: null,
   _cachedFincaId: null,
   _needsDataRefresh: false,
   _loadingPromise: null,
-  _filters: {
-    dateFrom: '',
-    dateTo: '',
-    search: ''
-  },
 
   async _ensureData(fincaId, force = false) {
     if (!fincaId) {
-      this._cachedData = { ventas: [], entregas: [], gastosRecords: [], kpis: { carne: [], leche: [], gastos: [] } };
+      this._cachedData = { ventas: [], entregas: [], kpis: { carne: [], leche: [] } };
       this._cachedFincaId = null;
       this._needsDataRefresh = false;
       return this._cachedData;
@@ -34,27 +29,23 @@ const ComercializacionView = {
     }
 
     this._loadingPromise = (async () => {
-      const [ventas, entregas, gastosRecords] = await Promise.all([
+      const [ventas, entregas] = await Promise.all([
         window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
-        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-        Gastos.list(fincaId).catch(() => [])
+        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => [])
       ]);
 
       ventas.sort((a, b) => new Date(b.fechaSacrificio || 0) - new Date(a.fechaSacrificio || 0));
       entregas.sort((a, b) => new Date(b.fechaRecogida || 0) - new Date(a.fechaRecogida || 0));
-      gastosRecords.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
       const pesoTotal = ventas.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
       const rendProm = ventas.length > 0 ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length : 0;
       const ingresoTotal = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
       const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
       const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
-      const gastoTotal = gastosRecords.reduce((s, g) => s + (g.monto || 0), 0);
 
       this._cachedData = {
         ventas,
         entregas,
-        gastosRecords,
         kpis: {
           carne: [
             { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
@@ -67,11 +58,6 @@ const ComercializacionView = {
             { label: 'Entregas', value: entregas.length },
             { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
             { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
-          ],
-          gastos: [
-            { label: 'Total (€)', value: this._fmt(gastoTotal) + ' €' },
-            { label: 'Registros', value: gastosRecords.length },
-            { label: 'Media/Registro', value: gastosRecords.length > 0 ? this._fmt(Math.round(gastoTotal / gastosRecords.length)) + ' €' : '0 €' }
           ]
         }
       };
@@ -94,8 +80,8 @@ const ComercializacionView = {
 
   async render(params) {
     const main = document.getElementById('app-content');
-    const tab = (params && params.get ? params.get("tab") : null) || this._currentTab;
-    this._currentTab = tab;
+    const tab = (params && params.get ? params.get("tab") : null) || this._activeSubModule;
+    this._activeSubModule = tab;
 
     const fincaId = await Fincas.getActiveId();
     if (!fincaId) {
@@ -103,53 +89,165 @@ const ComercializacionView = {
       return;
     }
 
-    const data = await this._ensureData(fincaId, this._needsDataRefresh);
-    const meta = this._getTabMeta(this._currentTab);
+    const currentMeta = this._getSubModuleMeta(this._activeSubModule);
 
     if (window.App && App.updateHeaderColor) {
-      App.updateHeaderColor(this._currentTab === 'gastos' ? null : this._currentTab);
+      App.updateHeaderColor(currentMeta.headerColorKey);
     }
 
     main.innerHTML = `
       <div class="mb-14">
-        <div class="text-left mb-10 flex items-center" style="font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.5px;">
-          <span style="color: ${meta.color}; font-size: 1.4rem; margin-right: 10px; font-weight: 900;">|</span> COMERCIALIZACIÓN
-        </div>
-        <div class="comer-mode-switch" style="display: flex; gap: 8px;">
-          <button class="comer-mode-btn ${this._currentTab === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger); color: ${this._currentTab === 'carne' ? '#000' : 'var(--c-danger)'}; flex: 1; padding: 10px;" onclick="ComercializacionView._cambiarTab('carne')">${Icons.carne()} Carne</button>
-          <button class="comer-mode-btn ${this._currentTab === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info); color: ${this._currentTab === 'leche' ? '#000' : 'var(--c-info)'}; flex: 1; padding: 10px;" onclick="ComercializacionView._cambiarTab('leche')">${Icons.leche()} Leche</button>
-          <button class="comer-mode-btn ${this._currentTab === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple); color: ${this._currentTab === 'gastos' ? '#000' : 'var(--c-purple)'}; flex: 1; padding: 10px;" onclick="ComercializacionView._cambiarTab('gastos')">${Icons.gastos()} Gastos</button>
+        <div class="text-left mb-6 uppercase" style="letter-spacing: 0.5px;">
+          <h1 style="font-size: 1.25rem; font-weight: 900; color: #fff; margin: 0; display: flex; items-center;">
+            <span style="color:${currentMeta.color}; margin-right:4px;">|</span> ${currentMeta.title}
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            ${currentMeta.desc}
+          </div>
         </div>
       </div>
 
-      <div class="explotacion-kpis mb-14">
-        ${this._renderKPIsTab()}
+      <!-- Barra de Navegación Multipestaña Horizontal Comercialización (Scrollable) Premium con Indicadores Animados -->
+      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
+        <div class="pestana-indicador-flecha pestana-flecha-izq" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: -100, behavior: 'smooth' })">
+          ${Icons.atras()}
+        </div>
+        <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
+          <div class="pestanas-premium-switch">
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ComercializacionView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ComercializacionView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'compradores' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('compradores')">${Icons.compradores()} CLIENTES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'contratos' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('contratos')">${Icons.documento()} CONTRATOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'transportistas' ? 'active' : ''}" style="--mode-color:var(--c-pink);" onclick="ComercializacionView._cambiarSubModulo('transportistas')">${Icons.transportistas()} LOGÍSTICA</button>
+          </div>
+        </div>
+        <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
+          ${Icons.siguiente()}
+        </div>
       </div>
+      
+      <!-- Contenedor Dinámico para la pestaña activa -->
+      <div id="comercializacion-tab-content" class="animate-fade-in"></div>`;
 
-      <div id="comer-content"><div class="loader">Cargando datos comerciales...</div></div>`;
+    // Delegación dinámica de renderizado de pestañas
+    switch (this._activeSubModule) {
+      case 'leche':
+        await this._renderLecheSubTab();
+        break;
+      case 'carne':
+        await this._renderCarneSubTab();
+        break;
+      case 'compradores':
+        if (window.CompradoresView) {
+          CompradoresView._activeModule = 'compradores';
+          await CompradoresView.render();
+        }
+        break;
+      case 'contratos':
+        if (window.ContratosView) {
+          await ContratosView.render();
+        }
+        break;
+      case 'transportistas':
+        if (window.TransportistasView) {
+          await TransportistasView.render();
+        }
+        break;
+    }
 
-    this._renderTabActual();
+    // Inicializar scroll dinámico para la barra de pestañas
+    const containerPestanas = document.querySelector('.pestanas-premium-container');
+    if (containerPestanas && window.App?.inicializarScrollPestanas) {
+      window.App.inicializarScrollPestanas(containerPestanas);
+    }
   },
 
-  _getTabMeta(tab) {
+  _cambiarSubModulo(subModulo) {
+    this._activeSubModule = subModulo;
+    this.render();
+  },
+
+  _getSubModuleMeta(sub) {
     const map = {
-      carne: { color: 'var(--c-danger)', label: 'Cárnico', icon: Icons.carne() },
-      leche: { color: 'var(--c-info)', label: 'Lácteo', icon: Icons.leche() },
-      gastos: { color: 'var(--c-purple)', label: 'Gastos', icon: Icons.gastos() }
+      leche: { color: 'var(--c-info)', title: 'CONTRATOS Y ENTREGAS LÁCTEAS', desc: 'Control de cisternas, analíticas y albaranes de leche', headerColorKey: 'leche' },
+      carne: { color: 'var(--c-danger)', title: 'COMERCIALIZACIÓN CÁRNICA', desc: 'Ventas de ganado, rendimientos de canal y facturación', headerColorKey: 'carne' },
+      compradores: { color: 'var(--c-purple)', title: 'CARTERA DE CLIENTES', desc: 'Registro de mataderos, cooperativas y centrales lecheras', headerColorKey: 'compradores' },
+      contratos: { color: 'var(--c-purple)', title: 'CONTRATOS DE COMPRA', desc: 'Acuerdos comerciales de suministro y trazabilidad de precios', headerColorKey: 'contratos' },
+      transportistas: { color: 'var(--c-pink)', title: 'LOGÍSTICA Y TRANSPORTISTAS', desc: 'Flota de transporte ganadero calificado y cisternas', headerColorKey: 'transportistas' }
     };
-    return map[tab] || map.carne;
+    return map[sub] || map.leche;
   },
 
-  _renderKPIsTab() {
-    const d = this._cachedData;
-    const tab = this._currentTab;
-    const kpis = d.kpis[tab] || [];
-    const meta = this._getTabMeta(tab);
+  async _renderLecheSubTab() {
+    const container = document.getElementById('comercializacion-tab-content');
+    if (!container) return;
+    const fincaId = await Fincas.getActiveId();
+    const d = await this._ensureData(fincaId, this._needsDataRefresh);
 
+    const kpisHtml = this._renderKPIsSubTab('leche', d.kpis.leche, 'var(--c-info)', Icons.leche());
+    
+    container.innerHTML = `
+      <div class="explotacion-kpis mb-14">
+        ${kpisHtml}
+      </div>
+      <div id="comer-sub-content"></div>`;
+
+    const subContent = document.getElementById('comer-sub-content');
+    this._renderSeccion(subContent, {
+      icon: Icons.leche(),
+      title: 'Entregas Leche',
+      color: 'var(--c-info)',
+      registrarLabel: 'REGISTRAR RETIRADA',
+      listName: 'LISTA DE ENTREGAS',
+      registrarHandler: "App._abrirWizardAlbaranLeche()",
+      records: d.entregas.slice(0, 50).map(e => ({
+        title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`,
+        metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span><span>·</span><span>${(e.cantidad || 0).toLocaleString()} L</span>`,
+        badge: e.estadoAnalitica || 'PENDIENTE',
+        onclick: `location.hash='/albaran-leche?id=${e.id}'`
+      })),
+      emptyMsg: 'Sin entregas de leche registradas.'
+    });
+  },
+
+  async _renderCarneSubTab() {
+    const container = document.getElementById('comercializacion-tab-content');
+    if (!container) return;
+    const fincaId = await Fincas.getActiveId();
+    const d = await this._ensureData(fincaId, this._needsDataRefresh);
+
+    const kpisHtml = this._renderKPIsSubTab('carne', d.kpis.carne, 'var(--c-danger)', Icons.carne());
+    
+    container.innerHTML = `
+      <div class="explotacion-kpis mb-14">
+        ${kpisHtml}
+      </div>
+      <div id="comer-sub-content"></div>`;
+
+    const subContent = document.getElementById('comer-sub-content');
+    this._renderSeccion(subContent, {
+      icon: Icons.carne(),
+      title: 'Ventas Carne',
+      color: 'var(--c-danger)',
+      registrarLabel: 'REGISTRAR VENTA',
+      listName: 'LISTA DE VENTAS',
+      registrarHandler: "App._abrirWizardVentaMasiva()",
+      records: d.ventas.slice(0, 50).map(v => ({
+        title: v.razonSocial || 'Matadero',
+        metadata: `<span>${new Date(v.fechaSacrificio || v.fecha || 0).toLocaleDateString()}</span><span>·</span><span>${v.pesoCanal || 0} kg canal</span>`,
+        badge: `${Math.round(v.importe_total || 0).toLocaleString()} €`,
+        onclick: `App._abrirDetalleVentaCarne(${v.id})`
+      })),
+      emptyMsg: 'Sin ventas de carne registradas.'
+    });
+  },
+
+  _renderKPIsSubTab(tabKey, kpis, color, icon) {
+    const labelMap = { leche: 'LÁCTEO', carne: 'CÁRNICO' };
     return `
       <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02); width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-          <span class="flex items-center gap-6"><span style="color: ${meta.color}; margin-right: 4px;">|</span> ${meta.icon} BALANCE ${meta.label.toUpperCase()}</span>
+          <span class="flex items-center gap-6"><span style="color: ${color}; margin-right: 4px;">|</span> ${icon} BALANCE ${labelMap[tabKey]}</span>
           <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
         </div>
         <div class="resumen-body flex flex-col">
@@ -161,25 +259,6 @@ const ComercializacionView = {
           `).join('')}
         </div>
       </div>`;
-  },
-
-  _cambiarTab(tab) {
-    this._currentTab = tab;
-    this.render();
-  },
-
-  _renderTabActual() {
-    const d = this._cachedData;
-    if (!d) return;
-    const content = document.getElementById('comer-content');
-    if (!content) return;
-
-    switch (this._currentTab) {
-      case 'carne': this._renderCarne(content, d); break;
-      case 'leche': this._renderLeche(content, d); break;
-      case 'gastos': this._renderGastos(content, d); break;
-      default: this._renderCarne(content, d);
-    }
   },
 
   _renderSeccion(content, opts) {
@@ -208,80 +287,6 @@ const ComercializacionView = {
       <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${registrarHandler}">
         <span class="fab-label">${registrarLabel}</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>`;
-  },
-
-  _renderCarne(content, d) {
-    this._renderSeccion(content, {
-      icon: Icons.carne(), title: 'Ventas Carne', color: 'var(--c-danger)',
-      registrarLabel: 'REGISTRAR VENTA',
-      listName: 'LISTA DE VENTAS',
-      registrarHandler: "App._abrirWizardVentaMasiva()",
-      records: d.ventas.slice(0, 50).map(v => ({
-        title: v.razonSocial || 'Matadero',
-        metadata: `<span>${new Date(v.fechaSacrificio).toLocaleDateString()}</span><span>·</span><span>${v.pesoCanal || 0} kg canal</span>`,
-        badge: `${Math.round(v.importe_total || 0).toLocaleString()} €`,
-        onclick: `App._abrirDetalleVentaCarne(${v.id})`
-      })),
-      emptyMsg: 'Sin ventas de carne registradas.'
-    });
-  },
-
-  _renderLeche(content, d) {
-    this._renderSeccion(content, {
-      icon: Icons.leche(), title: 'Entregas Leche', color: 'var(--c-info)',
-      registrarLabel: 'REGISTRAR RETIRADA',
-      listName: 'LISTA DE ENTREGAS',
-      registrarHandler: "App._abrirWizardAlbaranLeche()",
-      records: d.entregas.slice(0, 50).map(e => ({
-        title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`,
-        metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span><span>·</span><span>${(e.cantidad || 0).toLocaleString()} L</span>`,
-        badge: e.estadoAnalitica || 'PENDIENTE',
-        onclick: `location.hash='/albaran-leche?id=${e.id}'`
-      })),
-      emptyMsg: 'Sin entregas de leche registradas.'
-    });
-  },
-
-  _renderGastos(content, d) {
-    const records = d.gastosRecords.slice(0, 50);
-    const recordsHtml = records.length > 0
-      ? records.map(g => App._cardRegistro({
-          icon: Icons.gastos(),
-          title: g.concepto || 'Gasto',
-          metadata: `<span>${new Date(g.fecha).toLocaleDateString()}</span><span>·</span><span>${g.categoria || 'Varios'}</span>`,
-          badge: `${(g.monto || 0).toLocaleString()} €`,
-          color: 'var(--c-purple)',
-          onClick: `App.renderDetalleGasto(new URLSearchParams('id=${g.id}'))`
-        })).join('')
-      : `<div class="p-16 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-sm">${Icons.buscar()} Sin gastos registrados.</span></div>`;
-
-    content.innerHTML = `
-      <div class="card p-14 border-222" style="background: rgba(255,255,255,0.02);">
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-6">
-          <span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.gastos()} LISTA DE GASTOS (SOLO LECTURA)
-        </div>
-        <div class="grid gap-10">
-          ${recordsHtml}
-        </div>
-      </div>
-      <div class="card p-14 mb-14 border-222" style="background: rgba(255,255,255,0.02);">
-        <div class="text-xs text-white font-900 uppercase tracking-wider mb-6 flex items-center gap-6">
-          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.info()} GESTIÓN DE GASTOS
-        </div>
-        <p class="text-xs text-gray mb-10">
-          Los gastos se registran en el módulo de <strong class="text-white">Explotación</strong>. La vista analítica completa está en <strong class="text-white">Gastos</strong>.
-        </p>
-        <div class="grid grid-cols-2 gap-10">
-          <a href="#/explotacion?sub=gastos" class="widget-link-btn widget-link-btn--neon neon-success" style="text-decoration: none; text-align: center;">
-            ${Icons.agregar()}
-            <span class="widget-link-label">Registrar Gasto</span>
-          </a>
-          <a href="#/gastos" class="widget-link-btn widget-link-btn--neon neon-info" style="text-decoration: none; text-align: center;">
-            ${Icons.grafico()}
-            <span class="widget-link-label">Ver Analítica</span>
-          </a>
-        </div>
       </div>`;
   },
 

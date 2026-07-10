@@ -13,7 +13,7 @@ const CompradoresView = {
   },
   async render() {
     if (window.App) App.updateHeaderColor('compradores');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("comercializacion-tab-content") || document.getElementById("app-content");
 
     // Cargar datos necesarios según el módulo activo
     await this._cargarDatos();
