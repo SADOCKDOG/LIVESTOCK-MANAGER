@@ -9,7 +9,7 @@ const ConfigSistemaView = {
 
   async render(params) {
     if (window.App) App.updateHeaderColor('ajustes');
-    const main = document.getElementById("expro-tab-content") || document.getElementById("app-content");
+    const main = document.getElementById("app-content");
     const config = await AjustesView._loadConfig();
     const tab = params?.get?.('tab') || this._currentTab;
     this._currentTab = tab;

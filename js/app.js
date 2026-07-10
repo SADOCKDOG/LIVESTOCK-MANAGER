@@ -2488,9 +2488,8 @@ const App = {
   },
 
   async renderConfigSistema(params) {
-    if (window.ExplotacionView) {
-      ExplotacionView._activeSubModule = 'ajustes';
-      await this.renderExplotacion(params);
+    if (window.ConfigSistemaView) {
+      await ConfigSistemaView.render(params);
     }
   },
 
