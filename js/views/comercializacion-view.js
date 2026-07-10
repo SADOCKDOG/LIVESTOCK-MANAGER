@@ -125,6 +125,30 @@ const ComercializacionView = {
 
     const contratos = await window.db.getAll('contratos_compra').catch(() => []);
     const hoy = new Date();
+
+    // Auto-ajuste de demostración: Asegurar que el contrato de carne expire pronto (en 15 días) para testear alertas de vencimiento
+    const fincaActiva = await Fincas.getActive().catch(() => null);
+    if (fincaActiva && (fincaActiva.demo || (fincaActiva.nombre && fincaActiva.nombre.includes('CHAMORRO')))) {
+      const tieneVenciendoPronto = contratos.some(c => {
+        if (c.anulado || c.activo === false) return false;
+        if (!c.fecha_fin) return false;
+        const difDias = Math.ceil((new Date(c.fecha_fin) - hoy) / (24 * 60 * 60 * 1000));
+        return difDias >= 0 && difDias <= 30;
+      });
+
+      if (!tieneVenciendoPronto) {
+        const cCarne = contratos.find(c => c.numero_contrato === 'CT-2026-001');
+        if (cCarne) {
+          const fVence = new Date(hoy.getTime() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+          cCarne.fecha_fin = fVence;
+          await window.db.put('contratos_compra', cCarne).catch(() => {});
+          
+          setTimeout(() => { App.navigate('/comercializacion'); }, 100);
+          return;
+        }
+      }
+    }
+
     const contratosVenciendo = contratos.filter(c => {
       if (c.anulado || c.activo === false) return false;
       if (!c.fecha_fin) return false;
