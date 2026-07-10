@@ -10,6 +10,42 @@ const ZonasView = {
     const main = document.getElementById("expro-tab-content") || document.getElementById("app-content");
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
+
+    // Auto-inicialización inteligente en caliente de la parcela intensiva para pruebas en la demo CHAMORRO
+    if (finca && (finca.demo || (finca.nombre && finca.nombre.includes('CHAMORRO')))) {
+      finca.zonas = finca.zonas || [];
+      const tieneCercado = finca.zonas.some(z => z.nombre === 'Cercado de Cebo 1ha');
+      if (!tieneCercado) {
+        finca.zonas.push({
+          nombre: 'Cercado de Cebo 1ha',
+          superficieGrafica: 1,
+          superficie: 1,
+          aforoMax: 10,
+          aforo_maximo: 10,
+          usoPrincipal: 'Pasto',
+          uso: 'Pasto',
+          localizacion: 'Cercado intensivo temporal',
+          descripcion: 'Pruebas de sobrepastoreo',
+          codigo_pac: 'ES-AN-21005-004',
+          distancia_agua_m: 10
+        });
+
+        // Guardar la finca para persistir la nueva zona
+        await window.db.put('fincas', finca).catch(() => {});
+
+        // Reasignar el rebaño de Terneros Cebo a la nueva parcela pequeña para disparar el sobrepastoreo (2.0 UGM/ha)
+        const rCebo = rebanos.find(r => r.nombre === 'Terneros Cebo');
+        if (rCebo && rCebo.zonaActual !== 'Cercado de Cebo 1ha') {
+          rCebo.zonaActual = 'Cercado de Cebo 1ha';
+          await Rebanos.save(rCebo).catch(() => {});
+        }
+
+        // Recargar la vista suavemente para que los cambios surtan efecto en caliente
+        setTimeout(() => { App.navigate('/zonas'); }, 100);
+        return;
+      }
+    }
+
     const zonasConIndice = (finca.zonas || [])
           .map((zona, realIndex) => ({ zona, realIndex }))
           .filter(({ zona }) => !zona?.anulada);
@@ -19,6 +55,8 @@ const ZonasView = {
     else {
       let totalAforo = 0, totalOcupacion = 0;
       let fichasHtml = '';
+      let zonasConSobrepastoreo = [];
+
       for (const item of zonasConIndice) {
         const z = item.zona;
         let censoTotal = 0;
@@ -59,9 +97,21 @@ const ZonasView = {
           const ans = await Animales.list(r.id);
           ugmTotal += ans.length * factor;
         }
-        const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        const cargaGanaderaNum = superficie > 0 ? ugmTotal / superficie : 0;
+        const cargaGanadera = cargaGanaderaNum.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         const pacTexto = z.codigo_pac ? `PAC: ${z.codigo_pac}` : 'PAC: pendiente';
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
+
+        // Acumular zonas con sobrepastoreo activo si superan el aforo ecológico oficial (1.0 UGM/ha)
+        if (cargaGanaderaNum > 1.0) {
+          zonasConSobrepastoreo.push({
+            nombre: z.nombre,
+            carga: cargaGanadera,
+            ugm: ugmTotal,
+            superficie: superficie
+          });
+        }
 
         // Sincronización Fitosanitaria en tiempo real
         const bloqueoFito = await this.verificarBloqueoFitosanitario(finca.id, z.nombre);
@@ -121,6 +171,41 @@ const ZonasView = {
           onClick: `location.hash='/zona?index=${item.realIndex}'`
         });
       }
+
+      // Renderizar Alerta Bento de Sobrepastoreo si hay parcelas afectadas
+      let sobrepastoreoHtml = '';
+      if (zonasConSobrepastoreo.length > 0) {
+        let parcelasAfectadasHtml = '';
+        zonasConSobrepastoreo.forEach(p => {
+          parcelasAfectadasHtml += `
+            <div class="flex justify-between items-center py-6 border-bottom-222" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">
+              <span class="text-white">${p.nombre} (${p.superficie.toLocaleString('es-ES')} ha)</span>
+              <span class="font-950" style="color: var(--c-danger); text-shadow: 0 0 6px rgba(255,68,68,0.4);">${p.carga} UGM/ha</span>
+            </div>
+          `;
+        });
+
+        sobrepastoreoHtml = `
+          <!-- Alerta Bento de Sobrepastoreo Crítico -->
+          <div class="card p-12 mb-14 border-danger" style="background: rgba(255, 68, 68, 0.03); border: 1px solid var(--c-danger); box-shadow: 0 0 15px rgba(255, 68, 68, 0.12), inset 0 0 10px rgba(255, 68, 68, 0.05);">
+            <div class="flex items-center gap-6 mb-8 text-xs text-danger font-950 uppercase tracking-wider animate-pulse">
+              ${Icons.alerta()} ✕ ALERTA DE SOBREPASTOREO ACTIVO (>1.0 UGM/ha)
+            </div>
+            <p class="text-[0.62rem] text-aaa uppercase font-700 tracking-wide mb-8" style="line-height:1.4;">
+              El aforo ecológico máximo permitido para pastoreo extensivo ha sido superado en las siguientes parcelas. Se recomienda rotar los lotes o rebaños para evitar la degradación del pasto.
+            </p>
+            <div class="mb-10">
+              ${parcelasAfectadasHtml}
+            </div>
+            <div class="flex justify-end">
+              <button onclick="App.toastInfo('Abriendo panel de asistente de rotación de pastos...'); location.hash='/sistema?tab=interfaz'" class="px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem]" style="background: rgba(255,68,68,0.15); border: 1px solid var(--c-danger); color: var(--c-danger); border-radius: 4px; transition: all 0.2s; box-shadow: 0 0 8px rgba(255,68,68,0.15);" onmouseover="this.style.background='var(--c-danger)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,68,68,0.15)'; this.style.color='var(--c-danger)';">
+                ⇄ Sugerir Rotación Preventiva
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
       // Cabecera de Sección Estandarizada + Resumen Colapsable sin anidación
       const moduleColor = window.getModuleColor('/zonas');
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
@@ -155,6 +240,8 @@ const ZonasView = {
             </div>
           </div>
         </div>
+
+        ${sobrepastoreoHtml}
 
         <!-- Histórico de registros -->
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
