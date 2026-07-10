@@ -18,62 +18,71 @@ const DocumentosView = {
       let movimientos = await window.db.getAll('movimientos_ganado').catch(() => []);
       let ventas = await window.db.getAll('comercializacion_carne').catch(() => []);
 
-      // Auto-siembra inteligente de traslados/DIMOEs para la demo CHAMORRO si la tabla está vacía
-      if (finca && (finca.demo || (finca.nombre && finca.nombre.includes('CHAMORRO'))) && movimientos.length === 0) {
+      // Auto-siembra inteligente de traslados/DIMOEs para la demo CHAMORRO si faltan las guías de prueba
+      const tieneGuia1 = movimientos.some(m => m.numero_guia === 'GS-2025-0451');
+      const tieneGuia2 = movimientos.some(m => m.numero_guia === 'GS-2026-0922');
+
+      if (finca && (finca.demo || (finca.nombre && finca.nombre.includes('CHAMORRO'))) && (!tieneGuia1 || !tieneGuia2)) {
         const fechaSacrificio = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         
-        // Guía DIMOE Oficial Autorizada (GS-2025-0451)
-        await window.db.add('movimientos_ganado', {
-          demo: true,
-          fincaId: finca.id,
-          tipo: 'salida',
-          numero_guia: 'GS-2025-0451',
-          rega_origen: finca.rega || 'ES210050001234',
-          rega_destino: 'ES10.05/M',
-          explotacion_contraparte: 'Cárnicas Extremeñas SL',
-          motivo: 'sacrificio',
-          especie: 'Vacas',
-          num_animales: 1,
-          crotales: ['ES123456789016'],
-          tipo_operador_destino: 'matadero',
-          transportista_nombre: 'Transportes Ganaderos del Sur SL',
-          matricula: '1234BCD',
-          fecha: fechaSacrificio,
-          desinsectacion_certificada: true,
-          desinfeccion_numero_talon: 'DES-89012',
-          desinfeccion_fecha: fechaSacrificio,
-          veterinario_autorizante: 'Dr. Manuel Castillo',
-          estado_tramite: 'presentado',
-          fecha_presentacion: fechaSacrificio,
-          numero_registro_oficial: 'REG-OFF-8472',
-          acuse_recibo: 'OK-RECEP-3921',
-          creadoEn: new Date().toISOString()
-        }).catch(() => {});
+        if (!tieneGuia1) {
+          // Guía DIMOE Oficial Autorizada (GS-2025-0451)
+          await window.db.put('movimientos_ganado', {
+            id: 9901,
+            demo: true,
+            fincaId: finca.id,
+            tipo: 'salida',
+            numero_guia: 'GS-2025-0451',
+            rega_origen: finca.rega || 'ES210050001234',
+            rega_destino: 'ES10.05/M',
+            explotacion_contraparte: 'Cárnicas Extremeñas SL',
+            motivo: 'sacrificio',
+            especie: 'Vacas',
+            num_animales: 1,
+            crotales: ['ES123456789016'],
+            tipo_operador_destino: 'matadero',
+            transportista_nombre: 'Transportes Ganaderos del Sur SL',
+            matricula: '1234BCD',
+            fecha: fechaSacrificio,
+            desinsectacion_certificada: true,
+            desinfeccion_numero_talon: 'DES-89012',
+            desinfeccion_fecha: fechaSacrificio,
+            veterinario_autorizante: 'Dr. Manuel Castillo',
+            estado_tramite: 'presentado',
+            fecha_presentacion: fechaSacrificio,
+            numero_registro_oficial: 'REG-OFF-8472',
+            acuse_recibo: 'OK-RECEP-3921',
+            creadoEn: new Date().toISOString()
+          }).catch(err => console.error("Error al auto-sembrar GS-2025-0451:", err));
+        }
 
-        // Guía DIMOE Oficial Borrador (GS-2026-0922)
-        await window.db.add('movimientos_ganado', {
-          demo: true,
-          fincaId: finca.id,
-          tipo: 'salida',
-          numero_guia: 'GS-2026-0922',
-          rega_origen: finca.rega || 'ES210050001234',
-          rega_destino: 'ES410020004921',
-          explotacion_contraparte: 'Finca Los Helechos (Sevilla)',
-          motivo: 'pastoreo',
-          especie: 'Ovejas',
-          num_animales: 3,
-          crotales: ['ES654321098765', 'ES654321098766', 'ES654321098767'],
-          tipo_operador_destino: 'explotacion',
-          transportista_nombre: 'Transportes Ganaderos del Sur SL',
-          matricula: '1234BCD',
-          fecha: new Date().toISOString().split('T')[0],
-          desinsectacion_certificada: true,
-          desinfeccion_numero_talon: 'DES-90211',
-          desinfeccion_fecha: new Date().toISOString().split('T')[0],
-          veterinario_autorizante: 'Dr. Manuel Castillo',
-          estado_tramite: 'borrador',
-          creadoEn: new Date().toISOString()
-        }).catch(() => {});
+        if (!tieneGuia2) {
+          // Guía DIMOE Oficial Borrador (GS-2026-0922)
+          await window.db.put('movimientos_ganado', {
+            id: 9902,
+            demo: true,
+            fincaId: finca.id,
+            tipo: 'salida',
+            numero_guia: 'GS-2026-0922',
+            rega_origen: finca.rega || 'ES210050001234',
+            rega_destino: 'ES410020004921',
+            explotacion_contraparte: 'Finca Los Helechos (Sevilla)',
+            motivo: 'pastoreo',
+            especie: 'Ovejas',
+            num_animales: 3,
+            crotales: ['ES654321098765', 'ES654321098766', 'ES654321098767'],
+            tipo_operador_destino: 'explotacion',
+            transportista_nombre: 'Transportes Ganaderos del Sur SL',
+            matricula: '1234BCD',
+            fecha: new Date().toISOString().split('T')[0],
+            desinsectacion_certificada: true,
+            desinfeccion_numero_talon: 'DES-90211',
+            desinfeccion_fecha: new Date().toISOString().split('T')[0],
+            veterinario_autorizante: 'Dr. Manuel Castillo',
+            estado_tramite: 'borrador',
+            creadoEn: new Date().toISOString()
+          }).catch(err => console.error("Error al auto-sembrar GS-2026-0922:", err));
+        }
 
         // Refrescar lista de movimientos tras la inyección exitosa
         movimientos = await window.db.getAll('movimientos_ganado').catch(() => []);
