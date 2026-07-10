@@ -189,6 +189,57 @@ const Sanitarios = {
                 ultimoTratamiento: sanitarios.length > 0 ? sanitarios[0].fecha : null
             };
         }, { action: 'getCoberturaTratamiento' });
+    },
+
+    /**
+     * Verifica si hay algún tratamiento activo para el rebaño que restrinja la leche en la fecha dada
+     */
+    async verificarRetiroLeche(rebanoId, fechaStr) {
+        return await ErrorHandler.tryAsync(async () => {
+            const tratamientos = await this.list(Number(rebanoId));
+            const fechaConsulta = new Date(fechaStr);
+            const resultado = { bloqueado: false, motivos: [] };
+
+            for (const t of tratamientos) {
+                const fechaTratamiento = new Date(t.fecha);
+                const diasEspera = Number(t.tiempo_espera_leche_dias || 0);
+                const fechaFinRetiro = new Date(fechaTratamiento.getTime() + (diasEspera * 24 * 60 * 60 * 1000));
+                
+                if (t.prohibidoLeche) {
+                    resultado.bloqueado = true;
+                    resultado.motivos.push(`Principio activo PROHIBIDO permanente para leche (${t.medicamento || 'Tratamiento'}) registrado el ${t.fecha}`);
+                } else if (diasEspera > 0 && fechaConsulta >= fechaTratamiento && fechaConsulta <= fechaFinRetiro) {
+                    resultado.bloqueado = true;
+                    const diasRestantes = Math.ceil((fechaFinRetiro - fechaConsulta) / (24 * 60 * 60 * 1000));
+                    resultado.motivos.push(`Medicamento bajo retiro de leche (${t.medicamento || 'Tratamiento'}): ${diasEspera} días de espera. Faltan ${diasRestantes} días (Vence el ${fechaFinRetiro.toISOString().split('T')[0]})`);
+                }
+            }
+            return resultado;
+        }, { action: 'verificarRetiroLeche' });
+    },
+
+    /**
+     * Verifica si el rebaño o animal está en período de retiro de carne en la fecha dada
+     */
+    async verificarRetiroCarne(rebanoId, fechaStr) {
+        return await ErrorHandler.tryAsync(async () => {
+            const tratamientos = await this.list(Number(rebanoId));
+            const fechaConsulta = new Date(fechaStr);
+            const resultado = { bloqueado: false, motivos: [] };
+
+            for (const t of tratamientos) {
+                const fechaTratamiento = new Date(t.fecha);
+                const diasEspera = Number(t.tiempo_espera_carne_dias || 0);
+                const fechaFinRetiro = new Date(fechaTratamiento.getTime() + (diasEspera * 24 * 60 * 60 * 1000));
+
+                if (diasEspera > 0 && fechaConsulta >= fechaTratamiento && fechaConsulta <= fechaFinRetiro) {
+                    resultado.bloqueado = true;
+                    const diasRestantes = Math.ceil((fechaFinRetiro - fechaConsulta) / (24 * 60 * 60 * 1000));
+                    resultado.motivos.push(`Medicamento bajo retiro de carne (${t.medicamento || 'Tratamiento'}): ${diasEspera} días de espera. Faltan ${diasRestantes} días (Vence el ${fechaFinRetiro.toISOString().split('T')[0]})`);
+                }
+            }
+            return resultado;
+        }, { action: 'verificarRetiroCarne' });
     }
 };
 

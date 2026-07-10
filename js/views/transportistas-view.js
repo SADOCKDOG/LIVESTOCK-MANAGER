@@ -189,7 +189,7 @@ const TransportistasView = {
 
     container.innerHTML = transportistas.map(t => App._cardRegistro({
       title: t.nombre,
-      subtitle: [t.nif_cif ? Icons.documento() + ' ' + t.nif_cif : '', t.matricula ? Icons.transportistas() + ' ' + t.matricula : ''].filter(Boolean).join(' · '),
+      subtitle: [t.nif_cif ? Icons.documento() + ' ' + `<span class="text-gold font-mono font-950">${t.nif_cif}</span>` : '', t.matricula ? Icons.transportistas() + ' ' + `<span class="text-gold font-mono font-950">${t.matricula}</span>` : ''].filter(Boolean).join(' · '),
       rightSide: `
         <div class="text-right">
           <span class="badge badge-sm uppercase" style="background:${t.activo ? 'color-mix(in srgb, var(--c-success) 8%, transparent)' : '#6b728015'}; color:${t.activo ? 'var(--c-success)' : '#9ca3af'}; border:1px solid ${t.activo ? 'color-mix(in srgb, var(--c-success) 21%, transparent)' : '#6b728035'};">
@@ -261,8 +261,8 @@ const TransportistasView = {
           </div>
 
           <div class="grid grid-cols-2 gap-12 text-sm text-aaa">
-            <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.documento()} NIF/CIF</small><div class="text-white font-800 mt-2">${t.nif_cif || '-'}</div></div>
-            <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.transportistas()} Matrícula</small><div class="text-white font-800 mt-2">${t.matricula || '-'}</div></div>
+            <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.documento()} NIF/CIF</small><div class="text-gold font-mono font-950 mt-2">${t.nif_cif || '-'}</div></div>
+            <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.transportistas()} Matrícula</small><div class="text-gold font-mono font-950 mt-2">${t.matricula || '-'}</div></div>
             <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.info()} Teléfono</small><div class="text-white mt-2">${t.telefono || '-'}</div></div>
             <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.enlace()} Email</small><div class="text-white mt-2">${t.email || '-'}</div></div>
             <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.documento()} Registro Transporte</small><div class="text-white mt-2">${t.registro_transporte || '-'}</div></div>

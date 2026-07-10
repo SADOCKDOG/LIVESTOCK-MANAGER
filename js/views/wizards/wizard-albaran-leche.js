@@ -398,6 +398,21 @@ window.AlbaranLecheWizard = {
                 animalesARiesgo.push(...animalesDelRebano);
               }
 
+              // Validación de bioseguridad unificada cruzada por rebaño completo
+              if (window.Sanitarios && window.Sanitarios.verificarRetiroLeche) {
+                for (const reb of rebanosLecheros) {
+                  const checkReb = await window.Sanitarios.verificarRetiroLeche(reb.id, fechaEntrega);
+                  if (checkReb && checkReb.bloqueado) {
+                    const mensaje = `⚠️ ALERTA CRÍTICA DE RETIRO LÁCTEO\n\n` +
+                      `Rebaño: ${reb.nombre.toUpperCase()}\n` +
+                      `${checkReb.motivos.join('\n')}\n\n` +
+                      `Se bloquea la expedición de leche para evitar contaminación química del tanque de frío.`;
+                    App.toastError(mensaje);
+                    return; // Abortar el guardado
+                  }
+                }
+              }
+
               // Verificar supresión para cada animal
               const fechaEntrega = dataLeche.fecha || new Date().toISOString().split('T')[0];
               let bloqueoDetectado = null;
