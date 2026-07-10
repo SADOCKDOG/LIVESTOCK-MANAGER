@@ -122,7 +122,6 @@ const ExplotacionView = {
             <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'ajustes' ? 'active' : ''}" style="--mode-color:#94A3B8;" onclick="ExplotacionView._cambiarSubModulo('ajustes')">${Icons.ajustes()} SISTEMA</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
@@ -149,9 +148,6 @@ const ExplotacionView = {
         break;
       case 'proveedores':
         if (window.ProveedoresView) await ProveedoresView.render();
-        break;
-      case 'ajustes':
-        if (window.ConfigSistemaView) await ConfigSistemaView.render();
         break;
     }
 
@@ -310,8 +306,7 @@ const ExplotacionView = {
       silos: { color: 'var(--c-success)' },
       fitosanitarios: { color: 'var(--c-purple)' },
       gastos: { color: 'var(--c-purple)' },
-      proveedores: { color: 'var(--c-purple)' },
-      ajustes: { color: '#94A3B8' }
+      proveedores: { color: 'var(--c-purple)' }
     };
     return map[sub] || map.zonas;
   }
