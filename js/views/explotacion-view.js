@@ -111,7 +111,7 @@ const ExplotacionView = {
       </div>
 
       <!-- Barra de Navegación Multipestaña Horizontal ExPro (Scrollable) Premium con Indicadores Animados -->
-      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: var(--c-success);">
+      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${this._getSubModuleMeta(this._activeSubModule).color};">
         <div class="pestana-indicador-flecha pestana-flecha-izq" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: -100, behavior: 'smooth' })">
           ${Icons.atras()}
         </div>
@@ -119,10 +119,10 @@ const ExplotacionView = {
           <div class="pestanas-premium-switch">
             <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'ajustes' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('ajustes')">${Icons.ajustes()} SISTEMA</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'ajustes' ? 'active' : ''}" style="--mode-color:#94A3B8;" onclick="ExplotacionView._cambiarSubModulo('ajustes')">${Icons.ajustes()} SISTEMA</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
@@ -302,6 +302,18 @@ const ExplotacionView = {
     } else {
       App?.toast(`Visualizando registro #${eventId} en modo ${modo}`);
     }
+  },
+
+  _getSubModuleMeta(sub) {
+    const map = {
+      zonas: { color: 'var(--c-success)' },
+      silos: { color: 'var(--c-success)' },
+      fitosanitarios: { color: 'var(--c-purple)' },
+      gastos: { color: 'var(--c-purple)' },
+      proveedores: { color: 'var(--c-purple)' },
+      ajustes: { color: '#94A3B8' }
+    };
+    return map[sub] || map.zonas;
   }
 };
 
