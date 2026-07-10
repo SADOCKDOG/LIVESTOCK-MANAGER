@@ -63,6 +63,32 @@ const ZonasView = {
         const pacTexto = z.codigo_pac ? `PAC: ${z.codigo_pac}` : 'PAC: pendiente';
         const distAgua = z.distancia_agua_m ? `Agua: ${z.distancia_agua_m}m` : 'Agua: —';
 
+        // Sincronización Fitosanitaria en tiempo real
+        const bloqueoFito = await this.verificarBloqueoFitosanitario(finca.id, z.nombre);
+        let fitoAlertaHtml = '';
+        let botonRotacionHtml = '';
+        
+        if (bloqueoFito && bloqueoFito.bloqueado) {
+          fitoAlertaHtml = `
+            <div class="mt-8 p-6 flex items-center gap-6 rounded-xs" style="background: rgba(239, 68, 68, 0.04); border: 1px solid var(--c-danger); width: 100%;">
+              <span class="animate-pulse text-[0.58rem] font-black text-danger uppercase flex items-center gap-4" style="letter-spacing:0.5px; line-height:1.2;">
+                ✕ CUARENTENA ACTIVA (${bloqueoFito.concepto.toUpperCase()}) - BLOQUEADA HASTA EL ${bloqueoFito.fechaFinPlazo} (${bloqueoFito.diasRestantes}D RESTANTES)
+              </span>
+            </div>
+          `;
+          botonRotacionHtml = `
+            <button onclick="event.stopPropagation(); App.toastError('Esta parcela está bajo cuarentena fitosanitaria activa. Rotación suspendida.');" class="px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem] opacity-45 cursor-not-allowed" style="background:#222; border:1px solid #444; color:#999; border-radius:4px;">
+              ✕ CUARENTENA ACTIVA (BLOQUEADO)
+            </button>
+          `;
+        } else {
+          botonRotacionHtml = `
+            <button onclick="event.stopPropagation(); ZonasView._abrirRotacion('${z.nombre.replace(/'/g, "\\'")}')" class="widget-link-btn widget-link-btn--neon px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem]" style="border-color:var(--c-success); color:var(--c-success);">
+              ⇄ Rotar Lote / Rebaño
+            </button>
+          `;
+        }
+
         fichasHtml += App._cardRegistro({
           title: z.nombre,
           subtitle: `${z.usoPrincipal || 'Sin uso Principal'}${superficie ? ` · ${Number(superficie).toLocaleString('es-ES')} ha` : ''}`,
@@ -82,12 +108,11 @@ const ZonasView = {
               <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
               ${especiesEnZona.size ? `<div class="flex items-center gap-4">${Icons.animales()} ${[...especiesEnZona].join(', ')}</div>` : ''}
             </div>
+            ${fitoAlertaHtml}
             ${rebanosHtml ? `
               <div class="mt-4 border-top-222 pt-8">${rebanosHtml}</div>
               <div class="mt-8 flex justify-end">
-                <button onclick="event.stopPropagation(); ZonasView._abrirRotacion('${z.nombre.replace(/'/g, "\\'")}')" class="widget-link-btn widget-link-btn--neon px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem]" style="border-color:var(--c-success); color:var(--c-success);">
-                  ⇄ Rotar Lote / Rebaño
-                </button>
+                ${botonRotacionHtml}
               </div>
             ` : ''}
           `,
@@ -376,6 +401,19 @@ const ZonasView = {
         App.toast("No hay otras zonas disponibles en la finca. Crea otra zona primero.", "warning");
         return;
       }
+
+      // Evaluar estado fitosanitario de parcelas destino en tiempo real
+      const otrasZonasConBloqueo = [];
+      const fincaId = await Fincas.getActiveId();
+      for (const z of otrasZonas) {
+        const checkFito = await this.verificarBloqueoFitosanitario(fincaId, z.nombre);
+        otrasZonasConBloqueo.push({
+          zona: z,
+          bloqueada: checkFito.bloqueado,
+          concepto: checkFito.concepto,
+          fechaFin: checkFito.fechaFinPlazo
+        });
+      }
       
       // Inyectar el modal HTML en el body
       const modalId = 'modal-rotacion-pastos';
@@ -410,7 +448,11 @@ const ZonasView = {
               <div>
                 <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">2. SELECCIONAR PARCELA DESTINO</label>
                 <select id="rot-zona-select" class="premium-input w-full uppercase font-800" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
-                  ${otrasZonas.map(z => `<option value="${z.nombre}">${z.nombre} (${z.usoPrincipal || 'Pasto'} · ${z.superficieGrafica || 0} ha)</option>`).join('')}
+                  ${otrasZonasConBloqueo.map(item => `
+                    <option value="${item.zona.nombre}" ${item.bloqueada ? 'style="color:#ff4444; font-weight:bold;"' : ''}>
+                      ${item.zona.nombre} (${item.zona.usoPrincipal || 'Pasto'}${item.bloqueada ? ` · ✕ BLOQUEADA HASTA ${item.fechaFin}` : ` · ${item.zona.superficieGrafica || 0} ha`})
+                    </option>
+                  `).join('')}
                 </select>
               </div>
               
@@ -443,13 +485,21 @@ const ZonasView = {
         App.toastError("Rebaño no encontrado");
         return;
       }
+
+      const fincaId = await Fincas.getActiveId();
+      
+      // Chequeo fitosanitario estricto antes de guardar el traslado
+      const checkFito = await ZonasView.verificarBloqueoFitosanitario(fincaId, nuevaZonaNombre);
+      if (checkFito && checkFito.bloqueado) {
+        App.toastError(`✕ BLOQUEO FITOSANITARIO DE BIOSEGURIDAD:\n\nLa parcela destino "${nuevaZonaNombre.toUpperCase()}" está bajo CUARENTENA ACTIVA (${checkFito.concepto.toUpperCase()}).\n\nNo es apta para pastoreo hasta el ${checkFito.fechaFinPlazo} (${checkFito.diasRestantes}D restantes).`);
+        return; // Abortar traslado
+      }
       
       const zonaAnterior = rebano.zonaActual;
       rebano.zonaActual = nuevaZonaNombre;
       await Rebanos.save(rebano);
       
       // Registrar evento de traslado para auditoría
-      const fincaId = await Fincas.getActiveId();
       await window.db.add('registro_eventos', {
         fincaId: fincaId,
         entidad_id: rebano.id,
@@ -470,6 +520,38 @@ const ZonasView = {
     } catch (e) {
       App.toastError(e.message);
     }
+  },
+
+  async verificarBloqueoFitosanitario(fincaId, zonaNombre, fechaStr) {
+    if (!zonaNombre) return { bloqueado: false };
+    const hoy = fechaStr ? new Date(fechaStr) : new Date();
+    
+    // Obtener los tratamientos de fitosanitarios de la finca
+    const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []);
+    const fitos = gastos.filter(g => 
+      (g.categoria || '').toLowerCase() === 'fitosanitarios' &&
+      (g.snap_zona || '').toLowerCase() === zonaNombre.toLowerCase() &&
+      !g.anulado
+    );
+    
+    for (const f of fitos) {
+      const fechaTratamiento = new Date(f.fecha);
+      const diasPlazo = Number(f.control_normativo?.plazoSeguridadDias) || 0;
+      if (diasPlazo > 0) {
+        const fechaFinPlazo = new Date(fechaTratamiento.getTime() + (diasPlazo * 24 * 60 * 60 * 1000));
+        if (hoy < fechaFinPlazo) {
+          const diffMs = fechaFinPlazo - hoy;
+          const diasRestantes = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+          return {
+            bloqueado: true,
+            concepto: f.concepto,
+            fechaFinPlazo: fechaFinPlazo.toLocaleDateString('es-ES'),
+            diasRestantes: diasRestantes
+          };
+        }
+      }
+    }
+    return { bloqueado: false };
   }
 };
 
