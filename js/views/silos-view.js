@@ -397,9 +397,16 @@ const SilosView = {
         this.render();
     },
 
-    _abrirConsumirSilo(id) {
+    async _abrirConsumirSilo(id) {
         const silo = this._cachedSilos.find(s => s.id === Number(id));
         if (!silo) return;
+
+        let rebanos = [];
+        try {
+            rebanos = await window.Rebanos.list();
+        } catch (err) {
+            console.error('[SilosView] Error al listar rebaños:', err);
+        }
 
         const html = `
         <div class="card card-accent card-accent-red p-16 max-w-[400px] w-full mx-10">
@@ -409,6 +416,13 @@ const SilosView = {
             <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Nivel actual: <b>${silo.cantidadActual.toLocaleString()} kg</b></p>
             
             <div class="flex flex-col gap-12 mb-20">
+                <div>
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">REBAÑO / LOTE DESTINATARIO (OPCIONAL)</label>
+                    <select id="consume-rebano-id" class="wizard-input font-bold uppercase" style="color:#fff; background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; border-radius:4px; padding:0 10px; width:100%; display:block;">
+                        <option value="">-- Consumo General --</option>
+                        ${rebanos.map(r => `<option value="${r.id}">${r.nombre.toUpperCase()} (${r.especie.toUpperCase()})</option>`).join('')}
+                    </select>
+                </div>
                 <div>
                     <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD CONSUMIDA (kg)</label>
                     <input type="number" id="consume-amount" class="wizard-input font-bold" min="1" max="${silo.cantidadActual}" value="${Math.min(silo.cantidadActual, 200)}" style="font-family:'IBM Plex Mono', monospace;">
@@ -434,13 +448,24 @@ const SilosView = {
 
         const amountInput = document.getElementById('consume-amount');
         const dateInput = document.getElementById('consume-date');
+        const rebanoSelect = document.getElementById('consume-rebano-id');
 
         const amount = Number(amountInput?.value) || 0;
         const date = dateInput?.value || new Date().toISOString().split('T')[0];
+        const rebanoId = rebanoSelect?.value ? Number(rebanoSelect.value) : null;
 
         if (amount <= 0 || amount > silo.cantidadActual) {
             Toast.show('Ingresa una cantidad de consumo válida', 'warn');
             return;
+        }
+
+        let rebano = null;
+        if (rebanoId) {
+            try {
+                rebano = await window.Rebanos.get(rebanoId);
+            } catch (err) {
+                console.error('[SilosView] Error al cargar rebaño para consumo:', err);
+            }
         }
 
         const nuevaCantidad = silo.cantidadActual - amount;
@@ -452,16 +477,21 @@ const SilosView = {
         // Registrar evento de consumo de telemetría de silo_pienso
         try {
             const activeFincaId = await Fincas.getActiveId();
+            const observaciones = rebano 
+                ? `Consumo de ${amount.toLocaleString()} kg para Rebaño: "${rebano.nombre.toUpperCase()}" (${rebano.especie.toUpperCase()}). Silo: ${silo.nombre.toUpperCase()}. Restante: ${nuevaCantidad.toLocaleString()} kg.`
+                : `Consumo general registrado en ${silo.nombre.toUpperCase()}. Restante: ${nuevaCantidad.toLocaleString()} kg.`;
+
             const eventoSilo = {
                 fincaId: activeFincaId,
                 tipo: 'silo_consumo',
                 tipo_entidad: 'silo_pienso',
                 entidad_id: id,
+                rebanoId: rebanoId, // VINCULACIÓN AL LOTE GANADERO
                 fecha: date,
                 motivo_tarea: 'alimentacion',
                 valor_neto: amount,
                 unidad: 'kg',
-                observaciones: `Consumo registrado en ${silo.nombre}. Restante: ${nuevaCantidad.toLocaleString()} kg.`,
+                observaciones: observaciones,
                 creadoEn: new Date().toISOString()
             };
             await window.db.add('registro_eventos', eventoSilo);
@@ -469,7 +499,7 @@ const SilosView = {
             console.error('[SilosView] No se pudo guardar el evento de consumo:', e);
         }
 
-        Toast.show(`Consumo de pienso de silo registrado correctamente.`, 'success');
+        Toast.show(`Consumo de pienso registrado con éxito para el lote.`, 'success');
         this.render();
     },
 
