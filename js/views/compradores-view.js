@@ -51,39 +51,23 @@ const CompradoresView = {
       </div>`;
     }).join('');
 
+    this._activeModule = 'compradores';
     const colorCompradores = window.getModuleColor ? getModuleColor('/compradores') : '#4FADF5';
-    const colorContratos = window.getModuleColor ? getModuleColor('/contrato') : '#4FADF5';
-    const activeColor = this._activeModule === 'compradores' ? colorCompradores : colorContratos;
+    const activeColor = colorCompradores;
 
     main.innerHTML = `
       <!-- Cabecera de Sección Estandarizada -->
       <div class="flex items-center gap-12 mb-14">
         <span class="text-2xl" style="color:${activeColor}; display:inline-flex; align-items:center;">
-          ${this._activeModule === 'compradores' ? Icons.compradores() : Icons.contratos()}
+          ${Icons.compradores()}
         </span>
         <div>
           <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
             <span style="color:${activeColor}; margin-right:4px;">|</span> GESTIÓN COMERCIAL
           </h1>
           <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            ${this._activeModule === 'compradores' ? 'Gestión de Clientes y Compradores' : 'Gestión de Contratos de Compraventa'}
+            Gestión de Clientes y Compradores
           </div>
-        </div>
-      </div>
-
-      <!-- Selector superior de submódulos (Gestión de Compradores y Contratos) -->
-      <div class="mb-14">
-        <div class="comer-mode-switch" style="display: flex; gap: 8px; width: 100%;">
-          <button class="comer-mode-btn ${this._activeModule === 'compradores' ? 'active' : ''}"
-            style="--mode-color:${colorCompradores}; flex: 1; padding: 10px;"
-            onclick="CompradoresView._cambiarModulo('compradores')">
-            ${Icons.compradores()} Compradores
-          </button>
-          <button class="comer-mode-btn ${this._activeModule === 'contratos' ? 'active' : ''}"
-            style="--mode-color:${colorContratos}; flex: 1; padding: 10px;"
-            onclick="CompradoresView._cambiarModulo('contratos')">
-            ${Icons.contratos()} Contratos
-          </button>
         </div>
       </div>
 
@@ -523,12 +507,12 @@ const CompradoresView = {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-15 text-xs text-gray-500 uppercase font-800 tracking-wider bg-dark p-14 rounded-sm border border-222">
-          ${comprador.nif_cif ? `<div class="flex items-center gap-6">${Icons.documento()} <span class="text-aaa">NIF:</span> <strong class="text-white">${comprador.nif_cif}</strong></div>` : ''}
+          ${comprador.nif_cif ? `<div class="flex items-center gap-6">${Icons.documento()} <span class="text-aaa">NIF:</span> <strong class="text-gold font-950 font-mono">${comprador.nif_cif}</strong></div>` : ''}
           ${comprador.telefono ? `<div class="flex items-center gap-6">${Icons.info()} <span class="text-aaa">TEL:</span> <strong class="text-white">${comprador.telefono}</strong></div>` : ''}
           ${comprador.email ? `<div class="flex items-center gap-6 lowercase">${Icons.enlace()} <span class="text-aaa uppercase">EMAIL:</span> <strong class="text-white">${comprador.email}</strong></div>` : ''}
           ${comprador.ciudad ? `<div class="flex items-center gap-6">${Icons.zonas()} <span class="text-aaa">UBICACIÓN:</span> <strong class="text-white">${comprador.ciudad.toUpperCase()}${comprador.provincia ? ' ('+comprador.provincia.toUpperCase()+')' : ''}</strong></div>` : ''}
           ${comprador.condiciones_pago ? `<div class="col-span-full flex items-center gap-6 mt-4 border-top-222 pt-8">${Icons.dinero()} <span class="text-aaa">PAGO:</span> <strong class="text-white">${comprador.condiciones_pago.toUpperCase()}</strong></div>` : ''}
-          ${comprador.rega ? `<div class="col-span-full flex items-center gap-6 text-gold font-900">${Icons.informeRega()} <span class="text-aaa">REGA DESTINO:</span> ${comprador.rega}</div>` : ''}
+          ${comprador.rega ? `<div class="col-span-full flex items-center gap-6 text-gold font-950 font-mono">${Icons.informeRega()} <span class="text-aaa">REGA DESTINO:</span> <span class="text-gold font-mono font-950">${comprador.rega}</span></div>` : ''}
         </div>
 
         <!-- KPIS -->

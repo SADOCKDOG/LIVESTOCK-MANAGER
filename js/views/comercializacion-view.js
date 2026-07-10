@@ -41,7 +41,40 @@ const ComercializacionView = {
       const rendProm = ventas.length > 0 ? ventas.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventas.length : 0;
       const ingresoTotal = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
       const litrosTotal = entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
-      const mofaTotal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
+
+      // FASE 4: Margen Comercial Neto Real de Carne
+      const gastoTransporteTotal = ventas.reduce((s, v) => s + (parseFloat(v.Gasto_Transporte) || 0), 0);
+      const gastoMatanzaTotal = ventas.reduce((s, v) => s + (parseFloat(v.Gasto_Matanza) || 0), 0);
+      const margenNetoCarne = ingresoTotal - gastoTransporteTotal - gastoMatanzaTotal;
+
+      // FASE 4: Margen sobre Coste Alimentación (MOFA) Real Dinámico
+      const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []);
+      const gastosAlim = gastos.filter(g => {
+        const cat = (g.categoria || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return cat.includes('aliment') && !g.anulado;
+      });
+
+      let mofaTotalReal = 0;
+      let totalGastosAlimPeriodo = 0;
+      if (entregas.length > 0) {
+        const ingresosLecheTotal = entregas.reduce((s, e) => s + (e.importe_total || 0), 0);
+        const fechasRecogida = entregas.map(e => new Date(e.fechaRecogida || e.fecha)).filter(d => !isNaN(d));
+        if (fechasRecogida.length > 0) {
+          const fechaMin = new Date(Math.min(...fechasRecogida));
+          const fechaMax = new Date(Math.max(...fechasRecogida));
+          
+          totalGastosAlimPeriodo = gastosAlim.reduce((s, g) => {
+            const fGasto = new Date(g.fecha);
+            if (fGasto >= fechaMin && fGasto <= fechaMax) {
+              return s + (parseFloat(g.importe) || 0);
+            }
+            return s;
+          }, 0);
+          mofaTotalReal = ingresosLecheTotal - totalGastosAlimPeriodo;
+        } else {
+          mofaTotalReal = entregas.reduce((s, e) => s + (e.mofa || 0), 0);
+        }
+      }
 
       this._cachedData = {
         ventas,
@@ -49,15 +82,16 @@ const ComercializacionView = {
         kpis: {
           carne: [
             { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
-            { label: 'Animales', value: ventas.length },
-            { label: 'Rend. Prom.', value: rendProm.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' },
-            { label: 'Ingreso Total', value: this._fmt(ingresoTotal) + ' €' },
+            { label: 'Animales Vendidos', value: ventas.length },
+            { label: 'Rend. Promedio', value: rendProm.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' },
+            { label: 'Ingreso Bruto', value: this._fmt(ingresoTotal) + ' €', color: '#94A3B8' },
+            { label: 'Margen Neto Real', value: this._fmt(Math.round(margenNetoCarne)) + ' €', color: 'var(--c-success)' }
           ],
           leche: [
             { label: 'Total Litros', value: this._fmt(litrosTotal) + ' L' },
-            { label: 'Entregas', value: entregas.length },
-            { label: 'Promedio', value: entregas.length > 0 ? this._fmt(Math.round(litrosTotal / entregas.length)) + ' L' : '0 L' },
-            { label: 'MOFA Total', value: this._fmt(Math.round(mofaTotal)) + ' €' }
+            { label: 'Cisternas Cargadas', value: entregas.length },
+            { label: 'Alimentación Período', value: this._fmt(Math.round(totalGastosAlimPeriodo)) + ' €', color: 'var(--c-danger)' },
+            { label: 'MOFA Real (Neto)', value: this._fmt(Math.round(mofaTotalReal)) + ' €', color: 'var(--c-success)' }
           ]
         }
       };
@@ -89,6 +123,34 @@ const ComercializacionView = {
       return;
     }
 
+    const contratos = await window.db.getAll('contratos_compra').catch(() => []);
+    const hoy = new Date();
+    const contratosVenciendo = contratos.filter(c => {
+      if (c.anulado || c.activo === false) return false;
+      if (!c.fecha_fin) return false;
+      const fFin = new Date(c.fecha_fin);
+      const difMs = fFin - hoy;
+      const difDias = Math.ceil(difMs / (24 * 60 * 60 * 1000));
+      return difDias >= 0 && difDias <= 30;
+    });
+
+    let alertaContratosHtml = '';
+    if (contratosVenciendo.length > 0) {
+      alertaContratosHtml = `
+        <div class="card p-12 mb-14 border-gold animate-pulse-slow" style="background: rgba(255, 215, 0, 0.03); border-left: 4px solid var(--p-gold); border-radius: 8px;">
+          <div class="flex items-center gap-8 justify-between">
+            <div class="flex items-center gap-6 text-gold font-950 text-xs uppercase tracking-wider">
+              ${Icons.alerta()} ${contratosVenciendo.length === 1 ? 'CONTRATO EXPIRA PRONTO' : 'CONTRATOS EXPIRAN PRONTO'}
+            </div>
+            <button onclick="ComercializacionView._cambiarSubModulo('contratos')" class="text-[0.62rem] font-black text-gold border border-gold px-6 py-2 rounded-xs hover:bg-gold hover:text-black uppercase transition-all">GESTIONAR ➔</button>
+          </div>
+          <div class="text-[0.65rem] text-aaa font-700 uppercase mt-6 leading-relaxed">
+            ${contratosVenciendo.map(c => `CONTRATO Nº <span class="text-gold font-mono font-950">${c.numero_contrato || c.id}</span> EXPIRA EL ${new Date(c.fecha_fin).toLocaleDateString()} (${Math.ceil((new Date(c.fecha_fin) - hoy) / (24*60*60*1000))} DÍAS RESTANTES)`).join('<br>')}
+          </div>
+        </div>
+      `;
+    }
+
     const currentMeta = this._getSubModuleMeta(this._activeSubModule);
 
     if (window.App && App.updateHeaderColor) {
@@ -106,6 +168,8 @@ const ComercializacionView = {
           </div>
         </div>
       </div>
+
+      ${alertaContratosHtml}
 
       <!-- Barra de Navegación Multipestaña Horizontal Comercialización (Scrollable) Premium con Indicadores Animados -->
       <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
