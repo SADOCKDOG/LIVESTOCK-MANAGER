@@ -96,10 +96,17 @@ const GastosView = {
       </div>
 
       <div class="mb-14">
-        <div class="tabs-scroll gasto-tabs scroll-shadow-container">
-          ${this._CATEGORIAS.map(c => `
-            <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="GastosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label.toUpperCase()}</button>
-          `).join('')}
+        <div class="tabs-scroll-wrapper">
+          <div class="tabs-scroll gasto-tabs scroll-shadow-container"
+               onscroll="const b=this.parentNode.querySelector('.scroll-indicator-badge'); if(b) b.classList.add('hidden');">
+            ${this._CATEGORIAS.map(c => `
+              <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" 
+                      data-tab="${c.key}" 
+                      onclick="GastosView._cambiarTab('${c.key}')" 
+                      style="--tab-color: ${c.color};">${c.icon} ${c.label.toUpperCase()}</button>
+            `).join('')}
+          </div>
+          <div class="scroll-indicator-badge">${Icons.rotacion()} deslizar ➔</div>
         </div>
       </div>
       <div id="gasto-content"><div class="loader">Cargando gastos...</div></div>`;

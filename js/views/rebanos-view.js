@@ -107,10 +107,17 @@ const RebanosView = {
       </div>
 
       <div class="mb-14">
-        <div class="tabs-scroll rebaño-tabs scroll-shadow-container">
-          ${this._CATEGORIAS.map(c => `
-            <button class="rebaño-tab ${this._currentTab === c.key ? 'active' : ''}" data-tab="${c.key}" onclick="RebanosView._cambiarTab('${c.key}')" style="border-left: 3px solid ${c.color};">${c.icon} ${c.label}</button>
-          `).join('')}
+        <div class="tabs-scroll-wrapper">
+          <div class="tabs-scroll rebaño-tabs scroll-shadow-container"
+               onscroll="const b=this.parentNode.querySelector('.scroll-indicator-badge'); if(b) b.classList.add('hidden');">
+            ${this._CATEGORIAS.map(c => `
+              <button class="rebaño-tab ${this._currentTab === c.key ? 'active' : ''}" 
+                      data-tab="${c.key}" 
+                      onclick="RebanosView._cambiarTab('${c.key}')" 
+                      style="--tab-color: ${c.color};">${c.icon} ${c.label}</button>
+            `).join('')}
+          </div>
+          <div class="scroll-indicator-badge">${Icons.rotacion()} deslizar ➔</div>
         </div>
         <!-- Filtro de búsqueda integrado (controla el listado) -->
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">

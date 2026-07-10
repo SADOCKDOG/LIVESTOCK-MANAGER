@@ -421,6 +421,46 @@ nav.bottom-nav {
 .scroll-shadow-container[data-ss-start]::before { opacity: 1; }
 .scroll-shadow-container[data-ss-end]::after { opacity: 1; }
 
+/* ── Wrapper de Tabs con Indicador de Scroll ── */
+.tabs-scroll-wrapper {
+    position: relative;
+    width: 100%;
+}
+.scroll-indicator-badge {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(18, 18, 18, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    color: var(--p-gold);
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 5px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.9;
+    letter-spacing: 0.05em;
+    box-shadow: 0 0 10px rgba(255, 214, 0, 0.2);
+    animation: pulse-badge-glow 2s infinite ease-in-out;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    text-transform: uppercase;
+}
+.scroll-indicator-badge.hidden {
+    opacity: 0 !important;
+    visibility: hidden;
+    transform: translateY(-50%) scale(0.9);
+}
+@keyframes pulse-badge-glow {
+    0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(0.97); box-shadow: 0 0 8px rgba(255, 214, 0, 0.15); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.03); box-shadow: 0 0 14px rgba(255, 214, 0, 0.35); }
+}
+
 /* BOTONES PREMIUM */
 .btn {
     width: 100%;
@@ -1443,6 +1483,47 @@ label {
     color: #000;
     border-color: var(--p-cork);
     font-weight: 800;
+}
+
+/* ── Pestañas Estandarizadas de Módulos (Rebaños y Finanzas) ── */
+.rebaño-tab, .gasto-tab {
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1.5px solid #27272a;
+    background: rgba(255, 255, 255, 0.02);
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+.rebaño-tab .icon, .gasto-tab .icon {
+    font-size: 1.05em;
+    transition: color 0.2s;
+}
+.rebaño-tab:hover, .gasto-tab:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+}
+.rebaño-tab:active, .gasto-tab:active {
+    transform: scale(0.95);
+}
+.rebaño-tab.active, .gasto-tab.active {
+    background: rgba(18, 18, 18, 0.4) !important;
+    border: 1.5px solid var(--tab-color) !important;
+    color: var(--tab-color) !important;
+    font-weight: 950 !important;
+    box-shadow: 0 0 12px var(--tab-color), inset 0 0 8px rgba(255, 255, 255, 0.02) !important;
+    text-shadow: 0 0 6px var(--tab-color) !important;
 }
 
 /* ── Píldoras de filtro (ej: transportistas, compradores) ── */
