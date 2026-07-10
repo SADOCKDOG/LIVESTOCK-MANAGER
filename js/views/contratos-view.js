@@ -192,6 +192,37 @@ const ContratosView = {
       const comprador = compradorMap[c.compradorId];
       const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
 
+      let cuentaAtrasHtml = '';
+      if (c.activo !== false && c.fecha_fin) {
+        const hoy = new Date();
+        const fFin = new Date(c.fecha_fin);
+        const diffMs = fFin - hoy;
+        const diffDias = Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+        
+        if (diffDias >= 0) {
+          if (diffDias <= 30) {
+            cuentaAtrasHtml = `
+              <div class="mt-8 p-6 flex items-center gap-6 rounded-xs" style="background: rgba(255, 215, 0, 0.03); border: 1px solid var(--p-gold); width: fit-content;">
+                <span class="animate-pulse-slow text-[0.58rem] font-black text-gold uppercase flex items-center gap-4" style="letter-spacing:0.5px;">
+                  ${Icons.alerta()} EXPIRA EN ${diffDias} DÍAS (CRÍTICO)
+                </span>
+              </div>`;
+          } else {
+            cuentaAtrasHtml = `
+              <div class="mt-8 p-4 flex items-center gap-4 rounded-xs text-[0.55rem] text-aaa uppercase font-800" style="background: rgba(255,255,255,0.02); border: 1px solid #27272a; width: fit-content;">
+                <span>${diffDias} DÍAS RESTANTES</span>
+              </div>`;
+          }
+        } else {
+          cuentaAtrasHtml = `
+            <div class="mt-8 p-6 flex items-center gap-6 rounded-xs" style="background: rgba(239, 68, 68, 0.05); border: 1px solid var(--c-danger); width: fit-content;">
+              <span class="text-[0.58rem] font-black text-danger uppercase flex items-center gap-4" style="letter-spacing:0.5px;">
+                ${Icons.cerrar()} CONTRATO VENCIDO
+              </span>
+            </div>`;
+        }
+      }
+
       return App._cardRegistro({
         title: c.numero_contrato,
         icon: c.tipo === 'leche' ? Icons.leche() : Icons.carne(),
@@ -201,6 +232,7 @@ const ContratosView = {
             <span class="flex items-center gap-2">${Icons.calendar()} INICIO: ${c.fecha_inicio ? new Date(c.fecha_inicio).toLocaleDateString('es-ES') : '?'}</span>
             <span class="flex items-center gap-2">${Icons.calendar()} FIN: ${c.fecha_fin ? new Date(c.fecha_fin).toLocaleDateString('es-ES') : 'INDEFINIDO'}</span>
           </div>
+          ${cuentaAtrasHtml}
         `,
         rightSide: `
           <div class="text-right">

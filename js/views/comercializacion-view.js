@@ -267,7 +267,20 @@ const ComercializacionView = {
       records: d.entregas.slice(0, 50).map(e => ({
         title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`,
         metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span><span>·</span><span>${(e.cantidad || 0).toLocaleString()} L</span>`,
-        badge: e.estadoAnalitica || 'PENDIENTE',
+        badge: (() => {
+          const est = (e.estadoAnalitica || 'PENDIENTE').toUpperCase();
+          let colorBadge = 'var(--c-warning)';
+          if (est.includes('APT') || est.includes('CONFORME') || est.includes('CORRECT') || est.includes('EXIT')) {
+            colorBadge = 'var(--c-success)';
+          } else if (est.includes('RECHAZ') || est.includes('DANGER') || est.includes('INCORRECT') || est.includes('FAIL')) {
+            colorBadge = 'var(--c-danger)';
+          } else if (est.includes('PENDI') || est.includes('ESPERA')) {
+            colorBadge = 'var(--c-orange)';
+          } else {
+            colorBadge = 'var(--c-info)';
+          }
+          return `<span class="badge badge-sm uppercase" style="background:color-mix(in srgb, ${colorBadge} 8%, transparent); color:${colorBadge}; border:1px solid color-mix(in srgb, ${colorBadge} 21%, transparent); padding:4px 8px; border-radius:4px; font-weight:900; letter-spacing:0.5px; font-size: 0.62rem;">${est}</span>`;
+        })(),
         onclick: `location.hash='/albaran-leche?id=${e.id}'`
       })),
       emptyMsg: 'Sin entregas de leche registradas.'
