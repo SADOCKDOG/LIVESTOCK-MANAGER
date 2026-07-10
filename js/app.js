@@ -244,7 +244,7 @@ const App = {
    */
   _headerTitles: {
     '/': 'Inicio',
-    '/ganaderia': 'Ganadería',
+    '/ganaderia': 'GeGan',
     '/rebanos': 'Rebaños',
     '/rebano': 'Ficha Rebaño',
     '/carne': 'Gestión Carne',
@@ -882,7 +882,7 @@ const App = {
       if (navProduccion) {
         const labelEl = navProduccion.querySelector('.label');
         const svgEl = navProduccion.querySelector('svg');
-        if (labelEl) labelEl.textContent = 'Ganadería';
+        if (labelEl) labelEl.textContent = 'GeGan';
         navProduccion.setAttribute('href', '#/ganaderia');
         if (false) {
           svgEl.innerHTML = `
