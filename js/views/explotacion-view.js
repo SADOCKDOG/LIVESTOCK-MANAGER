@@ -91,9 +91,9 @@ const ExplotacionView = {
 
     if (window.App?.updateHeaderColor) App.updateHeaderColor('explotacion');
 
-    // Inicializar sub-módulo activo por defecto si no está definido o es el antiguo legado 'explotacion'
-    if (!this._activeSubModule || this._activeSubModule === 'explotacion') {
-      this._activeSubModule = 'zonas';
+    // Inicializar sub-módulo activo por defecto si no está definido
+    if (!this._activeSubModule) {
+      this._activeSubModule = 'explotacion';
     }
 
     main.innerHTML = `
@@ -117,6 +117,7 @@ const ExplotacionView = {
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
           <div class="pestanas-premium-switch">
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('explotacion')">${Icons.finca()} EXPRO</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
@@ -134,6 +135,10 @@ const ExplotacionView = {
 
     // Delegación dinámica de renderizado
     switch (this._activeSubModule) {
+      case 'explotacion':
+        const d = this._cachedData || (await this._ensureData(fincaId, this._needsDataRefresh) || this._cachedData);
+        this._renderModoExplotacion(document.getElementById('expro-tab-content'), d);
+        break;
       case 'zonas':
         if (window.ZonasView) await ZonasView.render();
         break;
@@ -302,6 +307,7 @@ const ExplotacionView = {
 
   _getSubModuleMeta(sub) {
     const map = {
+      explotacion: { color: 'var(--c-success)' },
       zonas: { color: 'var(--c-success)' },
       silos: { color: 'var(--c-success)' },
       fitosanitarios: { color: 'var(--c-purple)' },
