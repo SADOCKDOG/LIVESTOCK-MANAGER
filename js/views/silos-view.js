@@ -59,6 +59,40 @@ const SilosView = {
         const totalActual = this._cachedSilos.reduce((acc, s) => acc + (Number(s.cantidadActual) || 0), 0);
         const pctMedio = totalCapacidad > 0 ? Math.round((totalActual / totalCapacidad) * 100) : 0;
 
+        // Calcular silos críticos con stock < 15%
+        const silosCriticos = this._cachedSilos.filter(s => {
+            const pct = s.capacidad > 0 ? Math.round((s.cantidadActual / s.capacidad) * 100) : 0;
+            return pct < 15;
+        });
+
+        let alertaSiloHtml = '';
+        if (silosCriticos.length > 0) {
+            alertaSiloHtml = `
+            <!-- Alerta Bento de Stock Crítico -->
+            <div class="card p-14 mb-20 border-222 card-resumen" style="background: rgba(255, 68, 68, 0.03); border-left: 4px solid var(--c-danger);">
+                <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+                    <span class="flex items-center gap-6 text-red" style="color:var(--c-danger);">
+                        ${Icons.alerta()} ALERTA TELEMÉTRICA DE ALIMENTACIÓN: STOCK BAJO (<15%)
+                    </span>
+                </div>
+                <p class="text-[0.65rem] text-gray font-bold uppercase tracking-wide m-0 mb-10">
+                    Los siguientes silos requieren reabastecimiento inmediato para evitar interrupciones nutricionales en el ganado:
+                </p>
+                <div class="flex flex-col gap-6">
+                    ${silosCriticos.map(s => {
+                        const pct = s.capacidad > 0 ? Math.round((s.cantidadActual / s.capacidad) * 100) : 0;
+                        return `
+                        <div class="flex items-center justify-between p-8 rounded-sm bg-[#080808] border border-[#1a1a1a]">
+                            <span class="text-[0.65rem] font-black text-white uppercase">${s.nombre} (${s.alimento})</span>
+                            <span class="text-xs font-mono font-950 text-red" style="color:var(--c-danger);">${s.cantidadActual.toLocaleString()} kg / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            `;
+        }
+
         container.innerHTML = `
         <div class="p-16 max-w-[900px] mx-auto animate-fade-in" style="min-height: calc(100vh - 120px); padding-bottom: 80px;">
             <!-- Encabezado con estilo premium -->
@@ -79,13 +113,15 @@ const SilosView = {
                 </div>
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
                     <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">ALMACENADO</span>
-                    <span class="text-white font-black text-sm block style="font-family:'IBM Plex Mono', monospace;" style="color:var(--p-gold);">${totalActual.toLocaleString()} kg</span>
+                    <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--p-gold);">${totalActual.toLocaleString()} kg</span>
                 </div>
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
                     <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">OCUPACIÓN MEDIA</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--c-success);">${pctMedio}%</span>
                 </div>
             </div>
+
+            ${alertaSiloHtml}
 
             <!-- Listado de Silos -->
             <div class="flex flex-col gap-15 font-sans">
@@ -309,27 +345,53 @@ const SilosView = {
         Toast.show(`Calibración de ${silo.nombre} completada con éxito. Sensores ópticos estables.`, 'success');
     },
 
-    _abrirLlenarSilo(id) {
+    async _abrirLlenarSilo(id) {
         const silo = this._cachedSilos.find(s => s.id === Number(id));
         if (!silo) return;
 
         const maxCarga = silo.capacidad - silo.cantidadActual;
 
+        let proveedores = [];
+        try {
+            proveedores = await window.db.getAll('proveedores').catch(() => []);
+        } catch (err) {
+            console.error('[SilosView] Error al listar proveedores para carga:', err);
+        }
+
         const html = `
-        <div class="card card-accent card-accent-gold p-16 max-w-[400px] w-full mx-10">
+        <div class="card card-accent card-accent-gold p-16 max-w-[400px] w-full mx-10" style="background:#0C0C0C; border:1px solid #222;">
             <h3 class="text-md font-black uppercase tracking-wider mb-10 text-white" style="font-family:'Archivo Expanded', sans-serif;">
-                <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.sanidad()} REGISTRAR CARGA EN SILO
+                <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.explotacion()} REGISTRAR RECARGA EN SILO
             </h3>
             <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Espacio disponible: <b>${maxCarga.toLocaleString()} kg</b></p>
             
             <div class="flex flex-col gap-12 mb-20">
                 <div>
-                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD DE ALIMENTO A CARGAR (kg)</label>
-                    <input type="number" id="load-amount" class="wizard-input font-bold" min="1" max="${maxCarga}" value="${Math.max(0, maxCarga)}" style="font-family:'IBM Plex Mono', monospace;">
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">PROVEEDOR DE PIENSO / ALIMENTO</label>
+                    <select id="load-proveedor-id" class="wizard-input font-bold uppercase" style="color:#fff; background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; border-radius:4px; padding:0 10px; width:100%; display:block;">
+                        <option value="">-- Selecciona Proveedor --</option>
+                        ${proveedores.map(p => `<option value="${p.id}">${p.nombre.toUpperCase()} (${p.nif_cif || 'SIN NIF'})</option>`).join('')}
+                    </select>
                 </div>
-                <div>
-                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FECHA DE CARGA</label>
-                    <input type="date" id="load-date" class="wizard-input font-bold" value="${new Date().toISOString().split('T')[0]}">
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD A CARGAR (kg)</label>
+                        <input type="number" id="load-amount" class="wizard-input font-bold text-white bg-transparent" min="1" max="${maxCarga}" value="${Math.max(0, maxCarga)}" style="font-family:'IBM Plex Mono', monospace; height:38px; border:1px solid #27272a; padding:0 10px; border-radius:4px; width:100%;">
+                    </div>
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">COSTE DE FACTURA (€)</label>
+                        <input type="number" id="load-cost" class="wizard-input font-bold text-white bg-transparent" min="0" value="0" step="0.01" style="font-family:'IBM Plex Mono', monospace; height:38px; border:1px solid #27272a; padding:0 10px; border-radius:4px; width:100%;">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FECHA DE CARGA</label>
+                        <input type="date" id="load-date" class="wizard-input font-bold text-white bg-transparent" value="${new Date().toISOString().split('T')[0]}" style="height:38px; border:1px solid #27272a; padding:0 10px; border-radius:4px; width:100%;">
+                    </div>
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FAC. VINCULADA</label>
+                        <input type="text" id="load-invoice" placeholder="FAC-2026-X" class="wizard-input font-bold text-white bg-transparent uppercase" style="height:38px; border:1px solid #27272a; padding:0 10px; border-radius:4px; width:100%;">
+                    </div>
                 </div>
             </div>
 
@@ -348,18 +410,37 @@ const SilosView = {
 
         const amountInput = document.getElementById('load-amount');
         const dateInput = document.getElementById('load-date');
+        const proveedorSelect = document.getElementById('load-proveedor-id');
+        const costInput = document.getElementById('load-cost');
+        const invoiceInput = document.getElementById('load-invoice');
 
         const amount = Number(amountInput?.value) || 0;
         const date = dateInput?.value || new Date().toISOString().split('T')[0];
+        const proveedorId = proveedorSelect?.value ? Number(proveedorSelect.value) : null;
+        const costeTotal = Number(costInput?.value) || 0;
+        const factura = invoiceInput?.value ? invoiceInput.value.trim().toUpperCase() : '';
 
         if (amount <= 0) {
             Toast.show('Ingresa una cantidad válida a cargar', 'warn');
             return;
         }
 
+        let proveedorNombre = '';
+        if (proveedorId) {
+            try {
+                const provObj = await window.db.get('proveedores', proveedorId).catch(() => null);
+                if (provObj) proveedorNombre = provObj.nombre;
+            } catch (err) {
+                console.error('[SilosView] Error al obtener proveedor:', err);
+            }
+        }
+
+        const precioKg = amount > 0 ? (costeTotal / amount) : 0;
+
         const nuevaCantidad = Math.min(silo.capacidad, silo.cantidadActual + amount);
         silo.cantidadActual = nuevaCantidad;
         silo.fechaUltimaCarga = date;
+        silo.precioUltimaCargaKg = precioKg; // Guardar precio unitario de referencia
 
         await window.db.put('config_silos', silo);
         ModalManager.close('load-silo-modal');
@@ -371,14 +452,22 @@ const SilosView = {
                 fincaId: activeFincaId,
                 categoria: 'Alimentacion',
                 concepto: `Recarga Silo: ${silo.nombre} (+${amount.toLocaleString()} kg de ${silo.alimento})`,
-                monto: 0, // No genera costo directo a menos que se defina factura, o el usuario puede editarlo después en gastos
+                monto: costeTotal, // Guardar coste real de factura
                 fecha: date,
                 siloId: id,
+                proveedorId: proveedorId,
+                proveedor: proveedorNombre,
+                factura: factura,
                 creadoEn: new Date().toISOString()
             };
             await window.db.add('gastos_ganaderia', nuevoGasto);
             
             // También registrar evento telemétrico de silo_pienso
+            const observaciones = `Carga registrada en ${silo.nombre}. Nivel final: ${nuevaCantidad.toLocaleString()} kg.` + 
+                (proveedorNombre ? ` Proveedor: ${proveedorNombre.toUpperCase()}.` : '') + 
+                (costeTotal > 0 ? ` Coste: ${costeTotal.toLocaleString()} € (${precioKg.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} €/kg).` : '') +
+                (factura ? ` Factura: ${factura}.` : '');
+
             const eventoSilo = {
                 fincaId: activeFincaId,
                 tipo: 'silo_carga',
@@ -388,7 +477,7 @@ const SilosView = {
                 motivo_tarea: 'alimentacion',
                 valor_neto: amount,
                 unidad: 'kg',
-                observaciones: `Carga registrada en ${silo.nombre}. Nivel final: ${nuevaCantidad.toLocaleString()} kg.`,
+                observaciones: observaciones,
                 creadoEn: new Date().toISOString()
             };
             await window.db.add('registro_eventos', eventoSilo);
