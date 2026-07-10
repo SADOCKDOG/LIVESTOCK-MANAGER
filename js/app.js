@@ -2428,10 +2428,9 @@ const App = {
   // COMPRADORES (delegado)
   // ==========================================
   async renderCompradores() {
-    if (window.CompradoresView && typeof CompradoresView.render === 'function') {
-      await CompradoresView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando módulo de compradores...</div>';
+    if (window.ComercializacionView) {
+      ComercializacionView._activeSubModule = 'compradores';
+      await this.renderComercializacion();
     }
   },
 
@@ -2471,10 +2470,9 @@ const App = {
   },
 
   async renderTransportistas() {
-    if (window.TransportistasView && typeof TransportistasView.render === 'function') {
-      await TransportistasView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando módulo de transportistas...</div>';
+    if (window.ComercializacionView) {
+      ComercializacionView._activeSubModule = 'transportistas';
+      await this.renderComercializacion();
     }
   },
 

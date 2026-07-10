@@ -21,7 +21,7 @@ const TransportistasView = {
 
   async render() {
     if (window.App) App.updateHeaderColor('transportistas');
-    const main = document.getElementById("app-content");
+    const main = document.getElementById("comercializacion-tab-content") || document.getElementById("app-content");
     const moduleColor = window.getModuleColor ? getModuleColor('/transportistas') : 'var(--c-pink)';
 
     // Cargar datos
