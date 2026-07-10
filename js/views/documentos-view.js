@@ -409,7 +409,7 @@ const DocumentosView = {
           await window.WizardGuiaMovimiento.abrir(m);
         } else { App.toastError("Borrador no encontrado"); }
       } else {
-        App.toast("Los borradores de este tipo se modifican en sus respectivos módulos");
+        App.toast("Los borradores de este tipo se modifican en sus respectivos módulos", "info");
       }
     } catch (e) {
       App.toastError("Error al abrir borrador: " + e.message);
@@ -652,7 +652,7 @@ const DocumentosView = {
         await window.db.put('documentos_legales', registro);
       }
 
-      App.toast('Acuse manual registrado');
+      App.toast('Acuse manual registrado', 'success');
       this.render();
       return true;
     } catch (e) {

@@ -183,6 +183,18 @@ const App = {
         document.documentElement.style.setProperty('--banner-opacity', bOpacity);
 
       } catch (_) {}
+
+      // Delegado global de interacción táctil con los pickers de fecha
+      document.body.addEventListener('click', (e) => {
+        if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'date') {
+          if (typeof e.target.showPicker === 'function') {
+            try {
+              e.target.showPicker();
+            } catch (_) {}
+          }
+        }
+      });
+
       await App.route();
     } catch (error) {
       console.error(error);

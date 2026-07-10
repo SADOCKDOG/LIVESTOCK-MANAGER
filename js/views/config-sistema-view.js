@@ -19,17 +19,17 @@ const ConfigSistemaView = {
         <div class="mb-20">
           <a href="#/ajustes" class="link-back">← Volver a Ajustes</a>
           <h2 class="mt-10 flex items-center gap-10 text-white font-900 uppercase">
-            ${Icons.ajustes()} Sistema y Seguridad
+            <span style="color: var(--p-gold); margin-right: 4px;">|</span> ${Icons.ajustes()} Sistema y Seguridad
           </h2>
           <p class="text-gray text-sm leading-relaxed">Gestión integral de la plataforma: apariencia, integridad de datos y registros de auditoría.</p>
         </div>
-
+ 
         <!-- TABS DE NAVEGACIÓN INTERNA -->
         <div class="mb-14">
           <div class="tabs-scroll prod-tabs scroll-shadow-container">
-            <button class="prod-tab ${tab === 'interfaz' ? 'active' : ''}" onclick="ConfigSistemaView._cambiarTab('interfaz')">${Icons.foto()} Interfaz</button>
-            <button class="prod-tab ${tab === 'seguridad' ? 'active' : ''}" onclick="ConfigSistemaView._cambiarTab('seguridad')">${Icons.premium()} Seguridad</button>
-            <button class="prod-tab ${tab === 'auditoria' ? 'active' : ''}" onclick="ConfigSistemaView._cambiarTab('auditoria')">${Icons.documento()} Auditoría</button>
+            <button class="prod-tab ${tab === 'interfaz' ? 'active' : ''}" onclick="ConfigSistemaView._cambiarTab('interfaz')">${Icons.foto()} INTERFAZ</button>
+            <button class="prod-tab ${tab === 'seguridad' ? 'active' : ''}" onclick="ConfigSistemaView._cambiarTab('seguridad')">${Icons.premium()} SEGURIDAD</button>
+            <button class="prod-tab ${tab === 'auditoria' ? 'active' : ''}" onclick="ConfigSistemaView._cambiarTab('auditoria')">${Icons.documento()} AUDITORÍA</button>
           </div>
         </div>
 

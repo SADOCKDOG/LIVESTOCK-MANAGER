@@ -1655,6 +1655,20 @@ label {
 }
 .form-input::placeholder, .premium-input::placeholder, .wizard-input::placeholder { color: #555; }
 
+/* ── Estilos de campos de fecha (Calendario Blanco y Visible) ── */
+input[type="date"] {
+    position: relative;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.9);
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
 /* ── Form Input Large (animales wizard) ── */
 .form-input-lg { padding: 11px; font-size: 1rem; }
 .form-input-lg:focus { border-color: var(--p-cork); }
