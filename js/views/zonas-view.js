@@ -82,7 +82,14 @@ const ZonasView = {
               <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
               ${especiesEnZona.size ? `<div class="flex items-center gap-4">${Icons.animales()} ${[...especiesEnZona].join(', ')}</div>` : ''}
             </div>
-            ${rebanosHtml ? `<div class="mt-4 border-top-222 pt-8">${rebanosHtml}</div>` : ''}
+            ${rebanosHtml ? `
+              <div class="mt-4 border-top-222 pt-8">${rebanosHtml}</div>
+              <div class="mt-8 flex justify-end">
+                <button onclick="event.stopPropagation(); ZonasView._abrirRotacion('${z.nombre.replace(/'/g, "\\'")}')" class="widget-link-btn widget-link-btn--neon px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem]" style="border-color:var(--c-success); color:var(--c-success);">
+                  ⇄ Rotar Lote / Rebaño
+                </button>
+              </div>
+            ` : ''}
           `,
           footerRight: `<span style="display:block; font-size:0.7rem; font-weight:700; color:var(--c-warning); white-space:nowrap;">Ficha -></span>`,
           color: colorCenso,
@@ -346,6 +353,120 @@ const ZonasView = {
       }).catch(() => {});
       App.toast("Zona anulada", "success");
       location.hash = "#/zonas";
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
+
+  async _abrirRotacion(zonaOrigenNombre) {
+    try {
+      const finca = await Fincas.getActive();
+      const rebanos = await Rebanos.list();
+      const rebanosEnZona = rebanos.filter(r => r.zonaActual === zonaOrigenNombre);
+      
+      if (rebanosEnZona.length === 0) {
+        App.toast("No hay rebaños activos en esta zona para rotar.", "warning");
+        return;
+      }
+      
+      const otrasZonas = (finca.zonas || [])
+        .filter(z => !z?.anulada && z.nombre !== zonaOrigenNombre);
+        
+      if (otrasZonas.length === 0) {
+        App.toast("No hay otras zonas disponibles en la finca. Crea otra zona primero.", "warning");
+        return;
+      }
+      
+      // Inyectar el modal HTML en el body
+      const modalId = 'modal-rotacion-pastos';
+      let modalDiv = document.getElementById(modalId);
+      if (!modalDiv) {
+        modalDiv = document.createElement('div');
+        modalDiv.id = modalId;
+        document.body.appendChild(modalDiv);
+      }
+      
+      const moduleColor = 'var(--c-success)'; // Verde Lima de ExPro / Zonas
+      
+      modalDiv.innerHTML = `
+        <div class="modal-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:9999; animation:fadeIn 0.2s ease-out;">
+          <div class="card-registro p-20 border-222" style="--registro-color:${moduleColor}; width:90%; max-width:420px; background:#121212; box-shadow:0 0 30px rgba(204,255,0,0.15); border-radius:12px; margin:auto;">
+            <div class="flex items-center gap-10 mb-15">
+              <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.zonas()}</span>
+              <div>
+                <h3 class="text-white font-900 text-sm uppercase tracking-wider" style="margin:0;">⇄ ROTACIÓN DE PASTOS (SIGGAN)</h3>
+                <div class="text-gray text-[0.6rem] font-bold uppercase tracking-tight">Zona Origen: ${zonaOrigenNombre}</div>
+              </div>
+            </div>
+            
+            <div class="flex flex-col gap-15 mt-10">
+              <div>
+                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">1. SELECCIONAR REBAÑO / LOTE</label>
+                <select id="rot-rebano-select" class="premium-input w-full uppercase font-800" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
+                  ${rebanosEnZona.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
+                </select>
+              </div>
+              
+              <div>
+                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">2. SELECCIONAR PARCELA DESTINO</label>
+                <select id="rot-zona-select" class="premium-input w-full uppercase font-800" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
+                  ${otrasZonas.map(z => `<option value="${z.nombre}">${z.nombre} (${z.usoPrincipal || 'Pasto'} · ${z.superficieGrafica || 0} ha)</option>`).join('')}
+                </select>
+              </div>
+              
+              <div>
+                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">3. MOTIVO DE TRASLADO (OPCIONAL)</label>
+                <input type="text" id="rot-observaciones" placeholder="Ej: Rotación rutinaria de pastos, falta de agua..." class="premium-input w-full text-xs font-700" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
+              </div>
+            </div>
+            
+            <div class="flex justify-end gap-10 mt-20">
+              <button class="btn btn-secondary text-xs uppercase font-800 px-14 py-8" style="background:#1e1e1e; border:1px solid #333; color:#aaa; border-radius:6px;" onclick="document.getElementById('modal-rotacion-pastos').remove();">${Icons.cerrar()} Cancelar</button>
+              <button class="btn btn-success text-xs uppercase font-800 px-14 py-8" style="background:${moduleColor}; color:#000; border-radius:6px; font-weight:900;" onclick="ZonasView._confirmarRotacion()">${Icons.guardar()} Confirmar Traslado</button>
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
+
+  async _confirmarRotacion() {
+    try {
+      const rebanoId = Number(document.getElementById('rot-rebano-select').value);
+      const nuevaZonaNombre = document.getElementById('rot-zona-select').value;
+      const observaciones = document.getElementById('rot-observaciones').value.trim();
+      
+      const rebano = await Rebanos.get(rebanoId);
+      if (!rebano) {
+        App.toastError("Rebaño no encontrado");
+        return;
+      }
+      
+      const zonaAnterior = rebano.zonaActual;
+      rebano.zonaActual = nuevaZonaNombre;
+      await Rebanos.save(rebano);
+      
+      // Registrar evento de traslado para auditoría
+      const fincaId = await Fincas.getActiveId();
+      await window.db.add('registro_eventos', {
+        fincaId: fincaId,
+        entidad_id: rebano.id,
+        tipo_entidad: 'rebano',
+        tipo: 'traslado',
+        motivo_tarea: 'rotacion_pastos',
+        fecha: new Date().toISOString().split('T')[0],
+        descripcion: `Traslado de rebaño "${rebano.nombre}" por rotación de pastos`,
+        observaciones: observaciones || `Rotación rutinaria de pastos desde ${zonaAnterior} hacia ${nuevaZonaNombre}`,
+        creadoEn: new Date().toISOString()
+      }).catch(() => {});
+      
+      document.getElementById('modal-rotacion-pastos').remove();
+      App.toast("Rotación de rebaño registrada con éxito", "success");
+      
+      // Volver a renderizar en caliente
+      await ZonasView.render();
     } catch (e) {
       App.toastError(e.message);
     }
