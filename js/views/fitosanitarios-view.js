@@ -39,7 +39,7 @@ const FitosanitariosView = {
         const numRegistros = this._cachedRegistros.length;
 
         container.innerHTML = `
-        <div class="p-16 max-w-[900px] mx-auto animate-fade-in" style="min-height: calc(100vh - 120px);">
+        <div class="p-16 max-w-[900px] mx-auto animate-fade-in" style="min-height: calc(100vh - 120px); padding-bottom: 80px;">
             <!-- Encabezado premium -->
             <div class="flex items-center justify-between mb-20 gap-10">
                 <div>
@@ -48,13 +48,10 @@ const FitosanitariosView = {
                     </h1>
                     <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Cuaderno de campo y tratamientos de parcelas (RD 787/2023)</p>
                 </div>
-                <button class="btn btn-primary btn-sm flex items-center gap-6" onclick="FitosanitariosView._nuevoTratamiento()" style="min-height:44px; padding: 0 16px; background-color:#C5FA50; color:#000; border-color:#C5FA50;">
-                    ${Icons.agregar()} <span class="font-950 uppercase tracking-wider text-xs">NUEVO REGISTRO</span>
-                </button>
             </div>
 
             <!-- KPIs -->
-            <div class="grid grid-cols-3 gap-10 mb-20">
+            <div class="grid grid-cols-3 gap-10 mb-20 font-sans">
                 <div class="card p-12 text-center" style="background:#111; border:1px solid #222;">
                     <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">INVERSIÓN TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:#C5FA50;">${totalInversion.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
@@ -78,7 +75,7 @@ const FitosanitariosView = {
             </div>
 
             <!-- Historial de Aplicaciones -->
-            <div class="card p-16" style="background:#141414; border:1px solid #222;">
+            <div class="card p-16 font-sans" style="background:#141414; border:1px solid #222;">
                 <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-15 flex items-center gap-6">
                     <span style="color:#C5FA50;">|</span> ${Icons.historial()} TRATAMIENTOS Y COMPRAS REGISTRADAS
                 </h3>
@@ -93,6 +90,12 @@ const FitosanitariosView = {
                     ${this._cachedRegistros.map(r => this._renderRegistroItem(r)).join('')}
                 </div>
                 `}
+            </div>
+
+            <!-- FAB (Botón de Acción Flotante) Premium -->
+            <div class="fab-container" style="--fab-neon-color: var(--c-purple);" onclick="FitosanitariosView._nuevoTratamiento()">
+                <span class="fab-label">Nuevo Registro</span>
+                <button class="fab-btn">${Icons.fabPlus()}</button>
             </div>
         </div>
         `;
