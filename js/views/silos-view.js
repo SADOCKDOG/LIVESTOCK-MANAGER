@@ -60,7 +60,7 @@ const SilosView = {
         const pctMedio = totalCapacidad > 0 ? Math.round((totalActual / totalCapacidad) * 100) : 0;
 
         container.innerHTML = `
-        <div class="p-16 max-w-[900px] mx-auto animate-fade-in" style="min-height: calc(100vh - 120px);">
+        <div class="p-16 max-w-[900px] mx-auto animate-fade-in" style="min-height: calc(100vh - 120px); padding-bottom: 80px;">
             <!-- Encabezado con estilo premium -->
             <div class="flex items-center justify-between mb-20 gap-10">
                 <div>
@@ -69,9 +69,6 @@ const SilosView = {
                     </h1>
                     <p class="text-xs font-bold uppercase tracking-tight text-gray-400 m-0">Telemetría de alimentación y almacenamiento</p>
                 </div>
-                <button class="btn btn-primary btn-sm flex items-center gap-6" onclick="SilosView._abrirFormularioSilo()" style="min-height:44px; padding: 0 16px;">
-                    ${Icons.agregar()} <span class="font-950 uppercase tracking-wider text-xs">NUEVO SILO</span>
-                </button>
             </div>
 
             <!-- KPIs superiores (OLED dark design) -->
@@ -91,8 +88,14 @@ const SilosView = {
             </div>
 
             <!-- Listado de Silos -->
-            <div class="flex flex-col gap-15">
+            <div class="flex flex-col gap-15 font-sans">
                 ${this._cachedSilos.map(s => this._renderSiloCard(s)).join('')}
+            </div>
+
+            <!-- FAB (Botón de Acción Flotante) Premium -->
+            <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="SilosView._abrirFormularioSilo()">
+                <span class="fab-label">Nuevo Silo</span>
+                <button class="fab-btn">${Icons.fabPlus()}</button>
             </div>
         </div>
         `;
