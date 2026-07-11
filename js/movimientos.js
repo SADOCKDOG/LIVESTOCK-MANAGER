@@ -71,10 +71,22 @@ const Movimientos = {
         throw new Error('Esta comunidad exige certificar la desinsectación previa al movimiento.');
       }
 
-      const animalIds = Array.isArray(data.animalId)
+      let animalIds = Array.isArray(data.animalId)
         ? data.animalId.map(Number).filter(n => !Number.isNaN(n))
         : (data.animalId != null ? [Number(data.animalId)] : []);
       const crotales = Array.isArray(data.crotales) ? data.crotales : [];
+
+      // Reforzar la vinculación: si la guía informó crotales pero no animalId, resolver
+      // los IDs desde el censo para que el movimiento quede ligado a animales reales.
+      // Necesario para la trazabilidad SIGGAN y para el cierre de tanda del ICA de cebo.
+      if (animalIds.length === 0 && crotales.length > 0) {
+        try {
+          const censo = await window.db.getAll('animales').catch(() => []);
+          const porCrotal = {};
+          censo.forEach(a => { if (a.numero_identificacion) porCrotal[String(a.numero_identificacion)] = a.id; });
+          animalIds = crotales.map(c => porCrotal[String(c)]).filter(v => v != null).map(Number);
+        } catch (e) { /* si falla la resolución, el movimiento se guarda sin animalId */ }
+      }
       const numAnimalesDeclarado = Number(data.num_animales) || animalIds.length || 0;
 
       if (numAnimalesDeclarado <= 0) {
