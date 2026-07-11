@@ -317,10 +317,11 @@ const ExplotacionView = {
               <span class="text-[0.65rem] text-gray uppercase font-900">Peso Total Ganado (Carne)</span>
               <strong class="text-lg font-950" style="color: var(--c-success);">${this._calcularPesoTotalCarne().toLocaleString()} kg</strong>
             </div>
-            <div class="py-10 flex justify-between items-center>
+            <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">ICA Promedio</span>
               <strong class="text-lg font-950" style="color: var(--c-info);">${this._calcularICACarne().ica > 0 ? this._calcularICACarne().ica.toFixed(2) + ' : 1' : 'N/D'}</strong>
-            </div>`}
+            </div>`
+          }
           </div>
         </div>
 
