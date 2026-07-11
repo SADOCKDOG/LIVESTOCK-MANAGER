@@ -140,11 +140,13 @@ const GanaderiaView = {
           supresionesActivas.push({ ...t, tipoSupresion: 'carne', diasRestantes, fechaFin: fechaFinCarne });
         }
       }
-      if (diasEsperaLeche > 0) {
-        const fechaFinLeche = new Date(fechaApli.getTime() + (diasEsperaLeche * 24 * 60 * 60 * 1000));
-        if (fechaFinLeche > hoy) {
-          const diasRestantes = Math.ceil((fechaFinLeche - hoy) / (24 * 60 * 60 * 1000));
-          supresionesActivas.push({ ...t, tipoSupresion: 'leche', diasRestantes, fechaFin: fechaFinLeche });
+      // La supresión láctea puede ser por días de espera o por prohibición indefinida
+      // (medicamentos prohibidos en producción lechera). Contemplar ambos casos.
+      if (diasEsperaLeche > 0 || t.prohibidoLeche) {
+        const fechaFinLeche = t.prohibidoLeche ? null : new Date(fechaApli.getTime() + (diasEsperaLeche * 24 * 60 * 60 * 1000));
+        if (t.prohibidoLeche || fechaFinLeche > hoy) {
+          const diasRestantes = t.prohibidoLeche ? 'INDEFINIDO' : Math.ceil((fechaFinLeche - hoy) / (24 * 60 * 60 * 1000));
+          supresionesActivas.push({ ...t, tipoSupresion: 'leche', diasRestantes, fechaFin: fechaFinLeche, indefinido: !!t.prohibidoLeche });
         }
       }
     });
@@ -187,11 +189,11 @@ const GanaderiaView = {
                       <div class="badge badge-sm uppercase" style="background: rgba(255, 68, 68, 0.15); color: var(--c-danger); font-weight: 900; letter-spacing: 0.5px; border: 1px solid rgba(255, 68, 68, 0.3); box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);">
                         SUPRESIÓN ${isCarne ? 'CARNE' : 'LECHE'}
                       </div>
-                      <div class="text-md font-950 text-danger mt-4" style="text-shadow: 0 0 8px rgba(255,68,68,0.5);">${s.diasRestantes} <span class="text-[0.6rem] text-gray-500 font-bold uppercase">DÍAS REST.</span></div>
+                      <div class="text-md font-950 text-danger mt-4" style="text-shadow: 0 0 8px rgba(255,68,68,0.5);">${s.indefinido ? 'PROHIBIDO' : `${s.diasRestantes} <span class="text-[0.6rem] text-gray-500 font-bold uppercase">DÍAS REST.</span>`}</div>
                     </div>
                   </div>
                   <div class="text-[0.55rem] text-gray-500 font-extrabold uppercase mt-8 border-top-222 pt-8">
-                    ADVERTENCIA: Prohibido el envío al matadero o comercialización de leche de este animal hasta el vencimiento del periodo de espera (${this._fmtFecha(s.fechaFin)}).
+                    ADVERTENCIA: Prohibido el envío al matadero o comercialización de leche de este animal ${s.indefinido ? 'de forma permanente (medicamento prohibido en producción lechera).' : `hasta el vencimiento del periodo de espera (${this._fmtFecha(s.fechaFin)}).`}
                   </div>
                 </div>
               `;

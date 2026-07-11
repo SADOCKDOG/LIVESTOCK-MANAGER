@@ -365,13 +365,19 @@ const CarneView = {
     const mofaCarne = totalVentasEuros - totalGastosAlim;
     const ratioMofaCarne = totalVentasEuros > 0 ? (mofaCarne / totalVentasEuros) * 100 : 0;
 
+    // Índice de Conversión Alimenticia (kg pienso / kg ganancia de peso vivo)
+    const icaData = this._calcularICA(filteredData);
+
     return {
       ...filteredData,
+      ...icaData,
       kpis: {
         patrimonio: [
           { label: 'Censo Cárnico', value: filteredData.animalesCarne.length + ' cabezas' },
           { label: 'Lotes Cárnicos', value: filteredData.rebanosCarne.length },
-          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: 'var(--c-warning)' }
+          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: 'var(--c-warning)' },
+          { label: 'ICA (Conversión)', value: icaData.ica > 0 ? icaData.ica.toFixed(2) + ' : 1' : 'N/D', color: icaData.ica > 0 && icaData.ica <= 8 ? 'var(--c-success)' : (icaData.ica > 8 ? 'var(--c-danger)' : undefined) },
+          { label: 'Coste/kg Ganancia', value: icaData.costePorKgGanancia > 0 ? icaData.costePorKgGanancia.toFixed(2) + ' €/kg' : 'N/D', color: 'var(--c-warning)' }
         ],
         comercializacion: [
           { label: 'Ventas Matadero', value: filteredData.ventasCarne.length },
@@ -393,6 +399,32 @@ const CarneView = {
       mofaCarne,
       ratioMofaCarne
     };
+  },
+
+  /**
+   * Índice de Conversión Alimenticia (ICA) del lote cárnico.
+   * Fórmula: kg de pienso consumido (eventos de consumo de silo) / kg de ganancia
+   * de peso vivo (último - primer pesaje de cada animal en el periodo).
+   * Preferimos los consumos vinculados a lotes cárnicos; si ninguno está vinculado
+   * (datos sin asignar), usamos el consumo total como aproximación de finca.
+   * El coste €/kg de ganancia usa el coste real imputado al consumo de silo y, si no
+   * lo hay, cae al total de gastos de alimentación.
+   */
+  _calcularICA(data) {
+    const rebanosIds = (data.rebanosCarne || []).map(r => Number(r.id));
+    const consumos = (data.eventos || []).filter(e => e.tipo === 'silo_consumo' && !e.anulado);
+    const vinculados = consumos.filter(e => e.rebanoId && rebanosIds.includes(Number(e.rebanoId)));
+    const base = vinculados.length > 0 ? vinculados : consumos;
+
+    const kgPienso = base.reduce((s, e) => s + (e.valor_neto || 0), 0);
+    const costePienso = base.reduce((s, e) => s + (e.costeConsumo || 0), 0);
+    const gananciaPeso = (data.gmdList || []).reduce((s, g) => s + Math.max(0, (g.ultimoPeso || 0) - (g.primerPeso || 0)), 0);
+
+    const ica = gananciaPeso > 0 && kgPienso > 0 ? kgPienso / gananciaPeso : 0;
+    const costeBase = costePienso > 0 ? costePienso : (data.totalGastosAlim || 0);
+    const costePorKgGanancia = gananciaPeso > 0 && costeBase > 0 ? costeBase / gananciaPeso : 0;
+
+    return { ica, kgPienso, costePienso, gananciaPeso, costePorKgGanancia };
   },
 
   _setFiltro(type, value) {
