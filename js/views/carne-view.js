@@ -402,29 +402,123 @@ const CarneView = {
   },
 
   /**
-   * Índice de Conversión Alimenticia (ICA) del lote cárnico.
-   * Fórmula: kg de pienso consumido (eventos de consumo de silo) / kg de ganancia
-   * de peso vivo (último - primer pesaje de cada animal en el periodo).
-   * Preferimos los consumos vinculados a lotes cárnicos; si ninguno está vinculado
-   * (datos sin asignar), usamos el consumo total como aproximación de finca.
-   * El coste €/kg de ganancia usa el coste real imputado al consumo de silo y, si no
-   * lo hay, cae al total de gastos de alimentación.
+   * Índice de Conversión Alimenticia (ICA) del lote cárnico, estructurado en dos
+   * niveles temporales para que las altas/bajas de animales no distorsionen el ratio:
+   *
+   *  1) CIERRE DE LOTE (periodo principal, dato definitivo): desde la entrada del
+   *     lote (rebano.fecha_constitucion; fallback: primer pesaje / creadoEn) hasta su
+   *     salida a matadero (última venta con ese rebanoId). Si no hay ventas, sigue
+   *     "en curso" y se calcula hasta hoy.
+   *  2) CONTROL MENSUAL (alerta temprana): ICA de cada mes natural para detectar
+   *     desviaciones (mucho pienso, poca ganancia) antes del cierre.
+   *
+   * Fórmula en ambos: kg de pienso consumido (eventos silo_consumo del/los lote/s en
+   * el rango) / kg de ganancia de peso vivo (último - primer pesaje dentro del rango).
    */
   _calcularICA(data) {
-    const rebanosIds = (data.rebanosCarne || []).map(r => Number(r.id));
+    const rebanos = data.rebanosCarne || [];
+    const rebanoIds = rebanos.map(r => Number(r.id));
     const consumos = (data.eventos || []).filter(e => e.tipo === 'silo_consumo' && !e.anulado);
-    const vinculados = consumos.filter(e => e.rebanoId && rebanosIds.includes(Number(e.rebanoId)));
-    const base = vinculados.length > 0 ? vinculados : consumos;
 
-    const kgPienso = base.reduce((s, e) => s + (e.valor_neto || 0), 0);
-    const costePienso = base.reduce((s, e) => s + (e.costeConsumo || 0), 0);
-    const gananciaPeso = (data.gmdList || []).reduce((s, g) => s + Math.max(0, (g.ultimoPeso || 0) - (g.primerPeso || 0)), 0);
+    // Todas las comparaciones se hacen sobre strings de fecha ISO 'YYYY-MM-DD' (orden
+    // lexicográfico = orden cronológico) para evitar desfases de zona horaria.
+    const dia = (f) => String(f || '').slice(0, 10);
+    const mes = (f) => String(f || '').slice(0, 7);
 
+    // Pesajes por animal (ordenados por fecha ISO), sobre los pesajes cárnicos filtrados
+    const pesajesAnimal = {};
+    (data.pesajes || []).forEach(p => {
+      if (p.tipo_entidad === 'animal' && p.entidad_id) {
+        (pesajesAnimal[p.entidad_id] ||= []).push(p);
+      }
+    });
+    Object.values(pesajesAnimal).forEach(arr => arr.sort((a, b) => dia(a.fecha).localeCompare(dia(b.fecha))));
+
+    // Ganancia de peso vivo (kg) de un conjunto de animales dentro de [iniDia, finDia]
+    const gananciaEnRango = (animalIds, iniDia, finDia) => animalIds.reduce((g, aid) => {
+      const pts = (pesajesAnimal[aid] || []).filter(p => { const f = dia(p.fecha); return f >= iniDia && f <= finDia; });
+      return pts.length >= 2 ? g + Math.max(0, (pts[pts.length - 1].valor_neto || 0) - (pts[0].valor_neto || 0)) : g;
+    }, 0);
+
+    // Pienso consumido (kg y coste) por los lotes indicados dentro de [iniDia, finDia]
+    const piensoEnRango = (loteIds, iniDia, finDia) => consumos.reduce((acc, e) => {
+      const f = dia(e.fecha);
+      if (e.rebanoId && loteIds.includes(Number(e.rebanoId)) && f >= iniDia && f <= finDia) {
+        acc.kg += (e.valor_neto || 0); acc.coste += (e.costeConsumo || 0);
+      }
+      return acc;
+    }, { kg: 0, coste: 0 });
+
+    // Mapa animal -> lote
+    const animalesPorLote = {};
+    (data.animalesCarne || []).forEach(a => {
+      const rid = Number(a.rebanoId);
+      (animalesPorLote[rid] ||= []).push(a.id);
+    });
+
+    const hoyDia = new Date().toISOString().slice(0, 10);
+
+    // NIVEL 1 — Cierre de lote (periodo principal, dato definitivo)
+    const lotesICA = rebanos.map(r => {
+      const rid = Number(r.id);
+      const animalIds = animalesPorLote[rid] || [];
+      const primerPesajeDia = animalIds.map(aid => (pesajesAnimal[aid] || [])[0]).filter(Boolean)
+        .map(p => dia(p.fecha)).sort()[0];
+      const entrada = r.fecha_constitucion ? dia(r.fecha_constitucion)
+        : (primerPesajeDia || (r.creadoEn ? dia(r.creadoEn) : null));
+      if (!entrada) return null;
+
+      const ventasLote = (data.ventasCarne || []).filter(v => Number(v.rebanoId) === rid);
+      const cerrado = ventasLote.length > 0;
+      const salida = cerrado
+        ? ventasLote.map(v => dia(v.fechaSacrificio || v.fecha)).sort().slice(-1)[0]
+        : hoyDia;
+
+      const ganancia = gananciaEnRango(animalIds, entrada, salida);
+      const { kg, coste } = piensoEnRango([rid], entrada, salida);
+      const ica = ganancia > 0 && kg > 0 ? kg / ganancia : 0;
+      const costePorKg = ganancia > 0 && coste > 0 ? coste / ganancia : 0;
+      return {
+        rebanoId: rid, nombre: r.nombre || ('Lote ' + rid),
+        entrada, salida: cerrado ? salida : null,
+        cerrado, kgPienso: kg, ganancia, ica, costePorKg
+      };
+    }).filter(Boolean).filter(l => l.kgPienso > 0 || l.ganancia > 0);
+
+    // NIVEL 2 — Control mensual (últimos 6 meses naturales)
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const hoy = new Date();
+    const todosAnimalIds = Object.keys(pesajesAnimal).map(Number);
+    // Ganancia atribuida a un mes: incrementos entre pesajes consecutivos cuyo pesaje
+    // posterior cae en el mes (evita perder engorde de animales con 1 pesaje/mes).
+    const gananciaMes = (mesKey) => todosAnimalIds.reduce((g, aid) => {
+      const pts = pesajesAnimal[aid] || [];
+      let sum = 0;
+      for (let k = 1; k < pts.length; k++) {
+        if (mes(pts[k].fecha) === mesKey) sum += Math.max(0, (pts[k].valor_neto || 0) - (pts[k - 1].valor_neto || 0));
+      }
+      return g + sum;
+    }, 0);
+    const mensualICA = [];
+    for (let i = 5; i >= 0; i--) {
+      const dt = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const mesKey = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0');
+      const kg = consumos.reduce((s, e) => (e.rebanoId && rebanoIds.includes(Number(e.rebanoId)) && mes(e.fecha) === mesKey) ? s + (e.valor_neto || 0) : s, 0);
+      const ganancia = gananciaMes(mesKey);
+      mensualICA.push({
+        mesKey, label: meses[dt.getMonth()] + ' ' + dt.getFullYear(),
+        kgPienso: kg, ganancia, ica: ganancia > 0 && kg > 0 ? kg / ganancia : 0
+      });
+    }
+
+    // Agregado ponderado por ganancia (para el KPI resumen, sin distorsión por censo)
+    const kgPienso = lotesICA.reduce((s, l) => s + l.kgPienso, 0);
+    const gananciaPeso = lotesICA.reduce((s, l) => s + l.ganancia, 0);
+    const costeTotal = lotesICA.reduce((s, l) => s + (l.costePorKg * l.ganancia), 0);
     const ica = gananciaPeso > 0 && kgPienso > 0 ? kgPienso / gananciaPeso : 0;
-    const costeBase = costePienso > 0 ? costePienso : (data.totalGastosAlim || 0);
-    const costePorKgGanancia = gananciaPeso > 0 && costeBase > 0 ? costeBase / gananciaPeso : 0;
+    const costePorKgGanancia = gananciaPeso > 0 && costeTotal > 0 ? costeTotal / gananciaPeso : 0;
 
-    return { ica, kgPienso, costePienso, gananciaPeso, costePorKgGanancia };
+    return { ica, kgPienso, gananciaPeso, costePorKgGanancia, lotesICA, mensualICA };
   },
 
   _setFiltro(type, value) {
@@ -473,6 +567,72 @@ const CarneView = {
     </div>`;
   },
 
+  /**
+   * Panel de análisis del ICA en dos niveles: cierre de lote (definitivo) y control
+   * mensual (detección de desviaciones). Colorea el ICA según eficiencia y resalta
+   * los meses cuyo consumo se dispara respecto a la media de la serie.
+   */
+  _renderPanelICA(d) {
+    const lotes = d.lotesICA || [];
+    const mensual = d.mensualICA || [];
+    const conDatos = lotes.length > 0 || mensual.some(m => m.ica > 0);
+    if (!conDatos) {
+      return `
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255,255,255,0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-4" style="color:var(--c-warning);">${Icons.grafico ? Icons.grafico() : ''} Conversión Alimenticia (ICA)</div>
+          <div class="text-[0.62rem] text-gray-500 font-bold uppercase">Sin datos suficientes. Requiere pesajes seriados y consumos de silo imputados por lote.</div>
+        </div>`;
+    }
+
+    // Color por eficiencia del ICA (kg pienso : kg ganancia)
+    const colorICA = (v) => v <= 0 ? 'var(--c-gray)' : v <= 6 ? 'var(--c-success)' : v <= 8 ? 'var(--c-warning)' : 'var(--c-danger)';
+
+    // Cierre de lote
+    const lotesHtml = lotes.length > 0 ? lotes.map(l => `
+      <div class="flex items-center justify-between p-8 rounded-sm mb-6" style="background:#080808; border:1px solid #1a1a1a;">
+        <div class="min-w-0">
+          <div class="text-[0.68rem] font-black text-white uppercase text-ellipsis">${l.nombre}</div>
+          <div class="text-[0.55rem] text-gray-500 font-bold uppercase">${this._fmtFecha(l.entrada)} → ${l.cerrado ? this._fmtFecha(l.salida) : 'EN CURSO'} · ${Math.round(l.ganancia).toLocaleString()} kg ganados</div>
+        </div>
+        <div class="text-right flex-shrink-0 ml-8">
+          <div class="text-sm font-950" style="color:${colorICA(l.ica)};">${l.ica > 0 ? l.ica.toFixed(2) + ' : 1' : 'N/D'}</div>
+          <div class="text-[0.5rem] font-900 uppercase" style="color:${l.cerrado ? 'var(--c-success)' : 'var(--c-info)'};">${l.cerrado ? 'CERRADO' : 'ABIERTO'}${l.costePorKg > 0 ? ' · ' + l.costePorKg.toFixed(2) + ' €/kg' : ''}</div>
+        </div>
+      </div>`).join('') : `<div class="text-[0.58rem] text-gray-600 font-bold uppercase mb-6">Sin lotes con datos de cierre todavía.</div>`;
+
+    // Control mensual: media de meses con datos para detectar desviaciones
+    const mesesData = mensual.filter(m => m.ica > 0);
+    const mediaICA = mesesData.length > 0 ? mesesData.reduce((s, m) => s + m.ica, 0) / mesesData.length : 0;
+    const maxICA = Math.max(1, ...mensual.map(m => m.ica));
+    const mensualHtml = mensual.map(m => {
+      const desviado = m.ica > 0 && mediaICA > 0 && m.ica > mediaICA * 1.2;
+      const pct = Math.max(4, Math.min(100, (m.ica / maxICA) * 100));
+      const col = m.ica <= 0 ? '#333' : (desviado ? 'var(--c-danger)' : colorICA(m.ica));
+      return `
+        <div class="flex-1 text-center min-w-0">
+          <div class="text-[0.5rem] text-gray-500 font-bold uppercase" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.label.split(' ')[0]}</div>
+          <div style="height:44px; display:flex; align-items:flex-end; justify-content:center;">
+            <div style="width:60%; height:${pct}%; background:${col}; border-radius:4px 4px 0 0; min-height:3px;" title="${m.ica > 0 ? m.ica.toFixed(2) + ':1' : 'sin datos'}"></div>
+          </div>
+          <div class="text-[0.5rem] font-950 mt-2" style="color:${col};">${m.ica > 0 ? m.ica.toFixed(1) : '—'}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="card p-12 mb-14 border-222" style="background: rgba(255,255,255,0.02);">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-8" style="color:var(--c-warning);">${Icons.documento()} Conversión Alimenticia (ICA)</div>
+
+        <div class="text-[0.58rem] text-gray uppercase font-900 tracking-wide mb-6" style="border-left:2px solid var(--c-warning); padding-left:6px;">Cierre de Lote (dato definitivo)</div>
+        ${lotesHtml}
+
+        <div class="text-[0.58rem] text-gray uppercase font-900 tracking-wide mt-10 mb-6" style="border-left:2px solid var(--c-info); padding-left:6px;">Control Mensual (desviaciones)</div>
+        <div class="flex items-end gap-4 p-8 rounded-sm" style="background:#080808; border:1px solid #1a1a1a;">
+          ${mensualHtml}
+        </div>
+        ${mesesData.length > 0 ? `<div class="text-[0.52rem] text-gray-500 font-bold uppercase mt-4">Media del periodo: ${mediaICA.toFixed(2)}:1 · en rojo, meses con consumo desviado (&gt;20% sobre la media)</div>` : ''}
+      </div>`;
+  },
+
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
@@ -490,6 +650,8 @@ const CarneView = {
         </div>
 
         ${this._kpiGrid(d.kpis.patrimonio, 'var(--c-warning)')}
+
+        ${this._renderPanelICA(d)}
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
