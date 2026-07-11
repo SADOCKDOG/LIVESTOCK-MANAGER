@@ -16,13 +16,14 @@ const CarneView = {
     const finca = await Fincas.getActive();
 
     // Cargar datos
-    const [rebanos, animales, eventos, ventasCarne, todosSanitarios, todosGastos] = await Promise.all([
+    const [rebanos, animales, eventos, ventasCarne, todosSanitarios, todosGastos, movimientos] = await Promise.all([
       window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
       window.db.getAll('animales').catch(() => []),
       window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
       window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
       window.db.getAll('sanitarios_ganado').catch(() => []),
-      window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => [])
+      window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
+      window.db.getAll('movimientos_ganado').catch(() => [])
     ]);
 
     // Filtrar rebanos cárnicos o mixtos
@@ -147,6 +148,7 @@ const CarneView = {
       gmdList,
       gastosAlim,
       eventos,
+      movimientos,
       valorPatrimonioTotal,
       totalKgPesados,
       numPesajes,
@@ -458,32 +460,58 @@ const CarneView = {
 
     const hoyDia = new Date().toISOString().slice(0, 10);
 
-    // NIVEL 1 — Cierre de lote (periodo principal, dato definitivo)
-    const lotesICA = rebanos.map(r => {
-      const rid = Number(r.id);
-      const animalIds = animalesPorLote[rid] || [];
-      const primerPesajeDia = animalIds.map(aid => (pesajesAnimal[aid] || [])[0]).filter(Boolean)
-        .map(p => dia(p.fecha)).sort()[0];
-      const entrada = r.fecha_constitucion ? dia(r.fecha_constitucion)
-        : (primerPesajeDia || (r.creadoEn ? dia(r.creadoEn) : null));
-      if (!entrada) return null;
+    // Índices para resolver los animales de un movimiento de entrada (por id o crotal)
+    const animalById = {};
+    const idPorCrotal = {};
+    (data.animalesCarne || []).forEach(a => {
+      animalById[a.id] = a;
+      if (a.numero_identificacion) idPorCrotal[String(a.numero_identificacion)] = a.id;
+    });
 
-      const ventasLote = (data.ventasCarne || []).filter(v => Number(v.rebanoId) === rid);
-      const cerrado = ventasLote.length > 0;
-      const salida = cerrado
-        ? ventasLote.map(v => dia(v.fechaSacrificio || v.fecha)).sort().slice(-1)[0]
-        : hoyDia;
-
+    // Cierre de una tanda/lote: ventana [entrada, salida] + sus animales y lotes físicos
+    const construirCierre = (meta, animalIds, entrada) => {
+      const loteIds = [...new Set(animalIds.map(aid => animalById[aid] && Number(animalById[aid].rebanoId)).filter(v => v != null))];
+      const ventasDe = (data.ventasCarne || []).filter(v => animalIds.includes(Number(v.animalId)));
+      const cerrado = ventasDe.length > 0;
+      const salida = cerrado ? ventasDe.map(v => dia(v.fechaSacrificio || v.fecha)).sort().slice(-1)[0] : hoyDia;
       const ganancia = gananciaEnRango(animalIds, entrada, salida);
-      const { kg, coste } = piensoEnRango([rid], entrada, salida);
-      const ica = ganancia > 0 && kg > 0 ? kg / ganancia : 0;
-      const costePorKg = ganancia > 0 && coste > 0 ? coste / ganancia : 0;
+      const { kg, coste } = loteIds.length ? piensoEnRango(loteIds, entrada, salida) : { kg: 0, coste: 0 };
       return {
-        rebanoId: rid, nombre: r.nombre || ('Lote ' + rid),
-        entrada, salida: cerrado ? salida : null,
-        cerrado, kgPienso: kg, ganancia, ica, costePorKg
+        ...meta, entrada, salida: cerrado ? salida : null, cerrado,
+        nAnimales: animalIds.length, kgPienso: kg, ganancia,
+        ica: ganancia > 0 && kg > 0 ? kg / ganancia : 0,
+        costePorKg: ganancia > 0 && coste > 0 ? coste / ganancia : 0
       };
-    }).filter(Boolean).filter(l => l.kgPienso > 0 || l.ganancia > 0);
+    };
+
+    // NIVEL 1 — Cierre de lote (periodo principal, dato definitivo).
+    // Referencia SIGGAN: una tanda de cebo son los animales de un mismo movimiento de
+    // ENTRADA documentado (RD 787/2023). La entrada es la fecha del movimiento; la
+    // salida, la venta a matadero de esos animales. Si aún no hay movimientos de
+    // entrada registrados, se cae a un cierre por lote usando fecha_constitucion.
+    const movsEntrada = (data.movimientos || []).filter(m => m.tipo === 'entrada' && !m.anulado);
+    let lotesICA = [];
+    for (const m of movsEntrada) {
+      const idsPorId = (Array.isArray(m.animalId) ? m.animalId : []).map(Number);
+      const idsPorCrotal = (Array.isArray(m.crotales) ? m.crotales : []).map(c => idPorCrotal[String(c)]).filter(v => v != null);
+      const animalIds = [...new Set([...idsPorId, ...idsPorCrotal])].filter(aid => animalById[aid] !== undefined);
+      if (animalIds.length === 0) continue;
+      lotesICA.push(construirCierre(
+        { rebanoId: null, nombre: 'Tanda ' + (m.numero_guia || dia(m.fecha)), origen: 'tanda', guiaEntrada: m.numero_guia || null },
+        animalIds, dia(m.fecha)
+      ));
+    }
+    if (lotesICA.length === 0) {
+      lotesICA = rebanos.map(r => {
+        const rid = Number(r.id);
+        const animalIds = animalesPorLote[rid] || [];
+        const primerPesajeDia = animalIds.map(aid => (pesajesAnimal[aid] || [])[0]).filter(Boolean).map(p => dia(p.fecha)).sort()[0];
+        const entrada = r.fecha_constitucion ? dia(r.fecha_constitucion) : (primerPesajeDia || (r.creadoEn ? dia(r.creadoEn) : null));
+        if (!entrada) return null;
+        return construirCierre({ rebanoId: rid, nombre: r.nombre || ('Lote ' + rid), origen: 'lote', guiaEntrada: null }, animalIds, entrada);
+      }).filter(Boolean);
+    }
+    lotesICA = lotesICA.filter(l => l.kgPienso > 0 || l.ganancia > 0);
 
     // NIVEL 2 — Control mensual (últimos 6 meses naturales)
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -591,14 +619,14 @@ const CarneView = {
     const lotesHtml = lotes.length > 0 ? lotes.map(l => `
       <div class="flex items-center justify-between p-8 rounded-sm mb-6" style="background:#080808; border:1px solid #1a1a1a;">
         <div class="min-w-0">
-          <div class="text-[0.68rem] font-black text-white uppercase text-ellipsis">${l.nombre}</div>
-          <div class="text-[0.55rem] text-gray-500 font-bold uppercase">${this._fmtFecha(l.entrada)} → ${l.cerrado ? this._fmtFecha(l.salida) : 'EN CURSO'} · ${Math.round(l.ganancia).toLocaleString()} kg ganados</div>
+          <div class="text-[0.68rem] font-black text-white uppercase text-ellipsis">${l.nombre}${l.origen === 'tanda' ? ' <span style="color:var(--c-info);font-size:0.85em;">· SIGGAN</span>' : ''}</div>
+          <div class="text-[0.55rem] text-gray-500 font-bold uppercase">${l.nAnimales ? l.nAnimales + ' cab · ' : ''}${this._fmtFecha(l.entrada)} → ${l.cerrado ? this._fmtFecha(l.salida) : 'EN CURSO'} · ${Math.round(l.ganancia).toLocaleString()} kg ganados</div>
         </div>
         <div class="text-right flex-shrink-0 ml-8">
           <div class="text-sm font-950" style="color:${colorICA(l.ica)};">${l.ica > 0 ? l.ica.toFixed(2) + ' : 1' : 'N/D'}</div>
           <div class="text-[0.5rem] font-900 uppercase" style="color:${l.cerrado ? 'var(--c-success)' : 'var(--c-info)'};">${l.cerrado ? 'CERRADO' : 'ABIERTO'}${l.costePorKg > 0 ? ' · ' + l.costePorKg.toFixed(2) + ' €/kg' : ''}</div>
         </div>
-      </div>`).join('') : `<div class="text-[0.58rem] text-gray-600 font-bold uppercase mb-6">Sin lotes con datos de cierre todavía.</div>`;
+      </div>`).join('') : `<div class="text-[0.58rem] text-gray-600 font-bold uppercase mb-6">Sin tandas con datos de cierre todavía.</div>`;
 
     // Control mensual: media de meses con datos para detectar desviaciones
     const mesesData = mensual.filter(m => m.ica > 0);
@@ -622,7 +650,7 @@ const CarneView = {
       <div class="card p-12 mb-14 border-222" style="background: rgba(255,255,255,0.02);">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-8" style="color:var(--c-warning);">${Icons.documento()} Conversión Alimenticia (ICA)</div>
 
-        <div class="text-[0.58rem] text-gray uppercase font-900 tracking-wide mb-6" style="border-left:2px solid var(--c-warning); padding-left:6px;">Cierre de Lote (dato definitivo)</div>
+        <div class="text-[0.58rem] text-gray uppercase font-900 tracking-wide mb-6" style="border-left:2px solid var(--c-warning); padding-left:6px;">Cierre de Tanda de Cebo (entrada → matadero)</div>
         ${lotesHtml}
 
         <div class="text-[0.58rem] text-gray uppercase font-900 tracking-wide mt-10 mb-6" style="border-left:2px solid var(--c-info); padding-left:6px;">Control Mensual (desviaciones)</div>
