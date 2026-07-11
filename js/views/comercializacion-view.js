@@ -93,7 +93,8 @@ const ComercializacionView = {
             { label: 'Alimentación Período', value: this._fmt(Math.round(totalGastosAlimPeriodo)) + ' €', color: 'var(--c-danger)' },
             { label: 'MOFA Real (Neto)', value: this._fmt(Math.round(mofaTotalReal)) + ' €', color: 'var(--c-success)' }
           ]
-        }
+        },
+        rendimientoMensual: [] // Para los gráficos de barra - FASE 4: Tarea 3
       };
 
       this._cachedFincaId = fincaId;
@@ -393,6 +394,51 @@ const ComercializacionView = {
 
   _fmt(n) {
     return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
+  },
+
+  // FASE 4: Calcular datos de rendimiento mensual para gráficos de barra
+  _calcularRendimientoMensual(ventas, entregas) {
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const hoy = new Date();
+    const datosMensuales = [];
+
+    // Últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const mesKey = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
+
+      // Filtrar ventas del mes
+      const ventasMes = ventas.filter(v => {
+        const fechaVenta = new Date(v.fechaSacrificio || v.fecha || 0);
+        return fechaVenta.getFullYear() === fecha.getFullYear() &&
+               fechaVenta.getMonth() === fecha.getMonth();
+      });
+
+      // Filtrar entregas del mes
+      const entregasMes = entregas.filter(e => {
+        const fechaEntrega = new Date(e.fechaRecogida || e.fecha || 0);
+        return fechaEntrega.getFullYear() === fecha.getFullYear() &&
+               fechaEntrega.getMonth() === fecha.getMonth();
+      });
+
+      // Calcular métricas del mes
+      const pesoMensual = ventasMensual.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
+      const ingresoMensual = ventasMensual.reduce((s, v) => s + (v.precio_total || 0), 0);
+      const litrosMensual = entregasMes.reduce((s, e) => s + (e.cantidad || 0), 0);
+      const rendMensual = ventasMensual.length > 0 ?
+        ventasMensual.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventasMensual.length : 0;
+
+      datosMensuales.push({
+        mes: meses[fecha.getMonth()],
+        mesCompleto: `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`,
+        peso: pesoMensual,
+        ingreso: ingresoMensual,
+        litros: litrosMensual,
+        rendimiento: rendMensual
+      });
+    }
+
+    return datosMensuales;
   }
 };
 
