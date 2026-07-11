@@ -119,10 +119,12 @@ const LecheView = {
           { label: 'Grasa Media', value: grasaMedia.toFixed(2) + '%' },
           { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' }
         ],
+        // Datos operativos de entrega (vínculo INFOLAC). La facturación/liquidación
+        // vive en ComercializacionView; LecheView es control técnico-biológico.
         comercializacion: [
           { label: 'Litros Entregados', value: litrosTotal.toLocaleString() + ' L', color: 'var(--c-warning)' },
           { label: 'Entregas', value: numEntregas },
-          { label: 'Facturación Leche', value: Math.round(importeTotal).toLocaleString() + ' €', color: 'var(--c-success)' }
+          { label: 'MOFA (Neto)', value: Math.round(mofaTotal).toLocaleString() + ' €', color: 'var(--c-info)' }
         ],
         legislacion: [
           { label: 'Alertas Lácteas', value: alertas + tratamientosSupresionLeche.length, color: alertas + tratamientosSupresionLeche.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },

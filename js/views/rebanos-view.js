@@ -487,7 +487,7 @@ const RebanosView = {
       r.nombre = document.getElementById("r-edit-nombre").value.trim();
       r.especie = document.getElementById("r-edit-especie").value;
       r.tipo = document.getElementById("r-edit-tipo").value;
-      r.zonaActual = document.getElementById("r-edit-zona").value;
+      r.zonaId = document.getElementById("r-edit-zona").value;
       r.capacidad_total = Number(document.getElementById("r-edit-capacidad").value) || 0;
       r.codigo_lote = document.getElementById("r-edit-lote").value.trim();
       r.fecha_constitucion = document.getElementById("r-edit-fecha").value;
@@ -557,14 +557,14 @@ const RebanosView = {
               <label class="wizard-label">ZONA / PARCELA INICIAL</label>
               <select id="w-reb-zona" class="wizard-input font-800" style="border-color: var(--c-warning);">
                 <option value="">SIN ASIGNAR (FINCA GENERAL)</option>
-                ${zonas.map((z) => `<option value="${z.nombre}" ${data.zonaActual === z.nombre ? "selected" : ""}>${z.nombre.toUpperCase()}</option>`).join("")}
+                ${zonas.map((z) => `<option value="${z.id}" ${data.zonaId == z.id ? "selected" : ""}>${z.nombre.toUpperCase()}</option>`).join("")}
               </select>
             </div>
           </div>
         `,
         onChange: async (data) => {
           data.tipo = document.getElementById('w-reb-tipo')?.value || data.tipo;
-          data.zonaActual = document.getElementById('w-reb-zona')?.value || data.zonaActual;
+          data.zonaId = document.getElementById('w-reb-zona')?.value || data.zonaId;
         }
       },
       {
@@ -632,7 +632,7 @@ const RebanosView = {
         nombre: "",
         especie: especies[0].nombre,
         tipo: tipos[0].nombre,
-        zonaActual: "",
+        zonaId: "",
         tipo_explotacion_rega: "",
         capacidad_total: "",
         codigo_lote: "",
@@ -646,8 +646,8 @@ const RebanosView = {
             nombre: finalData.nombre,
             especie: finalData.especie,
             tipo: finalData.tipo,
-            zonaActual: finalData.zonaActual,
-            tipo_explotacion_rega: finalData.tipo_explotacion_rega,
+            zonaId: finalData.zonaId,
+            tipo_explotacion_rega: finalData.tipo_expetacion_rega,
             capacidad_total: Number(finalData.capacidad_total) || 0,
             codigo_lote: finalData.codigo_lote,
             fecha_constitucion: finalData.fecha_constitucion,

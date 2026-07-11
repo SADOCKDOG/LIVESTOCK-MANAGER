@@ -37,13 +37,14 @@ const ExplotacionView = {
     this._needsDataRefresh = false;
     this._loadingPromise = (async () => {
       const finca = await Fincas?.getActive();
-      const [rebanos, animales, eventosRaw, todosGastos, entregasLeche, ventasCarne] = await Promise.all([
+      const [rebanos, animales, eventosRaw, todosGastos, entregasLeche, ventasCarne, silos] = await Promise.all([
         window.db?.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
         window.db?.getAll('animales').catch(() => []),
         window.db?.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
         window.db?.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
         window.db?.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
-        window.db?.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => [])
+        window.db?.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
+        window.db?.getAll('config_silos').catch(() => [])
       ]);
 
       const eventos = (eventosRaw || []).filter(e => !e?.anulado);
@@ -67,11 +68,26 @@ const ExplotacionView = {
       const totalLitros = ordeños.reduce((sum, o) => sum + (o.valor_neto || 0), 0);
       const totalIngresosLeche = entregasLeche.reduce((s, e) => s + (e.importe_total || (e.cantidad * (e.precioBase || 0) || 0)), 0);
       const totalGastosAlim = todosGastos.filter(g => (g.categoria || '').toLowerCase().match(/alimen|pienso/)).reduce((s, g) => s + (g.monto || 0), 0);
+      const mofaLeche = totalIngresosLeche - totalGastosAlim;
+
+      // Margen Comercial Neto Real de Carne (coherente con ComercializacionView)
+      const totalIngresosCarne = (ventasCarne || []).reduce((s, v) => s + (v.precio_total || 0), 0);
+      const gastoTransporteCarne = (ventasCarne || []).reduce((s, v) => s + (parseFloat(v.Gasto_Transporte) || 0), 0);
+      const gastoMatanzaCarne = (ventasCarne || []).reduce((s, v) => s + (parseFloat(v.Gasto_Matanza) || 0), 0);
+      const margenCarne = totalIngresosCarne - gastoTransporteCarne - gastoMatanzaCarne;
 
       this._cachedData = {
         fincaId, finca, pesajes, ordeños, totalLitros, totalIngresosLeche, totalGastosAlim,
         animalesFinca: animales.filter(a => rebanos.map(r => r.id).includes(a.rebanoId)),
-        mofaLeche: totalIngresosLeche - totalGastosAlim,
+        mofaLeche,
+        margenCarne,
+        margenHibrido: mofaLeche + margenCarne,
+        ventasCarne,
+        silosCriticos: (silos || []).filter(s => {
+          const cap = Number(s.capacidad) || 0;
+          const pct = cap > 0 ? (Number(s.cantidadActual) || 0) / cap * 100 : 100;
+          return pct < 15;
+        }),
         todosGastos: todosGastos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha)),
         entregasLeche,
         proConsolidada: [...pesajes, ...ordeños].sort((a,b) => new Date(b.fecha) - new Date(a.fecha))
@@ -123,6 +139,7 @@ const ExplotacionView = {
             <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'tramites' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarSubModulo('tramites')">${Icons.documento()} TRÁMITES</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
@@ -153,6 +170,9 @@ const ExplotacionView = {
         break;
       case 'proveedores':
         if (window.ProveedoresView) await ProveedoresView.render();
+        break;
+      case 'tramites':
+        await this._renderTramitesView(document.getElementById('expro-tab-content'), fincaId);
         break;
     }
 
@@ -211,10 +231,27 @@ const ExplotacionView = {
         <div class="expro-mode-switch">
           <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} CARNE</button>
           <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} LECHE</button>
+          <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} HÍBRIDO</button>
         </div>
       </div>
       <div class="report-section px-4">
         ${guia365BannerHtml}
+        ${(d.silosCriticos && d.silosCriticos.length > 0) ? `
+        <div class="card p-14 mb-14 border-222 card-resumen" style="background: rgba(255, 68, 68, 0.03); border-left: 4px solid var(--c-danger);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center gap-6" style="color:var(--c-danger);">
+            ${Icons.alerta()} TELEMETRÍA DE ALIMENTACIÓN: STOCK BAJO (&lt;15%)
+          </div>
+          <div class="flex flex-col gap-6 mt-6">
+            ${d.silosCriticos.map(s => {
+              const cap = Number(s.capacidad) || 0;
+              const pct = cap > 0 ? Math.round((Number(s.cantidadActual) || 0) / cap * 100) : 0;
+              return `<div class="flex items-center justify-between p-8 rounded-sm" style="background:#080808; border:1px solid #1a1a1a;">
+                <span class="text-[0.65rem] font-black text-white uppercase">${s.nombre || 'Silo'} (${s.alimento || 'Pienso'})</span>
+                <span class="text-xs font-mono font-950" style="color:var(--c-danger);">${(Number(s.cantidadActual)||0).toLocaleString()} / ${cap.toLocaleString()} kg (${pct}%)</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
             <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} BALANCE ${meta.label.toUpperCase()}</span>
@@ -223,11 +260,11 @@ const ExplotacionView = {
           <div class="resumen-body flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-[0.65rem] text-gray uppercase font-900">Producción Total</span>
-              <strong class="text-lg font-950">${this._activeMode === 'leche' ? d.totalLitros.toLocaleString() + ' L' : d.pesajes.length + ' pesajes'}</strong>
+              <strong class="text-lg font-950">${this._activeMode === 'leche' ? d.totalLitros.toLocaleString() + ' L' : this._activeMode === 'carne' ? d.pesajes.length + ' pesajes' : d.totalLitros.toLocaleString() + ' L / ' + d.pesajes.length + ' pesajes'}</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Margen Estimado</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
+              <span class="text-[0.65rem] text-gray uppercase font-900">${this._activeMode === 'carne' ? 'Margen Neto (Carne)' : this._activeMode === 'hibrido' ? 'Margen Consolidado' : 'MOFA (Leche)'}</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(this._activeMode === 'carne' ? d.margenCarne : this._activeMode === 'hibrido' ? d.margenHibrido : d.mofaLeche).toLocaleString()} €</strong>
             </div>
           </div>
         </div>
@@ -247,7 +284,7 @@ const ExplotacionView = {
         </div>
       </div>
       <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="App._abrirAsistenteProduccion('${this._activeMode}', { origen_modulo: 'explotacion', modo_explotacion: this._activeMode })">
-        <span class="fab-label">${this._activeMode === 'leche' ? 'Registrar Ordeño' : 'Registrar Pesaje'}</span>
+        <span class="fab-label">${this._activeMode === 'leche' ? 'Registrar Ordeño' : this._activeMode === 'carne' ? 'Registrar Pesaje' : 'Registrar Producción'}</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
@@ -305,6 +342,92 @@ const ExplotacionView = {
     }
   },
 
+  // Pestaña TRÁMITES: hub administrativo consolidado (Tarea B.1 del plan v5).
+  // Reúne los tres trámites oficiales dispersos —INFOLAC, guías DIMOE y Censo— en
+  // un único punto, delegando las acciones a los wizards existentes.
+  async _renderTramitesView(container, fincaId) {
+    if (!container) return;
+    container.innerHTML = `<div class="p-16 text-center text-gray text-xs uppercase font-800">Cargando trámites…</div>`;
+
+    const [guias, entregasLeche] = await Promise.all([
+      window.db?.getAll('documentos_legales').catch(() => []),
+      window.db?.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => [])
+    ]);
+
+    // Guías DIMOE registradas para esta finca
+    const guiasFinca = (guias || []).filter(g =>
+      (g.tipo === 'guia_movimiento' || g.tipo_documento === 'guia_movimiento') &&
+      (g.fincaId === undefined || Number(g.fincaId) === Number(fincaId)) && !g.anulado
+    ).sort((a, b) => new Date(b.fecha || b.creadoEn || 0) - new Date(a.fecha || a.creadoEn || 0));
+
+    // Estado INFOLAC: entregas del mes en curso sin declaración presentada/aceptada
+    const mesActual = new Date().toISOString().slice(0, 7);
+    const entregasMes = (entregasLeche || []).filter(e => (e.fechaRecogida || e.fecha || '').slice(0, 7) === mesActual && !e.anulado);
+    const infolacPendiente = entregasMes.filter(e => !['presentado', 'aceptado'].includes(e.estado_tramite_infolac)).length;
+
+    const badge = (txt, color) => `<span class="text-[0.6rem] font-950 uppercase px-8 py-4 rounded-sm" style="background:color-mix(in srgb, ${color} 12%, transparent); border:1px solid color-mix(in srgb, ${color} 30%, transparent); color:${color};">${txt}</span>`;
+
+    const tramiteCard = (icon, titulo, subtitulo, estadoHtml, accionLabel, onclick, color) => `
+      <div class="card p-14 mb-12 border-222 card-resumen" style="background: rgba(255,255,255,0.02); border-left: 4px solid ${color};">
+        <div class="flex items-center justify-between gap-8 mb-8">
+          <span class="flex items-center gap-8 text-white font-900 text-sm uppercase tracking-wider" style="color:${color};">${icon} ${titulo}</span>
+          ${estadoHtml}
+        </div>
+        <div class="text-[0.65rem] text-gray font-bold uppercase tracking-wide mb-12">${subtitulo}</div>
+        <button class="btn btn-secondary w-full text-xs uppercase font-800 py-8" style="background:#141414; border:1px solid ${color}; color:${color}; border-radius:6px;" onclick="${onclick}">${accionLabel}</button>
+      </div>`;
+
+    container.innerHTML = `
+      <div class="report-section px-4">
+        <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
+          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} GESTIÓN DE TRÁMITES OFICIALES
+        </div>
+
+        ${tramiteCard(
+          Icons.leche(), 'INFOLAC',
+          'Declaración mensual de producción láctea (Letra Q / Paquete Lácteo UE).',
+          infolacPendiente > 0
+            ? badge(`${infolacPendiente} entregas sin declarar`, 'var(--c-danger)')
+            : badge(entregasMes.length > 0 ? 'Al día' : 'Sin entregas este mes', entregasMes.length > 0 ? 'var(--c-success)' : 'var(--c-gray)'),
+          'Ver comercialización láctea',
+          "window.location.hash='#/comercializacion'",
+          'var(--c-info)'
+        )}
+
+        ${tramiteCard(
+          Icons.documento(), 'GUÍAS DIMOE',
+          `${guiasFinca.length} guía(s) de movimiento registrada(s).${guiasFinca[0] ? ' Última: ' + this._fmtFecha(guiasFinca[0].fecha || guiasFinca[0].creadoEn) + '.' : ''}`,
+          badge(guiasFinca.length > 0 ? `${guiasFinca.length} emitidas` : 'Ninguna', guiasFinca.length > 0 ? 'var(--c-success)' : 'var(--c-gray)'),
+          'Emitir nueva guía DIMOE',
+          "if(window.App&&App._abrirWizardGuiaMovimiento)App._abrirWizardGuiaMovimiento();else if(window.WizardGuiaMovimiento)WizardGuiaMovimiento.abrir();",
+          'var(--c-info)'
+        )}
+
+        ${tramiteCard(
+          Icons.documento(), 'CENSO ANUAL',
+          'Declaración censal oficial por especie, edad y sexo a fecha de referencia.',
+          badge('Bajo demanda', 'var(--c-warning)'),
+          'Generar censo oficial',
+          "if(window.App&&App._abrirWizardCenso)App._abrirWizardCenso();else if(window.WizardCenso)WizardCenso.abrir();",
+          'var(--c-info)'
+        )}
+
+        ${guiasFinca.length > 0 ? `
+        <div class="inf-section-title mt-16 mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
+          <span style="color: var(--c-info); margin-right: 4px;">|</span> GUÍAS DIMOE RECIENTES
+        </div>
+        <div class="grid gap-10">
+          ${guiasFinca.slice(0, 10).map(g => App._cardRegistro({
+            icon: Icons.documento(),
+            title: g.numero_documento || g.numero || `Guía #${g.id}`,
+            metadata: `<span>${this._fmtFecha(g.fecha || g.creadoEn)}</span><span>·</span><span>${(g.destino || g.motivo || 'Movimiento').toString().toUpperCase()}</span>`,
+            badge: (g.estado_tramite || 'registrada').toString().toUpperCase(),
+            color: 'var(--c-info)'
+          })).join('')}
+        </div>` : ''}
+      </div>`;
+  },
+
   _getSubModuleMeta(sub) {
     const map = {
       explotacion: { color: 'var(--c-success)' },
@@ -312,7 +435,8 @@ const ExplotacionView = {
       silos: { color: 'var(--c-success)' },
       fitosanitarios: { color: 'var(--c-purple)' },
       gastos: { color: 'var(--c-purple)' },
-      proveedores: { color: 'var(--c-purple)' }
+      proveedores: { color: 'var(--c-purple)' },
+      tramites: { color: 'var(--c-info)' }
     };
     return map[sub] || map.zonas;
   }

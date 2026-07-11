@@ -60,7 +60,7 @@ const ZonasView = {
       for (const item of zonasConIndice) {
         const z = item.zona;
         let censoTotal = 0;
-        const rebsEnZona = rebanos.filter((r) => r.zonaActual === z.nombre);
+        const rebsEnZona = rebanos.filter((r) => r.zonaId === z.id);
         const especiesEnZona = new Set();
 
         let rebanosHtml = "";
@@ -317,22 +317,29 @@ const ZonasView = {
     try {
       const finca = await Fincas.getActive();
       const zona = finca.zonas[index];
+
+      // Ensure zona has an ID (for backward compatibility with older zonas)
+      if (!zona.id) {
+        const maxId = finca.zonas.reduce((max, z) => Math.max(max, z.id || 0), 0);
+        zona.id = maxId + 1;
+      }
+
       zona.nombre = document.getElementById("z-edit-nombre").value.trim();
-      
+
       const aforo = parseInt(document.getElementById("z-edit-aforo").value) || 0;
       zona.aforoMax = aforo;
       zona.aforo_maximo = aforo;
-      
+
       const sup = parseFloat(document.getElementById("z-edit-superficie").value) || 0;
       zona.superficieGrafica = sup;
       zona.superficie = sup;
-      
+
       zona.codigo_pac = document.getElementById("z-edit-pac").value.trim();
-      
+
       const uso = document.getElementById("z-edit-uso").value.trim();
       zona.usoPrincipal = uso;
       zona.uso = uso;
-      
+
       zona.distancia_agua_m = parseInt(document.getElementById("z-edit-agua").value) || 0;
       zona.localizacion = document.getElementById("z-edit-localizacion").value.trim();
       if (!zona.nombre) return App.toastError("Nombre requerido");
@@ -411,7 +418,12 @@ const ZonasView = {
       onComplete: async (finalData) => {
         try {
           const finca = await Fincas.getActive();
+          // Generate unique ID for the new zona
+          const maxId = finca.zonas.reduce((max, zona) => Math.max(max, zona.id || 0), 0);
+          const newId = maxId + 1;
+
           finca.zonas.push({
+            id: newId,
             nombre: finalData.nombre,
             aforoMax: finalData.aforoMax,
             aforo_maximo: finalData.aforoMax,
@@ -583,7 +595,12 @@ const ZonasView = {
       }
       
       const zonaAnterior = rebano.zonaActual;
+      // Resolver el ID de la parcela destino: el censo por zona filtra por zonaId,
+      // así que debemos actualizar zonaId (fuente de verdad) además de zonaActual.
+      const fincaObj = await Fincas.get(fincaId);
+      const zonaDestino = (fincaObj?.zonas || []).find(z => z.nombre === nuevaZonaNombre);
       rebano.zonaActual = nuevaZonaNombre;
+      rebano.zonaId = zonaDestino?.id ?? null;
       await Rebanos.save(rebano);
       
       // Registrar evento de traslado para auditoría

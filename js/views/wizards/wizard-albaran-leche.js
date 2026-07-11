@@ -398,6 +398,9 @@ window.AlbaranLecheWizard = {
                 animalesARiesgo.push(...animalesDelRebano);
               }
 
+              // Fecha de referencia para toda la validación sanitaria (retiro + supresión)
+              const fechaEntrega = dataLeche.fecha || new Date().toISOString().split('T')[0];
+
               // Validación de bioseguridad unificada cruzada por rebaño completo
               if (window.Sanitarios && window.Sanitarios.verificarRetiroLeche) {
                 for (const reb of rebanosLecheros) {
@@ -414,7 +417,6 @@ window.AlbaranLecheWizard = {
               }
 
               // Verificar supresión para cada animal
-              const fechaEntrega = dataLeche.fecha || new Date().toISOString().split('T')[0];
               let bloqueoDetectado = null;
 
               for (const animal of animalesARiesgo) {

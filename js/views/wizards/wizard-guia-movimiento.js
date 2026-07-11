@@ -238,6 +238,21 @@ window.WizardGuiaMovimiento = {
             App.toastError("Debes certificar la desinsectación para esta comunidad");
             return false;
           }
+          // Bloqueo duro de bioseguridad si el transportista tiene ficha registrada:
+          // exige ATG y desinsectación vigente (coherente con el wizard de venta masiva).
+          if (data.transportistaId && window.Transportistas) {
+            const t = await window.Transportistas.get(data.transportistaId).catch(() => null);
+            if (t) {
+              if (!t.autorizacion_transporte_ganado) {
+                App.toastError("El transportista debe tener ATG (autorización de transporte de ganado) para emitir la guía.");
+                return false;
+              }
+              if (t.desinsectacion_vencimiento && new Date(t.desinsectacion_vencimiento) < new Date(new Date().toISOString().split('T')[0])) {
+                App.toastError("La desinsectación del transportista está vencida. No se puede emitir la guía DIMOE.");
+                return false;
+              }
+            }
+          }
           return true;
         }
       },
