@@ -262,10 +262,65 @@ const ExplotacionView = {
               <span class="text-[0.65rem] text-gray uppercase font-900">Producción Total</span>
               <strong class="text-lg font-950">${this._activeMode === 'leche' ? d.totalLitros.toLocaleString() + ' L' : this._activeMode === 'carne' ? d.pesajes.length + ' pesajes' : d.totalLitros.toLocaleString() + ' L / ' + d.pesajes.length + ' pesajes'}</strong>
             </div>
+
+            <!-- Mode-specific metrics -->
+            ${this._activeMode === 'leche' ? `
             <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">${this._activeMode === 'carne' ? 'Margen Neto (Carne)' : this._activeMode === 'hibrido' ? 'Margen Consolidado' : 'MOFA (Leche)'}</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(this._activeMode === 'carne' ? d.margenCarne : this._activeMode === 'hibrido' ? d.margenHibrido : d.mofaLeche).toLocaleString()} €</strong>
+              <span class="text-[0.65rem] text-gray uppercase font-900">MOFA (Leche)</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
             </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Litros Totales</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${d.totalLitros.toLocaleString()} L</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Litros Control</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${d.totalLitrosControles.toLocaleString()} L</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Grasa Media</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${d.grasaMedia.toFixed(2)}%</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Proteína Media</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${d.protMedia.toFixed(2)}%</strong>
+            </div>` : this._activeMode === 'carne' ? `
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Margen Neto (Carne)</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.margenCarne).toLocaleString()} €</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">GMD (Ganancia Media Diaria)</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${this._calcularGMDCarne() > 0 ? this._calcularGMDCarne().toFixed(2) + ' kg/día' : '0.00 kg/día'}</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Peso Total Ganado</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${this._calcularPesoTotalCarne().toLocaleString()} kg</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">ICA (Conversión Alimenticia)</span>
+              <strong class="text-lg font-950" style="color: ${this._calcularICACarne().ica > 0 && this._calcularICACarne().ica <= 6 ? 'var(--c-success)' : this._calcularICACarne().ica > 8 ? 'var(--c-danger)' : 'var(--c-warning)'};">${this._calcularICACarne().ica > 0 ? this._calcularICACarne().ica.toFixed(2) + ' : 1' : 'N/D'}</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Costo/kg Ganancia</span>
+              <strong class="text-lg font-950" style="color: var(--c-warning);">${this._calcularICACarne().costePorKgGanancia > 0 ? this._calcularICACarne().costePorKgGanancia.toFixed(2) + ' €/kg' : '0.00 €/kg'}</strong>
+            </div>` : `
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Margen Consolidado</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.margenHibrido).toLocaleString()} €</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">MOFA (Leche)</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Peso Total Ganado (Carne)</span>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${this._calcularPesoTotalCarne().toLocaleString()} kg</strong>
+            </div>
+            <div class="py-10 flex justify-between items-center>
+              <span class="text-[0.65rem] text-gray uppercase font-900">ICA Promedio</span>
+              <strong class="text-lg font-950" style="color: var(--c-info);">${this._calcularICACarne().ica > 0 ? this._calcularICACarne().ica.toFixed(2) + ' : 1' : 'N/D'}</strong>
+            </div>`}
           </div>
         </div>
 
@@ -293,6 +348,24 @@ const ExplotacionView = {
     this._activeMode = modo;
     if (window.ModoContextoHelper) ModoContextoHelper.setModeForBlock('explotacion', modo);
     this.render();
+  },
+
+  // Helper methods for calculating carne-specific metrics
+  _calcularGMDCarne() {
+    const { gmdList = [] } = this._cachedData || {};
+    if (!gmdList.length) return 0;
+    const totalGMD = gmdList.reduce((sum, item) => sum + (item.gmd || 0), 0);
+    return totalGMD / gmdList.length;
+  },
+
+  _calcularPesoTotalCarne() {
+    const { gmdList = [] } = this._cachedData || {};
+    return gmdList.reduce((sum, item) => sum + (item.ultimoPeso || 0) - (item.primerPeso || 0), 0);
+  },
+
+  _calcularICACarne() {
+    // Reuse existing ICA calculation logic (returns { ica, kgPienso, costePorKgGanancia })
+    return this._cachedData || {};
   },
 
   _renderGastosView(container, d) {
