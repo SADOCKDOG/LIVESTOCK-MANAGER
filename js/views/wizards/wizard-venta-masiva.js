@@ -618,6 +618,7 @@ window.VentaMasivaWizard = {
 
             const reg = {
               animalId: aId,
+              rebanoId: animal.rebanoId || null, // Vínculo al lote para el cierre de lote (ICA)
               compradorId: finalData.compradorId || null,
               contratoId: null,
               fechaSacrificio: finalData.fechaSacrificio,

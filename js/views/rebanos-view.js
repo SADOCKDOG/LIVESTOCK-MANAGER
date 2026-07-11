@@ -647,7 +647,7 @@ const RebanosView = {
             especie: finalData.especie,
             tipo: finalData.tipo,
             zonaId: finalData.zonaId,
-            tipo_explotacion_rega: finalData.tipo_expetacion_rega,
+            tipo_explotacion_rega: finalData.tipo_explotacion_rega,
             capacidad_total: Number(finalData.capacidad_total) || 0,
             codigo_lote: finalData.codigo_lote,
             fecha_constitucion: finalData.fecha_constitucion,
