@@ -380,6 +380,7 @@
               fincaId: fincaId,
               fecha: pcItem.pesos[pp].f,
               entidad_id: pcItem.animal.id,
+              rebanoId: pcItem.animal.rebanoId, // vincula el pesaje al lote (control cárnico / ICA)
               tipo_entidad: 'animal',
               valor_neto: pcItem.pesos[pp].p,
               unidad: 'kg',
@@ -396,6 +397,78 @@
         }
       }
 
+
+      // 12b. Tanda de cebo (SIGGAN): movimiento de ENTRADA + silo/consumos para el ICA
+      // Define la tanda de los terneros por su movimiento de entrada documentado y siembra
+      // el pienso consumido por el lote, para poder validar el ICA de cierre y control mensual.
+      if (terner1 && terner2) {
+        try {
+          await window.db.put('movimientos_ganado', {
+            id: 9900,
+            demo: true,
+            fincaId: fincaId,
+            tipo: 'entrada',
+            numero_guia: 'ENT-' + currentYear + '-0018',
+            rega_origen: 'ES060140000123',
+            rega_destino: DEMO_FINCA.rega,
+            explotacion_contraparte: 'Ganadería de Origen SL (Badajoz)',
+            motivo: 'cebo',
+            especie: 'Vacas',
+            num_animales: 2,
+            animalId: [terner1.id, terner2.id],
+            crotales: [terner1.numero_identificacion, terner2.numero_identificacion],
+            tipo_operador_destino: 'explotacion',
+            transportista_nombre: 'Transportes Ganaderos del Sur SL',
+            matricula: '1234BCD',
+            fecha: currentYear + '-01-05',
+            desinsectacion_certificada: true,
+            desinfeccion_fecha: currentYear + '-01-05',
+            veterinario_autorizante: 'Dr. Manuel Castillo',
+            estado_tramite: 'presentado',
+            fecha_presentacion: currentYear + '-01-05',
+            numero_registro_oficial: 'REG-ENT-1180',
+            acuse_recibo: 'OK-ENT-2261',
+            creadoEn: new Date().toISOString()
+          });
+
+          await window.db.put('config_silos', {
+            id: 8801,
+            demo: true,
+            fincaId: fincaId,
+            nombre: 'Silo Cebo 1',
+            alimento: 'Pienso engorde vacuno',
+            capacidad: 8000,
+            cantidadActual: 1500,
+            precioUltimaCargaKg: 0.30,
+            creadoEn: new Date().toISOString()
+          });
+
+          var consumosCebo = [
+            { fecha: currentYear + '-02-01', kg: 350 },
+            { fecha: currentYear + '-03-01', kg: 380 },
+            { fecha: currentYear + '-04-01', kg: 400 }
+          ];
+          for (var cc = 0; cc < consumosCebo.length; cc++) {
+            await window.db.add('registro_eventos', {
+              demo: true,
+              fincaId: fincaId,
+              tipo: 'silo_consumo',
+              tipo_entidad: 'silo_pienso',
+              entidad_id: 8801,
+              rebanoId: rebTerneros.id,
+              fecha: consumosCebo[cc].fecha,
+              motivo_tarea: 'alimentacion',
+              valor_neto: consumosCebo[cc].kg,
+              unidad: 'kg',
+              precioKgConsumo: 0.30,
+              costeConsumo: +(consumosCebo[cc].kg * 0.30).toFixed(2),
+              observaciones: 'Consumo de pienso de cebo (lote Terneros Cebo)',
+              creadoEn: new Date().toISOString()
+            });
+            await sleep(50);
+          }
+        } catch (e) { console.log('[SEED] Error tanda cebo:', e.message); }
+      }
 
       // 13. Producción de leche (Individual, Lote y Expedición Tanque)
       var prodLecheVacas = [vaca1, vaca2, vaca3];
