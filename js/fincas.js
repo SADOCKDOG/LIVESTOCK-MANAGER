@@ -70,7 +70,7 @@ const Fincas = {
         const id = await this.getActiveId();
         if (!id) return null;
         const finca = await this.get(id);
-        
+
         // Migración Gap 9: Ensure zonas tienen codigo_pac y distancia_agua_m
         if (finca && finca.zonas && Array.isArray(finca.zonas)) {
             let needsUpdate = false;
@@ -99,7 +99,7 @@ const Fincas = {
                 }
             }
         }
-        
+
         return finca;
     },
 
@@ -128,6 +128,25 @@ const Fincas = {
         }
 
         const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
+
+        // Process zonas to ensure they have unique IDs (for both new and updated fincas)
+        if (data.zonas && Array.isArray(data.zonas)) {
+            // Find the maximum existing ID to avoid conflicts
+            const maxExistingId = data.zonas.reduce((max, zona) => {
+                return zona.id && typeof zona.id === 'number' ? Math.max(max, zona.id) : max;
+            }, 0);
+            let nextId = Math.max(maxExistingId + 1, 1); // Start at 1
+
+            // Ensure all zonas have IDs
+            data.zonas = data.zonas.map(zona => {
+                // If zona already has a valid numeric ID, keep it
+                if (zona.id && typeof zona.id === 'number' && zona.id > 0) {
+                    return zona;
+                }
+                // Otherwise assign a new sequential ID
+                return {...zona, id: nextId++};
+            });
+        }
 
         if (esEdicion) {
             data.id = Number(data.id);
@@ -255,6 +274,29 @@ const Fincas = {
 
             // Crear finca nueva
             const regaNorm = this._normalizarREGA(datos.rega || datos.codigo_REGA);
+
+            // Process zonas to ensure they have unique IDs
+            let zonasProcesadas = [];
+            if (datos.zonas && Array.isArray(datos.zonas)) {
+                // Find the maximum existing ID to avoid conflicts
+                const maxExistingId = datos.zonas.reduce((max, zona) => {
+                    return zona.id && typeof zona.id === 'number' ? Math.max(max, zona.id) : max;
+                }, 0);
+                let nextId = Math.max(maxExistingId + 1, 1); // Start at 1
+
+                // Ensure all zonas have IDs
+                zonasProcesadas = datos.zonas.map(zona => {
+                    // If zona already has a valid numeric ID, keep it
+                    if (zona.id && typeof zona.id === 'number' && zona.id > 0) {
+                        return zona;
+                    }
+                    // Otherwise assign a new sequential ID
+                    return {...zona, id: nextId++};
+                });
+            } else {
+                zonasProcesadas = [];
+            }
+
             const nuevaFinca = {
                 nombre: datos.nombre.trim(),
                 propietario: datos.propietario.trim(),
@@ -274,7 +316,7 @@ const Fincas = {
                 clasificacion_zootecnica: datos.clasificacion_zootecnica || '',
                 capacidad_maxima: datos.capacidad_maxima != null ? Number(datos.capacidad_maxima) : null,
                 especies_autorizadas: Array.isArray(datos.especies_autorizadas) ? datos.especies_autorizadas : [],
-                zonas: datos.zonas || [],
+                zonas: zonasProcesadas,
                 creadoEn: new Date().toISOString()
             };
 

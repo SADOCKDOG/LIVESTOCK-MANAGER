@@ -563,6 +563,10 @@ const SilosView = {
         const nuevaCantidad = silo.cantidadActual - amount;
         silo.cantidadActual = nuevaCantidad;
 
+        // Coste real del consumo (base para el Índice de Conversión Alimenticia por lote)
+        const precioKg = Number(silo.precioUltimaCargaKg) || 0;
+        const costeConsumo = Math.round(precioKg * amount * 100) / 100;
+
         await window.db.put('config_silos', silo);
         ModalManager.close('consume-silo-modal');
 
@@ -583,6 +587,8 @@ const SilosView = {
                 motivo_tarea: 'alimentacion',
                 valor_neto: amount,
                 unidad: 'kg',
+                precioKgConsumo: precioKg,
+                costeConsumo: costeConsumo,
                 observaciones: observaciones,
                 creadoEn: new Date().toISOString()
             };

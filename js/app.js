@@ -929,6 +929,27 @@ const App = {
     const [path, query] = hash.split("?");
     const params = new URLSearchParams(query);
 
+    // URL redirections for consolidated architecture v5.0
+    const redirectMap = {
+      '/zonas': '/explotacion?tab=zonas',
+      '/silos': '/explotacion?tab=silos',
+      '/fitosanitario': '/explotacion?tab=fitosanitarios',
+      '/gastos': '/explotacion?tab=gastos',
+      '/proveedores': '/explotacion?tab=proveedores',
+      '/leche': '/ganaderia?tab=leche',
+      '/carne': '/ganaderia?tab=carne',
+      '/hibrido': '/ganaderia?tab=hibrido',
+      '/compradores': '/comercializacion?tab=compradores',
+      '/contratos': '/comercializacion?tab=contratos',
+      '/transportistas': '/comercializacion?tab=transportistas'
+    };
+
+    // Check if we need to redirect
+    if (redirectMap[path]) {
+      window.location.hash = '#' + redirectMap[path];
+      return;
+    }
+
     await this.updateNavigationMenu();
 
     let activeSvg = null;

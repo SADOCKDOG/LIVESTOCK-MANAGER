@@ -36,6 +36,16 @@ window.WizardFinca = {
                   ).join('')}
                 </select>
               </div>
+              <div class="grid grid-cols-2 gap-8">
+                <div class="wizard-input-group">
+                  <label class="wizard-label">SUPERFICIE TOTAL (HA)</label>
+                  <input type="number" step="0.01" id="w-fn-superficie" value="${data.superficie_total || ''}" placeholder="Ej: 120.5" class="wizard-input font-800">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="wizard-label">COORDENADAS / SIGPAC</label>
+                  <input type="text" id="w-fn-coordenadas" value="${data.coordenadas || ''}" placeholder="Ej: 37.8882, -4.7794" class="wizard-input">
+                </div>
+              </div>
 
               <div class="wizard-input-group mt-10">
                 <label class="wizard-label">ESPECIES AUTORIZADAS</label>
@@ -62,7 +72,10 @@ window.WizardFinca = {
           data.propietario = document.getElementById('w-fn-propietario')?.value.trim() || data.propietario;
           data.codigo_REGA = document.getElementById('w-fn-rega')?.value.trim() || data.codigo_REGA;
           data.comunidad_autonoma = document.getElementById('w-fn-ccaa')?.value || data.comunidad_autonoma;
-          
+          const supVal = document.getElementById('w-fn-superficie')?.value;
+          data.superficie_total = supVal !== undefined && supVal !== '' ? Number(supVal) : data.superficie_total;
+          data.coordenadas = document.getElementById('w-fn-coordenadas')?.value.trim() ?? data.coordenadas;
+
           const chks = document.querySelectorAll('input[name="w-fn-especies-chk"]:checked');
           data.especies_autorizadas = Array.from(chks).map(el => el.value);
         },
@@ -84,7 +97,7 @@ window.WizardFinca = {
     window.WizardManager.create({
       id: 'wizard-nueva-finca',
       title: 'NUEVA FINCA',
-      initialData: { nombre: '', propietario: '', codigo_REGA: '', comunidad_autonoma: '', especies_autorizadas: [] },
+      initialData: { nombre: '', propietario: '', codigo_REGA: '', comunidad_autonoma: '', especies_autorizadas: [], superficie_total: '', coordenadas: '' },
       steps: wizardSteps,
       onComplete: onComplete || (async (finalData) => {
         try {
