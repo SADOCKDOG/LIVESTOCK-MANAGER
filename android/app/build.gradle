@@ -64,14 +64,15 @@ try {
 }
 
 play {
-    // Configuración básica para gradle-play-publisher
-    // El archivo service-account.json debes colocarlo en la carpeta android/app/
+    // Configuración para subida automática a Google Play
     serviceAccountCredentials.set(file("service-account.json"))
     
-    // Por defecto, se subirá a la pista interna de pruebas.
-    // Opciones: "internal", "alpha", "beta", "production"
+    // Track por defecto (se puede sobrescribir por línea de comandos)
     track.set("internal")
     
-    // Priorizamos Android App Bundles (AAB)
+    // Si quieres subir a Alpha automáticamente usa:
+    // track.set("alpha")
+    
     defaultToAppBundles.set(true)
+    releaseName.set("4.9.0 - Industrial Premium Update")
 }
