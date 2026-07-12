@@ -19,29 +19,47 @@ Esta versión marca una evolución crítica hacia la operatividad profesional en
 - **Wizards de Campo 2.0:** Asistentes de registro a pantalla completa (Pesajes, Censo, Tratamientos) diseñados para ser operados rápidamente con una sola mano.
 - **Tarjetas de Registro Inteligentes:** Nueva jerarquía visual en fichas de animales y fincas para acceso instantáneo a datos REGA y estados sanitarios.
 - **Cumplimiento Normativo Total:** Integración profunda con el **RD 787/2023** y plataformas autonómicas (**SIGGAN/BADIGEX**).
-- **Automatización Play Console:** Preparado para despliegue automatizado mediante Google Play Service Accounts.
 
 ---
 
 ## 🛠️ Alcance Funcional
 
-*   **Gestión R.E.G.A.:** Control total de explotaciones, fincas y zonas de pastoreo.
-*   **Módulo Ganadero:** Trazabilidad 360° desde el nacimiento/compra hasta la venta masiva.
-*   **Producción Dual:** Gestión especializada para líneas de **Carne** (Pesajes, GMD, SEUROP) y **Leche** (Ordeño, Calidad, MOFA).
-*   **Sanidad y Bienestar:** Libro de tratamientos veterinarios con control estricto de periodos de supresión.
-*   **Inteligencia de Negocio:** 14 tipos de informes financieros y operativos con exportación a PDF y Excel.
-*   **Archivo Documental:** Gestión digital de guías DIMOE, declaraciones ICA y acuses de recibo.
+La aplicación se organiza en módulos interconectados que cubren todo el ciclo de vida de la explotación ganadera:
 
----
+### 1. Gestión de Infraestructura y R.E.G.A.
+*   **Explotaciones (Fincas):** Configuración de datos oficiales (REGA, CEA), titularidad y comunidad autónoma. Es la raíz de la jerarquía de datos.
+*   **Zonas y Parcelas:** Subdivisión física de la finca. Permite el control de carga ganadera (UGM/Ha), aforos y pastoreo rotacional. Integración con datos PAC.
 
-## 📐 Estándar de Diseño "Cork Manager"
+### 2. Módulo Ganadero (Censo y Trazabilidad)
+*   **Animales:** Ficha individual con identificador oficial (ES+12), escáner de crotales, genealogía completa y línea de tiempo vital (nacimiento, traslados, bajas).
+*   **Rebaños:** Agrupación lógica de animales para gestión masiva. Estructura: *Finca > Zona > Rebaño > Animal*.
+*   **Movimientos:** Registro de traslados internos entre zonas y movimientos inter-explotación.
 
-La aplicación sigue el lenguaje de diseño **Industrial Premium**:
-- **Tipografía:** Archivo Expanded (Títulos), Inter (Cuerpo), IBM Plex Mono (Datos Técnicos).
-- **Colores Semánticos:** Neon Lime (#CF0) para éxito, Gold (#FFD600) para identificación oficial, Red (#F44) para gastos/alertas.
-- **Interactividad:** Botones de gran tamaño (48px+) y radios de 16px para uso táctil robusto.
+### 3. Producción y Rendimiento (ExPro)
+*   **Línea Cárnica:** Registro de pesajes individuales o por lotes, cálculo automático de GMD (Ganancia Media Diaria) y clasificación SEUROP.
+*   **Línea Láctea:** Control de ordeño diario, gestión de silos y tanques, y analíticas de calidad (Grasa, Proteína, Células Somáticas).
+*   **Silos:** Control de inventario de suministros y piensos con trazabilidad de consumo por rebaño.
 
-Para más detalles, consulte el archivo [DESIGN.md](docs/design/DESIGN.md).
+### 4. Comercialización y Logística (CoMer)
+*   **Compradores:** Gestión CRM de clientes, contratos comerciales vinculados y tablas de precios pactados.
+*   **Transportistas:** Directorio de logística autorizada con registro de matrículas y certificados de bienestar animal.
+*   **Ventas y Albaranes:** Emisión masiva de ventas de animales y albaranes de leche. Generación automática de liquidaciones comerciales.
+
+### 5. Sanidad y Bienestar Animal
+*   **Libro de Tratamientos:** Registro normativo de aplicaciones veterinarias, recetas y periodos de supresión (carne/leche).
+*   **Alertas Sanitarias:** Bloqueo automático de animales en periodo de espera para evitar riesgos en la cadena alimentaria.
+
+### 6. Finanzas y Control de Costes
+*   **Gastos Operativos:** Imputación analítica de costes (Alimentación, Sanidad, Energía, Personal, Amortizaciones).
+*   **Fitosanitarios:** Registro de tratamientos de parcelas y control de fitosanitarios aplicados al terreno.
+
+### 7. Inteligencia de Negocio e Informes (BI)
+*   **Panel Analítico:** 14 categorías de informes técnicos y financieros.
+*   **Balances (P&L):** Cálculo de margen neto, punto de equilibrio y rentabilidad por animal o rebaño.
+
+### 8. Gestión Documental y Normativa (RD 787/2023)
+*   **Cuaderno Digital (CUE):** Generación y exportación del cuaderno oficial de explotación compatible con SIGGAN/BADIGEX.
+*   **Documentos Oficiales:** Archivo digital para guías DIMOE, declaraciones ICA y documentos de movimiento SIA.
 
 ---
 
