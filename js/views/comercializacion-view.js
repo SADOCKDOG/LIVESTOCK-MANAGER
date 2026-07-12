@@ -310,6 +310,13 @@ const ComercializacionView = {
       })),
       emptyMsg: 'Sin entregas de leche registradas.'
     });
+
+    // FASE 4: Gráfico de rendimiento de leche (Tarea 3)
+    const lecheChartContainer = document.createElement('div');
+    lecheChartContainer.id = 'leche-rendimiento-chart';
+    subContent.appendChild(lecheChartContainer);
+    const rendimientoLeche = this._calcularRendimientoMensual(d.ventas, d.entregas);
+    this._renderRendimientoBarChart(lecheChartContainer, rendimientoLeche, 'litros', 'Producción Mensual de Leche', 'var(--c-success)', 'var(--c-danger)');
   },
 
   async _renderCarneSubTab() {
@@ -342,6 +349,13 @@ const ComercializacionView = {
       })),
       emptyMsg: 'Sin ventas de carne registradas.'
     });
+
+    // FASE 4: Gráfico de rendimiento de carne (Tarea 3)
+    const carneChartContainer = document.createElement('div');
+    carneChartContainer.id = 'carne-rendimiento-chart';
+    subContent.appendChild(carneChartContainer);
+    const rendimientoCarne = this._calcularRendimientoMensual(d.ventas, d.entregas);
+    this._renderRendimientoBarChart(carneChartContainer, rendimientoCarne, 'peso', 'Peso Mensual de Carne Vendida', 'var(--c-danger)', 'var(--c-warning)');
   },
 
   _renderKPIsSubTab(tabKey, kpis, color, icon) {
