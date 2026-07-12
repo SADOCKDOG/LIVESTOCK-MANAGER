@@ -1,0 +1,5 @@
+- Nueva interfaz "Industrial Premium" optimizada para alta visibilidad en exteriores y pantallas OLED.
+- Rediseño de asistentes (Wizards) de registro para operación rápida en campo con una sola mano.
+- Incorporación de tarjetas de información técnica con acceso directo a datos REGA y estados sanitarios.
+- Mejoras críticas en la estabilidad de la gestión de fincas y sincronización de datos.
+- Optimizaciones de rendimiento en el motor de renderizado web.

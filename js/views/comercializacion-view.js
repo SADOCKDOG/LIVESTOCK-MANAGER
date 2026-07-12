@@ -439,6 +439,69 @@ const ComercializacionView = {
     }
 
     return datosMensuales;
+  },
+
+  // FASE 4: Renderizar gráficos de barra de rendimiento (Tarea 3)
+  _renderRendimientoBarChart(container, datosMensuales, tipoMetrica, titulo, colorPositivo, colorNegativo) {
+    if (!datosMensuales || datosMensuales.length === 0) {
+      container.innerHTML = `<div class="p-16 text-center text-gray">No hay datos disponibles para mostrar gráficos de rendimiento.</div>`;
+      return;
+    }
+
+    // Calcular el valor máximo para escalar las barras
+    let maxValor = 0;
+    if (tipoMetrica === 'peso') {
+      maxValor = Math.max(...datosMensuales.map(d => d.peso));
+    } else if (tipoMetrica === 'ingreso') {
+      maxValor = Math.max(...datosMensuales.map(d => d.ingreso));
+    } else if (tipoMetrica === 'litros') {
+      maxValor = Math.max(...datosMensuales.map(d => d.litros));
+    } else if (tipoMetrica === 'rendimiento') {
+      maxValor = Math.max(...datosMensuales.map(d => d.rendimiento));
+    }
+
+    // Asegurar que el máximo sea al menos 1 para evitar división por cero
+    maxValor = Math.max(1, maxValor);
+
+    const mesesHtml = datosMensuales.map(dato => {
+      let valor = 0;
+      let color = 'var(--c-success)'; // Color por defecto (positivo)
+
+      if (tipoMetrica === 'peso') {
+        valor = dato.peso;
+      } else if (tipoMetrica === 'ingreso') {
+        valor = dato.ingreso;
+      } else if (tipoMetrica === 'litros') {
+        valor = dato.litros;
+      } else if (tipoMetrica === 'rendimiento') {
+        valor = dato.rendimiento;
+        // Para el rendimiento, el color indica si es bueno (> promedio) o malo (< promedio)
+        const promedio = datosMensuales.reduce((sum, d) => sum + d.rendimiento, 0) / datosMensuales.length;
+        color = valor >= promedio ? colorPositivo : colorNegativo;
+      }
+
+      const porcentaje = (valor / maxValor) * 100;
+      const altura = Math.max(4, porcentaje); // Altura mínima de 4px
+
+      return `<div class="flex-1 text-center min-w-0">
+        <div class="text-xs text-gray mb-2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${dato.mes}</div>
+        <div class="leche-bar-wrap" style="position:relative; height:30px;">
+          <div style="position:absolute;bottom:0;width:80%;height:${altura}%;background:${color};border-radius:4px 4px 0 0;opacity:0.8;transition:height 0.3s;left:10%;"></div>
+        </div>
+        <div class="text-xs font-bold mt-1" style="color:${color};">${valor.toLocaleString()}${tipoMetrica === 'rendimiento' ? '%' : ''}</div>
+      </div>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="mb-12">
+        <div class="text-[0.65rem] text-gray uppercase font-900 tracking-wider mb-4">${titulo}</div>
+        <div class="grid gap-4">
+          ${mesesHtml}
+        </div>
+        <div class="text-xs text-gray mt-2">
+          Últimos 6 meses: ${datosMensuales.map(d => d.mesCompleto).join(' • ')}
+        </div>
+      </div>`;
   }
 };
 

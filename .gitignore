@@ -4,8 +4,16 @@ dist/
 
 # Build output (generado por npm run build copiando desde la raíz)
 www/
-# Android — regenerar con npx cap copy android
-android/
+# Android — solo carpetas de código y configuración
+# android/ (Quitamos la exclusión general)
+android/.gradle/
+android/build/
+android/local.properties
+android/app/build/
+android/app/release/
+android/app/debug/
+android/capacitor-cordova-android-plugins/build/
+android/node_modules/
 
 # Interno / Privado — datos de usuario, backups, capturas, informes
 Private/
@@ -44,3 +52,7 @@ desktop.ini
 # Artefactos temporales de pruebas
 tmp/
 tmp_test/
+
+# Keystore
+android/app/*.jks
+android/app/service-account.json
