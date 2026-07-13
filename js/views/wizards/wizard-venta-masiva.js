@@ -287,7 +287,7 @@ window.VentaMasivaWizard = {
             return false;
           }
           if (data.pCanal > 0 && data.precioUnitario <= 0) {
-            App.toastWarning("Has dejado el Precio Unitario en 0€. Se emitirá la factura como pendiente de fijar.");
+            App.toast("Has dejado el Precio Unitario en 0€. Se emitirá la factura como pendiente de fijar.", 'warning');
           }
           return true;
         }
