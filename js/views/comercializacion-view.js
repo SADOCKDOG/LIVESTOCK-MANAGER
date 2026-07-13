@@ -436,11 +436,11 @@ const ComercializacionView = {
       });
 
       // Calcular métricas del mes
-      const pesoMensual = ventasMensual.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
-      const ingresoMensual = ventasMensual.reduce((s, v) => s + (v.precio_total || 0), 0);
+      const pesoMensual = ventasMes.reduce((s, v) => s + (v.pesoCanal || v.pesoVivo || 0), 0);
+      const ingresoMensual = ventasMes.reduce((s, v) => s + (v.precio_total || 0), 0);
       const litrosMensual = entregasMes.reduce((s, e) => s + (e.cantidad || 0), 0);
-      const rendMensual = ventasMensual.length > 0 ?
-        ventasMensual.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventasMensual.length : 0;
+      const rendMensual = ventasMes.length > 0 ?
+        ventasMes.reduce((s, v) => s + (v.rendimientoCanal || 0), 0) / ventasMes.length : 0;
 
       datosMensuales.push({
         mes: meses[fecha.getMonth()],
