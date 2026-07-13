@@ -41,7 +41,7 @@ const ZonasView = {
         }
 
         // Recargar la vista suavemente para que los cambios surtan efecto en caliente
-        setTimeout(() => { App.navigate('/zonas'); }, 100);
+        setTimeout(() => { location.hash = '#/zonas'; }, 100);
         return;
       }
     }
