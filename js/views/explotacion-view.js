@@ -70,6 +70,33 @@ const ExplotacionView = {
       const totalGastosAlim = todosGastos.filter(g => (g.categoria || '').toLowerCase().match(/alimen|pienso/)).reduce((s, g) => s + (g.monto || 0), 0);
       const mofaLeche = totalIngresosLeche - totalGastosAlim;
 
+      // Métricas complementarias de calidad láctea (coherente con LecheView)
+      const totalLitrosControles = ordeños.reduce((s, o) => s + (o.valor_neto || 0), 0);
+      const conLab = entregasLeche.filter(e => e.laboratorio);
+      const grasaMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.grasa || 0), 0) / conLab.length : 0;
+      const protMedia = conLab.length > 0 ? conLab.reduce((s, e) => s + (e.laboratorio.proteina || 0), 0) / conLab.length : 0;
+
+      // GMD (Ganancia Media Diaria) por animal, coherente con CarneView
+      const pesajesPorAnimal = {};
+      pesajes.forEach(p => {
+        if (p.tipo_entidad === 'animal' && p.entidad_id) {
+          if (!pesajesPorAnimal[p.entidad_id]) pesajesPorAnimal[p.entidad_id] = [];
+          pesajesPorAnimal[p.entidad_id].push(p);
+        }
+      });
+      const gmdList = [];
+      for (const animId in pesajesPorAnimal) {
+        const pts = pesajesPorAnimal[animId].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+        if (pts.length >= 2) {
+          const pIni = pts[0].valor_neto || 0;
+          const pFin = pts[pts.length - 1].valor_neto || 0;
+          const dias = (new Date(pts[pts.length - 1].fecha) - new Date(pts[0].fecha)) / (1000 * 60 * 60 * 24);
+          if (dias > 0) {
+            gmdList.push({ animalId: animId, gmd: (pFin - pIni) / dias, ultimoPeso: pFin, primerPeso: pIni, dias });
+          }
+        }
+      }
+
       // Margen Comercial Neto Real de Carne (coherente con ComercializacionView)
       const totalIngresosCarne = (ventasCarne || []).reduce((s, v) => s + (v.precio_total || 0), 0);
       const gastoTransporteCarne = (ventasCarne || []).reduce((s, v) => s + (parseFloat(v.Gasto_Transporte) || 0), 0);
@@ -80,6 +107,10 @@ const ExplotacionView = {
         fincaId, finca, pesajes, ordeños, totalLitros, totalIngresosLeche, totalGastosAlim,
         animalesFinca: animales.filter(a => rebanos.map(r => r.id).includes(a.rebanoId)),
         mofaLeche,
+        totalLitrosControles,
+        grasaMedia,
+        protMedia,
+        gmdList,
         margenCarne,
         margenHibrido: mofaLeche + margenCarne,
         ventasCarne,
