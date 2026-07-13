@@ -144,7 +144,7 @@ const ComercializacionView = {
           cCarne.fecha_fin = fVence;
           await window.db.put('contratos_compra', cCarne).catch(() => {});
           
-          setTimeout(() => { App.navigate('/comercializacion'); }, 100);
+          setTimeout(() => { location.hash = '#/comercializacion'; }, 100);
           return;
         }
       }
