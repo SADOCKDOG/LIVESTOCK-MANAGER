@@ -198,7 +198,7 @@ const ZonasView = {
               ${parcelasAfectadasHtml}
             </div>
             <div class="flex justify-end">
-              <button onclick="App.toastInfo('Abriendo panel de asistente de rotación de pastos...'); location.hash='/sistema?tab=interfaz'" class="px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem]" style="background: rgba(255,68,68,0.15); border: 1px solid var(--c-danger); color: var(--c-danger); border-radius: 4px; transition: all 0.2s; box-shadow: 0 0 8px rgba(255,68,68,0.15);" onmouseover="this.style.background='var(--c-danger)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,68,68,0.15)'; this.style.color='var(--c-danger)';">
+              <button onclick="App.toast('Abriendo panel de asistente de rotación de pastos...', 'info'); location.hash='/sistema?tab=interfaz'" class="px-10 py-5 min-h-0 h-auto font-900 uppercase tracking-wider text-[0.62rem]" style="background: rgba(255,68,68,0.15); border: 1px solid var(--c-danger); color: var(--c-danger); border-radius: 4px; transition: all 0.2s; box-shadow: 0 0 8px rgba(255,68,68,0.15);" onmouseover="this.style.background='var(--c-danger)'; this.style.color='#000';" onmouseout="this.style.background='rgba(255,68,68,0.15)'; this.style.color='var(--c-danger)';">
                 ⇄ Sugerir Rotación Preventiva
               </button>
             </div>
