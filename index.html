@@ -55,7 +55,7 @@
     />
     <title>Livestock Manager</title>
     <link rel="stylesheet" href="css/design-tokens.css?v=5.3.12" />
-    <link rel="stylesheet" href="css/styles.css?v=6.28.7" />
+    <link rel="stylesheet" href="css/styles.css?v=6.28.8" />
     <link rel="stylesheet" href="css/layout.css?v=1.0.0" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/Logo aplicación.png" />
@@ -187,23 +187,11 @@
         <div class="more-sheet-handle"></div>
         <div class="more-sheet-title">Navegación</div>
         <div class="more-sheet-grid">
-          <!-- EXPRO - EXPLOTACIÓN Y SOPORTE -->
-          <h3 class="more-sheet-section-title mb-4 mt-6 text-xs font-black uppercase tracking-wider" style="color: var(--c-success); border-bottom: 1px solid color-mix(in srgb, var(--c-success) 20%, transparent); padding-bottom: 2px;">EXPRO - EXPLOTACIÓN Y SOPORTE</h3>
-          <a href="#/zonas" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="zonas">
-            <span>Zonas</span>
-          </a>
-          <a href="#/silos" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="silos">
-            <span>Silos</span>
-          </a>
-          <a href="#/fitosanitario" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="fitosanitario">
-            <span>Fitosanitario</span>
-          </a>
-          <a href="#/gastos" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="gastos">
-            <span>Gastos</span>
-          </a>
-          <a href="#/proveedores" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="proveedores">
-            <span>Proveedores</span>
-          </a>
+          <!-- Nota: Zonas/Silos/Fitosanitario/Gastos/Proveedores (tabs de ExPro), Leche/Cárnico/Híbrido
+               (tabs de GeGan) y Comercial/Compradores/Contratos/Transportistas (entrada y tabs de CoMer)
+               se han retirado de este menú por estar ya accesibles desde la barra de pestañas de su
+               pilar (ExPro/GeGan/CoMer, ya presentes en la navegación inferior) — evita duplicar accesos. -->
+          <h3 class="more-sheet-section-title mb-4 mt-6 text-xs font-black uppercase tracking-wider" style="color: var(--c-success); border-bottom: 1px solid color-mix(in srgb, var(--c-success) 20%, transparent); padding-bottom: 2px;">INFORMES Y DOCUMENTACIÓN</h3>
           <a href="#/informes" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="informes">
             <span>Informes</span>
           </a>
@@ -225,41 +213,17 @@
           <a href="#/manuales" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="libro">
             <span>Manuales</span>
           </a>
-          <a href="#/ajustes" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="ajustes">
-            <span>Ajustes</span>
-          </a>
 
-          <!-- GANADERÍA - CENSO Y BIOLOGÍA -->
-          <h3 class="more-sheet-section-title mb-4 mt-6 text-xs font-black uppercase tracking-wider" style="color: var(--c-info); border-bottom: 1px solid color-mix(in srgb, var(--c-info) 20%, transparent); padding-bottom: 2px;">GANADERÍA - CENSO Y BIOLOGÍA</h3>
-          <a href="#/leche" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="leche">
-            <span>Leche</span>
-          </a>
-          <a href="#/carne" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="carne">
-            <span>Cárnico</span>
-          </a>
-          <a href="#/hibrido" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="hibrido">
-            <span>Híbrido</span>
-          </a>
+          <!-- HERRAMIENTAS Y AJUSTES -->
+          <h3 class="more-sheet-section-title mb-4 mt-6 text-xs font-black uppercase tracking-wider" style="color: var(--c-info); border-bottom: 1px solid color-mix(in srgb, var(--c-info) 20%, transparent); padding-bottom: 2px;">HERRAMIENTAS Y AJUSTES</h3>
           <a href="#/wizards" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="wizards">
             <span>Asistentes</span>
           </a>
           <a href="#/pesadas" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="pesadas">
             <span>Pesadas</span>
           </a>
-
-          <!-- COMERCIALIZACIÓN -->
-          <h3 class="more-sheet-section-title mb-4 mt-6 text-xs font-black uppercase tracking-wider" style="color: var(--c-danger); border-bottom: 1px solid color-mix(in srgb, var(--c-danger) 20%, transparent); padding-bottom: 2px;">COMERCIALIZACIÓN</h3>
-          <a href="#/comercializacion" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="comercial">
-            <span>Comercial</span>
-          </a>
-          <a href="#/compradores" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="compradores">
-            <span>Compradores</span>
-          </a>
-          <a href="#/contratos" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="contratos">
-            <span>Contratos</span>
-          </a>
-          <a href="#/transportistas" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="transportistas">
-            <span>Transportistas</span>
+          <a href="#/ajustes" class="more-sheet-item" onclick="App._toggleMenuNavegacion()" data-icon="ajustes">
+            <span>Ajustes</span>
           </a>
         </div>
       </div>
@@ -409,7 +373,7 @@
     <script src="js/views/transportistas-view.js?v=6.28"></script>
 
     <!-- 6º Arrancar el Controlador de la Aplicación (Orquestador Central) -->
-    <script src="js/app.js?v=6.28.6"></script>
+    <script src="js/app.js?v=6.28.7"></script>
 
     <!-- E2E Test Suite (solo en desarrollo) -->
     <script src="js/e2e-test-suite.js?v=6.28"></script>
