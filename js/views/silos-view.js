@@ -22,7 +22,7 @@ const SilosView = {
     async _cargarSilos() {
         try {
             this._cachedSilos = await window.db.getAll('config_silos');
-            
+
             // Si está vacío, agregar un silo de muestra para que el usuario no empiece de cero
             if (this._cachedSilos.length === 0) {
                 const muestraSilos = [
@@ -52,6 +52,30 @@ const SilosView = {
             console.warn('[SilosView] No se pudo acceder a config_silos:', err);
             this._cachedSilos = [];
         }
+    },
+
+    /**
+     * Obtiene la lista de silos, cargándola si es necesario
+     * @returns {Promise<Array>} Lista de silos
+     */
+    async _getSilos() {
+        // Si no tenemos silos en caché, los cargamos
+        if (this._cachedSilos.length === 0) {
+            await this._cargarSilos();
+        }
+        return this._cachedSilos;
+    },
+
+    /**
+     * Obtiene la lista de silos disponibles, cargándolos si es necesario
+     * @returns {Promise<Array>} Lista de silos
+     */
+    async _getSilos() {
+        // Asegurarse de que los silos estén cargados
+        if (this._cachedSilos.length === 0) {
+            await this._cargarSilos();
+        }
+        return this._cachedSilos;
     },
 
     _renderContenido(container) {
