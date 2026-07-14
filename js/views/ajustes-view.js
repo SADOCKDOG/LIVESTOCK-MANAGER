@@ -222,7 +222,7 @@ const AjustesView = {
   async _loadConfig() {
     const defaults = {
       objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5,
-      autoBackup: false, temaOscuro: true, mostrarContextos: false,
+      autoBackup: false, temaOscuro: true, mostrarContextos: true,
       glowMarco: true, glowLaterales: false, glowBotones: true, glowTarjetas: true,
       glowMarcoFijo: false, glowMarcoFijoColor: '#FFFFFF', bannerOpacity: 0.77,
       hazLuzColor: '', hazLuzIntensidad: 50,
