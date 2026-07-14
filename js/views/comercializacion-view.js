@@ -370,7 +370,7 @@ const ComercializacionView = {
           ${kpis.map(k => `
             <div class="py-12 flex justify-between items-center ${kpis.indexOf(k) < kpis.length - 1 ? 'border-bottom-222' : ''}">
               <span class="text-xs text-gray uppercase font-900">${k.label}</span>
-              <strong class="text-xl font-950" style="color:${k.color || '#fff'};">${k.value}</strong>
+              <strong class="text-xl font-950" style="color:${k.color || 'var(--text-p)'};">${k.value}</strong>
             </div>
           `).join('')}
         </div>
