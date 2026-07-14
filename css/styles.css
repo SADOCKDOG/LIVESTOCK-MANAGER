@@ -3928,3 +3928,17 @@ body.glow-tarjetas-off .status-badge {
     }
 }
 
+/* P1-4: Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--c-success) !important;
+  outline-offset: 2px;
+}
+
+/* P1-3: Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
