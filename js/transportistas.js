@@ -90,6 +90,7 @@ const Transportistas = {
                 desinsectacion_vencimiento: vencimientoDesinsectacion,
                 desinsectacion_vigente: !vencimientoDesinsectacion || new Date(vencimientoDesinsectacion) >= new Date(new Date().toISOString().split('T')[0]),
                 certificado_bienestar: data.certificado_bienestar || false,
+                certificado_bienestar_vencimiento: (data.certificado_bienestar_vencimiento || '').trim(),
                 condiciones_termoneutrales: data.condiciones_termoneutrales || false,
                 capacidad_animales: parseInt(data.capacidad_animales) || 0,
                 tipo_vehiculo: data.tipo_vehiculo || '',

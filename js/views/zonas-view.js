@@ -154,7 +154,8 @@ const ZonasView = {
               </div>
             </div>
             <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase">
-              ${z.codigo_pac ? `<div class="flex items-center gap-4">${Icons.documento()} PAC: ${z.codigo_pac}</div>` : ''}
+              <div class="flex items-center gap-4" style="${z.codigo_pac ? '' : 'color:var(--c-warning);'}">${Icons.documento()} ${pacTexto}</div>
+              <div class="flex items-center gap-4" style="${z.distancia_agua_m ? '' : 'color:var(--text-d);'}">${Icons.zonas()} ${distAgua}</div>
               <div class="flex items-center gap-4">${Icons.grafico()} ${cargaGanadera} UGM/ha</div>
               ${especiesEnZona.size ? `<div class="flex items-center gap-4">${Icons.animales()} ${[...especiesEnZona].join(', ')}</div>` : ''}
             </div>
