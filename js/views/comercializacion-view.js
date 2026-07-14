@@ -289,16 +289,19 @@ const ComercializacionView = {
       registrarLabel: 'REGISTRAR RETIRADA',
       listName: 'LISTA DE ENTREGAS',
       registrarHandler: "App._abrirWizardAlbaranLeche()",
-      records: d.entregas.slice(0, 50).map(e => ({
+      records: d.entregas.slice(0, 50).map(e => {
+        const grasa = e.laboratorio?.grasa;
+        const proteina = e.laboratorio?.proteina;
+        return {
         title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`,
-        metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span><span>·</span><span>${(e.cantidad || 0).toLocaleString()} L</span>`,
+        metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span><span>·</span><span>${(e.cantidad || 0).toLocaleString()} L</span>${grasa ? `<span>·</span><span style="color:var(--c-warning);">${Icons.grafico()} Grasa ${grasa}%</span>` : ''}${proteina ? `<span>·</span><span style="color:var(--c-info);">Prot. ${proteina}%</span>` : ''}${e.antibioticos ? `<span>·</span><span style="color:var(--c-danger); font-weight:900;">${Icons.alerta()} ANTIBIÓTICOS</span>` : ''}`,
         badge: (() => {
           const est = (e.estadoAnalitica || 'PENDIENTE').toUpperCase();
           let colorBadge = 'var(--c-warning)';
-          if (est.includes('APT') || est.includes('CONFORME') || est.includes('CORRECT') || est.includes('EXIT')) {
-            colorBadge = 'var(--c-success)';
-          } else if (est.includes('RECHAZ') || est.includes('DANGER') || est.includes('INCORRECT') || est.includes('FAIL')) {
+          if (e.antibioticos || est.includes('ALERTA') || est.includes('CRÍTIC') || est.includes('CRITIC') || est.includes('RECHAZ') || est.includes('DANGER') || est.includes('INCORRECT') || est.includes('FAIL')) {
             colorBadge = 'var(--c-danger)';
+          } else if (est.includes('APT') || est.includes('CONFORME') || est.includes('CORRECT') || est.includes('EXIT') || est.includes('VALID')) {
+            colorBadge = 'var(--c-success)';
           } else if (est.includes('PENDI') || est.includes('ESPERA')) {
             colorBadge = 'var(--c-orange)';
           } else {
@@ -307,7 +310,7 @@ const ComercializacionView = {
           return `<span class="badge badge-sm uppercase" style="background:color-mix(in srgb, ${colorBadge} 8%, transparent); color:${colorBadge}; border:1px solid color-mix(in srgb, ${colorBadge} 21%, transparent); padding:4px 8px; border-radius:4px; font-weight:900; letter-spacing:0.5px; font-size: 0.62rem;">${est}</span>`;
         })(),
         onclick: `location.hash='/albaran-leche?id=${e.id}'`
-      })),
+      };}),
       emptyMsg: 'Sin entregas de leche registradas.'
     });
 
@@ -343,7 +346,7 @@ const ComercializacionView = {
       registrarHandler: "App._abrirWizardVentaMasiva()",
       records: d.ventas.slice(0, 50).map(v => ({
         title: v.razonSocial || 'Matadero',
-        metadata: `<span>${new Date(v.fechaSacrificio || v.fecha || 0).toLocaleDateString()}</span><span>·</span><span>${v.pesoCanal || 0} kg canal</span>`,
+        metadata: `<span>${new Date(v.fechaSacrificio || v.fecha || 0).toLocaleDateString()}</span><span>·</span><span>${v.pesoCanal || 0} kg canal</span>${v.rendimientoCanal ? `<span>·</span><span style="color:${v.rendimientoCanal >= 50 ? 'var(--c-success)' : 'var(--c-warning)'};">${Icons.grafico()} Rend. ${v.rendimientoCanal}%</span>` : ''}${v.clasificacionCanal ? `<span>·</span><span style="color:var(--p-gold);">Clasif. ${v.clasificacionCanal}</span>` : ''}`,
         badge: `${Math.round(v.importe_total || 0).toLocaleString()} €`,
         onclick: `App._abrirDetalleVentaCarne(${v.id})`
       })),

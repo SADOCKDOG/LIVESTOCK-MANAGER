@@ -227,17 +227,37 @@ const CompradoresView = {
   async _cargarDatos() {
     try {
       // Cargar ambos conjuntos de datos siempre (se usan en resúmenes y filtrados)
-      const [compradores, contratos] = await Promise.all([
+      const fincaId = await Fincas.getActiveId().catch(() => null);
+      const [compradores, contratos, ventasCarne] = await Promise.all([
         Compradores.list().catch(() => []),
-        Contratos.list().catch(() => [])
+        Contratos.list().catch(() => []),
+        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', Number(fincaId)).catch(() => [])
       ]);
 
       this._cachedCompradores = compradores;
       this._cachedContratos = contratos;
+      this._cachedMetricasComprador = this._calcularMetricasComprador(ventasCarne);
     } catch (e) {
       console.error('[CompradoresView] Error:', e);
       // Los datos se manejarán como arrays vacíos en los métodos de renderizado
     }
+  },
+
+  /** Última operación y volumen del año actual por comprador, a partir de ventas de carne (las entregas de leche no llevan compradorId: van a una única industria por contrato). */
+  _calcularMetricasComprador(ventasCarne) {
+    const anioActual = new Date().getFullYear();
+    const metricas = {};
+    (ventasCarne || []).forEach(v => {
+      if (!v.compradorId) return;
+      if (!metricas[v.compradorId]) metricas[v.compradorId] = { ultimaOperacion: null, volumenAnual: 0 };
+      const fecha = v.fechaSacrificio || v.fecha_emision;
+      const f = fecha ? new Date(fecha) : null;
+      if (f && (!metricas[v.compradorId].ultimaOperacion || f > metricas[v.compradorId].ultimaOperacion)) {
+        metricas[v.compradorId].ultimaOperacion = f;
+      }
+      if (f && f.getFullYear() === anioActual) metricas[v.compradorId].volumenAnual += (v.precio_total || 0);
+    });
+    return metricas;
   },
 
   _getResumenCompradores() {
@@ -324,10 +344,12 @@ const CompradoresView = {
     contenedor.innerHTML = `<div class="grid gap-12">${lista.map(c => {
       const color = this._colorTipo(c.tipo_comprador);
       const cContratos = contratosPorComprador[c.id] || [];
+      const metricas = (this._cachedMetricasComprador || {})[c.id];
 
       return App._cardRegistro({
         title: c.nombre,
         subtitle: [c.nif_cif ? Icons.documento() + ' ' + c.nif_cif : '', c.ciudad ? Icons.zonas() + ' ' + c.ciudad.toUpperCase() : ''].filter(Boolean).join(' · '),
+        metadata: metricas ? `<span style="color:var(--c-info);">${Icons.calendar()} Última op.: ${metricas.ultimaOperacion.toLocaleDateString('es-ES')}</span><span>·</span><span style="color:var(--c-success);">${Icons.dinero()} ${metricas.volumenAnual.toLocaleString('es-ES')} € (año actual)</span>` : `<span style="color:var(--text-d);">Sin operaciones registradas</span>`,
         rightSide: `
           <div class="text-right">
             <span class="badge badge-sm font-900 uppercase" style="background:color-mix(in srgb, ${color} 12%, transparent); color:${color}; border:1px solid color-mix(in srgb, ${color} 25%, transparent);">

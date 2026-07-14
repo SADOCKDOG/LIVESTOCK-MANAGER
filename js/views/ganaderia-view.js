@@ -241,13 +241,24 @@ const GanaderiaView = {
 
         <div class="grid gap-10">
           ${tratamientosFiltrados.length > 0 ? tratamientosFiltrados.slice(0, 30).map(t => {
-            const hasSupresion = (parseInt(t.tiempo_espera_carne_dias) || 0) > 0 || (parseInt(t.tiempo_espera_leche_dias) || 0) > 0;
+            const diasCarne = parseInt(t.tiempo_espera_carne_dias) || 0;
+            const diasLeche = parseInt(t.tiempo_espera_leche_dias) || 0;
+            const permanente = t.prohibidoLeche === true || diasLeche === 999;
+            const maxDias = Math.max(diasCarne, permanente ? 0 : diasLeche);
+            let diasRestantes = 0;
+            if (maxDias > 0) {
+              const fechaFin = new Date(t.fecha);
+              fechaFin.setDate(fechaFin.getDate() + maxDias);
+              diasRestantes = Math.ceil((fechaFin - new Date()) / (1000 * 60 * 60 * 24));
+            }
+            const hasSupresion = permanente || diasRestantes > 0;
+            const tipoSupresion = diasCarne > 0 && diasLeche > 0 ? 'CARNE/LECHE' : diasLeche > 0 ? 'LECHE' : 'CARNE';
             return App._cardRegistro({
               icon: Icons.sanidad(),
               title: t.medicamento || t.tipo_tratamiento,
               subtitle: `Crotal: <strong style="color: var(--p-gold); font-weight: 950;">${t.snap_identificacion || t.animalId || 'Rebaño'}</strong>`,
               metadata: `<span>${this._fmtFecha(t.fecha)}</span><span>·</span><span>${t.tipo_tratamiento}</span>`,
-              badge: hasSupresion ? 'Espera Activa' : 'Sin supresión',
+              badge: permanente ? 'SUPRESIÓN PERMANENTE' : hasSupresion ? `ESPERA ${diasRestantes}D (${tipoSupresion})` : 'Sin supresión',
               color: hasSupresion ? 'var(--c-danger)' : 'var(--c-purple)',
               onClick: `GanaderiaView._abrirOpcionesTratamiento(${t.id})`
             });

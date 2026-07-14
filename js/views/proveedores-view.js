@@ -75,6 +75,12 @@ const ProveedoresView = {
                 </div>
               </div>`;
         }
+        this._cachedMetricasProveedor = {};
+        gastosConProveedor.forEach(g => {
+            const m = this._cachedMetricasProveedor[g.proveedorId] || (this._cachedMetricasProveedor[g.proveedorId] = { ultimaCompra: null });
+            const f = g.fecha ? new Date(g.fecha) : null;
+            if (f && (!m.ultimaCompra || f > m.ultimaCompra)) m.ultimaCompra = f;
+        });
         this._cachedData = proveedores;
         this._renderLista(proveedores);
     },
@@ -108,9 +114,10 @@ const ProveedoresView = {
             return;
         }
 
-        contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => App._cardRegistro({
+        contenedor.innerHTML = `<div class="grid gap-6">${lista.map(p => { const m = (this._cachedMetricasProveedor || {})[p.id]; return App._cardRegistro({
           title: p.nombre,
           subtitle: [p.nif_cif ? Icons.documento() + ' ' + p.nif_cif : '', p.ciudad ? Icons.zonas() + ' ' + p.ciudad.toUpperCase() : ''].filter(Boolean).join(' · '),
+          metadata: m?.ultimaCompra ? `<span style="color:var(--c-info);">${Icons.calendar()} Última compra: ${m.ultimaCompra.toLocaleDateString('es-ES')}</span>` : `<span style="color:var(--text-d);">Sin compras registradas</span>`,
           rightSide: `
             <div class="text-right">
               <span style="font-size: 1.1rem; font-weight: 800; border: 1px solid ${p.activo === false ? 'var(--c-danger)' : 'var(--c-success)'}; color: ${p.activo === false ? 'var(--c-danger)' : 'var(--c-success)'};
@@ -133,7 +140,7 @@ const ProveedoresView = {
           footerRight: `<span style="display: inline-block; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px;">Ficha -></span>`,
           color: 'var(--c-purple)',
           onClick: `location.hash='#/proveedor?id=${p.id}'`
-        })).join('')}</div>`;
+        }); }).join('')}</div>`;
     },
 
     // ============================================

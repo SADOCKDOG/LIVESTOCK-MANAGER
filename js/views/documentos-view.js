@@ -281,9 +281,11 @@ const DocumentosView = {
           descHtml = doc.numero || 'Sin número registrado';
         }
 
+        const fechaEmision = doc.createdAt || doc.fecha;
+        const diasPendiente = fechaEmision ? Math.floor((new Date() - new Date(fechaEmision)) / (1000 * 60 * 60 * 24)) : null;
         const acuseHtml = doc.acuseManual
           ? `<div class="text-xs text-green mt-6">${Icons.adjuntar()} Acuse manual: <span class="font-900">${doc.acuseManual}</span></div>`
-          : `<div class="text-xs text-red mt-6">${Icons.adjuntar()} Acuse manual pendiente</div>`;
+          : `<div class="text-xs mt-6" style="color:${diasPendiente >= 15 ? 'var(--c-danger)' : diasPendiente >= 7 ? 'var(--c-warning)' : 'var(--text-d)'};">${Icons.adjuntar()} Acuse manual pendiente${diasPendiente !== null ? ` <span class="font-900">(${diasPendiente}d)</span>` : ''}</div>`;
 
         return `
           <div class="card-registro" style="--registro-color: ${color};">

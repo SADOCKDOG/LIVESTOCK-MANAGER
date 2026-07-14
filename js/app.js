@@ -676,7 +676,7 @@ const App = {
    * El color del borde izquierdo corresponde al color de la especie.
    * El badge superior derecho muestra el estado con su color semántico y brillo neón canónico.
    */
-  _getAnimalCardProps(a, rebano) {
+  _getAnimalCardProps(a, rebano, supresionInfo) {
     const estado = a.estado || 'activo';
     // Color del badge según estado (éxito, warning, danger, info, etc.)
     const estadoColor = estado === 'activo' ? 'var(--c-success)' : 
@@ -696,6 +696,7 @@ const App = {
         <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.65rem] text-gray font-800 uppercase mt-4">
           <div class="flex items-center gap-4">${Icons.rebanos()} ${rebano ? rebano.nombre : 'Sin asignar'}</div>
           ${a.alerta ? `<div class="flex items-center gap-4">${Icons.alerta()} <span style="color:var(--c-warning);">${a.alerta}</span></div>` : ''}
+          ${supresionInfo && supresionInfo.activo ? `<div class="flex items-center gap-4">${Icons.alerta()} <span style="color:var(--c-danger); font-weight:900;">SUPRESIÓN ${supresionInfo.permanente ? 'PERMANENTE' : supresionInfo.diasRestantes + 'D'} (${supresionInfo.tipo === 'leche' ? 'LECHE' : supresionInfo.tipo === 'carne' ? 'CARNE' : 'CARNE/LECHE'})</span></div>` : ''}
           ${edad !== null ? `<div class="flex items-center gap-4">${Icons.calendar()} <span style="color:var(--c-info); font-weight:900;">${edad}</span> ${edad === 1 ? 'AÑO' : 'AÑOS'}</div>` : ''}
           <div class="flex items-center gap-4">${Icons.peso()} ${a.peso_actual || a.peso_inicial || a.peso_nacimiento || '-'} kg</div>
           ${a.notificado_rega ? `<div class="flex items-center gap-4">${Icons.check()} <span style="color:var(--c-success);">Alta comunicada</span></div>` : ''}

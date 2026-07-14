@@ -19,6 +19,32 @@ const TransportistasView = {
     return this._TIPO_VEHICULO_LABELS[valor] || valor || '-';
   },
 
+  /** Días restantes hasta una fecha de vencimiento (negativo si ya caducó). */
+  _diasHastaVencimiento(fechaStr) {
+    if (!fechaStr) return null;
+    const hoy = new Date(new Date().toISOString().split('T')[0]);
+    const fin = new Date(fechaStr);
+    return Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
+  },
+
+  /** Color según urgencia: sin certificado o caducado = rojo, próximo (<=30d) = ámbar, vigente = verde. */
+  _colorVencimiento(fechaStr, sinCertificado = false) {
+    if (sinCertificado) return `color:var(--c-danger);`;
+    const dias = this._diasHastaVencimiento(fechaStr);
+    if (dias === null) return `color:var(--text-d);`;
+    if (dias < 0) return `color:var(--c-danger);`;
+    if (dias <= 30) return `color:var(--c-warning);`;
+    return `color:var(--c-success);`;
+  },
+
+  _labelVencimiento(prefijo, fechaStr, sinCertificado = false) {
+    if (sinCertificado) return `Sin certificado`;
+    const dias = this._diasHastaVencimiento(fechaStr);
+    if (dias === null) return `${prefijo}: sin vencimiento`;
+    if (dias < 0) return `${prefijo} CADUCADO (${Math.abs(dias)}d)`;
+    return `${prefijo}: ${dias}d`;
+  },
+
   async render() {
     if (window.App) App.updateHeaderColor('transportistas');
     const main = document.getElementById("comercializacion-tab-content") || document.getElementById("app-content");
@@ -199,7 +225,8 @@ const TransportistasView = {
       `,
       content: `
         <div class="flex flex-wrap gap-x-12 gap-y-3 text-[0.62rem] text-aaa font-800 uppercase mt-4">
-          <div class="flex items-center gap-4">${t.certificado_bienestar ? Icons.check() + ' Bienestar OK' : Icons.alerta() + ' Sin Certificado'}</div>
+          <div class="flex items-center gap-4" style="${this._colorVencimiento(t.certificado_bienestar_vencimiento, !t.certificado_bienestar)}">${t.certificado_bienestar ? Icons.check() : Icons.alerta()} ${this._labelVencimiento('Bienestar', t.certificado_bienestar_vencimiento, !t.certificado_bienestar)}</div>
+          ${t.desinsectacion_vencimiento ? `<div class="flex items-center gap-4" style="${this._colorVencimiento(t.desinsectacion_vencimiento)}">${Icons.calendar()} ${this._labelVencimiento('Desinsect.', t.desinsectacion_vencimiento)}</div>` : ''}
           ${t.condiciones_termoneutrales ? `<div class="flex items-center gap-4">${Icons.info()} Termoneutral</div>` : ''}
         </div>
       `,
@@ -270,8 +297,8 @@ const TransportistasView = {
             <div><small class="text-gray uppercase font-800 text-[0.65rem]">${Icons.animales()} Capacidad</small><div class="text-white mt-2">${t.capacidad_animales || 0} ${Number(t.capacidad_animales) === 1 ? 'animal' : 'animales'}</div></div>
           </div>
           <div class="mt-12 flex gap-8 flex-wrap">
-            <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.certificado_bienestar ? 'rgba(204,255,0,0.15)' : 'rgba(255,68,68,0.15)'}; color:${t.certificado_bienestar ? 'var(--c-success)' : 'var(--c-danger)'};">
-              ${t.certificado_bienestar ? 'Cert. Bienestar' : 'Sin Cert. Bienestar'}
+            <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:color-mix(in srgb, ${this._colorVencimiento(t.certificado_bienestar_vencimiento, !t.certificado_bienestar).replace('color:','').replace(';','')} 15%, transparent); ${this._colorVencimiento(t.certificado_bienestar_vencimiento, !t.certificado_bienestar)}">
+              ${this._labelVencimiento('Cert. Bienestar', t.certificado_bienestar_vencimiento, !t.certificado_bienestar)}
             </span>
             <span class="badge" style="padding:4px 10px; font-size:0.7rem; background:${t.condiciones_termoneutrales ? 'rgba(204,255,0,0.15)' : 'rgba(107,114,128,0.15)'}; color:${t.condiciones_termoneutrales ? 'var(--c-success)' : '#9ca3af'};">
               ${t.condiciones_termoneutrales ? 'Termoneutral' : 'Sin control térmico'}
@@ -384,6 +411,10 @@ const TransportistasView = {
           <input type="checkbox" id="tf-bienestar" ${t?.certificado_bienestar ? 'checked' : ''}>
           <span>Certificado de bienestar animal en transporte</span>
         </label>
+        <div class="wizard-input-group">
+          <label class="wizard-label">VENCIMIENTO CERTIFICADO BIENESTAR</label>
+          <input type="date" id="tf-bienestar-venc" value="${t?.certificado_bienestar_vencimiento || ''}" class="wizard-input">
+        </div>
         <label class="wizard-checkbox-container mb-6">
           <input type="checkbox" id="tf-termoneutral" ${t?.condiciones_termoneutrales ? 'checked' : ''}>
           <span>Vehículo con condiciones termoneutrales</span>
@@ -430,6 +461,7 @@ const TransportistasView = {
         tipo_vehiculo: overlay.querySelector('#tf-tipo-vehiculo').value,
         capacidad_animales: parseInt(overlay.querySelector('#tf-capacidad').value) || 0,
         certificado_bienestar: overlay.querySelector('#tf-bienestar').checked,
+        certificado_bienestar_vencimiento: overlay.querySelector('#tf-bienestar-venc').value,
         condiciones_termoneutrales: overlay.querySelector('#tf-termoneutral').checked,
         activo: overlay.querySelector('#tf-activo').checked,
         notas: overlay.querySelector('#tf-notas').value.trim(),

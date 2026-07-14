@@ -52,6 +52,28 @@ const SilosView = {
             console.warn('[SilosView] No se pudo acceder a config_silos:', err);
             this._cachedSilos = [];
         }
+        await this._calcularAutonomia();
+    },
+
+    /** Calcula días de autonomía por silo a partir del consumo real de los últimos 30 días (registro_eventos tipo silo_consumo). */
+    async _calcularAutonomia() {
+        try {
+            const eventos = await window.db.getAll('registro_eventos').catch(() => []);
+            const hace30dias = new Date();
+            hace30dias.setDate(hace30dias.getDate() - 30);
+            const consumos = eventos.filter(e => e.tipo === 'silo_consumo' && new Date(e.fecha) >= hace30dias);
+            this._cachedSilos.forEach(s => {
+                const delSilo = consumos.filter(e => Number(e.entidad_id) === Number(s.id));
+                if (!delSilo.length) { s.diasAutonomia = null; return; }
+                const totalConsumido = delSilo.reduce((acc, e) => acc + (Number(e.valor_neto) || 0), 0);
+                const fechas = delSilo.map(e => new Date(e.fecha).getTime());
+                const diasTranscurridos = Math.max(1, Math.ceil((Date.now() - Math.min(...fechas)) / (1000 * 60 * 60 * 24)));
+                const consumoDiario = totalConsumido / diasTranscurridos;
+                s.diasAutonomia = consumoDiario > 0 ? Math.round((Number(s.cantidadActual) || 0) / consumoDiario) : null;
+            });
+        } catch (e) {
+            console.warn('[SilosView] No se pudo calcular autonomía:', e);
+        }
     },
 
     /**
@@ -194,6 +216,10 @@ const SilosView = {
                         <div>
                             <span class="text-gray-500 font-900 text-[0.55rem] tracking-wider uppercase block">ÚLTIMA CARGA</span>
                             <span class="text-white font-bold text-xs block">${s.fechaUltimaCarga || 'S/D'}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 font-900 text-[0.55rem] tracking-wider uppercase block">AUTONOMÍA</span>
+                            <span class="font-black text-xs block" style="color:${s.diasAutonomia == null ? '#666' : s.diasAutonomia <= 7 ? 'var(--c-danger)' : s.diasAutonomia <= 15 ? 'var(--c-warning)' : 'var(--c-success)'};">${s.diasAutonomia == null ? 'Sin datos' : s.diasAutonomia + ' días'}</span>
                         </div>
                     </div>
                 </div>

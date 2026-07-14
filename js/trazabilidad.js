@@ -117,6 +117,51 @@ const MotorTrazabilidad = {
     }
   },
 
+  /**
+   * Version sincrona de checkSupresion para listados (tarjetas): recibe los
+   * registros de sanitarios_ganado ya cargados en memoria (una sola consulta
+   * para toda la lista) en vez de golpear IndexedDB por cada animal.
+   * Devuelve el peor caso entre carne y leche para mostrar de un vistazo.
+   */
+  calcularSupresionRapida(animalId, rebanoId, sanitariosAll, fechaEvaluar = new Date()) {
+    const registros = (sanitariosAll || []).filter(s =>
+      Number(s.animalId) === Number(animalId) || (rebanoId && Number(s.rebanoId) === Number(rebanoId))
+    );
+    if (!registros.length) return { activo: false, diasRestantes: 0, tipo: null, permanente: false };
+
+    let permanenteLeche = false;
+    let peorFecha = new Date(0);
+    let peorTipo = null;
+    let peorMedicamento = null;
+
+    for (const r of registros) {
+      if (r.prohibidoLeche === true || parseInt(r.tiempo_espera_leche_dias) === 999) {
+        permanenteLeche = true;
+        peorMedicamento = r.medicamento;
+      }
+      for (const [tipo, campo] of [['carne', 'tiempo_espera_carne_dias'], ['leche', 'tiempo_espera_leche_dias']]) {
+        const dias = parseInt(r[campo] || 0);
+        if (!dias) continue;
+        const fechaFin = new Date(r.fecha);
+        fechaFin.setDate(fechaFin.getDate() + dias);
+        if (fechaFin > peorFecha) {
+          peorFecha = fechaFin;
+          peorTipo = tipo;
+          peorMedicamento = r.medicamento;
+        }
+      }
+    }
+
+    if (permanenteLeche) {
+      return { activo: true, diasRestantes: Infinity, tipo: 'leche', permanente: true, medicamento: peorMedicamento };
+    }
+    if (peorFecha > fechaEvaluar) {
+      const diasRestantes = Math.ceil((peorFecha - fechaEvaluar) / (1000 * 60 * 60 * 24));
+      return { activo: true, diasRestantes, tipo: peorTipo, permanente: false, medicamento: peorMedicamento };
+    }
+    return { activo: false, diasRestantes: 0, tipo: null, permanente: false };
+  },
+
   // =========================================================================
   // MÓDULO 1: RENDIMIENTO INDUSTRIAL DE LA CANAL (calcularRendimiento)
   // =========================================================================

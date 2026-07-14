@@ -17,6 +17,7 @@ const AnimalesView = {
 
     const rebanoMap = {};
     rebanos.forEach(r => { rebanoMap[r.id] = r; });
+    const sanitariosAll = await window.db.getAll('sanitarios_ganado').catch(() => []);
 
     const activos = animales.filter(a => a.estado === 'activo').length;
     const especies = [...new Set(animales.map(a => a.especie).filter(Boolean))];
@@ -99,7 +100,9 @@ const AnimalesView = {
       </div>
       <div id="animales-lista" class="grid gap-12">`;
     filtrados.forEach(a => {
-      const props = App._getAnimalCardProps(a, rebanoMap[a.rebanoId]);
+      const rebano = rebanoMap[a.rebanoId];
+      const supresionInfo = window.Trazabilidad?.calcularSupresionRapida(a.id, a.rebanoId, sanitariosAll);
+      const props = App._getAnimalCardProps(a, rebano, supresionInfo);
       html += App._cardRegistro(props);
     });
     html += `</div>
@@ -115,7 +118,7 @@ const AnimalesView = {
 `;
 
     main.innerHTML = html;
-    AnimalesView._cache = { animales, rebanoMap };
+    AnimalesView._cache = { animales, rebanoMap, sanitariosAll };
   },
 
   _aplicarFiltros(animales, rebanoMap) {
@@ -151,7 +154,8 @@ const AnimalesView = {
       if (emptyMsg) emptyMsg.style.display = 'none';
       contenedor.innerHTML = base.map(a => {
         const r = cache.rebanoMap[a.rebanoId];
-        const props = App._getAnimalCardProps(a, r);
+        const supresionInfo = window.Trazabilidad?.calcularSupresionRapida(a.id, a.rebanoId, cache.sanitariosAll);
+        const props = App._getAnimalCardProps(a, r, supresionInfo);
         return App._cardRegistro(props);
       }).join('');
       return;
@@ -173,7 +177,8 @@ const AnimalesView = {
       if (emptyMsg) emptyMsg.style.display = 'none';
       contenedor.innerHTML = filtrados.map(a => {
         const r = cache.rebanoMap[a.rebanoId];
-        const props = App._getAnimalCardProps(a, r);
+        const supresionInfo = window.Trazabilidad?.calcularSupresionRapida(a.id, a.rebanoId, cache.sanitariosAll);
+        const props = App._getAnimalCardProps(a, r, supresionInfo);
         return App._cardRegistro(props);
       }).join('');
     }
