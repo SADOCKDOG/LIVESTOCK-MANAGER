@@ -4,6 +4,19 @@
  */
 
 const AsistenteConfiguracion = {
+    /** Carga js/seed-data.js bajo demanda (solo se usa desde este asistente) en vez de en cada arranque. */
+    async _ensureSeedData() {
+        if (window.SeedData && typeof window.SeedData.run === 'function') return true;
+        await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'js/seed-data.js?v=6.28';
+            s.onload = resolve;
+            s.onerror = reject;
+            document.body.appendChild(s);
+        });
+        return !!(window.SeedData && typeof window.SeedData.run === 'function');
+    },
+
     /**
      * Mostrar ventana de bienvenida/configuración inicial
      * @returns {Promise<void>}
@@ -161,7 +174,7 @@ const AsistenteConfiguracion = {
                 mensaje.innerHTML = '<div class="text-gold text-center font-bold asistente-msg-body">Cargando datos de la demo...<br><span class="text-gray text-sm font-normal">Esto puede tardar unos segundos.</span></div>';
 
                 try {
-                    if (window.SeedData && typeof window.SeedData.run === 'function') {
+                    if (await AsistenteConfiguracion._ensureSeedData()) {
                         await window.SeedData.run(true);
                         window.location.reload();
                     } else {
@@ -485,7 +498,7 @@ const AsistenteConfiguracion = {
 
         switch (metodo) {
             case 'cargarDemo':
-                if (window.SeedData && typeof window.SeedData.run === 'function') {
+                if (await AsistenteConfiguracion._ensureSeedData()) {
                     if (!await Confirm.confirm("Cargar Demo", '¿Cargar la explotación de ejemplo "DEMO CHAMORRO"? Se añadirán datos de ejemplo en todos los módulos.', false)) return;
                     const msgDiv = document.createElement('div');
                     msgDiv.className = 'asistente-loading-overlay';
