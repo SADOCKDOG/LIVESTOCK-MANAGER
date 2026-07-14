@@ -69,8 +69,6 @@ const App = {
     "/manuales": "renderManuales",
     "/albaranes-ventas": "renderAlbaranesVentas",
     "/silos": "renderSilos",
-    "/pesadas": "renderPesadas",
-    "/wizards": "renderWizards",
     "/fitosanitario": "renderFitosanitarios",
   },
 
@@ -2466,22 +2464,6 @@ const App = {
     if (window.ExplotacionView) {
       ExplotacionView._activeSubModule = 'silos';
       await this.renderExplotacion();
-    }
-  },
-
-  async renderPesadas() {
-    if (window.PesadasView) {
-      await PesadasView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando histórico de pesajes...</div>';
-    }
-  },
-
-  async renderWizards() {
-    if (window.WizardsView) {
-      await WizardsView.render();
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando asistentes...</div>';
     }
   },
 
