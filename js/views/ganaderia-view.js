@@ -56,13 +56,13 @@ const GanaderiaView = {
           ${Icons.atras()}
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch">
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'animales' ? 'active' : ''}" style="--mode-color:var(--c-orange);" onclick="GanaderiaView._cambiarSubModulo('animales')">${Icons.animales()} ANIMALES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'rebanos' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('rebanos')">${Icons.rebanos()} REBAÑOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'sanidad' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="GanaderiaView._cambiarSubModulo('sanidad')">${Icons.sanidad()} SANIDAD</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="GanaderiaView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'hibrido' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="GanaderiaView._cambiarSubModulo('hibrido')">${Icons.rotacion()} HÍBRIDO</button>
+          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Ganadería">
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'animales' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'animales'}" style="--mode-color:var(--c-orange);" onclick="GanaderiaView._cambiarSubModulo('animales')">${Icons.animales()} ANIMALES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'rebanos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'rebanos'}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('rebanos')">${Icons.rebanos()} REBAÑOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'sanidad' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'sanidad'}" style="--mode-color:var(--c-purple);" onclick="GanaderiaView._cambiarSubModulo('sanidad')">${Icons.sanidad()} SANIDAD</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'carne'}" style="--mode-color:var(--c-danger);" onclick="GanaderiaView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'leche'}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'hibrido' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'hibrido'}" style="--mode-color:var(--c-success);" onclick="GanaderiaView._cambiarSubModulo('hibrido')">${Icons.rotacion()} HÍBRIDO</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
