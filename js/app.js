@@ -1620,6 +1620,21 @@ const App = {
     }
   },
 
+  async _ensureHtml5Qrcode() {
+    if (typeof Html5Qrcode !== 'undefined') return true;
+    if (!App._html5QrcodeLoadPromise) {
+      App._html5QrcodeLoadPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'js/html5-qrcode.min.js?v=6.28';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+    }
+    await App._html5QrcodeLoadPromise;
+    return typeof Html5Qrcode !== 'undefined';
+  },
+
   async _escanearCrotal(inputId) {
     const isCapacitor = window.Capacitor?.isNativePlatform?.() || window.hasOwnProperty('Capacitor');
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
@@ -1696,10 +1711,14 @@ const App = {
       }
     }
 
-    // 2️⃣ Fallback Web con html5-qrcode
+    // 2️⃣ Fallback Web con html5-qrcode (carga diferida: ~366KB que la mayoría de sesiones no usan)
     if (typeof Html5Qrcode === 'undefined') {
-      App.toastError('Librería de escaneo no disponible. Introduce el crotal manualmente.');
-      return;
+      try {
+        await App._ensureHtml5Qrcode();
+      } catch (_) {
+        App.toastError('Librería de escaneo no disponible. Introduce el crotal manualmente.');
+        return;
+      }
     }
 
     // Crear overlay con cámara en vivo
