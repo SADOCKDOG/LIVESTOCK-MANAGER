@@ -498,6 +498,15 @@ const Icons = {
     );
   },
 
+  wizards() {
+    return this._svg(
+      '<path d="m15 4-2 2L15 8l2-2L15 4z"/>' +
+      '<path d="m11.5 7.5-9 9a2.12 2.12 0 0 0 3 3l9-9-3-3z"/>' +
+      '<path d="M18 10h1M21 14h1M14 18h1"/>' +
+      '<path d="M19 6V5M17 14v-1M20 19v-1"/>'
+    );
+  },
+
   statusCritico() {
     return this._svg('<circle cx="12" cy="12" r="6" fill="#ef4444" stroke="none"/>');
   },
