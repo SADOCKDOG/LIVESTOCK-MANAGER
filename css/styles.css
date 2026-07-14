@@ -914,12 +914,18 @@ label {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+    align-items: stretch;
+}
+
+.more-sheet-section-title {
+    grid-column: 1 / -1;
 }
 
 .more-sheet-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     padding: 16px 8px;
     background: rgba(255,255,255,0.03);
@@ -927,6 +933,8 @@ label {
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
     border: 1px solid transparent;
     transition: all 0.2s ease;
     cursor: pointer;
@@ -946,25 +954,31 @@ label {
     color: inherit;
     filter: drop-shadow(0 0 6px currentColor);
 }
-/* Colores según MAPA ÚNICO de módulos (js/module-colors.js + design-tokens.css) */
-.more-sheet-item[href="#/zonas"] { color: var(--c-success); }
-.more-sheet-item[href="#/leche"] { color: var(--c-info); }
-.more-sheet-item[href="#/carne"] { color: var(--c-danger); }
-.more-sheet-item[href="#/hibrido"] { color: var(--c-success); }
-.more-sheet-item[href="#/comercializacion"] { color: var(--c-success); }
-.more-sheet-item[href="#/compradores"] { color: var(--c-info); }
-.more-sheet-item[href="#/proveedores"] { color: var(--c-purple); }
-.more-sheet-item[href="#/transportistas"] { color: var(--c-pink); }
-.more-sheet-item[href="#/gastos"] { color: var(--c-danger); }
-.more-sheet-item[href="#/informes"] { color: var(--c-warning); }
-.more-sheet-item[href="#/cuaderno"] { color: var(--c-orange); }
-.more-sheet-item[href="#/documentos"] { color: var(--c-purple); }
-.more-sheet-item[href="#/manuales"] { color: var(--c-purple); }
-.more-sheet-item[href="#/wizards"] { color: var(--c-purple); }
-.more-sheet-item[href="#/silos"] { color: var(--c-warning); }
-.more-sheet-item[href="#/pesadas"] { color: var(--c-info); }
-.more-sheet-item[href="#/fitosanitario"] { color: var(--c-success); }
-.more-sheet-item[href="#/ajustes"] { color: var(--text-s); }
+/* Colores según MAPA ÚNICO de módulos (js/module-colors.js + design-tokens.css).
+   Clave: data-icon (único por ítem) en vez de href — varios ítems comparten
+   href (p.ej. los 4 sub-accesos de Informes) y quedaban indistinguibles. */
+.more-sheet-item[data-icon="zonas"] { color: var(--c-success); }
+.more-sheet-item[data-icon="silos"] { color: var(--c-warning); }
+.more-sheet-item[data-icon="fitosanitario"] { color: var(--c-success); }
+.more-sheet-item[data-icon="gastos"] { color: var(--c-danger); }
+.more-sheet-item[data-icon="proveedores"] { color: var(--c-purple); }
+.more-sheet-item[data-icon="informes"] { color: var(--c-warning); }
+.more-sheet-item[data-icon="libroVentas"] { color: var(--c-info); }
+.more-sheet-item[data-icon="informeRega"] { color: var(--c-orange); }
+.more-sheet-item[data-icon="exportacion"] { color: var(--c-accent); }
+.more-sheet-item[data-icon="cuaderno"] { color: var(--c-orange); }
+.more-sheet-item[data-icon="documento"] { color: var(--c-purple); }
+.more-sheet-item[data-icon="libro"] { color: var(--c-purple); }
+.more-sheet-item[data-icon="ajustes"] { color: var(--text-s); }
+.more-sheet-item[data-icon="leche"] { color: var(--c-info); }
+.more-sheet-item[data-icon="carne"] { color: var(--c-danger); }
+.more-sheet-item[data-icon="hibrido"] { color: var(--c-success); }
+.more-sheet-item[data-icon="wizards"] { color: var(--c-purple); }
+.more-sheet-item[data-icon="pesadas"] { color: var(--c-info); }
+.more-sheet-item[data-icon="comercial"] { color: var(--c-success); }
+.more-sheet-item[data-icon="compradores"] { color: var(--c-info); }
+.more-sheet-item[data-icon="contratos"] { color: var(--c-info); }
+.more-sheet-item[data-icon="transportistas"] { color: var(--c-pink); }
 
 /* ============================================
    SISTEMA DE CLASES UTILITARIAS v5.0
