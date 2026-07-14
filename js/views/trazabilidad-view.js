@@ -395,7 +395,7 @@ const TrazabilidadView = {
       `;
       document.body.appendChild(pdfEl);
 
-      if (typeof html2pdf === 'undefined') {
+      if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
         App.toastError('Librería PDF no disponible');
         document.body.removeChild(pdfEl); return;
       }

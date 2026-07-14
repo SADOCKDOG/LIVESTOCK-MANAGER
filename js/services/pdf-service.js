@@ -91,6 +91,7 @@ const PdfService = {
         };
 
         updateProgress(70, 'Generando archivo...');
+        if (typeof html2pdf === 'undefined') await App._ensureHtml2Pdf();
         await html2pdf()
           .set(opt)
           .from(tempContainer)

@@ -74,8 +74,8 @@
     <script src="js/idb-local.js?v=6.28"></script>
 
     <!-- Librerías Externas vía CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- xlsx.js y html2pdf.js (~1.1MB combinados) se cargan bajo demanda desde
+         App._ensureXLSX() / App._ensureHtml2Pdf() en app.js, solo al exportar. -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="capacitor.js"></script>
   </head>
@@ -274,7 +274,7 @@
     <script src="js/services/alertas-service.js?v=6.28"></script>
     <script src="js/services/balance-service.js?v=6.28"></script>
     <script src="js/services/comunidades-service.js?v=6.28"></script>
-    <script src="js/services/pdf-service.js?v=6.28"></script>
+    <script src="js/services/pdf-service.js?v=6.28.21"></script>
     <script src="js/services/export-service.js?v=6.28"></script>
 
     <!-- Vistas Modulares -->
@@ -292,12 +292,12 @@
     <script src="js/views/comercializacion-view.js?v=6.28.4"></script>
     <script src="js/views/informes-view.js?v=6.28.20"></script>
     <script src="js/views/informes-data.js?v=6.28.20"></script>
-    <script src="js/views/informes-export.js?v=6.28.20"></script>
-    <script src="js/views/trazabilidad-view.js?v=6.28"></script>
-    <script src="js/views/cuaderno-view.js?v=6.28"></script>
-    <script src="js/views/documentos-view.js?v=6.28"></script>
+    <script src="js/views/informes-export.js?v=6.28.21"></script>
+    <script src="js/views/trazabilidad-view.js?v=6.28.21"></script>
+    <script src="js/views/cuaderno-view.js?v=6.28.21"></script>
+    <script src="js/views/documentos-view.js?v=6.28.21"></script>
     <script src="js/views/albaranes-ventas-view.js?v=6.28"></script>
-    <script src="js/views/manuales-view.js?v=6.28"></script>
+    <script src="js/views/manuales-view.js?v=6.28.21"></script>
     <script src="js/views/ajustes-view.js?v=6.28.19"></script>
     <script src="js/views/config-sistema-view.js?v=6.28"></script>
     <script src="js/views/silos-view.js?v=6.28"></script>
@@ -331,7 +331,7 @@
     <script src="js/reproduccion.js?v=6.28"></script>
 
     <!-- 5º Inyectar los Módulos de Onboarding, Backups y Formularios de UI -->
-    <script src="js/export_reco.js?v=6.28"></script>
+    <script src="js/export_reco.js?v=6.28.21"></script>
     <script src="js/importador.js?v=6.28"></script>
     <script src="js/asistente-configuracion.js?v=6.28.20"></script>
     <script src="js/modal-manager.js?v=6.28"></script>
@@ -344,7 +344,7 @@
     <script src="js/views/wizards/wizard-finca.js?v=6.28"></script>
     <script src="js/views/wizards/wizard-crotales.js?v=6.28.18"></script>
     <script src="js/views/wizards/wizard-guia-movimiento.js?v=6.28"></script>
-    <script src="js/views/wizards/wizard-censo.js?v=6.28"></script>
+    <script src="js/views/wizards/wizard-censo.js?v=6.28.21"></script>
     <script src="js/views/wizards/wizard-albaran-leche.js?v=6.28.4"></script>
     <script src="js/views/wizards/wizard-gasto.js?v=6.28"></script>
     <script src="js/views/wizards/wizard-venta-masiva.js?v=6.28"></script>
@@ -376,7 +376,7 @@
     <script src="js/views/transportistas-view.js?v=6.28"></script>
 
     <!-- 6º Arrancar el Controlador de la Aplicación (Orquestador Central) -->
-    <script src="js/app.js?v=6.28.20"></script>
+    <script src="js/app.js?v=6.28.21"></script>
 
     <!-- Herramientas de QA/E2E (solo en desarrollo): se cargan bajo demanda,
          no en cada arranque en producción. Activar una vez con

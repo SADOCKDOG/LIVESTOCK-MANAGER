@@ -266,7 +266,7 @@ const ManualesView = {
         if (txt) txt.textContent = text.toUpperCase();
       };
 
-      if (typeof html2pdf === 'undefined') {
+      if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
         App.toastError('La librería de PDF no está disponible.');
         loader.remove();
         return;

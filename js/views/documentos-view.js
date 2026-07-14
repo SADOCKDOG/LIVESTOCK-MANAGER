@@ -240,6 +240,7 @@ const DocumentosView = {
         Tipo: d.tipo || '', Número: d.numero || '', Fecha: d.fecha || '',
         Estado: d.estado || '', Detalle: d.isPedidoCrotales ? `Pedido Crotales: ${d.dataRaw.cantidad} uds` : (d.isMovimiento ? `Guía Movimiento (${d.dataRaw.tipo})` : '')
       }));
+      if (typeof XLSX === 'undefined') await App._ensureXLSX();
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Documentos');
       const wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -475,7 +476,7 @@ const DocumentosView = {
           const el = document.getElementById('doc-pdf-content');
           if (!el) return App.toastError("Contenido no disponible");
           const filename = `${label.replace(/\s+/g, '_')}_${doc.numero || doc.id}_${Date.now()}.pdf`;
-          if (typeof html2pdf !== 'undefined') {
+          if (typeof html2pdf !== 'undefined' || await App._ensureHtml2Pdf()) {
             await html2pdf().set({ margin: 10, filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save(filename);
           } else {
             const win = window.open('', '_blank');
