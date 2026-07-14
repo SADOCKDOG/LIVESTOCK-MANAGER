@@ -1456,12 +1456,7 @@ const App = {
   },
 
   async _abrirAltaAnimalDirecto() {
-    location.hash = '#/animales';
-    setTimeout(() => {
-      if (window.AnimalesView && typeof window.AnimalesView.renderFormulario === 'function') {
-        window.AnimalesView.renderFormulario();
-      }
-    }, 200);
+    location.hash = '#/animal';
   },
 
   async _abrirEntradaAlimentoSiloDirecto() {
