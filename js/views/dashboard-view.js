@@ -208,6 +208,56 @@ const DashboardView = {
               <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
             </div>
 
+            <!-- Traslado de Animales -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirWizardTraslado()" style="--quick-color: #E8555F;">
+              <div class="quick-icon-wrapper">${Icons.rotacion()}</div>
+              <div class="quick-text-wrapper" style="flex: 1;">
+                <span class="quick-title">Traslado</span>
+                <span class="quick-desc">Mover animales entre rebaños</span>
+              </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
+            </div>
+
+            <!-- Censo Anual -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirWizardCenso()" style="--quick-color: #E8555F;">
+              <div class="quick-icon-wrapper">${Icons.historial()}</div>
+              <div class="quick-text-wrapper" style="flex: 1;">
+                <span class="quick-title">Censo Anual</span>
+                <span class="quick-desc">Recuento oficial de ganado</span>
+              </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
+            </div>
+
+            <!-- Pedido de Crotales -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirWizardCrotales()" style="--quick-color: #C5FA50;">
+              <div class="quick-icon-wrapper">${Icons.paquete()}</div>
+              <div class="quick-text-wrapper" style="flex: 1;">
+                <span class="quick-title">Pedido Crotales</span>
+                <span class="quick-desc">Solicitud oficial ADSG</span>
+              </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
+            </div>
+
+            <!-- Guía de Movimiento -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirWizardGuiaMovimiento()" style="--quick-color: #C5FA50;">
+              <div class="quick-icon-wrapper">${Icons.transportistas()}</div>
+              <div class="quick-text-wrapper" style="flex: 1;">
+                <span class="quick-title">Guía Movimiento</span>
+                <span class="quick-desc">Transporte entre explotaciones</span>
+              </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
+            </div>
+
+            <!-- Albarán de Leche -->
+            <div class="card-registro-quick col-span-4" onclick="App._abrirWizardAlbaranLeche()" style="--quick-color: #4FADF5;">
+              <div class="quick-icon-wrapper">${Icons.documento()}</div>
+              <div class="quick-text-wrapper" style="flex: 1;">
+                <span class="quick-title">Albarán Leche</span>
+                <span class="quick-desc">Entrega a comprador/industria</span>
+              </div>
+              <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
+            </div>
+
             <!-- Venta Masiva / Matadero -->
             <div class="card-registro-quick col-span-12" onclick="App._abrirWizardVentaMasiva()" style="--quick-color: var(--c-warning);">
               <div class="quick-icon-wrapper">${Icons.libroVentas()}</div>

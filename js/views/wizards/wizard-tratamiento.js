@@ -3,13 +3,16 @@
  * Extraído de app.js para modularización
  */
 window.WizardTratamiento = {
+  async abrir(options = {}) {
+    return this.registrar(null, options);
+  },
   async registrar(rebanoId, options = {}) {
     if (!window.CatalogoSanitario) {
       App.toastError("Catálogo Sanitario no cargado.");
       return;
     }
 
-    const animales = rebanoId ? await window.Animales.list(Number(rebanoId)).catch(() => []) : [];
+    const animales = await window.Animales.list(rebanoId ? Number(rebanoId) : null).catch(() => []);
     const catalogo = window.CatalogoSanitario.obtenerCatalogo();
 
     // Catálogos SIGGAN para el libro de tratamientos veterinarios

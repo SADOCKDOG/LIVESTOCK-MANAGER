@@ -1330,6 +1330,22 @@ const App = {
     if (window.AlbaranLecheWizard) { return window.AlbaranLecheWizard.open(); }
     App.toastError("Error: AlbaranLecheWizard no disponible");
   },
+  async _abrirWizardTraslado() {
+    if (window.WizardTraslado) { return window.WizardTraslado.abrir(); }
+    App.toastError("Error: WizardTraslado no disponible");
+  },
+  async _abrirWizardCenso() {
+    if (window.WizardCenso) { return window.WizardCenso.abrir(); }
+    App.toastError("Error: WizardCenso no disponible");
+  },
+  async _abrirWizardCrotales() {
+    if (window.WizardCrotales) { return window.WizardCrotales.abrir(); }
+    App.toastError("Error: WizardCrotales no disponible");
+  },
+  async _abrirWizardGuiaMovimiento() {
+    if (window.WizardGuiaMovimiento) { return window.WizardGuiaMovimiento.abrir(); }
+    App.toastError("Error: WizardGuiaMovimiento no disponible");
+  },
   async _abrirFormularioGasto(options = {}) {
     if (window.GastoWizard) { return window.GastoWizard.open(options); }
     App.toastError("Error: GastoWizard no disponible");
@@ -1471,7 +1487,8 @@ const App = {
     } else {
         // Multiple silos → show selector ( fall back to silos list for now )
         location.hash = '#/silos';
-    },
+    }
+  },
 
   // ==========================================
   // HISTORIAL REPRODUCTIVO Y REFERENCIA

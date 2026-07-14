@@ -3,6 +3,9 @@
  * Extraído de app.js para modularización
  */
 window.WizardCrotales = {
+  async abrir(borrador = null) {
+    return this.abrirPedido(borrador);
+  },
   async abrirPedido(borrador = null) {
     const finca = await Fincas.getActive();
     if (!finca) { App.toastError("No hay finca activa"); return; }
