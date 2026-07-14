@@ -1459,8 +1459,18 @@ const App = {
   },
 
   async _abrirEntradaAlimentoSiloDirecto() {
-    location.hash = '#/silos';
-  },
+    // Get list of silos for active farm
+    const silos = await SilosView._getSilos?.() || [];
+    if (silos.length === 0) {
+        location.hash = '#/silos'; // No silos → go to list to create one
+    } else if (silos.length === 1) {
+        // Direct form for the only silo
+        location.hash = '#/silos';
+        setTimeout(() => SilosView._abrirFormularioSilo?.(silos[0].id), 200);
+    } else {
+        // Multiple silos → show selector ( fall back to silos list for now )
+        location.hash = '#/silos';
+    },
 
   // ==========================================
   // HISTORIAL REPRODUCTIVO Y REFERENCIA
