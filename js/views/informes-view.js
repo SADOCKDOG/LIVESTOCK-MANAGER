@@ -200,6 +200,7 @@ const InformesView = {
 
   async render() {
     const main = document.getElementById("app-content");
+    const chartLoadPromise = App._ensureChartJs();
 
     main.innerHTML = `
       <div id="informes-header-navigation" class="mb-14">
@@ -271,6 +272,7 @@ const InformesView = {
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw
       };
 
+      await chartLoadPromise;
       this._renderTabActual();
     } catch (e) {
       document.getElementById("informes-content").innerHTML =

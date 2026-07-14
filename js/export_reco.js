@@ -235,6 +235,7 @@ const Charts = {
      */
     async charProduccionCarne(containerId, animalId) {
         try {
+            await App._ensureChartJs();
             if (this.chartInstances[containerId]) {
                 this.chartInstances[containerId].destroy();
             }
@@ -285,6 +286,7 @@ const Charts = {
      */
     async chartProduccionLeche(containerId, fincaId = null) {
         try {
+            await App._ensureChartJs();
             if (this.chartInstances[containerId]) {
                 this.chartInstances[containerId].destroy();
             }
@@ -334,6 +336,7 @@ const Charts = {
      */
     async chartVentas(containerId, fincaId = null) {
         try {
+            await App._ensureChartJs();
             if (this.chartInstances[containerId]) {
                 this.chartInstances[containerId].destroy();
             }
@@ -388,6 +391,7 @@ const Charts = {
      */
     async chartGastos(containerId, fincaId = null) {
         try {
+            await App._ensureChartJs();
             if (this.chartInstances[containerId]) {
                 this.chartInstances[containerId].destroy();
             }

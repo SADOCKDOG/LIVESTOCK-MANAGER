@@ -1636,6 +1636,22 @@ const App = {
     return typeof html2pdf !== 'undefined';
   },
 
+  /** Carga chart.js bajo demanda (~200KB vía CDN) solo cuando se renderiza un gráfico (Informes, Export). */
+  async _ensureChartJs() {
+    if (typeof Chart !== 'undefined') return true;
+    if (!App._chartJsLoadPromise) {
+      App._chartJsLoadPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+    }
+    try { await App._chartJsLoadPromise; } catch (_) {}
+    return typeof Chart !== 'undefined';
+  },
+
   async _escanearCrotal(inputId) {
     const isCapacitor = window.Capacitor?.isNativePlatform?.() || window.hasOwnProperty('Capacitor');
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
