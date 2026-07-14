@@ -10,7 +10,8 @@ const Export = {
     async toExcel(sheetData) {
         try {
             ErrorHandler.validateRequired('sheetData', sheetData, 'Data required for Excel export');
-            
+
+            if (typeof XLSX === 'undefined') await App._ensureXLSX();
             const workbook = XLSX.utils.book_new();
             
             if (Array.isArray(sheetData)) {

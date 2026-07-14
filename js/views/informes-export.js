@@ -8,7 +8,7 @@ Object.assign(window.InformesView, {
 
   async _exportExcel() {
     try {
-      if (typeof XLSX === 'undefined') return App.toastError("Librería Excel no disponible");
+      if (typeof XLSX === 'undefined' && !(await App._ensureXLSX())) return App.toastError("Librería Excel no disponible");
       App.toast("Generando Excel...");
 
       const fId = await Fincas.getActiveId();
@@ -205,7 +205,7 @@ Object.assign(window.InformesView, {
         if (txt) txt.textContent = text.toUpperCase();
       };
 
-      if (typeof html2pdf === 'undefined') {
+      if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
         App.toastError("Librería PDF no disponible");
         loader.remove();
         this._exportFallback();

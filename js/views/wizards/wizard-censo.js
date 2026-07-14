@@ -308,7 +308,7 @@ window.WizardCenso = {
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
-        if (typeof html2pdf === 'undefined') {
+        if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
           document.body.removeChild(tempContainer);
           loader.remove();
           if (window.WizardCrotales && WizardCrotales._fallbackPDF) {

@@ -1242,10 +1242,10 @@ const App = {
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
-        if (typeof html2pdf === 'undefined') {
+        if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
           document.body.removeChild(tempContainer);
           loader.remove();
-          html2pdf().set(opt).from(sourceEl).save();
+          App.toastError("Librería PDF no disponible");
           return;
         }
 
@@ -1633,6 +1633,38 @@ const App = {
     }
     await App._html5QrcodeLoadPromise;
     return typeof Html5Qrcode !== 'undefined';
+  },
+
+  /** Carga xlsx.js bajo demanda (~700KB vía CDN) solo cuando se exporta a Excel. */
+  async _ensureXLSX() {
+    if (typeof XLSX !== 'undefined') return true;
+    if (!App._xlsxLoadPromise) {
+      App._xlsxLoadPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+    }
+    try { await App._xlsxLoadPromise; } catch (_) {}
+    return typeof XLSX !== 'undefined';
+  },
+
+  /** Carga html2pdf.js bajo demanda (~400KB vía CDN) solo cuando se exporta a PDF. */
+  async _ensureHtml2Pdf() {
+    if (typeof html2pdf !== 'undefined') return true;
+    if (!App._html2pdfLoadPromise) {
+      App._html2pdfLoadPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+    }
+    try { await App._html2pdfLoadPromise; } catch (_) {}
+    return typeof html2pdf !== 'undefined';
   },
 
   async _escanearCrotal(inputId) {

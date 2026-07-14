@@ -443,7 +443,7 @@ const CuadernoDigitalView = {
         if (txt) txt.textContent = text.toUpperCase();
       };
 
-      if (typeof html2pdf === 'undefined') {
+      if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
         App.toastError('html2pdf no disponible');
         loader.remove();
         return;
@@ -667,7 +667,7 @@ const CuadernoDigitalView = {
           if (txt) txt.textContent = text.toUpperCase();
         };
 
-        if (typeof html2pdf === 'undefined') {
+        if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
           App.toastError('html2pdf no disponible');
           loader.remove();
           return;
