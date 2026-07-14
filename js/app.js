@@ -218,12 +218,12 @@ const App = {
 
   /** Inyecta de forma masiva los iconos SVGs de la librería en elementos estáticos HTML con el atributo data-icon */
   _inyectarIconosEstaticos() {
-    if (!window.Icons) return;
+    if (typeof Icons === 'undefined') return;
     document.querySelectorAll('[data-icon]').forEach(el => {
       if (el.querySelector('svg')) return; // Evitar duplicar
       const name = el.getAttribute('data-icon');
-      if (typeof window.Icons[name] === 'function') {
-        el.insertAdjacentHTML('afterbegin', window.Icons[name]());
+      if (typeof Icons[name] === 'function') {
+        el.insertAdjacentHTML('afterbegin', Icons[name]());
       }
     });
   },
