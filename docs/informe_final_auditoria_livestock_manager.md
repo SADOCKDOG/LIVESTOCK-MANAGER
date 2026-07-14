@@ -211,7 +211,7 @@ Impacto estimado: Bundle efectivo en primera carga pasa de 2.1 MB a ~500 KB. Tie
 | # | Acción | Esfuerzo |
 |---|--------|:--------:|
 | P1-1 | Completar redirectMap: Añadir /rebanos, /carne, /animales, /contratos (crear ruta plural) | 30 min |
-| P1-2 | Modo claro: Añadir variables CSS [data-tema-claro] y toggle funcional en AjustesView | ⚠️ PARCIAL (2026-07-14): toggle funcional + variables --bg/--surface/--text vía body[data-modo="claro"]. Pendiente: revisar 54 usos de text-shadow/box-shadow con glow neón (diseñados solo para OLED negro) que quedan de bajo contraste sobre fondo claro. Esfuerzo restante: 3-4 h |
+| P1-2 | Modo claro: Añadir variables CSS [data-tema-claro] y toggle funcional en AjustesView | ⚠️ PARCIAL (2026-07-14): toggle funcional + variables --bg/--surface/--text vía body[data-modo="claro"]. Corregidos los 4 patrones de contraste de mayor impacto: .section-header-neon/.section-header-theme (texto blanco+glow sobre título), .wizard-check-label (overlay negro 40%+texto gris claro), .card-registro-quick .quick-title y, sobre todo, .text-white (290 usos en js/views/*, la utilidad de título más extendida del proyecto) — verificado visualmente en Dashboard, GeGan, ExPro y Ajustes>Sistema. Pendiente: auditoría fina del resto de los 54 usos de text-shadow/box-shadow glow (casos puntuales no cubiertos por los 4 overrides de arriba). Esfuerzo restante estimado: 1-2 h |
 | P1-3 | prefers-reduced-motion: Añadir media query que desactive animaciones | 1 h |
 | P1-4 | focus-visible: Reemplazar outline:none global por :focus-visible { outline: 2px solid var(--c-success) } | 30 min |
 | P1-5 | Modularizar informes-view.js: Dividir en informes-ventas.js, informes-rega.js, informes-export.js | 5-8 h |
