@@ -232,7 +232,7 @@ const DashboardView = {
         ${this._renderAlertasAdministrativas(alertasAdministrativas)}
       </div>
 
-      ${`<div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease; grid-column: span 3;">${this._renderIndicadoresLacteos(indicadoresLeche)}</div>`}
+      ${this._renderIndicadoresLacteos(indicadoresLeche)}
 
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
