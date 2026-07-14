@@ -74,9 +74,9 @@
     <script src="js/idb-local.js?v=6.28"></script>
 
     <!-- Librerías Externas vía CDN -->
-    <!-- xlsx.js y html2pdf.js (~1.1MB combinados) se cargan bajo demanda desde
-         App._ensureXLSX() / App._ensureHtml2Pdf() en app.js, solo al exportar. -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- xlsx.js, html2pdf.js y chart.js (~1.3MB combinados) se cargan bajo demanda desde
+         App._ensureXLSX() / App._ensureHtml2Pdf() / App._ensureChartJs() en app.js,
+         solo al exportar o al abrir una vista con gráficos. -->
     <script src="capacitor.js"></script>
   </head>
   <body>
@@ -284,7 +284,7 @@
     <script src="js/views/explotacion-view.js?v=6.28.5"></script>
     <script src="js/views/gastos-view.js?v=6.28"></script>
     <script src="js/views/comercializacion-view.js?v=6.28.5"></script>
-    <script src="js/views/informes-view.js?v=6.28.20"></script>
+    <script src="js/views/informes-view.js?v=6.28.21"></script>
     <script src="js/views/informes-data.js?v=6.28.20"></script>
     <script src="js/views/informes-export.js?v=6.28.21"></script>
     <script src="js/views/trazabilidad-view.js?v=6.28.21"></script>
@@ -323,7 +323,7 @@
     <script src="js/reproduccion.js?v=6.28"></script>
 
     <!-- 5º Inyectar los Módulos de Onboarding, Backups y Formularios de UI -->
-    <script src="js/export_reco.js?v=6.28.21"></script>
+    <script src="js/export_reco.js?v=6.28.22"></script>
     <script src="js/importador.js?v=6.28"></script>
     <script src="js/asistente-configuracion.js?v=6.28.20"></script>
     <script src="js/modal-manager.js?v=6.28"></script>
@@ -368,7 +368,7 @@
     <script src="js/views/transportistas-view.js?v=6.28.5"></script>
 
     <!-- 6º Arrancar el Controlador de la Aplicación (Orquestador Central) -->
-    <script src="js/app.js?v=6.28.25"></script>
+    <script src="js/app.js?v=6.28.26"></script>
 
     <!-- Herramientas de QA/E2E (solo en desarrollo): se cargan bajo demanda,
          no en cada arranque en producción. Activar una vez con
