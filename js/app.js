@@ -149,6 +149,10 @@ const App = {
         if (cfg?.value?.colorTema && cfg.value.colorTema !== 'gold') {
           document.body.setAttribute('data-tema', cfg.value.colorTema);
         }
+        if (cfg?.value?.temaOscuro === false) {
+          document.body.setAttribute('data-modo', 'claro');
+          document.documentElement.style.colorScheme = 'light';
+        }
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
         if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');

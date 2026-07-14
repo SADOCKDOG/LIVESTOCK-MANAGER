@@ -266,6 +266,8 @@ const AjustesView = {
   async _toggleTema(checked) {
     await this._saveConfig({ temaOscuro: checked });
     document.documentElement.style.colorScheme = checked ? 'dark' : 'light';
+    if (checked) document.body.removeAttribute('data-modo');
+    else document.body.setAttribute('data-modo', 'claro');
     App.toast(checked ? 'Modo oscuro' : 'Modo claro', "info");
   },
 

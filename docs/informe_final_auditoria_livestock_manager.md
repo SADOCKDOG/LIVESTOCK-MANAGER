@@ -211,7 +211,7 @@ Impacto estimado: Bundle efectivo en primera carga pasa de 2.1 MB a ~500 KB. Tie
 | # | Acción | Esfuerzo |
 |---|--------|:--------:|
 | P1-1 | Completar redirectMap: Añadir /rebanos, /carne, /animales, /contratos (crear ruta plural) | 30 min |
-| P1-2 | Modo claro: Añadir variables CSS [data-tema-claro] y toggle funcional en AjustesView | 4-6 h |
+| P1-2 | Modo claro: Añadir variables CSS [data-tema-claro] y toggle funcional en AjustesView | ⚠️ PARCIAL (2026-07-14): toggle funcional + variables --bg/--surface/--text vía body[data-modo="claro"]. Pendiente: revisar 54 usos de text-shadow/box-shadow con glow neón (diseñados solo para OLED negro) que quedan de bajo contraste sobre fondo claro. Esfuerzo restante: 3-4 h |
 | P1-3 | prefers-reduced-motion: Añadir media query que desactive animaciones | 1 h |
 | P1-4 | focus-visible: Reemplazar outline:none global por :focus-visible { outline: 2px solid var(--c-success) } | 30 min |
 | P1-5 | Modularizar informes-view.js: Dividir en informes-ventas.js, informes-rega.js, informes-export.js | 5-8 h |
