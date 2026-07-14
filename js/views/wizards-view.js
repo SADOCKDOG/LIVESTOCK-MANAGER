@@ -159,7 +159,7 @@ const WizardsView = {
                     else Toast.show('Wizard Censo no disponible', 'danger');
                     break;
                 case 'finca':
-                    if (window.WizardFinca) window.WizardFinca.abrir();
+                    if (window.WizardFinca) window.WizardFinca.showForm();
                     else Toast.show('Wizard Finca no disponible', 'danger');
                     break;
                 case 'crotales':

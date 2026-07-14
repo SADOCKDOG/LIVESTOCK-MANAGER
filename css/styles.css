@@ -506,6 +506,9 @@ nav.bottom-nav {
     box-shadow: 0 4px 15px rgba(0,0,0,0.6);
     border: 1px solid color-mix(in srgb, var(--fab-color-final) calc(var(--fab-intensity-num, 60) * 1%), transparent);
     white-space: nowrap;
+    max-width: calc(100vw - 96px);
+    overflow: hidden;
+    text-overflow: ellipsis;
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--fab-color-final) calc(var(--fab-intensity-num, 60) * 1%), transparent));
     transition: all 0.2s ease;
     opacity: 0.9;

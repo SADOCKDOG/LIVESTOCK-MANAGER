@@ -5,6 +5,21 @@
  * unificando la experiencia visual con el resto de asistentes.
  */
 window.WizardTraslado = {
+  async abrir() {
+    const App = window.App;
+    if (!App) return console.error("App no disponible");
+    const rebanos = (await Rebanos.list()).filter((r) => !r.anulado);
+    if (rebanos.length === 0) {
+      App.toastError("No hay rebaños creados. Crea un rebaño de destino primero.");
+      location.hash = '#/rebanos';
+      return;
+    }
+    if (rebanos.length === 1) {
+      return this.abrirSelectorAnimales(rebanos[0].id);
+    }
+    App.toastInfo?.('Selecciona el rebaño destino para el traslado');
+    location.hash = '#/rebanos';
+  },
   async abrirSelectorAnimales(rebanoId) {
     const App = window.App;
     if (!App) return console.error("App no disponible");
