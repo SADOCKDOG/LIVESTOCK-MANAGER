@@ -223,10 +223,10 @@ const AjustesView = {
     const defaults = {
       objGmd: 0.8, objLitros: 25, objFert: 85, objOcup: 85, objRent: 20, objBajas: 5,
       autoBackup: false, temaOscuro: true, mostrarContextos: false,
-      glowMarco: true, glowLaterales: true, glowBotones: true,
-      glowMarcoFijo: false, glowMarcoFijoColor: '#FFFFFF',
-      hazLuzColor: '', hazLuzIntensidad: 45,
-      fabColor: '', fabIntensidad: 60,
+      glowMarco: true, glowLaterales: false, glowBotones: true, glowTarjetas: true,
+      glowMarcoFijo: false, glowMarcoFijoColor: '#FFFFFF', bannerOpacity: 0.77,
+      hazLuzColor: '', hazLuzIntensidad: 50,
+      fabColor: '#FFFFFF', fabIntensidad: 40,
       colorTema: 'gold', formatoFecha: 'es-ES', moneda: '€', especies: [],
       alertSanidad: true, alertTrazabilidad: true, alertPAC: true,
       alertADSG: true, alertINCOLAC: true, alertContratos: false
