@@ -220,9 +220,9 @@ Impacto estimado: Bundle efectivo en primera carga pasa de 2.1 MB a ~500 KB. Tie
 ### 🟢 P2 — Mejora continua (Sprint 3+: Backlog)
 | # | Acción | Esfuerzo |
 |---|--------|:--------:|
-| P2-1 | Unificar sistema de redirección: Eliminar redirectMap o eliminar render* functions redundantes — usar solo un mecanismo | 2-3 h |
+| P2-1 | Unificar sistema de redirección: Eliminar redirectMap o eliminar render* functions redundantes — usar solo un mecanismo | ✅ REVISADO (2026-07-14): no es redundancia real. redirectMap es necesario para el resaltado correcto del nav activo (compara href.startsWith('#'+path)); las funciones render* se usan directamente desde 3 sitios (rebanos-view.js, wizard-albaran-leche.js, wizard-gasto.js) para refrescar la vista sin pasar por el router. Único código muerto: 13 entradas de routes{} nunca alcanzables por quedar interceptadas por redirectMap — sin riesgo ni beneficio funcional al tocarlas, se deja como está. |
 | P2-2 | Eliminar vistas legacy no referenciadas: Si todas las rutas pasan por pilares, eliminar archivos legacy muertos | 2-4 h |
-| P2-3 | Añadir roles ARIA: role=navigation, role=main, aria-label en bottom sheet y tabs | 2-3 h |
+| P2-3 | Añadir roles ARIA: role=navigation, role=main, aria-label en bottom sheet y tabs | ✅ COMPLETO (2026-07-14): role="banner"/"main" en header/main, aria-label en nav inferior, role="dialog" en bottom sheet "Más" y dropdown del header, role="tablist"/"tab"+aria-selected dinámico en las 18 pestañas de ExPro/GeGan/CoMer. Corregido además un bug real de accesibilidad: el botón "Más" era un `<a>` sin href (inalcanzable por teclado) — ahora role="button" tabindex="0" con soporte Enter/Espacio y aria-expanded sincronizado. |
 | P2-4 | Bundle analysis: Webpack/Rollup bundle visualizer para identificar dependencias duplicadas | 2 h |
 | P2-4 | Bundle analysis: Webpack/Rollup bundle visualizer para identificar dependencias duplicadas | 2 h |
 ---
