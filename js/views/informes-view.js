@@ -344,7 +344,7 @@ const InformesView = {
       <div class="inf-export-bar mb-14">
         <span class="inf-export-label">${label}</span>
         <div class="inf-export-btns">
-          <button class="inf-export-btn" onclick="InformesView._exportPDFSeccion('${seccion}')" title="Exportar ${label} a PDF">
+          <button class="inf-export-btn inf-export-btn--pdf" onclick="InformesView._exportPDFSeccion('${seccion}')" title="Exportar ${label} a PDF">
             ${Icons.documento()} PDF
           </button>
           <button class="inf-export-btn inf-export-btn--excel" onclick="InformesView._exportExcel()" title="Exportar a Excel">
