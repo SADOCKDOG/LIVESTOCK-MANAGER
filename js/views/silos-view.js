@@ -66,18 +66,6 @@ const SilosView = {
         return this._cachedSilos;
     },
 
-    /**
-     * Obtiene la lista de silos disponibles, cargándolos si es necesario
-     * @returns {Promise<Array>} Lista de silos
-     */
-    async _getSilos() {
-        // Asegurarse de que los silos estén cargados
-        if (this._cachedSilos.length === 0) {
-            await this._cargarSilos();
-        }
-        return this._cachedSilos;
-    },
-
     _renderContenido(container) {
         const totalCapacidad = this._cachedSilos.reduce((acc, s) => acc + (Number(s.capacidad) || 0), 0);
         const totalActual = this._cachedSilos.reduce((acc, s) => acc + (Number(s.cantidadActual) || 0), 0);
