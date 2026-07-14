@@ -140,7 +140,7 @@ const App = {
         this._config = storedCfg?.value || {};
         const cfg = storedCfg;
         const mostrar = cfg?.value?.mostrarContextos;
-        if (mostrar === false || mostrar === undefined) {
+        if (mostrar === false) {
           document.body.classList.add('hide-context');
           document.querySelectorAll('.card-dark-gradient, .card-total-3d').forEach(c => c.classList.add('compact'));
         }
@@ -657,36 +657,6 @@ const App = {
         <!-- BLOQUE IZQUIERDO -->
         <div class="flex-1 min-w-0 flex flex-col justify-center">
           ${leftColumnContent}
-        </div>
-        <!-- POSTE DE CERCA (reemplaza borde izquierdo simple) -->
-        <div class="fence-post" style="
-          width: 4px;
-          flex-shrink: 0;
-          background: linear-gradient(
-            to bottom,
-            var(--registro-color) 0%,
-            color-mix(in srgb, var(--registro-color) 80%, black) 50%,
-            var(--registro-color) 100%
-          );
-          border-radius: 2px;
-          position: relative;
-          overflow: hidden;
-        ">
-          <div class="fence-post-texture" style="
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: repeating-linear-gradient(
-              45deg,
-              transparent,
-              transparent 2px,
-              rgba(255,255,255,0.1) 2px,
-              rgba(255,255,255,0.1) 4px
-            );
-            opacity: 0.3;
-          "></div>
         </div>
         <!-- BLOQUE DERECHO -->
         <div class="flex flex-col items-end justify-between flex-shrink-0">
