@@ -84,3 +84,22 @@
     --safe-top: env(safe-area-inset-top);
     --safe-bottom: env(safe-area-inset-bottom);
 }
+
+/* ── MODO CLARO (Light Pro) ──
+   Activado vía body[data-modo="claro"] (AjustesView._toggleTema / ConfigSistemaView).
+   Solo redefine superficie/texto/sombras; los colores semánticos (--c-success, --c-danger…)
+   y de módulo se mantienen para no romper el contraste ni la identidad visual. */
+body[data-modo="claro"] {
+    --bg: #F4F3EF;            /* Papel de campo claro */
+    --surface: #FFFFFF;
+    --surface-light: #ECEAE4;
+    --surface-input: #FFFFFF;
+    --border: #D8D5CC;
+    --border-input: #C9C6BC;
+
+    --text-p: #1A1A18;
+    --text-s: #55534C;
+    --text-d: #9A968A;
+
+    --shadow-md: 0 4px 20px rgb(0 0 0 / 12%);
+}
