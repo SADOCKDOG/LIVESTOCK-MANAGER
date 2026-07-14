@@ -202,12 +202,12 @@ const ComercializacionView = {
           ${Icons.atras()}
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch">
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ComercializacionView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ComercializacionView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'compradores' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('compradores')">${Icons.compradores()} CLIENTES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'contratos' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('contratos')">${Icons.documento()} CONTRATOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'transportistas' ? 'active' : ''}" style="--mode-color:var(--c-pink);" onclick="ComercializacionView._cambiarSubModulo('transportistas')">${Icons.transportistas()} LOGÍSTICA</button>
+          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Comercialización">
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'leche'}" style="--mode-color:var(--c-info);" onclick="ComercializacionView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'carne'}" style="--mode-color:var(--c-danger);" onclick="ComercializacionView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'compradores' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'compradores'}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('compradores')">${Icons.compradores()} CLIENTES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'contratos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'contratos'}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('contratos')">${Icons.documento()} CONTRATOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'transportistas' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'transportistas'}" style="--mode-color:var(--c-pink);" onclick="ComercializacionView._cambiarSubModulo('transportistas')">${Icons.transportistas()} LOGÍSTICA</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">

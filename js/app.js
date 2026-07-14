@@ -525,7 +525,8 @@ const App = {
   _toggleMenuNavegacion() {
     const sheet = document.getElementById("nav-more-sheet");
     if (!sheet) return;
-    sheet.classList.toggle("open");
+    const isOpen = sheet.classList.toggle("open");
+    document.getElementById("nav-more")?.setAttribute("aria-expanded", String(isOpen));
   },
 
   /** Colapsa/expande la card de resumen (chevron esquina superior derecha). Reutilizable en todas las vistas. */

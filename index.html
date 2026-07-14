@@ -80,7 +80,7 @@
     <script src="capacitor.js"></script>
   </head>
   <body>
-    <header id="main-header">
+    <header id="main-header" role="banner">
       <!-- Left: Logo (Centrado en su columna) -->
       <div class="header-logo-container" onclick="App.route('/')">
           <img src="icons/Logo aplicación.png" alt="Livestock Manager" id="app-logo" />
@@ -99,7 +99,7 @@
         </div>
       <!-- Dropdown del Header -->
       <div id="header-dropdown-menu" class="header-dropdown-overlay" onclick="App._toggleHeaderDropdown()">
-        <div class="header-dropdown-content" onclick="event.stopPropagation()">
+        <div class="header-dropdown-content" role="dialog" aria-modal="true" aria-label="Accesos rápidos" onclick="event.stopPropagation()">
             <div class="header-dropdown-grid" id="header-dropdown-grid">
                 <!-- Se puebla dinámicamente en app.js -->
             </div>
@@ -107,7 +107,7 @@
       </div>
     </header>
 
-    <main id="app-content">
+    <main id="app-content" role="main" aria-live="polite">
       <div class="loader">Iniciando aplicación...</div>
       <div id="startup-rescue">
         <p>El inicio está tardando más de lo esperado...</p>
@@ -154,7 +154,7 @@
     BOTTOM NAV: 5 items + "Más"
     ============================ -->
     <div class="bottom-nav-wrap" id="bottomNavWrap">
-    <nav class="bottom-nav" id="bottomNav">
+    <nav class="bottom-nav" id="bottomNav" aria-label="Navegación principal">
       <a href="#/" class="nav-item" id="nav-home" data-icon="home">
         <span class="label">Inicio</span>
       </a>
@@ -173,7 +173,7 @@
       <a href="#/comercializacion" class="nav-item" id="nav-comercializacion" data-icon="comercial">
         <span class="label">CoMer</span>
       </a>
-      <a class="nav-item" id="nav-more" onclick="App._toggleMenuNavegacion()" data-icon="mas">
+      <a class="nav-item" id="nav-more" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" onclick="App._toggleMenuNavegacion()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App._toggleMenuNavegacion();}" data-icon="mas">
         <span class="label">Más</span>
       </a>
     </nav>
@@ -183,9 +183,9 @@
     BOTTOM SHEET "MÁS"
     ============================ -->
     <div id="nav-more-sheet" class="more-sheet-overlay" onclick="App._toggleMenuNavegacion()">
-      <div class="more-sheet" onclick="event.stopPropagation()">
+      <div class="more-sheet" role="dialog" aria-modal="true" aria-labelledby="more-sheet-title" onclick="event.stopPropagation()">
         <div class="more-sheet-handle"></div>
-        <div class="more-sheet-title">Navegación</div>
+        <div class="more-sheet-title" id="more-sheet-title">Navegación</div>
         <div class="more-sheet-grid">
           <!-- Nota: Zonas/Silos/Fitosanitario/Gastos/Proveedores (tabs de ExPro), Leche/Cárnico/Híbrido
                (tabs de GeGan) y Comercial/Compradores/Contratos/Transportistas (entrada y tabs de CoMer)

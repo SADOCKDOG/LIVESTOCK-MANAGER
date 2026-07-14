@@ -163,14 +163,14 @@ const ExplotacionView = {
           ${Icons.atras()}
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch">
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('explotacion')">${Icons.finca()} EXPRO</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'tramites' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarSubModulo('tramites')">${Icons.documento()} TRÁMITES</button>
+          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Explotación y Soporte">
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'explotacion'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('explotacion')">${Icons.finca()} EXPRO</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'zonas'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'silos'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'fitosanitarios'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'gastos'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'proveedores'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'tramites' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'tramites'}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarSubModulo('tramites')">${Icons.documento()} TRÁMITES</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
