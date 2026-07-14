@@ -154,12 +154,12 @@ const App = {
           document.documentElement.style.colorScheme = 'light';
         }
         if (cfg?.value?.glowMarco === false) document.body.classList.add('glow-marco-off');
-        if (cfg?.value?.glowLaterales === false) document.body.classList.add('glow-laterales-off');
+        if (cfg?.value?.glowLaterales !== true) document.body.classList.add('glow-laterales-off');
         if (cfg?.value?.glowBotones === false) document.body.classList.add('glow-botones-off');
         if (cfg?.value?.glowTarjetas === false) document.body.classList.add('glow-tarjetas-off');
 
         // Cargar intensidad y color de haz
-        const hazInt = cfg?.value?.hazLuzIntensidad ?? 45;
+        const hazInt = cfg?.value?.hazLuzIntensidad ?? 50;
         document.documentElement.style.setProperty('--haz-intensity', hazInt + '%');
         document.documentElement.style.setProperty('--haz-intensity-num', hazInt);
 
@@ -170,7 +170,7 @@ const App = {
           document.documentElement.style.removeProperty('--haz-luz-color');
         }
 
-        const fColor = cfg?.value?.fabColor || '';
+        const fColor = cfg?.value?.fabColor || '#FFFFFF';
         if (fColor) {
           document.documentElement.style.setProperty('--fab-user-color', fColor);
           document.documentElement.style.setProperty('--fab-neon-color', fColor);
@@ -179,11 +179,11 @@ const App = {
           document.documentElement.style.removeProperty('--fab-neon-color');
         }
 
-        const fInt = cfg?.value?.fabIntensidad ?? 60;
+        const fInt = cfg?.value?.fabIntensidad ?? 40;
         document.documentElement.style.setProperty('--fab-intensity', fInt + '%');
         document.documentElement.style.setProperty('--fab-intensity-num', fInt);
 
-        const bOpacity = cfg?.value?.bannerOpacity ?? 0.4;
+        const bOpacity = cfg?.value?.bannerOpacity ?? 0.77;
         document.documentElement.style.setProperty('--banner-opacity', bOpacity);
 
       } catch (_) {}
