@@ -9,6 +9,7 @@ const ExplotacionView = {
   _cachedFincaId: null,
   _needsDataRefresh: false,
   _loadingPromise: null,
+  _filtroActividad: '',
 
   _cambiarSubModulo(subModulo) {
     this._activeSubModule = subModulo;
@@ -359,15 +360,16 @@ const ExplotacionView = {
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
           <span style="color: ${meta.color}; margin-right: 4px;">|</span> ${Icons.documento()} ACTIVIDAD RECIENTE
         </div>
-        <div class="grid gap-10">
-          ${(this._activeMode === 'leche' ? d.ordeños : d.pesajes).slice(0, 50).map(e => App._cardRegistro({
-            icon: this._activeMode === 'leche' ? Icons.leche() : Icons.carne(),
-            title: e.snap_identificacion || 'Registro',
-            metadata: `<span>${this._fmtFecha(e.fecha)}</span><span>·</span><span>${e.snap_zona || 'Finca'}</span>`,
-            badge: `${(e.valor_neto || 0).toLocaleString()} ${e.unidad || ''}`,
-            color: meta.color,
-            onClick: `ExplotacionView._abrirOpcionesRegistro(${e.id}, '${this._activeMode}')`
-          })).join('')}
+        <div class="mb-10 relative">
+          <input type="text" id="expro-search-actividad" class="wizard-input font-bold uppercase py-12 px-16 pr-40 text-sm"
+                 placeholder="BUSCAR POR CROTAL O ZONA..." value="${this._filtroActividad}"
+                 oninput="ExplotacionView._filtrarActividad(this.value)">
+          <div style="position:absolute; right:15px; top:50%; transform:translateY(-50%); pointer-events:none; color:${meta.color};">
+            ${Icons.buscar()}
+          </div>
+        </div>
+        <div class="grid gap-10" id="expro-actividad-grid">
+          ${this._renderActividadItems()}
         </div>
       </div>
       <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="App._abrirAsistenteProduccion('${this._activeMode}', { origen_modulo: 'explotacion', modo_explotacion: this._activeMode })">
@@ -378,8 +380,42 @@ const ExplotacionView = {
 
   _cambiarModo(modo) {
     this._activeMode = modo;
+    this._filtroActividad = '';
     if (window.ModoContextoHelper) ModoContextoHelper.setModeForBlock('explotacion', modo);
     this.render();
+  },
+
+  /** Filtra la lista de "Actividad Reciente" por crotal o zona, sin re-renderizar toda la vista (conserva el foco del buscador). */
+  _filtrarActividad(texto) {
+    this._filtroActividad = texto;
+    const grid = document.getElementById('expro-actividad-grid');
+    if (!grid) return;
+    grid.innerHTML = this._renderActividadItems();
+  },
+
+  _renderActividadItems() {
+    const d = this._cachedData;
+    if (!d) return '';
+    const meta = { color: this._activeMode === 'carne' ? 'var(--c-danger)' : this._activeMode === 'leche' ? 'var(--c-info)' : 'var(--c-success)' };
+    const texto = (this._filtroActividad || '').trim().toLowerCase();
+    let items = this._activeMode === 'leche' ? d.ordeños : d.pesajes;
+    if (texto) {
+      items = items.filter(e =>
+        (e.snap_identificacion || '').toLowerCase().includes(texto) ||
+        (e.snap_zona || '').toLowerCase().includes(texto)
+      );
+    }
+    if (!items.length) {
+      return `<div class="empty-state py-30 text-center"><p class="empty-state-text text-gray-500 font-bold uppercase text-xs">Sin registros que coincidan con la búsqueda.</p></div>`;
+    }
+    return items.slice(0, 50).map(e => App._cardRegistro({
+      icon: this._activeMode === 'leche' ? Icons.leche() : Icons.carne(),
+      title: e.snap_identificacion || 'Registro',
+      metadata: `<span>${this._fmtFecha(e.fecha)}</span><span>·</span><span>${e.snap_zona || 'Finca'}</span>`,
+      badge: `${(e.valor_neto || 0).toLocaleString()} ${e.unidad || ''}`,
+      color: meta.color,
+      onClick: `ExplotacionView._abrirOpcionesRegistro(${e.id}, '${this._activeMode}')`
+    })).join('');
   },
 
   // Helper methods for calculating carne-specific metrics
