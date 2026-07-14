@@ -103,3 +103,30 @@ body[data-modo="claro"] {
 
     --shadow-md: 0 4px 20px rgb(0 0 0 / 12%);
 }
+
+/* Componentes con color de texto/fondo fijo pensado solo para OLED negro
+   (glow blanco sobre negro, overlay rgba(0,0,0,X) como "tarjeta oscura").
+   Sin este override quedan ilegibles sobre fondo claro. */
+body[data-modo="claro"] .section-header-neon,
+body[data-modo="claro"] .section-header-theme {
+    color: var(--text-p) !important;
+    text-shadow: none;
+}
+body[data-modo="claro"] .wizard-check-label {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--border);
+    color: var(--text-s);
+}
+body[data-modo="claro"] .wizard-check-label:has(input:checked) {
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--text-p);
+}
+body[data-modo="claro"] .card-registro-quick .quick-title {
+    color: var(--text-p) !important;
+}
+/* .text-white es la utilidad de título más usada del proyecto (290 usos en js/views/*)
+   y siempre asume fondo OLED negro. Redirigirla a --text-p corrige la inmensa
+   mayoría de cabeceras/títulos ilegibles en modo claro de una sola vez. */
+body[data-modo="claro"] .text-white {
+    color: var(--text-p);
+}
