@@ -240,7 +240,7 @@ const TransportistasView = {
     fabContainer.className = 'fab-container';
     fabContainer.innerHTML = `
       <span class="fab-label">Nuevo Transportista</span>
-      <button class="fab-btn">${Icons.fabPlus()}</button>
+      <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
     `;
     fabContainer.onclick = () => TransportistasView._abrirFormulario();
     container.appendChild(fabContainer);
@@ -336,65 +336,65 @@ const TransportistasView = {
         <h3 class="mt-0 text-sm text-blue-400">${isEdit ? `${Icons.editar()} EDITAR TRANSPORTISTA` : `${Icons.agregar()} NUEVO TRANSPORTISTA`}</h3>
 
         <div class="wizard-input-group">
-          <label class="wizard-label">NOMBRE / RAZÓN SOCIAL <span class="text-red">*</span></label>
-          <input type="text" id="tf-nombre" value="${t?.nombre || ''}" class="wizard-input" placeholder="Ej: Transportes García S.L.">
+          <label class="wizard-label" for="tf-nombre">NOMBRE / RAZÓN SOCIAL <span class="text-red">*</span></label>
+          <input type="text" id="tf-nombre" value="${t?.nombre || ''}" required class="wizard-input" placeholder="Ej: Transportes García S.L.">
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">NIF / CIF <span class="text-red">*</span></label>
-          <input type="text" id="tf-nif" value="${t?.nif_cif || ''}" class="wizard-input" placeholder="Ej: B12345678">
+          <label class="wizard-label" for="tf-nif">NIF / CIF <span class="text-red">*</span></label>
+          <input type="text" id="tf-nif" value="${t?.nif_cif || ''}" required class="wizard-input" placeholder="Ej: B12345678">
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">MATRÍCULA VEHÍCULO</label>
+          <label class="wizard-label" for="tf-matricula">MATRÍCULA VEHÍCULO</label>
           <input type="text" id="tf-matricula" value="${t?.matricula || ''}" class="wizard-input" placeholder="Ej: 1234ABC">
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">REGISTRO DE TRANSPORTE</label>
+          <label class="wizard-label" for="tf-registro">REGISTRO DE TRANSPORTE</label>
           <input type="text" id="tf-registro" value="${t?.registro_transporte || ''}" class="wizard-input" placeholder="Nº registro oficial...">
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">AUTORIZACIÓN TRANSPORTE GANADO (ATG) <span class="text-red">*</span></label>
-          <input type="text" id="tf-atg" value="${t?.autorizacion_transporte_ganado || ''}" class="wizard-input" placeholder="ATG-...">
+          <label class="wizard-label" for="tf-atg">AUTORIZACIÓN TRANSPORTE GANADO (ATG) <span class="text-red">*</span></label>
+          <input type="text" id="tf-atg" value="${t?.autorizacion_transporte_ganado || ''}" required class="wizard-input" placeholder="ATG-...">
         </div>
         <div class="grid grid-cols-2 gap-12">
           <div class="wizard-input-group">
-            <label class="wizard-label">ÚLTIMA DESINSECTACIÓN</label>
+            <label class="wizard-label" for="tf-desinsectacion">ÚLTIMA DESINSECTACIÓN</label>
             <input type="date" id="tf-desinsectacion" value="${t?.desinsectacion_ultima_fecha || ''}" class="wizard-input">
           </div>
           <div class="wizard-input-group">
-            <label class="wizard-label">VENCIMIENTO DESINSECTACIÓN</label>
+            <label class="wizard-label" for="tf-desinsectacion-venc">VENCIMIENTO DESINSECTACIÓN</label>
             <input type="date" id="tf-desinsectacion-venc" value="${t?.desinsectacion_vencimiento || ''}" class="wizard-input">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-12">
           <div class="wizard-input-group">
-            <label class="wizard-label">TELÉFONO</label>
+            <label class="wizard-label" for="tf-telefono">TELÉFONO</label>
             <input type="tel" id="tf-telefono" value="${t?.telefono || ''}" class="wizard-input" placeholder="Teléfono...">
           </div>
           <div class="wizard-input-group">
-            <label class="wizard-label">EMAIL</label>
+            <label class="wizard-label" for="tf-email">EMAIL</label>
             <input type="email" id="tf-email" value="${t?.email || ''}" class="wizard-input" placeholder="Email...">
           </div>
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">DIRECCIÓN</label>
+          <label class="wizard-label" for="tf-direccion">DIRECCIÓN</label>
           <input type="text" id="tf-direccion" value="${t?.direccion || ''}" class="wizard-input" placeholder="Dirección...">
         </div>
         <div class="grid" style="grid-template-columns:2fr 1fr 1fr; gap:12px;">
           <div class="wizard-input-group">
-            <label class="wizard-label">CIUDAD</label>
+            <label class="wizard-label" for="tf-ciudad">CIUDAD</label>
             <input type="text" id="tf-ciudad" value="${t?.ciudad || ''}" class="wizard-input" placeholder="Ciudad...">
           </div>
           <div class="wizard-input-group">
-            <label class="wizard-label">C.POSTAL</label>
+            <label class="wizard-label" for="tf-cp">C.POSTAL</label>
             <input type="text" id="tf-cp" value="${t?.codigo_postal || ''}" class="wizard-input" placeholder="CP...">
           </div>
           <div class="wizard-input-group">
-            <label class="wizard-label">PROVINCIA</label>
+            <label class="wizard-label" for="tf-provincia">PROVINCIA</label>
             <input type="text" id="tf-provincia" value="${t?.provincia || ''}" class="wizard-input" placeholder="Prov...">
           </div>
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">TIPO VEHÍCULO</label>
+          <label class="wizard-label" for="tf-tipo-vehiculo">TIPO VEHÍCULO</label>
           <select id="tf-tipo-vehiculo" class="wizard-input">
             <option value="">Seleccionar...</option>
             <option value="camion" ${t?.tipo_vehiculo === 'camion' ? 'selected' : ''}>Camión</option>
@@ -404,7 +404,7 @@ const TransportistasView = {
           </select>
         </div>
         <div class="wizard-input-group">
-          <label class="wizard-label">CAPACIDAD (animales)</label>
+          <label class="wizard-label" for="tf-capacidad">CAPACIDAD (animales)</label>
           <input type="number" id="tf-capacidad" value="${t?.capacidad_animales || 0}" class="wizard-input" min="0">
         </div>
         <label class="wizard-checkbox-container mb-6">
@@ -412,7 +412,7 @@ const TransportistasView = {
           <span>Certificado de bienestar animal en transporte</span>
         </label>
         <div class="wizard-input-group">
-          <label class="wizard-label">VENCIMIENTO CERTIFICADO BIENESTAR</label>
+          <label class="wizard-label" for="tf-bienestar-venc">VENCIMIENTO CERTIFICADO BIENESTAR</label>
           <input type="date" id="tf-bienestar-venc" value="${t?.certificado_bienestar_vencimiento || ''}" class="wizard-input">
         </div>
         <label class="wizard-checkbox-container mb-6">
@@ -424,7 +424,7 @@ const TransportistasView = {
           <span>Activo</span>
         </label>
         <div class="wizard-input-group">
-          <label class="wizard-label">NOTAS</label>
+          <label class="wizard-label" for="tf-notas">NOTAS</label>
           <textarea id="tf-notas" class="wizard-input" style="min-height:50px; resize:none;" placeholder="Observaciones...">${t?.notas || ''}</textarea>
         </div>
 

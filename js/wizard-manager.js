@@ -1,7 +1,7 @@
 /**
- * Livestock Manager - Generic Wizard Manager v1.1.0
+ * Livestock Manager - Generic Wizard Manager v1.2.0
  * Proporciona un framework para crear asistentes multi-paso de forma declarativa.
- * v1.1.0: Refactorizado a clases CSS para consistencia visual y soporte móvil.
+ * v1.2.0: Persistencia de borradores en localStorage + barra de progreso visual.
  */
 
 const WizardManager = {
@@ -9,11 +9,37 @@ const WizardManager = {
         const { id, title, steps, initialData, onComplete, onCancel } = options;
 
         let currentStepIndex = 0;
+        const draftKey = `wizard-draft-${id}`;
         let wizardData = { ...initialData };
+
+        try {
+            const draft = localStorage.getItem(draftKey);
+            if (draft) {
+                const parsed = JSON.parse(draft);
+                if (parsed && typeof parsed === 'object') {
+                    wizardData = { ...initialData, ...parsed };
+                }
+            }
+        } catch (e) { /* ignore corrupt drafts */ }
+
+        const saveDraft = () => {
+            try { localStorage.setItem(draftKey, JSON.stringify(wizardData)); } catch (e) { /* quota */ }
+        };
+
+        const clearDraft = () => {
+            try { localStorage.removeItem(draftKey); } catch (e) { /* ignore */ }
+        };
 
         const overlay = document.createElement("div");
         overlay.id = id;
         overlay.className = "wizard-full-screen";
+
+        const renderStepDots = () => {
+            return steps.map((_, i) => {
+                const cls = i < currentStepIndex ? 'wizard-dot-done' : i === currentStepIndex ? 'wizard-dot-current' : 'wizard-dot-pending';
+                return `<span class="wizard-dot ${cls}" data-step="${i}"></span>`;
+            }).join('');
+        };
 
         const render = async () => {
             const step = steps[currentStepIndex];
@@ -25,6 +51,7 @@ const WizardManager = {
         <div class="wizard-header-fixed">
           <h2>${title}</h2>
           <div class="wizard-step-indicator">PASO ${currentStepIndex + 1} DE ${steps.length}</div>
+          <div class="wizard-step-dots">${renderStepDots()}</div>
         </div>
 
         <div id="wizard-content-area" class="wizard-content-scrollable animate-in">
@@ -43,7 +70,6 @@ const WizardManager = {
 
             const contentArea = overlay.querySelector('#wizard-content-area');
 
-            // Attach events
             const prevBtn = overlay.querySelector('#wizard-btn-prev');
             const nextBtn = overlay.querySelector('#wizard-btn-next');
             const finishBtn = overlay.querySelector('#wizard-btn-finish');
@@ -60,6 +86,7 @@ const WizardManager = {
             if (nextBtn) {
                 nextBtn.onclick = async () => {
                     if (await updateDataFromStep() && await validateStep()) {
+                        saveDraft();
                         currentStepIndex++;
                         render();
                     }
@@ -69,6 +96,7 @@ const WizardManager = {
             if (finishBtn) {
                 finishBtn.onclick = async () => {
                     if (await updateDataFromStep() && await validateStep()) {
+                        clearDraft();
                         if (onComplete) await onComplete(wizardData);
                         overlay.remove();
                     }
@@ -77,10 +105,10 @@ const WizardManager = {
 
             if (cancelBtn) {
                 cancelBtn.onclick = async () => {
-                    // Con pasos avanzados hay datos introducidos: confirmar el descarte
-                    if (currentStepIndex > 0) {
+                    if (currentStepIndex > 0 || Object.keys(wizardData).some(k => initialData[k] !== wizardData[k])) {
                         const ok = await Confirm.confirm('Salir sin guardar', '¿Cerrar sin guardar datos?', false);
                         if (!ok) return;
+                        clearDraft();
                     }
                     if (onCancel) onCancel();
                     overlay.remove();

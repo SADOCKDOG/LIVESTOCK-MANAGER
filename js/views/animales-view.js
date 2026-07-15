@@ -109,7 +109,7 @@ const AnimalesView = {
       <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="location.hash='/animal'">
         <span class="fab-label">Nuevo Animal</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
+        <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
       </div>
       <div id="animales-empty-search" class="card mt-10 p-12 text-center d-none" style="background: rgba(255,255,255,0.01);">
         <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
@@ -243,8 +243,8 @@ const AnimalesView = {
         </div>
         <div class="wizard-content-scrollable p-20">
           <div class="text-center mb-16">
-            <label class="text-[0.65rem] text-gray uppercase font-900 tracking-widest mb-8 block">Nº CROTAL IDENTIFICACIÓN</label>
-            <input type="text" id="a-crotal"
+            <label class="text-[0.65rem] text-gray uppercase font-900 tracking-widest mb-8 block" for="a-crotal">Nº CROTAL IDENTIFICACIÓN</label>
+            <input type="text" id="a-crotal" required
                    value="${a.numero_identificacion}"
                    placeholder="ES000000000000" maxlength="14"
                    oninput="AnimalesView._validarCrotalUI(this)"
@@ -258,13 +258,13 @@ const AnimalesView = {
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-orange); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-amber); margin-right: 4px;">|</span> ${Icons.info()} DATOS GENERALES</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">ESPECIE</label>
-                <select id="a-especie" class="wizard-input" onchange="AnimalesView._onEspecieChange(this)">
+                <label class="wizard-label" for="a-especie">ESPECIE</label>
+                <select id="a-especie" required class="wizard-input" onchange="AnimalesView._onEspecieChange(this)">
                   ${especies.map((e) => `<option value="${e.nombre}" ${a.especie === e.nombre ? "selected" : ""}>${e.nombre.toUpperCase()}</option>`).join("")}
                 </select>
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">SEXO</label>
+                <label class="wizard-label" for="a-sexo">SEXO</label>
                 <select id="a-sexo" class="wizard-input">
                   <option value="H" ${a.sexo === "H" ? "selected" : ""}>HEMBRA (H)</option>
                   <option value="M" ${a.sexo === "M" ? "selected" : ""}>MACHO (M)</option>
@@ -274,11 +274,11 @@ const AnimalesView = {
             </div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">RAZA</label>
+                <label class="wizard-label" for="a-raza">RAZA</label>
                 <input type="text" id="a-raza" value="${a.raza || ""}" class="wizard-input uppercase font-800" placeholder="SIN RAZA">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">REBAÑO / LOTE</label>
+                <label class="wizard-label" for="a-rebano">REBAÑO / LOTE</label>
                 <select id="a-rebano" class="wizard-input font-800">
                   <option value="">SIN ASIGNAR</option>
                   ${rebanos.map((r) => `<option value="${r.id}" ${a.rebanoId == r.id ? "selected" : ""}>${r.nombre.toUpperCase()}</option>`).join("")}
@@ -287,11 +287,11 @@ const AnimalesView = {
             </div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">NACIMIENTO</label>
+                <label class="wizard-label" for="a-fecha">NACIMIENTO</label>
                 <input type="date" id="a-fecha" value="${a.fecha_nacimiento || ""}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">TIPO DE ALTA</label>
+                <label class="wizard-label" for="a-tipoalta">TIPO DE ALTA</label>
                 <select id="a-tipoalta" class="wizard-input font-800" onchange="AnimalesView._onTipoAltaChange(this)">
                   ${tiposAlta.map((t) => `<option value="${t.value}" ${a.tipoAlta === t.value ? "selected" : ""}>${t.label.toUpperCase()}</option>`).join("")}
                 </select>
@@ -299,11 +299,11 @@ const AnimalesView = {
             </div>
             <div class="grid grid-cols-2 gap-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">TIPO / VARIEDAD (VARIEDAD ESPECIE)</label>
+                <label class="wizard-label" for="a-tipo">TIPO / VARIEDAD (VARIEDAD ESPECIE)</label>
                 <input type="text" id="a-tipo" value="${a.tipo || ""}" class="wizard-input uppercase font-800" placeholder="EJ: VACONA, CORDERA, TERNERO">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">PESO INICIAL (kg)</label>
+                <label class="wizard-label" for="a-pesoinicial">PESO INICIAL (kg)</label>
                 <input type="number" step="0.1" id="a-pesoinicial" value="${a.peso_inicial || ""}" class="wizard-input font-800" placeholder="EJ: 25.0">
               </div>
             </div>
@@ -312,7 +312,7 @@ const AnimalesView = {
           <div class="card p-16 mb-20" style="border: 1px solid #4FADF5; background: rgba(255,255,255,0.02);">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-info); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: #4FADF5; margin-right: 4px;">|</span> ${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
             <div class="wizard-input-group mb-12">
-              <label class="wizard-label">CATEGORÍA (LIBRO DE REGISTRO)</label>
+              <label class="wizard-label" for="a-categoria">CATEGORÍA (LIBRO DE REGISTRO)</label>
               <select id="a-categoria" class="wizard-input font-800">
                 <option value="">— SIN CLASIFICAR —</option>
                 ${categoriasAnimal.map((c) => `<option value="${c}" ${a.categoria === c ? "selected" : ""}>${c.toUpperCase()}</option>`).join("")}
@@ -320,16 +320,16 @@ const AnimalesView = {
             </div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">CHIP (RFID/NFC)</label>
+                <label class="wizard-label" for="a-rfid">CHIP (RFID/NFC)</label>
                 <input type="text" id="a-rfid" value="${a.rfid_codigo || ""}" placeholder="OPCIONAL" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">FECHA IDENTIFICACIÓN</label>
+                <label class="wizard-label" for="a-fecha-ident">FECHA IDENTIFICACIÓN</label>
                 <input type="date" id="a-fecha-ident" value="${a.fecha_identificacion || ""}" class="wizard-input font-800">
               </div>
             </div>
             <div class="wizard-input-group mb-12">
-              <label class="wizard-label">TIPO DE IDENTIFICACIÓN</label>
+              <label class="wizard-label" for="a-tipo-ident">TIPO DE IDENTIFICACIÓN</label>
               <select id="a-tipo-ident" class="wizard-input font-800">
                 <option value="Completa (EID + Visual)" ${a.tipo_identificacion === "Completa (EID + Visual)" ? "selected" : ""}>COMPLETA (EID + VISUAL)</option>
                 <option value="Matadero (Visual REGA)" ${a.tipo_identificacion === "Matadero (Visual REGA)" ? "selected" : ""}>MATADERO (VISUAL REGA)</option>
@@ -346,34 +346,34 @@ const AnimalesView = {
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-success); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-success); margin-right: 4px;">|</span> ${Icons.libroVentas()} LIBRO DE REGISTRO (SIGGAN)</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label">PAÍS DE NACIMIENTO</label>
+                <label class="wizard-label" for="a-pais-nac">PAÍS DE NACIMIENTO</label>
                 <select id="a-pais-nac" class="wizard-input font-800">
                   ${paisesNac.map((p) => `<option value="${p.value}" ${(a.pais_nacimiento || 'ES') === p.value ? "selected" : ""}>${p.label.toUpperCase()}</option>`).join("")}
                 </select>
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">FECHA ALTA EXPLOTACIÓN</label>
+                <label class="wizard-label" for="a-fecha-alta">FECHA ALTA EXPLOTACIÓN</label>
                 <input type="date" id="a-fecha-alta" value="${a.fecha_alta || ""}" class="wizard-input font-800">
               </div>
             </div>
             <div id="a-procedencia-section" class="wizard-input-group mb-12" style="display:${esCompra ? 'block' : 'none'};">
-              <label class="wizard-label">REGA DE PROCEDENCIA (ORIGEN)</label>
+              <label class="wizard-label" for="a-rega-origen">REGA DE PROCEDENCIA (ORIGEN)</label>
               <input type="text" id="a-rega-origen" value="${a.rega_origen || ""}" placeholder="ES041230000123" class="wizard-input font-800 input-rega-std text-gold" maxlength="14">
             </div>
             <div class="wizard-input-group mb-12">
-              <label class="wizard-label">MADRE (GENEALOGÍA)</label>
+              <label class="wizard-label" for="a-madre">MADRE (GENEALOGÍA)</label>
               <select id="a-madre" class="wizard-input font-800">
                 <option value="">SIN ASIGNAR</option>
                 ${hembras.map((h) => `<option value="${h.id}" ${a.madre_id == h.id ? "selected" : ""}>${(h.numero_identificacion || ('#' + h.id)).toUpperCase()}${h.especie ? ' · ' + h.especie.toUpperCase() : ''}</option>`).join("")}
               </select>
             </div>
             <div id="a-dib-section" class="wizard-input-group mb-12" style="display:${mostrarDIB ? 'block' : 'none'};">
-              <label class="wizard-label">DIB / Nº PASAPORTE</label>
+              <label class="wizard-label" for="a-dib">DIB / Nº PASAPORTE</label>
               <input type="text" id="a-dib" value="${a.dib || ""}" placeholder="DOC. IDENTIFICACIÓN BOVINA" class="wizard-input font-800">
             </div>
             <div class="grid grid-cols-2 gap-12 items-start">
               <div class="wizard-input-group">
-                <label class="wizard-label">ESTADO ACTUAL</label>
+                <label class="wizard-label" for="a-estado">ESTADO ACTUAL</label>
                 <select id="a-estado" class="wizard-input font-900" onchange="AnimalesView._onEstadoChange(this)">
                   <option value="activo" ${(a.estado || 'activo') === 'activo' ? "selected" : ""}>ACTIVO</option>
                   <option value="vendido" ${a.estado === 'vendido' ? "selected" : ""}>VENDIDO</option>
@@ -381,7 +381,7 @@ const AnimalesView = {
                 </select>
               </div>
               <div id="a-motivo-baja-wrap" class="wizard-input-group" style="display:${esBaja ? 'block' : 'none'};">
-                <label class="wizard-label">MOTIVO DE BAJA</label>
+                <label class="wizard-label" for="a-motivo-baja">MOTIVO DE BAJA</label>
                 <select id="a-motivo-baja" class="wizard-input font-800">
                   <option value="">— SELECCIONA —</option>
                   ${motivosBaja.map((m) => `<option value="${m.value}" ${a.motivo_baja === m.value ? "selected" : ""}>${m.label.toUpperCase()}</option>`).join("")}
@@ -393,7 +393,7 @@ const AnimalesView = {
               </div>
             </div>
             <div id="a-fecha-baja-wrap" class="wizard-input-group mt-12" style="display:${esSalida ? 'block' : 'none'};">
-              <label class="wizard-label">FECHA DE SALIDA / BAJA</label>
+              <label class="wizard-label" for="a-fecha-baja">FECHA DE SALIDA / BAJA</label>
               <input type="date" id="a-fecha-baja" value="${a.fecha_baja || ""}" class="wizard-input font-800">
             </div>
           </div>

@@ -413,7 +413,9 @@ window.WizardGuiaMovimiento = {
       : '';
 
     // Generar hash telemétrico de bioseguridad para certificar autenticidad
-    const hashSeguridad = Array.from({length:32}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
+    const hashInput = JSON.stringify({ numero: mov.numero_guia, fecha: mov.fecha, crotales: crotalesLista, origen: mov.rega_origen, destino: mov.rega_destino });
+    const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(hashInput));
+    const hashSeguridad = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
     const regaOrigenDestacado = `<span style="font-family:monospace; font-weight:950; color:#8F6B2B; background:#FFFDF0; padding:1px 4px; border-radius:3px; border:1px solid rgba(197, 160, 89, 0.3);">${mov.rega_origen || '\u2014'}</span>`;
     const regaDestinoDestacado = `<span style="font-family:monospace; font-weight:950; color:#8F6B2B; background:#FFFDF0; padding:1px 4px; border-radius:3px; border:1px solid rgba(197, 160, 89, 0.3);">${mov.rega_destino || '\u2014'}</span>`;
 
@@ -471,9 +473,9 @@ window.WizardGuiaMovimiento = {
       <div style="display:flex; gap:20px; align-items:center; padding:14px; border:1px dashed #C5A059; background:#FFFDF0; border-radius:6px; margin-bottom:30px; font-size:0.78rem;">
         <div style="font-size:1.8rem; color:#8F6B2B; padding:0 8px;">🛡️</div>
         <div style="flex:1; line-height:1.4; color:#555;">
-          <strong>VALIDADOR TELEMÉTRICO OFICIAL PAC & SIGGAN</strong><br/>
-          Documento regulatorio certificado electrónicamente en la plataforma <strong>${plataforma}</strong>. Saneamiento pecuario y trazabilidad aprobados de conformidad con la normativa de sanidad animal vigente. <br/>
-          <span style="font-family:'IBM Plex Mono', monospace; font-size:0.65rem; color:#888;">Firma Digital SHA-256: ${hashSeguridad}</span>
+          <strong>REFERENCIA DE TRAZABILIDAD DIGITAL</strong><br/>
+          Documento generado electrónicamente en la plataforma <strong>${plataforma}</strong>. Saneamiento pecuario y trazabilidad de conformidad con la normativa de sanidad animal vigente. <br/>
+          <span style="font-family:'IBM Plex Mono', monospace; font-size:0.65rem; color:#888;">Código integridad SHA-256: ${hashSeguridad}</span>
         </div>
       </div>
 

@@ -17,19 +17,22 @@
     --surface: #1E1E1E;       /* Tarjetas Dark Pro */
     --surface-light: #2A2A2A; /* Elevación / Sub-superficies */
     --surface-input: #121212;
+    --surface-card: #111111;  /* Cards estándar */
+    --surface-dark: #1a1a1a;  /* Secciones oscuras */
     --border: #27272A;        /* Borde sutil */
+    --border-subtle: #222222; /* Borde más tenue */
     --border-input: #27272A;
 
     /* ── FAMILIAS TIPOGRÁFICAS (identidad) ──
-       body IBM Plex Sans Condensed · títulos Cormorant Garamond · datos/identificadores IBM Plex Mono */
-    --font-body:    'IBM Plex Sans Condensed', system-ui, -apple-system, sans-serif;
-    --font-display: 'Cormorant Garamond', 'Cormorant Garamond', 'Archivo', 'Inter', sans-serif;
+       body Inter · títulos Archivo Expanded · datos/identificadores IBM Plex Mono */
+    --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Archivo Expanded', 'Inter', sans-serif;
     --font-mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', 'Fira Code', monospace;
 
     /* ── TEXTO ── */
     --text-p: #FFF;        /* Pure White */
     --text-s: #B1B1B1;        /* Gris Acero (Numeros, texto y viñetas.jpg) */
-    --text-d: #666;        /* Deshabilitado / placeholder */
+    --text-d: #777;        /* Deshabilitado / placeholder */
 
     /* ── COLORES AMBIENTALISTAS (Rancho) ── */
     --c-tierra: #8B7355;     /* Tierra seca - corrales y senderos */
@@ -45,6 +48,8 @@
     --c-danger:  #FF4444;     /* Rojo Neón - Peligro / Carne / Gastos */
     --c-info:    #3b82f6;     /* Azul Neón - Info / Leche / Listas */
     --c-accent:  #7EEFEF;     /* Acento / Genética (Cyan Claro de apoyo) */
+    --c-blue-accent: #4FADF5; /* Azul UI (badges, bordes) */
+    --c-red-accent:  #E8555F; /* Rojo UI (badges, alertas) */
 
     /* ── COLORES DE MÓDULO (Tricolor corporativo simplificado) ── */
     --c-orange: #F97316;      /* Naranja Neón - Animales / Cuaderno Digital */
@@ -71,9 +76,11 @@
     --tap-gap: 8px;
 
     /* ── RADIOS ── */
+    --r-xs:   4px;            /* Elementos mínimos */
     --r-sm:   8px;            /* chips / inputs internos */
     --r-md:   14px;           /* inputs / botones */
     --r-lg:   16px;           /* cards */
+    --r-xl:   20px;           /* Cards grandes */
     --r-pill: 28px;           /* botón principal / FAB */
     --radius: 16px;           /* alias legacy = --r-lg */
 
@@ -100,7 +107,6 @@ body[data-modo="claro"] {
     --text-p: #1A1A18;
     --text-s: #55534C;
     --text-d: #9A968A;
-
     --shadow-md: 0 4px 20px rgb(0 0 0 / 12%);
 }
 
@@ -111,6 +117,11 @@ body[data-modo="claro"] .section-header-neon,
 body[data-modo="claro"] .section-header-theme {
     color: var(--text-p) !important;
     text-shadow: none;
+}
+body[data-modo="claro"] .kpi-pill,
+body[data-modo="claro"] .section-header,
+body[data-modo="claro"] .filter-pill {
+    background: var(--surface-light);
 }
 body[data-modo="claro"] .wizard-check-label {
     background: rgba(0, 0, 0, 0.04);

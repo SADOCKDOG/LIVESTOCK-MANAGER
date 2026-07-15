@@ -342,7 +342,7 @@ const DocumentosView = {
     overlay.style.zIndex = '7000';
     overlay.innerHTML = `
       <div class="wizard-header-fixed text-center">
-        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-pesaje-close">${Icons.cerrar()}</button>
+        <button onclick="this.closest('.wizard-full-screen').remove()" class="btn-pesaje-close" aria-label="Cerrar"><span aria-hidden="true">${Icons.cerrar()}</span></button>
         <h2 class="pesaje-titulo-h2">${Icons.buscar()} CONSULTAR / IMPRIMIR</h2>
       </div>
       <div class="wizard-content-scrollable">
@@ -538,7 +538,7 @@ const DocumentosView = {
             <div class="font-900 text-white text-lg">${doc.numero || 'S/N'}</div>
             <div class="text-xs text-ccc mt-2">${this._fmtFecha(doc.createdAt || doc.fecha)}</div>
           </div>
-          <button onclick="document.getElementById('doc-detail-overlay-${docId}').remove()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;">${Icons.cerrar()}</button>
+          <button onclick="document.getElementById('doc-detail-overlay-${docId}').remove()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;" aria-label="Cerrar"><span aria-hidden="true">${Icons.cerrar()}</span></button>
         </div>
         <div class="grid grid-cols-2 gap-8 text-xs text-ccc mb-8">
           <div><span class="text-gray">Estado:</span> <span class="text-white">${(doc.estado || 'desconocido').toUpperCase()}</span></div>
@@ -606,7 +606,7 @@ const DocumentosView = {
             <div class="font-900 text-sm" style="color:var(--c-warning);"><span style="color: var(--c-warning); margin-right: 4px;">|</span> ${docLabel}</div>
             <div class="text-xs text-aaa">Introduce el número de acuse o referencia oficial</div>
           </div>
-          <button id="acuse-close" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;">${Icons.cerrar()}</button>
+          <button id="acuse-close" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;" aria-label="Cerrar"><span aria-hidden="true">${Icons.cerrar()}</span></button>
         </div>
         <label class="text-xs text-gray mb-2" for="acuse-input">Referencia / justificante</label>
         <input id="acuse-input" type="text" class="wizard-input font-800" placeholder="Ej: SIGGAN-2026-000123" value="${valorActual.replace(/"/g, '&quot;')}">

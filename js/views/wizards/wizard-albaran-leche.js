@@ -21,7 +21,7 @@ window.AlbaranLecheWizard = {
       const pbInput = document.getElementById('w-l-pb');
       const pexInput = document.getElementById('w-l-pex');
       const primInput = document.getElementById('w-l-prim');
-      const cantInput = document.getElementById('w-l-cant');
+      const cantInput = document.getElementById('w-l-cant') || document.getElementById('w-l-cant-oculto');
       
       const grasaInput = document.getElementById('w-l-grasa');
       const protInput = document.getElementById('w-l-prot');
@@ -235,7 +235,7 @@ window.AlbaranLecheWizard = {
               </div>
               
               <input type="hidden" id="w-l-pex" value="${data.precio_extracto_seco || refPrecios.precio_por_punto_extracto}">
-              <input type="hidden" id="w-l-cant" value="${data.l}">
+              <input type="hidden" id="w-l-cant-oculto" value="${data.l}">
 
               <div class="bg-black border border-222 rounded-sm p-14">
                 <div class="grid grid-cols-2 gap-8 text-[0.65rem] uppercase font-900 tracking-tight">

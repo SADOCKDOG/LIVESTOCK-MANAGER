@@ -206,7 +206,7 @@ const GastosView = {
       <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="${registrarHandler}">
         <span class="fab-label">Nuevo ${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
+        <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
       </div>`;
   },
 
