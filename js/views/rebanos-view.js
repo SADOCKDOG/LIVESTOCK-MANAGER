@@ -379,6 +379,22 @@ const RebanosView = {
         <div id="lista-sanitarios-rebano" class="mt-10"></div>
       </div>
 
+      <!-- Gastos y consumos -->
+      <div class="card mb-20 card-dark-gradient p-12 pb-24" style="border: 1px solid #27272a; background: #1E1E1E;">
+        <div class="section-header-theme" style="--theme-color: var(--p-gold); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--p-gold); margin-right: 4px;">|</span> GASTOS Y CONSUMOS</div>
+        <div id="total-gastos-rebano" class="text-center mt-10 mb-4">
+          <span class="text-[0.6rem] text-gray uppercase font-800">Total imputado</span>
+          <div class="text-xl font-950" style="color: var(--p-gold);">—</div>
+        </div>
+        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-8 mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="App._abrirFormularioGasto({ rebanoId: ${id}, categoria: 'Alimentacion', origenModulo: 'rebano', onComplete: () => RebanosView._cargarGastosRebano(${id}) })">
+            ${Icons.agregar()}
+            <span class="widget-link-label">Imputar Gasto</span>
+          </button>
+        </div>
+        <div id="lista-gastos-rebano" class="mt-10"></div>
+      </div>
+
       <!-- Animales -->
       <div class="card p-12 mb-16 card-dark-gradient pb-24" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="section-header-theme" style="--theme-color: var(--c-info); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-info); margin-right: 4px;">|</span> ANIMALES (${animales.length})</div>
@@ -409,6 +425,47 @@ const RebanosView = {
         </div>
       </div>`;
     this._cargarHistorialSanitario(id);
+    this._cargarGastosRebano(Number(id));
+  },
+
+  /**
+   * Carga los gastos imputados manualmente (gastos_ganaderia) más el consumo de
+   * pienso registrado desde Silos (registro_eventos tipo silo_consumo) para este
+   * rebaño, como listado combinado de "control de consumos" ordenado por fecha.
+   */
+  async _cargarGastosRebano(rebanoId) {
+    const container = document.getElementById("lista-gastos-rebano");
+    const totalEl = document.querySelector("#total-gastos-rebano > div");
+    if (!container) return;
+    try {
+      const fincaId = await Fincas.getActiveId();
+      const [gastos, eventos] = await Promise.all([
+        window.Gastos ? Gastos.list(fincaId, rebanoId) : window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
+        window.db.getAll('registro_eventos').catch(() => [])
+      ]);
+      const gastosReb = (gastos || []).filter(g => g.rebanoId == rebanoId);
+      const consumosSilo = (eventos || []).filter(e => e.tipo === 'silo_consumo' && e.rebanoId == rebanoId);
+
+      const combinado = [
+        ...gastosReb.map(g => ({ tipo: 'gasto', fecha: g.fecha, concepto: g.concepto || g.categoria, categoria: g.categoria, monto: g.monto || 0 })),
+        ...consumosSilo.map(e => ({ tipo: 'consumo', fecha: e.fecha, concepto: `Consumo de pienso (${(e.valor_neto || 0).toLocaleString()} kg)`, categoria: 'Alimentación', monto: e.costeConsumo || 0 }))
+      ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+      const total = combinado.reduce((s, x) => s + (x.monto || 0), 0);
+      if (totalEl) totalEl.textContent = `${total.toLocaleString('es-ES', { maximumFractionDigits: 2 })} €`;
+
+      if (combinado.length === 0) {
+        container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin gastos ni consumos registrados</p></div>`;
+        return;
+      }
+      container.innerHTML = combinado.map(x => `
+        <div class="info-box-sm ${x.tipo === 'consumo' ? 'border-left-gold' : 'border-left-green'} mt-8 bg-black">
+          <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${x.tipo === 'consumo' ? Icons.paquete() : Icons.dinero()} ${x.concepto}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(x.fecha).toLocaleDateString()}</span></div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Categoría: <strong class="text-white">${x.categoria || 'N/D'}</strong> · Importe: <strong class="text-gold">${(x.monto || 0).toLocaleString('es-ES', { maximumFractionDigits: 2 })} €</strong></div>
+        </div>`).join('');
+    } catch (e) {
+      container.innerHTML = '<p class="text-red text-sm font-900 uppercase">Error cargando gastos</p>';
+    }
   },
 
   async _cargarHistorialSanitario(rebanoId) {
