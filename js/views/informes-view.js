@@ -13,7 +13,7 @@ const InformesView = {
 
   /** Formatea un número en es-ES con decimales fijos (auditoría F5: coherencia decimal). */
   _fmt(n, dec = 0) {
-    return Number(n || 0).toLocaleString('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    return UI.formatNumber(n, dec);
   },
 
   _categories: {
@@ -371,12 +371,12 @@ const InformesView = {
       <!-- KPIs compactos -->
       <div class="inf-report">
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-15">
-        <div class="summary-cell"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}" style="word-break:break-all;">${balanceTotal.toLocaleString()}€</div></div>
+        <div class="summary-cell"><div class="s-lbl">BALANCE</div><div class="s-val inf-val-lg ${balanceTotal >= 0 ? 'text-green' : 'text-red'}" style="word-break:break-all;">${UI.formatCurrency(balanceTotal)}</div></div>
         <div class="summary-cell"><div class="s-lbl">RENTAB.</div><div class="s-val inf-val-lg ${parseFloat(pctRent) > 0 ? 'text-green' : 'text-red'}">${pctRent}%</div></div>
         <div class="summary-cell"><div class="s-lbl">CENSO</div><div class="s-val inf-val-lg text-blue">${totalAnimales}</div></div>
-        <div class="summary-cell"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg text-amber" style="word-break:break-all;">${(rent?.detalles?.carne || 0).toLocaleString()}€</div></div>
-        <div class="summary-cell"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg text-gold" style="word-break:break-all;">${(rent?.detalles?.leche || 0).toLocaleString()}€</div></div>
-        <div class="summary-cell"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg text-red" style="word-break:break-all;">${(rent?.gastos || 0).toLocaleString()}€</div></div>
+        <div class="summary-cell"><div class="s-lbl">CARNE</div><div class="s-val inf-val-lg text-amber" style="word-break:break-all;">${UI.formatCurrency(rent?.detalles?.carne || 0)}</div></div>
+        <div class="summary-cell"><div class="s-lbl">LECHE</div><div class="s-val inf-val-lg text-gold" style="word-break:break-all;">${UI.formatCurrency(rent?.detalles?.leche || 0)}</div></div>
+        <div class="summary-cell"><div class="s-lbl">GASTOS</div><div class="s-val inf-val-lg text-red" style="word-break:break-all;">${UI.formatCurrency(rent?.gastos || 0)}</div></div>
       </div>
 
       ${alertas ? `<div class="card inf-alert-red>
@@ -393,23 +393,23 @@ const InformesView = {
           <div class="flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Ingresos Cárnica</span>
-              <strong class="text-xl font-950 text-amber">${(rent?.detalles?.carne || 0).toLocaleString()} €</strong>
+              <strong class="text-xl font-950 text-amber">${UI.formatCurrency(rent?.detalles?.carne || 0)}</strong>
             </div>
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Ingresos Láctea</span>
-              <strong class="text-xl font-950 text-gold">${(rent?.detalles?.leche || 0).toLocaleString()} €</strong>
+              <strong class="text-xl font-950 text-gold">${UI.formatCurrency(rent?.detalles?.leche || 0)}</strong>
             </div>
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Alimentación Estimada</span>
-              <strong class="text-base font-900 text-red">−${(rent?.detalles?.alimentacion_estimada || 0).toLocaleString()} €</strong>
+              <strong class="text-base font-900 text-red">−${UI.formatCurrency(rent?.detalles?.alimentacion_estimada || 0)}</strong>
             </div>
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-xs text-gray uppercase font-900">Otros Gastos</span>
-              <strong class="text-base font-900 text-red">−${(rent?.detalles?.otros_gastos || 0).toLocaleString()} €</strong>
+              <strong class="text-base font-900 text-red">−${UI.formatCurrency(rent?.detalles?.otros_gastos || 0)}</strong>
             </div>
             <div class="py-12 flex justify-between items-center">
               <span class="text-xs text-white uppercase font-950">Balance Neto</span>
-              <span class="text-2xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()} €  <span class="text-base font-800">(${pctRent}%)</span></span>
+              <span class="text-2xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${UI.formatCurrency(balanceTotal)}  <span class="text-base font-800">(${pctRent}%)</span></span>
             </div>
           </div>
         </div>
@@ -470,15 +470,15 @@ const InformesView = {
             <div class="info-box-center border-left-blue py-10">
               <small class="s-lbl uppercase mb-4">MES ACTUAL</small>
               <div class="inf-val-md text-white font-900 mb-6">${actual.mes}</div>
-              <div class="text-xs">Ingresos: <strong class="text-green">${actual.ingresos.toLocaleString()}€</strong></div>
-              <div class="text-xs">Gastos: <strong class="text-red">${actual.gastos.toLocaleString()}€</strong></div>
-              <div class="text-sm mt-4 font-900">Balance: <strong class="${actual.balance >= 0 ? 'text-green' : 'text-red'}">${actual.balance.toLocaleString()}€</strong></div>
+              <div class="text-xs">Ingresos: <strong class="text-green">${UI.formatCurrency(actual.ingresos)}</strong></div>
+              <div class="text-xs">Gastos: <strong class="text-red">${UI.formatCurrency(actual.gastos)}</strong></div>
+              <div class="text-sm mt-4 font-900">Balance: <strong class="${actual.balance >= 0 ? 'text-green' : 'text-red'}">${UI.formatCurrency(actual.balance)}</strong></div>
             </div>
             <div class="info-box-center border-left-amber py-10">
               <small class="s-lbl uppercase mb-4">VS MES ANTERIOR</small>
               <div class="inf-val-md text-white font-900 mb-6">${anterior?.mes || '—'}</div>
-              <div class="text-xs">Ingresos: <strong class="${diffIngresos >= 0 ? 'text-green' : 'text-red'}">${diffIngresos >= 0 ? '+' : ''}${diffIngresos.toLocaleString()}€</strong></div>
-              <div class="text-sm mt-4 font-900">Balance: <strong class="${diffBalance >= 0 ? 'text-green' : 'text-red'}">${diffBalance >= 0 ? '+' : ''}${diffBalance.toLocaleString()}€</strong></div>
+              <div class="text-xs">Ingresos: <strong class="${diffIngresos >= 0 ? 'text-green' : 'text-red'}">${diffIngresos >= 0 ? '+' : ''}${UI.formatCurrency(diffIngresos)}</strong></div>
+              <div class="text-sm mt-4 font-900">Balance: <strong class="${diffBalance >= 0 ? 'text-green' : 'text-red'}">${diffBalance >= 0 ? '+' : ''}${UI.formatCurrency(diffBalance)}</strong></div>
             </div>
           </div>
         </div>`;
@@ -521,7 +521,7 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos Totales</small>
-              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${totalIngresos.toLocaleString()}€">${totalIngresos.toLocaleString()}€</span>
+              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${UI.formatCurrency(totalIngresos)}">${UI.formatCurrency(totalIngresos)}</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ventas Realizadas</small>
@@ -560,7 +560,7 @@ const InformesView = {
           <table class="inf-table tbl-accent-amber">
             <thead><tr><th>Fecha</th><th>Animales</th><th>kg</th><th>Total</th></tr></thead>
             <tbody>${ventasHist.slice(0, 10).map(v => `
-              <tr><td>${v.fecha || '-'}</td><td class="font-900">${v.animales || 1}</td><td class="font-900">${v.kg || '-'}</td><td class="text-green font-950">${(v.total || 0).toLocaleString()}€</td></tr>`).join('')}</tbody>
+              <tr><td>${v.fecha || '-'}</td><td class="font-900">${v.animales || 1}</td><td class="font-900">${v.kg || '-'}</td><td class="text-green font-950">${UI.formatCurrency(v.total || 0)}</td></tr>`).join('')}</tbody>
           </table>
         </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas</p></div>`}
 
@@ -571,7 +571,7 @@ const InformesView = {
             <div class="info-box-sm flex justify-between items-center">
               <span class="text-aaa text-sm">${Icons.rebanos()} ${r.rebano}</span>
               <div class="text-right">
-                <span class="text-amber font-800">${r.total.toLocaleString()}€</span>
+                <span class="text-amber font-800">${UI.formatCurrency(r.total)}</span>
                 <span class="text-gray text-xs ml-6">${InformesView._fmt(r.kg, 1)} kg</span>
                 <span class="text-blue text-xs ml-6">${r.numVentas} ${r.numVentas === 1 ? 'venta' : 'ventas'}</span>
               </div>
@@ -645,7 +645,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">MOFA Total</small>
-              <span class="text-xl font-950 ${mofaTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" title="${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€">${(mofaTotal >= 0 ? '+' : '')}${Math.round(mofaTotal).toLocaleString()}€</span>
+              <span class="text-xl font-950 ${mofaTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" title="${(mofaTotal >= 0 ? '+' : '')}${UI.formatCurrency(Math.round(mofaTotal))}">${(mofaTotal >= 0 ? '+' : '')}${UI.formatCurrency(Math.round(mofaTotal))}</span>
             </div>
           </div>
         </div>
@@ -671,7 +671,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
               <small class="s-lbl uppercase font-900">CÉL. SOMÁTICAS</small>
-              <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${Math.round(somaticasMedia).toLocaleString()}</div>
+              <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${UI.formatNumber(Math.round(somaticasMedia))}</div>
               ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≤${InformesView._fmt((umbrales.somaticas.max / 1000), 0)}k</small>` : ''}
             </div>
           </div>
@@ -685,7 +685,7 @@ const InformesView = {
               <span class="text-ccc text-sm uppercase font-900 flex items-center gap-6">${Icons.rebanos()} ${r.rebano}</span>
               <div class="text-right">
                 <span class="text-gold font-950 text-md">${InformesView._fmt(r.litros, 1)} L</span>
-                <span class="text-green text-xs font-900 ml-8">${r.importe.toLocaleString()}€</span>
+                <span class="text-green text-xs font-900 ml-8">${UI.formatCurrency(r.importe)}</span>
               </div>
             </div>`).join('')}
         </div>` : ''}
@@ -831,7 +831,7 @@ const InformesView = {
           ${gastosCat.slice(0, 6).map(g => `
             <div class="info-box-sm">
               <div class="s-lbl">${g.categoria}</div>
-              <div class="inf-val-md text-red">${g.total.toLocaleString()}€</div>
+              <div class="inf-val-md text-red">${UI.formatCurrency(g.total)}</div>
             </div>`).join('')}
         </div>
       </div>` : ''}
@@ -952,7 +952,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Importe Total</small>
-              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${totalImporte.toLocaleString()}€">${totalImporte.toLocaleString()}€</span>
+              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${UI.formatCurrency(totalImporte)}">${UI.formatCurrency(totalImporte)}</span>
             </div>
           </div>
         </div>
@@ -1038,7 +1038,7 @@ const InformesView = {
                   <td><strong>${c.nombre}</strong></td>
                   <td class="text-center">${c.num}</td>
                   <td class="text-right">${InformesView._fmt(c.kg, 1)}</td>
-                  <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
+                <td class="text-right font-bold text-amber">${UI.formatCurrency(c.total)}</td>
                   <td class="text-right font-bold text-green">${InformesView._fmt(c.precioMedio, 2)}€</td>
                 </tr>`).join('')}
               </tbody>
@@ -1071,7 +1071,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos Totales</small>
-              <span class="text-xl text-green font-950 truncate w-full px-4" title="${totalIngresos.toLocaleString()}€">${totalIngresos.toLocaleString()}€</span>
+              <span class="text-xl text-green font-950 truncate w-full px-4" title="${UI.formatCurrency(totalIngresos)}">${UI.formatCurrency(totalIngresos)}</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ventas</small>
@@ -1087,7 +1087,7 @@ const InformesView = {
         <div class="card mb-14 card-tint-blue>
           <div class="flex justify-between items-center px-14 py-10">
             <div><span class="text-gray text-xs">COMPRADOR PRINCIPAL</span><div class="text-white font-800 text-md mt-4">${topComprador.nombre}</div></div>
-            <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-amber font-900 text-md">${topComprador.total.toLocaleString()}€</div></div>
+            <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-amber font-900 text-md">${UI.formatCurrency(topComprador.total)}</div></div>
           </div>
         </div>` : ''}
 
@@ -1117,7 +1117,7 @@ const InformesView = {
                 <td class="text-right">${c.numVentas}</td>
                 <td class="text-right">${InformesView._fmt(c.kg, 1)}</td>
                 <td class="text-right font-bold text-gray">${precioMedio} €/kg</td>
-                <td class="text-right font-bold text-amber">${c.total.toLocaleString()}€</td>
+                  <td class="text-right font-bold text-amber">${UI.formatCurrency(c.total)}</td>
                 <td class="text-center font-bold text-green">${pctIngresos}%</td>
                 <td><span class="badge badge-sm badge-green">ACTIVO</span></td>
                 <td class="text-gray text-xs">${c.ultimaVenta || '-'}</td>
@@ -1128,7 +1128,7 @@ const InformesView = {
               <td class="text-right font-bold">${totalVentas}</td>
               <td class="text-right font-bold">${InformesView._fmt(totalKg, 1)}</td>
               <td class="text-right font-bold text-gray">—</td>
-              <td class="text-right font-bold text-amber">${totalIngresos.toLocaleString()}€</td>
+              <td class="text-right font-bold text-amber">${UI.formatCurrency(totalIngresos)}</td>
               <td class="text-center font-bold text-green">100%</td>
               <td colspan="2"></td>
             </tr></tfoot>
@@ -1188,7 +1188,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Gasto Total</small>
-              <span class="text-xl text-red font-950 truncate w-full px-4" title="${totalGasto.toLocaleString()}€">${totalGasto.toLocaleString()}€</span>
+              <span class="text-xl text-red font-950 truncate w-full px-4" title="${UI.formatCurrency(totalGasto)}">${UI.formatCurrency(totalGasto)}</span>
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Facturas</small>
@@ -1196,7 +1196,7 @@ const InformesView = {
             </div>
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Media/Prov</small>
-              <span class="text-xl text-green font-950 truncate w-full px-4" title="${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€">${data.length > 0 ? (totalGasto / data.length).toLocaleString() : 0}€</span>
+              <span class="text-xl text-green font-950 truncate w-full px-4" title="${data.length > 0 ? UI.formatCurrency(totalGasto / data.length) : 0}">${data.length > 0 ? UI.formatCurrency(totalGasto / data.length) : 0}</span>
             </div>
           </div>
         </div>
@@ -1204,7 +1204,7 @@ const InformesView = {
         <div class="card mb-14 card-tint-orange>
           <div class="flex justify-between items-center px-14 py-10">
             <div><span class="text-gray text-xs">PRINCIPAL PROVEEDOR</span><div class="text-white font-800 text-md mt-4">${topProv.nombre}</div></div>
-            <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-red font-900 text-md">${topProv.total.toLocaleString()}€</div></div>
+            <div class="text-right"><span class="text-gray text-xs">TOTAL</span><div class="text-red font-900 text-md">${UI.formatCurrency(topProv.total)}</div></div>
           </div>
         </div>` : ''}
 
@@ -1229,10 +1229,10 @@ const InformesView = {
                 <td><strong>${p.nombre}</strong></td>
                 <td class="text-gray text-xs">${p.nif || '-'}</td>
                 <td class="text-right">${p.numFacturas}</td>
-                <td class="text-right font-bold text-gray">${parseFloat(mediaFac).toLocaleString()}€</td>
-                <td class="text-right font-bold text-red">${p.total.toLocaleString()}€</td>
+                <td class="text-right font-bold text-gray">${UI.formatCurrency(parseFloat(mediaFac))}</td>
+                <td class="text-right font-bold text-red">${UI.formatCurrency(p.total)}</td>
                 <td class="text-center font-bold text-amber">${pct}%</td>
-                <td class="text-xs text-gray-400">${cats.map(([c, t]) => `${c}: ${t.toLocaleString()}€`).join(', ')}</td>
+                <td class="text-xs text-gray-400">${cats.map(([c, t]) => `${c}: ${UI.formatCurrency(t)}`).join(', ')}</td>
                 <td class="text-gray text-xs">${p.ultimaCompra || '-'}</td>
               </tr>`;
             }).join('')}</tbody>
@@ -1240,7 +1240,7 @@ const InformesView = {
               <td colspan="2" class="text-right text-gray">TOTALES</td>
               <td class="text-right font-bold">${totalFacturas}</td>
               <td class="text-right font-bold text-gray">—</td>
-              <td class="text-right font-bold text-red">${totalGasto.toLocaleString()}€</td>
+              <td class="text-right font-bold text-red">${UI.formatCurrency(totalGasto)}</td>
               <td class="text-center font-bold text-amber">100%</td>
               <td colspan="2"></td>
             </tr></tfoot>
@@ -1290,7 +1290,7 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gasto Total</small>
-              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2);" title="${data.total.toLocaleString()}€">${data.total.toLocaleString()}€</span>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2);" title="${UI.formatCurrency(data.total)}">${UI.formatCurrency(data.total)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Operaciones</small>
@@ -1328,11 +1328,11 @@ const InformesView = {
                 <td>${r.proveedor || r.proveedorNombre || '-'}</td>
                 <td>${r.descripcion || r.producto || '-'}</td>
                 <td>${r.snap_zona || '-'}</td>
-                <td class="text-right font-bold text-red">${(r.monto || 0).toLocaleString()}€</td>
+                <td class="text-right font-bold text-red">${UI.formatCurrency(r.monto || 0)}</td>
               </tr>`).join('')}</tbody>
             <tfoot><tr>
               <td colspan="4" class="text-right text-gray">TOTAL</td>
-              <td class="text-right font-bold text-red">${data.total.toLocaleString()}€</td>
+              <td class="text-right font-bold text-red">${UI.formatCurrency(data.total)}</td>
             </tr></tfoot>
           </table>
         </div>`}
@@ -1510,15 +1510,15 @@ const InformesView = {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
             <div class="info-box-center border-left-amber py-12">
               <small class="s-lbl uppercase mb-4">INGRESOS</small>
-              <div class="inf-val-lg text-amber font-950">${(rent.ingresos || 0).toLocaleString()}€</div>
+              <div class="inf-val-lg text-amber font-950">${UI.formatCurrency(rent.ingresos || 0)}</div>
             </div>
             <div class="info-box-center border-left-red py-12">
               <small class="s-lbl uppercase mb-4">GASTOS</small>
-              <div class="inf-val-lg text-red font-950">${(rent.gastos || 0).toLocaleString()}€</div>
+              <div class="inf-val-lg text-red font-950">${UI.formatCurrency(rent.gastos || 0)}</div>
             </div>
             <div class="info-box-center border-left-green py-12">
               <small class="s-lbl uppercase mb-4">BALANCE</small>
-              <div class="inf-val-lg font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</div>
+              <div class="inf-val-lg font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${UI.formatCurrency(balanceTotal)}</div>
             </div>
           </div>
         </div>` : ''}
@@ -1781,15 +1781,15 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Ingresos</small>
-              <span class="text-xl text-green font-950 truncate w-full px-4" style="word-break:break-all;" title="${totalIngresosCalculado.toLocaleString()}€">${totalIngresosCalculado.toLocaleString()}€</span>
+              <span class="text-xl text-green font-950 truncate w-full px-4" style="word-break:break-all;" title="${UI.formatCurrency(totalIngresosCalculado)}">${UI.formatCurrency(totalIngresosCalculado)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Gastos</small>
-              <span class="text-xl text-red font-950 truncate w-full px-4" style="word-break:break-all;" title="${totalGastosCalculado.toLocaleString()}€">${totalGastosCalculado.toLocaleString()}€</span>
+              <span class="text-xl text-red font-950 truncate w-full px-4" style="word-break:break-all;" title="${UI.formatCurrency(totalGastosCalculado)}">${UI.formatCurrency(totalGastosCalculado)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Oper.</small>
-              <span class="text-xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" style="word-break:break-all;" title="${balanceTotal.toLocaleString()}€">${balanceTotal.toLocaleString()}€</span>
+              <span class="text-xl font-950 ${balanceTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" style="word-break:break-all;" title="${UI.formatCurrency(balanceTotal)}">${UI.formatCurrency(balanceTotal)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">EBITDA %</small>
@@ -1812,18 +1812,18 @@ const InformesView = {
               <tr>
                 <td style="width:24px;">${Icons.leche()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;"><strong>Ingresos por Venta de Leche (Entregas Lácteas)</strong></td>
-                <td class="text-right text-green" style="white-space:nowrap;">${ingLeche.toLocaleString()}€</td>
+                <td class="text-right text-green" style="white-space:nowrap;">${UI.formatCurrency(ingLeche)}</td>
                 <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? InformesView._fmt(((ingLeche / totalIngresosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.carne()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;"><strong>Ingresos por Venta de Ganado (Canal / Vivo)</strong></td>
-                <td class="text-right text-green" style="white-space:nowrap;">${ingCarne.toLocaleString()}€</td>
+                <td class="text-right text-green" style="white-space:nowrap;">${UI.formatCurrency(ingCarne)}</td>
                 <td class="text-right font-bold text-gray">${totalIngresosCalculado > 0 ? InformesView._fmt(((ingCarne / totalIngresosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
                 <td colspan="2">TOTAL INGRESOS BRUTOS</td>
-                <td class="text-right text-green">${totalIngresosCalculado.toLocaleString()}€</td>
+                <td class="text-right text-green">${UI.formatCurrency(totalIngresosCalculado)}</td>
                 <td class="text-right text-green">100%</td>
               </tr>
             </tbody>
@@ -1839,42 +1839,42 @@ const InformesView = {
               <tr>
                 <td>${Icons.pac()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos en Alimentación (Piensos, Forrajes, Ración)</td>
-                <td class="text-right text-red" style="white-space:nowrap;">${gastosAlim.toLocaleString()}€</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${UI.formatCurrency(gastosAlim)}</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosAlim / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.fitosanitario()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos Fitosanitarios (Tratamientos parcelas, herbicidas)</td>
-                <td class="text-right text-red" style="white-space:nowrap;">${gastosFito.toLocaleString()}€</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${UI.formatCurrency(gastosFito)}</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosFito / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.sanidad()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos de Sanidad Ganadera (Medicamentos, ADSG, vacunas)</td>
-                <td class="text-right text-red" style="white-space:nowrap;">${gastosSanidad.toLocaleString()}€</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${UI.formatCurrency(gastosSanidad)}</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosSanidad / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.rayo()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos en Electricidad y Suministros (Energía, Gasoil)</td>
-                <td class="text-right text-red" style="white-space:nowrap;">${gastosElectricidad.toLocaleString()}€</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${UI.formatCurrency(gastosElectricidad)}</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosElectricidad / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.finca()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Gastos de Personal (Mano de obra, seguridad social)</td>
-                <td class="text-right text-red" style="white-space:nowrap;">${gastosPersonal.toLocaleString()}€</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${UI.formatCurrency(gastosPersonal)}</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosPersonal / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr>
                 <td>${Icons.edificio()}</td>
                 <td style="white-space:normal; line-height:1.2; padding-right:10px;">Amortizaciones (Instalaciones, maquinaria, cercados)</td>
-                <td class="text-right text-red" style="white-space:nowrap;">${gastosAmort.toLocaleString()}€</td>
+                <td class="text-right text-red" style="white-space:nowrap;">${UI.formatCurrency(gastosAmort)}</td>
                 <td class="text-right font-bold text-gray">${totalGastosCalculado > 0 ? InformesView._fmt(((gastosAmort / totalGastosCalculado) * 100), 1) : 0}%</td>
               </tr>
               <tr class="font-bold border-top-222 text-white bg-black-opacity-30">
                 <td colspan="2">TOTAL GASTOS OPERATIVOS</td>
-                <td class="text-right text-red">${totalGastosCalculado.toLocaleString()}€</td>
+                <td class="text-right text-red">${UI.formatCurrency(totalGastosCalculado)}</td>
                 <td class="text-right text-red">100%</td>
               </tr>
             </tbody>
@@ -1882,7 +1882,7 @@ const InformesView = {
             <tfoot>
               <tr class="font-bold text-white bg-black-opacity-50 text-base">
                 <td colspan="2" class="text-left">MARGEN NETO DE EXPLOTACIÓN (EBITDA)</td>
-                <td class="text-right ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${balanceTotal.toLocaleString()}€</td>
+                <td class="text-right ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${UI.formatCurrency(balanceTotal)}</td>
                 <td class="text-right ${balanceTotal >= 0 ? 'text-green' : 'text-red'}">${rentabilidadCalculada}%</td>
               </tr>
             </tfoot>
@@ -1902,7 +1902,7 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Coste Medio/Cabeza</small>
-              <span class="font-950 text-purple" style="font-size:var(--fs-h2); word-break:break-all;">${data.costeMedioCabeza.toLocaleString()}€</span>
+              <span class="font-950 text-purple" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.costeMedioCabeza)}</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
@@ -1917,7 +1917,7 @@ const InformesView = {
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Gasto Total</small>
-              <span class="font-950 text-red" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalGasto.toLocaleString()}€</span>
+              <span class="font-950 text-red" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.totalGasto)}</span>
             </div>
           </div>
         </div>
@@ -1929,8 +1929,8 @@ const InformesView = {
               <tr>
                 <td><strong>${r.nombre}</strong> <span class="text-gray text-xs">${r.especie}</span></td>
                 <td class="text-center">${r.numAnimales}</td>
-                <td class="text-right font-bold text-red">${r.totalGasto.toLocaleString()}€</td>
-                <td class="text-right">${r.costePorCabeza.toLocaleString()}€</td>
+                <td class="text-right font-bold text-red">${UI.formatCurrency(r.totalGasto)}</td>
+                <td class="text-right">${UI.formatCurrency(r.costePorCabeza)}</td>
                 <td class="text-right text-blue">${r.costePorDia}€</td>
                 <td class="text-right">${r.pctAlimentacion}%</td>
                 <td class="text-right">${r.pctSanidad}%</td>
@@ -2109,19 +2109,19 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Entradas</small>
-              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalEntradas.toLocaleString()}€">${data.totalEntradas.toLocaleString()}€</span>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.totalEntradas)}">${UI.formatCurrency(data.totalEntradas)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Salidas</small>
-              <span class="font-950 text-red truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalSalidas.toLocaleString()}€">${data.totalSalidas.toLocaleString()}€</span>
+              <span class="font-950 text-red truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.totalSalidas)}">${UI.formatCurrency(data.totalSalidas)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Neto</small>
-              <span class="font-950 ${data.totalNeto>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalNeto.toLocaleString()}€">${data.totalNeto.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalNeto>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.totalNeto)}">${UI.formatCurrency(data.totalNeto)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Saldo Final</small>
-              <span class="font-950 text-blue truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.saldoFinal.toLocaleString()}€">${data.saldoFinal.toLocaleString()}€</span>
+              <span class="font-950 text-blue truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.saldoFinal)}">${UI.formatCurrency(data.saldoFinal)}</span>
             </div>
           </div>
         </div>
@@ -2132,10 +2132,10 @@ const InformesView = {
             <tbody>${data.porMes.filter(m => m.entradas > 0 || m.salidas > 0).map(m => `
               <tr>
                 <td><strong>${m.mes}</strong></td>
-                <td class="text-right text-green">${m.entradas.toLocaleString()}€</td>
-                <td class="text-right text-red">${m.salidas.toLocaleString()}€</td>
-                <td class="text-right font-bold ${m.neto >= 0 ? 'text-green' : 'text-red'}">${m.neto.toLocaleString()}€</td>
-                <td class="text-right text-blue font-bold">${m.acumulado.toLocaleString()}€</td>
+                <td class="text-right text-green">${UI.formatCurrency(m.entradas)}</td>
+                <td class="text-right text-red">${UI.formatCurrency(m.salidas)}</td>
+                <td class="text-right font-bold ${m.neto >= 0 ? 'text-green' : 'text-red'}">${UI.formatCurrency(m.neto)}</td>
+                <td class="text-right text-blue font-bold">${UI.formatCurrency(m.acumulado)}</td>
               </tr>`).join('')}</tbody>
           </table>
         </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.tendencia()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de ingresos o gastos para calcular flujo de caja.</p></div>`}
@@ -2153,15 +2153,15 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
-              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalIngresos.toLocaleString()}€">${data.totalIngresos.toLocaleString()}€</span>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.totalIngresos)}">${UI.formatCurrency(data.totalIngresos)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gastos</small>
-              <span class="font-950 text-red truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalGastos.toLocaleString()}€">${data.totalGastos.toLocaleString()}€</span>
+              <span class="font-950 text-red truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.totalGastos)}">${UI.formatCurrency(data.totalGastos)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Balance</small>
-              <span class="font-950 ${data.totalBalance>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalBalance.toLocaleString()}€">${data.totalBalance.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalBalance>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${UI.formatCurrency(data.totalBalance)}">${UI.formatCurrency(data.totalBalance)}</span>
             </div>
           </div>
         </div>
@@ -2174,9 +2174,9 @@ const InformesView = {
                 <td><strong>${e.especie}</strong></td>
                 <td class="text-center">${e.numRebanos}</td>
                 <td class="text-center font-bold">${e.numAnimales}</td>
-                <td class="text-right text-green font-bold">${e.ingresos.toLocaleString()}€</td>
-                <td class="text-right text-red">${e.gastos.toLocaleString()}€</td>
-                <td class="text-right font-bold ${e.balance >= 0 ? 'text-green' : 'text-red'}">${e.balance.toLocaleString()}€</td>
+                <td class="text-right text-green font-bold">${UI.formatCurrency(e.ingresos)}</td>
+                <td class="text-right text-red">${UI.formatCurrency(e.gastos)}</td>
+                <td class="text-right font-bold ${e.balance >= 0 ? 'text-green' : 'text-red'}">${UI.formatCurrency(e.balance)}</td>
                 <td class="text-center">${e.numVentasCarne}</td>
                 <td class="text-center">${e.numVentasLeche}</td>
               </tr>`).join('')}
@@ -2234,7 +2234,7 @@ const InformesView = {
                 <td class="text-right text-gold">${InformesView._fmt(m.litros, 1)}</td>
                 <td class="text-right font-bold">${InformesView._fmt(m.kgAcum, 1)}</td>
                 <td class="text-right font-bold">${InformesView._fmt(m.litrosAcum, 1)}</td>
-                <td class="text-right text-green">${m.ingresos.toLocaleString()}€</td>
+                <td class="text-right text-green">${UI.formatCurrency(m.ingresos)}</td>
               </tr>`).join('')}</tbody>
           </table>
         </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.grafico()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de producción registrados.</p></div>`}
@@ -2252,15 +2252,15 @@ const InformesView = {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Fijos</small>
-              <span class="font-950 text-red" style="font-size:var(--fs-h2); word-break:break-all;">${data.costesFijos.toLocaleString()}€</span>
+              <span class="font-950 text-red" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.costesFijos)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Variables</small>
-              <span class="font-950 text-amber" style="font-size:var(--fs-h2); word-break:break-all;">${data.costesVariables.toLocaleString()}€</span>
+              <span class="font-950 text-amber" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.costesVariables)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
-              <span class="font-950 text-green" style="font-size:var(--fs-h2); word-break:break-all;">${data.ingresosTotal.toLocaleString()}€</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.ingresosTotal)}</span>
             </div>
           </div>
         </div>
@@ -2306,17 +2306,17 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Solicitado</small>
-              <span class="font-950 text-green" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalSolicitado.toLocaleString()}€</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.totalSolicitado)}</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Cobrado</small>
-              <span class="font-950 text-blue" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalCobrado.toLocaleString()}€</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.totalCobrado)}</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Pendiente</small>
-              <span class="font-950 ${data.totalPendiente>0?'text-amber':'text-green'}" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalPendiente.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalPendiente>0?'text-amber':'text-green'}" style="font-size:var(--fs-h2); word-break:break-all;">${UI.formatCurrency(data.totalPendiente)}</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
@@ -2332,7 +2332,7 @@ const InformesView = {
             <div class="info-box-center py-10 bg-black border border-222">
               <small class="s-lbl text-amber">${a.anio}</small>
               <div class="flex flex-col items-center gap-4">
-                <div class="text-xl font-950 text-green">${a.cobrado.toLocaleString()}€ <span class="text-gray-700 text-xs mx-4">/</span> <span class="text-amber font-900 text-lg">${a.solicitado.toLocaleString()}€</span></div>
+                <div class="text-xl font-950 text-green">${UI.formatCurrency(a.cobrado)} <span class="text-gray-700 text-xs mx-4">/</span> <span class="text-amber font-900 text-lg">${UI.formatCurrency(a.solicitado)}</span></div>
                 <span class="text-gray-500 text-[0.6rem] uppercase font-900 tracking-widest">${a.num} AYUDAS REGISTRADAS</span>
               </div>
             </div>`).join('')}
@@ -2348,8 +2348,8 @@ const InformesView = {
                 <td class="font-900">${r.anio || '-'}</td>
                 <td class="uppercase font-700">${r.concepto || r.descripcion || 'PAC'}</td>
                 <td class="text-gray-500 text-[0.6rem] uppercase font-800">${r.regimen || '—'}</td>
-                <td class="text-right font-800">${(r.importe_solicitado || 0).toLocaleString()}€</td>
-                <td class="text-right text-green font-950">${(r.importe_cobrado || 0).toLocaleString()}€</td>
+                <td class="text-right font-800">${UI.formatCurrency(r.importe_solicitado || 0)}</td>
+                <td class="text-right text-green font-950">${UI.formatCurrency(r.importe_cobrado || 0)}</td>
                 <td class="text-center text-[0.6rem] font-900 uppercase">${est}</td>
               </tr>`;
             }).join('')}</tbody>

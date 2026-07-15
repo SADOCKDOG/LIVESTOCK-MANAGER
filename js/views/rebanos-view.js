@@ -160,7 +160,7 @@ const RebanosView = {
       registrarHandler: "RebanosView._crearRebano()",
       records: data.slice(0, 50).map(r => ({
         title: r.nombre || 'Rebaño sin nombre',
-        date: r.fecha_constitucion ? new Date(r.fecha_constitucion).toLocaleDateString() : '-',
+        date: r.fecha_constitucion ? UI.formatDate(r.fecha_constitucion) : '-',
         zona: r.zonaActual || '',
         tipo: r.tipo || '',
         value: `${r.estado === 'activo' ? 'Activo' : r.estado === 'inactivo' ? 'Inactivo' : 'Vendido'}`,
@@ -225,7 +225,7 @@ const RebanosView = {
   },
 
   _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
+    return UI.formatNumber(n);
   },
 
   _aplicarFiltros() {
@@ -292,8 +292,8 @@ const RebanosView = {
         <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">TOTAL</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-warning);">${animales.length}</div></div>
         <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">ACTIVOS</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-success);">${activos}</div></div>
         <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">VENDIDOS</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-danger);">${vendidos}</div></div>
-        <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl flex items-center gap-4 justify-center text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">${Icons.carne()} kg</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-info);">${Math.round(totalKg).toLocaleString('es-ES')}</div></div>
-        <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl flex items-center gap-4 justify-center text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">${Icons.leche()} LITROS</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-warning);">${Math.round(totalLeche).toLocaleString('es-ES')}</div></div>
+        <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl flex items-center gap-4 justify-center text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">${Icons.carne()} kg</small>        <div class="inf-val-lg font-950 text-xl" style="color: var(--c-info);">${UI.formatNumber(Math.round(totalKg))}</div></div>
+        <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl flex items-center gap-4 justify-center text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">${Icons.leche()} LITROS</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-warning);">${UI.formatNumber(Math.round(totalLeche))}</div></div>
         <div class="info-box-center py-10" style="background: #1e1e1e; border: 1px solid #27272a;"><small class="s-lbl flex items-center gap-4 justify-center text-gray uppercase font-800" style="font-size: 0.65rem; letter-spacing: 0.5px;">${Icons.registros()} EVENTOS</small><div class="inf-val-lg font-950 text-xl" style="color: var(--c-purple);">${eventosReb.length}</div></div>
       </div>
 
@@ -462,7 +462,7 @@ const RebanosView = {
         <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.paquete()} CONSUMO DE PIENSO</h3>
         <label class="wizard-label mb-10">Selecciona el silo de origen:</label>
         <select id="w-consumo-silo" class="wizard-input wizard-select mb-15">
-          ${silos.map(s => `<option value="${s.id}">${s.nombre.toUpperCase()} (${(s.cantidadActual || 0).toLocaleString()} kg)</option>`).join('')}
+          ${silos.map(s => `<option value="${s.id}">${s.nombre.toUpperCase()} (${UI.formatNumber(s.cantidadActual || 0)} kg)</option>`).join('')}
         </select>
         <div class="flex gap-10">
           <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-consumo-next">Proceder ${Icons.siguiente()}</button>
@@ -501,11 +501,11 @@ const RebanosView = {
 
       const combinado = [
         ...gastosReb.map(g => ({ tipo: 'gasto', fecha: g.fecha, concepto: g.concepto || g.categoria, categoria: g.categoria, monto: g.monto || 0, kg: g.kilos_totales || null })),
-        ...consumosSilo.map(e => ({ tipo: 'consumo', fecha: e.fecha, concepto: `Consumo de pienso (${(e.valor_neto || 0).toLocaleString()} kg)`, categoria: 'Alimentación', monto: e.costeConsumo || 0, kg: e.valor_neto || null }))
+        ...consumosSilo.map(e => ({ tipo: 'consumo', fecha: e.fecha, concepto: `Consumo de pienso (${UI.formatNumber(e.valor_neto || 0)} kg)`, categoria: 'Alimentación', monto: e.costeConsumo || 0, kg: e.valor_neto || null }))
       ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
       const total = combinado.reduce((s, x) => s + (x.monto || 0), 0);
-      if (totalEl) totalEl.textContent = `${total.toLocaleString('es-ES', { maximumFractionDigits: 2 })} €`;
+      if (totalEl) totalEl.textContent = UI.formatCurrency(total);
 
       if (combinado.length === 0) {
         container.innerHTML = `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.buscar()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin gastos ni consumos registrados</p></div>`;
@@ -513,8 +513,8 @@ const RebanosView = {
       }
       container.innerHTML = combinado.map(x => `
         <div class="info-box-sm ${x.tipo === 'consumo' ? 'border-left-gold' : 'border-left-green'} mt-8 bg-black">
-          <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${x.tipo === 'consumo' ? Icons.paquete() : Icons.dinero()} ${x.concepto}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(x.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Categoría: <strong class="text-white">${x.categoria || 'N/D'}</strong> · Importe: <strong class="text-gold">${(x.monto || 0).toLocaleString('es-ES', { maximumFractionDigits: 2 })} €</strong>${x.kg ? ` · Kilos: <strong class="text-white">${x.kg.toLocaleString('es-ES')} kg</strong>` : ''}</div>
+          <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${x.tipo === 'consumo' ? Icons.paquete() : Icons.dinero()} ${x.concepto}</span><span class="text-gray-500 font-900 text-[0.6rem]">${UI.formatDate(x.fecha)}</span></div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Categoría: <strong class="text-white">${x.categoria || 'N/D'}</strong> · Importe: <strong class="text-gold">${UI.formatCurrency(x.monto || 0)}</strong>${x.kg ? ` · Kilos: <strong class="text-white">${UI.formatNumber(x.kg)} kg</strong>` : ''}</div>
         </div>`).join('');
     } catch (e) {
       container.innerHTML = '<p class="text-red text-sm font-900 uppercase">Error cargando gastos</p>';
@@ -539,7 +539,7 @@ const RebanosView = {
         const aplicadorStr = t.aplicadoPor ? ` · Aplicado por: <strong class="text-white">${t.aplicadoPor.toUpperCase()}</strong>` : '';
         const vetStr = t.veterinario_prescriptor ? ` · Vet: <strong class="text-gold">${t.veterinario_prescriptor}</strong>` : '';
         html += `<div class="info-box-sm border-left-green mt-8 bg-black">
-          <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(t.fecha).toLocaleDateString()}</span></div>
+          <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${Icons.sanidad()} ${t.medicamento}</span><span class="text-gray-500 font-900 text-[0.6rem]">${UI.formatDate(t.fecha)}</span></div>
           <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Retiro carne: <strong class="text-red">${t.tiempo_espera_carne_dias || 0} D</strong> ${t.prohibidoLeche ? ' | <strong class="text-red">PROHIBIDO LECHE</strong>' : ''}${dosisStr}${duracionStr}${aplicadorStr}${vetStr}</div>
         </div>`;
       });

@@ -83,7 +83,7 @@ const ComercializacionView = {
           carne: [
             { label: 'Peso Canal (kg)', value: this._fmt(pesoTotal) + ' kg' },
             { label: 'Animales Vendidos', value: ventas.length },
-            { label: 'Rend. Promedio', value: rendProm.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' },
+            { label: 'Rend. Promedio', value: UI.formatPercent(rendProm, 1) },
             { label: 'Ingreso Bruto', value: this._fmt(ingresoTotal) + ' €', color: '#94A3B8' },
             { label: 'Margen Neto Real', value: this._fmt(Math.round(margenNetoCarne)) + ' €', color: 'var(--c-success)' }
           ],
@@ -170,7 +170,7 @@ const ComercializacionView = {
             <button onclick="ComercializacionView._cambiarSubModulo('contratos')" class="text-[0.62rem] font-black text-gold border border-gold px-6 py-2 rounded-xs hover:bg-gold hover:text-black uppercase transition-all">GESTIONAR ➔</button>
           </div>
           <div class="text-[0.65rem] text-aaa font-700 uppercase mt-6 leading-relaxed">
-            ${contratosVenciendo.map(c => `CONTRATO Nº <span class="text-gold font-mono font-950">${c.numero_contrato || c.id}</span> EXPIRA EL ${new Date(c.fecha_fin).toLocaleDateString()} (${Math.ceil((new Date(c.fecha_fin) - hoy) / (24*60*60*1000))} DÍAS RESTANTES)`).join('<br>')}
+            ${contratosVenciendo.map(c => `CONTRATO Nº <span class="text-gold font-mono font-950">${c.numero_contrato || c.id}</span> EXPIRA EL ${UI.formatDate(c.fecha_fin)} (${Math.ceil((new Date(c.fecha_fin) - hoy) / (24*60*60*1000))} DÍAS RESTANTES)`).join('<br>')}
           </div>
         </div>
       `;
@@ -294,7 +294,7 @@ const ComercializacionView = {
         const proteina = e.laboratorio?.proteina;
         return {
         title: `Cisterna: ${e.matriculaCisterna || 'S/N'}`,
-        metadata: `<span>${new Date(e.fechaRecogida || e.fecha).toLocaleDateString()}</span><span>·</span><span>${(e.cantidad || 0).toLocaleString()} L</span>${grasa ? `<span>·</span><span style="color:var(--c-warning);">${Icons.grafico()} Grasa ${grasa}%</span>` : ''}${proteina ? `<span>·</span><span style="color:var(--c-info);">Prot. ${proteina}%</span>` : ''}${e.antibioticos ? `<span>·</span><span style="color:var(--c-danger); font-weight:900;">${Icons.alerta()} ANTIBIÓTICOS</span>` : ''}`,
+        metadata: `<span>${UI.formatDate(e.fechaRecogida || e.fecha)}</span><span>·</span><span>${UI.formatNumber(e.cantidad || 0)} L</span>${grasa ? `<span>·</span><span style="color:var(--c-warning);">${Icons.grafico()} Grasa ${grasa}%</span>` : ''}${proteina ? `<span>·</span><span style="color:var(--c-info);">Prot. ${proteina}%</span>` : ''}${e.antibioticos ? `<span>·</span><span style="color:var(--c-danger); font-weight:900;">${Icons.alerta()} ANTIBIÓTICOS</span>` : ''}`,
         badge: (() => {
           const est = (e.estadoAnalitica || 'PENDIENTE').toUpperCase();
           let colorBadge = 'var(--c-warning)';
@@ -346,8 +346,8 @@ const ComercializacionView = {
       registrarHandler: "App._abrirWizardVentaMasiva()",
       records: d.ventas.slice(0, 50).map(v => ({
         title: v.razonSocial || 'Matadero',
-        metadata: `<span>${new Date(v.fechaSacrificio || v.fecha || 0).toLocaleDateString()}</span><span>·</span><span>${v.pesoCanal || 0} kg canal</span>${v.rendimientoCanal ? `<span>·</span><span style="color:${v.rendimientoCanal >= 50 ? 'var(--c-success)' : 'var(--c-warning)'};">${Icons.grafico()} Rend. ${v.rendimientoCanal}%</span>` : ''}${v.clasificacionCanal ? `<span>·</span><span style="color:var(--p-gold);">Clasif. ${v.clasificacionCanal}</span>` : ''}`,
-        badge: `${Math.round(v.importe_total || 0).toLocaleString()} €`,
+        metadata: `<span>${UI.formatDate(v.fechaSacrificio || v.fecha || 0)}</span><span>·</span><span>${v.pesoCanal || 0} kg canal</span>${v.rendimientoCanal ? `<span>·</span><span style="color:${v.rendimientoCanal >= 50 ? 'var(--c-success)' : 'var(--c-warning)'};">${Icons.grafico()} Rend. ${v.rendimientoCanal}%</span>` : ''}${v.clasificacionCanal ? `<span>·</span><span style="color:var(--p-gold);">Clasif. ${v.clasificacionCanal}</span>` : ''}`,
+        badge: UI.formatCurrency(Math.round(v.importe_total || 0)),
         onclick: `App._abrirDetalleVentaCarne(${v.id})`
       })),
       emptyMsg: 'Sin ventas de carne registradas.'
@@ -410,7 +410,7 @@ const ComercializacionView = {
   },
 
   _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
+    return UI.formatNumber(n);
   },
 
   // FASE 4: Calcular datos de rendimiento mensual para gráficos de barra
@@ -505,7 +505,7 @@ const ComercializacionView = {
         <div class="leche-bar-wrap" style="position:relative; height:30px;">
           <div style="position:absolute;bottom:0;width:80%;height:${altura}%;background:${color};border-radius:4px 4px 0 0;opacity:0.8;transition:height 0.3s;left:10%;"></div>
         </div>
-        <div class="text-xs font-bold mt-1" style="color:${color};">${valor.toLocaleString()}${tipoMetrica === 'rendimiento' ? '%' : ''}</div>
+        <div class="text-xs font-bold mt-1" style="color:${color};">${UI.formatNumber(valor)}${tipoMetrica === 'rendimiento' ? '%' : ''}</div>
       </div>`;
     }).join('');
 

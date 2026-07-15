@@ -17,16 +17,11 @@ const ExplotacionView = {
   },
 
   _fmtFecha(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
-    } catch (e) { return '-'; }
+    return UI.formatDate(dateStr);
   },
 
   _fmt(val) {
-    if (val == null || isNaN(val)) return '0';
-    return Number(val).toLocaleString(undefined, { maximumFractionDigits: 1 });
+    return UI.formatNumber(val, 1);
   },
 
   async _ensureData(fincaIdRaw, force = false) {
@@ -317,7 +312,7 @@ const ExplotacionView = {
               const pct = cap > 0 ? Math.round((Number(s.cantidadActual) || 0) / cap * 100) : 0;
               return `<div class="flex items-center justify-between p-8 rounded-sm" style="background:#080808; border:1px solid #1a1a1a;">
                 <span class="text-[0.65rem] font-black text-white uppercase">${s.nombre || 'Silo'} (${s.alimento || 'Pienso'})</span>
-                <span class="text-xs font-mono font-950" style="color:var(--c-danger);">${(Number(s.cantidadActual)||0).toLocaleString()} / ${cap.toLocaleString()} kg (${pct}%)</span>
+                <span class="text-xs font-mono font-950" style="color:var(--c-danger);">${UI.formatNumber(Number(s.cantidadActual)||0)} / ${UI.formatNumber(cap)} kg (${pct}%)</span>
               </div>`;
             }).join('')}
           </div>
@@ -330,22 +325,22 @@ const ExplotacionView = {
           <div class="resumen-body flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-[0.65rem] text-gray uppercase font-900">Producción Total</span>
-              <strong class="text-lg font-950">${this._activeMode === 'leche' ? d.totalLitros.toLocaleString() + ' L' : this._activeMode === 'carne' ? d.pesajes.length + ' pesajes' : d.totalLitros.toLocaleString() + ' L / ' + d.pesajes.length + ' pesajes'}</strong>
+              <strong class="text-lg font-950">${this._activeMode === 'leche' ? UI.formatNumber(d.totalLitros) + ' L' : this._activeMode === 'carne' ? d.pesajes.length + ' pesajes' : UI.formatNumber(d.totalLitros) + ' L / ' + d.pesajes.length + ' pesajes'}</strong>
             </div>
 
             <!-- Mode-specific metrics -->
             ${this._activeMode === 'leche' ? `
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">MOFA (Leche)</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.mofaLeche))}</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Litros Totales</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${d.totalLitros.toLocaleString()} L</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatNumber(d.totalLitros)} L</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Litros Control</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${d.totalLitrosControles.toLocaleString()} L</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatNumber(d.totalLitrosControles)} L</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Grasa Media</span>
@@ -357,7 +352,7 @@ const ExplotacionView = {
             </div>` : this._activeMode === 'carne' ? `
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Margen Neto (Carne)</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.margenCarne).toLocaleString()} €</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.margenCarne))}</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">GMD (Ganancia Media Diaria)</span>
@@ -365,7 +360,7 @@ const ExplotacionView = {
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Peso Total Ganado</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${this._calcularPesoTotalCarne().toLocaleString()} kg</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatNumber(this._calcularPesoTotalCarne())} kg</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">ICA (Conversión Alimenticia)</span>
@@ -377,15 +372,15 @@ const ExplotacionView = {
             </div>` : `
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Margen Consolidado</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.margenHibrido).toLocaleString()} €</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.margenHibrido))}</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">MOFA (Leche)</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${Math.round(d.mofaLeche).toLocaleString()} €</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.mofaLeche))}</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Peso Total Ganado (Carne)</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${this._calcularPesoTotalCarne().toLocaleString()} kg</strong>
+              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatNumber(this._calcularPesoTotalCarne())} kg</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">ICA Promedio</span>
@@ -450,7 +445,7 @@ const ExplotacionView = {
       icon: this._activeMode === 'leche' ? Icons.leche() : Icons.carne(),
       title: e.snap_identificacion || 'Registro',
       metadata: `<span>${this._fmtFecha(e.fecha)}</span><span>·</span><span>${e.snap_zona || 'Finca'}</span>`,
-      badge: `${(e.valor_neto || 0).toLocaleString()} ${e.unidad || ''}`,
+      badge: `${UI.formatNumber(e.valor_neto || 0)} ${e.unidad || ''}`,
       color: meta.color,
       onClick: `ExplotacionView._abrirOpcionesRegistro(${e.id}, '${this._activeMode}')`
     })).join('');
@@ -486,7 +481,7 @@ const ExplotacionView = {
           <div class="resumen-body flex flex-col">
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Total Gastos</span>
-              <strong class="text-lg font-950" style="color: var(--c-danger);">${gastos.reduce((s, g) => s + (g.monto || 0), 0).toLocaleString()} €</strong>
+              <strong class="text-lg font-950" style="color: var(--c-danger);">${UI.formatCurrency(gastos.reduce((s, g) => s + (g.monto || 0), 0))}</strong>
             </div>
           </div>
         </div>
@@ -499,7 +494,7 @@ const ExplotacionView = {
             icon: Icons.dinero(),
             title: g.concepto || g.categoria,
             metadata: `<span>${this._fmtFecha(g.fecha)}</span><span>·</span><span>${g.categoria}</span>`,
-            badge: `${(g.monto || 0).toLocaleString()} €`,
+            badge: UI.formatCurrency(g.monto || 0),
             color: 'var(--c-purple)',
             onClick: `App.renderDetalleGasto(new URLSearchParams('id=${g.id}'))`
           })).join('')}
