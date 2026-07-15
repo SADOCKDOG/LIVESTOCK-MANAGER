@@ -171,6 +171,10 @@ const ExplotacionView = {
             <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'gastos'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'proveedores'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'tramites' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'tramites'}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarSubModulo('tramites')">${Icons.documento()} TRÁMITES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'traslado' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'traslado'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('traslado')">${Icons.documento()} TRASLADO</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'censo' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'censo'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('censo')">${Icons.documento()} CENSO</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'crotales' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'crotales'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('crotales')">${Icons.documento()} CROTALES</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'guia' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'guia'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('guia')">${Icons.documento()} GUÍA MOVIMIENTO</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
@@ -201,6 +205,18 @@ const ExplotacionView = {
         break;
       case 'tramites':
         await this._renderTramitesView(document.getElementById('expro-tab-content'), fincaId);
+        break;
+      case 'traslado':
+        if (window.WizardTraslado) await window.WizardTraslado.abrir();
+        break;
+      case 'censo':
+        if (window.WizardCenso) await window.WizardCenso.abrir();
+        break;
+      case 'crotales':
+        if (window.WizardCrotales) await window.WizardCrotales.abrir();
+        break;
+      case 'guia':
+        if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
         break;
     }
 

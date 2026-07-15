@@ -709,7 +709,7 @@ const CarneView = {
 
   // ========== BLOQUE 3: LOGÍSTICA Y VENTAS (dueño único del dato: ComercializacionView) ==========
   _renderComercializacion(content, d) {
-    const html = `
+    content.innerHTML = `
       <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex items-center gap-12 mb-16">
           <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
@@ -727,12 +727,8 @@ const CarneView = {
           Las ventas, albaranes y contratos de este lote se registran y consultan en Comercialización, para mantener un único histórico.
         </div>
 
-        <!-- Accesos directos comerciales -->
-        <div class="grid grid-cols-2 gap-8">
-          <a href="#/comercializacion?tab=carne" class="widget-link-btn">${Icons.comercial()} Ir a Comercialización</a>
-          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
-          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Transportistas</a>
-          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardVentaMasiva()">${Icons.agregar()} Registrar Venta</button>
+        <div class="text-center">
+          <a href="#/comercializacion?tab=carne" class="widget-link-btn">${Icons.comercial()} Ir a Comercialización →</a>
         </div>
       </div>
     `;

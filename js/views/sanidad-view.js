@@ -225,8 +225,7 @@ const SanidadView = {
     }
   },
 
-  /** Overlay real de edición/borrado de un tratamiento (antes referenciaba window.SanitariosView, inexistente). */
-  async _abrirOpcionesTratamiento(id) {
+    async _abrirOpcionesTratamiento(id) {
     try {
       const t = await Sanitarios.get(id);
       if (!t) return;

@@ -444,7 +444,7 @@ const HibridoView = {
           <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
           <div>
             <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-              <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS CONSOLIDADO
+              <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS
             </h2>
             <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Ventas de carne, entregas de leche, compradores y transporte</div>
           </div>
@@ -456,14 +456,9 @@ const HibridoView = {
           Las ventas, entregas y contratos se registran y consultan en Comercialización, para mantener un único histórico.
         </div>
 
-        <!-- Accesos directos comerciales -->
-        <div class="grid grid-cols-2 gap-8">
+        <div class="text-center">
           <a href="#/comercializacion?tab=carne" class="widget-link-btn">${Icons.carne()} Ventas Carne</a>
           <a href="#/comercializacion?tab=leche" class="widget-link-btn">${Icons.leche()} Entregas Leche</a>
-          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
-          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Transportistas</a>
-          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardVentaMasiva()">${Icons.agregar()} Registrar Venta Carne</button>
-          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardAlbaranLeche()">${Icons.agregar()} Registrar Albarán Leche</button>
         </div>
       </div>
     `;
