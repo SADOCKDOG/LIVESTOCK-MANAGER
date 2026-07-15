@@ -612,7 +612,7 @@ const DocumentosView = {
         <input id="acuse-input" type="text" class="wizard-input font-800" placeholder="Ej: SIGGAN-2026-000123" value="${valorActual.replace(/"/g, '&quot;')}">
         <div class="text-[0.65rem] text-aaa mt-2">Puedes pegar el código del acuse, URL o anotación breve.</div>
         <div class="flex gap-8 justify-end mt-10">
-          <button class="btn btn-sm" id="acuse-cancel">Cancelar</button>
+          <button class="btn btn-sm" id="acuse-cancel">${Icons.cerrar()} Cancelar</button>
           <button class="btn btn-sm btn-primary" id="acuse-save">Guardar</button>
         </div>
       </div>`;
