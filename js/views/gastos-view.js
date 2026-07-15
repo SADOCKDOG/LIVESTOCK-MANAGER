@@ -68,7 +68,7 @@ const GastosView = {
       <div class="card mb-14 p-12 card-resumen" style="background:rgba(168,85,247,0.015); width:100%;">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase"><span style="color: var(--c-purple); margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
-          <span class="text-xs text-gray">${totalGeneral.toLocaleString()}€ total</span>
+          <span class="text-xs text-gray">${UI.formatCurrency(totalGeneral)} total</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
@@ -84,13 +84,13 @@ const GastosView = {
             return `
               <div class="py-10 flex justify-between items-center border-bottom-222">
                 <span class="text-xs text-gray uppercase font-800 flex items-center gap-6">${c.icon} ${c.label}</span>
-                <strong class="text-base font-900" style="color:${c.color};">${catGasto.toLocaleString()} €</strong>
+                <strong class="text-base font-900" style="color:${c.color};">${UI.formatCurrency(catGasto)}</strong>
               </div>
             `;
           }).join('')}
           <div class="py-12 mt-4 flex justify-between items-center text-white">
             <span class="text-xs uppercase font-950 tracking-wider">TOTAL GENERAL GASTOS</span>
-            <strong class="text-2xl text-red font-950">${totalGeneral.toLocaleString()} €</strong>
+            <strong class="text-2xl text-red font-950">${UI.formatCurrency(totalGeneral)}</strong>
           </div>
         </div>
       </div>
@@ -138,11 +138,11 @@ const GastosView = {
     this._renderSeccion(content, {
       icon: catInfo.icon,
       title: `Gastos — ${catInfo.label}`,
-      subtitle: data.count > 0 ? `${data.count} ${data.count === 1 ? "registro" : "registros"} · ${this._fmt(data.total)} € total` : 'Sin registros en esta categoría',
+      subtitle: data.count > 0 ? `${data.count} ${data.count === 1 ? "registro" : "registros"} · ${UI.formatCurrency(data.total)} total` : 'Sin registros en esta categoría',
       color: catInfo.color,
       colorDark: catInfo.colorDark,
       kpis: [
-        { label: 'Total (€)', value: this._fmt(data.total) + ' €' },
+        { label: 'Total (€)', value: UI.formatCurrency(data.total) },
         { label: 'Registros', value: data.count }
       ],
       registrarLabel: 'Gasto',
@@ -150,10 +150,10 @@ const GastosView = {
       registrarHandler: "App._abrirFormularioGasto()",
       records: data.records.slice(0, 50).map(g => ({
         title: (g.concepto || g.categoria || 'Gasto'),
-        date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
+        date: g.fecha ? UI.formatDate(g.fecha) : '-',
         zone: g.snap_zona || '',
         categoria: g.categoria || '',
-        value: GastosView._fmt(g.monto || 0) + ' €',
+        value: UI.formatCurrency(g.monto || 0),
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),
       emptyMsg: `Sin gastos de ${catInfo.label.toLowerCase()}. Usa "Registrar Gasto" para añadir.`
@@ -211,7 +211,7 @@ const GastosView = {
   },
 
   _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
+    return UI.formatNumber(n);
   }
 };
 

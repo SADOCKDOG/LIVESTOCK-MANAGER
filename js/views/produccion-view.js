@@ -172,9 +172,9 @@ const ProduccionView = {
         const idDisplay = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} ${e.lote_animales_count === 1 ? 'animal' : 'animales'}` : (e.snap_tipo || 'S/N'));
         return {
           title: `${label}: ${idDisplay}`,
-          date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+          date: e.fecha ? UI.formatDate(e.fecha) : '-',
           zone: e.snap_zona || '',
-          value: Number(e.valor_neto || 0).toLocaleString('es-ES') + ' kg',
+          value: UI.formatNumber(e.valor_neto || 0) + ' kg',
           typeColor: isInd ? 'var(--c-danger)' : 'var(--c-warning)',
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
@@ -190,7 +190,7 @@ const ProduccionView = {
       kpis: [
         { label: 'Total litros', value: this._fmt(d.litrosTotal) + ' L' },
         { label: 'Registros', value: d.litrosCount },
-        { label: 'Extracto Seco Medio', value: d.extractoSecoMedio > 0 ? d.extractoSecoMedio.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%' : 'N/D' },
+        { label: 'Extracto Seco Medio', value: d.extractoSecoMedio > 0 ? UI.formatPercent(d.extractoSecoMedio, 2) : 'N/D' },
       ],
       registrarLabel: 'Láctea', listName: 'Lista PRO Láctea',
       registrarHandler: "App._abrirAsistenteProduccion('leche')",
@@ -207,9 +207,9 @@ const ProduccionView = {
         const idDisplayLeche = e.snap_identificacion || (e.lote_crotales ? `LOTE ${e.lote_animales_count || '?'} ${e.lote_animales_count === 1 ? 'animal' : 'animales'}` : (e.snap_tipo || 'S/N'));
         return {
           title: `${label}: ${idDisplayLeche}`,
-          date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+          date: e.fecha ? UI.formatDate(e.fecha) : '-',
           zone: e.snap_zona || '',
-          value: Number(e.valor_neto || 0).toLocaleString('es-ES') + ' L',
+          value: UI.formatNumber(e.valor_neto || 0) + ' L',
           typeColor: isInd ? 'var(--c-info)' : (isLote ? 'var(--c-purple)' : 'var(--c-success)'),
           onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
         };
@@ -230,9 +230,9 @@ const ProduccionView = {
       registrarHandler: "App._abrirAsistenteProduccion('venta_masiva')",
       records: d.ventaEvents.slice(0, 20).map(e => ({
         title: 'Expedición: ' + (e.snap_especie || 'Ganado'),
-        date: e.fecha ? new Date(e.fecha).toLocaleDateString() : '-',
+        date: e.fecha ? UI.formatDate(e.fecha) : '-',
         zone: e.snap_zona || '',
-        value: (e.importe_total || e.valor_neto || 0) + ' €',
+        value: UI.formatCurrency(e.importe_total || e.valor_neto || 0),
         onclick: "ProduccionView._abrirOpcionesRegistro(" + e.id + ")"
       })),
       emptyMsg: 'Sin ventas registradas. Usa "Registrar Venta" para añadir.'
@@ -251,9 +251,9 @@ const ProduccionView = {
       registrarHandler: "App._abrirAsistenteProduccion('gasto')",
       records: d.gastosRecords.slice(0, 20).map(g => ({
         title: (g.concepto || g.categoria || 'Gasto'),
-        date: g.fecha ? new Date(g.fecha).toLocaleDateString() : '-',
+        date: g.fecha ? UI.formatDate(g.fecha) : '-',
         zone: g.snap_zona || '',
-        value: (g.monto || 0) + ' €',
+        value: UI.formatCurrency(g.monto || 0),
         onclick: "ProduccionView._abrirOpcionesGasto(" + g.id + ")"
       })),
       emptyMsg: 'Sin gastos registrados. Usa "Registrar Gasto" para añadir.'
@@ -487,7 +487,7 @@ const ProduccionView = {
   },
 
   _fmt(n) {
-    return (n != null && !isNaN(n)) ? Number(n).toLocaleString() : '0';
+    return UI.formatNumber(n);
   }
 };
 

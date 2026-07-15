@@ -436,12 +436,12 @@ const DashboardView = {
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
               <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">MOFA</div>
-              <div style="font-weight: 800; border: 1px solid ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; color: ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; background: ${mofaRatio >= 20 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${Math.round(mofaTotal / meses).toLocaleString()}€</div>
+              <div style="font-weight: 800; border: 1px solid ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; color: ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; background: ${mofaRatio >= 20 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${UI.formatCurrency(Math.round(mofaTotal / meses))}</div>
               <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">${mofaRatio.toFixed(1)}%</div>
             </div>
             <div>
               <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PRECIO</div>
-              <div style="font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</div>
+              <div style="font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${UI.formatNumber(precioFinalMedio, 3)}</div>
               <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">€/L</div>
             </div>
             <div>
@@ -562,7 +562,7 @@ const DashboardView = {
             </div>
               <div>
                 <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PIENSO (g/L)</div>
-                <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: color-mix(in srgb, ${piensoColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}</div>
+                <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: color-mix(in srgb, ${piensoColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? UI.formatNumber(eficienciaPienso) : '—'}</div>
                 <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">Eficiencia</div>
               </div>
             <div>

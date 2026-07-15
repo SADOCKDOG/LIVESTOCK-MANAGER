@@ -115,16 +115,16 @@ const LecheView = {
           { label: 'Raza Principal', value: animalesLeche.length > 0 ? (animalesLeche[0].raza || 'N/D') : 'N/D' }
         ],
         explotacion: [
-          { label: 'Litros Control', value: totalLitrosControles.toLocaleString() + ' L' },
+          { label: 'Litros Control', value: UI.formatNumber(totalLitrosControles) + ' L' },
           { label: 'Grasa Media', value: grasaMedia.toFixed(2) + '%' },
-          { label: 'Alimentación', value: totalGastosAlim.toLocaleString() + ' €', color: 'var(--c-danger)' }
+          { label: 'Alimentación', value: UI.formatCurrency(totalGastosAlim), color: 'var(--c-danger)' }
         ],
         // Datos operativos de entrega (vínculo INFOLAC). La facturación/liquidación
         // vive en ComercializacionView; LecheView es control técnico-biológico.
         comercializacion: [
-          { label: 'Litros Entregados', value: litrosTotal.toLocaleString() + ' L', color: 'var(--c-warning)' },
+          { label: 'Litros Entregados', value: UI.formatNumber(litrosTotal) + ' L', color: 'var(--c-warning)' },
           { label: 'Entregas', value: numEntregas },
-          { label: 'MOFA (Neto)', value: Math.round(mofaTotal).toLocaleString() + ' €', color: 'var(--c-info)' }
+          { label: 'MOFA (Neto)', value: UI.formatCurrency(Math.round(mofaTotal)), color: 'var(--c-info)' }
         ],
         legislacion: [
           { label: 'Alertas Lácteas', value: alertas + tratamientosSupresionLeche.length, color: alertas + tratamientosSupresionLeche.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
@@ -202,7 +202,7 @@ const LecheView = {
             </div>
             <div class="leche-kpi-item" style="--kpi-color:var(--c-info); --kpi-value-color:#fff">
               <small class="leche-kpi-label">Litros Control</small>
-              <div class="leche-kpi-value" style="font-size: 1.1rem; font-weight: 950; color: var(--c-success);">${filteredData.totalLitrosControles.toLocaleString()} L</div>
+              <div class="leche-kpi-value" style="font-size: 1.1rem; font-weight: 950; color: var(--c-success);">${UI.formatNumber(filteredData.totalLitrosControles)} L</div>
             </div>
             <div class="leche-kpi-item" style="--kpi-color:var(--c-purple); --kpi-value-color:#fff">
               <small class="leche-kpi-label">Media Diaria</small>
@@ -429,12 +429,7 @@ const LecheView = {
   },
 
   _fmtFecha(dateStr) {
-    if (!dateStr) return '—';
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return dateStr;
+    return UI.formatDate(dateStr);
   },
 
   _setFiltro(type, value) {

@@ -110,15 +110,15 @@ const ConfigSistemaView = {
         <div class="section-header-theme mb-15 font-900 uppercase tracking-wider text-[0.7rem] text-gray"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.calendar()} FORMATOS DE SISTEMA</div>
         <div class="grid grid-cols-1 gap-15">
           <div class="wizard-input-group">
-            <label class="wizard-label">FORMATO DE FECHA</label>
-            <select class="wizard-input" onchange="ConfigSistemaView._action('guardarPreferencia', 'formatoFecha', this.value)">
+            <label class="wizard-label" for="sys-formato-fecha">FORMATO DE FECHA</label>
+            <select id="sys-formato-fecha" class="wizard-input" onchange="ConfigSistemaView._action('guardarPreferencia', 'formatoFecha', this.value)">
               <option value="es-ES" ${config.formatoFecha !== 'en-US' ? 'selected' : ''}>DD/MM/AAAA (Europa)</option>
               <option value="en-US" ${config.formatoFecha === 'en-US' ? 'selected' : ''}>MM/DD/AAAA (Internacional)</option>
             </select>
           </div>
           <div class="wizard-input-group">
-            <label class="wizard-label">MONEDA PRINCIPAL</label>
-            <select class="wizard-input" onchange="ConfigSistemaView._action('guardarPreferencia', 'moneda', this.value)">
+            <label class="wizard-label" for="sys-moneda">MONEDA PRINCIPAL</label>
+            <select id="sys-moneda" class="wizard-input" onchange="ConfigSistemaView._action('guardarPreferencia', 'moneda', this.value)">
               <option value="€" ${config.moneda !== '$' ? 'selected' : ''}>Euro (€)</option>
               <option value="$" ${config.moneda === '$' ? 'selected' : ''}>Dólar ($)</option>
             </select>

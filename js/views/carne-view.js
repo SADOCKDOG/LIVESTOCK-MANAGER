@@ -195,7 +195,7 @@ const CarneView = {
         <div id="resumen-carne" class="space-y-6 text-white card p-12" style="background: rgba(255,255,255,0.01);">
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.edificio()} Patrimonio Ganadero</span>
-            <strong class="text-xl font-950" style="color: var(--c-danger);">${Math.round(filteredData.valorPatrimonioTotal).toLocaleString()} €</strong>
+            <strong class="text-xl font-950" style="color: var(--c-danger);">${UI.formatCurrency(Math.round(filteredData.valorPatrimonioTotal))}</strong>
           </div>
           <div class="py-8 flex justify-between items-center border-bottom-222">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.documento()} Censo Cárnico</span>
@@ -203,7 +203,7 @@ const CarneView = {
           </div>
           <div class="py-8 flex justify-between items-center">
             <span class="text-xs text-gray uppercase font-900 flex items-center gap-4">${Icons.transportistas()} Ventas Matadero</span>
-            <strong class="text-xl font-950 text-blue">${filteredData.totalVentasEuros.toLocaleString()} €</strong>
+            <strong class="text-xl font-950 text-blue">${UI.formatCurrency(filteredData.totalVentasEuros)}</strong>
           </div>
         </div>
       </div>
@@ -363,14 +363,14 @@ const CarneView = {
         patrimonio: [
           { label: 'Censo Cárnico', value: filteredData.animalesCarne.length + ' cabezas' },
           { label: 'Lotes Cárnicos', value: filteredData.rebanosCarne.length },
-          { label: 'Valor Estimado', value: Math.round(valorPatrimonioTotal).toLocaleString() + ' €', color: 'var(--c-warning)' },
+          { label: 'Valor Estimado', value: UI.formatCurrency(Math.round(valorPatrimonioTotal)), color: 'var(--c-warning)' },
           { label: 'ICA (Conversión)', value: icaData.ica > 0 ? icaData.ica.toFixed(2) + ' : 1' : 'N/D', color: icaData.ica > 0 && icaData.ica <= 8 ? 'var(--c-success)' : (icaData.ica > 8 ? 'var(--c-danger)' : undefined) },
           { label: 'Coste/kg Ganancia', value: icaData.costePorKgGanancia > 0 ? icaData.costePorKgGanancia.toFixed(2) + ' €/kg' : 'N/D', color: 'var(--c-warning)' }
         ],
         comercializacion: [
           { label: 'Ventas Matadero', value: filteredData.ventasCarne.length },
-          { label: 'Kg Canal', value: totalKgMatadero.toLocaleString() + ' kg' },
-          { label: 'Facturación', value: totalVentasEuros.toLocaleString() + ' €', color: 'var(--c-success)' }
+          { label: 'Kg Canal', value: UI.formatNumber(totalKgMatadero) + ' kg' },
+          { label: 'Facturación', value: UI.formatCurrency(totalVentasEuros), color: 'var(--c-success)' }
         ],
         legislacion: [
           { label: 'Alertas', value: filteredData.tratamientosSupresion.length, color: filteredData.tratamientosSupresion.length > 0 ? 'var(--c-danger)' : 'var(--c-success)' },
@@ -606,7 +606,7 @@ const CarneView = {
       <div class="flex items-center justify-between p-8 rounded-sm mb-6" style="background:#080808; border:1px solid #1a1a1a;">
         <div class="min-w-0">
           <div class="text-[0.68rem] font-black text-white uppercase text-ellipsis">${l.nombre}${l.origen === 'tanda' ? ' <span style="color:var(--c-info);font-size:0.85em;">· SIGGAN</span>' : ''}</div>
-          <div class="text-[0.55rem] text-gray-500 font-bold uppercase">${l.nAnimales ? l.nAnimales + ' cab · ' : ''}${this._fmtFecha(l.entrada)} → ${l.cerrado ? this._fmtFecha(l.salida) : 'EN CURSO'} · ${Math.round(l.ganancia).toLocaleString()} kg ganados</div>
+          <div class="text-[0.55rem] text-gray-500 font-bold uppercase">${l.nAnimales ? l.nAnimales + ' cab · ' : ''}${UI.formatDate(l.entrada)} → ${l.cerrado ? UI.formatDate(l.salida) : 'EN CURSO'} · ${UI.formatNumber(Math.round(l.ganancia))} kg ganados</div>
         </div>
         <div class="text-right flex-shrink-0 ml-8">
           <div class="text-sm font-950" style="color:${colorICA(l.ica)};">${l.ica > 0 ? l.ica.toFixed(2) + ' : 1' : 'N/D'}</div>
@@ -770,11 +770,7 @@ const CarneView = {
   },
 
   _fmtFecha(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
-    } catch (e) { return '-'; }
+    return UI.formatDate(dateStr);
   },
 
   async _abrirOpcionesRegistro(id) {

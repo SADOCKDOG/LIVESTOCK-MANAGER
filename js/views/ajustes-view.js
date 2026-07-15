@@ -163,8 +163,8 @@ const AjustesView = {
         </h3>
         <p class="text-gray mt-5 text-sm">Metas de rendimiento para el Panel de Eficiencia Técnica.</p>
         <div class="grid grid-cols-2 gap-10 mt-15">
-          <div class="wizard-input-group"><label class="wizard-label">GMD (kg/día)</label><input type="number" value="${config.objGmd || 0.8}" step="0.1" class="wizard-input" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
-          <div class="wizard-input-group"><label class="wizard-label">Fertilidad (%)</label><input type="number" value="${config.objFert || 85}" class="wizard-input" onchange="AjustesView._guardarObjetivo('objFert', this.value)"></div>
+          <div class="wizard-input-group"><label class="wizard-label" for="obj-gmd">GMD (kg/día)</label><input type="number" id="obj-gmd" value="${config.objGmd || 0.8}" step="0.1" class="wizard-input" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
+          <div class="wizard-input-group"><label class="wizard-label" for="obj-fert">Fertilidad (%)</label><input type="number" id="obj-fert" value="${config.objFert || 85}" class="wizard-input" onchange="AjustesView._guardarObjetivo('objFert', this.value)"></div>
         </div>
       </div>
 
@@ -454,7 +454,7 @@ const AjustesView = {
               </div>
             </div>
             <div class="wizard-input-group mt-10">
-              <label class="wizard-label" id="lbl-banner-opacity">TRANSPARENCIA DE BANNERS (${Math.round((data.bannerOpacity || 0.4) * 100)}%)</label>
+              <label class="wizard-label" for="w-banner-opacity" id="lbl-banner-opacity">TRANSPARENCIA DE BANNERS (${Math.round((data.bannerOpacity || 0.4) * 100)}%)</label>
               <input type="range" id="w-banner-opacity" min="0" max="100" value="${(data.bannerOpacity || 0.4) * 100}" class="w-full">
             </div>
           </div>
@@ -486,11 +486,11 @@ const AjustesView = {
         content: (data) => `
           <div class="grid gap-15">
             <div class="wizard-input-group">
-              <label class="wizard-label" id="lbl-haz-int">INTENSIDAD DEL HAZ DE LUZ (${data.hazLuzIntensidad || 45}%)</label>
+              <label class="wizard-label" for="w-haz-int" id="lbl-haz-int">INTENSIDAD DEL HAZ DE LUZ (${data.hazLuzIntensidad || 45}%)</label>
               <input type="range" id="w-haz-int" min="10" max="90" value="${data.hazLuzIntensidad || 45}" class="w-full">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">COLOR DEL HAZ DE LUZ</label>
+              <label class="wizard-label" for="w-haz-color-mode">COLOR DEL HAZ DE LUZ</label>
               <select id="w-haz-color-mode" class="wizard-input">
                 <option value="" ${!data.hazLuzColor ? 'selected' : ''}>DINÁMICO (SIGUE AL MARCO)</option>
                 <option value="fijo" ${data.hazLuzColor ? 'selected' : ''}>FIJO (PERSONALIZADO)</option>
@@ -534,7 +534,7 @@ const AjustesView = {
           <div class="grid gap-15">
             <p class="text-gray text-xs uppercase font-800">Elige el color para el botón flotante:</p>
             <div class="wizard-input-group">
-              <label class="wizard-label">MODO DE COLOR</label>
+              <label class="wizard-label" for="w-fab-color-mode">MODO DE COLOR</label>
               <select id="w-fab-color-mode" class="wizard-input">
                 <option value="" ${!data.fabColor ? 'selected' : ''}>DINÁMICO (SIGUE AL MARCO)</option>
                 <option value="fijo" ${data.fabColor ? 'selected' : ''}>FIJO (PERSONALIZADO)</option>
@@ -546,7 +546,7 @@ const AjustesView = {
               </div>
             </div>
             <div class="wizard-input-group mt-10">
-              <label class="wizard-label" id="lbl-fab-int">INTENSIDAD DE BRILLO (${data.fabIntensidad || 60}%)</label>
+              <label class="wizard-label" for="w-fab-int" id="lbl-fab-int">INTENSIDAD DE BRILLO (${data.fabIntensidad || 60}%)</label>
               <input type="range" id="w-fab-int" min="10" max="100" value="${data.fabIntensidad || 60}" class="w-full">
             </div>
           </div>
