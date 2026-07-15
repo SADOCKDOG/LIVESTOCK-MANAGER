@@ -949,16 +949,33 @@ const App = {
       '/transportistas': '/comercializacion?tab=transportistas'
     };
 
-    // Check if we need to redirect (unless suppressing for wizards)
-    if (!window._redirectSuppression || !['/rebanos','/zonas','/animales','/animal'].includes(path)) {
-      // Not suppressing, or path not in suppression list: proceed with normal redirect check
-      if (redirectMap[path]) {
-        window.location.hash = '#' + redirectMap[path];
+    // Check if we need to redirect (unless suppressing for wizards or wizard call in progress)
+    const redirectTarget = redirectMap[path];
+    let shouldRedirect = true;
+    // Apply existing suppression based on _redirectSuppression and specific paths
+    if (window._redirectSuppression) {
+        if (['/rebanos','/zonas','/animales','/animal'].includes(path)) {
+            shouldRedirect = false;
+        }
+    }
+    // Additional suppression: if we are in a wizard and the redirect target leads to a ganadero view, suppress redirect
+    if (shouldRedirect && redirectTarget) {
+        const targetPath = redirectTarget.split('?')[0];
+        const ganaderoPaths = new Set(['/ganaderia','/rebanos','/rebano','/carne','/hibrido','/animales','/animal']);
+        if (window._wizardCallInProgress && ganaderoPaths.has(targetPath)) {
+            shouldRedirect = false;
+        }
+    }
+    if (shouldRedirect && redirectTarget) {
+        // Not suppressing, or path not in suppression list: proceed with normal redirect check
+        window.location.hash = '#' + redirectTarget;
         return;
-      }
     } else {
-      // Suppressed for this path: clear flag and continue without redirect
-      window._redirectSuppression = false;
+        // Suppressed for this path or wizard in progress: clear redirect suppression flag if set
+        if (window._redirectSuppression) {
+            window._redirectSuppression = false;
+        }
+        // wizard flag will be cleared by the caller that set it
     }
 
     await this.updateNavigationMenu();
@@ -1118,10 +1135,17 @@ const App = {
   // WIZARDS COMERCIALES MASIVOS
   // ==========================================
   async _abrirWizardVentaMasiva() {
-    if (window.VentaMasivaWizard) {
-      await window.VentaMasivaWizard.open();
-    } else {
-      this.toastError("Error: VentaMasivaWizard no disponible");
+    window._wizardCallInProgress = true;
+    try {
+      if (window.VentaMasivaWizard) {
+        await window.VentaMasivaWizard.open();
+      } else {
+        this.toastError("Error: VentaMasivaWizard no disponible");
+      }
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
     }
   },
 
@@ -1334,24 +1358,59 @@ const App = {
   },
 
   async _abrirWizardAlbaranLeche() {
-    if (window.AlbaranLecheWizard) { return window.AlbaranLecheWizard.open(); }
-    App.toastError("Error: AlbaranLecheWizard no disponible");
+    window._wizardCallInProgress = true;
+    try {
+      if (window.AlbaranLecheWizard) { return window.AlbaranLecheWizard.open(); }
+      App.toastError("Error: AlbaranLecheWizard no disponible");
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
+    }
   },
   async _abrirWizardTraslado() {
-    if (window.WizardTraslado) { return window.WizardTraslado.abrir(); }
-    App.toastError("Error: WizardTraslado no disponible");
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardTraslado) { return window.WizardTraslado.abrir(); }
+      App.toastError("Error: WizardTraslado no disponible");
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
+    }
   },
   async _abrirWizardCenso() {
-    if (window.WizardCenso) { return window.WizardCenso.abrir(); }
-    App.toastError("Error: WizardCenso no disponible");
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardCenso) { return window.WizardCenso.abrir(); }
+      App.toastError("Error: WizardCenso no disponible");
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
+    }
   },
   async _abrirWizardCrotales() {
-    if (window.WizardCrotales) { return window.WizardCrotales.abrir(); }
-    App.toastError("Error: WizardCrotales no disponible");
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardCrotales) { return window.WizardCrotales.abrir(); }
+      App.toastError("Error: WizardCrotales no disponible");
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
+    }
   },
   async _abrirWizardGuiaMovimiento() {
-    if (window.WizardGuiaMovimiento) { return window.WizardGuiaMovimiento.abrir(); }
-    App.toastError("Error: WizardGuiaMovimiento no disponible");
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardGuiaMovimiento) { return window.WizardGuiaMovimiento.abrir(); }
+      App.toastError("Error: WizardGuiaMovimiento no disponible");
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
+    }
   },
   async _abrirFormularioGasto(options = {}) {
     if (window.GastoWizard) { return window.GastoWizard.open(options); }
@@ -2931,20 +2990,41 @@ const App = {
   },
 
   async _abrirWizardPedidoCrotales() {
-    if (window.WizardCrotales) {
-      await window.WizardCrotales.abrirPedido();
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardCrotales) {
+        await window.WizardCrotales.abrirPedido();
+      }
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
     }
   },
 
   async _abrirWizardGuiaMovimiento() {
-    if (window.WizardGuiaMovimiento) {
-      await window.WizardGuiaMovimiento.abrir();
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardGuiaMovimiento) {
+        await window.WizardGuiaMovimiento.abrir();
+      }
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
     }
   },
 
   async _abrirWizardCenso() {
-    if (window.WizardCenso) {
-      await window.WizardCenso.abrir();
+    window._wizardCallInProgress = true;
+    try {
+      if (window.WizardCenso) {
+        await window.WizardCenso.abrir();
+      }
+    } finally {
+      setTimeout(() => {
+        window._wizardCallInProgress = false;
+      }, 0);
     }
   },
 

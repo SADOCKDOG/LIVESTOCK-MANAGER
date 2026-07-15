@@ -7,7 +7,7 @@
  */
 
 const InformesView = {
-  _currentTab: 'general',
+  _currentTab: 'carne',
   _cachedData: null,
 
   /** Formatea un número en es-ES con decimales fijos (auditoría F5: coherencia decimal). */
@@ -16,56 +16,55 @@ const InformesView = {
   },
 
   _categories: {
-    general: {
-      label: "Resumen",
-      icon: Icons.grafico(),
+    gegan: {
+      label: "GeGan",
+      icon: Icons.animales(),
       tabs: {
         "general": "General",
         "por-finca": "Por Finca",
-        "alertas": "Alertas"
-      }
-    },
-    operaciones: {
-      label: "Producción",
-      icon: Icons.sanidad(),
-      tabs: {
+        "alertas": "Alertas",
         "carne": "Cárnico",
         "leche": "Lácteo",
         "reproductivo": "Repro",
         "sanidad": "Sanidad",
         "fitosanitario": "Fitosanitario",
-        "curva-prod": "Curva"
+        "curva-prod": "Curva",
+        "censo": "Censo",
+        "coste-prod": "Coste/Animal",
+        "eficiencia": "Eficiencia",
+        "rotacion": "Rotación",
+        "rent-esp": "Rent. Especie"
       }
     },
-    economico: {
-      label: "Finanzas",
-      icon: Icons.dinero(),
+    expro: {
+      label: "Expro",
+      icon: Icons.finca(),
+      tabs: {
+        "general": "General",
+        "por-finca": "Por Finca",
+        "alertas": "Alertas",
+        "cargas": "Aforos"
+      }
+    },
+    comer: {
+      label: "Comer",
+      icon: Icons.compradores(),
+      tabs: {
+        "ventas": "Ventas",
+        "compradores": "Compradores",
+        "proveedores": "Proveedores"
+      }
+    },
+    libros: {
+      label: "Libros",
+      icon: Icons.documento(),
       tabs: {
         "pyg": "P y G",
         "flujo-caja": "Flujo Caja",
         "breakeven": "Break-Even",
         "subvenciones": "PAC",
-        "coste-prod": "Coste/Animal",
-        "eficiencia": "Eficiencia"
-      }
-    },
-    comercial: {
-      label: "Comercial",
-      icon: Icons.libroVentas(),
-      tabs: {
-        "ventas": "Ventas",
-        "compradores": "Compradores",
-        "proveedores": "Proveedores",
-        "rega": "REGA",
-        "cargas": "Aforos",
-        "rotacion": "Rotación"
-      }
-    },
-    exportar: {
-      label: "Exportar",
-      icon: Icons.exportar(),
-      tabs: {
-        "exportar": "Exportar"
+        "exportar": "Exportar",
+        "rega": "REGA"
       }
     }
   },
@@ -74,7 +73,7 @@ const InformesView = {
     for (const [catKey, cat] of Object.entries(this._categories)) {
       if (tab in cat.tabs) return catKey;
     }
-    return 'general';
+    return 'gegan'; // Default to gegan instead of general
   },
 
   _obtenerIconoDeSubTab(tab) {
@@ -88,19 +87,21 @@ const InformesView = {
       case 'sanidad': return Icons.sanidad();
       case 'fitosanitario': return Icons.fitosanitario();
       case 'curva-prod': return Icons.grafico();
-      case 'pyg': return Icons.dinero();
-      case 'flujo-caja': return Icons.tendencia();
-      case 'breakeven': return Icons.balanza();
-      case 'subvenciones': return Icons.pac();
+      case 'censo': return Icons.animales();
       case 'coste-prod': return Icons.animales();
-      case 'eficiencia': return Icons.tendencia();
+      case 'eficiencia': return Icons.grafico();
+      case 'rotacion': return Icons.rotacion();
       case 'ventas': return Icons.libroVentas();
       case 'compradores': return Icons.compradores();
       case 'proveedores': return Icons.proveedores();
       case 'rega': return Icons.informeRega();
       case 'cargas': return Icons.balanza();
-      case 'rotacion': return Icons.rotacion();
+      case 'pyg': return Icons.dinero();
+      case 'flujo-caja': return Icons.tendencia();
+      case 'breakeven': return Icons.balanza();
+      case 'subvenciones': return Icons.pac();
       case 'exportar': return Icons.exportar();
+      case 'rent-esp': return Icons.reproduccion(); // Using reproduction icon for species profitability
       default: return '';
     }
   },
@@ -109,13 +110,12 @@ const InformesView = {
     const activeCatKey = this._obtenerCategoriaDeTab(this._currentTab);
     // Colores por categoría
     const catColors = {
-      general: 'var(--c-warning)',
-      operaciones: 'var(--c-success)',
-      economico: 'var(--c-info)',
-      comercial: 'var(--c-purple)',
-      exportar: '#6b7280'
+      gegan: 'var(--c-success)',      // Green for GeGan (livestock/production)
+      expro: 'var(--c-info)',         // Blue for Expro (farm operations)
+      comer: 'var(--c-warning)',      # Orange/Yellow for Comer (commerce/trade)
+      libros: 'var(--c-purple)'       # Purple for Libros (record books/ledgers)
     };
-    const activeColor = catColors[activeCatKey] || 'var(--c-warning)';
+    const activeColor = catColors[activeCatKey] || 'var(--c-success)';
 
     // 1. Nivel 1: Categorías
     let catsHtml = `
@@ -124,9 +124,9 @@ const InformesView = {
     `;
     for (const [catKey, cat] of Object.entries(this._categories)) {
       const isActive = catKey === activeCatKey;
-      const col = catColors[catKey] || 'var(--c-warning)';
+      const col = catColors[catKey] || 'var(--c-success)';
       catsHtml += `
-        <button class="inf-cat-tab ${isActive ? 'active' : ''}" 
+        <button class="inf-cat-tab ${isActive ? 'active' : ''}"
                 id="inf-cat-${catKey}"
                 style="${isActive ? `--tab-color:${col}; background:${col}15; border-color:${col}; color:${col} !important; box-shadow: 0 0 12px ${col}50;` : `--tab-color:${col};`}"
                 onclick="InformesView._cambiarCategoria('${catKey}')">
@@ -149,7 +149,7 @@ const InformesView = {
       const isActive = tabKey === this._currentTab;
       const subTabIcon = this._obtenerIconoDeSubTab(tabKey);
       subTabsHtml += `
-        <button class="inf-tab ${isActive ? 'active' : ''}" 
+        <button class="inf-tab ${isActive ? 'active' : ''}"
                 id="inf-tab-${tabKey}"
                 data-tab="${tabKey}"
                 style="${isActive ? `--tab-color:${activeColor}; background:${activeColor}18; border-color:${activeColor}; color:${activeColor} !important; box-shadow: 0 0 8px ${activeColor}40;` : ''}"
@@ -293,34 +293,34 @@ const InformesView = {
     try {
       switch (this._currentTab) {
         case 'general': this._renderGeneral(content, d); break;
+        case 'por-finca': this._renderPorFinca(content, d); break;
+        case 'alertas': this._renderAlertas(content, d); break;
         case 'carne': this._renderCarne(content, d); break;
         case 'leche': this._renderLeche(content, d); break;
         case 'reproductivo': this._renderReproductivo(content, d); break;
         case 'sanidad': this._renderSanidad(content, d); break;
+        case 'fitosanitario': this._renderFitosanitario(content, d); break;
+        case 'curva-prod': this._renderCurvaProduccion(content, d); break;
         case 'censo': this._renderCenso(content, d); break;
+        case 'coste-prod': this._renderCosteProd(content, d); break;
+        case 'eficiencia': this._renderEficiencia(content, d); break;
+        case 'rotacion': this._renderRotacion(content, d); break;
         case 'ventas': this._renderVentas(content, d); break;
         case 'compradores': this._renderCompradores(content, d); break;
         case 'proveedores': this._renderProveedores(content, d); break;
-        case 'fitosanitario': this._renderFitosanitario(content, d); break;
-        case 'alertas': this._renderAlertas(content, d); break;
-        case 'por-finca': this._renderPorFinca(content, d); break;
         case 'rega': this._renderRega(content, d); break;
-        case 'exportar': this._renderExportar(content, d); break;
-        case 'pyg': this._renderPyG(content, d); break;
-        case 'coste-prod': this._renderCosteProd(content, d); break;
-        case 'eficiencia': this._renderEficiencia(content, d); break;
         case 'cargas': this._renderCargas(content, d); break;
-        case 'rotacion': this._renderRotacion(content, d); break;
+        case 'pyg': this._renderPyG(content, d); break;
         case 'flujo-caja': this._renderFlujoCaja(content, d); break;
-        case 'rent-esp': this._renderRentabilidadEspecie(content, d); break;
-        case 'curva-prod': this._renderCurvaProduccion(content, d); break;
         case 'breakeven': this._renderBreakEven(content, d); break;
         case 'subvenciones': this._renderSubvenciones(content, d); break;
+        case 'exportar': this._renderExportar(content, d); break;
+        case 'rent-esp': this._renderRentabilidadEspecie(content, d); break;
         default: this._renderGeneral(content, d);
       }
     } catch (e) {
       console.error('[InformesView] Error en render:', e);
-      content.innerHTML = `<div class="card empty-state><p class="text-red text-base">${Icons.cerrar()} Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
+      content.innerHTML = `<div class="card empty-state"><p class="text-red text-base">${Icons.cerrar()} Error al mostrar: ${e.message}</p><p class="text-gray text-xs mt-6">Comprueba la consola para más detalles.</p></div>`;
     }
 
     // Animación de entrada suave
