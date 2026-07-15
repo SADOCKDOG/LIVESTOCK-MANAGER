@@ -1796,7 +1796,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.43';
+        s.src = src + '?v=6.28.46';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;
@@ -2994,32 +2994,6 @@ const App = {
     try {
       if (window.WizardCrotales) {
         await window.WizardCrotales.abrirPedido();
-      }
-    } finally {
-      setTimeout(() => {
-        window._wizardCallInProgress = false;
-      }, 0);
-    }
-  },
-
-  async _abrirWizardGuiaMovimiento() {
-    window._wizardCallInProgress = true;
-    try {
-      if (window.WizardGuiaMovimiento) {
-        await window.WizardGuiaMovimiento.abrir();
-      }
-    } finally {
-      setTimeout(() => {
-        window._wizardCallInProgress = false;
-      }, 0);
-    }
-  },
-
-  async _abrirWizardCenso() {
-    window._wizardCallInProgress = true;
-    try {
-      if (window.WizardCenso) {
-        await window.WizardCenso.abrir();
       }
     } finally {
       setTimeout(() => {
