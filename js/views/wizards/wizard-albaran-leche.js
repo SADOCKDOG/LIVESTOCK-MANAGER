@@ -207,7 +207,7 @@ window.AlbaranLecheWizard = {
             </div>
 
             <div class="border-top-222 pt-12 mt-12 mb-12">
-              <div class="section-header-theme mb-12" style="--theme-color: var(--c-warning); font-size: 0.65rem;">MÁRGENES Y COSTES DE ALIMENTACIÓN</div>
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-warning); font-size: var(--fs-tiny);">MÁRGENES Y COSTES DE ALIMENTACIÓN</div>
               <div class="grid grid-cols-2 gap-10">
                 <div class="wizard-input-group">
                   <label class="wizard-label">COSTE DIARIO RACIÓN (€)</label>

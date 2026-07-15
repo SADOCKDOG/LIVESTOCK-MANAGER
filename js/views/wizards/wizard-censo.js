@@ -93,7 +93,7 @@ window.WizardCenso = {
             </div>
             <div class="wizard-input-group">
               <label class="wizard-label">ACUSE RECIBO / JUSTIFICANTE</label>
-              <textarea id="w-cs-acuse" class="wizard-input uppercase font-700" style="min-height:70px;resize:none;font-size:0.8rem;">${data.acuse_recibo || ""}</textarea>
+              <textarea id="w-cs-acuse" class="wizard-input uppercase font-700" style="min-height:70px;resize:none;font-size:var(--fs-sm);">${data.acuse_recibo || ""}</textarea>
             </div>
           </div>
         `,
