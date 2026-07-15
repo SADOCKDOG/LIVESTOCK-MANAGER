@@ -158,3 +158,35 @@ body[data-modo="claro"] .gasto-tab:hover {
     background: rgba(0, 0, 0, 0.06);
     color: var(--text-p);
 }
+/* .detail-value/.empty-state-*: no tienen fondo propio, heredan la superficie
+   adaptable de la .card contenedora — el texto claro fijo queda ilegible sobre
+   fondo claro. Verificado: sin fondo propio en css/styles.css (.detail-row,
+   .empty-state no declaran background). */
+body[data-modo="claro"] .detail-value {
+    color: var(--text-p);
+}
+body[data-modo="claro"] .detail-label,
+body[data-modo="claro"] .empty-state-text {
+    color: var(--text-s);
+}
+body[data-modo="claro"] .empty-state-search {
+    color: var(--text-d);
+}
+/* Utilidades genéricas .text-888/aaa/etc (css/styles.css ~línea 1000-2735):
+   sin componente propio, se usan sueltas sobre cualquier superficie adaptable. */
+body[data-modo="claro"] .text-gray,
+body[data-modo="claro"] .text-999,
+body[data-modo="claro"] .text-777,
+body[data-modo="claro"] .text-aaa,
+body[data-modo="claro"] .text-ccc,
+body[data-modo="claro"] .text-gray-400,
+body[data-modo="claro"] .text-zinc-200 {
+    color: var(--text-s);
+}
+body[data-modo="claro"] .text-gray-500,
+body[data-modo="claro"] .text-333,
+body[data-modo="claro"] .text-444,
+body[data-modo="claro"] .text-555,
+body[data-modo="claro"] .text-neutral {
+    color: var(--text-d);
+}
