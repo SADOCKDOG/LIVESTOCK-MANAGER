@@ -7,8 +7,7 @@
 const RebanosView = {
   _currentTab: 'todos',
   _filtroActivo: {
-    texto: '',
-    tipo: ''
+    texto: ''
   },
   async render() {
     if (window.App) App.updateHeaderColor('rebanos');
@@ -129,14 +128,6 @@ const RebanosView = {
                    oninput="RebanosView._setFiltro('texto', this.value)"
                    class="form-input search-input w-full" style="margin-top:0;">
           </div>
-          <select id="rebanos-filtro-tipo" class="form-select"
-                  onchange="RebanosView._setFiltro('tipo', this.value)"
-                  style="width:120px; min-width:110px; flex-shrink:0; padding:12px; min-height:44px;">
-            <option value="">Todos los tipos</option>
-            <option value="carne" ${this._filtroActivo.tipo === 'carne' ? 'selected' : ''}>Carne</option>
-            <option value="leche" ${this._filtroActivo.tipo === 'leche' ? 'selected' : ''}>Leche</option>
-            <option value="hibrido" ${this._filtroActivo.tipo === 'hibrido' ? 'selected' : ''}>Híbrido</option>
-          </select>
         </div>
       </div>
       <div id="rebanos-content"><div class="loader">Cargando rebaños...</div></div>`;
@@ -159,7 +150,7 @@ const RebanosView = {
     document.querySelectorAll('.rebaño-tab').forEach(b => {
       b.classList.toggle('active', b.dataset.tab === tab);
     });
-    this._renderTabActual();
+    this._aplicarFiltros();
     window.scrollTo(0, 0);
   },
 
@@ -187,7 +178,7 @@ const RebanosView = {
           }
         }).length;
 
-    const tieneFiltro = this._filtroActivo.texto !== '' || this._filtroActivo.tipo !== '';
+    const tieneFiltro = this._filtroActivo.texto !== '';
 
     this._renderSeccion(content, {
       icon: catInfo.icon,
