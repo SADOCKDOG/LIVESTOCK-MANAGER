@@ -5,7 +5,6 @@
  */
 
 const RebanosView = {
-  _currentTab: 'todos',
   _filtroActivo: {
     texto: ''
   },
@@ -106,18 +105,6 @@ const RebanosView = {
       </div>
 
       <div class="mb-14">
-        <div class="tabs-scroll-wrapper">
-          <div class="tabs-scroll rebaño-tabs scroll-shadow-container"
-               onscroll="const b=this.parentNode.querySelector('.scroll-indicator-badge'); if(b) b.classList.add('hidden');">
-            ${this._CATEGORIAS.map(c => `
-              <button class="rebaño-tab ${this._currentTab === c.key ? 'active' : ''}" 
-                      data-tab="${c.key}" 
-                      onclick="RebanosView._cambiarTab('${c.key}')" 
-                      style="--tab-color: ${c.color};">${c.icon} ${c.label}</button>
-            `).join('')}
-          </div>
-          <div class="scroll-indicator-badge">${Icons.rotacion()} deslizar ➔</div>
-        </div>
         <!-- Filtro de búsqueda integrado (controla el listado) -->
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
           ${Icons.rebanos()} LISTA DE REBAÑOS
@@ -132,9 +119,9 @@ const RebanosView = {
       </div>
       <div id="rebanos-content"><div class="loader">Cargando rebaños...</div></div>`;
 
-    // Actualizar datos filtrados para el tab actual
+    // Actualizar datos filtrados para la lista
     this._cachedData = { rebanos: filteredRebanos, eventos };
-    this._renderTabActual();
+    this._renderLista();
   },
 
   _CATEGORIAS: [
@@ -145,47 +132,24 @@ const RebanosView = {
     { key: 'activo',       icon: Icons.check(),   label: 'Activos',        color: 'var(--c-success)', colorDark: '#059669' }
   ],
 
-  _cambiarTab(tab) {
-    this._currentTab = tab;
-    document.querySelectorAll('.rebaño-tab').forEach(b => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-    });
-    this._aplicarFiltros();
-    window.scrollTo(0, 0);
-  },
-
-  _renderTabActual() {
+  _renderLista() {
     const d = this._cachedData;
     if (!d) return;
     const content = document.getElementById('rebanos-content');
     if (!content) return;
 
-    const catInfo = this._CATEGORIAS.find(c => c.key === this._currentTab) || this._CATEGORIAS[0];
     const data = d.rebanos;
     if (!data) { content.innerHTML = '<div class="loader">Sin datos</div>'; return; }
 
-    // Calcular total para esta categoría (antes de aplicar filtros de texto/tipo)
     const rawData = this._cachedDataRaw ? this._cachedDataRaw.rebanos : [];
-    const totalParaCategoria = this._currentTab === 'todos'
-      ? rawData.length
-      : rawData.filter(r => {
-          switch (this._currentTab) {
-            case 'carne': return (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn');
-            case 'leche': return (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct');
-            case 'hibrido': return (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble');
-            case 'activo': return r.estado !== 'inactivo';
-            default: return true;
-          }
-        }).length;
-
     const tieneFiltro = this._filtroActivo.texto !== '';
 
     this._renderSeccion(content, {
-      icon: catInfo.icon,
-      title: `Rebaños — ${catInfo.label}`,
-      subtitle: data.length > 0 ? `${data.length} ${data.length === 1 ? "rebaño" : "rebaños"} · ${this._fmt(totalParaCategoria)} total` : 'Sin registros en esta categoría',
-      color: catInfo.color,
-      colorDark: catInfo.colorDark,
+      icon: Icons.rebanos(),
+      title: 'Rebaños',
+      subtitle: data.length > 0 ? `${data.length} ${data.length === 1 ? "rebaño" : "rebaños"} total` : 'Sin registros',
+      color: 'var(--c-purple)',
+      colorDark: '#6d28d9',
       kpis: [
         { label: 'Total', value: this._fmt(data.length) },
         { label: 'Filtrados', value: this._fmt(tieneFiltro ? data.length : 0) }
@@ -201,7 +165,7 @@ const RebanosView = {
         value: `${r.estado === 'activo' ? 'Activo' : r.estado === 'inactivo' ? 'Inactivo' : 'Vendido'}`,
         onclick: "location.hash='/rebano?id=" + r.id + "'"
       })),
-      emptyMsg: `No hay rebaños de ${catInfo.label.toLowerCase()}. Usa "Nuevo Rebaño" para añadir.`
+      emptyMsg: `No hay rebaños registrados. Usa "Nuevo Rebaño" para añadir.`
     });
   },
 
@@ -264,7 +228,7 @@ const RebanosView = {
   },
 
   _aplicarFiltros() {
-    // Re-filtrar los datos basándose en los filtros actuales y la pestaña
+    // Re-filtrar los datos basándose en el filtro de texto actual
     const rawData = this._cachedDataRaw ? this._cachedDataRaw.rebanos : [];
     const eventos = this._cachedDataRaw ? this._cachedDataRaw.eventos : [];
     const filteredRebanos = this._filtrar(rawData);
@@ -272,8 +236,8 @@ const RebanosView = {
     // Actualizar los datos en caché con los resultados filtrados
     this._cachedData = { rebanos: filteredRebanos, eventos };
 
-    // Volver a renderizar la pestaña actual
-    this._renderTabActual();
+    // Volver a renderizar la lista
+    this._renderLista();
   },
 
   _setFiltro(type, value) {
@@ -283,17 +247,7 @@ const RebanosView = {
 
   _filtrar(rebanos) {
     if (!rebanos) return [];
-    let filtrados = this._currentTab === 'todos'
-      ? rebanos
-      : rebanos.filter(r => {
-          switch (this._currentTab) {
-            case 'carne': return (r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn');
-            case 'leche': return (r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct');
-            case 'hibrido': return (r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble');
-            case 'activo': return r.estado !== 'inactivo';
-            default: return true;
-          }
-        });
+    let filtrados = rebanos;
 
     if (this._filtroActivo.texto.trim()) {
       const q = this._filtroActivo.texto.toLowerCase();
