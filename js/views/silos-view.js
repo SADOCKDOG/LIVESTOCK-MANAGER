@@ -527,9 +527,10 @@ const SilosView = {
         this.render();
     },
 
-    async _abrirConsumirSilo(id) {
+    async _abrirConsumirSilo(id, rebanoPreseleccionado = null, onSaved = null) {
         const silo = this._cachedSilos.find(s => s.id === Number(id));
         if (!silo) return;
+        this._consumoOnSaved = onSaved;
 
         let rebanos = [];
         try {
@@ -544,18 +545,33 @@ const SilosView = {
                 <span style="color:var(--p-gold); margin-right:4px;">|</span> ${Icons.balanza()} REGISTRAR CONSUMO DE PIENSO
             </h3>
             <p class="text-xs text-gray-400 mb-15 font-medium uppercase tracking-tight">Silo: ${silo.nombre.toUpperCase()}<br>Nivel actual: <b>${silo.cantidadActual.toLocaleString()} kg</b></p>
-            
+
             <div class="flex flex-col gap-12 mb-20">
                 <div>
                     <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">REBAÑO / LOTE DESTINATARIO (OPCIONAL)</label>
                     <select id="consume-rebano-id" class="wizard-input font-bold uppercase" style="color:#fff; background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; border-radius:4px; padding:0 10px; width:100%; display:block;">
                         <option value="">-- Consumo General --</option>
-                        ${rebanos.map(r => `<option value="${r.id}">${r.nombre.toUpperCase()} (${r.especie.toUpperCase()})</option>`).join('')}
+                        ${rebanos.map(r => `<option value="${r.id}" ${rebanoPreseleccionado && Number(rebanoPreseleccionado) === r.id ? 'selected' : ''}>${r.nombre.toUpperCase()} (${r.especie.toUpperCase()})</option>`).join('')}
                     </select>
                 </div>
+                <div class="grid grid-cols-2 gap-10">
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">Nº DE SACOS</label>
+                        <input type="number" id="consume-sacos" class="wizard-input font-bold" min="0" step="1" value="0" style="font-family:'IBM Plex Mono', monospace;" oninput="SilosView._recalcularConsumoTotal(${silo.cantidadActual})">
+                    </div>
+                    <div>
+                        <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">KG POR SACO</label>
+                        <input type="number" id="consume-kg-saco" class="wizard-input font-bold" min="0" step="0.5" value="0" style="font-family:'IBM Plex Mono', monospace;" oninput="SilosView._recalcularConsumoTotal(${silo.cantidadActual})">
+                    </div>
+                </div>
+                <div class="text-center p-8 rounded-sm" style="background:rgba(255,255,255,0.03); border:1px solid #27272a;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider">TOTAL A CONSUMIR</span>
+                    <div id="consume-total-kg" class="text-white font-black text-lg">0 kg</div>
+                    <input type="hidden" id="consume-amount" value="0">
+                </div>
                 <div>
-                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">CANTIDAD CONSUMIDA (kg)</label>
-                    <input type="number" id="consume-amount" class="wizard-input font-bold" min="1" max="${silo.cantidadActual}" value="${Math.min(silo.cantidadActual, 200)}" style="font-family:'IBM Plex Mono', monospace;">
+                    <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">VALOR TOTAL (€, OPCIONAL)</label>
+                    <input type="number" id="consume-valor" class="wizard-input font-bold" min="0" step="0.01" placeholder="Si se deja vacío, se calcula al precio de la última carga" style="font-family:'IBM Plex Mono', monospace;">
                 </div>
                 <div>
                     <label class="text-gray-500 font-950 uppercase text-[0.55rem] tracking-wider mb-4 d-block">FECHA DE CONSUMO</label>
@@ -572,6 +588,20 @@ const SilosView = {
         ModalManager.show('consume-silo-modal', html, { closeOnOverlayClick: true });
     },
 
+    /** Recalcula el total en kg (sacos × kg/saco) y lo refleja en el input oculto usado al guardar. */
+    _recalcularConsumoTotal(maxStock) {
+        const sacos = Number(document.getElementById('consume-sacos')?.value) || 0;
+        const kgSaco = Number(document.getElementById('consume-kg-saco')?.value) || 0;
+        const total = Math.round(sacos * kgSaco * 100) / 100;
+        const totalEl = document.getElementById('consume-total-kg');
+        const hiddenEl = document.getElementById('consume-amount');
+        if (hiddenEl) hiddenEl.value = total;
+        if (totalEl) {
+            totalEl.textContent = `${total.toLocaleString('es-ES')} kg`;
+            totalEl.style.color = total > maxStock ? 'var(--c-danger)' : '#fff';
+        }
+    },
+
     async _guardarConsumoSilo(id) {
         const silo = this._cachedSilos.find(s => s.id === Number(id));
         if (!silo) return;
@@ -579,13 +609,16 @@ const SilosView = {
         const amountInput = document.getElementById('consume-amount');
         const dateInput = document.getElementById('consume-date');
         const rebanoSelect = document.getElementById('consume-rebano-id');
+        const sacos = Number(document.getElementById('consume-sacos')?.value) || 0;
+        const kgPorSaco = Number(document.getElementById('consume-kg-saco')?.value) || 0;
+        const valorInput = document.getElementById('consume-valor');
 
         const amount = Number(amountInput?.value) || 0;
         const date = dateInput?.value || new Date().toISOString().split('T')[0];
         const rebanoId = rebanoSelect?.value ? Number(rebanoSelect.value) : null;
 
         if (amount <= 0 || amount > silo.cantidadActual) {
-            Toast.show('Ingresa una cantidad de consumo válida', 'warning');
+            Toast.show('Ingresa nº de sacos y kg/saco válidos (el total no puede superar el stock)', 'warning');
             return;
         }
 
@@ -601,19 +634,21 @@ const SilosView = {
         const nuevaCantidad = silo.cantidadActual - amount;
         silo.cantidadActual = nuevaCantidad;
 
-        // Coste real del consumo (base para el Índice de Conversión Alimenticia por lote)
+        // Coste real del consumo (base para el Índice de Conversión Alimenticia por lote):
+        // se usa el valor introducido manualmente si lo hay; si no, se deriva del precio de la última carga.
+        const valorManual = Number(valorInput?.value) || 0;
         const precioKg = Number(silo.precioUltimaCargaKg) || 0;
-        const costeConsumo = Math.round(precioKg * amount * 100) / 100;
+        const costeConsumo = valorManual > 0 ? valorManual : Math.round(precioKg * amount * 100) / 100;
 
         await window.db.put('config_silos', silo);
         ModalManager.close('consume-silo-modal');
 
-        // Registrar evento de consumo de telemetría de silo_pienso
+        // Registrar evento de consumo de telemetría de silo_pienso (base del ICA por lote)
         try {
             const activeFincaId = await Fincas.getActiveId();
-            const observaciones = rebano 
-                ? `Consumo de ${amount.toLocaleString()} kg para Rebaño: "${rebano.nombre.toUpperCase()}" (${rebano.especie.toUpperCase()}). Silo: ${silo.nombre.toUpperCase()}. Restante: ${nuevaCantidad.toLocaleString()} kg.`
-                : `Consumo general registrado en ${silo.nombre.toUpperCase()}. Restante: ${nuevaCantidad.toLocaleString()} kg.`;
+            const observaciones = rebano
+                ? `Consumo de ${amount.toLocaleString()} kg (${sacos} sacos × ${kgPorSaco} kg) para Rebaño: "${rebano.nombre.toUpperCase()}" (${rebano.especie.toUpperCase()}). Silo: ${silo.nombre.toUpperCase()}. Restante: ${nuevaCantidad.toLocaleString()} kg.`
+                : `Consumo general de ${amount.toLocaleString()} kg (${sacos} sacos × ${kgPorSaco} kg) registrado en ${silo.nombre.toUpperCase()}. Restante: ${nuevaCantidad.toLocaleString()} kg.`;
 
             const eventoSilo = {
                 fincaId: activeFincaId,
@@ -625,18 +660,49 @@ const SilosView = {
                 motivo_tarea: 'alimentacion',
                 valor_neto: amount,
                 unidad: 'kg',
+                num_sacos: sacos,
+                kilos_por_saco: kgPorSaco,
                 precioKgConsumo: precioKg,
                 costeConsumo: costeConsumo,
                 observaciones: observaciones,
                 creadoEn: new Date().toISOString()
             };
-            await window.db.add('registro_eventos', eventoSilo);
+            const eventoId = await window.db.add('registro_eventos', eventoSilo);
+
+            // Si el consumo se imputa a un rebaño, generar también el gasto analítico correspondiente
+            // (categoría Alimentación), para que aparezca en Gastos/Informes y en la ficha del rebaño.
+            // Se enlaza al evento vía eventoConsumoId para no duplicar el importe entre ambas fuentes.
+            if (rebanoId && window.Gastos) {
+                try {
+                    const gastoId = await Gastos.save({
+                        fincaId: activeFincaId,
+                        categoria: 'Alimentacion',
+                        concepto: `Consumo de pienso: ${silo.alimento || silo.nombre} (${sacos} sacos × ${kgPorSaco} kg)`,
+                        monto: costeConsumo,
+                        fecha: date,
+                        rebanoId: rebanoId,
+                        siloId: id,
+                        num_sacos: sacos,
+                        kilos_por_saco: kgPorSaco,
+                        kilos_totales: amount,
+                        evento_consumo_id: eventoId,
+                        origen_modulo: 'silos'
+                    });
+                    eventoSilo.id = eventoId;
+                    eventoSilo.gastoId = gastoId;
+                    await window.db.put('registro_eventos', eventoSilo);
+                } catch (err) {
+                    console.error('[SilosView] No se pudo generar el gasto analítico del consumo:', err);
+                }
+            }
         } catch (e) {
             console.error('[SilosView] No se pudo guardar el evento de consumo:', e);
         }
 
-        Toast.show(`Consumo de pienso registrado con éxito para el lote.`, 'success');
-        this.render();
+        Toast.show(`Consumo de pienso registrado y gasto imputado correctamente.`, 'success');
+        const onSaved = this._consumoOnSaved;
+        this._consumoOnSaved = null;
+        if (onSaved) onSaved(); else this.render();
     },
 
     _abrirFormularioSilo(id = null) {
