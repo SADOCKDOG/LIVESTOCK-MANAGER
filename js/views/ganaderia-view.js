@@ -4,7 +4,7 @@
  * Integra: Animales, Rebaños, Patrimonio y Ganadería (ICA), Sanidad/Veterinaria
  */
 const GanaderiaView = {
-  _activeSubModule: 'animales', // 'animales', 'rebanos', 'patrimonio', 'sanidad'
+  _activeSubModule: 'animales', // 'animales', 'rebanos', 'patrimonio', 'zonas', 'sanidad'
   _cache: null,
 
   async render() {
@@ -23,6 +23,7 @@ const GanaderiaView = {
       animales: { color: 'var(--c-orange)', icon: Icons.animales(), title: 'Censo de Animales', desc: 'Control de crotales, altas, bajas e inventario' },
       rebanos: { color: 'var(--c-info)', icon: Icons.rebanos(), title: 'Lotes y Rebaños', desc: 'Agrupamiento de ganado y asignación de lotes' },
       patrimonio: { color: 'var(--c-warning)', icon: Icons.edificio(), title: 'Patrimonio y Ganadería', desc: 'Censo, lotes y conversión alimenticia de toda la finca' },
+      zonas: { color: 'var(--c-success)', icon: Icons.zonas(), title: 'Zonas y Parcelas', desc: 'Ubicación de rebaños, UGM, carga ganadera y PAC' },
       sanidad: { color: 'var(--c-purple)', icon: Icons.sanidad(), title: 'Legislación Sanitaria y Sanidad', desc: 'Libro de tratamientos, vacunas y periodos de supresión' }
     };
 
@@ -57,6 +58,7 @@ const GanaderiaView = {
             <button class="pestanas-premium-btn ${this._activeSubModule === 'animales' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'animales'}" style="--mode-color:var(--c-orange);" onclick="GanaderiaView._cambiarSubModulo('animales')">${Icons.animales()} ANIMALES</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'rebanos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'rebanos'}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('rebanos')">${Icons.rebanos()} REBAÑOS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'patrimonio' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'patrimonio'}" style="--mode-color:var(--c-warning);" onclick="GanaderiaView._cambiarSubModulo('patrimonio')">${Icons.edificio()} PATRIMONIO</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'zonas'}" style="--mode-color:var(--c-success);" onclick="GanaderiaView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'sanidad' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'sanidad'}" style="--mode-color:var(--c-purple);" onclick="GanaderiaView._cambiarSubModulo('sanidad')">${Icons.sanidad()} SANIDAD</button>
           </div>
         </div>
@@ -78,6 +80,9 @@ const GanaderiaView = {
         break;
       case 'patrimonio':
         if (window.PatrimonioView) await PatrimonioView.render(document.getElementById('ganaderia-tab-content'));
+        break;
+      case 'zonas':
+        if (window.ZonasView) await ZonasView.render();
         break;
       case 'sanidad':
         if (window.SanidadView) await SanidadView.render(document.getElementById('ganaderia-tab-content'));

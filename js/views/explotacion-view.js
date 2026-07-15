@@ -166,7 +166,6 @@ const ExplotacionView = {
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
           <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Explotación y Soporte">
             <button class="pestanas-premium-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'explotacion'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('explotacion')">${Icons.finca()} EXPRO</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'zonas'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'silos'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'fitosanitarios'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'gastos'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
@@ -187,9 +186,6 @@ const ExplotacionView = {
       case 'explotacion':
         const d = this._cachedData || (await this._ensureData(fincaId, this._needsDataRefresh) || this._cachedData);
         this._renderModoExplotacion(document.getElementById('expro-tab-content'), d);
-        break;
-      case 'zonas':
-        if (window.ZonasView) await ZonasView.render();
         break;
       case 'silos':
         if (window.SilosView) await SilosView.render();
@@ -572,14 +568,13 @@ const ExplotacionView = {
   _getSubModuleMeta(sub) {
     const map = {
       explotacion: { color: 'var(--c-success)' },
-      zonas: { color: 'var(--c-success)' },
       silos: { color: 'var(--c-success)' },
       fitosanitarios: { color: 'var(--c-purple)' },
       gastos: { color: 'var(--c-purple)' },
       proveedores: { color: 'var(--c-purple)' },
       tramites: { color: 'var(--c-info)' }
     };
-    return map[sub] || map.zonas;
+    return map[sub] || map.explotacion;
   }
 };
 

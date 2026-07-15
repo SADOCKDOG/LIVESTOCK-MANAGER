@@ -930,7 +930,7 @@ const App = {
 
     // URL redirections for consolidated architecture v5.0
     const redirectMap = {
-      '/zonas': '/explotacion?tab=zonas',
+      '/zonas': '/ganaderia?tab=zonas',
       '/silos': '/explotacion?tab=silos',
       '/fitosanitario': '/explotacion?tab=fitosanitarios',
       '/gastos': '/explotacion?tab=gastos',
@@ -1689,8 +1689,8 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/carne-view.js', 'js/views/leche-view.js', 'js/views/hibrido-view.js'],
-    expro: ['js/views/explotacion-view.js', 'js/views/zonas-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/carne-view.js', 'js/views/leche-view.js', 'js/views/hibrido-view.js'],
+    expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
     informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
     cuaderno: ['js/views/cuaderno-view.js'],
@@ -1703,8 +1703,8 @@ const App = {
 
   // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
   _routeGroups: {
-    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/carne': 'gegan', '/hibrido': 'gegan', '/animales': 'gegan', '/leche': 'gegan', '/rebano': 'gegan', '/animal': 'gegan',
-    '/explotacion': 'expro', '/zonas': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/zona': 'expro', '/proveedor': 'expro',
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/carne': 'gegan', '/hibrido': 'gegan', '/animales': 'gegan', '/leche': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan',
+    '/explotacion': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/proveedor': 'expro',
     '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
     '/informes': 'informes', '/alertas': 'informes',
     '/cuaderno': 'cuaderno',
@@ -1727,7 +1727,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.39';
+        s.src = src + '?v=6.28.40';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;
