@@ -207,47 +207,39 @@ const ExplotacionView = {
         await this._renderTramitesView(document.getElementById('expro-tab-content'), fincaId);
         break;
       case 'traslado':
-        let oldHash = location.hash;
+        window._redirectSuppression = true;
         try {
           if (window.App && window.App._abrirWizardTraslado) await window.App._abrirWizardTraslado();
           else if (window.WizardTraslado) await window.WizardTraslado.abrir();
         } finally {
-          if (!location.hash.startsWith('#/expro')) {
-            location.hash = oldHash;
-          }
+          window._redirectSuppression = false;
         }
         break;
       case 'censo':
-        let oldHash = location.hash;
+        window._redirectSuppression = true;
         try {
           if (window.App && window.App._abrirWizardCenso) await window.App._abrirWizardCenso();
           else if (window.WizardCenso) await window.WizardCenso.abrir();
         } finally {
-          if (!location.hash.startsWith('#/expro')) {
-            location.hash = oldHash;
-          }
+          window._redirectSuppression = false;
         }
         break;
       case 'crotales':
-        let oldHash = location.hash;
+        window._redirectSuppression = true;
         try {
           if (window.App && window.App._abrirWizardCrotales) await window.App._abrirWizardCrotales();
           else if (window.WizardCrotales) await window.WizardCrotales.abrir();
         } finally {
-          if (!location.hash.startsWith('#/expro')) {
-            location.hash = oldHash;
-          }
+          window._redirectSuppression = false;
         }
         break;
       case 'guia':
-        let oldHash = location.hash;
+        window._redirectSuppression = true;
         try {
           if (window.App && window.App._abrirWizardGuiaMovimiento) await window.App._abrirWizardGuiaMovimiento();
           else if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
         } finally {
-          if (!location.hash.startsWith('#/expro')) {
-            location.hash = oldHash;
-          }
+          window._redirectSuppression = false;
         }
         break;
     }
