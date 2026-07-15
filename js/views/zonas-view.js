@@ -7,7 +7,7 @@
 const ZonasView = {
   async render() {
     if (window.App) App.updateHeaderColor('zonas');
-    const main = document.getElementById("expro-tab-content") || document.getElementById("app-content");
+    const main = document.getElementById("ganaderia-tab-content") || document.getElementById("app-content");
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
 

@@ -191,6 +191,12 @@ const SanidadView = {
           </div>
         </div>
 
+        <!-- Accesos directos a trámites oficiales -->
+        <div class="grid grid-cols-2 gap-8 mb-14">
+          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardCrotales()">${Icons.documento()} Pedido de Crotales</button>
+          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardGuiaMovimiento()">${Icons.documento()} Guía de Movimiento</button>
+        </div>
+
         <div class="flex items-center gap-8 mb-14">
           <div class="search-input-wrapper flex-1" style="position: relative;">
             <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #555;">${Icons.buscar()}</span>
