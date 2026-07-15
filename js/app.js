@@ -949,10 +949,16 @@ const App = {
       '/transportistas': '/comercializacion?tab=transportistas'
     };
 
-    // Check if we need to redirect
-    if (redirectMap[path]) {
-      window.location.hash = '#' + redirectMap[path];
-      return;
+    // Check if we need to redirect (unless suppressing for wizards)
+    if (!window._redirectSuppression || !['/rebanos','/zonas','/animales','/animal'].includes(path)) {
+      // Not suppressing, or path not in suppression list: proceed with normal redirect check
+      if (redirectMap[path]) {
+        window.location.hash = '#' + redirectMap[path];
+        return;
+      }
+    } else {
+      // Suppressed for this path: clear flag and continue without redirect
+      window._redirectSuppression = false;
     }
 
     await this.updateNavigationMenu();
