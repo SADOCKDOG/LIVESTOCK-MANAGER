@@ -2399,10 +2399,14 @@ const InformesView = {
         </div>
         <div class="flex gap-10 mt-20">
           <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-pac-guardar">${Icons.guardar()} Guardar</button>
-          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+          <button class="wizard-btn-action wizard-btn-secondary" onclick="InformesView._cerrarOverlayPAC(this)">Cancelar</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
+
+    InformesView._pacGuardado = false;
+    App.setExitGuard(() => InformesView._confirmSalirOverlayPAC());
+
     overlay.querySelector('#btn-pac-guardar').onclick = async () => {
       const anio = parseInt(document.getElementById('pac-anio').value);
       const concepto = document.getElementById('pac-concepto').value.trim();
@@ -2418,11 +2422,26 @@ const InformesView = {
           fincaId: await Fincas.getActiveId(),
           creadoEn: new Date().toISOString()
         });
+        InformesView._pacGuardado = true;
+        App.clearExitGuard();
         App.toast('Subvención registrada', 'success');
         overlay.remove();
         if (window.InformesView) { InformesView._cachedData = null; await InformesView.render(); }
       } catch (e) { App.toastError("Error: " + e.message); }
     };
+  },
+
+  /** Guarda de salida compartida con el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirOverlayPAC() {
+    if (this._pacGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _cerrarOverlayPAC(btn) {
+    if (!(await this._confirmSalirOverlayPAC())) return;
+    App.clearExitGuard();
+    const overlay = btn.closest('.wizard-full-screen');
+    if (overlay) overlay.remove();
   },
 
   // ===================== GRÁFICOS =====================

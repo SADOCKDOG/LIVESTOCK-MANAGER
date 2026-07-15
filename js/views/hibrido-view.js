@@ -689,9 +689,12 @@ const HibridoView = {
                     <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                     <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
                 </div>
-                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="HibridoView._cerrarOverlayRegistro(this)">Cancelar</button>
             </div>`;
         document.body.appendChild(overlay);
+
+        HibridoView._registroGuardado = false;
+        App.setExitGuard(() => HibridoView._confirmSalirOverlayRegistro());
 
         overlay.querySelector('#btn-save-reg').onclick = async () => {
           const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
@@ -706,6 +709,8 @@ const HibridoView = {
           evento.actualizadoEn = new Date().toISOString();
 
           await window.db.put('registro_eventos', evento);
+          HibridoView._registroGuardado = true;
+          App.clearExitGuard();
           App.toast("Registro lácteo actualizado", "success");
           overlay.remove();
           HibridoView.render();
@@ -714,6 +719,8 @@ const HibridoView = {
         overlay.querySelector('#btn-del-reg').onclick = async () => {
           if (!await Confirm.confirm("Eliminar Control", "¿Eliminar este control de forma permanente?", true)) return;
           await window.db.delete('registro_eventos', id);
+          HibridoView._registroGuardado = true;
+          App.clearExitGuard();
           App.toast("Registro lácteo eliminado", "success");
           overlay.remove();
           HibridoView.render();
@@ -722,6 +729,19 @@ const HibridoView = {
         App.toastError(e.message);
       }
     }
+  },
+
+  /** Guarda de salida compartida con el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirOverlayRegistro() {
+    if (this._registroGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _cerrarOverlayRegistro(btn) {
+    if (!(await this._confirmSalirOverlayRegistro())) return;
+    App.clearExitGuard();
+    const overlay = btn.closest('.wizard-full-screen');
+    if (overlay) overlay.remove();
   },
 
   async _abrirAsistenteTratamientoMix() {
