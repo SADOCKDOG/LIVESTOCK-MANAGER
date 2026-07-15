@@ -359,8 +359,6 @@ const App = {
       { path: '/animales', label: 'Animales', icon: Icons.animales() },
       { path: '/rebanos', label: 'Rebaños', icon: Icons.rebanos() },
       { path: '/ganaderia', label: 'Ganadería', icon: Icons.rebanos() },
-      { path: '/leche', label: 'Leche', icon: Icons.leche() },
-      { path: '/hibrido', label: 'Híbrido', icon: Icons.rotacion() },
       { path: '/explotacion', label: 'ExPro', icon: Icons.dashboard() },
       { path: '/comercializacion', label: 'CoMer', icon: Icons.carne() },
       { path: '/zonas', label: 'Zonas', icon: Icons.zonas() },
@@ -937,9 +935,9 @@ const App = {
       '/fitosanitario': '/explotacion?tab=fitosanitarios',
       '/gastos': '/explotacion?tab=gastos',
       '/proveedores': '/explotacion?tab=proveedores',
-      '/leche': '/ganaderia?tab=leche',
-      '/carne': '/ganaderia?tab=carne',
-      '/hibrido': '/ganaderia?tab=hibrido',
+      '/leche': '/explotacion',
+      '/carne': '/explotacion',
+      '/hibrido': '/explotacion',
       '/rebanos': '/ganaderia?tab=rebanos',
       '/animales': '/ganaderia?tab=animales',
       '/compradores': '/comercializacion?tab=compradores',
@@ -1691,7 +1689,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/carne-view.js', 'js/views/leche-view.js', 'js/views/hibrido-view.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/carne-view.js', 'js/views/leche-view.js', 'js/views/hibrido-view.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/zonas-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
     informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1729,7 +1727,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.38';
+        s.src = src + '?v=6.28.39';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;

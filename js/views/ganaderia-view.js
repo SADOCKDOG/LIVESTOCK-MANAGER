@@ -1,10 +1,10 @@
 /**
- * Livestock Manager - GanaderiaView v2.0.0
+ * Livestock Manager - GanaderiaView v3.0.0
  * Consola Unificada de Ganadería (GeGan) con barra multipestaña horizontal scrollable
- * Integra: Animales, Rebaños, Sanidad/Veterinaria, Control Lácteo, Control Cárnico y Consola Híbrida
+ * Integra: Animales, Rebaños, Patrimonio y Ganadería (ICA), Sanidad/Veterinaria
  */
 const GanaderiaView = {
-  _activeSubModule: 'animales', // 'animales', 'rebanos', 'sanidad', 'carne', 'leche', 'hibrido'
+  _activeSubModule: 'animales', // 'animales', 'rebanos', 'patrimonio', 'sanidad'
   _cache: null,
 
   async render() {
@@ -22,10 +22,8 @@ const GanaderiaView = {
     const moduloMeta = {
       animales: { color: 'var(--c-orange)', icon: Icons.animales(), title: 'Censo de Animales', desc: 'Control de crotales, altas, bajas e inventario' },
       rebanos: { color: 'var(--c-info)', icon: Icons.rebanos(), title: 'Lotes y Rebaños', desc: 'Agrupamiento de ganado y asignación de lotes' },
-      sanidad: { color: 'var(--c-purple)', icon: Icons.sanidad(), title: 'Sanidad & Tratamientos', desc: 'Libro de tratamientos, vacunas y periodos de supresión' },
-      carne: { color: 'var(--c-danger)', icon: Icons.carne(), title: 'Control Cárnico', desc: 'Pesajes, ganancia media diaria y rendimiento canal' },
-      leche: { color: 'var(--c-info)', icon: Icons.leche(), title: 'Control Lácteo', desc: 'Ordeños diarios, calidades y entregas a compradores' },
-      hibrido: { color: 'var(--c-success)', icon: Icons.rotacion(), title: 'Consola Híbrida', desc: 'Sistemas de doble aptitud y rotación de pastizales' }
+      patrimonio: { color: 'var(--c-warning)', icon: Icons.edificio(), title: 'Patrimonio y Ganadería', desc: 'Censo, lotes y conversión alimenticia de toda la finca' },
+      sanidad: { color: 'var(--c-purple)', icon: Icons.sanidad(), title: 'Legislación Sanitaria y Sanidad', desc: 'Libro de tratamientos, vacunas y periodos de supresión' }
     };
 
     const currentMeta = moduloMeta[this._activeSubModule] || moduloMeta.animales;
@@ -58,17 +56,15 @@ const GanaderiaView = {
           <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Ganadería">
             <button class="pestanas-premium-btn ${this._activeSubModule === 'animales' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'animales'}" style="--mode-color:var(--c-orange);" onclick="GanaderiaView._cambiarSubModulo('animales')">${Icons.animales()} ANIMALES</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'rebanos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'rebanos'}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('rebanos')">${Icons.rebanos()} REBAÑOS</button>
+            <button class="pestanas-premium-btn ${this._activeSubModule === 'patrimonio' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'patrimonio'}" style="--mode-color:var(--c-warning);" onclick="GanaderiaView._cambiarSubModulo('patrimonio')">${Icons.edificio()} PATRIMONIO</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'sanidad' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'sanidad'}" style="--mode-color:var(--c-purple);" onclick="GanaderiaView._cambiarSubModulo('sanidad')">${Icons.sanidad()} SANIDAD</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'carne'}" style="--mode-color:var(--c-danger);" onclick="GanaderiaView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'leche'}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'hibrido' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'hibrido'}" style="--mode-color:var(--c-success);" onclick="GanaderiaView._cambiarSubModulo('hibrido')">${Icons.rotacion()} HÍBRIDO</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
           ${Icons.siguiente()}
         </div>
       </div>
-      
+
       <!-- Contenedor Dinámico para la pestaña activa -->
       <div id="ganaderia-tab-content" class="animate-fade-in"></div>`;
 
@@ -80,17 +76,11 @@ const GanaderiaView = {
       case 'rebanos':
         if (window.RebanosView) await RebanosView.render();
         break;
+      case 'patrimonio':
+        if (window.PatrimonioView) await PatrimonioView.render(document.getElementById('ganaderia-tab-content'));
+        break;
       case 'sanidad':
         if (window.SanidadView) await SanidadView.render(document.getElementById('ganaderia-tab-content'));
-        break;
-      case 'carne':
-        if (window.CarneView) await CarneView.render();
-        break;
-      case 'leche':
-        if (window.LecheView) await LecheView.render();
-        break;
-      case 'hibrido':
-        if (window.HibridoView) await HibridoView.render();
         break;
     }
 
