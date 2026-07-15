@@ -67,12 +67,7 @@ const RebanosView = {
         </div>
       </div>
 
-      <!-- Accesos directos a trámites de rebaño -->
-      <div class="grid grid-cols-2 gap-8 mb-14">
-        <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardTraslado()">${Icons.rotacion()} Traslado</button>
-        <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardCenso()">${Icons.documento()} Censo Anual</button>
-      </div>
-
+      
       <div class="card mb-14 p-12" style="background:rgba(59,130,246,0.015); border:1px solid rgba(255,255,255,0.03);">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
