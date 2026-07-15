@@ -40,39 +40,10 @@ const HibridoView = {
     const sanitariosFinca = todosSanitarios.filter(s => rebanosIds.includes(s.rebanoId));
     sanitariosFinca.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    // Periodos de supresión activos de carne y de leche
-    const hoy = new Date();
-    const supresionesCarne = [];
-    const supresionesLeche = [];
-    sanitariosFinca.forEach(s => {
-      const fechaApli = new Date(s.fecha);
-
-      // Carne
-      const dCarne = s.tiempo_espera_carne_dias || 0;
-      if (dCarne > 0) {
-        const fFinC = new Date(fechaApli.getTime() + dCarne * 24 * 60 * 60 * 1000);
-        if (fFinC > hoy) {
-          supresionesCarne.push({
-            ...s,
-            diasRestantes: Math.ceil((fFinC - hoy) / (24 * 60 * 60 * 1000)),
-            fechaFin: fFinC.toISOString().split('T')[0]
-          });
-        }
-      }
-
-      // Leche
-      const dLeche = s.tiempo_espera_leche_dias || 0;
-      if (dLeche > 0 || s.prohibidoLeche) {
-        const fFinL = new Date(fechaApli.getTime() + (s.prohibidoLeche ? 999 * 24 : dLeche * 24) * 60 * 60 * 1000);
-        if (fFinL > hoy) {
-          supresionesLeche.push({
-            ...s,
-            diasRestantes: s.prohibidoLeche ? 'PROHIBIDO' : Math.ceil((fFinL - hoy) / (24 * 60 * 60 * 1000)),
-            fechaFin: s.prohibidoLeche ? 'INDEFINIDO' : fFinL.toISOString().split('T')[0]
-          });
-        }
-      }
-    });
+    // Periodos de supresión activos de carne y de leche (cálculo centralizado en SanidadView)
+    const sanitariosEnriquecidos = window.SanidadView ? SanidadView.enriquecer(sanitariosFinca) : [];
+    const supresionesCarne = sanitariosEnriquecidos.filter(t => t.enSupresionCarne);
+    const supresionesLeche = sanitariosEnriquecidos.filter(t => t.enSupresionLeche);
 
     // 3. Totales económicos y MOFA consolidado
     const totalIngresosCarne = ventasCarne.reduce((s, v) => s + (v.importe_total || v.valor_neto || 0), 0);
@@ -412,14 +383,6 @@ const HibridoView = {
     </div>`;
   },
 
-  _fmtFecha(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return !isNaN(d.getTime()) ? d.toLocaleDateString() : '-';
-    } catch (e) { return '-'; }
-  },
-
   // ========== BLOQUE 1: PATRIMONIO Y GANADERIA ==========
   _renderPatrimonio(content, d) {
     const html = `
@@ -473,119 +436,43 @@ const HibridoView = {
     content.innerHTML = html;
   },
 
-  // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
+  // ========== BLOQUE 3: LOGÍSTICA Y VENTAS (dueño único del dato: ComercializacionView) ==========
   _renderComercializacion(content, d) {
-    // Liquidaciones unificadas
-    const lList = [];
-    d.ventasCarne.forEach(v => {
-      lList.push({
-        id: v.id,
-        tipo: 'carne',
-        titulo: `${Icons.carne()} Carne: ${v.numero_albaran || 'Albarán'} - ${v.razonSocial || 'Matadero'}`,
-        fecha: v.fechaSacrificio || v.fecha,
-        valor: v.importe_total || v.valor_neto || 0,
-        detalle: `${v.pesoCanal || 0} kg canal`,
-        onclick: `App._abrirDetalleVentaCarne(${v.id})`
-      });
-    });
-    d.entregasLeche.forEach(e => {
-      lList.push({
-        id: e.id,
-        tipo: 'leche',
-        titulo: `${Icons.leche()} Leche: Entrega de ${(e.cantidad || 0).toLocaleString()} L`,
-        fecha: e.fechaRecogida || e.fecha,
-        valor: e.importe_total || e.cantidad * e.precioBase || 0,
-        detalle: `Vehículo: ${e.matriculaCisterna || '—'}`,
-        onclick: `location.hash='/albaran-leche?id=${e.id}'`
-      });
-    });
-    lList.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
-
     const html = `
       <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
-            <div>
-              <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS CONSOLIDADO
-              </h2>
-              <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Logística, transporte, compradores, contratos y ventas consolidado</div>
-            </div>
-          </div>
-          <div class="flex gap-4">
-            <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
-              ${Icons.agregar()} Venta Carne
-            </button>
-            <button class="btn btn-success btn-sm" onclick="App._abrirWizardAlbaranLeche()">
-              ${Icons.agregar()} Albarán Leche
-            </button>
+        <div class="flex items-center gap-12 mb-16">
+          <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
+          <div>
+            <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
+              <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS CONSOLIDADO
+            </h2>
+            <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Ventas de carne, entregas de leche, compradores y transporte</div>
           </div>
         </div>
 
         ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
 
-        <!-- Accesos directos comerciales -->
-        <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
-          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Logística</a>
-          <a href="#/comercializacion" class="widget-link-btn">${Icons.comercial()} Comercial</a>
+        <div class="text-[0.62rem] text-gray-500 font-bold uppercase tracking-wide mb-10">
+          Las ventas, entregas y contratos se registran y consultan en Comercialización, para mantener un único histórico.
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Historial de Ventas e Ingresos Mixtos (${lList.length})
-        </div>
-        <div class="grid gap-10">
-          ${lList.slice(0, 15).map(l => {
-            const color = l.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-info)';
-            return `
-              <div class="card-registro" onclick="${l.onclick}" style="--registro-color: ${color};">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-6">
-                      <span class="text-xl">${l.tipo === 'carne' ? Icons.carne() : Icons.leche()}</span>
-                      <h3 class="section-h3 m-0 text-ellipsis">${l.titulo}</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                      <span>${Icons.calendar()} ${this._fmtFecha(l.fecha)}</span>
-                      <span>·</span>
-                      <span>${l.detalle}</span>
-                    </div>
-                  </div>
-                  <div class="text-right flex-shrink-0 ml-8">
-                    <span class="badge badge-sm text-green font-bold text-lg" style="background:rgba(204,255,0,0.1); border:1px solid rgba(204,255,0,0.3); display:block;">${Math.round(l.valor).toLocaleString()} €</span>
-                  </div>
-                </div>
-              </div>`;
-          }).join('')}
+        <!-- Accesos directos comerciales -->
+        <div class="grid grid-cols-2 gap-8">
+          <a href="#/comercializacion?tab=carne" class="widget-link-btn">${Icons.carne()} Ventas Carne</a>
+          <a href="#/comercializacion?tab=leche" class="widget-link-btn">${Icons.leche()} Entregas Leche</a>
+          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
+          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Transportistas</a>
+          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardVentaMasiva()">${Icons.agregar()} Registrar Venta Carne</button>
+          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardAlbaranLeche()">${Icons.agregar()} Registrar Albarán Leche</button>
         </div>
       </div>
     `;
     content.innerHTML = html;
   },
 
-  // ========== BLOQUE 4: REGISTROS, LEGISLACIÓN Y CUMPLIMIENTO SANITARIO ==========
+  // ========== BLOQUE 4: SANIDAD Y LEGISLACIÓN (cálculo/edición centralizados en SanidadView) ==========
   _renderLegislacion(content, d) {
-    // Alertas de supresión
-    let alertasHtml = '';
-    if (d.supresionesCarne.length > 0 || d.supresionesLeche.length > 0) {
-      alertasHtml = `
-        <div class="supresion-alerta-box">
-          <strong>${Icons.alerta()} ALERTAS SANITARIAS ACTIVAS:</strong>
-          <ul class="mt-4 pl-20 m-0">
-            ${d.supresionesCarne.map(s => `
-              <li><span class="sup-badge sup-badge-carne">CARNE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> para matadero.</li>
-            `).join('')}
-            ${d.supresionesLeche.map(s => `
-              <li><span class="sup-badge sup-badge-leche">LECHE</span> Rebaño <strong class="text-white">${s.rebanoId}</strong> — ${typeof s.diasRestantes === 'number' ? `Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> para ordeño.` : '<strong class="text-white">Ordeño prohibido durante el tratamiento.</strong>'}</li>
-            `).join('')}
-          </ul>
-        </div>
-      `;
-    }
-
     const html = `
-      ${alertasHtml}
       <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
@@ -610,138 +497,10 @@ const HibridoView = {
           <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno de Explotación</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Historial Sanitario Consolidado (${d.sanitariosFinca.length})
-        </div>
-        <div class="grid gap-10">
-          ${d.sanitariosFinca.length > 0
-            ? d.sanitariosFinca.slice(0, 15).map(s => {
-                const enSupC = d.supresionesCarne.some(ts => ts.id === s.id);
-                const enSupL = d.supresionesLeche.some(ts => ts.id === s.id);
-                const color = (enSupC || enSupL) ? 'var(--c-danger)' : 'var(--c-purple)';
-                return `
-                  <div class="card-registro" style="--registro-color: ${color};">
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-6">
-                          <span class="text-xl">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
-                        </div>
-                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray">
-                          <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
-                          <span>·</span>
-                          <span>Carne: <strong>${s.tiempo_espera_carne_dias || 0}d</strong> · Leche: <strong>${s.tiempo_espera_leche_dias || 0}d</strong></span>
-                        </div>
-                      </div>
-                      <div class="text-right flex-shrink-0 ml-8">
-                        ${enSupC ? `<span class="badge badge-sm badge-red block mb-2">SUP. CARNE</span>` : ''}
-                        ${enSupL ? `<span class="badge badge-sm badge-blue block">SUP. LECHE</span>` : ''}
-                        ${!enSupC && !enSupL ? `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">LIBRE</span>` : ''}
-                      </div>
-                    </div>
-                  </div>`;
-              }).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm"><span class="text-555 text-sm">${Icons.buscar()} Sin tratamientos sanitarios.</span></div>`
-          }
-        </div>
+        ${window.SanidadView ? SanidadView.renderFragmentHTML(d.sanitariosFinca, { limit: 15, tituloHistorial: `Historial Sanitario Consolidado (${d.sanitariosFinca.length})` }) : ''}
       </div>
     `;
     content.innerHTML = html;
-  },
-
-  async _abrirOpcionesRegistro(id, tipo) {
-    if (tipo === 'carne' && window.CarneView) {
-      await window.CarneView._abrirOpcionesRegistro(id);
-      setTimeout(() => HibridoView.render(), 500);
-    } else {
-      // Editar registro lácteo
-      try {
-        const evento = await window.db.get('registro_eventos', id);
-        if (!evento) return;
-
-        const overlay = document.createElement("div");
-        overlay.className = "wizard-full-screen";
-        overlay.style.justifyContent = "center";
-        overlay.style.alignItems = "center";
-        overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
-        overlay.innerHTML = `
-            <div class="card p-25" style="max-width:420px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
-                <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> EDITAR REGISTRO LÁCTEO</h3>
-                <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
-
-                <div class="grid grid-cols-2 gap-10">
-                  <div class="wizard-input-group">
-                      <label class="wizard-label">Litros (L)</label>
-                      <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
-                  </div>
-                  <div class="wizard-input-group">
-                      <label class="wizard-label">Fecha</label>
-                      <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
-                  </div>
-                </div>
-
-                <div class="wizard-input-group">
-                    <label class="wizard-label">Identificación (Crotal/Lote)</label>
-                    <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input">
-                </div>
-
-                <div class="flex gap-10 mt-20">
-                    <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
-                    <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
-                </div>
-                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="HibridoView._cerrarOverlayRegistro(this)">${Icons.cerrar()} Cancelar</button>
-            </div>`;
-        document.body.appendChild(overlay);
-
-        HibridoView._registroGuardado = false;
-        App.setExitGuard(() => HibridoView._confirmSalirOverlayRegistro());
-
-        overlay.querySelector('#btn-save-reg').onclick = async () => {
-          const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
-          const fecha = overlay.querySelector('#edit-reg-fecha').value;
-          const ident = overlay.querySelector('#edit-reg-ident').value.trim();
-
-          if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
-
-          evento.valor_neto = val;
-          evento.fecha = fecha;
-          evento.snap_identificacion = ident;
-          evento.actualizadoEn = new Date().toISOString();
-
-          await window.db.put('registro_eventos', evento);
-          HibridoView._registroGuardado = true;
-          App.clearExitGuard();
-          App.toast("Registro lácteo actualizado", "success");
-          overlay.remove();
-          HibridoView.render();
-        };
-
-        overlay.querySelector('#btn-del-reg').onclick = async () => {
-          if (!await Confirm.confirm("Eliminar Control", "¿Eliminar este control de forma permanente?", true)) return;
-          await window.db.delete('registro_eventos', id);
-          HibridoView._registroGuardado = true;
-          App.clearExitGuard();
-          App.toast("Registro lácteo eliminado", "success");
-          overlay.remove();
-          HibridoView.render();
-        };
-      } catch (e) {
-        App.toastError(e.message);
-      }
-    }
-  },
-
-  /** Guarda de salida compartida con el botón físico Android (ver App.setExitGuard). */
-  async _confirmSalirOverlayRegistro() {
-    if (this._registroGuardado) return true;
-    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
-  },
-
-  async _cerrarOverlayRegistro(btn) {
-    if (!(await this._confirmSalirOverlayRegistro())) return;
-    App.clearExitGuard();
-    const overlay = btn.closest('.wizard-full-screen');
-    if (overlay) overlay.remove();
   },
 
   async _abrirAsistenteTratamientoMix() {
