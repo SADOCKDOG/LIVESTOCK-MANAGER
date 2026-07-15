@@ -429,9 +429,9 @@ const TransportistasView = {
         </div>
 
         <div class="flex justify-between items-center mt-20">
-          ${isEdit ? `<button onclick="TransportistasView._eliminar(${t.id}); this.closest('.wizard-full-screen').remove();" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
+          ${isEdit ? `<button onclick="TransportistasView._eliminar(${t.id}); App.clearExitGuard(); this.closest('.wizard-full-screen').remove();" class="btn btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
           <div class="flex gap-10">
-            <button class="btn btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} Cancelar</button>
+            <button class="btn btn-secondary" onclick="TransportistasView._cerrarFormulario(this)">${Icons.cerrar()} Cancelar</button>
             <button class="btn btn-success" id="btn-save-trans">${Icons.guardar()} Guardar</button>
           </div>
         </div>
@@ -439,6 +439,9 @@ const TransportistasView = {
       </div>
     `;
     document.body.appendChild(overlay);
+
+    TransportistasView._transportistaGuardado = false;
+    App.setExitGuard(() => TransportistasView._confirmSalirFormulario());
 
     overlay.querySelector('#btn-save-trans').onclick = async () => {
       const errorDiv = overlay.querySelector('#trans-form-error');
@@ -471,6 +474,8 @@ const TransportistasView = {
 
       try {
         await Transportistas.save(data);
+        TransportistasView._transportistaGuardado = true;
+        App.clearExitGuard();
         App.toast(isEdit ? 'Transportista actualizado' : 'Transportista creado', 'success');
         overlay.remove();
         TransportistasView.render();
@@ -479,6 +484,19 @@ const TransportistasView = {
         errorDiv.style.display = 'block';
       }
     };
+  },
+
+  /** Guarda de salida compartida con el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirFormulario() {
+    if (this._transportistaGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _cerrarFormulario(btn) {
+    if (!(await this._confirmSalirFormulario())) return;
+    App.clearExitGuard();
+    const overlay = btn.closest('.wizard-full-screen');
+    if (overlay) overlay.remove();
   },
 
   async _eliminar(id) {

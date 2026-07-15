@@ -335,8 +335,11 @@ const RebanosView = {
     const porCategoria = {};
     animales.forEach(a => { const c = a.categoria || 'Sin categoría'; porCategoria[c] = (porCategoria[c] || 0) + 1; });
 
+    RebanosView._rebanoGuardado = false;
+    App.setExitGuard(() => RebanosView._confirmSalirEdicion());
+
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/rebanos" class="link-back">← Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
+      <div class="mb-20"><a href="#" onclick="RebanosView._salirDetalle(); return false;" class="link-back">← Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
 
       <!-- KPIs -->
       <div class="grid grid-cols-3 gap-8 mb-20">
@@ -401,6 +404,10 @@ const RebanosView = {
           <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="RebanosView._eliminarRebano(${id})">
             ${Icons.eliminar()}
             <span class="widget-link-label">Eliminar</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon flex-1" onclick="RebanosView._salirDetalle()">
+            ${Icons.cerrar()}
+            <span class="widget-link-label">Cancelar</span>
           </button>
           <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="RebanosView._guardarRebano(${id})">
             ${Icons.guardar()}
@@ -495,11 +502,25 @@ const RebanosView = {
       r.notas = document.getElementById("r-edit-notas").value.trim();
       if (!r.nombre) return App.toastError("Nombre requerido");
       await Rebanos.save(r);
+      RebanosView._rebanoGuardado = true;
+      App.clearExitGuard();
       App.toast("Rebaño actualizado", "success");
       App.renderRebanos();
     } catch (e) {
       App.toastError(e.message);
     }
+  },
+
+  /** Guarda de salida compartida con el header-back y el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirEdicion() {
+    if (this._rebanoGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _salirDetalle() {
+    if (!(await this._confirmSalirEdicion())) return;
+    App.clearExitGuard();
+    location.hash = "#/rebanos";
   },
 
   async _crearRebano() {
