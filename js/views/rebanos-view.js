@@ -381,10 +381,14 @@ const RebanosView = {
           <span class="text-[0.6rem] text-gray uppercase font-800">Total imputado</span>
           <div class="text-xl font-950" style="color: var(--p-gold);">—</div>
         </div>
-        <div class="grid grid-cols-1 gap-10 max-w-220 mx-auto mt-8 mb-16">
+        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto mt-8 mb-16">
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="RebanosView._abrirConsumoPienso(${id})">
+            ${Icons.paquete()}
+            <span class="widget-link-label">Consumo Pienso</span>
+          </button>
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="App._abrirFormularioGasto({ rebanoId: ${id}, categoria: 'Alimentacion', origenModulo: 'rebano', onComplete: () => RebanosView._cargarGastosRebano(${id}) })">
             ${Icons.agregar()}
-            <span class="widget-link-label">Imputar Gasto</span>
+            <span class="widget-link-label">Otro Gasto</span>
           </button>
         </div>
         <div id="lista-gastos-rebano" class="mt-10"></div>
@@ -424,6 +428,58 @@ const RebanosView = {
   },
 
   /**
+   * Abre el registro de consumo de pienso (Silos) con este rebaño preseleccionado.
+   * Descuenta stock del silo elegido, imputa kilos al rebaño y genera el gasto
+   * analítico correspondiente (ver SilosView._guardarConsumoSilo).
+   */
+  async _abrirConsumoPienso(rebanoId) {
+    if (window.App && App._ensureViewGroup) {
+      await App._ensureViewGroup('expro');
+    }
+    if (!window.SilosView) {
+      App.toastError('Módulo de Silos no disponible');
+      return;
+    }
+    const silos = await window.db.getAll('config_silos').catch(() => []);
+    if (silos.length === 0) {
+      App.toastError('No hay silos configurados. Crea uno primero en Explotación → Silos.');
+      return;
+    }
+    SilosView._cachedSilos = silos;
+    const onSaved = () => RebanosView._cargarGastosRebano(rebanoId);
+    if (silos.length === 1) {
+      await SilosView._abrirConsumirSilo(silos[0].id, rebanoId, onSaved);
+      return;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.className = "wizard-full-screen";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+    overlay.innerHTML = `
+      <div class="card p-25" style="max-width:380px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
+        <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.paquete()} CONSUMO DE PIENSO</h3>
+        <label class="wizard-label mb-10">Selecciona el silo de origen:</label>
+        <select id="w-consumo-silo" class="wizard-input wizard-select mb-15">
+          ${silos.map(s => `<option value="${s.id}">${s.nombre.toUpperCase()} (${(s.cantidadActual || 0).toLocaleString()} kg)</option>`).join('')}
+        </select>
+        <div class="flex gap-10">
+          <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-consumo-next">Proceder ${Icons.siguiente()}</button>
+          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#btn-consumo-next').onclick = async () => {
+      const siloId = parseInt(overlay.querySelector('#w-consumo-silo').value);
+      overlay.remove();
+      await SilosView._abrirConsumirSilo(siloId, rebanoId, onSaved);
+    };
+  },
+
+  /**
    * Carga los gastos imputados manualmente (gastos_ganaderia) más el consumo de
    * pienso registrado desde Silos (registro_eventos tipo silo_consumo) para este
    * rebaño, como listado combinado de "control de consumos" ordenado por fecha.
@@ -439,11 +495,13 @@ const RebanosView = {
         window.db.getAll('registro_eventos').catch(() => [])
       ]);
       const gastosReb = (gastos || []).filter(g => g.rebanoId == rebanoId);
-      const consumosSilo = (eventos || []).filter(e => e.tipo === 'silo_consumo' && e.rebanoId == rebanoId);
+      // Los consumos de silo ya imputados como gasto (gastoId presente) se excluyen aquí para no
+      // contar el mismo importe dos veces: aparecen representados por su gasto correspondiente.
+      const consumosSilo = (eventos || []).filter(e => e.tipo === 'silo_consumo' && e.rebanoId == rebanoId && !e.gastoId);
 
       const combinado = [
-        ...gastosReb.map(g => ({ tipo: 'gasto', fecha: g.fecha, concepto: g.concepto || g.categoria, categoria: g.categoria, monto: g.monto || 0 })),
-        ...consumosSilo.map(e => ({ tipo: 'consumo', fecha: e.fecha, concepto: `Consumo de pienso (${(e.valor_neto || 0).toLocaleString()} kg)`, categoria: 'Alimentación', monto: e.costeConsumo || 0 }))
+        ...gastosReb.map(g => ({ tipo: 'gasto', fecha: g.fecha, concepto: g.concepto || g.categoria, categoria: g.categoria, monto: g.monto || 0, kg: g.kilos_totales || null })),
+        ...consumosSilo.map(e => ({ tipo: 'consumo', fecha: e.fecha, concepto: `Consumo de pienso (${(e.valor_neto || 0).toLocaleString()} kg)`, categoria: 'Alimentación', monto: e.costeConsumo || 0, kg: e.valor_neto || null }))
       ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
       const total = combinado.reduce((s, x) => s + (x.monto || 0), 0);
@@ -456,7 +514,7 @@ const RebanosView = {
       container.innerHTML = combinado.map(x => `
         <div class="info-box-sm ${x.tipo === 'consumo' ? 'border-left-gold' : 'border-left-green'} mt-8 bg-black">
           <div class="flex justify-between items-center"><span class="text-white font-black uppercase text-sm">${x.tipo === 'consumo' ? Icons.paquete() : Icons.dinero()} ${x.concepto}</span><span class="text-gray-500 font-900 text-[0.6rem]">${new Date(x.fecha).toLocaleDateString()}</span></div>
-          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Categoría: <strong class="text-white">${x.categoria || 'N/D'}</strong> · Importe: <strong class="text-gold">${(x.monto || 0).toLocaleString('es-ES', { maximumFractionDigits: 2 })} €</strong></div>
+          <div class="text-gray text-[0.65rem] mt-6 uppercase font-800 tracking-wider">Categoría: <strong class="text-white">${x.categoria || 'N/D'}</strong> · Importe: <strong class="text-gold">${(x.monto || 0).toLocaleString('es-ES', { maximumFractionDigits: 2 })} €</strong>${x.kg ? ` · Kilos: <strong class="text-white">${x.kg.toLocaleString('es-ES')} kg</strong>` : ''}</div>
         </div>`).join('');
     } catch (e) {
       container.innerHTML = '<p class="text-red text-sm font-900 uppercase">Error cargando gastos</p>';
