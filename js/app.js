@@ -8,7 +8,27 @@ const App = {
   _animalGuardado: false,
   _pesadaBatch: null,
   _config: null,
-  _dirtyChecker: null,
+  /** Guarda de salida de la vista activa: función async () => boolean (true = permite salir). Ver setExitGuard/_confirmLeave. */
+  _exitGuard: null,
+
+  /** Registra la guarda de salida de la vista actualmente renderizada. */
+  setExitGuard(fn) {
+    this._exitGuard = fn;
+  },
+
+  /** Limpia la guarda de salida (llamar tras guardar o al confirmar la salida). */
+  clearExitGuard() {
+    this._exitGuard = null;
+  },
+
+  /** Comprueba la guarda de salida antes de navegar. Devuelve true si se puede continuar. */
+  async _confirmLeave() {
+    if (!this._exitGuard) return true;
+    const guard = this._exitGuard;
+    const ok = await guard();
+    if (ok) this._exitGuard = null;
+    return ok;
+  },
 
   _getColorClass(color) {
     if (!color) return 'text-gray';
@@ -300,8 +320,9 @@ const App = {
     const backBtn = document.getElementById('header-back-btn');
     if (!backBtn || backBtn._wired) return;
     backBtn._wired = true;
-    backBtn.addEventListener('click', (e) => {
+    backBtn.addEventListener('click', async (e) => {
       e.stopPropagation(); // Evitar que el clic en volver abra el dropdown
+      if (!(await App._confirmLeave())) return;
       // Si hay historial de navegación en la app, volver; si no, ir al dashboard
       if (window.history.length > 1) {
         window.history.back();
@@ -412,7 +433,9 @@ const App = {
       const wizard = document.querySelector('.wizard-full-screen');
       if (wizard) {
         const cancelBtn = wizard.querySelector('#wizard-btn-cancel');
-        if (cancelBtn) { cancelBtn.click(); } else { wizard.remove(); }
+        if (cancelBtn) { cancelBtn.click(); return; }
+        // Sin botón de cancelar propio (p.ej. ficha de animal): respetar la guarda de salida de la vista
+        App._confirmLeave().then(ok => { if (ok) wizard.remove(); });
         return;
       }
 
@@ -427,13 +450,16 @@ const App = {
         return;
       }
 
-      // 6. Cualquier otra ruta → retroceder en el historial
+      // 6. Cualquier otra ruta → retroceder en el historial (respetando la guarda de salida)
       //    Si no hay historial, volver al Dashboard
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.hash = '#/';
-      }
+      App._confirmLeave().then(ok => {
+        if (!ok) return;
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.hash = '#/';
+        }
+      });
     });
   },
 
@@ -1007,6 +1033,7 @@ const App = {
       return await AsistenteConfiguracion.mostrarAsistente();
 
     main.innerHTML = '<div class="loader">Cargando...</div>';
+    App.clearExitGuard(); // La vista que se va a renderizar registrará su propia guarda si la necesita
     try {
       await App._ensureRouteScripts(path);
       const methodName = App.routes[path];
@@ -1699,7 +1726,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.27';
+        s.src = src + '?v=6.28.28';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
