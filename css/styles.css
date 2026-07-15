@@ -375,7 +375,7 @@ nav.bottom-nav {
     text-decoration: none;
     color: #FFFFFF;
     text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
-    font-size: 10px;
+    font-size: var(--fs-tiny);
     font-weight: 700;
     gap: 3px;
     padding: 4px 0;
@@ -385,7 +385,7 @@ nav.bottom-nav {
 .nav-item svg { width: 26px; height: 26px; stroke-width: 2.5; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); transition: all 0.3s ease; }
 .nav-item.active svg { display: none; }
 #nav-more.active svg { display: block; stroke: currentColor; filter: drop-shadow(0 0 8px var(--header-neon-color, rgba(197, 250, 80,0.5))); }
-.nav-item.active { color: var(--header-neon-color, #C5FA50); text-shadow: 0 0 8px var(--header-neon-color, rgba(197, 250, 80,0.5)); font-size: 12px; }
+.nav-item.active { color: var(--header-neon-color, #C5FA50); text-shadow: 0 0 8px var(--header-neon-color, rgba(197, 250, 80,0.5)); font-size: var(--fs-label); }
 
 /* (Scroll shadows de nav eliminados — ahora es fijo con 5 items) */
 
@@ -829,7 +829,7 @@ label {
         border-radius: 12px;
     }
     .nav-item {
-        font-size: 8px;
+        font-size: 0.5rem;
     }
     .nav-item svg {
         width: 22px;
@@ -1951,7 +1951,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center;
     justify-content: center; z-index: 3000;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-body);
 }
 .asistente-configuracion {
     background: #0a0a0a; border-radius: 0; box-shadow: none;
@@ -1961,8 +1961,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     display: flex; flex-direction: column;
 }
 .asistente-cabecera { text-align: center; margin-bottom: 35px; }
-.asistente-cabecera h1 { font-size: 26px; color: #ffffff; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.5px; }
-.asistente-cabecera p  { color: #888; margin: 0 0 16px 0; font-size: 15px; }
+.asistente-cabecera h1 { font-size: var(--fs-display); color: #ffffff; margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.5px; }
+.asistente-cabecera p  { color: #888; margin: 0 0 16px 0; font-size: var(--fs-body); }
 .btn-tour {
     background: rgba(217,119,6,0.12); border: 1px solid rgba(217,119,6,0.3);
     color: var(--p-gold-dark); padding: 10px 24px; border-radius: 14px;
@@ -1978,23 +1978,23 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 .asistente-opcion:hover { border-color: var(--p-gold-dark); background: #161616; transform: scale(1.02); }
 .asistente-icono {
-    font-size: 32px; margin-right: 20px; background: #1a1a1a;
+    font-size: 2rem; margin-right: 20px; background: #1a1a1a;
     width: 60px; height: 60px; display: flex; align-items: center;
     justify-content: center; border-radius: 14px; color: var(--p-gold, #c9851f);
 }
 .asistente-info-opcion { flex: 1; }
-.asistente-titulo      { font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
-.asistente-descripcion { font-size: 13px; color: #777; line-height: 1.4; }
+.asistente-titulo      { font-size: var(--fs-h2); font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+.asistente-descripcion { font-size: var(--fs-sm); color: #777; line-height: 1.4; }
 .asistente-seccion     { margin-top: 20px; animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.asistente-titulo-seccion { font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 20px; text-align: center; }
+.asistente-titulo-seccion { font-size: var(--fs-h2); font-weight: 700; color: #ffffff; margin-bottom: 20px; text-align: center; }
 .asistente-carga-zona {
     border: 2px dashed #333; border-radius: 16px; padding: 30px;
     text-align: center; margin-bottom: 20px; background: #0a0a0a; transition: border-color 0.3s;
 }
 .asistente-carga-zona:hover { border-color: var(--p-gold-dark); }
-.btn-carga { padding: 12px 24px; background: var(--p-gold-dark); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; }
-.asistente-archivo-nombre { color: var(--p-gold); font-size: 13px; margin-top: 15px; font-weight: 500; }
+.btn-carga { padding: 12px 24px; background: var(--p-gold-dark); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: var(--fs-sm); }
+.asistente-archivo-nombre { color: var(--p-gold); font-size: var(--fs-sm); margin-top: 15px; font-weight: 500; }
 .asistente-progreso    { margin-bottom: 20px; }
 .asistente-barra-progreso { height: 6px; background: #222; border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
 .asistente-barra-lleno { height: 100%; background: linear-gradient(to right, var(--c-warning), var(--c-warning)); animation: progreso 2s infinite ease-in-out; width: 30%; }
@@ -2005,8 +2005,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     background: #111; text-align: left; cursor: pointer; transition: all 0.2s; width: 100%;
 }
 .asistente-finca-item:hover { background: #1a1a1a; border-color: var(--p-gold-dark); }
-.asistente-finca-nombre    { font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: 16px; }
-.asistente-finca-propietario { font-size: 13px; color: #888; }
+.asistente-finca-nombre    { font-weight: 700; color: #ffffff; margin-bottom: 4px; font-size: var(--fs-h2); }
+.asistente-finca-propietario { font-size: var(--fs-sm); color: #888; }
 .asistente-botones  { display: flex; gap: 12px; margin-top: 20px; }
 .asistente-mensaje  { margin-top: 15px; padding: 14px; border-radius: 10px; background: #111; }
 .asistente-resultado { padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; }
@@ -2035,7 +2035,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 #tour-flotante-overlay {
     position: fixed; inset: 0; z-index: 4000;
     display: flex; align-items: center; justify-content: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-body);
 }
 .tour-flotante-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); }
 .tour-flotante-card {
@@ -2142,7 +2142,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     word-break: break-word;
 }
 .error-dialog-meta {
-    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-family: var(--font-mono);
     font-size: 0.7rem;
     color: #555;
     text-align: center;
@@ -3069,7 +3069,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .pdf-loader-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100000;
     background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
-    align-items: center; justify-content: center; color: #fff; font-family: sans-serif;
+    align-items: center; justify-content: center; color: #fff; font-family: var(--font-body);
 }
 .pdf-gen-modal { width: 280px; text-align: center; }
 .pdf-gen-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
@@ -3571,7 +3571,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .pesaje-info-grid    { padding: 12px; border-radius: 10px; border: 1px solid #222; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.75rem; flex-shrink: 0; background: #000; }
 .pesaje-animal-box   { text-align: center; padding: 25px 20px; background: #000; border: 2px solid #222; border-radius: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .pesaje-animal-label { text-transform: uppercase; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; font-size: 0.75rem; }
-.pesaje-crotal       { font-family: 'IBM Plex Mono', monospace; font-size: 2.2rem; font-weight: 950; line-height: 1.1; text-transform: uppercase; letter-spacing: -1.5px; width: 100%; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pesaje-crotal       { font-family: var(--font-mono); font-size: 2.2rem; font-weight: 950; line-height: 1.1; text-transform: uppercase; letter-spacing: -1.5px; width: 100%; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 400px) { 
   .pesaje-crotal { font-size: 1.8rem; letter-spacing: -1px; } 
   .pesaje-peso-input { font-size: 3.5rem !important; padding: 10px !important; }
@@ -3580,7 +3580,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .pesaje-crotal { font-size: 1.6rem; letter-spacing: -0.5px; } 
   .pesaje-peso-input { font-size: 2.8rem !important; padding: 8px !important; }
 }
-.pesaje-peso-input   { display: block; margin: 10px auto 0; width: 100%; max-width: 250px; min-width: 0; font-size: 4.5rem; font-weight: 950; text-align: center; background: #0a0a0a; color: white; border-radius: 24px; padding: 15px; font-family: 'IBM Plex Mono', monospace; border: 3px solid #333 !important; box-sizing: border-box; }
+.pesaje-peso-input   { display: block; margin: 10px auto 0; width: 100%; max-width: 250px; min-width: 0; font-size: 4.5rem; font-weight: 950; text-align: center; background: #0a0a0a; color: white; border-radius: 24px; padding: 15px; font-family: var(--font-mono); border: 3px solid #333 !important; box-sizing: border-box; }
 .pesaje-peso-input:focus { border-color: var(--p-gold) !important; outline: none; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
 .pesaje-unidad-label { font-weight: 950; font-size: 0.9rem; text-transform: uppercase; margin-top: 15px; letter-spacing: 3px; text-align: center; }
 .pesaje-input-wrapper { display: flex; flex-direction: column; align-items: center; padding: 12px; background: #000; border: 1px solid #222; border-radius: 12px; }

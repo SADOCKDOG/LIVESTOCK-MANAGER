@@ -84,7 +84,7 @@
     padding: 20px;
     color: var(--c-danger);
     font-family: monospace;
-    font-size: 14px;
+    font-size: var(--fs-sm);
     overflow-y: auto;
     white-space: pre-wrap;
 }
