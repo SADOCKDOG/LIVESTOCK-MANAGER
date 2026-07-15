@@ -767,6 +767,7 @@ const App = {
   },
 
   async _abrirAltaCompradorRapida() {
+    await App._ensureViewGroup('comer');
     if (!window.CompradoresView || typeof CompradoresView.renderFormulario !== 'function') {
       App.toastError('Módulo de compradores no disponible');
       return;
@@ -1007,6 +1008,7 @@ const App = {
 
     main.innerHTML = '<div class="loader">Cargando...</div>';
     try {
+      await App._ensureRouteScripts(path);
       const methodName = App.routes[path];
       if (methodName && typeof App[methodName] === "function") {
         await App[methodName](params);
@@ -1447,6 +1449,7 @@ const App = {
 
   async _abrirEntradaAlimentoSiloDirecto() {
     // Get list of silos for active farm
+    await App._ensureViewGroup('expro');
     const silos = await SilosView._getSilos?.() || [];
     if (silos.length === 0) {
         location.hash = '#/silos'; // No silos → go to list to create one
@@ -1650,6 +1653,68 @@ const App = {
     }
     try { await App._chartJsLoadPromise; } catch (_) {}
     return typeof Chart !== 'undefined';
+  },
+
+  // ==========================================
+  // LAZY LOADING DE VISTAS POR GRUPO (P0-4)
+  // ==========================================
+  // Las vistas de cada pilar (y sus pestañas internas) se cargan juntas la
+  // primera vez que se visita una ruta de ese grupo, en vez de siempre al
+  // arrancar. Los ficheros "core" (dashboard, ajustes, wizards, modelos,
+  // servicios) siguen cargando siempre, porque el Dashboard los usa todos
+  // desde sus accesos directos.
+  _viewGroups: {
+    gegan: ['js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/carne-view.js', 'js/views/leche-view.js', 'js/views/hibrido-view.js'],
+    expro: ['js/views/explotacion-view.js', 'js/views/zonas-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js'],
+    comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
+    informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
+    cuaderno: ['js/views/cuaderno-view.js'],
+    documentos: ['js/views/documentos-view.js'],
+    manuales: ['js/views/manuales-view.js'],
+    trazabilidad: ['js/views/trazabilidad-view.js'],
+    'albaranes-ventas': ['js/views/albaranes-ventas-view.js'],
+    sistema: ['js/views/config-sistema-view.js'],
+  },
+
+  // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
+  _routeGroups: {
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/carne': 'gegan', '/hibrido': 'gegan', '/animales': 'gegan', '/leche': 'gegan', '/rebano': 'gegan', '/animal': 'gegan',
+    '/explotacion': 'expro', '/zonas': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/zona': 'expro', '/proveedor': 'expro',
+    '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
+    '/informes': 'informes', '/alertas': 'informes',
+    '/cuaderno': 'cuaderno',
+    '/documentos': 'documentos',
+    '/manuales': 'manuales',
+    '/trazabilidad': 'trazabilidad',
+    '/albaranes-ventas': 'albaranes-ventas',
+    '/sistema': 'sistema',
+  },
+
+  _viewGroupLoadPromises: {},
+
+  /** Carga (una sola vez) todos los archivos de un grupo de vistas, en paralelo. */
+  async _ensureViewGroup(groupName) {
+    const files = App._viewGroups[groupName];
+    if (!files) return true;
+    if (!App._viewGroupLoadPromises[groupName]) {
+      App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src + '?v=6.28.27';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      })));
+    }
+    try { await App._viewGroupLoadPromises[groupName]; return true; } catch (e) {
+      console.error('[LazyView] Error cargando grupo ' + groupName, e);
+      return false;
+    }
+  },
+
+  /** Punto único de entrada desde route(): asegura el grupo de la ruta actual antes de despachar. */
+  async _ensureRouteScripts(path) {
+    const group = App._routeGroups[path];
+    if (group) await App._ensureViewGroup(group);
   },
 
   async _escanearCrotal(inputId) {
