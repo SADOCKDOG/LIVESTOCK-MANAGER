@@ -448,6 +448,7 @@ const DocumentosView = {
 
       const overlay = document.createElement('div');
       overlay.id = 'doc-pdf-overlay';
+      overlay.className = 'wizard-full-screen';
       overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:#fff;color:#000;display:flex;flex-direction:column;';
       overlay.innerHTML = `
         <div id="doc-pdf-content" style="flex:1;padding:40px;font-family:serif;overflow-y:auto;">
@@ -501,6 +502,7 @@ const DocumentosView = {
     const color = colors[doc.tipo] || '#666';
     const label = labels[doc.tipo] || doc.tipo;
     const overlay = document.createElement('div');
+    overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.id = `doc-detail-overlay-${docId}`;
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
@@ -591,8 +593,9 @@ const DocumentosView = {
 
     const overlay = document.createElement('div');
     overlay.id = 'acuse-overlay';
+    overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) DocumentosView._cerrarAcuseModal(overlay); });
 
     const docLabels = { dimoe: 'Guía DIMOE', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido de Crotales' };
     const docLabel = esPedidoCrotales ? 'Pedido de Crotales' : (docLabels[tipo] || 'Documento');
@@ -618,13 +621,32 @@ const DocumentosView = {
     const input = overlay.querySelector('#acuse-input');
     setTimeout(() => { input?.focus(); input?.setSelectionRange(input.value.length, input.value.length); }, 120);
 
-    overlay.querySelector('#acuse-cancel').addEventListener('click', () => overlay.remove());
-    overlay.querySelector('#acuse-close').addEventListener('click', () => overlay.remove());
+    DocumentosView._acuseGuardado = false;
+    App.setExitGuard(() => DocumentosView._confirmSalirAcuseModal());
+
+    overlay.querySelector('#acuse-cancel').addEventListener('click', () => DocumentosView._cerrarAcuseModal(overlay));
+    overlay.querySelector('#acuse-close').addEventListener('click', () => DocumentosView._cerrarAcuseModal(overlay));
     overlay.querySelector('#acuse-save').addEventListener('click', async () => {
       const valor = input.value;
       const ok = await this._guardarAcuseValor({ docId, tipo, esMovimiento, esPedidoCrotales, valor });
-      if (ok) overlay.remove();
+      if (ok) {
+        DocumentosView._acuseGuardado = true;
+        App.clearExitGuard();
+        overlay.remove();
+      }
     });
+  },
+
+  /** Guarda de salida compartida con el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirAcuseModal() {
+    if (this._acuseGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _cerrarAcuseModal(overlay) {
+    if (!(await this._confirmSalirAcuseModal())) return;
+    App.clearExitGuard();
+    overlay.remove();
   },
 
   async _guardarAcuseValor({ docId, tipo, esMovimiento, esPedidoCrotales, valor }) {
