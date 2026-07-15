@@ -207,20 +207,48 @@ const ExplotacionView = {
         await this._renderTramitesView(document.getElementById('expro-tab-content'), fincaId);
         break;
       case 'traslado':
-        if (window.App && window.App._abrirWizardTraslado) await window.App._abrirWizardTraslado();
-        else if (window.WizardTraslado) await window.WizardTraslado.abrir();
+        let oldHash = location.hash;
+        try {
+          if (window.App && window.App._abrirWizardTraslado) await window.App._abrirWizardTraslado();
+          else if (window.WizardTraslado) await window.WizardTraslado.abrir();
+        } finally {
+          if (!location.hash.startsWith('#/expro')) {
+            location.hash = oldHash;
+          }
+        }
         break;
       case 'censo':
-        if (window.App && window.App._abrirWizardCenso) await window.App._abrirWizardCenso();
-        else if (window.WizardCenso) await window.WizardCenso.abrir();
+        let oldHash = location.hash;
+        try {
+          if (window.App && window.App._abrirWizardCenso) await window.App._abrirWizardCenso();
+          else if (window.WizardCenso) await window.WizardCenso.abrir();
+        } finally {
+          if (!location.hash.startsWith('#/expro')) {
+            location.hash = oldHash;
+          }
+        }
         break;
       case 'crotales':
-        if (window.App && window.App._abrirWizardCrotales) await window.App._abrirWizardCrotales();
-        else if (window.WizardCrotales) await window.WizardCrotales.abrir();
+        let oldHash = location.hash;
+        try {
+          if (window.App && window.App._abrirWizardCrotales) await window.App._abrirWizardCrotales();
+          else if (window.WizardCrotales) await window.WizardCrotales.abrir();
+        } finally {
+          if (!location.hash.startsWith('#/expro')) {
+            location.hash = oldHash;
+          }
+        }
         break;
       case 'guia':
-        if (window.App && window.App._abrirWizardGuiaMovimiento) await window.App._abrirWizardGuiaMovimiento();
-        else if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
+        let oldHash = location.hash;
+        try {
+          if (window.App && window.App._abrirWizardGuiaMovimiento) await window.App._abrirWizardGuiaMovimiento();
+          else if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
+        } finally {
+          if (!location.hash.startsWith('#/expro')) {
+            location.hash = oldHash;
+          }
+        }
         break;
     }
 
