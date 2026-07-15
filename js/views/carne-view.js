@@ -51,24 +51,10 @@ const CarneView = {
     const sanitariosCarne = todosSanitarios.filter(s => rebanosIds.includes(s.rebanoId));
     sanitariosCarne.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    // Calcular periodos de supresión cárnicos activos
-    const hoy = new Date();
-    const tratamientosSupresion = [];
-    sanitariosCarne.forEach(s => {
-      const fechaApli = new Date(s.fecha);
-      const diasEspera = s.tiempo_espera_carne_dias || 0;
-      if (diasEspera > 0) {
-        const fechaFin = new Date(fechaApli.getTime() + diasEspera * 24 * 60 * 60 * 1000);
-        if (fechaFin > hoy) {
-          const diasRestantes = Math.ceil((fechaFin - hoy) / (24 * 60 * 60 * 1000));
-          tratamientosSupresion.push({
-            ...s,
-            diasRestantes,
-            fechaFin: fechaFin.toISOString().split('T')[0]
-          });
-        }
-      }
-    });
+    // Periodos de supresión cárnicos activos (cálculo centralizado en SanidadView)
+    const tratamientosSupresion = window.SanidadView
+      ? SanidadView.enriquecer(sanitariosCarne).filter(t => t.enSupresionCarne)
+      : [];
 
     // Calcular GMD (Ganancia Media Diaria)
     const pesajesPorAnimal = {};
@@ -721,85 +707,41 @@ const CarneView = {
     content.innerHTML = html;
   },
 
-  // ========== BLOQUE 3: LOGÍSTICA Y TRANSPORTE, COMERCIALIZACIÓN VENTAS ==========
+  // ========== BLOQUE 3: LOGÍSTICA Y VENTAS (dueño único del dato: ComercializacionView) ==========
   _renderComercializacion(content, d) {
     const html = `
       <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
-        <div class="flex justify-between items-center mb-16">
-          <div class="flex items-center gap-12">
-            <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
-            <div>
-              <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
-                <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS
-              </h2>
-              <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Logística, vehículos, compradores, contratos y ventas</div>
-            </div>
+        <div class="flex items-center gap-12 mb-16">
+          <span class="text-3xl" style="color: var(--c-success);">${Icons.transportistas()}</span>
+          <div>
+            <h2 class="text-white font-900 text-lg uppercase tracking-wider style-none m-0" style="line-height:1.2;">
+              <span style="color: var(--c-success); margin-right:4px;">|</span> LOGÍSTICA Y VENTAS
+            </h2>
+            <div class="text-gray text-[0.62rem] uppercase font-800 tracking-wider">Ventas de matadero, compradores y transporte</div>
           </div>
-          <button class="btn btn-create btn-sm" onclick="App._abrirWizardVentaMasiva()">
-            ${Icons.agregar()} Registrar Venta
-          </button>
         </div>
 
         ${this._kpiGrid(d.kpis.comercializacion, 'var(--c-success)')}
 
-        <!-- Accesos directos comerciales -->
-        <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
-          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Logística</a>
-          <a href="#/comercializacion" class="widget-link-btn">${Icons.comercial()} Comercial</a>
+        <div class="text-[0.62rem] text-gray-500 font-bold uppercase tracking-wide mb-10">
+          Las ventas, albaranes y contratos de este lote se registran y consultan en Comercialización, para mantener un único histórico.
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Historial de Facturas/Matadero
-        </div>
-        <div class="grid gap-10">
-          ${d.ventasCarne.length > 0
-            ? d.ventasCarne.slice(0, 15).map(v => `
-                <div class="card-registro" onclick="App._abrirDetalleVentaCarne(${v.id})" style="--registro-color: var(--c-success);">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-8">
-                        <span class="text-xl text-green">${Icons.documento()}</span>
-                        <h3 class="section-h3 m-0 text-ellipsis">${v.numero_albaran || 'ALBARÁN'} · ${v.razonSocial || 'MATADERO'}</h3>
-                      </div>
-                      <div class="flex wrap gap-4 mt-4 text-[0.65rem] text-gray font-800 uppercase">
-                        <span>${Icons.calendar()} ${this._fmtFecha(v.fechaSacrificio)}</span>
-                        <span>·</span>
-                        <span>Rend: <span class="text-green font-900">${v.rendimientoCanal || 0}%</span> · Clasif: <span class="text-gold font-900">${v.clasificacionCanal || 'N/D'}</span></span>
-                      </div>
-                    </div>
-                    <div class="text-right flex-shrink-0 ml-8">
-                      <span class="badge badge-sm text-green font-black text-lg badge-green-outline block">${Math.round(v.importe_total || v.valor_neto || 0).toLocaleString()} €</span>
-                    </div>
-                  </div>
-                </div>`).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin albaranes de matadero registrados.</span></div>`
-          }
+        <!-- Accesos directos comerciales -->
+        <div class="grid grid-cols-2 gap-8">
+          <a href="#/comercializacion?tab=carne" class="widget-link-btn">${Icons.comercial()} Ir a Comercialización</a>
+          <a href="#/compradores" class="widget-link-btn">${Icons.compradores()} Compradores</a>
+          <a href="#/transportistas" class="widget-link-btn">${Icons.transportistas()} Transportistas</a>
+          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardVentaMasiva()">${Icons.agregar()} Registrar Venta</button>
         </div>
       </div>
     `;
     content.innerHTML = html;
   },
 
-  // ========== BLOQUE 4: REGISTROS, LEGISLACIÓN Y CUMPLIMIENTO SANITARIO ==========
+  // ========== BLOQUE 4: SANIDAD Y LEGISLACIÓN (cálculo/edición centralizados en SanidadView) ==========
   _renderLegislacion(content, d) {
-    // Alertas de supresión
-    let supresionesHtml = '';
-    if (d.tratamientosSupresion.length > 0) {
-      supresionesHtml = `
-        <div class="supresion-alerta-box">
-          <strong class="flex items-center gap-6">${Icons.alerta()} ALERTA: SUPRESIÓN DE CARNE ACTIVA:</strong>
-          <ul class="mt-4 pl-20 m-0">
-            ${d.tratamientosSupresion.map(s => `
-              <li>Rebaño: <strong class="text-white">${s.rebanoId}</strong> (Medicamento: <strong class="text-white">${s.medicamento}</strong>) — Restan <strong class="text-white">${s.diasRestantes} ${s.diasRestantes === 1 ? 'día' : 'días'}</strong> (Finaliza: ${s.fechaFin})</li>
-            `).join('')}
-          </ul>
-        </div>
-      `;
-    }
-
     const html = `
-      ${supresionesHtml}
       <div class="card p-16 mb-14" style="border: 1px solid #27272a; background: #1E1E1E;">
         <div class="flex justify-between items-center mb-16">
           <div class="flex items-center gap-12">
@@ -826,38 +768,7 @@ const CarneView = {
           <a href="#/cuaderno" class="widget-link-btn">${Icons.cuaderno()} Cuaderno de Explotación</a>
         </div>
 
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
-          ${Icons.documento()} Historial Sanitario Cárnico (${d.sanitariosCarne.length})
-        </div>
-        <div class="grid gap-10">
-          ${d.sanitariosCarne.length > 0
-            ? d.sanitariosCarne.slice(0, 15).map(s => {
-                const enSup = d.tratamientosSupresion.some(ts => ts.id === s.id);
-                return `
-                  <div class="card-registro" style="--registro-color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-6">
-                          <span class="text-xl" style="color: ${enSup ? 'var(--c-danger)' : 'var(--c-purple)'};">${Icons.sanidad()}</span>
-                          <h3 class="section-h3 m-0 text-ellipsis">${s.medicamento || s.tipo_tratamiento || 'Tratamiento'}</h3>
-                        </div>
-                        <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray uppercase font-800">
-                          <span>${Icons.calendar()} ${this._fmtFecha(s.fecha)}</span>
-                          <span>·</span>
-                          <span>Rebaño: <strong class="text-ccc">${s.rebanoId}</strong></span>
-                          <span>·</span>
-                          <span>Espera: <strong class="text-ccc">${s.tiempo_espera_carne_dias || 0} días</strong></span>
-                        </div>
-                      </div>
-                      <div class="text-right flex-shrink-0 ml-8">
-                        ${enSup ? `<span class="badge badge-sm badge-red block">SUPRESIÓN ACTIVA</span>` : `<span class="badge badge-sm block" style="background:rgba(168,85,247,0.15); color:var(--c-purple); border:1px solid color-mix(in srgb, var(--c-purple) 25%, transparent);">COMPLETO</span>`}
-                      </div>
-                    </div>
-                  </div>`;
-              }).join('')
-            : `<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">${Icons.buscar()} Sin tratamientos sanitarios registrados.</span></div>`
-          }
-        </div>
+        ${window.SanidadView ? SanidadView.renderFragmentHTML(d.sanitariosCarne, { tipo: 'carne', limit: 15, tituloHistorial: `Historial Sanitario Cárnico (${d.sanitariosCarne.length})` }) : ''}
       </div>
     `;
     content.innerHTML = html;
