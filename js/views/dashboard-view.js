@@ -128,7 +128,7 @@ const DashboardView = {
           <div class="text-white text-xs font-900 uppercase tracking-wider">Versi&oacute;n Gratuita</div>
           <div class="text-gray text-[0.6rem] mt-2">Actualiza a Premium para desbloquear todas las funciones</div>
         </div>
-        <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,var(--c-warning),var(--c-warning));border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:0.65rem;font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
+        <button onclick="window.PurchaseManager && window.PurchaseManager.purchase()" style="flex-shrink:0;background:linear-gradient(135deg,var(--c-warning),var(--c-warning));border:none;padding:8px 16px;border-radius:10px;color:#fff;font-size:var(--fs-tiny);font-weight:900;text-transform:uppercase;cursor:pointer;">${Icons.estrella()} Premium</button>
       </div>
       ` : ''}
       <!-- Registro Rápido Bento Grid (Propuesta de visualización Premium Integrada) -->
@@ -140,7 +140,7 @@ const DashboardView = {
               <h2 class="text-white font-900 text-sm uppercase tracking-wider" style="margin:0; font-family:'IBM Plex Sans Condensed', sans-serif; display:flex; align-items:center; gap:8px;">
                 <span style="color: var(--header-neon-color, var(--c-success)); font-weight:900;">|</span> REGISTRO RÁPIDO DE ACTIVIDAD
               </h2>
-              <div class="text-gray mt-2" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+              <div class="text-gray mt-2" style="font-size: var(--fs-tiny); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
                 Acceso directo a operaciones de campo diarias sin intermediarios
               </div>
             </div>
@@ -287,13 +287,13 @@ const DashboardView = {
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
+          <h3 style="color: var(--text-s); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ${(alertaEpoca.titulo || 'Calendario Preventivo').replace(/^[^\w\s]+\s*/u, '')}</h3>
           ${alertaEpoca.sugerencias?.length > 0 ? `
           <ul class="text-xs text-gray m-0 leading-relaxed pl-16" style="text-align: left; margin-bottom: 20px;">
             ${alertaEpoca.sugerencias.map(s => `<li class="mb-3">${s}</li>`).join('')}
-          </ul>` : '<div class="text-grey" style="font-size: 0.8rem; margin-bottom: 20px;">Sin sugerencias para esta temporada.</div>'}
+          </ul>` : '<div class="text-grey" style="font-size: var(--fs-sm); margin-bottom: 20px;">Sin sugerencias para esta temporada.</div>'}
           <div class="text-center" style="border-top: 1px solid #2a2a2a; padding-top: 20px;">
-            <a href="#/alertas" class="text-blue no-underline" style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Ver Alertas Completas ${Icons.siguiente()}</a>
+            <a href="#/alertas" class="text-blue no-underline" style="font-size: var(--fs-label); font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Ver Alertas Completas ${Icons.siguiente()}</a>
           </div>
         </div>
       </div>
@@ -311,23 +311,23 @@ const DashboardView = {
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card-registro" style="--registro-color: var(--c-danger); grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center; border-top: none !important; background: rgba(255,255,255,0.02);">
-          <h3 style="color: var(--c-danger); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+          <h3 style="color: var(--c-danger); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ALERTAS SANITARIAS <span class="bg-pill-red text-red" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                   <div>
-                    <div style="color: #FFF; font-weight: 700; font-size: 0.9rem; text-transform: uppercase;">${a.medicamento}</div>
-                    <div style="color: var(--text-s); font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
+                    <div style="color: #FFF; font-weight: 700; font-size: var(--fs-body); text-transform: uppercase;">${a.medicamento}</div>
+                    <div style="color: var(--text-s); font-size: var(--fs-tiny); margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.paquete()} ${a.rebanoNombre || 'Lote desconocido'}</div>
                   </div>
                   <div style="text-align: right;">
-                    <div style="color: var(--c-danger); font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
-                    <div style="color: var(--text-s); font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Supresión</div>
+                    <div style="color: var(--c-danger); font-weight: 900; font-size: var(--fs-h2);">${a.diasRestantes}D</div>
+                    <div style="color: var(--text-s); font-size: var(--fs-tiny); text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Supresión</div>
                   </div>
                 </div>
               </div>
             `).join('')}
-            ${alertas.length > 3 ? `<div style="text-align: center; color: var(--text-s); font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más activas</div>` : ''}
+            ${alertas.length > 3 ? `<div style="text-align: center; color: var(--text-s); font-size: var(--fs-label); margin-top: 10px;">+${alertas.length - 3} alertas más activas</div>` : ''}
           </div>
         </div>
       </div>`;
@@ -338,20 +338,20 @@ const DashboardView = {
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
-          <h3 style="color: var(--c-orange); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+          <h3 style="color: var(--c-orange); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> ALERTAS TRAZABILIDAD <span class="bg-pill-gold text-gold" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 3).map(a => `
               <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 4px solid ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'};">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
-                    <div style="color: #FFF; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">${a.crotal}</div>
-                    <div style="color: var(--text-s); font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${a.mensaje}</div>
+                    <div style="color: #FFF; font-weight: 900; font-size: var(--fs-body); text-transform: uppercase; letter-spacing: 0.5px;">${a.crotal}</div>
+                    <div style="color: var(--text-s); font-size: var(--fs-tiny); margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${a.mensaje}</div>
                   </div>
-                  <div style="color: ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
+                  <div style="color: ${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'}; font-size: var(--fs-h1);">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>
                 </div>
               </div>
             `).join('')}
-            ${alertas.length > 3 ? `<div style="text-align: center; color: var(--text-s); font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 3} alertas más</div>` : ''}
+            ${alertas.length > 3 ? `<div style="text-align: center; color: var(--text-s); font-size: var(--fs-label); margin-top: 10px;">+${alertas.length - 3} alertas más</div>` : ''}
           </div>
         </div>
       </div>`;
@@ -362,7 +362,7 @@ const DashboardView = {
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card-registro" style="--registro-color: var(--c-warning); grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center; background: rgba(255,255,255,0.02);">
-          <h3 style="color: var(--c-purple); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
+          <h3 style="color: var(--c-purple); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 15px; font-weight: 700; letter-spacing: 0.1em;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> GESTIÓN / PAC <span class="badge rounded-xl badge-solid-purple" style="font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 8px;">${alertas.length}</span></h3>
           <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${alertas.slice(0, 4).map(a => {
               let iconoSVG = Icons.info();
@@ -379,18 +379,18 @@ const DashboardView = {
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="color: var(--c-purple);">${iconoSVG}</span>
                     <div>
-                      <div style="color: #FFF; font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">${a.mensaje}</div>
-                      ${a.accion ? `<div style="color: var(--c-purple); font-size: 0.65rem; margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">${Icons.info()} ${a.accion}</div>` : ''}
+                      <div style="color: #FFF; font-weight: 700; font-size: var(--fs-sm); text-transform: uppercase;">${a.mensaje}</div>
+                      ${a.accion ? `<div style="color: var(--c-purple); font-size: var(--fs-tiny); margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;">${Icons.info()} ${a.accion}</div>` : ''}
                     </div>
                   </div>
                   ${a.diasRestantes != null ? `<div style="text-align: right;">
-                    <div style="color: var(--c-danger); font-weight: 900; font-size: 1.1rem;">${a.diasRestantes}D</div>
-                    <div style="color: #64748B; font-size: 0.55rem; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Restantes</div>
-                  </div>` : `<div style="color:${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'}; font-size: 1.2rem;">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
+                    <div style="color: var(--c-danger); font-weight: 900; font-size: var(--fs-h2);">${a.diasRestantes}D</div>
+                    <div style="color: #64748B; font-size: var(--fs-tiny); text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Restantes</div>
+                  </div>` : `<div style="color:${a.urgencia === 'rojo' ? 'var(--c-danger)' : 'var(--c-warning)'}; font-size: var(--fs-h1);">${a.urgencia === 'rojo' ? Icons.alerta() : Icons.calendar()}</div>`}
                 </div>
               </div>`;
             }).join('')}
-            ${alertas.length > 4 ? `<div style="text-align: center; color: var(--text-s); font-size: 0.7rem; margin-top: 10px;">+${alertas.length - 4} alertas más</div>` : ''}
+            ${alertas.length > 4 ? `<div style="text-align: center; color: var(--text-s); font-size: var(--fs-label); margin-top: 10px;">+${alertas.length - 4} alertas más</div>` : ''}
           </div>
         </div>
       </div>`;
@@ -432,26 +432,26 @@ const DashboardView = {
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> INDICADORES LÁCTEOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
+          <h3 style="color: var(--text-s); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> INDICADORES LÁCTEOS <span style="font-size: var(--fs-tiny); color: #64748B; text-transform: none;">(últimos 12 meses)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
-              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">MOFA</div>
+              <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">MOFA</div>
               <div style="font-weight: 800; border: 1px solid ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; color: ${mofaRatio >= 20 ? 'var(--c-success)' : 'var(--c-warning)'}; background: ${mofaRatio >= 20 ? 'rgba(204, 255, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)'}; padding: 6px 12px; border-radius: 8px; display: inline-block;">${Math.round(mofaTotal / meses).toLocaleString()}€</div>
-              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${mofaRatio.toFixed(1)}%</div>
+              <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">${mofaRatio.toFixed(1)}%</div>
             </div>
             <div>
-              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PRECIO</div>
+              <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PRECIO</div>
               <div style="font-weight: 800; border: 1px solid var(--c-info); color: var(--c-info); background: rgba(79, 172, 254, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${precioFinalMedio.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</div>
-              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">€/L</div>
+              <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">€/L</div>
             </div>
             <div>
-              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">EXT. SECO</div>
+              <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">EXT. SECO</div>
               <div style="font-weight: 800; border: 1px solid var(--c-purple); color: var(--c-purple); background: rgba(192, 132, 252, 0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">${esMedia.toFixed(2)}%</div>
-              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${conLab.length} anal.</div>
+              <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">${conLab.length} anal.</div>
             </div>
           </div>
           <div class="text-center" style="border-top: 1px solid #2a2a2a; padding-top: 20px; margin-top: 20px;">
-            <a href="#/leche" class="text-gold no-underline" style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Control Lechero Detallado ${Icons.siguiente()}</a>
+            <a href="#/leche" class="text-gold no-underline" style="font-size: var(--fs-label); font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Control Lechero Detallado ${Icons.siguiente()}</a>
           </div>
         </div>
       </div>`;
@@ -538,8 +538,8 @@ const DashboardView = {
       return `
         <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
           <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 20px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIS DIARIOS</h3>
-            <div style="color: var(--text-s); font-size: 0.75rem;">No hay suficientes datos. Registra entregas de leche y animales.</div>
+          <h3 style="color: var(--text-s); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 15px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIS DIARIOS</h3>
+            <div style="color: var(--text-s); font-size: var(--fs-label);">No hay suficientes datos. Registra entregas de leche y animales.</div>
           </div>
         </div>`;
     }
@@ -553,22 +553,22 @@ const DashboardView = {
     return `
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
         <div class="card" style="grid-column: span 12; margin-bottom: 0; padding: 24px; text-align: center;">
-          <h3 style="color: var(--text-s); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIS DIARIOS <span style="font-size: 0.6rem; color: #64748B; text-transform: none;">(7-30 días)</span></h3>
+          <h3 style="color: var(--text-s); font-size: var(--fs-sm); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: 0.1em; border-bottom: none; padding-bottom: 0;"><span style="color: var(--header-neon-color, var(--c-success)); margin-right: 4px;">|</span> KPIS DIARIOS <span style="font-size: var(--fs-tiny); color: #64748B; text-transform: none;">(7-30 días)</span></h3>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
             <div>
-              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">L/DÍA</div>
+              <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">L/DÍA</div>
               <div style="font-weight: 800; border: 1px solid ${kpiColorHex}; color: ${kpiColorHex}; background: color-mix(in srgb, ${kpiColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${litrosPorOveja != null ? litrosPorOveja.toFixed(2) : '—'}</div>
-              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">${totalHembras} ♀</div>
+              <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">${totalHembras} ♀</div>
             </div>
               <div>
-                <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PIENSO (g/L)</div>
+                <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">PIENSO (g/L)</div>
                 <div style="font-weight: 800; border: 1px solid ${piensoColorHex}; color: ${piensoColorHex}; background: color-mix(in srgb, ${piensoColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${eficienciaPienso != null ? eficienciaPienso.toLocaleString() : '—'}</div>
-                <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Eficiencia</div>
+                <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">Eficiencia</div>
               </div>
             <div>
-              <div class="text-grey" style="font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">BAJAS</div>
+              <div class="text-grey" style="font-size: var(--fs-label); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">BAJAS</div>
               <div style="font-weight: 800; border: 1px solid ${bajasColorHex}; color: ${bajasColorHex}; background: color-mix(in srgb, ${bajasColorHex} 10%, transparent); padding: 6px 12px; border-radius: 8px; display: inline-block;">${pctBajas != null ? pctBajas + '%' : '—'}</div>
-              <div style="font-size: 0.55rem; color: #64748B; margin-top: 4px;">Mamitis</div>
+              <div style="font-size: var(--fs-tiny); color: #64748B; margin-top: 4px;">Mamitis</div>
             </div>
           </div>
         </div>
