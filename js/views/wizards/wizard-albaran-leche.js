@@ -528,7 +528,7 @@ window.AlbaranLecheWizard = {
             window.LecheView._cachedData = null;
             await window.LecheView.render();
           } else {
-            App.renderLeche();
+            App.route();
           }
           await App.imprimirAlbaran(est, "leche");
         } catch (e) {
