@@ -292,7 +292,7 @@ const ContratosView = {
     main.innerHTML = `
       <div class="mb-14">
         <button onclick="ContratosView._salirFormulario()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} VOLVER A CONTRATOS</span>
+          <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
         </button>
       </div>
       <div class="card-registro card-accent card-accent-purple p-20 bg-black" style="--registro-color: var(--c-purple);">

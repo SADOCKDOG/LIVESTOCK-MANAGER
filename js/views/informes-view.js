@@ -2399,7 +2399,7 @@ const InformesView = {
         </div>
         <div class="flex gap-10 mt-20">
           <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-pac-guardar">${Icons.guardar()} Guardar</button>
-          <button class="wizard-btn-action wizard-btn-secondary" onclick="InformesView._cerrarOverlayPAC(this)">Cancelar</button>
+          <button class="wizard-btn-action wizard-btn-secondary" onclick="InformesView._cerrarOverlayPAC(this)">${Icons.cerrar()} Cancelar</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);

@@ -333,7 +333,7 @@ const ProduccionView = {
                   <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
               </div>
-              <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="ProduccionView._cerrarOverlayRegistro(this)">Cancelar</button>
+              <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="ProduccionView._cerrarOverlayRegistro(this)">${Icons.cerrar()} Cancelar</button>
           </div>`;
       document.body.appendChild(overlay);
 
@@ -449,7 +449,7 @@ const ProduccionView = {
             <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-save-gasto">${Icons.guardar()} Guardar</button>
             <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-gasto">${Icons.eliminar()} Borrar</button>
           </div>
-          <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="ProduccionView._cerrarOverlayRegistro(this)">Cerrar</button>
+          <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="ProduccionView._cerrarOverlayRegistro(this)">${Icons.cerrar()} Cancelar</button>
         </div>`;
       document.body.appendChild(overlay);
 
