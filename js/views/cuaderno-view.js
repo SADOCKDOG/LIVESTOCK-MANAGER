@@ -603,6 +603,7 @@ const CuadernoDigitalView = {
 
     const overlay = document.createElement('div');
     overlay.id = 'cuaderno-print-overlay';
+    overlay.className = 'wizard-full-screen';
     overlay.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background:#fff; overflow-y:auto; display:flex; flex-direction:column;';
     overlay.innerHTML = `
       <div style="position:sticky; top:0; z-index:10; background:#f5f5f5; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d97706; -webkit-print-color-adjust:exact;">

@@ -202,6 +202,7 @@ const ManualesView = {
     // Cargar el manual dentro de un overlay con iframe y botón de salir
     const overlay = document.createElement('div');
     overlay.id = 'manual-viewer-overlay';
+    overlay.className = 'wizard-full-screen';
     overlay.style.cssText = `
       position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999;
       background:#fff; display:flex; flex-direction:column;

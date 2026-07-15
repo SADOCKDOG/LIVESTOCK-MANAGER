@@ -79,7 +79,7 @@ const WizardManager = {
                 cancelBtn.onclick = async () => {
                     // Con pasos avanzados hay datos introducidos: confirmar el descarte
                     if (currentStepIndex > 0) {
-                        const ok = await Confirm.confirm('Cancelar asistente', 'Se perderán los datos introducidos. ¿Deseas salir?', true, 'Salir', 'Continuar aquí');
+                        const ok = await Confirm.confirm('Salir sin guardar', '¿Cerrar sin guardar datos?', false);
                         if (!ok) return;
                     }
                     if (onCancel) onCancel();

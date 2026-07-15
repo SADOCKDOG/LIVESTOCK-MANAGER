@@ -388,6 +388,7 @@ const AlbaranesVentasView = {
       const colors = { leche: 'var(--c-warning)', carne: 'var(--c-warning)' };
       const color = colors[tipo] || '#666';
       const overlay = document.createElement('div');
+      overlay.className = 'wizard-full-screen';
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
       overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 
