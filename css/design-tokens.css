@@ -76,6 +76,8 @@
     --tap-gap: 8px;
 
     /* ── RADIOS ── */
+    --r-2xs:  2px;            /* Scrollbars, tiny elements */
+    --r-3xs:  3px;
     --r-xs:   4px;            /* Elementos mínimos */
     --r-sm:   8px;            /* chips / inputs internos */
     --r-md:   14px;           /* inputs / botones */
