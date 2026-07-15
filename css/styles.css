@@ -1011,7 +1011,7 @@ label {
 .text-yellow    { color: var(--c-warning); }
 .text-amber     { color: var(--c-warning); }
 .text-purple    { color: var(--c-purple); }
-.text-violet    { color: #4FADF5; }
+.text-violet    { color: var(--c-purple); }
 .text-dark-gold { color: var(--p-gold-dark); }
 .text-orange    { color: #E8555F; }
 .text-333       { color: #333; }
@@ -1271,7 +1271,7 @@ label {
 .color-yellow  { --registro-color: var(--c-warning); }
 .color-orange  { --registro-color: #E8555F; }
 .color-purple  { --registro-color: var(--c-purple); }
-.color-pink    { --registro-color: #4FADF5; }
+.color-pink    { --registro-color: var(--c-pink); }
 .color-gray    { --registro-color: var(--text-gray); }
 .color-gold    { --registro-color: var(--p-gold); }
 .color-info    { --registro-color: var(--c-info); }
@@ -1351,7 +1351,7 @@ label {
 .card-left-blue   { border-left: 4px solid #4FADF5; }
 .card-left-purple { border-left: 4px solid var(--c-purple); }
 .card-left-red    { border-left: 4px solid var(--c-danger); }
-.card-left-pink   { border-left: 4px solid #4FADF5; }
+.card-left-pink   { border-left: 4px solid var(--c-pink); }
 .card-left-green  { border-left: 4px solid var(--c-success); }
 .card-left-gold   { border-left: 4px solid var(--p-cork); }
 
@@ -2670,7 +2670,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .border-left-gold   { border-left: 3px solid var(--p-gold); }
 .border-left-amber  { border-left: 3px solid var(--c-warning); }
 .border-left-blue   { border-left: 3px solid #4FADF5; }
-.border-left-purple { border-left: 3px solid #4FADF5; }
+.border-left-purple { border-left: 3px solid var(--c-purple); }
 .border-left-violet   { border-left: 3px solid var(--c-purple); }
 .border-left-neutral  { border-left: 3px solid #6b7280; }
 .border-left-dark-gold { border-left: 3px solid var(--p-gold-dark); }
@@ -3064,7 +3064,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .inf-small    { font-size: 0.75rem; }
 .inf-card-title { font-size: 1.1rem; font-weight: 800; margin: 0 0 10px 0; }
 .card-tint-red    { background: rgba(232, 85, 95,0.08)    !important; }
-.card-tint-violet { background: rgba(79, 173, 245,0.05)   !important; }
+.card-tint-violet { background: rgba(168, 85, 247,0.05)   !important; }
 .inf-led       { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .pdf-loader-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100000;
@@ -3273,7 +3273,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .input-sm        { height: 36px; }
 .checkbox-row    { padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; }
 .note-amber      { font-size: 0.72rem; padding: 8px; background: rgba(255,214,0,0.08); border: 1px solid rgba(255,214,0,0.15); border-radius: 8px; }
-.note-purple     { font-size: 0.72rem; padding: 6px; background: rgba(79, 173, 245,0.08); border-radius: 8px; }
+.note-purple     { font-size: 0.72rem; padding: 6px; background: rgba(168, 85, 247,0.08); border-radius: 8px; }
 
 /* dashboard: tarjeta verde con radio */
 .card-tint-green-lg { background: rgba(197, 250, 80,0.08); border-radius: 12px; }
@@ -3527,7 +3527,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .nota-box           { padding: 12px; font-size: 0.85rem; }
 .nota-box-red       { background: rgba(232, 85, 95,0.1);   border-left: 3px solid var(--c-danger); }
 .nota-box-green     { background: rgba(197, 250, 80,0.1);  border-left: 3px solid var(--c-success); }
-.nota-box-purple    { background: rgba(79, 173, 245,0.1);  border-left: 3px solid var(--c-purple); }
+.nota-box-purple    { background: rgba(168, 85, 247,0.1);  border-left: 3px solid var(--c-purple); }
 .nota-box-blue      { background: rgba(79, 173, 245,0.08); border: 1px solid #4FADF5; border-radius: 10px; }
 .nota-box-amber     { background: rgba(255,214,0,0.1);  border-left: 3px solid var(--c-warning); }
 .ayuda-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
@@ -3667,7 +3667,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .table-collapse      { border-collapse: collapse; }
 .thead-sticky        { background: #111; position: sticky; top: 0; z-index: 10; }
 .hint-box-gold       { background: rgba(251,191,36,0.08);  border: 1px solid rgba(251,191,36,0.2);  border-radius: 10px; padding: 10px 12px; }
-.hint-box-violet     { background: rgba(79, 173, 245,0.06);  border: 1px solid rgba(79, 173, 245,0.15); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+.hint-box-violet     { background: rgba(168, 85, 247,0.06);  border: 1px solid rgba(168, 85, 247,0.15); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
 .btn-inline-green    { padding: 11px 14px; border-radius: 12px; background: rgba(197, 250, 80,0.15); border: 1px solid rgba(197, 250, 80,0.3); cursor: pointer; white-space: nowrap; }
 .btn-inline-blue     { padding: 11px 14px; border-radius: 12px; background: rgba(79, 173, 245,0.15); border: 1px solid rgba(79, 173, 245,0.3); text-decoration: none; white-space: nowrap; }
 
