@@ -207,39 +207,41 @@ const ExplotacionView = {
         await this._renderTramitesView(document.getElementById('expro-tab-content'), fincaId);
         break;
       case 'traslado':
-        window._redirectSuppression = true;
+        window._wizardCallFromExpro = true;
         try {
           if (window.App && window.App._abrirWizardTraslado) await window.App._abrirWizardTraslado();
           else if (window.WizardTraslado) await window.WizardTraslado.abrir();
         } finally {
-          window._redirectSuppression = false;
+          window._wizardCallFromExpro = false;
+          // Regresar a la pestaña principal después de lanzar el wizard para evitar contenido vacío
+          this._cambiarSubModulo('explotacion');
         }
         break;
       case 'censo':
-        window._redirectSuppression = true;
+        window._wizardCallFromExpro = true;
         try {
           if (window.App && window.App._abrirWizardCenso) await window.App._abrirWizardCenso();
           else if (window.WizardCenso) await window.WizardCenso.abrir();
         } finally {
-          window._redirectSuppression = false;
+          window._wizardCallFromExpro = false;
         }
         break;
       case 'crotales':
-        window._redirectSuppression = true;
+        window._wizardCallFromExpro = true;
         try {
           if (window.App && window.App._abrirWizardCrotales) await window.App._abrirWizardCrotales();
           else if (window.WizardCrotales) await window.WizardCrotales.abrir();
         } finally {
-          window._redirectSuppression = false;
+          window._wizardCallFromExpro = false;
         }
         break;
       case 'guia':
-        window._redirectSuppression = true;
+        window._wizardCallFromExpro = true;
         try {
           if (window.App && window.App._abrirWizardGuiaMovimiento) await window.App._abrirWizardGuiaMovimiento();
           else if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
         } finally {
-          window._redirectSuppression = false;
+          window._wizardCallFromExpro = false;
         }
         break;
     }
