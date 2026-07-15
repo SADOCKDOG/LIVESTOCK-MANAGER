@@ -2,10 +2,10 @@
 name: "Livestock Manager"
 version: "4.9.0"
 colors:
-  primary: "#C5FA50"      # Verde Lima (Expro - Explotación)
-  secondary: "#4FADF5"    # Azul/Cyan (Comer - Comercialización)
-  danger: "#E8555F"       # Rojo Coral (Ganadería)
-  warning: "#FFFC55"      # Amarillo Oro (Aviso / Identificadores)
+  primary: "#CCFF00"      # Verde Lima Neón (Expro - Explotación)
+  secondary: "#3b82f6"    # Azul Neón (Comer - Comercialización)
+  danger: "#FF4444"       # Rojo Neón (Ganadería)
+  warning: "#FFD600"      # Amarillo Neón (Aviso / Identificadores)
   accent: "#7EEFEF"       # Cyan Claro (Genética)
   background: "#0C0C0C"   # Fondo Global OLED
   surface: "#1E1E1E"      # Tarjetas Dark Pro
@@ -39,10 +39,10 @@ La aplicación divide su interfaz y elementos en tres grandes áreas conceptuale
 
 | Área / Concepto | Variable CSS | Hex | Origen (Brand Design) | Rutas y Módulos Asociados |
 | :--- | :--- | :--- | :--- | :--- |
-| **Expro (Explotación)** | `--c-success` | `#C5FA50` | `Numeros, texto y viñetas.jpg` | Verde Lima. Pantalla de Inicio / Dashboard (`/`), Zonas y Potreros (`/zonas`, `/zona`), loaders y botones de guardado. |
-| **Ganadería** | `--c-danger` | `#E8555F` | `Numeros, texto y viñetas.jpg` | Rojo Coral. Fichas de Animales (`/animales`, `/animal`), Cuaderno Digital (`/cuaderno`), Ganadería y Sanidad (`/ganaderia`), Carne (`/carne`), Gastos directos (`/gastos`). |
-| **Comer (Comercialización)**| `--c-info` | `#4FADF5` | `Numeros, texto y viñetas.jpg` | Azul/Cyan. Módulo de Leche (`/leche`), Comercialización (`/comercializacion`), Rebaños (`/rebanos`), Compradores (`/compradores`), Proveedores (`/proveedores`), Transportistas (`/transportistas`), Documentos (`/documentos`) y Contratos (`/contrato`). |
-| **Aviso / Identificación** | `--c-warning` / `--p-gold` | `#FFFC55` | `Numeros, texto y viñetas.jpg` | Amarillo Oro brillante. Enlaces de acción (Ficha ➔), identificadores principales en cards (crotales, códigos) y cifras de producción destacadas. |
+| **Expro (Explotación)** | `--c-success` | `#CCFF00` | Verde Lima Neón. Pantalla de Inicio / Dashboard (`/`), Zonas y Potreros (`/zonas`, `/zona`), loaders y botones de guardado. |
+| **Ganadería** | `--c-danger` | `#FF4444` | Rojo Neón. Fichas de Animales (`/animales`, `/animal`), Cuaderno Digital (`/cuaderno`), Ganadería y Sanidad (`/ganaderia`), Carne (`/carne`), Gastos directos (`/gastos`). |
+| **Comer (Comercialización)**| `--c-info` | `#3b82f6` | Azul Neón. Módulo de Leche (`/leche`), Comercialización (`/comercializacion`), Rebaños (`/rebanos`), Compradores (`/compradores`), Proveedores (`/proveedores`), Transportistas (`/transportistas`), Documentos (`/documentos`) y Contratos (`/contrato`). |
+| **Aviso / Identificación** | `--c-warning` / `--p-gold` | `#FFD600` / `#FFB300` | Amarillo Neón / Oro. Enlaces de acción (Ficha ➔), identificadores principales en cards (crotales, códigos) y cifras de producción destacadas. |
 | **Genética (Acento)** | `--c-accent` | `#7EEFEF` | `Blue.jpg` (variante) | Cyan claro. Acentos de reproducción, celos, inseminaciones e historial genético. |
 
 ### Paleta Tipográfica y Contraste de Datos
@@ -54,9 +54,9 @@ Para asegurar que las cifras destaquen sin contaminar la interfaz:
 
 > [!IMPORTANT]
 > El sistema de diseño se estructura estrictamente en base a estas tres áreas cromáticas (**Expro**, **Ganadería**, **Comer**). Las antiguas variables de módulo se mapean para compatibilidad legacy:
-> *   `--c-orange` ➔ Mapea a Rojo Coral (`#E8555F`) - Área Ganadería.
-> *   `--c-purple` ➔ Mapea a Azul/Cyan (`#4FADF5`) - Área Comercialización.
-> *   `--c-pink` ➔ Mapea a Azul/Cyan (`#4FADF5`) - Área Comercialización.
+> *   `--c-orange` ➔ Mapea a Naranja Neón (`#F97316`) - Animales / Cuaderno.
+> *   `--c-purple` ➔ Mapea a Violeta Neón (`#A855F7`) - Proveedores / Manuales.
+> *   `--c-pink` ➔ Mapea a Rosa Neón (`#EC4899`) - Transportistas / Logística.
 
 ---
 

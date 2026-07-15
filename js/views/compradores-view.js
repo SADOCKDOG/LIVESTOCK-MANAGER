@@ -382,7 +382,7 @@ const CompradoresView = {
     fabContainer.className = 'fab-container';
     fabContainer.innerHTML = `
       <span class="fab-label">Nuevo Comprador</span>
-      <button class="fab-btn">${Icons.fabPlus()}</button>
+      <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
     `;
     fabContainer.onclick = () => CompradoresView.renderFormulario();
     contenedor.appendChild(fabContainer);
@@ -461,7 +461,7 @@ const CompradoresView = {
     fabContainer.className = 'fab-container';
     fabContainer.innerHTML = `
       <span class="fab-label">Nuevo Contrato</span>
-      <button class="fab-btn">${Icons.fabPlus()}</button>
+      <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
     `;
     fabContainer.onclick = () => CompradoresView._nuevoContratoLibre();
     contenedor.appendChild(fabContainer);
@@ -519,11 +519,11 @@ const CompradoresView = {
             </div>
           </div>
           <div class="flex gap-8">
-            <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._eliminar(${id})">
-              ${Icons.eliminar()}
+            <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="CompradoresView._eliminar(${id})" aria-label="Eliminar">
+              <span aria-hidden="true">${Icons.eliminar()}</span>
             </button>
-            <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="CompradoresView.renderFormulario(${id})">
-              ${Icons.editar()}
+            <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="CompradoresView.renderFormulario(${id})" aria-label="Editar">
+              <span aria-hidden="true">${Icons.editar()}</span>
             </button>
           </div>
         </div>
@@ -661,18 +661,18 @@ const CompradoresView = {
           <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)"><span style="color: var(--c-amber); margin-right: 6px;">|</span> ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
 
           <div class="wizard-input-group mb-15">
-              <label class="wizard-label uppercase font-900">Nombre / Razón Social *</label>
-              <input type="text" id="c-nombre" value="${c.nombre || ''}" class="wizard-input uppercase font-900" placeholder="EJ: GANADERÍAS DEL SUR S.L.">
+              <label class="wizard-label uppercase font-900" for="c-nombre">Nombre / Razón Social *</label>
+              <input type="text" id="c-nombre" value="${c.nombre || ''}" required class="wizard-input uppercase font-900" placeholder="EJ: GANADERÍAS DEL SUR S.L.">
           </div>
 
           <div class="grid grid-cols-2 gap-12 mb-15">
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">NIF / CIF *</label>
-              <input type="text" id="c-nif" value="${c.nif_cif || ''}" class="wizard-input uppercase font-800" placeholder="B12345678">
+              <label class="wizard-label uppercase font-900" for="c-nif">NIF / CIF *</label>
+              <input type="text" id="c-nif" value="${c.nif_cif || ''}" required class="wizard-input uppercase font-800" placeholder="B12345678">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">Tipo Comprador *</label>
-              <select id="c-tipo" class="wizard-input wizard-select font-900 uppercase">
+              <label class="wizard-label uppercase font-900" for="c-tipo">Tipo Comprador *</label>
+              <select id="c-tipo" required class="wizard-input wizard-select font-900 uppercase">
                 <option value="cárnico" ${c.tipo_comprador === 'cárnico' ? 'selected' : ''}>CÁRNICO</option>
                 <option value="láctico" ${c.tipo_comprador === 'láctico' ? 'selected' : ''}>LÁCTEO</option>
                 <option value="híbrido" ${c.tipo_comprador === 'híbrido' || !c.tipo_comprador ? 'selected' : ''}>HÍBRIDO / MIXTO</option>
@@ -682,7 +682,7 @@ const CompradoresView = {
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-15">
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">Operador SIGGAN</label>
+              <label class="wizard-label uppercase font-900" for="c-tipo-operador">Operador SIGGAN</label>
               <select id="c-tipo-operador" class="wizard-input wizard-select font-800 uppercase">
                 <option value="matadero" ${c.tipo_operador === 'matadero' ? 'selected' : ''}>MATADERO</option>
                 <option value="industria_lactea" ${c.tipo_operador === 'industria_lactea' ? 'selected' : ''}>INDUSTRIA LÁCTEA</option>
@@ -691,11 +691,11 @@ const CompradoresView = {
               </select>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">REGA Destino</label>
+              <label class="wizard-label uppercase font-900" for="c-rega">REGA Destino</label>
               <input type="text" id="c-rega" value="${c.rega || ''}" class="wizard-input uppercase font-800 input-rega-std" placeholder="ES000000000000" maxlength="14">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">CCAA</label>
+              <label class="wizard-label uppercase font-900" for="c-ccaa">CCAA</label>
               <select id="c-ccaa" class="wizard-input wizard-select font-800 uppercase">
                 <option value="">— SIN DEFINIR —</option>
                 <option value="andalucia" ${c.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>ANDALUCÍA</option>
@@ -705,43 +705,43 @@ const CompradoresView = {
           </div>
 
           <div class="wizard-input-group mb-15">
-              <label class="wizard-label uppercase font-900">Dirección Postal</label>
+              <label class="wizard-label uppercase font-900" for="c-dir">Dirección Postal</label>
               <input type="text" id="c-dir" value="${c.direccion || ''}" class="wizard-input uppercase font-800">
           </div>
 
           <div class="grid grid-cols-3 gap-12 mb-15">
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">C.P.</label>
+              <label class="wizard-label uppercase font-900" for="c-cp">C.P.</label>
               <input type="text" id="c-cp" value="${c.codigo_postal || ''}" class="wizard-input font-800">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">Ciudad</label>
+              <label class="wizard-label uppercase font-900" for="c-ciudad">Ciudad</label>
               <input type="text" id="c-ciudad" value="${c.ciudad || ''}" class="wizard-input uppercase font-800">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">Provincia</label>
+              <label class="wizard-label uppercase font-900" for="c-prov">Provincia</label>
               <input type="text" id="c-prov" value="${c.provincia || ''}" class="wizard-input uppercase font-800">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-12 mb-15">
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">Teléfono</label>
+              <label class="wizard-label uppercase font-900" for="c-tel">Teléfono</label>
               <input type="tel" id="c-tel" value="${c.telefono || ''}" class="wizard-input font-800">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label uppercase font-900">Email</label>
+              <label class="wizard-label uppercase font-900" for="c-email">Email</label>
               <input type="email" id="c-email" value="${c.email || ''}" class="wizard-input font-800 lowercase">
             </div>
           </div>
 
           <div class="wizard-input-group mb-15">
-              <label class="wizard-label uppercase font-900">Condiciones de Pago</label>
+              <label class="wizard-label uppercase font-900" for="c-pago">Condiciones de Pago</label>
               <input type="text" id="c-pago" value="${c.condiciones_pago || ''}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
           </div>
 
           <div class="wizard-input-group mb-15">
-              <label class="wizard-label uppercase font-900">Notas / Observaciones</label>
+              <label class="wizard-label uppercase font-900" for="c-notas">Notas / Observaciones</label>
               <textarea id="c-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${c.notas || ''}</textarea>
           </div>
 

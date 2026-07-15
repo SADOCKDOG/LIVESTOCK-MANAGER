@@ -128,18 +128,20 @@
         const diag = document.getElementById('error-diag');
         if (diag) {
           diag.style.display = 'block';
-          diag.innerHTML = 'ERROR JS\n\n' + msg + '\n\nArchivo: ' + (url || '?') + '\nLínea: ' + (line || '?') + '\nCol: ' + (col || '?') + '\n\nStack: ' + (err ? err.stack : 'N/A') + '\n\n[Toque aquí para cerrar]';
+          diag.innerHTML = 'Se ha producido un error. Pulsa para continuar.\n\n<small style="opacity:0.5">Detalles técnicos disponibles en consola</small>';
           diag.onclick = () => diag.style.display = 'none';
         }
+        console.error('[Error]', msg, '\nArchivo:', url, '\nLínea:', line, '\nCol:', col, '\nStack:', err?.stack);
         return true;
       };
       window.addEventListener('unhandledrejection', function(e) {
         const diag = document.getElementById('error-diag');
         if (diag) {
           diag.style.display = 'block';
-          diag.innerHTML = 'PROMESA RECHAZADA\n\n' + (e.reason ? e.reason.message || e.reason : '?') + '\n\nStack: ' + (e.reason ? e.reason.stack || 'N/A' : 'N/A') + '\n\n[Toque aquí para cerrar]';
+          diag.innerHTML = 'Se ha producido un error. Pulsa para continuar.\n\n<small style="opacity:0.5">Detalles técnicos disponibles en consola</small>';
           diag.onclick = () => diag.style.display = 'none';
         }
+        console.error('[Promise]', e.reason?.message || e.reason, '\nStack:', e.reason?.stack);
       });
       // Rescue timer
       setTimeout(() => {
@@ -223,7 +225,7 @@
       </div>
     </div>
 
-    <div id="toast-container"></div>
+    <div id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script>
     // ============================================
@@ -279,6 +281,7 @@
     <!-- Helpers de UI -->
     <script src="js/views/helpers/modo-contexto.js?v=6.28"></script>
     <script src="js/views/helpers/calidad-leche.js?v=6.28"></script>
+    <script src="js/ui-utils.js?v=1.0.0"></script>
 
     <!-- 1º Inyectar el Motor de Reglas y Trazabilidad Oficial (Validaciones y Albaranes) -->
     <script src="js/trazabilidad.js?v=6.28.5"></script>
@@ -375,10 +378,7 @@
       } catch (e) {
         console.warn("Service Worker no disponible o bloqueado por el sandbox del entorno:", e.message);
       }
-      window.onerror = function (msg, url, line) {
-        try { Confirm.alert("Error", "Error: " + msg + "\nLínea: " + line); } catch (e) { console.error("Error global:", msg); }
-        return false;
-      };
+
     </script>
 
 </body>

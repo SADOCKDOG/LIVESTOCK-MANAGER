@@ -41,7 +41,7 @@ const ProveedoresView = {
           <!-- Botón Flotante de Acción con viñeta -->
           <div class="fab-container" onclick="ProveedoresView.renderFormulario()">
             <span class="fab-label">Nuevo Proveedor</span>
-            <button class="fab-btn">${Icons.fabPlus()}</button>
+            <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
           </div>
           `;
 
@@ -176,11 +176,11 @@ const ProveedoresView = {
                 </div>
               </div>
               <div class="flex gap-8">
-                <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="ProveedoresView._eliminar(${id})">
-                  ${Icons.eliminar()}
+                <button class="widget-link-btn widget-link-btn--neon neon-danger px-12 py-8 min-h-0 h-auto" onclick="ProveedoresView._eliminar(${id})" aria-label="Eliminar">
+                  <span aria-hidden="true">${Icons.eliminar()}</span>
                 </button>
-                <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="ProveedoresView.renderFormulario(${id})">
-                  ${Icons.editar()}
+                <button class="widget-link-btn widget-link-btn--neon neon-info px-12 py-8 min-h-0 h-auto" onclick="ProveedoresView.renderFormulario(${id})" aria-label="Editar">
+                  <span aria-hidden="true">${Icons.editar()}</span>
                 </button>
               </div>
             </div>
@@ -288,24 +288,24 @@ const ProveedoresView = {
             <div class="section-header-theme mb-20" style="--theme-color: var(--c-success)"><span style="color: var(--c-success); margin-right: 4px;">|</span> ${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR'}</div>
 
             <div class="wizard-input-group mb-15">
-                <label class="wizard-label">NOMBRE / RAZÓN SOCIAL *</label>
-                <input type="text" id="p-nombre" value="${p.nombre || ''}" class="wizard-input uppercase font-900" placeholder="EJ: SUMINISTROS AGRÍCOLAS S.L.">
+                <label class="wizard-label" for="p-nombre">NOMBRE / RAZÓN SOCIAL *</label>
+                <input type="text" id="p-nombre" value="${p.nombre || ''}" required class="wizard-input uppercase font-900" placeholder="EJ: SUMINISTROS AGRÍCOLAS S.L.">
             </div>
 
             <div class="grid grid-cols-2 gap-12 mb-15">
               <div class="wizard-input-group">
-                <label class="wizard-label">NIF / CIF</label>
+                <label class="wizard-label" for="p-nif">NIF / CIF</label>
                 <input type="text" id="p-nif" value="${p.nif_cif || ''}" class="wizard-input uppercase font-800" placeholder="B12345678">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">TELÉFONO</label>
+                <label class="wizard-label" for="p-tel">TELÉFONO</label>
                 <input type="tel" id="p-tel" value="${p.telefono || ''}" class="wizard-input font-800" placeholder="600000000">
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-15">
               <div class="wizard-input-group">
-                <label class="wizard-label">TIPO OPERADOR SIGGAN</label>
+                <label class="wizard-label" for="p-tipo-operador">TIPO OPERADOR SIGGAN</label>
                 <select id="p-tipo-operador" class="wizard-input wizard-select font-800">
                   <option value="proveedor_servicios" ${!p.tipo_operador || p.tipo_operador === 'proveedor_servicios' ? 'selected' : ''}>PROVEEDOR SERVICIOS</option>
                   <option value="piensos" ${p.tipo_operador === 'piensos' ? 'selected' : ''}>PIENSOS</option>
@@ -314,11 +314,11 @@ const ProveedoresView = {
                 </select>
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">REGA</label>
+                <label class="wizard-label" for="p-rega">REGA</label>
                 <input type="text" id="p-rega" value="${p.rega || ''}" class="wizard-input uppercase font-800 input-rega-std" placeholder="ES041230000123" maxlength="14">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">CCAA</label>
+                <label class="wizard-label" for="p-ccaa">CCAA</label>
                 <select id="p-ccaa" class="wizard-input wizard-select font-800">
                   <option value="">— SIN DEFINIR —</option>
                   <option value="andalucia" ${p.comunidad_autonoma === 'andalucia' ? 'selected' : ''}>ANDALUCÍA</option>
@@ -328,21 +328,21 @@ const ProveedoresView = {
             </div>
 
             <div class="wizard-input-group mb-15">
-                <label class="wizard-label">DIRECCIÓN POSTAL</label>
+                <label class="wizard-label" for="p-dir">DIRECCIÓN POSTAL</label>
                 <input type="text" id="p-dir" value="${p.direccion || ''}" class="wizard-input uppercase font-800">
             </div>
 
             <div class="grid grid-cols-3 gap-12 mb-15">
               <div class="wizard-input-group">
-                <label class="wizard-label">C.P.</label>
+                <label class="wizard-label" for="p-cp">C.P.</label>
                 <input type="text" id="p-cp" value="${p.codigo_postal || ''}" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">CIUDAD</label>
+                <label class="wizard-label" for="p-ciudad">CIUDAD</label>
                 <input type="text" id="p-ciudad" value="${p.ciudad || ''}" class="wizard-input uppercase font-800">
               </div>
               <div class="wizard-input-group">
-                <label class="wizard-label">PROVINCIA</label>
+                <label class="wizard-label" for="p-prov">PROVINCIA</label>
                 <input type="text" id="p-prov" value="${p.provincia || ''}" class="wizard-input uppercase font-800">
               </div>
             </div>
@@ -368,17 +368,17 @@ const ProveedoresView = {
             </div>
 
             <div class="wizard-input-group mb-15">
-                <label class="wizard-label">EMAIL CONTACTO</label>
+                <label class="wizard-label" for="p-email">EMAIL CONTACTO</label>
                 <input type="email" id="p-email" value="${p.email || ''}" class="wizard-input font-800 lowercase">
             </div>
 
             <div class="wizard-input-group mb-15">
-                <label class="wizard-label">CONDICIONES DE PAGO</label>
+                <label class="wizard-label" for="p-pago">CONDICIONES DE PAGO</label>
                 <input type="text" id="p-pago" value="${p.condiciones_pago || ''}" class="wizard-input uppercase font-800" placeholder="EJ: TRANSFERENCIA 30 DÍAS">
             </div>
 
             <div class="wizard-input-group mb-15">
-                <label class="wizard-label">NOTAS / OBSERVACIONES</label>
+                <label class="wizard-label" for="p-notas">NOTAS / OBSERVACIONES</label>
                 <textarea id="p-notas" class="wizard-input uppercase font-700" style="min-height:80px; resize:none;">${p.notas || ''}</textarea>
             </div>
 

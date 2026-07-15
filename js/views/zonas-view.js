@@ -287,25 +287,25 @@ const ZonasView = {
       <div class="mb-20"><a href="#" onclick="ZonasView._salirEdicionZona(); return false;" class="link-back">← Volver</a><h2 class="mt-10 font-900 uppercase tracking-wider"><span style="color: var(--neon);">|</span> ${Icons.zonas()} DETALLE ZONA</h2></div>
       <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="flex flex-col gap-15">
-          <div><label class="form-label">Nombre</label>
-          <input type="text" id="z-edit-nombre" value="${zona.nombre}" class="premium-input"></div>
+          <div><label class="form-label" for="z-edit-nombre">Nombre</label>
+          <input type="text" id="z-edit-nombre" required value="${zona.nombre}" class="premium-input"></div>
           <div class="grid grid-cols-2 gap-10">
-            <div><label class="form-label">Aforo Máximo</label>
+            <div><label class="form-label" for="z-edit-aforo">Aforo Máximo</label>
             <input type="number" id="z-edit-aforo" value="${zona.aforoMax || ""}" class="premium-input"></div>
-            <div><label class="form-label">Superficie (ha)</label>
+            <div><label class="form-label" for="z-edit-superficie">Superficie (ha)</label>
             <input type="number" id="z-edit-superficie" value="${zona.superficieGrafica || ""}" step="0.01" class="premium-input"></div>
           </div>
-          <div><label class="form-label">Código PAC (Parcela Agraria)</label>
+          <div><label class="form-label" for="z-edit-pac">Código PAC (Parcela Agraria)</label>
           <input type="text" id="z-edit-pac" value="${zona.codigo_pac || ""}" placeholder="Ej: ES01A123456789" class="premium-input"></div>
-          <div><label class="form-label">Uso Principal de la Parcela</label>
+          <div><label class="form-label" for="z-edit-uso">Uso Principal de la Parcela</label>
           <input type="text" id="z-edit-uso" value="${zona.usoPrincipal || ""}" placeholder="Ej: Pasto libre, Engorde, Cultivo..." class="premium-input"></div>
-          <div><label class="form-label">Distancia a Fuente de Agua (m)</label>
+          <div><label class="form-label" for="z-edit-agua">Distancia a Fuente de Agua (m)</label>
           <input type="number" id="z-edit-agua" value="${zona.distancia_agua_m || ""}" placeholder="Metros" class="premium-input"></div>
           <div class="text-gray text-xs mt-8">
             <strong>${Icons.grafico()} Métricas SIGGAN (solo lectura):</strong><br/>
             UGM Total: <strong>${ugmTotal.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</strong> · Carga: <strong>${cargaGanadera} UGM/ha</strong>
           </div>
-          <div><label class="form-label">Localización</label>
+          <div><label class="form-label" for="z-edit-localizacion">Localización</label>
           <textarea id="z-edit-localizacion" class="premium-input min-h-60 resize-none">${zona.localizacion || ""}</textarea></div>
         </div>
         <div class="flex justify-between items-center mt-20">
@@ -374,19 +374,19 @@ const ZonasView = {
         content: (data) => `
           <div class="mt-10">
             <div class="wizard-input-group">
-              <label class="wizard-label">NOMBRE DE LA ZONA / PARCELA</label>
-              <input type="text" id="w-zona-nombre" value="${data.nombre}" placeholder="Ej: Parcela Norte..." class="wizard-input">
+              <label class="wizard-label" for="w-zona-nombre">NOMBRE DE LA ZONA / PARCELA</label>
+              <input type="text" id="w-zona-nombre" value="${data.nombre}" required placeholder="Ej: Parcela Norte..." class="wizard-input">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">AFORO MÁXIMO (Animales)</label>
+              <label class="wizard-label" for="w-zona-aforo">AFORO MÁXIMO (Animales)</label>
               <input type="number" id="w-zona-aforo" value="${data.aforoMax}" class="wizard-input">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">SUPERFICIE (ha)</label>
+              <label class="wizard-label" for="w-zona-superficie">SUPERFICIE (ha)</label>
               <input type="number" id="w-zona-superficie" value="${data.superficie}" step="0.01" placeholder="Ej: 42.5" class="wizard-input">
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">USO PRINCIPAL (Opcional)</label>
+              <label class="wizard-label" for="w-zona-uso">USO PRINCIPAL (Opcional)</label>
               <input type="text" id="w-zona-uso" value="${data.usoPrincipal}" placeholder="Ej: Engorde, Pasto libre..." class="wizard-input">
             </div>
           </div>
@@ -409,12 +409,12 @@ const ZonasView = {
         content: (data) => `
           <div class="mt-10">
             <div class="wizard-input-group">
-              <label class="wizard-label">CÓDIGO PAC (Parcela Agraria SIGGAN)</label>
+              <label class="wizard-label" for="w-zona-pac">CÓDIGO PAC (Parcela Agraria SIGGAN)</label>
               <input type="text" id="w-zona-pac" value="${data.codigo_pac}" placeholder="Ej: ES01A123456789" class="wizard-input">
               <small class="text-gray">Requisito para subvenciones CCAA</small>
             </div>
             <div class="wizard-input-group">
-              <label class="wizard-label">DISTANCIA A FUENTE DE AGUA (m)</label>
+              <label class="wizard-label" for="w-zona-agua">DISTANCIA A FUENTE DE AGUA (m)</label>
               <input type="number" id="w-zona-agua" value="${data.distancia_agua_m}" placeholder="Metros a abrevadero o agua" class="wizard-input">
             </div>
           </div>
@@ -555,14 +555,14 @@ const ZonasView = {
             
             <div class="flex flex-col gap-15 mt-10">
               <div>
-                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">1. SELECCIONAR REBAÑO / LOTE</label>
+                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" for="rot-rebano-select" style="display:block;">1. SELECCIONAR REBAÑO / LOTE</label>
                 <select id="rot-rebano-select" class="premium-input w-full uppercase font-800" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
                   ${rebanosEnZona.map(r => `<option value="${r.id}">${r.nombre} (${r.especie})</option>`).join('')}
                 </select>
               </div>
               
               <div>
-                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">2. SELECCIONAR PARCELA DESTINO</label>
+                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" for="rot-zona-select" style="display:block;">2. SELECCIONAR PARCELA DESTINO</label>
                 <select id="rot-zona-select" class="premium-input w-full uppercase font-800" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
                   ${otrasZonasConBloqueo.map(item => `
                     <option value="${item.zona.nombre}" ${item.bloqueada ? 'style="color:#ff4444; font-weight:bold;"' : ''}>
@@ -573,7 +573,7 @@ const ZonasView = {
               </div>
               
               <div>
-                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" style="display:block;">3. MOTIVO DE TRASLADO (OPCIONAL)</label>
+                <label class="form-label text-[0.65rem] font-bold uppercase text-gray mb-4" for="rot-observaciones" style="display:block;">3. MOTIVO DE TRASLADO (OPCIONAL)</label>
                 <input type="text" id="rot-observaciones" placeholder="Ej: Rotación rutinaria de pastos, falta de agua..." class="premium-input w-full text-xs font-700" style="background:rgba(255,255,255,0.03); border:1px solid #27272a; height:38px; padding:0 10px; border-radius:6px; color:#fff; display:block;">
               </div>
             </div>

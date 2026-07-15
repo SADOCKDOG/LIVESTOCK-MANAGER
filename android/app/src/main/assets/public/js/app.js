@@ -102,6 +102,8 @@ const App = {
       // Inicializar servicios del sistema
       if (window.CacheService) window.CacheService.init();
 
+      this._setupOfflineIndicator();
+
       if (window.EventBus) {
         const eventosRefresh = [
           'tratamiento:added', 'tratamiento:deleted',
@@ -226,6 +228,20 @@ const App = {
     }
   },
 
+
+  _setupOfflineIndicator() {
+    const banner = document.createElement('div');
+    banner.id = 'offline-banner';
+    banner.textContent = 'Sin conexión';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--c-danger);color:#fff;text-align:center;padding:6px 12px;font-size:0.75rem;font-weight:800;z-index:99999;transform:translateY(-100%);transition:transform 0.3s ease;text-transform:uppercase;letter-spacing:0.05em;';
+    document.body.prepend(banner);
+    const update = () => {
+      banner.style.transform = navigator.onLine ? 'translateY(-100%)' : 'translateY(0)';
+    };
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    update();
+  },
 
   _injectGlobalStyles() {
     const pStyles = document.createElement("style");

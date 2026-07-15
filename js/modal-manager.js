@@ -13,6 +13,9 @@ const ModalManager = {
 
         const overlay = document.createElement('div');
         overlay.id = id;
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        if (options.title) overlay.setAttribute('aria-label', options.title);
         const zIndex = 10000 + (this._activeModals.length * 10);
         overlay.style = `position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; z-index:${zIndex}; padding:0; overflow-y:auto;`;
 

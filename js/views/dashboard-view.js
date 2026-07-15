@@ -301,7 +301,7 @@ const DashboardView = {
 
       <div class="fab-container" onclick="App._abrirSubmenuRegistros({ origen_modulo: 'dashboard' })">
         <span class="fab-label">Nueva Actividad</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
+        <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
       </div>
     `;
   },

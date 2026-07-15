@@ -732,7 +732,6 @@ const CarneView = {
         </div>
       </div>
     `;
-    content.innerHTML = html;
   },
 
   // ========== BLOQUE 4: SANIDAD Y LEGISLACIÓN (cálculo/edición centralizados en SanidadView) ==========

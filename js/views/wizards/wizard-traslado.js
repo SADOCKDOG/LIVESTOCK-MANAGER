@@ -96,17 +96,9 @@ window.WizardTraslado = {
             </div>
           `;
         },
-        onChange: async (data, wizardInstance) => {
+        onChange: async (data) => {
           const checks = document.querySelectorAll(".w-tras-chk:checked:not(:disabled)");
           data.selectedIds = Array.from(checks).map((c) => parseInt(c.value, 10));
-
-          // Update the tercer paso data if needed
-          if (wizardInstance.steps[2]) {
-            wizardInstance.steps[2].initialData = {
-              ...wizardInstance.steps[2].initialData,
-              allAnimales: rebanoSeleccionado.allAnimales
-            };
-          }
         },
         validate: async (data) => {
           if (!data.selectedIds || data.selectedIds.length === 0) {
