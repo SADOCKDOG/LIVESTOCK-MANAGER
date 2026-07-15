@@ -8,6 +8,7 @@
 
 const InformesView = {
   _currentTab: 'carne',
+  _currentCategory: 'gegan',
   _cachedData: null,
 
   /** Formatea un número en es-ES con decimales fijos (auditoría F5: coherencia decimal). */
@@ -18,7 +19,7 @@ const InformesView = {
   _categories: {
     gegan: {
       label: "GeGan",
-      icon: Icons.animales(),
+      icon: 'animales',
       tabs: {
         "general": "General",
         "por-finca": "Por Finca",
@@ -38,7 +39,7 @@ const InformesView = {
     },
     expro: {
       label: "Expro",
-      icon: Icons.finca(),
+      icon: 'finca',
       tabs: {
         "general": "General",
         "por-finca": "Por Finca",
@@ -48,7 +49,7 @@ const InformesView = {
     },
     comer: {
       label: "Comer",
-      icon: Icons.compradores(),
+      icon: 'compradores',
       tabs: {
         "ventas": "Ventas",
         "compradores": "Compradores",
@@ -57,7 +58,7 @@ const InformesView = {
     },
     libros: {
       label: "Libros",
-      icon: Icons.documento(),
+      icon: 'documento',
       tabs: {
         "pyg": "P y G",
         "flujo-caja": "Flujo Caja",
@@ -107,13 +108,13 @@ const InformesView = {
   },
 
   _renderTabsHeader() {
-    const activeCatKey = this._obtenerCategoriaDeTab(this._currentTab);
+    const activeCatKey = this._currentCategory;
     // Colores por categoría
     const catColors = {
       gegan: 'var(--c-success)',      // Green for GeGan (livestock/production)
       expro: 'var(--c-info)',         // Blue for Expro (farm operations)
-      comer: 'var(--c-warning)',      # Orange/Yellow for Comer (commerce/trade)
-      libros: 'var(--c-purple)'       # Purple for Libros (record books/ledgers)
+      comer: 'var(--c-warning)',      // Orange/Yellow for Comer (commerce/trade)
+      libros: 'var(--c-purple)'       // Purple for Libros (record books/ledgers)
     };
     const activeColor = catColors[activeCatKey] || 'var(--c-success)';
 
@@ -128,9 +129,9 @@ const InformesView = {
       catsHtml += `
         <button class="inf-cat-tab ${isActive ? 'active' : ''}"
                 id="inf-cat-${catKey}"
-                style="${isActive ? `--tab-color:${col}; background:${col}15; border-color:${col}; color:${col} !important; box-shadow: 0 0 12px ${col}50;` : `--tab-color:${col};`}"
+                style="${isActive ? '--tab-color:' + col + '; background:' + col + '15; border-color:' + col + '; color:' + col + ' !important; box-shadow: 0 0 12px ' + col + '50;' : '--tab-color:' + col + ';'}"
                 onclick="InformesView._cambiarCategoria('${catKey}')">
-          ${cat.icon} ${cat.label.toUpperCase()}
+          ${Icons[cat.icon]()} ${cat.label.toUpperCase()}
         </button>
       `;
     }
@@ -152,7 +153,7 @@ const InformesView = {
         <button class="inf-tab ${isActive ? 'active' : ''}"
                 id="inf-tab-${tabKey}"
                 data-tab="${tabKey}"
-                style="${isActive ? `--tab-color:${activeColor}; background:${activeColor}18; border-color:${activeColor}; color:${activeColor} !important; box-shadow: 0 0 8px ${activeColor}40;` : ''}"
+                style="${isActive ? '--tab-color:' + activeColor + '; background:' + activeColor + '18; border-color:' + activeColor + '; color:' + activeColor + ' !important; box-shadow: 0 0 8px ' + activeColor + '40;' : ''}"
                 onclick="InformesView._cambiarTab('${tabKey}')">
           ${subTabIcon} ${tabLabel.toUpperCase()}
         </button>
@@ -167,6 +168,7 @@ const InformesView = {
   },
 
   _cambiarCategoria(catKey) {
+    this._currentCategory = catKey;
     const firstTab = Object.keys(this._categories[catKey].tabs)[0];
     this._currentTab = firstTab;
     this._actualizarHeader();
