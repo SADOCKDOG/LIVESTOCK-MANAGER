@@ -285,10 +285,13 @@ const ContratosView = {
 
     const compradores = await Compradores.list().catch(() => []);
 
+    ContratosView._contratoGuardado = false;
+    App.setExitGuard(() => ContratosView._confirmSalirFormulario());
+
     const main = document.getElementById("app-content");
     main.innerHTML = `
       <div class="mb-14">
-        <button onclick="location.hash='#/contratos'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+        <button onclick="ContratosView._salirFormulario()" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
           <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} VOLVER A CONTRATOS</span>
         </button>
       </div>
@@ -372,7 +375,7 @@ const ContratosView = {
             <button onclick="ContratosView._guardar('${id || ''}')" class="widget-link-btn widget-link-btn--neon neon-success">
               ${Icons.guardar()} <span class="widget-label">GUARDAR</span>
             </button>
-            <button onclick="location.hash='#/contratos'" class="widget-link-btn widget-link-btn--neon neon-danger">
+            <button onclick="ContratosView._salirFormulario()" class="widget-link-btn widget-link-btn--neon neon-danger">
               ${Icons.cerrar()} <span class="widget-label">CANCELAR</span>
             </button>
         </div>
@@ -446,12 +449,25 @@ const ContratosView = {
       if (!data.compradorId) return App.toastError('Selecciona un comprador');
 
       await Contratos.save(data);
+      ContratosView._contratoGuardado = true;
       App.toast(id ? 'Contrato actualizado' : 'Contrato creado', 'success');
 
       location.hash = '#/contratos';
     } catch (e) {
       App.toastError(e.message);
     }
+  },
+
+  /** Guarda de salida compartida con el header-back y el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirFormulario() {
+    if (this._contratoGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _salirFormulario() {
+    if (!(await this._confirmSalirFormulario())) return;
+    App.clearExitGuard();
+    location.hash = '#/contratos';
   },
 
   async _eliminarContrato(id) {

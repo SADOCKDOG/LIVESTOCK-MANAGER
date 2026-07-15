@@ -273,10 +273,14 @@ const ProveedoresView = {
             'Alimentacion', 'Sanidad', 'Fitosanitarios', 'Electricidad', 'Personal', 'Amortizacion'
         ];
 
+        const destinoCancelar = esEdicion ? '#/proveedor?id=' + id : '#/proveedores';
+        ProveedoresView._proveedorGuardado = false;
+        App.setExitGuard(() => ProveedoresView._confirmSalirFormulario());
+
         const main = document.getElementById("app-content");
         main.innerHTML = `
           <div class="mb-14">
-            <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+            <button onclick="ProveedoresView._salirFormulario('${destinoCancelar}')" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
               <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
             </button>
           </div>
@@ -387,7 +391,7 @@ const ProveedoresView = {
                 <button onclick="ProveedoresView._guardar(${id || ''})" class="widget-link-btn widget-link-btn--neon neon-success">
                   ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
                 </button>
-                <button onclick="location.hash='${esEdicion ? '#/proveedor?id='+id : '#/proveedores'}'" class="widget-link-btn widget-link-btn--neon neon-danger">
+                <button onclick="ProveedoresView._salirFormulario('${destinoCancelar}')" class="widget-link-btn widget-link-btn--neon neon-danger">
                   ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
                 </button>
             </div>
@@ -425,11 +429,24 @@ const ProveedoresView = {
             if (!data.nombre) return App.toastError('El nombre es obligatorio');
 
             const nuevoId = await Proveedores.save(data);
+            ProveedoresView._proveedorGuardado = true;
             App.toast(id ? 'Proveedor actualizado' : 'Proveedor creado', 'success');
             location.hash = '#/proveedor?id=' + nuevoId;
         } catch (e) {
             App.toastError(e.message);
         }
+    },
+
+    /** Guarda de salida compartida con el header-back y el botón físico Android (ver App.setExitGuard). */
+    async _confirmSalirFormulario() {
+        if (this._proveedorGuardado) return true;
+        return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+    },
+
+    async _salirFormulario(destino) {
+        if (!(await this._confirmSalirFormulario())) return;
+        App.clearExitGuard();
+        location.hash = destino;
     },
 
     async _eliminar(id) {

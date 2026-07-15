@@ -279,9 +279,12 @@ const ZonasView = {
       ugmTotal += ans.length * factor;
     }
     const cargaGanadera = (superficie > 0 ? ugmTotal / superficie : 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    
+
+    ZonasView._zonaGuardada = false;
+    App.setExitGuard(() => ZonasView._confirmSalirEdicion());
+
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#/zonas" class="link-back">← Volver</a><h2 class="mt-10 font-900 uppercase tracking-wider"><span style="color: var(--neon);">|</span> ${Icons.zonas()} DETALLE ZONA</h2></div>
+      <div class="mb-20"><a href="#" onclick="ZonasView._salirEdicionZona(); return false;" class="link-back">← Volver</a><h2 class="mt-10 font-900 uppercase tracking-wider"><span style="color: var(--neon);">|</span> ${Icons.zonas()} DETALLE ZONA</h2></div>
       <div class="card-registro" style="--registro-color: var(--c-success);">
         <div class="flex flex-col gap-15">
           <div><label class="form-label">Nombre</label>
@@ -308,7 +311,7 @@ const ZonasView = {
         <div class="flex justify-between items-center mt-20">
           <button class="btn btn-danger" onclick="ZonasView._eliminarZona(${index})">${Icons.eliminar()} Eliminar</button>
           <div class="flex gap-10">
-            <button class="btn btn-secondary" onclick="location.hash='/zonas'">${Icons.cerrar()} Cancelar</button>
+            <button class="btn btn-secondary" onclick="ZonasView._salirEdicionZona()">${Icons.cerrar()} Cancelar</button>
             <button class="btn btn-success" onclick="ZonasView._guardarZona(${index})">${Icons.guardar()} Guardar</button>
           </div>
         </div>
@@ -345,11 +348,24 @@ const ZonasView = {
       zona.localizacion = document.getElementById("z-edit-localizacion").value.trim();
       if (!zona.nombre) return App.toastError("Nombre requerido");
       await Fincas.save(finca);
+      ZonasView._zonaGuardada = true;
       App.toast("Zona actualizada", "success");
       location.hash = "#/zonas";
     } catch (e) {
       App.toastError(e.message);
     }
+  },
+
+  /** Guarda de salida compartida con el header-back y el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirEdicion() {
+    if (this._zonaGuardada) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _salirEdicionZona() {
+    if (!(await this._confirmSalirEdicion())) return;
+    App.clearExitGuard();
+    location.hash = "#/zonas";
   },
 
   async _crearZona() {

@@ -646,10 +646,14 @@ const CompradoresView = {
           rega: '', comunidad_autonoma: '', condiciones_pago: '', notas: '', activo: true
       };
 
+      const destinoCancelar = esEdicion ? '#/comprador?id=' + id : '#/compradores';
+      CompradoresView._compradorGuardado = false;
+      App.setExitGuard(() => CompradoresView._confirmSalirFormulario());
+
       const main = document.getElementById("app-content");
       main.innerHTML = `
         <div class="mb-14">
-          <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
+          <button onclick="CompradoresView._salirFormulario('${destinoCancelar}')" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
             <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
           </button>
         </div>
@@ -750,7 +754,7 @@ const CompradoresView = {
               <button onclick="CompradoresView._guardar(${id || ''})" class="widget-link-btn widget-link-btn--neon neon-success">
                 ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
               </button>
-              <button onclick="location.hash='${esEdicion ? '#/comprador?id='+id : '#/compradores'}'" class="widget-link-btn widget-link-btn--neon neon-danger">
+              <button onclick="CompradoresView._salirFormulario('${destinoCancelar}')" class="widget-link-btn widget-link-btn--neon neon-danger">
                 ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
               </button>
             </div>
@@ -785,6 +789,8 @@ const CompradoresView = {
             if (!data.nif_cif) return App.toastError('El NIF/CIF es obligatorio');
 
             const nuevoId = await Compradores.save(data);
+            CompradoresView._compradorGuardado = true;
+            App.clearExitGuard();
             App.toast(id ? 'Comprador actualizado' : 'Comprador creado', 'success');
 
             // Si venimos del wizard de venta, volver
@@ -800,6 +806,18 @@ const CompradoresView = {
         } catch (e) {
             App.toastError(e.message);
         }
+    },
+
+    /** Guarda de salida compartida con el header-back y el botón físico Android (ver App.setExitGuard). */
+    async _confirmSalirFormulario() {
+        if (this._compradorGuardado) return true;
+        return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+    },
+
+    async _salirFormulario(destino) {
+        if (!(await this._confirmSalirFormulario())) return;
+        App.clearExitGuard();
+        location.hash = destino;
     },
 
     async _eliminar(id) {
