@@ -583,10 +583,14 @@ const App = {
     el.addEventListener('scroll', () => this.evaluarScrollPestanas(el));
     setTimeout(() => {
       this.evaluarScrollPestanas(el);
-      // Buscar el botón activo y autocentrarlo con scroll behavior smooth
+      // Centrar el botón activo desplazando únicamente este contenedor (nunca la página):
+      // scrollIntoView() puede hacer scroll en cualquier ancestro para lograr el centrado,
+      // arrastrando también el viewport completo cuando la pestaña activa queda cerca del borde.
       const activeBtn = el.querySelector('.pestanas-premium-btn.active');
       if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        const destino = activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - el.clientWidth / 2;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        el.scrollTo({ left: Math.max(0, Math.min(destino, maxScroll)), behavior: 'smooth' });
       }
     }, 150);
   },
@@ -1727,7 +1731,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.40';
+        s.src = src + '?v=6.28.41';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;
