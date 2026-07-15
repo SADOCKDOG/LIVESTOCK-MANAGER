@@ -275,7 +275,7 @@ const FitosanitariosView = {
             const main = document.getElementById('app-content');
             if (main) this._renderContenido(main);
         } catch (e) {
-            Toast.show('Error al eliminar: ' + e.message, 'danger');
+            Toast.show('Error al eliminar: ' + e.message, 'error');
         }
     },
 
@@ -291,7 +291,7 @@ const FitosanitariosView = {
                 }
             });
         } else {
-            Toast.show('Error: Wizard de gastos no cargado', 'danger');
+            Toast.show('Error: Wizard de gastos no cargado', 'error');
         }
     },
 
@@ -301,7 +301,7 @@ const FitosanitariosView = {
             // InformesView tiene un método para generar sección individual a PDF
             window.InformesView._ejecutarExportarPDFSeccion('fitosanitario');
         } else {
-            Toast.show('Error: Motor de informes PDF no disponible', 'danger');
+            Toast.show('Error: Motor de informes PDF no disponible', 'error');
         }
     }
 };

@@ -352,7 +352,7 @@ const SilosView = {
         const silo = this._cachedSilos.find(s => s.id === Number(id));
         if (!silo) return;
 
-        Toast.show(`Iniciando calibración telemétrica de sensores de ${silo.nombre}...`, 'warn');
+        Toast.show(`Iniciando calibración telemétrica de sensores de ${silo.nombre}...`, 'warning');
 
         const circle = document.getElementById(`silo-circle-${id}`);
         const pctText = document.getElementById(`silo-pct-text-${id}`);
@@ -459,7 +459,7 @@ const SilosView = {
         const factura = invoiceInput?.value ? invoiceInput.value.trim().toUpperCase() : '';
 
         if (amount <= 0) {
-            Toast.show('Ingresa una cantidad válida a cargar', 'warn');
+            Toast.show('Ingresa una cantidad válida a cargar', 'warning');
             return;
         }
 
@@ -585,7 +585,7 @@ const SilosView = {
         const rebanoId = rebanoSelect?.value ? Number(rebanoSelect.value) : null;
 
         if (amount <= 0 || amount > silo.cantidadActual) {
-            Toast.show('Ingresa una cantidad de consumo válida', 'warn');
+            Toast.show('Ingresa una cantidad de consumo válida', 'warning');
             return;
         }
 
@@ -705,19 +705,19 @@ const SilosView = {
         const fechaUltimaCarga = fechaInput?.value || new Date().toISOString().split('T')[0];
 
         if (!nombre) {
-            Toast.show('El nombre del silo es obligatorio', 'warn');
+            Toast.show('El nombre del silo es obligatorio', 'warning');
             return;
         }
         if (!alimento) {
-            Toast.show('El tipo de alimento es obligatorio', 'warn');
+            Toast.show('El tipo de alimento es obligatorio', 'warning');
             return;
         }
         if (capacidad <= 0) {
-            Toast.show('La capacidad debe ser mayor que 0', 'warn');
+            Toast.show('La capacidad debe ser mayor que 0', 'warning');
             return;
         }
         if (cantidadActual < 0 || cantidadActual > capacidad) {
-            Toast.show('La cantidad actual debe estar entre 0 y la capacidad máxima', 'warn');
+            Toast.show('La cantidad actual debe estar entre 0 y la capacidad máxima', 'warning');
             return;
         }
 
@@ -743,7 +743,7 @@ const SilosView = {
             this.render();
         } catch (e) {
             console.error('[SilosView] Error al guardar silo:', e);
-            Toast.show('Error al guardar silo: ' + e.message, 'danger');
+            Toast.show('Error al guardar silo: ' + e.message, 'error');
         }
     },
 
@@ -761,7 +761,7 @@ const SilosView = {
                 this.render();
             } catch (e) {
                 console.error('[SilosView] Error al eliminar silo:', e);
-                Toast.show('Error al eliminar silo', 'danger');
+                Toast.show('Error al eliminar silo', 'error');
             }
         }
     }

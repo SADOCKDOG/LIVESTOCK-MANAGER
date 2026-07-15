@@ -188,6 +188,7 @@ const AnimalesView = {
     const id = params.get ? params.get("id") : null;
     const esNuevo = !id;
     AnimalesView._animalGuardado = false;
+    App.setExitGuard(() => AnimalesView._confirmSalirSinGuardar());
 
     let a = {
       numero_identificacion: "",
@@ -716,8 +717,15 @@ const AnimalesView = {
     if (fecha) fecha.style.display = esSalida ? 'block' : 'none';
   },
 
+  /** Guarda de salida compartida con el header-back y el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirSinGuardar() {
+    if (this._animalGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
   async _salirRegistro() {
-    if (!this._animalGuardado && !await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false)) return;
+    if (!(await this._confirmSalirSinGuardar())) return;
+    App.clearExitGuard();
     location.hash = "#/animales";
   },
 
