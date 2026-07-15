@@ -207,16 +207,20 @@ const ExplotacionView = {
         await this._renderTramitesView(document.getElementById('expro-tab-content'), fincaId);
         break;
       case 'traslado':
-        if (window.WizardTraslado) await window.WizardTraslado.abrir();
+        if (window.App && window.App._abrirWizardTraslado) await window.App._abrirWizardTraslado();
+        else if (window.WizardTraslado) await window.WizardTraslado.abrir();
         break;
       case 'censo':
-        if (window.WizardCenso) await window.WizardCenso.abrir();
+        if (window.App && window.App._abrirWizardCenso) await window.App._abrirWizardCenso();
+        else if (window.WizardCenso) await window.WizardCenso.abrir();
         break;
       case 'crotales':
-        if (window.WizardCrotales) await window.WizardCrotales.abrir();
+        if (window.App && window.App._abrirWizardCrotales) await window.App._abrirWizardCrotales();
+        else if (window.WizardCrotales) await window.WizardCrotales.abrir();
         break;
       case 'guia':
-        if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
+        if (window.App && window.App._abrirWizardGuiaMovimiento) await window.App._abrirWizardGuiaMovimiento();
+        else if (window.WizardGuiaMovimiento) await window.WizardGuiaMovimiento.abrir();
         break;
     }
 
