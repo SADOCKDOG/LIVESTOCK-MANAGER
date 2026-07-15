@@ -201,7 +201,7 @@ const HibridoView = {
         <div class="scroll-shadow-container scroll-tabs-row mb-10">
           <div class="hibrido-tabs">
             <button class="hibrido-tab ${this._currentTab === 'patrimonio' ? 'active' : ''}" data-tab="patrimonio" onclick="HibridoView._cambiarTab('patrimonio')">${Icons.edificio()} Patrimonio y Ganadería</button>
-            <button class="hibrido-tab ${this._currentTab === 'comercializacion' ? 'active' : ''}" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Transporte, Comercialización Ventas</button>
+            <button class="hibrido-tab ${this._currentTab === 'comercializacion' ? 'active' : ''}" data-tab="comercializacion" onclick="HibridoView._cambiarTab('comercializacion')">${Icons.transportistas()} Logística y Ventas</button>
             <button class="hibrido-tab ${this._currentTab === 'legislacion' ? 'active' : ''}" data-tab="legislacion" onclick="HibridoView._cambiarTab('legislacion')">${Icons.documento()} Registros Legislación, Cumplimiento Sanitario</button>
           </div>
         </div>
