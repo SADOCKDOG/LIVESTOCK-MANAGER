@@ -1290,19 +1290,19 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gasto Total</small>
-              <span class="font-950 text-green truncate w-full px-4" style="font-size:1.1rem;" title="${data.total.toLocaleString()}€">${data.total.toLocaleString()}€</span>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2);" title="${data.total.toLocaleString()}€">${data.total.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Operaciones</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${data.numRegistros}</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2);">${data.numRegistros}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Zonas</small>
-              <span class="font-950 text-amber" style="font-size:1.1rem;">${data.numZonas}</span>
+              <span class="font-950 text-amber" style="font-size:var(--fs-h2);">${data.numZonas}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Media/Op</small>
-              <span class="font-950 text-purple" style="font-size:1.1rem;">${InformesView._fmt(data.mediaPorOperacion, 2)}€</span>
+              <span class="font-950 text-purple" style="font-size:var(--fs-h2);">${InformesView._fmt(data.mediaPorOperacion, 2)}€</span>
             </div>
           </div>
         </div>
@@ -1358,15 +1358,15 @@ const InformesView = {
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Alertas</small>
-                <span class="font-950 text-red" style="font-size:1.2rem;">${totalAlertas}</span>
+                <span class="font-950 text-red" style="font-size:var(--fs-h1);">${totalAlertas}</span>
               </div>
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">${Icons.alerta()} Críticas</small>
-                <span class="font-950 text-red" style="font-size:1.2rem;">${rojas}</span>
+                <span class="font-950 text-red" style="font-size:var(--fs-h1);">${rojas}</span>
               </div>
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">${Icons.alerta()} Avisos</small>
-                <span class="font-950 text-amber" style="font-size:1.2rem;">${totalAlertas - rojas}</span>
+                <span class="font-950 text-amber" style="font-size:var(--fs-h1);">${totalAlertas - rojas}</span>
               </div>
             </div>
           </div>
@@ -1623,15 +1623,15 @@ const InformesView = {
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Animales</small>
-                <span class="font-950 text-blue" style="font-size:1.1rem;">${totalAnimales}</span>
+                <span class="font-950 text-blue" style="font-size:var(--fs-h2);">${totalAnimales}</span>
               </div>
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Activos</small>
-                <span class="font-950 text-green" style="font-size:1.1rem;">${activos}</span>
+                <span class="font-950 text-green" style="font-size:var(--fs-h2);">${activos}</span>
               </div>
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ventas</small>
-                <span class="font-950 text-amber" style="font-size:1.1rem;">${totalVentas}</span>
+                <span class="font-950 text-amber" style="font-size:var(--fs-h2);">${totalVentas}</span>
               </div>
             </div>
           </div>
@@ -1902,22 +1902,22 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Coste Medio/Cabeza</small>
-              <span class="font-950 text-purple" style="font-size:1.1rem; word-break:break-all;">${data.costeMedioCabeza.toLocaleString()}€</span>
+              <span class="font-950 text-purple" style="font-size:var(--fs-h2); word-break:break-all;">${data.costeMedioCabeza.toLocaleString()}€</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Coste/Día</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${data.costeMedioDia}€</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2);">${data.costeMedioDia}€</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Animales</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalAnimales}</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2);">${data.totalAnimales}</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Gasto Total</small>
-              <span class="font-950 text-red" style="font-size:1.1rem; word-break:break-all;">${data.totalGasto.toLocaleString()}€</span>
+              <span class="font-950 text-red" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalGasto.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -1952,19 +1952,19 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Rebaños</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${data.numRebanos}</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2);">${data.numRebanos}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Activos</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.activos}</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2);">${data.activos}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">H. Lecheras</small>
-              <span class="font-950 text-amber" style="font-size:1.1rem;">${data.totalLecheros}</span>
+              <span class="font-950 text-amber" style="font-size:var(--fs-h2);">${data.totalLecheros}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total</small>
-              <span class="font-950 text-purple" style="font-size:1.1rem;">${data.totalAnimales}</span>
+              <span class="font-950 text-purple" style="font-size:var(--fs-h2);">${data.totalAnimales}</span>
             </div>
           </div>
         </div>
@@ -2054,23 +2054,23 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-5 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Censo Total</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.totalAnimales}</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2);">${data.totalAnimales}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Activos</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${data.activos}</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2);">${data.activos}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Entrada Neta</small>
-              <span class="font-950 ${(u90.entradaNeta||0)>=0?'text-green':'text-red'}" style="font-size:1.1rem;">${(u90.entradaNeta||0)>=0?'+':''}${u90.entradaNeta||0}</span>
+              <span class="font-950 ${(u90.entradaNeta||0)>=0?'text-green':'text-red'}" style="font-size:var(--fs-h2);">${(u90.entradaNeta||0)>=0?'+':''}${u90.entradaNeta||0}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Reposición</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${data.tasaReposicion}</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2);">${data.tasaReposicion}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Bajas</small>
-              <span class="font-950 text-red" style="font-size:1.1rem;">${data.tasaBajas}</span>
+              <span class="font-950 text-red" style="font-size:var(--fs-h2);">${data.tasaBajas}</span>
             </div>
           </div>
         </div>
@@ -2078,19 +2078,19 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Nacimientos</small>
-              <span class="font-950 text-green" style="font-size:1rem;">${u90.nacimientos || 0}</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-body);">${u90.nacimientos || 0}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Compras</small>
-              <span class="font-950 text-blue" style="font-size:1rem;">${u90.compras || 0}</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-body);">${u90.compras || 0}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ventas</small>
-              <span class="font-950 text-red" style="font-size:1rem;">${u90.ventas || 0}</span>
+              <span class="font-950 text-red" style="font-size:var(--fs-body);">${u90.ventas || 0}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Bajas</small>
-              <span class="font-950 text-gray" style="font-size:1rem;">${u90.bajas || 0}</span>
+              <span class="font-950 text-gray" style="font-size:var(--fs-body);">${u90.bajas || 0}</span>
             </div>
           </div>
         </div>
@@ -2109,19 +2109,19 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Entradas</small>
-              <span class="font-950 text-green truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalEntradas.toLocaleString()}€">${data.totalEntradas.toLocaleString()}€</span>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalEntradas.toLocaleString()}€">${data.totalEntradas.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Salidas</small>
-              <span class="font-950 text-red truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalSalidas.toLocaleString()}€">${data.totalSalidas.toLocaleString()}€</span>
+              <span class="font-950 text-red truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalSalidas.toLocaleString()}€">${data.totalSalidas.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Neto</small>
-              <span class="font-950 ${data.totalNeto>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalNeto.toLocaleString()}€">${data.totalNeto.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalNeto>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalNeto.toLocaleString()}€">${data.totalNeto.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Saldo Final</small>
-              <span class="font-950 text-blue truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.saldoFinal.toLocaleString()}€">${data.saldoFinal.toLocaleString()}€</span>
+              <span class="font-950 text-blue truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.saldoFinal.toLocaleString()}€">${data.saldoFinal.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -2153,15 +2153,15 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
-              <span class="font-950 text-green truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalIngresos.toLocaleString()}€">${data.totalIngresos.toLocaleString()}€</span>
+              <span class="font-950 text-green truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalIngresos.toLocaleString()}€">${data.totalIngresos.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Gastos</small>
-              <span class="font-950 text-red truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalGastos.toLocaleString()}€">${data.totalGastos.toLocaleString()}€</span>
+              <span class="font-950 text-red truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalGastos.toLocaleString()}€">${data.totalGastos.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Balance</small>
-              <span class="font-950 ${data.totalBalance>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:1.1rem; word-break:break-all;" title="${data.totalBalance.toLocaleString()}€">${data.totalBalance.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalBalance>=0?'text-green':'text-red'} truncate w-full px-4" style="font-size:var(--fs-h2); word-break:break-all;" title="${data.totalBalance.toLocaleString()}€">${data.totalBalance.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -2197,19 +2197,19 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">kg Total</small>
-              <span class="font-950 text-amber" style="font-size:1.1rem;">${InformesView._fmt(data.totalKg, 1)}</span>
+              <span class="font-950 text-amber" style="font-size:var(--fs-h2);">${InformesView._fmt(data.totalKg, 1)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Litros Total</small>
-              <span class="font-950 text-gold" style="font-size:1.1rem;">${InformesView._fmt(data.totalLitros, 1)}</span>
+              <span class="font-950 text-gold" style="font-size:var(--fs-h2);">${InformesView._fmt(data.totalLitros, 1)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta kg</small>
-              <span class="font-950 text-green" style="font-size:1.1rem;">${Math.round(data.metaKg)}</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2);">${Math.round(data.metaKg)}</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Meta L</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem;">${Math.round(data.metaLitros)}</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2);">${Math.round(data.metaLitros)}</span>
             </div>
           </div>
         </div>
@@ -2252,15 +2252,15 @@ const InformesView = {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Fijos</small>
-              <span class="font-950 text-red" style="font-size:1.1rem; word-break:break-all;">${data.costesFijos.toLocaleString()}€</span>
+              <span class="font-950 text-red" style="font-size:var(--fs-h2); word-break:break-all;">${data.costesFijos.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Costes Variables</small>
-              <span class="font-950 text-amber" style="font-size:1.1rem; word-break:break-all;">${data.costesVariables.toLocaleString()}€</span>
+              <span class="font-950 text-amber" style="font-size:var(--fs-h2); word-break:break-all;">${data.costesVariables.toLocaleString()}€</span>
             </div>
             <div class="info-box-center py-6">
               <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Ingresos</small>
-              <span class="font-950 text-green" style="font-size:1.1rem; word-break:break-all;">${data.ingresosTotal.toLocaleString()}€</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2); word-break:break-all;">${data.ingresosTotal.toLocaleString()}€</span>
             </div>
           </div>
         </div>
@@ -2306,22 +2306,22 @@ const InformesView = {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Solicitado</small>
-              <span class="font-950 text-green" style="font-size:1.1rem; word-break:break-all;">${data.totalSolicitado.toLocaleString()}€</span>
+              <span class="font-950 text-green" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalSolicitado.toLocaleString()}€</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Cobrado</small>
-              <span class="font-950 text-blue" style="font-size:1.1rem; word-break:break-all;">${data.totalCobrado.toLocaleString()}€</span>
+              <span class="font-950 text-blue" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalCobrado.toLocaleString()}€</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Pendiente</small>
-              <span class="font-950 ${data.totalPendiente>0?'text-amber':'text-green'}" style="font-size:1.1rem; word-break:break-all;">${data.totalPendiente.toLocaleString()}€</span>
+              <span class="font-950 ${data.totalPendiente>0?'text-amber':'text-green'}" style="font-size:var(--fs-h2); word-break:break-all;">${data.totalPendiente.toLocaleString()}€</span>
             </div>
             <div class="hidden sm:block" style="width:1px;height:22px;background:#2a2a2a; align-self:center;"></div>
             <div class="py-6">
               <small class="text-neutral block text-[0.6rem] mb-2 uppercase font-800">Registros</small>
-              <span class="font-950 text-purple" style="font-size:1.1rem;">${data.numRegistros}</span>
+              <span class="font-950 text-purple" style="font-size:var(--fs-h2);">${data.numRegistros}</span>
             </div>
           </div>
         </div>
