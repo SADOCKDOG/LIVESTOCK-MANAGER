@@ -1719,14 +1719,18 @@ const App = {
 
   _viewGroupLoadPromises: {},
 
-  /** Carga (una sola vez) todos los archivos de un grupo de vistas, en paralelo. */
+  /** Carga (una sola vez) todos los archivos de un grupo de vistas. Descargan en paralelo, pero
+   *  se ejecutan en el orden del array (s.async = false) porque algunos ficheros del mismo grupo
+   *  (p.ej. informes-data.js/informes-export.js) extienden con Object.assign la vista definida
+   *  por el primer fichero, y necesitan que esta ya exista en window al ejecutarse. */
   async _ensureViewGroup(groupName) {
     const files = App._viewGroups[groupName];
     if (!files) return true;
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.29';
+        s.src = src + '?v=6.28.30';
+        s.async = false;
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
