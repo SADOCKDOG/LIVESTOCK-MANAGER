@@ -33,6 +33,7 @@ const AjustesView = {
 
     const costesRef = activeId ? await window.db.getAllFromIndex('config_costes_referencia', 'fincaId', Number(activeId)) : [];
     const config = await this._loadConfig();
+    const modoFlags = ModoContextoHelper.getFlags() || { leche: true, carne: false };
     const catalogoTiposREGA = window.ComunidadesService?.getTiposExplotacionREGA ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const catalogoEspeciesREGA = window.ComunidadesService?.getEspeciesAutorizables ? window.ComunidadesService.getEspeciesAutorizables() : [];
     const catalogoTiposResumen = catalogoTiposREGA.slice(0, 5);
@@ -166,6 +167,25 @@ const AjustesView = {
           <div class="wizard-input-group"><label class="wizard-label" for="obj-gmd">GMD (kg/día)</label><input type="number" id="obj-gmd" value="${config.objGmd || 0.8}" step="0.1" class="wizard-input" onchange="AjustesView._guardarObjetivo('objGmd', this.value)"></div>
           <div class="wizard-input-group"><label class="wizard-label" for="obj-fert">Fertilidad (%)</label><input type="number" id="obj-fert" value="${config.objFert || 85}" class="wizard-input" onchange="AjustesView._guardarObjetivo('objFert', this.value)"></div>
         </div>
+      </div>
+
+      <!-- ===================== TIPO DE EXPLOTACIÓN ===================== -->
+      <div class="card">
+        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
+          <span style="color: var(--c-warning);">|</span> ${Icons.finca()} TIPO DE EXPLOTACIÓN
+        </h3>
+        <p class="text-gray mt-5 text-sm">Active uno o ambos tipos según su explotación. Los módulos ocultarán todo lo relativo al tipo desactivado.</p>
+        <div class="space-y-6 mt-15">
+          <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+            <input type="checkbox" ${modoFlags.leche ? 'checked' : ''} onchange="AjustesView._toggleTipoExplotacion('leche', this.checked)">
+            <span>${Icons.leche()} Lácteo</span>
+          </label>
+          <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+            <input type="checkbox" ${modoFlags.carne ? 'checked' : ''} onchange="AjustesView._toggleTipoExplotacion('carne', this.checked)">
+            <span>${Icons.carne()} Cárnico</span>
+          </label>
+        </div>
+        <p class="text-xs text-aaa mt-4">Esta configuración afecta a todos los módulos de la aplicación. Con ambos activos, cada módulo muestra sus secciones de leche y de carne por separado. Debe permanecer al menos uno activo.</p>
       </div>
 
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
@@ -306,6 +326,26 @@ const AjustesView = {
   async _guardarPreferencia(key, val) {
     await this._saveConfig({ [key]: val });
     App.toast('Preferencia guardada', 'success');
+  },
+
+  async _toggleTipoExplotacion(tipo, activo) {
+    const flags = ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const nuevosFlags = { ...flags, [tipo]: activo };
+
+    if (!nuevosFlags.leche && !nuevosFlags.carne) {
+      App.toast('Debe permanecer al menos un tipo activo', 'error');
+      this.render();
+      return;
+    }
+
+    ModoContextoHelper.setFlags(nuevosFlags);
+    const partes = [nuevosFlags.leche ? 'Lácteo' : '', nuevosFlags.carne ? 'Cárnico' : ''].filter(Boolean);
+    App.toast(`Tipo de explotación: ${partes.join(' + ')}`, 'success');
+
+    if (window.App && typeof App.updateNavigationMenu === 'function') {
+      await App.updateNavigationMenu();
+    }
+    this.render();
   },
 
   _renderEspecies(config) {

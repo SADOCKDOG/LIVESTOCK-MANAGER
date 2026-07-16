@@ -190,7 +190,7 @@ const ContratosView = {
 
     container.innerHTML = `<div class="grid gap-12">${contratos.map(c => {
       const comprador = compradorMap[c.compradorId];
-      const color = c.tipo === 'leche' ? 'var(--c-info)' : (c.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
+      const color = c.tipo === 'leche' ? 'var(--c-info)' : 'var(--c-success)';
 
       let cuentaAtrasHtml = '';
       if (c.activo !== false && c.fecha_fin) {
@@ -268,13 +268,14 @@ const ContratosView = {
     const id = params?.get ? params.get('id') : null;
     const compradorId = params?.get ? params.get('compradorId') : null;
     const esEdicion = !!id;
+    const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
 
     let contrato = esEdicion ? await Contratos.get(id) : {
       compradorId: Number(compradorId) || null,
       numero_contrato: '',
       fecha_inicio: new Date().toISOString().split('T')[0],
       fecha_fin: '',
-      tipo: 'carne',
+      tipo: flagsModo.carne ? 'carne' : 'leche',
       precios: [],
       iva_pct: 10,
       retencion_pct: 0,
@@ -316,8 +317,8 @@ const ContratosView = {
           <div class="wizard-input-group">
             <label class="wizard-label uppercase font-900">TIPO CONTRATO</label>
             <select id="ct-tipo" class="wizard-input wizard-select font-900 uppercase">
-              <option value="carne" ${contrato.tipo === 'carne' ? 'selected' : ''}>CARNE</option>
-              <option value="leche" ${contrato.tipo === 'leche' ? 'selected' : ''}>LECHE</option>
+              ${flagsModo.carne ? `<option value="carne" ${contrato.tipo === 'carne' ? 'selected' : ''}>CARNE</option>` : ''}
+              ${flagsModo.leche ? `<option value="leche" ${contrato.tipo === 'leche' ? 'selected' : ''}>LECHE</option>` : ''}
               <option value="mixto" ${contrato.tipo === 'mixto' ? 'selected' : ''}>MIXTO / OTRO</option>
             </select>
           </div>

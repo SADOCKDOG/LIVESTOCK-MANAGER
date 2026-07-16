@@ -101,21 +101,7 @@ const DashboardView = {
     const totalActivos = censo.reduce((s, r) => s + r.activos, 0);
     const totalVendidos = censo.reduce((s, r) => s + r.vendidos, 0);
 
-    const modoAuto = (() => {
-      let tieneCarne = false, tieneLeche = false, tieneHibrido = false;
-      rebanos.forEach(r => {
-        const tipo = (r.tipo || '').toLowerCase();
-        if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
-        else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
-        else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
-      });
-      if (tieneHibrido || (tieneCarne && tieneLeche)) return 'hibrido';
-      if (tieneLeche) return 'leche';
-      return 'carne';
-    })();
-    const modoColor = modoAuto === 'carne' ? 'var(--c-danger)' : modoAuto === 'leche' ? 'var(--c-info)' : 'var(--c-success)';
-    const modoLabel = modoAuto === 'hibrido' ? 'Híbrido' : modoAuto === 'leche' ? 'Leche' : 'Carne';
-    const modoIcon = modoAuto === 'hibrido' ? Icons.rotacion() : modoAuto === 'leche' ? Icons.leche() : Icons.carne();
+    const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
     const isFreeDashboard = window.PremiumManager && window.PremiumManager.isFree();
 
     return `
@@ -149,6 +135,7 @@ const DashboardView = {
           <div class="grid grid-cols-12 gap-12">
             
             <!-- Control Lechero -->
+            ${flagsModo.leche ? `
             <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('leche', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-info);">
               <div class="quick-icon-wrapper">${Icons.leche()}</div>
               <div class="quick-text-wrapper" style="flex: 1;">
@@ -156,17 +143,18 @@ const DashboardView = {
                 <span class="quick-desc">Ordeño y lactación</span>
               </div>
               <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
-            </div>
+            </div>` : ''}
 
             <!-- Pesaje Ganado -->
-            <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-danger);">
+            ${flagsModo.carne ? `
+            <div class="card-registro-quick col-span-4" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'dashboard' })" style="--quick-color: var(--c-success);">
               <div class="quick-icon-wrapper">${Icons.carne()}</div>
               <div class="quick-text-wrapper" style="flex: 1;">
                 <span class="quick-title">Pesaje Ganado</span>
                 <span class="quick-desc">Pesos de lotes o individual</span>
               </div>
               <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
-            </div>
+            </div>` : ''}
 
             <!-- Tratamiento Sanitario -->
             <div class="card-registro-quick col-span-4" onclick="App._abrirTratamientoSanitarioDirecto()" style="--quick-color: var(--p-gold);">
@@ -249,6 +237,7 @@ const DashboardView = {
             </div>
 
             <!-- Albarán de Leche -->
+            ${flagsModo.leche ? `
             <div class="card-registro-quick col-span-4" onclick="App._abrirWizardAlbaranLeche()" style="--quick-color: #4FADF5;">
               <div class="quick-icon-wrapper">${Icons.documento()}</div>
               <div class="quick-text-wrapper" style="flex: 1;">
@@ -256,9 +245,10 @@ const DashboardView = {
                 <span class="quick-desc">Entrega a comprador/industria</span>
               </div>
               <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
-            </div>
+            </div>` : ''}
 
             <!-- Venta Masiva / Matadero -->
+            ${flagsModo.carne ? `
             <div class="card-registro-quick col-span-12" onclick="App._abrirWizardVentaMasiva()" style="--quick-color: var(--c-warning);">
               <div class="quick-icon-wrapper">${Icons.libroVentas()}</div>
               <div class="quick-text-wrapper" style="flex: 1;">
@@ -266,7 +256,7 @@ const DashboardView = {
                 <span class="quick-desc">Gestión integral de salidas comerciales, guías de traslado y guías de transporte</span>
               </div>
               <div class="quick-arrow-indicator">${Icons.siguiente()}</div>
-            </div>
+            </div>` : ''}
 
           </div>
 
@@ -282,7 +272,7 @@ const DashboardView = {
         ${this._renderAlertasAdministrativas(alertasAdministrativas)}
       </div>
 
-      ${this._renderIndicadoresLacteos(indicadoresLeche)}
+      ${flagsModo.leche ? this._renderIndicadoresLacteos(indicadoresLeche) : ''}
 
       <!-- Calendario Preventivo -->
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeInUp 0.4s ease;">
@@ -451,7 +441,7 @@ const DashboardView = {
             </div>
           </div>
           <div class="text-center" style="border-top: 1px solid #2a2a2a; padding-top: 20px; margin-top: 20px;">
-            <a href="#/leche" class="text-gold no-underline" style="font-size: var(--fs-label); font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Control Lechero Detallado ${Icons.siguiente()}</a>
+            <a href="#/comercializacion?tab=leche" class="text-gold no-underline" style="font-size: var(--fs-label); font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">Control Lechero Detallado ${Icons.siguiente()}</a>
           </div>
         </div>
       </div>`;

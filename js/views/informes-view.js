@@ -70,6 +70,13 @@ const InformesView = {
     }
   },
 
+  /** Las pestañas 'carne'/'leche' de GeGan solo se muestran si su tipo de explotación está activo. */
+  _esTabPermitida(tabKey) {
+    if (tabKey !== 'carne' && tabKey !== 'leche') return true;
+    const flags = window.ModoContextoHelper?.getFlags() || { leche: true, carne: false };
+    return tabKey === 'carne' ? !!flags.carne : !!flags.leche;
+  },
+
   _obtenerCategoriaDeTab(tab) {
     for (const [catKey, cat] of Object.entries(this._categories)) {
       if (tab in cat.tabs) return catKey;
@@ -147,6 +154,7 @@ const InformesView = {
         <div class="informes-tabs py-2" id="inf-tab-row">
     `;
     for (const [tabKey, tabLabel] of Object.entries(activeCat.tabs)) {
+      if (!this._esTabPermitida(tabKey)) continue;
       const isActive = tabKey === this._currentTab;
       const subTabIcon = this._obtenerIconoDeSubTab(tabKey);
       subTabsHtml += `
@@ -169,7 +177,7 @@ const InformesView = {
 
   _cambiarCategoria(catKey) {
     this._currentCategory = catKey;
-    const firstTab = Object.keys(this._categories[catKey].tabs)[0];
+    const firstTab = Object.keys(this._categories[catKey].tabs).find(t => this._esTabPermitida(t));
     this._currentTab = firstTab;
     this._actualizarHeader();
     // Scroll automático al tab activo de categoría
@@ -202,6 +210,13 @@ const InformesView = {
 
   async render() {
     const main = document.getElementById("app-content");
+
+    // Si la pestaña activa dejó de estar permitida (p.ej. tras desactivar Carne o Leche), volver a una válida
+    if (!this._esTabPermitida(this._currentTab)) {
+      const firstTab = Object.keys(this._categories[this._currentCategory].tabs).find(t => this._esTabPermitida(t));
+      this._currentTab = firstTab || 'general';
+    }
+
     const chartLoadPromise = App._ensureChartJs();
 
     main.innerHTML = `

@@ -4,16 +4,15 @@
  * PROHIBIDO duplicar mapas de color en menús/vistas: consumir siempre este objeto.
  */
 window.MODULE_COLORS = Object.freeze({
-  // Success / Zonas / Híbrido / Ventas
+  // Success / Zonas / Carne / Ventas
   '/': '#CCFF00',
   '/explotacion': '#CCFF00',
-  '/hibrido': '#CCFF00',
   '/zonas': '#CCFF00',
+  '/carne': '#CCFF00',
   '/comercializacion': '#3B82F6',
   '/trazabilidad': '#3B82F6',
-  // Danger / Carne / Gastos
+  // Danger / Gastos
   '/ganaderia': '#FF4444',
-  '/carne': '#FF4444',
   '/gastos': '#FF4444',
   // Info / Leche / Listas
   '/leche': '#3B82F6',
@@ -40,7 +39,7 @@ window.MODULE_COLORS = Object.freeze({
   '/comprador': '#3B82F6',
   '/proveedor': '#A855F7',
   '/gasto': '#FF4444',
-  '/venta-carne': '#FF4444',
+  '/venta-carne': '#CCFF00',
   '/albaran-leche': '#3B82F6',
   '/contrato': '#3B82F6'
 });

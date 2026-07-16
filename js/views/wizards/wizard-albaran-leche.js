@@ -523,13 +523,8 @@ window.AlbaranLecheWizard = {
           }
 
           App.toast("Salida láctea registrada.", 'success');
-          // Refrescar vista
-          if (window.LecheView) {
-            window.LecheView._cachedData = null;
-            await window.LecheView.render();
-          } else {
-            App.route();
-          }
+          // Refrescar vista actual
+          App.route();
           await App.imprimirAlbaran(est, "leche");
         } catch (e) {
           App.toastError(e.message);
