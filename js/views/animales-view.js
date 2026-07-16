@@ -127,10 +127,11 @@ const AnimalesView = {
     if (this._filtroActivo.especie) r = r.filter(a => a.especie === this._filtroActivo.especie);
     if (this._filtroActivo.sexo) r = r.filter(a => a.sexo === this._filtroActivo.sexo);
     if (this._filtroActivo.estado) r = r.filter(a => a.estado === this._filtroActivo.estado);
-    // Filtro por tipo de explotación activo (leche/carne)
+    // Filtro por tipo de explotación activo (leche/carne).
+    // Animales sin rebaño asignado siempre visibles: no se les puede inferir tipo.
     r = r.filter(a => {
       const rebano = rebanoMap[a.rebanoId];
-      if (!rebano) return false;
+      if (!rebano) return true;
       return window.ModoContextoHelper._matchTipoByMode(rebano.tipo, flags);
     });
     return r;

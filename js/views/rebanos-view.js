@@ -591,7 +591,12 @@ const RebanosView = {
 
   async _crearRebano() {
     const especies = await window.db.getAll("config_especies");
-    const tipos = await window.db.getAll("config_tipos_produccion");
+    const tiposAll = await window.db.getAll("config_tipos_produccion");
+    // Restringir el catálogo a los tipos compatibles con los flags de explotación activos,
+    // para no crear rebaños que luego queden ocultos por el filtro de modo.
+    const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const tiposFiltrados = tiposAll.filter(t => window.ModoContextoHelper._matchTipoByMode(t.nombre, flagsModo));
+    const tipos = tiposFiltrados.length > 0 ? tiposFiltrados : tiposAll;
     const tiposExplotacionREGA = window.ComunidadesService ? window.ComunidadesService.getTiposExplotacionREGA() : [];
     const finca = await Fincas.getActive();
     const zonas = finca ? finca.zonas || [] : [];
