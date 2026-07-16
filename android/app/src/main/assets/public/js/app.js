@@ -60,13 +60,10 @@ const App = {
     "/ganaderia": "renderGanaderia",
     "/rebanos": "renderRebanos",
     "/rebano": "renderDetalleRebano",
-    "/carne": "renderCarne",
-    "/hibrido": "renderHibrido",
     "/zonas": "renderZonas",
     "/zona": "renderDetalleZona",
     "/animales": "renderAnimales",
     "/animal": "renderDetalleAnimal",
-    "/leche": "renderLeche",
     "/explotacion": "renderExplotacion",
     "/gastos": "renderGastos",
     "/comercializacion": "renderComercializacion",
@@ -129,7 +126,6 @@ const App = {
             if (window.DashboardView) window.DashboardView._needsRefresh = true;
             if (window.ExplotacionView) { window.ExplotacionView._cachedData = null; window.ExplotacionView._needsDataRefresh = true; }
             if (window.ComercializacionView) { window.ComercializacionView._cachedData = null; window.ComercializacionView._needsDataRefresh = true; }
-            if (window.CarneView) { window.CarneView._cachedData = null; window.CarneView._needsDataRefresh = true; }
             if (window.AnimalesView) window.AnimalesView._cache = null;
             if (window.GanaderiaView) { window.GanaderiaView._cachedData = null; window.GanaderiaView._needsDataRefresh = true; }
 
@@ -295,14 +291,11 @@ const App = {
     '/ganaderia': 'Ganadería',
     '/rebanos': 'Rebaños',
     '/rebano': 'Ficha Rebaño',
-    '/carne': 'Gestión Carne',
-    '/hibrido': 'Consola Híbrida',
     '/explotacion': 'ExPro',
     '/zonas': 'Zonas',
     '/zona': 'Ficha Zona',
     '/animales': 'Animales',
     '/animal': 'Ficha Animal',
-    '/leche': 'Leche',
     '/gastos': 'Gastos',
     '/comercializacion': 'Comercialización',
     '/albaran-leche': 'Albarán Lácteo',
@@ -485,14 +478,11 @@ const App = {
       '/ganaderia': Icons.rebanos(),
       '/rebanos': Icons.rebanos(),
       '/rebano': Icons.rebanos(),
-      '/carne': Icons.carne(),
-      '/hibrido': Icons.rotacion(),
       '/explotacion': Icons.dashboard(),
       '/zonas': Icons.zonas(),
       '/zona': Icons.zonas(),
       '/animales': Icons.animales(),
       '/animal': Icons.animales(),
-      '/leche': Icons.leche(),
       '/gastos': Icons.gastos(),
       '/comercializacion': Icons.comercial(),
       '/albaran-leche': Icons.leche(),
@@ -963,7 +953,7 @@ const App = {
     // Additional suppression: if we are in a wizard and the redirect target leads to a ganadero view, suppress redirect
     if (shouldRedirect && redirectTarget) {
         const targetPath = redirectTarget.split('?')[0];
-        const ganaderoPaths = new Set(['/ganaderia','/rebanos','/rebano','/carne','/hibrido','/animales','/animal']);
+        const ganaderoPaths = new Set(['/ganaderia','/rebanos','/rebano','/animales','/animal']);
         if (window._wizardCallInProgress && ganaderoPaths.has(targetPath)) {
             shouldRedirect = false;
         }
@@ -1760,7 +1750,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/carne-view.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
     informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1774,7 +1764,7 @@ const App = {
 
   // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
   _routeGroups: {
-    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/carne': 'gegan', '/hibrido': 'gegan', '/animales': 'gegan', '/leche': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan',
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan',
     '/explotacion': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/proveedor': 'expro',
     '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
     '/informes': 'informes', '/alertas': 'informes',
@@ -1798,7 +1788,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.28.46';
+        s.src = src + '?v=6.29.1';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;
@@ -2499,20 +2489,6 @@ const App = {
     if (window.RebanosView) { await RebanosView.renderDetalle(params); }
   },
 
-  async renderCarne() {
-    if (window.GanaderiaView) {
-      GanaderiaView._activeSubModule = 'carne';
-      await this.renderGanaderia();
-    }
-  },
-
-  async renderHibrido() {
-    if (window.GanaderiaView) {
-      GanaderiaView._activeSubModule = 'hibrido';
-      await this.renderGanaderia();
-    }
-  },
-
   async renderZonas() {
     if (window.ExplotacionView) {
       ExplotacionView._activeSubModule = 'zonas';
@@ -2533,13 +2509,6 @@ const App = {
 
   async renderDetalleAnimal(params) {
     if (window.AnimalesView) { await AnimalesView.renderDetalle(params); }
-  },
-
-  async renderLeche() {
-    if (window.GanaderiaView) {
-      GanaderiaView._activeSubModule = 'leche';
-      await this.renderGanaderia();
-    }
   },
 
   async renderExplotacion(params) {
