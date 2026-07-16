@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - GanaderiaView v3.0.0
+ * Livestock Manager - GanaderiaView v3.1.0
  * Consola Unificada de Ganadería (GeGan) con barra multipestaña horizontal scrollable
  * Integra: Animales, Rebaños, Patrimonio y Ganadería (ICA), Sanidad/Veterinaria
  */
@@ -26,6 +26,16 @@ const GanaderiaView = {
       zonas: { color: 'var(--c-success)', icon: Icons.zonas(), title: 'Zonas y Parcelas', desc: 'Ubicación de rebaños, UGM, carga ganadera y PAC' },
       sanidad: { color: 'var(--c-purple)', icon: Icons.sanidad(), title: 'Legislación Sanitaria y Sanidad', desc: 'Libro de tratamientos, vacunas y periodos de supresión' }
     };
+
+    // Definir submódulos permitidos según los tipos de explotación activos (Patrimonio es exclusivo de Carne)
+    const flags = ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const allowedSubModules = ['animales', 'rebanos', 'zonas', 'sanidad'];
+    if (flags.carne) allowedSubModules.push('patrimonio');
+
+    // Si el sub-módulo activo dejó de estar permitido (p.ej. tras desactivar Carne), volver a uno válido
+    if (!allowedSubModules.includes(this._activeSubModule)) {
+      this._activeSubModule = allowedSubModules[0];
+    }
 
     const currentMeta = moduloMeta[this._activeSubModule] || moduloMeta.animales;
 
@@ -55,11 +65,12 @@ const GanaderiaView = {
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
           <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Ganadería">
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'animales' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'animales'}" style="--mode-color:var(--c-orange);" onclick="GanaderiaView._cambiarSubModulo('animales')">${Icons.animales()} ANIMALES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'rebanos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'rebanos'}" style="--mode-color:var(--c-info);" onclick="GanaderiaView._cambiarSubModulo('rebanos')">${Icons.rebanos()} REBAÑOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'patrimonio' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'patrimonio'}" style="--mode-color:var(--c-warning);" onclick="GanaderiaView._cambiarSubModulo('patrimonio')">${Icons.edificio()} PATRIMONIO</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'zonas' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'zonas'}" style="--mode-color:var(--c-success);" onclick="GanaderiaView._cambiarSubModulo('zonas')">${Icons.zonas()} ZONAS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'sanidad' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'sanidad'}" style="--mode-color:var(--c-purple);" onclick="GanaderiaView._cambiarSubModulo('sanidad')">${Icons.sanidad()} SANIDAD</button>
+            ${['animales', 'rebanos', 'patrimonio', 'zonas', 'sanidad'].map(tab => {
+            if (!allowedSubModules.includes(tab)) return '';
+            const isActive = this._activeSubModule === tab;
+            const meta = moduloMeta[tab];
+            return `<button class="pestanas-premium-btn ${isActive ? 'active' : ''}" role="tab" aria-selected="${isActive}" style="--mode-color:${meta.color};" onclick="GanaderiaView._cambiarSubModulo('${tab}')">${meta.icon} ${tab.toUpperCase()}</button>`;
+          }).join('')}
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
@@ -97,6 +108,13 @@ const GanaderiaView = {
   },
 
   _cambiarSubModulo(subModulo) {
+    const flags = ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const allowed = ['animales', 'rebanos', 'zonas', 'sanidad'];
+    if (flags.carne) allowed.push('patrimonio');
+    if (!allowed.includes(subModulo)) {
+      // Sub-módulo no permitido con los tipos de explotación activos actuales: se ignora el cambio
+      return;
+    }
     this._activeSubModule = subModulo;
     this.render();
   },

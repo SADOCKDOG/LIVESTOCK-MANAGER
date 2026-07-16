@@ -43,9 +43,9 @@
     --c-sombra: #2D2D26;     /* Sombra de corral - profundidad y elevación */
 
     /* ── SEMÁNTICA (única fuente de verdad para datos/estados) ── */
-    --c-success: #CCFF00;     /* Verde Lima Neón - Éxito / Zonas / Híbrido */
+    --c-success: #CCFF00;     /* Verde Lima Neón - Éxito / Zonas / Carne */
     --c-warning: #FFD600;     /* Amarillo Neón - Alertas / Warning */
-    --c-danger:  #FF4444;     /* Rojo Neón - Peligro / Carne / Gastos */
+    --c-danger:  #FF4444;     /* Rojo Neón - Peligro / Gastos */
     --c-info:    #3b82f6;     /* Azul Neón - Info / Leche / Listas */
     --c-accent:  #7EEFEF;     /* Acento / Genética (Cyan Claro de apoyo) */
     --c-blue-accent: #4FADF5; /* Azul UI (badges, bordes) */

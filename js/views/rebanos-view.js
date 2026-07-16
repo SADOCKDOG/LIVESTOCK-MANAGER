@@ -21,6 +21,7 @@ const RebanosView = {
 
     // Aplicar filtros iniciales
     const filteredRebanos = this._filtrar(rebanos);
+    const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
 
     // Resumen mensual (últimos 6 meses)
     const hoy = new Date();
@@ -83,12 +84,11 @@ const RebanosView = {
           <button class="resumen-toggle" onclick="App.toggleResumen(this)" aria-label="Ocultar resumen">${Icons.chevronAbajo()}</button>
         </div>
         <div class="resumen-body flex flex-col">
-          ${this._CATEGORIAS.filter(c => c.key !== 'todos').map(c => {
+          ${this._CATEGORIAS.filter(c => c.key !== 'todos' && (c.key !== 'carne' || flagsModo.carne) && (c.key !== 'leche' || flagsModo.leche)).map(c => {
             const count = filteredRebanos.filter(r =>
               c.key === 'todos' ||
               (c.key === 'carne' && ((r.tipo || '').toLowerCase().includes('carne') || (r.tipo || '').toLowerCase().includes('cárn'))) ||
               (c.key === 'leche' && ((r.tipo || '').toLowerCase().includes('leche') || (r.tipo || '').toLowerCase().includes('láct'))) ||
-              (c.key === 'hibrido' && ((r.tipo || '').toLowerCase().includes('mixt') || (r.tipo || '').toLowerCase().includes('híbr') || (r.tipo || '').toLowerCase().includes('doble'))) ||
               (c.key === 'activo' && r.estado !== 'inactivo')
             ).length;
             return `
@@ -127,9 +127,8 @@ const RebanosView = {
 
   _CATEGORIAS: [
     { key: 'todos',        icon: Icons.rebanos(), label: 'Todos',          color: 'var(--c-purple)', colorDark: '#6d28d9' },
-    { key: 'carne',        icon: Icons.carne(),   label: 'Carne',          color: 'var(--c-danger)', colorDark: '#b91c1c' },
+    { key: 'carne',        icon: Icons.carne(),   label: 'Carne',          color: 'var(--c-success)', colorDark: '#059669' },
     { key: 'leche',        icon: Icons.leche(),   label: 'Leche',          color: 'var(--c-info)', colorDark: '#0284c7' },
-    { key: 'hibrido',      icon: Icons.rotacion(),label: 'Híbrido',       color: 'var(--c-success)', colorDark: '#059669' },
     { key: 'activo',       icon: Icons.check(),   label: 'Activos',        color: 'var(--c-success)', colorDark: '#059669' }
   ],
 
@@ -249,6 +248,12 @@ const RebanosView = {
   _filtrar(rebanos) {
     if (!rebanos) return [];
     let filtrados = rebanos;
+
+    // Filtro por tipo de explotación activo (leche/carne)
+    const flags = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    filtrados = filtrados.filter(r => {
+      return window.ModoContextoHelper._matchTipoByMode(r.tipo, flags);
+    });
 
     if (this._filtroActivo.texto.trim()) {
       const q = this._filtroActivo.texto.toLowerCase();

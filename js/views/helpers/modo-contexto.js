@@ -1,71 +1,121 @@
 /**
- * Helper transversal para contexto de modo por bloque.
- * Permite independencia de modo (carne/leche/híbrido) en cada módulo.
+ * Helper transversal para el modo de explotación (Leche / Carne).
+ * Dos flags independientes y persistentes: el usuario puede activar uno o ambos.
+ * No existe un tercer estado "híbrido": tener ambos flags activos ES el caso mixto.
  */
 const ModoContextoHelper = {
-  VALID_MODES: new Set(['carne', 'leche', 'hibrido']),
+  FLAGS_KEY: 'lm.explotacion.flags',
+  LEGACY_MODE_KEY: 'lm.explotacion.modo_global',
+  VALID_LEGACY_MODES: new Set(['carne', 'leche', 'hibrido']),
 
   getModeMeta(mode) {
     const map = {
-      carne: { icon: Icons.carne(), label: 'Cárnico', color: 'var(--c-danger)' },
-      leche: { icon: Icons.leche(), label: 'Lácteo', color: 'var(--c-info)' },
-      hibrido: { icon: Icons.rotacion(), label: 'Híbrido', color: 'var(--c-success)' }
+      carne: { icon: Icons.carne(), label: 'Cárnico', color: 'var(--c-success)' },
+      leche: { icon: Icons.leche(), label: 'Lácteo', color: 'var(--c-info)' }
     };
     return map[mode] || map.leche;
   },
 
-  detectModeFromRebanos(rebanos) {
+  detectFlagsFromRebanos(rebanos) {
     let tieneCarne = false;
     let tieneLeche = false;
-    let tieneHibrido = false;
 
     (rebanos || []).forEach(r => {
       const tipo = (r.tipo || '').toLowerCase();
       if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
-      else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
-      else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
+      if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
+      if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) { tieneCarne = true; tieneLeche = true; }
     });
 
-    if (tieneHibrido || (tieneCarne && tieneLeche)) return 'hibrido';
-    if (tieneLeche) return 'leche';
-    return 'carne';
+    if (!tieneCarne && !tieneLeche) return { leche: true, carne: false };
+    return { leche: tieneLeche, carne: tieneCarne };
   },
 
-  _matchTipoByMode(tipo, mode) {
+  _matchTipoByMode(tipo, flags) {
     const t = (tipo || '').toLowerCase();
     const esCarne = t.includes('carne') || t.includes('cárn');
     const esLeche = t.includes('leche') || t.includes('láct');
     const esHibrido = t.includes('mixt') || t.includes('híbr') || t.includes('doble');
 
-    if (mode === 'carne') return esCarne || esHibrido;
-    if (mode === 'leche') return esLeche || esHibrido;
-    if (mode === 'hibrido') return esCarne || esLeche || esHibrido;
+    if (esHibrido) return flags.leche || flags.carne;
+    if (esCarne) return !!flags.carne;
+    if (esLeche) return !!flags.leche;
     return false;
   },
 
-  filterRebanosByMode(rebanos, mode) {
-    return (rebanos || []).filter(r => this._matchTipoByMode(r.tipo, mode));
+  filterRebanosByMode(rebanos, flags) {
+    return (rebanos || []).filter(r => this._matchTipoByMode(r.tipo, flags));
   },
 
-  getModeForBlock(blockKey, rebanos) {
-    const fallback = this.detectModeFromRebanos(rebanos);
+  /**
+   * Lee los flags persistidos, migrando desde el antiguo modo único si hace falta.
+   */
+  getFlags() {
     try {
-      const saved = localStorage.getItem(`lm.modo.${blockKey}`);
-      if (saved && this.VALID_MODES.has(saved)) return saved;
+      const saved = localStorage.getItem(this.FLAGS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && (parsed.leche || parsed.carne)) {
+          return { leche: !!parsed.leche, carne: !!parsed.carne };
+        }
+      }
     } catch (_) {}
 
-    // Si no hay modo guardado y el sistema detecta híbrido,
-    // forzamos 'leche' por defecto según requerimiento de UI.
-    if (fallback === 'hibrido') return 'leche';
+    // Migración desde el modo único antiguo (leche/carne/hibrido)
+    try {
+      const legacy = localStorage.getItem(this.LEGACY_MODE_KEY);
+      if (legacy && this.VALID_LEGACY_MODES.has(legacy)) {
+        const flags = legacy === 'hibrido' ? { leche: true, carne: true }
+          : legacy === 'carne' ? { leche: false, carne: true }
+          : { leche: true, carne: false };
+        this.setFlags(flags);
+        return flags;
+      }
+    } catch (_) {}
 
-    return fallback;
+    return null; // null indica que no hay preferencia establecida todavía
   },
 
-  setModeForBlock(blockKey, mode) {
-    if (!this.VALID_MODES.has(mode)) return;
+  /**
+   * Guarda los flags. Si ambos vienen desactivados, no hace nada (se exige al menos uno activo).
+   */
+  setFlags(flags) {
+    const leche = !!flags.leche;
+    const carne = !!flags.carne;
+    if (!leche && !carne) return false;
     try {
-      localStorage.setItem(`lm.modo.${blockKey}`, mode);
+      localStorage.setItem(this.FLAGS_KEY, JSON.stringify({ leche, carne }));
     } catch (_) {}
+    return true;
+  },
+
+  /**
+   * Flags efectivos: preferencia guardada, o detección automática (y persistencia) la primera vez.
+   */
+  async getEffectiveFlags(fincaId) {
+    const saved = this.getFlags();
+    if (saved) return saved;
+
+    try {
+      if (fincaId !== undefined) {
+        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
+        const detected = this.detectFlagsFromRebanos(rebanos);
+        this.setFlags(detected);
+        return detected;
+      }
+    } catch (_) {}
+
+    return { leche: true, carne: false };
+  },
+
+  isLecheActivo() {
+    const flags = this.getFlags();
+    return flags ? flags.leche : true;
+  },
+
+  isCarneActivo() {
+    const flags = this.getFlags();
+    return flags ? !!flags.carne : false;
   },
 
   getEspecieColor(especie) {

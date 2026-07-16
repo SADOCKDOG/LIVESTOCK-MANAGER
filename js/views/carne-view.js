@@ -185,10 +185,10 @@ const CarneView = {
       <!-- Balance Consolidado (Colapsable con App.toggleResumen) -->
       <div class="mb-14">
         <div class="flex items-center gap-12 mb-14">
-          <span class="text-2xl" style="color:var(--c-danger); display:inline-flex; align-items:center;">${Icons.carne()}</span>
+          <span class="text-2xl" style="color:var(--c-success); display:inline-flex; align-items:center;">${Icons.carne()}</span>
           <div>
             <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-              <span style="color:var(--c-danger); margin-right:4px;">|</span> RESUMEN DE CARNE
+              <span style="color:var(--c-success); margin-right:4px;">|</span> RESUMEN DE CARNE
             </h1>
           </div>
         </div>
@@ -241,7 +241,7 @@ const CarneView = {
       </div>
       <div id="carne-content"><div class="loader">Cargando datos...</div></div>
       <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" style="--fab-neon-color: var(--c-danger);" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'carne' })">
+      <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'carne' })">
         <span class="fab-label">Nuevo Registro</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

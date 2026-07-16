@@ -122,10 +122,17 @@ const AnimalesView = {
   },
 
   _aplicarFiltros(animales, rebanoMap) {
+    const flags = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
     let r = animales;
     if (this._filtroActivo.especie) r = r.filter(a => a.especie === this._filtroActivo.especie);
     if (this._filtroActivo.sexo) r = r.filter(a => a.sexo === this._filtroActivo.sexo);
     if (this._filtroActivo.estado) r = r.filter(a => a.estado === this._filtroActivo.estado);
+    // Filtro por tipo de explotación activo (leche/carne)
+    r = r.filter(a => {
+      const rebano = rebanoMap[a.rebanoId];
+      if (!rebano) return false;
+      return window.ModoContextoHelper._matchTipoByMode(rebano.tipo, flags);
+    });
     return r;
   },
 

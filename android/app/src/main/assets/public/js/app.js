@@ -130,8 +130,6 @@ const App = {
             if (window.ExplotacionView) { window.ExplotacionView._cachedData = null; window.ExplotacionView._needsDataRefresh = true; }
             if (window.ComercializacionView) { window.ComercializacionView._cachedData = null; window.ComercializacionView._needsDataRefresh = true; }
             if (window.CarneView) { window.CarneView._cachedData = null; window.CarneView._needsDataRefresh = true; }
-            if (window.LecheView) { window.LecheView._cachedData = null; window.LecheView._needsDataRefresh = true; }
-            if (window.HibridoView) { window.HibridoView._cachedData = null; window.HibridoView._needsDataRefresh = true; }
             if (window.AnimalesView) window.AnimalesView._cache = null;
             if (window.GanaderiaView) { window.GanaderiaView._cachedData = null; window.GanaderiaView._needsDataRefresh = true; }
 
@@ -878,23 +876,8 @@ const App = {
 
       const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
 
-      let tieneCarne = false;
-      let tieneLeche = false;
-      let tieneHibrido = false;
-
-      rebanos.forEach(r => {
-        const tipo = (r.tipo || '').toLowerCase();
-        if (tipo.includes('carne') || tipo.includes('cárn')) tieneCarne = true;
-        else if (tipo.includes('leche') || tipo.includes('láct')) tieneLeche = true;
-        else if (tipo.includes('mixt') || tipo.includes('híbr') || tipo.includes('doble')) tieneHibrido = true;
-      });
-
-      let modo = 'leche'; // Prioridad Lácteo por defecto
-      if (tieneLeche || tieneHibrido || (tieneCarne && tieneLeche)) {
-        modo = 'leche';
-      } else if (tieneCarne) {
-        modo = 'carne';
-      }
+      // Obtener los flags efectivos: prioridad a preferencia global del usuario, luego detección automática
+      const flags = await ModoContextoHelper.getEffectiveFlags(fincaId);
 
       // Limpiar Barra Inferior: Ocultar Animales y Rebaños para simplificar la interfaz a 3 botones principales
       const navAnimales = document.getElementById('nav-animales');
@@ -905,9 +888,12 @@ const App = {
       const navComer = document.getElementById('nav-comercializacion');
       if (navComer) {
         navComer.style.display = 'flex';
-        const tab = modo === 'leche' ? 'leche' : 'carne';
+        const tab = flags.leche ? 'leche' : 'carne';
         navComer.setAttribute('href', `#/comercializacion?tab=${tab}`);
       }
+
+      // Establecer el modo de explotación en el dataset del body para que las vistas puedan acceder a él
+      document.body.dataset.modoExplotacion = [flags.leche ? 'leche' : '', flags.carne ? 'carne' : ''].filter(Boolean).join(',');
 
       const navProduccion = document.getElementById('nav-produccion');
       if (navProduccion) {
@@ -1774,7 +1760,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/carne-view.js', 'js/views/leche-view.js', 'js/views/hibrido-view.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/carne-view.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
     informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],

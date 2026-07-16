@@ -3,7 +3,6 @@
  * Vista unificada del Módulo ExPro (Explotación y Producción)
  */
 const ExplotacionView = {
-  _activeMode: 'leche',
   _activeSubModule: 'explotacion',
   _cachedData: null,
   _cachedFincaId: null,
@@ -44,8 +43,6 @@ const ExplotacionView = {
       ]);
 
       const eventos = (eventosRaw || []).filter(e => !e?.anulado);
-
-      this._activeMode = window.ModoContextoHelper?.getModeForBlock('explotacion', rebanos) || 'leche';
 
       // Filtrado ultra-permisivo para asegurar visibilidad en Demo
       const pesajes = eventos.filter(e =>
@@ -249,8 +246,12 @@ const ExplotacionView = {
   },
 
   _renderModoExplotacion(container, d) {
-    const meta = window.ModoContextoHelper?.getModeMeta(this._activeMode) || { color: 'var(--c-info)', icon: Icons.leche(), label: 'Lácteo' };
-    
+    const flags = window.ModoContextoHelper?.getFlags() || { leche: true, carne: false };
+    // Color/icono de referencia para elementos neutros (búsqueda, título de sección "Actividad Reciente")
+    const metaRef = flags.leche && !flags.carne ? window.ModoContextoHelper.getModeMeta('leche')
+      : !flags.leche && flags.carne ? window.ModoContextoHelper.getModeMeta('carne')
+      : { color: 'var(--c-purple)', icon: Icons.finca(), label: 'Explotación' };
+
     const ccaa = d.finca?.comunidad_autonoma || '';
     const configCCAA = window.ComunidadesService?.getConfiguracionCCAA ? window.ComunidadesService.getConfiguracionCCAA(ccaa) : null;
     const supportsGuia365 = configCCAA?.guia_automatica_si_saneada || false;
@@ -292,13 +293,6 @@ const ExplotacionView = {
     }
 
     container.innerHTML = `
-      <div class="mb-14 px-4">
-        <div class="expro-mode-switch">
-          <button class="expro-mode-btn ${this._activeMode === 'carne' ? 'active' : ''}" style="--mode-color:var(--c-danger);" onclick="ExplotacionView._cambiarModo('carne')">${Icons.carne()} CARNE</button>
-          <button class="expro-mode-btn ${this._activeMode === 'leche' ? 'active' : ''}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarModo('leche')">${Icons.leche()} LECHE</button>
-          <button class="expro-mode-btn ${this._activeMode === 'hibrido' ? 'active' : ''}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarModo('hibrido')">${Icons.rotacion()} HÍBRIDO</button>
-        </div>
-      </div>
       <div class="report-section px-4">
         ${guia365BannerHtml}
         ${(d.silosCriticos && d.silosCriticos.length > 0) ? `
@@ -317,26 +311,20 @@ const ExplotacionView = {
             }).join('')}
           </div>
         </div>` : ''}
+        ${flags.leche ? `
         <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
           <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color: ${meta.color}">${meta.icon} BALANCE ${meta.label.toUpperCase()}</span>
+            <span class="flex items-center gap-6" style="color: var(--c-info)">${Icons.leche()} BALANCE LÁCTEO</span>
             <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
           </div>
           <div class="resumen-body flex flex-col">
             <div class="py-10 flex justify-between items-center border-bottom-222">
               <span class="text-[0.65rem] text-gray uppercase font-900">Producción Total</span>
-              <strong class="text-lg font-950">${this._activeMode === 'leche' ? UI.formatNumber(d.totalLitros) + ' L' : this._activeMode === 'carne' ? d.pesajes.length + ' pesajes' : UI.formatNumber(d.totalLitros) + ' L / ' + d.pesajes.length + ' pesajes'}</strong>
+              <strong class="text-lg font-950">${UI.formatNumber(d.totalLitros)} L</strong>
             </div>
-
-            <!-- Mode-specific metrics -->
-            ${this._activeMode === 'leche' ? `
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">MOFA (Leche)</span>
               <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.mofaLeche))}</strong>
-            </div>
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Litros Totales</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatNumber(d.totalLitros)} L</strong>
             </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Litros Control</span>
@@ -349,7 +337,20 @@ const ExplotacionView = {
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Proteína Media</span>
               <strong class="text-lg font-950" style="color: var(--c-success);">${d.protMedia.toFixed(2)}%</strong>
-            </div>` : this._activeMode === 'carne' ? `
+            </div>
+          </div>
+        </div>` : ''}
+        ${flags.carne ? `
+        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
+          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
+            <span class="flex items-center gap-6" style="color: var(--c-success)">${Icons.carne()} BALANCE CÁRNICO</span>
+            <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
+          </div>
+          <div class="resumen-body flex flex-col">
+            <div class="py-10 flex justify-between items-center border-bottom-222">
+              <span class="text-[0.65rem] text-gray uppercase font-900">Producción Total</span>
+              <strong class="text-lg font-950">${d.pesajes.length} pesajes</strong>
+            </div>
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Margen Neto (Carne)</span>
               <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.margenCarne))}</strong>
@@ -369,35 +370,18 @@ const ExplotacionView = {
             <div class="py-10 flex justify-between items-center">
               <span class="text-[0.65rem] text-gray uppercase font-900">Costo/kg Ganancia</span>
               <strong class="text-lg font-950" style="color: var(--c-warning);">${this._calcularICACarne().costePorKgGanancia > 0 ? this._calcularICACarne().costePorKgGanancia.toFixed(2) + ' €/kg' : '0.00 €/kg'}</strong>
-            </div>` : `
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Margen Consolidado</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.margenHibrido))}</strong>
             </div>
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">MOFA (Leche)</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatCurrency(Math.round(d.mofaLeche))}</strong>
-            </div>
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Peso Total Ganado (Carne)</span>
-              <strong class="text-lg font-950" style="color: var(--c-success);">${UI.formatNumber(this._calcularPesoTotalCarne())} kg</strong>
-            </div>
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">ICA Promedio</span>
-              <strong class="text-lg font-950" style="color: var(--c-info);">${this._calcularICACarne().ica > 0 ? this._calcularICACarne().ica.toFixed(2) + ' : 1' : 'N/D'}</strong>
-            </div>`
-          }
           </div>
-        </div>
+        </div>` : ''}
 
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
-          <span style="color: ${meta.color}; margin-right: 4px;">|</span> ${Icons.documento()} ACTIVIDAD RECIENTE
+          <span style="color: ${metaRef.color}; margin-right: 4px;">|</span> ${Icons.documento()} ACTIVIDAD RECIENTE
         </div>
         <div class="mb-10 relative">
           <input type="text" id="expro-search-actividad" class="wizard-input font-bold uppercase py-12 px-16 pr-40 text-sm"
                  placeholder="BUSCAR POR CROTAL O ZONA..." value="${this._filtroActividad}"
                  oninput="ExplotacionView._filtrarActividad(this.value)">
-          <div style="position:absolute; right:15px; top:50%; transform:translateY(-50%); pointer-events:none; color:${meta.color};">
+          <div style="position:absolute; right:15px; top:50%; transform:translateY(-50%); pointer-events:none; color:${metaRef.color};">
             ${Icons.buscar()}
           </div>
         </div>
@@ -405,17 +389,10 @@ const ExplotacionView = {
           ${this._renderActividadItems()}
         </div>
       </div>
-      <div class="fab-container" style="--fab-neon-color: ${meta.color};" onclick="App._abrirAsistenteProduccion('${this._activeMode}', { origen_modulo: 'explotacion', modo_explotacion: this._activeMode })">
-        <span class="fab-label">${this._activeMode === 'leche' ? 'Registrar Ordeño' : this._activeMode === 'carne' ? 'Registrar Pesaje' : 'Registrar Producción'}</span>
+      <div class="fab-container" style="--fab-neon-color: ${metaRef.color};" onclick="${flags.leche && flags.carne ? "App._abrirSubmenuRegistros({ origen_modulo: 'explotacion' })" : flags.carne ? "App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion' })" : "App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion' })"}">
+        <span class="fab-label">${flags.leche && flags.carne ? 'Registrar Producción' : flags.carne ? 'Registrar Pesaje' : 'Registrar Ordeño'}</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
-  },
-
-  _cambiarModo(modo) {
-    this._activeMode = modo;
-    this._filtroActividad = '';
-    if (window.ModoContextoHelper) ModoContextoHelper.setModeForBlock('explotacion', modo);
-    this.render();
   },
 
   /** Filtra la lista de "Actividad Reciente" por crotal o zona, sin re-renderizar toda la vista (conserva el foco del buscador). */
@@ -429,9 +406,12 @@ const ExplotacionView = {
   _renderActividadItems() {
     const d = this._cachedData;
     if (!d) return '';
-    const meta = { color: this._activeMode === 'carne' ? 'var(--c-danger)' : this._activeMode === 'leche' ? 'var(--c-info)' : 'var(--c-success)' };
+    const flags = window.ModoContextoHelper?.getFlags() || { leche: true, carne: false };
     const texto = (this._filtroActividad || '').trim().toLowerCase();
-    let items = this._activeMode === 'leche' ? d.ordeños : d.pesajes;
+    let items = [
+      ...(flags.leche ? d.ordeños.map(e => ({ ...e, _tipo: 'leche' })) : []),
+      ...(flags.carne ? d.pesajes.map(e => ({ ...e, _tipo: 'carne' })) : [])
+    ].sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
     if (texto) {
       items = items.filter(e =>
         (e.snap_identificacion || '').toLowerCase().includes(texto) ||
@@ -442,12 +422,12 @@ const ExplotacionView = {
       return `<div class="empty-state py-30 text-center"><p class="empty-state-text text-gray-500 font-bold uppercase text-xs">Sin registros que coincidan con la búsqueda.</p></div>`;
     }
     return items.slice(0, 50).map(e => App._cardRegistro({
-      icon: this._activeMode === 'leche' ? Icons.leche() : Icons.carne(),
+      icon: e._tipo === 'leche' ? Icons.leche() : Icons.carne(),
       title: e.snap_identificacion || 'Registro',
       metadata: `<span>${this._fmtFecha(e.fecha)}</span><span>·</span><span>${e.snap_zona || 'Finca'}</span>`,
       badge: `${UI.formatNumber(e.valor_neto || 0)} ${e.unidad || ''}`,
-      color: meta.color,
-      onClick: `ExplotacionView._abrirOpcionesRegistro(${e.id}, '${this._activeMode}')`
+      color: e._tipo === 'leche' ? 'var(--c-info)' : 'var(--c-success)',
+      onClick: `ExplotacionView._abrirOpcionesRegistro(${e.id}, '${e._tipo}')`
     })).join('');
   },
 

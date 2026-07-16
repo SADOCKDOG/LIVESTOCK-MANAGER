@@ -249,7 +249,7 @@ const AlbaranesVentasView = {
       return;
     }
 
-    const colors = { leche: 'var(--c-info)', carne: 'var(--c-danger)' };
+    const colors = { leche: 'var(--c-info)', carne: 'var(--c-success)' };
     const badgeColors = {
       borrador: 'var(--c-warning)',
       presentado: 'var(--c-success)',

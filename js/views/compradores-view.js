@@ -408,7 +408,7 @@ const CompradoresView = {
 
     contenedor.innerHTML = `<div class="grid gap-12">${lista.map(ct => {
       const comp = compradorMap[ct.compradorId];
-      const color = ct.tipo === 'leche' ? 'var(--c-info)' : (ct.tipo === 'carne' ? 'var(--c-danger)' : 'var(--c-success)');
+      const color = ct.tipo === 'leche' ? 'var(--c-info)' : 'var(--c-success)';
 
       return App._cardRegistro({
         title: ct.numero_contrato,
@@ -540,8 +540,8 @@ const CompradoresView = {
         <!-- KPIS -->
         <div class="grid grid-cols-3 gap-8 mb-16 mt-16">
           <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
-            <small class="s-lbl uppercase font-900" style="color: var(--c-danger);">CARNE</small>
-            <div class="s-val inf-val-lg text-red font-950">${resumen.total_ventas_carne}</div>
+            <small class="s-lbl uppercase font-900" style="color: var(--c-success);">CARNE</small>
+            <div class="s-val inf-val-lg text-green font-950">${resumen.total_ventas_carne}</div>
             <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
           </div>
           <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
@@ -587,7 +587,7 @@ const CompradoresView = {
         <!-- Historial de Ventas Carne -->
         <div class="card p-16 mb-16 border-222 bg-black">
           <div class="text-xs text-gray-500 uppercase font-950 tracking-widest border-bottom-222 pb-8 mb-12 flex items-center gap-8">
-              <span style="color: var(--c-danger);">|</span> ${Icons.carne()} HISTORIAL CARNE
+              <span style="color: var(--c-success);">|</span> ${Icons.carne()} HISTORIAL CARNE
           </div>
           ${ventasCarne.length === 0 ? '<div class="empty-state border-none mt-0 mb-0"><p class="empty-state-text uppercase font-900 text-xs">Sin ventas registradas.</p></div>' :
             ventasCarne.slice(0, 30).map(v => `

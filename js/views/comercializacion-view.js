@@ -115,14 +115,23 @@ const ComercializacionView = {
 
   async render(params) {
     const main = document.getElementById('app-content');
-    const tab = (params && params.get ? params.get("tab") : null) || this._activeSubModule;
-    this._activeSubModule = tab;
-
     const fincaId = await Fincas.getActiveId();
     if (!fincaId) {
       main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">No hay ninguna finca seleccionada.</p></div>`;
       return;
     }
+
+    // Sub-módulos permitidos según los tipos de explotación activos (Leche/Carne)
+    const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const allowedSubModules = ['compradores', 'contratos', 'transportistas']; // siempre permitidos
+    if (flagsModo.leche) allowedSubModules.push('leche');
+    if (flagsModo.carne) allowedSubModules.push('carne');
+
+    // Obtener la pestaña solicitada por parámetro o por el estado actual
+    const requestedTab = (params && params.get ? params.get("tab") : null) || this._activeSubModule;
+    const priorityOrder = ['leche', 'carne', 'compradores', 'contratos', 'transportistas'];
+    const firstAllowed = priorityOrder.find(tab => allowedSubModules.includes(tab)) || null;
+    this._activeSubModule = allowedSubModules.includes(requestedTab) ? requestedTab : firstAllowed;
 
     const contratos = await window.db.getAll('contratos_compra').catch(() => []);
     const hoy = new Date();
@@ -203,11 +212,13 @@ const ComercializacionView = {
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
           <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Comercialización">
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'leche' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'leche'}" style="--mode-color:var(--c-info);" onclick="ComercializacionView._cambiarSubModulo('leche')">${Icons.leche()} LECHE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'carne' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'carne'}" style="--mode-color:var(--c-danger);" onclick="ComercializacionView._cambiarSubModulo('carne')">${Icons.carne()} CARNE</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'compradores' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'compradores'}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('compradores')">${Icons.compradores()} CLIENTES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'contratos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'contratos'}" style="--mode-color:var(--c-purple);" onclick="ComercializacionView._cambiarSubModulo('contratos')">${Icons.documento()} CONTRATOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'transportistas' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'transportistas'}" style="--mode-color:var(--c-pink);" onclick="ComercializacionView._cambiarSubModulo('transportistas')">${Icons.transportistas()} LOGÍSTICA</button>
+            <!-- Pestañas generadas dinámicamente según los tipos de explotación activos -->
+            ${['leche', 'carne', 'compradores', 'contratos', 'transportistas'].map(tab => {
+              if (!allowedSubModules.includes(tab)) return '';
+              const isActive = this._activeSubModule === tab;
+              const meta = this._getSubModuleMeta(tab);
+              return `<button class="pestanas-premium-btn ${isActive ? 'active' : ''}" role="tab" aria-selected="${isActive}" style="--mode-color:${meta.color};" onclick="ComercializacionView._cambiarSubModulo('${tab}')">${meta.icon} ${tab.toUpperCase()}</button>`;
+            }).join('')}
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
@@ -252,17 +263,27 @@ const ComercializacionView = {
   },
 
   _cambiarSubModulo(subModulo) {
+    const flags = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const permitido =
+      ['compradores', 'contratos', 'transportistas'].includes(subModulo) ||
+      (subModulo === 'leche' && flags.leche) ||
+      (subModulo === 'carne' && flags.carne);
+
+    if (!permitido) {
+      // Sub-módulo no permitido con los tipos de explotación activos actuales: se ignora el cambio
+      return;
+    }
     this._activeSubModule = subModulo;
     this.render();
   },
 
   _getSubModuleMeta(sub) {
     const map = {
-      leche: { color: 'var(--c-info)', title: 'CONTRATOS Y ENTREGAS LÁCTEAS', desc: 'Control de cisternas, analíticas y albaranes de leche', headerColorKey: 'leche' },
-      carne: { color: 'var(--c-danger)', title: 'COMERCIALIZACIÓN CÁRNICA', desc: 'Ventas de ganado, rendimientos de canal y facturación', headerColorKey: 'carne' },
-      compradores: { color: 'var(--c-purple)', title: 'CARTERA DE CLIENTES', desc: 'Registro de mataderos, cooperativas y centrales lecheras', headerColorKey: 'compradores' },
-      contratos: { color: 'var(--c-purple)', title: 'CONTRATOS DE COMPRA', desc: 'Acuerdos comerciales de suministro y trazabilidad de precios', headerColorKey: 'contratos' },
-      transportistas: { color: 'var(--c-pink)', title: 'LOGÍSTICA Y TRANSPORTISTAS', desc: 'Flota de transporte ganadero calificado y cisternas', headerColorKey: 'transportistas' }
+      leche: { icon: Icons.leche(), color: 'var(--c-info)', title: 'CONTRATOS Y ENTREGAS LÁCTEAS', desc: 'Control de cisternas, analíticas y albaranes de leche', headerColorKey: 'leche' },
+      carne: { icon: Icons.carne(), color: 'var(--c-success)', title: 'COMERCIALIZACIÓN CÁRNICA', desc: 'Ventas de ganado, rendimientos de canal y facturación', headerColorKey: 'carne' },
+      compradores: { icon: Icons.compradores(), color: 'var(--c-purple)', title: 'CARTERA DE CLIENTES', desc: 'Registro de mataderos, cooperativas y centrales lecheras', headerColorKey: 'compradores' },
+      contratos: { icon: Icons.documento(), color: 'var(--c-purple)', title: 'CONTRATOS DE COMPRA', desc: 'Acuerdos comerciales de suministro y trazabilidad de precios', headerColorKey: 'contratos' },
+      transportistas: { icon: Icons.transportistas(), color: 'var(--c-pink)', title: 'LOGÍSTICA Y TRANSPORTISTAS', desc: 'Flota de transporte ganadero calificado y cisternas', headerColorKey: 'transportistas' }
     };
     return map[sub] || map.leche;
   },
@@ -328,7 +349,7 @@ const ComercializacionView = {
     const fincaId = await Fincas.getActiveId();
     const d = await this._ensureData(fincaId, this._needsDataRefresh);
 
-    const kpisHtml = this._renderKPIsSubTab('carne', d.kpis.carne, 'var(--c-danger)', Icons.carne());
+    const kpisHtml = this._renderKPIsSubTab('carne', d.kpis.carne, 'var(--c-success)', Icons.carne());
     
     container.innerHTML = `
       <div class="explotacion-kpis mb-14">
@@ -340,7 +361,7 @@ const ComercializacionView = {
     this._renderSeccion(subContent, {
       icon: Icons.carne(),
       title: 'Ventas Carne',
-      color: 'var(--c-danger)',
+      color: 'var(--c-success)',
       registrarLabel: 'REGISTRAR VENTA',
       listName: 'LISTA DE VENTAS',
       registrarHandler: "App._abrirWizardVentaMasiva()",
@@ -358,7 +379,7 @@ const ComercializacionView = {
     carneChartContainer.id = 'carne-rendimiento-chart';
     subContent.appendChild(carneChartContainer);
     const rendimientoCarne = this._calcularRendimientoMensual(d.ventas, d.entregas);
-    this._renderRendimientoBarChart(carneChartContainer, rendimientoCarne, 'peso', 'Peso Mensual de Carne Vendida', 'var(--c-danger)', 'var(--c-warning)');
+    this._renderRendimientoBarChart(carneChartContainer, rendimientoCarne, 'peso', 'Peso Mensual de Carne Vendida', 'var(--c-success)', 'var(--c-warning)');
   },
 
   _renderKPIsSubTab(tabKey, kpis, color, icon) {
