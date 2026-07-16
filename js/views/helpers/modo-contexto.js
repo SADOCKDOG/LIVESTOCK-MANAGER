@@ -121,6 +121,26 @@ const ModoContextoHelper = {
     return flags ? !!flags.carne : false;
   },
 
+  /**
+   * Banner informativo de registros ocultos por el filtro de tipo de explotación.
+   * Devuelve '' si no hay ninguno oculto.
+   */
+  bannerOcultosPorModo(cantidadOculta, etiquetaSingular, etiquetaPlural) {
+    if (!cantidadOculta || cantidadOculta <= 0) return '';
+    const etiqueta = cantidadOculta === 1
+      ? `${etiquetaSingular} oculto`
+      : `${etiquetaPlural} ocultos`;
+    return `
+      <div class="card p-10 mb-12 border-222" style="background: rgba(255, 214, 0, 0.03); border-left: 3px solid var(--c-warning);">
+        <div class="flex items-center justify-between gap-8">
+          <span class="text-[0.62rem] text-aaa font-800 uppercase tracking-wide flex items-center gap-6">
+            ${Icons.alerta()} ${cantidadOculta} ${etiqueta} por el tipo de explotación configurado
+          </span>
+          <a href="#/ajustes" class="text-[0.6rem] font-900 uppercase no-underline" style="color: var(--c-warning); white-space: nowrap;">Ajustes -></a>
+        </div>
+      </div>`;
+  },
+
   getEspecieColor(especie) {
     if (!especie) return '#6b7280'; // Gray
     const e = especie.toLowerCase();

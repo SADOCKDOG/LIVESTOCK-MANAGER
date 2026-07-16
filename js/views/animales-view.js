@@ -40,6 +40,11 @@ const AnimalesView = {
 
     const filtrados = this._aplicarFiltros(animales, rebanoMap);
     const vendidos = animales.filter(a => a.estado === 'vendido').length;
+    const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const ocultosPorModo = animales.filter(a => {
+      const rebano = rebanoMap[a.rebanoId];
+      return rebano && !window.ModoContextoHelper._matchTipoByMode(rebano.tipo, flagsModo);
+    }).length;
     const moduleColor = window.getModuleColor('/animales');
     html += `
       <!-- Cabecera de Sección Estandarizada -->
@@ -54,6 +59,8 @@ const AnimalesView = {
           </div>
         </div>
       </div>
+
+      ${window.ModoContextoHelper.bannerOcultosPorModo(ocultosPorModo, 'animal', 'animales')}
 
 
       <!-- Resumen de datos registrados (colapsable) -->
