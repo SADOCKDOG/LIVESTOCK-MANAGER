@@ -38,9 +38,12 @@ const ModoContextoHelper = {
     const esHibrido = t.includes('mixt') || t.includes('híbr') || t.includes('doble');
 
     if (esHibrido) return flags.leche || flags.carne;
+    if (esCarne && esLeche) return flags.leche || flags.carne;
     if (esCarne) return !!flags.carne;
     if (esLeche) return !!flags.leche;
-    return false;
+    // Tipos no clasificables (p.ej. "Ibérico" o tipos personalizados): siempre visibles
+    // para no ocultar datos que no encajan en la taxonomía leche/carne.
+    return true;
   },
 
   filterRebanosByMode(rebanos, flags) {
