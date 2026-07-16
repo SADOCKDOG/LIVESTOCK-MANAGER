@@ -22,6 +22,7 @@ const RebanosView = {
     // Aplicar filtros iniciales
     const filteredRebanos = this._filtrar(rebanos);
     const flagsModo = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+    const ocultosPorModo = rebanos.length - rebanos.filter(r => window.ModoContextoHelper._matchTipoByMode(r.tipo, flagsModo)).length;
 
     // Resumen mensual (últimos 6 meses)
     const hoy = new Date();
@@ -68,7 +69,8 @@ const RebanosView = {
         </div>
       </div>
 
-      
+      ${window.ModoContextoHelper.bannerOcultosPorModo(ocultosPorModo, 'rebaño', 'rebaños')}
+
       <div class="card mb-14 p-12" style="background:rgba(59,130,246,0.015); border:1px solid rgba(255,255,255,0.03);">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase">EVOLUCIÓN MENSUAL (últimos 6 meses)</span>
