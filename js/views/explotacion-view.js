@@ -490,10 +490,119 @@ const ExplotacionView = {
     if (modo === 'leche') {
       if (window.ProduccionView) await window.ProduccionView._abrirOpcionesRegistro(eventId);
     } else if (modo === 'carne') {
-      if (window.CarneView) await window.CarneView._abrirOpcionesRegistro(eventId);
+      await this._abrirOpcionesRegistroCarne(eventId);
     } else {
       App?.toast(`Visualizando registro #${eventId} en modo ${modo}`);
     }
+  },
+
+  /** Modal de edición/borrado de un registro de pesaje cárnico (migrado de CarneView). */
+  async _abrirOpcionesRegistroCarne(id) {
+    try {
+      const evento = await window.db.get('registro_eventos', id);
+      if (!evento) return;
+
+      const finca = await Fincas.getActive();
+      const zonas = finca?.zonas || [];
+
+      const overlay = document.createElement("div");
+      overlay.className = "wizard-full-screen";
+      overlay.style.justifyContent = "center";
+      overlay.style.alignItems = "center";
+      overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+      overlay.innerHTML = `
+          <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-gray); background: #1e1e1e; width: 100%;">
+              <h3 class="mt-0 text-gold font-900 uppercase tracking-wider"><span style="color: var(--c-gray); margin-right: 4px;">|</span> EDITAR REGISTRO CÁRNICO</h3>
+              <p class="text-xs text-gray mb-15">ID Interno: ${evento.id}</p>
+
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                  <label class="wizard-label">Peso (${evento.unidad})</label>
+                  <input type="number" id="edit-reg-valor" value="${evento.valor_neto}" step="0.1" class="wizard-input">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="wizard-label">Fecha</label>
+                  <input type="date" id="edit-reg-fecha" value="${evento.fecha}" class="wizard-input">
+                </div>
+              </div>
+
+              <div class="wizard-input-group">
+                  <label class="wizard-label">Identificación (Crotal/Lote)</label>
+                  <input type="text" id="edit-reg-ident" value="${evento.snap_identificacion || ''}" class="wizard-input text-gold">
+              </div>
+
+              <div class="grid grid-cols-2 gap-10">
+                <div class="wizard-input-group">
+                  <label class="wizard-label">Zona</label>
+                  <select id="edit-reg-zona" class="wizard-input wizard-select">
+                    <option value="">Sin zona</option>
+                    ${zonas.map(z => `<option value="${z.nombre}" ${evento.snap_zona === z.nombre ? 'selected' : ''}>${z.nombre}</option>`).join('')}
+                    </select>
+                </div>
+              </div>
+
+              <div class="flex gap-10 mt-20">
+                  <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-reg">${Icons.guardar()} Guardar</button>
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-reg">${Icons.eliminar()} Borrar</button>
+                </div>
+                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="ExplotacionView._cerrarOverlayRegistro(this)">${Icons.cerrar()} Cancelar</button>
+            </div>
+          </div>`;
+      document.body.appendChild(overlay);
+
+      this._registroGuardado = false;
+      App.setExitGuard(() => ExplotacionView._confirmSalirOverlayRegistro());
+
+      const cerrarYRefrescar = () => {
+        this._registroGuardado = true;
+        App.clearExitGuard();
+        overlay.remove();
+        this._cachedData = null;
+        this._needsDataRefresh = true;
+        this.render();
+      };
+
+      overlay.querySelector('#btn-save-reg').onclick = async () => {
+        const val = parseFloat(overlay.querySelector('#edit-reg-valor').value);
+        const fecha = overlay.querySelector('#edit-reg-fecha').value;
+        const ident = overlay.querySelector('#edit-reg-ident').value.trim();
+        const zona = overlay.querySelector('#edit-reg-zona').value;
+
+        if (isNaN(val) || val <= 0) return App.toastError("Valor inválido");
+
+        evento.valor_neto = val;
+        evento.fecha = fecha;
+        evento.snap_identificacion = ident;
+        evento.snap_zona = zona;
+        evento.actualizadoEn = new Date().toISOString();
+
+        await window.db.put('registro_eventos', evento);
+        App.toast("Registro de pesaje actualizado", "success");
+        cerrarYRefrescar();
+      };
+
+      overlay.querySelector('#btn-del-reg').onclick = async () => {
+        if (!await Confirm.confirm("Eliminar Pesaje", "¿Eliminar este pesaje de forma permanente?", true)) return;
+        await window.db.delete('registro_eventos', id);
+        App.toast("Registro de pesaje eliminado", "success");
+        cerrarYRefrescar();
+      };
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
+
+  /** Guarda de salida compartida con el botón físico Android (ver App.setExitGuard). */
+  async _confirmSalirOverlayRegistro() {
+    if (this._registroGuardado) return true;
+    return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
+  },
+
+  async _cerrarOverlayRegistro(btn) {
+    if (!(await this._confirmSalirOverlayRegistro())) return;
+    App.clearExitGuard();
+    const overlay = btn.closest('.wizard-full-screen');
+    if (overlay) overlay.remove();
   },
 
   // Pestaña TRÁMITES: hub administrativo consolidado (Tarea B.1 del plan v5).
