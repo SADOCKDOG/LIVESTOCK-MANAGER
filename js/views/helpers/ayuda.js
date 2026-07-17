@@ -238,7 +238,8 @@ window.Ayuda = {
         </ul>
 
         <h3 class="text-blue mb-10" class="section-underline">Plazos de Identificación</h3>
-        <table class="ayuda-table mb-25">
+        <div class="mb-25 scroll-shadow-container" style="overflow-x: auto;">
+        <table class="ayuda-table" style="min-width: 400px;">
             <thead>
                 <tr style="background: #18181b; border-bottom: 2px solid var(--c-info);">
                     <th class="p-10">Sistema de Cría</th>
@@ -260,6 +261,7 @@ window.Ayuda = {
                 </tr>
             </tbody>
         </table>
+        </div>
 
         <div class="rounded-sm p-15 border-left-violet">
             <h4 class="text-purple m-0 mb-4">Excepción: Destino Directo a Matadero</h4>

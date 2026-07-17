@@ -103,17 +103,17 @@ const FitosanitariosView = {
 
     _renderRegistroItem(r) {
         return `
-        <div class="flex items-center justify-between p-12 rounded-sm border border-222 hover:border-gray transition-all" 
-             style="background:#0C0C0C; border:1px solid #1c1c1c; cursor:pointer;" 
+        <div class="flex items-center justify-between gap-10 p-12 rounded-sm border border-222 hover:border-gray transition-all"
+             style="background:#0C0C0C; border:1px solid #1c1c1c; cursor:pointer;"
              onclick="FitosanitariosView._abrirFichaTratamiento(${r.id})"
              title="Ver Ficha Técnica de Tratamiento">
-            <div class="flex items-center gap-10">
-                <div class="flex items-center justify-center rounded-sm" style="width:36px; height:36px; background:#181818; color:#C5FA50; border:1px solid #222;">
+            <div class="flex items-center gap-10 min-w-0">
+                <div class="flex items-center justify-center rounded-sm flex-shrink-0" style="width:36px; height:36px; background:#181818; color:#C5FA50; border:1px solid #222;">
                     ${Icons.fitosanitario()}
                 </div>
-                <div>
-                    <div class="text-xs font-black text-white uppercase tracking-wider">${r.concepto.toUpperCase()}</div>
-                    <div class="flex items-center gap-6 text-[0.6rem] font-bold text-gray-500 uppercase tracking-tight mt-2">
+                <div class="min-w-0">
+                    <div class="text-xs font-black text-white uppercase tracking-wider truncate">${r.concepto.toUpperCase()}</div>
+                    <div class="flex items-center flex-wrap gap-x-6 gap-y-2 text-[0.6rem] font-bold text-gray-500 uppercase tracking-tight mt-2">
                         <span>${r.fecha}</span>
                         <span>•</span>
                         <span>ZONA: ${r.snap_zona || 'GENERAL'}</span>
@@ -121,8 +121,8 @@ const FitosanitariosView = {
                     </div>
                 </div>
             </div>
-            
-            <div class="text-right" style="font-family:'IBM Plex Mono', monospace;">
+
+            <div class="text-right flex-shrink-0" style="font-family:'IBM Plex Mono', monospace;">
                 <div class="text-xs font-black text-white">${r.monto.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</div>
                 <div class="text-[0.5rem] text-gray-500 font-950 uppercase mt-2">CATEGORÍA: FITOSANITARIOS</div>
             </div>
