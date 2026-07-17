@@ -336,6 +336,10 @@ const Fincas = {
 
             const fincaId = await window.db.add('fincas', nuevaFinca);
 
+            if ((datos.flag_leche !== undefined || datos.flag_carne !== undefined) && window.ModoContextoHelper) {
+                window.ModoContextoHelper.setFlags({ leche: !!datos.flag_leche, carne: !!datos.flag_carne }, fincaId);
+            }
+
             // Si es la primera finca, establecerla como activa
             if (!(await this.getActiveId())) {
                 await this.setActiveId(fincaId);
