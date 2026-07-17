@@ -140,7 +140,7 @@ const SilosView = {
             </div>
 
             <!-- KPIs superiores (OLED dark design) -->
-            <div class="grid grid-cols-3 gap-10 mb-20">
+            <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-3 sm:gap-10 sm:mb-20">
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
                     <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">CAPACIDAD TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${totalCapacidad.toLocaleString()} kg</span>
