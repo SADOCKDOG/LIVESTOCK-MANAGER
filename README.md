@@ -19,7 +19,7 @@
 
 ---
 
-## <img src="docs/readme-icons/cow.svg" width="22" height="22" align="absmiddle" alt=""> ¿Qué es Livestock Manager?
+## ¿Qué es Livestock Manager?
 
 Livestock Manager es una plataforma de gestión ganadera de grado industrial pensada para el día a día del ganadero: censo y trazabilidad animal, producción (carne y leche), comercialización, sanidad, finanzas y documentación oficial — todo funcionando **sin conexión** en el terreno, con sincronización y exportación cuando hace falta.
 
@@ -27,7 +27,7 @@ La aplicación no es un CRM genérico adaptado al sector: su modelo de datos y s
 
 ---
 
-## <img src="docs/readme-icons/house.svg" width="22" height="22" align="absmiddle" alt=""> Multi-Explotación
+## Multi-Explotación
 
 Livestock Manager gestiona **varias explotaciones (fincas) de forma simultánea** desde una misma instalación, y cada una es completamente independiente en cuanto a datos y configuración:
 
@@ -42,64 +42,64 @@ Livestock Manager gestiona **varias explotaciones (fincas) de forma simultánea*
 
 ---
 
-## <img src="docs/readme-icons/wrench.svg" width="22" height="22" align="absmiddle" alt=""> Módulos y funcionalidades
+## Módulos y funcionalidades
 
 La aplicación se organiza en pilares interconectados que cubren todas las áreas críticas de una explotación ganadera profesional:
 
-### <img src="docs/readme-icons/house.svg" width="22" height="22" align="absmiddle" alt=""> Dashboard
+### Dashboard
 Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritarias. Filtra automáticamente según el tipo de explotación activa (leche/carne).
 
-### <img src="docs/readme-icons/cow.svg" width="22" height="22" align="absmiddle" alt=""> Ganadería y Animales
+### Ganadería y Animales
 - Censo completo con trazabilidad individual (crotal, DIB, pedigree)
 - Gestión de partos, celos y tratamientos reproductivos
 - Historial clínico completo por animal
 - Gestión de rebones y lotes
 
-### 🥛 Producción Lechera (módulo condicional)
+### Producción Lechera (módulo condicional)
 - Registro de ordeños individuales y por lote
 - Control de calidad leche (grasa, proteína, celulas somáticas)
 - Gestión de cuotas y contratos lácteos
 - Alertas de periodos de espera post-tratamiento
 
-### 🥩 Producción Cárnica (módulo condicional)
+### Producción Cárnica (módulo condicional)
 - Registro de engorde y conversión alimenticia
 - Control de prácticas de bienestar animal
 - Trazabilidad completa desde nacimiento hasta sacrificio
 - Gestión de lotes de cebo y fechas de salida previstas
 
-### 💊 Sanidad y Tratamientos
-- Libro de tratamentos veterninarios con tiempos de espera automáticos
+### Sanidad y Tratamientos
+- Libro de tratamientos veterinarios con tiempos de espera automáticos
 - Gestión de vacunaciones, desparasitaciones y profilaxis
 - Alertas de periodos de supresión (SIGGAN/BADIGEX)
 - Historial sanitario completo por animal y lote
 
-### 💰 Finanzas y Gastos
+### Finanzas y Gastos
 - Control de ingresos y gastos por categoría
 - Gestión de facturas y albaranes
 - Control de subvenciones y ayudas PAC
 - Análisis de rentabilidad por producción y animal
 
-### 📦 Comercialización
+### Comercialización
 - Gestión de ventas de animales, leche y subproductos
 - Gestión de compras de ganado y piensos
 - Control de proveedores y transportistas
 - Generación automática de documentación de transporte
 
-### 📄 Documentación Oficial
+### Documentación Oficial
 - Generación automática de guías de movimiento oficiales
 - Libro de registro de explotación (registro de eventos)
 - Libro de tratamientos veterinarios
 - Libro de piensos y medicamentos
 - Exportación a formatos oficiales SIGGAN/BADIGEX
 
-### 📊 Informes y Analítica
+### Informes y Analítica
 - Informes de producción (leche/carne) por periodo
 - Informes sanitarios y tratamientos
 - Informes financieros y de rentabilidad
 - Informes de cumplimiento normativo
 - Exportación a PDF/CSV para presentación oficial
 
-### 🧰 Herramientas y Asistentes
+### Herramientas y Asistentes
 - Asistentes guiados (wizards) para operaciones complejas:
   - Alta de finca y animales
   - Movimientos oficiales (entradas/salidas)
@@ -109,7 +109,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
   - Ventas masivas y lotes
 - Manuales de usuario integrados y actualizables
 
-### ⚙️ Ajustes y Configuración
+### Ajustes y Configuración
 - Gestión de múltiples fincas y cambio de contexto
 - Configuración de tipo de explotación (leche/carne)
 - Gestión de usuarios y permisos
@@ -118,7 +118,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 
 ---
 
-## <img src="docs/readme-icons/shield.svg" width="22" height="22" align="absmiddle" alt=""> Integración SIGGAN / BADIGEX
+## Integración SIGGAN / BADIGEX
 
 Livestock Manager está diseñado desde cero para cumplir con los requisitos normativos de los sistemas oficiales de gestión ganadera:
 
@@ -142,7 +142,7 @@ Consulte la [Matriz de Cumplimiento SIGGAN](docs/CUMPLIMIENTO_SIGGAN.md) para un
 
 ---
 
-## <img src="docs/readme-icons/settings.svg" width="22" height="22" align="absmiddle" alt=""> Arquitectura Técnica
+## Arquitectura Técnica
 
 ### **Enfoque Offline-First**
 - Aplicación Progressive Web App (PWA) 100% funcional sin conexión
@@ -173,7 +173,7 @@ Consulte la [Matriz de Cumplimiento SIGGAN](docs/CUMPLIMIENTO_SIGGAN.md) para un
 
 ---
 
-## <img src="docs/readme-icons/folder.svg" width="22" height="22" align="absmiddle" alt=""> Estructura del repositorio
+## Estructura del repositorio
 
 ```
 ├── index.html            # Punto de entrada de la PWA
@@ -193,7 +193,7 @@ Consulte la [Matriz de Cumplimiento SIGGAN](docs/CUMPLIMIENTO_SIGGAN.md) para un
 
 ---
 
-## <img src="docs/readme-icons/package.svg" width="22" height="22" align="absmiddle" alt=""> Instalación y Desarrollo
+## Instalación y Desarrollo
 
 ### Prerrequisitos
 - Node.js (v16+ recommended)
@@ -247,7 +247,43 @@ npm run cap:open
 
 ---
 
-## <img src="docs/readme-icons/document.svg" width="22" height="22" align="absmiddle" alt=""> Documentación Adicional
+## Capturas de Pantalla
+
+A continuación se presentan algunas capturas de pantalla de la aplicación en acción:
+
+![Pantalla Principal 1](docs/Pantallas/Livestock_20260717_202535.png)
+*Pantalla principal mostrando el dashboard con métricas en tiempo real*
+
+![Pantalla Principal 2](docs/Pantallas/Livestock_20260717_202552.png)
+*Vista del módulo de Ganadería y Animales con filtrado por tipo de explotación*
+
+![Pantalla Principal 3](docs/Pantallas/Livestock_20260717_202608.png)
+*Interfaz de Producción Lechera con gráficos y métricas de calidad*
+
+![Pantalla Principal 4](docs/Pantallas/Livestock_20260717_220636.png)
+*Módulo de Sanidad y Tratamientos con alertas de periodos de supresión*
+
+![Pantalla Principal 5](docs/Pantallas/Livestock_20260717_220748.png)
+*Vista de Finanzas y Gastos con análisis de rentabilidad*
+
+![Pantalla Principal 6](docs/Pantallas/Livestock_20260717_220804.png)
+*Sección de Comercialización con gestión de ventas y compras*
+
+![Pantalla Principal 7](docs/Pantallas/Livestock_20260717_220814.png)
+*Documentación Oficial con generación de guías de movimiento*
+
+![Pantalla Principal 8](docs/Pantallas/Livestock_20260717_220854.png)
+*Informes y Analítica con exportación a PDF/CSV*
+
+![Pantalla Principal 9](docs/Pantallas/Livestock_20260717_220928.png)
+*Herramientas y Asistentes con wizards guiados para operaciones complejas*
+
+![Pantalla Principal 10](docs/Pantallas/Livestock_20260717_220942.png)
+*Ajustes y Configuración con gestión de múltiples fincas*
+
+---
+
+## Documentación Adicional
 
 Consulte los siguientes documentos para información técnica y normativa detallada:
 
@@ -261,14 +297,14 @@ Consulte los siguientes documentos para información técnica y normativa detall
 
 ---
 
-## <img src="docs/readme-icons/git.svg" width="22" height="22" align="absmiddle" alt=""> Próximos Pasos y Roadmap
+## Próximos Pasos y Roadmap
 
 ### Versión 5.0 (Planificada)
 - Integración con servicios web de SIGGAN/BADIGEX para validación oficial en tiempo real
 - Módulo de análisis predictivo de producción y salud
 - Integración con dispositivos IoT (balanzas, sensores de ambiente, etc.)
 - Modo multiidioma completo (es/fr/en)
-- Mejora en sinchronización selectiva y resolución de conflictos
+- Mejora en sincronización selectiva y resolución de conflictos
 
 ### Mejoras Continuas
 - Optimización de rendimiento offline
@@ -278,8 +314,7 @@ Consulte los siguientes documentos para información técnica y normativa detall
 
 ---
 
-## <img src="docs/readme-icons/license.svg" width="22" height="22" align="absmiddle" alt=""> Licencia y Créditos
+## Licencia y Créditos
 
 © 2026 David Asuar Arteaga · Livestock Manager Premium.  
 Todos los derechos reservados. Uso exclusivo interno.
-
