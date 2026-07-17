@@ -1269,21 +1269,19 @@ Object.assign(window.InformesView, {
   },
 
   _exportFallback() {
-    App.toast("Abriendo vista de impresión...");
-    Fincas.getActive().then(f => {
-      const win = window.open('', '_blank');
-      if (!win) { App.toastError("Bloqueador de pop-ups activo"); return; }
-      win.document.write(`<html><head><title>Informe Livestock Manager</title>
-        <style>body{font-family:"Inter",system-ui,sans-serif;padding:30px;color:#000;background:#fff;}
-        table{width:100%;border-collapse:collapse;margin:12px 0;} th,td{padding:6px 8px;border-bottom:1px solid #ddd;text-align:left;font-size:0.8rem;}
-        th{background:#f0f0f0;border-bottom:2px solid #d97706;}</style></head><body>
+    App.toastError("No se pudo generar el PDF (librería no disponible sin conexión)");
+    const html = `
+      <div style="padding:30px; box-sizing:border-box; font-family:'Inter',system-ui,sans-serif; color:#000;">
         <h1 style="color:#d97706;">Livestock Manager</h1>
         <p>Informe generado el ${new Date().toLocaleDateString()}.</p>
-        <p><em>Usa la exportación PDF para una versión completa.</em></p>
+        <p><em>La librería de exportación PDF no pudo cargarse (sin conexión). Vuelve a intentarlo con conexión a internet.</em></p>
         <hr><p style="color:#999;font-size:0.7rem;">Livestock Manager Premium</p>
-      </body></html>`);
-      win.document.close();
-      win.focus();
+      </div>`;
+    DocumentViewer.show({
+      id: 'doc-viewer-informes-fallback',
+      title: 'Informe Livestock Manager',
+      html,
+      filename: `Informe_${Date.now()}`
     });
   }
 });

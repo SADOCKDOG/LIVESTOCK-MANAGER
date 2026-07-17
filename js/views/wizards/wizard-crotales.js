@@ -262,45 +262,24 @@ window.WizardCrotales = {
   },
 
   async _mostrarPDF(html, baseName, titulo) {
-    const overlay = document.createElement('div');
-    overlay.id = 'pdf-viewer-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:#fff;display:flex;flex-direction:column;';
-    overlay.innerHTML = `
-      <div id="pdf-viewer-content" style="flex:1;overflow:auto;background:#fff;">${html}</div>
-      <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;">
-        <button class="btn btn-primary" id="btn-pdf-share" style="width:auto;padding:0 30px;background:#10b981;color:#fff;font-weight:bold;">${Icons.exportar()} COMPARTIR</button>
-        <button class="btn btn-primary" id="btn-pdf-print" style="width:auto;padding:0 30px;background:#4FADF5;color:#fff;font-weight:bold;">${Icons.documento()} IMPRIMIR</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('pdf-viewer-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
-      </div>`;
-    document.body.appendChild(overlay);
+    DocumentViewer.show({
+      id: 'doc-viewer-crotales',
+      title: titulo,
+      html,
+      filename: baseName,
+      shareTitle: titulo
+    });
+  },
 
-    const filename = `${baseName}_${Date.now()}.html`;
-
-    overlay.querySelector('#btn-pdf-share').onclick = async () => {
-      try {
-        const blob = new Blob([html], { type: 'text/html' });
-        const cap = window.Capacitor;
-        if (cap?.Plugins?.Share) {
-          const reader = new FileReader();
-          const dataUri = await new Promise((res, rej) => { reader.onload = () => res(reader.result); reader.onerror = rej; reader.readAsDataURL(blob); });
-          const result = await cap.Plugins.Filesystem.writeFile({ path: filename, data: dataUri.split(',')[1], directory: 'CACHE' });
-          await cap.Plugins.Share.share({ title: titulo, files: [result.uri], dialogTitle: 'Compartir con…' });
-        } else if (navigator.share) {
-          await navigator.share({ title: titulo, files: [new File([blob], filename, { type: 'text/html' })] });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-          URL.revokeObjectURL(url);
-        }
-        App.toast("Documento compartido", 'success');
-      } catch (e) { App.toastError("Error: " + e.message); }
-    };
-
-    overlay.querySelector('#btn-pdf-print').onclick = () => {
-      const win = window.open('', '_blank');
-      if (win) { win.document.write('<html><head><title>' + baseName + '</title></head><body>' + html + '</body></html>'); win.document.close(); win.print(); }
-      else App.toastError("Abre el documento y usa imprimir desde el menú del navegador");
-    };
+  /** Fallback genérico cuando html2pdf no llegó a cargarse: muestra el documento igualmente. */
+  _fallbackPDF(element, filename) {
+    if (!element) { App.toastError('Documento no disponible'); return; }
+    DocumentViewer.show({
+      id: 'doc-viewer-fallback',
+      title: filename,
+      html: element.innerHTML,
+      filename: filename.replace(/\.pdf$/i, '')
+    });
   },
 
   async _onSelectADSG(adsgId) {

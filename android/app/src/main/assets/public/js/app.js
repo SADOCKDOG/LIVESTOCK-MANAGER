@@ -1142,14 +1142,7 @@ const App = {
   },
 
   async imprimirAlbaran(albaran, tipo) {
-    const overlay = document.createElement("div");
-    overlay.id = "albaran-preview-overlay";
-    overlay.style =
-      "position:fixed; top:0; left:0; right:0; bottom:0; background:white; z-index:5000; display:flex; flex-direction:column; padding:0; overflow:hidden;";
-
-    const contentId = `albaran-print-${Date.now()}`;
-    overlay.innerHTML = `
-            <div style="flex:1; width:100%; overflow-y:auto; margin: 0; background:white; color:black; padding:30px; border-radius:0; font-family:serif; box-sizing:border-box;" id="${contentId}">
+    const html = `
                 <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:10px;">
                     <img src="icons/Logo aplicación.png" style="height:50px; filter:grayscale(1);">
                     <div style="text-align:right;">
@@ -1200,135 +1193,16 @@ const App = {
                 </div>
                 <div style="margin-top:40px; text-align:center; font-size:0.8rem; border-top:1px solid #eee; padding-top:20px;">
                     <p>Documento generado electrónicamente por Livestock Manager Premium v${window.APP_INFO.version}</p>
-                </div>
-            </div>
-            <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-                <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">DESCARGAR PDF</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('albaran-preview-overlay').remove()" style="width:auto; padding:0 30px;">CERRAR</button>
-            </div>
-        `;
-    document.body.appendChild(overlay);
+                </div>`;
 
-    overlay.querySelector("#btn-descargar-pdf").onclick = async () => {
-      let loader;
-      try {
-        loader = document.createElement('div');
-        loader.id = 'pdf-loader-overlay';
-        loader.style.cssText = `
-          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
-          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
-          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
-        `;
-        loader.innerHTML = `
-          <div class="pdf-loader">
-            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:15px; transform:scale(2);">${Icons.documento()}</div>
-            <div class="pdf-loader-title">Generando PDF</div>
-            <div class="pdf-loader-desc">Albarán ${albaran.cabecera.numero_albaran}</div>
-            <div class="pdf-loader-bar">
-              <div id="pdf-progress-bar" class="pdf-loader-fill"></div>
-            </div>
-            <div id="pdf-progress-text" class="pdf-loader-status">PROCESANDO...</div>
-          </div>
-        `;
-        document.body.appendChild(loader);
-
-        const updateProgress = (pct, text) => {
-          const bar = loader.querySelector('#pdf-progress-bar');
-          const txt = loader.querySelector('#pdf-progress-text');
-          if (bar) bar.style.width = pct + '%';
-          if (txt) txt.textContent = text.toUpperCase();
-        };
-
-        updateProgress(30, 'Preparando documento...');
-        const sourceEl = overlay.querySelector(`#${contentId}`);
-        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-        const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = `position:fixed; left:0; top:0; width:800px; z-index:10; background:#fff; color:#000; padding:30px; visibility:visible;`;
-        tempContainer.innerHTML = sourceEl.innerHTML;
-        // Forzar color negro en hijos para evitar herencia de temas oscuros
-        tempContainer.querySelectorAll('*').forEach(el => el.style.color = 'black');
-        document.body.appendChild(tempContainer);
-
-        const filename = `albaran_${albaran.cabecera.numero_albaran}.pdf`;
-
-        const opt = {
-          margin: [12, 10, 12, 10],
-          filename: filename,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-          },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        if (typeof html2pdf === 'undefined' && !(await App._ensureHtml2Pdf())) {
-          document.body.removeChild(tempContainer);
-          loader.remove();
-          App.toastError("Librería PDF no disponible");
-          return;
-        }
-
-        updateProgress(70, 'Rasterizando PDF...');
-        const pdfBlob = await html2pdf().set(opt).from(tempContainer).toPdf().output('blob');
-        document.body.removeChild(tempContainer);
-
-        updateProgress(90, 'Compartiendo...');
-
-        const shareTitle = 'Albarán de Expedición';
-        const shareText = `Albarán nº ${albaran.cabecera.numero_albaran}`;
-
-        const fileObj = {
-          blob: pdfBlob,
-          fileName: filename,
-          mimeType: 'application/pdf',
-          titulo: 'Albarán',
-          shareTitle,
-          shareText
-        };
-
-        if (window.InformesView && typeof InformesView._ejecutarShare === 'function') {
-          await InformesView._ejecutarShare(fileObj);
-        } else {
-          const cap = window.Capacitor;
-          if (cap?.Plugins?.Share) {
-            const reader = new FileReader();
-            const dataUri = await new Promise((resolve, reject) => {
-              reader.onload = () => resolve(reader.result);
-              reader.onerror = reject;
-              reader.readAsDataURL(pdfBlob);
-            });
-            const result = await cap.Plugins.Filesystem.writeFile({
-              path: filename,
-              data: dataUri.split(',')[1],
-              directory: 'CACHE'
-            });
-            await cap.Plugins.Share.share({
-              title: shareTitle,
-              text: shareText,
-              url: result.uri,
-              files: [result.uri],
-              dialogTitle: 'Compartir Albarán con…'
-            });
-          } else if (navigator.share) {
-            const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-            await navigator.share({ title: shareTitle, text: shareText, files: [file] });
-          } else {
-            html2pdf().set(opt).from(sourceEl).save(filename);
-          }
-        }
-
-        updateProgress(100, '¡Listo!');
-        await new Promise(r => setTimeout(r, 500));
-        loader.remove();
-      } catch (e) {
-        console.error('[App PDF] Error:', e);
-        if (loader) loader.remove();
-        App.toastError("Error al generar PDF: " + e.message);
-      }
-    };
+    DocumentViewer.show({
+      id: 'doc-viewer-albaran',
+      title: 'Albarán de Expedición',
+      html: `<div style="padding:30px; box-sizing:border-box; font-family:serif; color:black;">${html}</div>`,
+      filename: `albaran_${albaran.cabecera.numero_albaran}`,
+      shareTitle: 'Albarán de Expedición',
+      shareText: `Albarán nº ${albaran.cabecera.numero_albaran}`
+    });
   },
 
   async imprimirFactura(albaran, liquidacion, numeroFactura) {
