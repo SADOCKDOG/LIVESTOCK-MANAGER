@@ -283,4 +283,3 @@ Consulte los siguientes documentos para información técnica y normativa detall
 © 2026 David Asuar Arteaga · Livestock Manager Premium.  
 Todos los derechos reservados. Uso exclusivo interno.
 
-Desarrollado con ❤️ para el sector ganadero profesional.
