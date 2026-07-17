@@ -34,11 +34,7 @@
     "@capacitor/filesystem": "^5.2.2",
     "@capacitor/share": "^5.0.8",
     "@capawesome/capacitor-file-picker": "^5.3.0",
-    "@earendil-works/pi-agent-core": "^0.78.0",
-    "@earendil-works/pi-ai": "^0.78.0",
-    "chrome-remote-interface": "^0.34.0",
-    "cordova-plugin-purchase": "^13.17.2",
-    "puppeteer": "^25.1.0"
+    "cordova-plugin-purchase": "^13.17.2"
   },
   "overrides": {
     "minimatch": "3.1.4",
