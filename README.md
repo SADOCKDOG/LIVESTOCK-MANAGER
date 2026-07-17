@@ -25,6 +25,10 @@ Livestock Manager es una plataforma de gestión ganadera de grado industrial pen
 
 La aplicación no es un CRM genérico adaptado al sector: su modelo de datos y sus flujos de trabajo están construidos directamente sobre la normativa española y autonómica de identificación y movimiento de ganado (RD 787/2023, RD 479/2004, Reg. UE 1069/2009), con los sistemas oficiales de gestión ganadera de Andalucía y Extremadura como referencia de diseño.
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_202535.png" alt="Pantalla principal" width="300">
+</p>
+
 ---
 
 ## Multi-Explotación
@@ -49,11 +53,19 @@ La aplicación se organiza en pilares interconectados que cubren todas las área
 ### Dashboard
 Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritarias. Filtra automáticamente según el tipo de explotación activa (leche/carne).
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_202552.png" alt="Dashboard" width="300">
+</p>
+
 ### Ganadería y Animales
 - Censo completo con trazabilidad individual (crotal, DIB, pedigree)
 - Gestión de partos, celos y tratamientos reproductivos
 - Historial clínico completo por animal
 - Gestión de rebones y lotes
+
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_202608.png" alt="Ganadería y Animales" width="300">
+</p>
 
 ### Producción Lechera (módulo condicional)
 - Registro de ordeños individuales y por lote
@@ -61,11 +73,19 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Gestión de cuotas y contratos lácteos
 - Alertas de periodos de espera post-tratamiento
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220636.png" alt="Producción Lechera" width="300">
+</p>
+
 ### Producción Cárnica (módulo condicional)
 - Registro de engorde y conversión alimenticia
 - Control de prácticas de bienestar animal
 - Trazabilidad completa desde nacimiento hasta sacrificio
 - Gestión de lotes de cebo y fechas de salida previstas
+
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220748.png" alt="Producción Cárnica" width="300">
+</p>
 
 ### Sanidad y Tratamientos
 - Libro de tratamientos veterinarios con tiempos de espera automáticos
@@ -73,17 +93,29 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Alertas de periodos de supresión (SIGGAN/BADIGEX)
 - Historial sanitario completo por animal y lote
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220804.png" alt="Sanidad y Tratamientos" width="300">
+</p>
+
 ### Finanzas y Gastos
 - Control de ingresos y gastos por categoría
 - Gestión de facturas y albaranes
 - Control de subvenciones y ayudas PAC
 - Análisis de rentabilidad por producción y animal
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220814.png" alt="Finanzas y Gastos" width="300">
+</p>
+
 ### Comercialización
 - Gestión de ventas de animales, leche y subproductos
 - Gestión de compras de ganado y piensos
 - Control de proveedores y transportistas
 - Generación automática de documentación de transporte
+
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220854.png" alt="Comercialización" width="300">
+</p>
 
 ### Documentación Oficial
 - Generación automática de guías de movimiento oficiales
@@ -92,12 +124,20 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Libro de piensos y medicamentos
 - Exportación a formatos oficiales SIGGAN/BADIGEX
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220928.png" alt="Documentación Oficial" width="300">
+</p>
+
 ### Informes y Analítica
 - Informes de producción (leche/carne) por periodo
 - Informes sanitarios y tratamientos
 - Informes financieros y de rentabilidad
 - Informes de cumplimiento normativo
 - Exportación a PDF/CSV para presentación oficial
+
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220942.png" alt="Informes y Analítica" width="300">
+</p>
 
 ### Herramientas y Asistentes
 - Asistentes guiados (wizards) para operaciones complejas:
@@ -109,12 +149,20 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
   - Ventas masivas y lotes
 - Manuales de usuario integrados y actualizables
 
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220928.png" alt="Herramientas y Asistentes" width="300">
+</p>
+
 ### Ajustes y Configuración
 - Gestión de múltiples fincas y cambio de contexto
 - Configuración de tipo de explotación (leche/carne)
 - Gestión de usuarios y permisos
 - Configuración de impresión y exportación
 - Gestión de actualizaciones y mantenimiento
+
+<p align="center">
+  <img src="docs/Pantallas/Livestock_20260717_220942.png" alt="Ajustes y Configuración" width="300">
+</p>
 
 ---
 
@@ -244,42 +292,6 @@ npm run cap:open
   - Exportaciones avanzadas y lotes
   - Informes consolidados multi-finca
   - Sincronización en la nube opcional
-
----
-
-## Capturas de Pantalla
-
-A continuación se presentan algunas capturas de pantalla de la aplicación en acción:
-
-![Pantalla Principal 1](docs/Pantallas/Livestock_20260717_202535.png)
-*Pantalla principal mostrando el dashboard con métricas en tiempo real*
-
-![Pantalla Principal 2](docs/Pantallas/Livestock_20260717_202552.png)
-*Vista del módulo de Ganadería y Animales con filtrado por tipo de explotación*
-
-![Pantalla Principal 3](docs/Pantallas/Livestock_20260717_202608.png)
-*Interfaz de Producción Lechera con gráficos y métricas de calidad*
-
-![Pantalla Principal 4](docs/Pantallas/Livestock_20260717_220636.png)
-*Módulo de Sanidad y Tratamientos con alertas de periodos de supresión*
-
-![Pantalla Principal 5](docs/Pantallas/Livestock_20260717_220748.png)
-*Vista de Finanzas y Gastos con análisis de rentabilidad*
-
-![Pantalla Principal 6](docs/Pantallas/Livestock_20260717_220804.png)
-*Sección de Comercialización con gestión de ventas y compras*
-
-![Pantalla Principal 7](docs/Pantallas/Livestock_20260717_220814.png)
-*Documentación Oficial con generación de guías de movimiento*
-
-![Pantalla Principal 8](docs/Pantallas/Livestock_20260717_220854.png)
-*Informes y Analítica con exportación a PDF/CSV*
-
-![Pantalla Principal 9](docs/Pantallas/Livestock_20260717_220928.png)
-*Herramientas y Asistentes con wizards guiados para operaciones complejas*
-
-![Pantalla Principal 10](docs/Pantallas/Livestock_20260717_220942.png)
-*Ajustes y Configuración con gestión de múltiples fincas*
 
 ---
 
