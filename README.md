@@ -10,16 +10,16 @@
 </p>
 
 <p align="center">
-  <a href="#-multi-explotación">Multi-Explotación</a> ·
-  <a href="#-módulos-y-funcionalidades">Módulos</a> ·
-  <a href="#-integración-siggan--badigex">SIGGAN / BADIGEX</a> ·
-  <a href="#-arquitectura-técnica">Arquitectura</a> ·
-  <a href="#-instalación-y-desarrollo">Instalación</a>
+  <a href="#multi-explotación">Multi-Explotación</a> ·
+  <a href="#módulos-y-funcionalidades">Módulos</a> ·
+  <a href="#integración-siggan--badigex">SIGGAN / BADIGEX</a> ·
+  <a href="#arquitectura-técnica">Arquitectura</a> ·
+  <a href="#instalación-y-desarrollo">Instalación</a>
 </p>
 
 ---
 
-## 🐄 ¿Qué es Livestock Manager?
+## <img src="docs/readme-icons/cow.svg" width="22" height="22" align="absmiddle" alt=""> ¿Qué es Livestock Manager?
 
 Livestock Manager es una plataforma de gestión ganadera de grado industrial pensada para el día a día del ganadero: censo y trazabilidad animal, producción (carne y leche), comercialización, sanidad, finanzas y documentación oficial — todo funcionando **sin conexión** en el terreno, con sincronización y exportación cuando hace falta.
 
@@ -27,7 +27,7 @@ La aplicación no es un CRM genérico adaptado al sector: su modelo de datos y s
 
 ---
 
-## 🏡 Multi-Explotación
+## <img src="docs/readme-icons/house.svg" width="22" height="22" align="absmiddle" alt=""> Multi-Explotación
 
 Livestock Manager gestiona **varias explotaciones (fincas) de forma simultánea** desde una misma instalación, y cada una es completamente independiente en cuanto a datos y configuración:
 
@@ -42,7 +42,7 @@ Livestock Manager gestiona **varias explotaciones (fincas) de forma simultánea*
 
 ---
 
-## 🛠️ Módulos y funcionalidades
+## <img src="docs/readme-icons/wrench.svg" width="22" height="22" align="absmiddle" alt=""> Módulos y funcionalidades
 
 La aplicación se organiza en pilares interconectados que cubren todo el ciclo de vida de la explotación:
 
@@ -91,7 +91,7 @@ La aplicación se organiza en pilares interconectados que cubren todo el ciclo d
 
 ---
 
-## 🇪🇸 Integración SIGGAN / BADIGEX
+## <img src="docs/readme-icons/shield-check.svg" width="22" height="22" align="absmiddle" alt=""> Integración SIGGAN / BADIGEX
 
 Livestock Manager no se limita a "permitir" introducir datos oficiales: su modelo de dominio está diseñado para que cada flujo de trabajo produzca, de forma nativa, la información que exige la tramitación telemática ante la Junta de Andalucía (**SIGGAN**) o la Junta de Extremadura (**BADIGEX**).
 
@@ -108,7 +108,7 @@ El detalle completo, flujo a flujo, está documentado en [`docs/CUMPLIMIENTO_SIG
 
 ---
 
-## 💻 Arquitectura Técnica
+## <img src="docs/readme-icons/cpu.svg" width="22" height="22" align="absmiddle" alt=""> Arquitectura Técnica
 
 PWA híbrida optimizada para ejecución **100% offline**, sin backend propio:
 
@@ -120,7 +120,7 @@ PWA híbrida optimizada para ejecución **100% offline**, sin backend propio:
 
 ---
 
-## 📂 Estructura del repositorio
+## <img src="docs/readme-icons/folder.svg" width="22" height="22" align="absmiddle" alt=""> Estructura del repositorio
 
 ```
 ├── index.html            # Punto de entrada de la PWA
@@ -140,7 +140,7 @@ PWA híbrida optimizada para ejecución **100% offline**, sin backend propio:
 
 ---
 
-## 📦 Instalación y Desarrollo
+## <img src="docs/readme-icons/package.svg" width="22" height="22" align="absmiddle" alt=""> Instalación y Desarrollo
 
 ```bash
 # 1. Instalar dependencias
@@ -160,7 +160,7 @@ Requiere Node.js, Android Studio y JDK para la compilación nativa. El proyecto 
 
 ---
 
-## 📄 Licencia y Créditos
+## <img src="docs/readme-icons/document.svg" width="22" height="22" align="absmiddle" alt=""> Licencia y Créditos
 
 © 2026 David Asuar Arteaga · Livestock Manager Premium.
 Todos los derechos reservados. Uso exclusivo interno.
