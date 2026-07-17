@@ -1,4 +1,4 @@
-const CACHE_NAME = 'corcho-v6.31.2';
+const CACHE_NAME = 'corcho-v6.31.3';
 const ASSETS = [
   './',
   './index.html',
@@ -75,6 +75,7 @@ const ASSETS = [
   './js/views/wizards/wizard-guia-movimiento.js',
   './js/views/helpers/ayuda.js',
   './js/qa-siggan.js',
+  './js/qa-premium.js',
   './js/idb-local.js',
   './manual/index.html',
   './manual/estilo-manuales.css',
