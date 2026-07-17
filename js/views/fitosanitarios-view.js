@@ -51,17 +51,17 @@ const FitosanitariosView = {
             </div>
 
             <!-- KPIs -->
-            <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-3 sm:gap-10 sm:mb-20 font-sans">
-                <div class="card p-12 text-center" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">INVERSIÓN TOTAL</span>
+            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3 sm:gap-6 sm:mb-20 font-sans">
+                <div class="card p-6 text-center" style="background:#111; border:1px solid #222; min-height: 100px;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.5rem] tracking-wider mb-2 leading-tight min-w-0 break-words">INVERSIÓN TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:#C5FA50;">${totalInversion.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
                 </div>
-                <div class="card p-12 text-center" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">APLICACIONES</span>
+                <div class="card p-6 text-center" style="background:#111; border:1px solid #222; min-height: 100px;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.5rem] tracking-wider mb-2 leading-tight min-w-0 break-words">APLICACIONES</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${numRegistros}</span>
                 </div>
-                <div class="card p-12 text-center" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">ZONAS TRATADAS</span>
+                <div class="card p-6 text-center" style="background:#111; border:1px solid #222; min-height: 100px;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.5rem] tracking-wider mb-2 leading-tight min-w-0 break-words">ZONAS TRATADAS</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${zonasTratadas.size}</span>
                 </div>
             </div>
