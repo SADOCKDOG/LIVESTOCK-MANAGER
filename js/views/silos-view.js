@@ -116,9 +116,9 @@ const SilosView = {
                     ${silosCriticos.map(s => {
                         const pct = s.capacidad > 0 ? Math.round((s.cantidadActual / s.capacidad) * 100) : 0;
                         return `
-                        <div class="flex items-center justify-between p-8 rounded-sm bg-[#080808] border border-[#1a1a1a]">
-                            <span class="text-[0.65rem] font-black text-white uppercase">${s.nombre} (${s.alimento})</span>
-                            <span class="text-xs font-mono font-950 text-red" style="color:var(--c-danger);">${s.cantidadActual.toLocaleString()} kg / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
+                        <div class="flex items-center justify-between gap-8 p-8 rounded-sm bg-[#080808] border border-[#1a1a1a]">
+                            <span class="text-[0.65rem] font-black text-white uppercase truncate min-w-0">${s.nombre} (${s.alimento})</span>
+                            <span class="text-xs font-mono font-950 text-red flex-shrink-0" style="color:var(--c-danger);">${s.cantidadActual.toLocaleString()} kg / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
                         </div>
                         `;
                     }).join('')}
@@ -201,13 +201,13 @@ const SilosView = {
                 </div>
 
                 <!-- Detalles del silo -->
-                <div class="text-center md:text-left w-full md:w-auto" onclick="SilosView._abrirFichaSilo(${s.id})" style="cursor: pointer; flex: 1;" title="Ver ficha del silo">
-                    <div class="flex items-center justify-center md:justify-start gap-8 mb-6">
-                        <h2 class="text-sm font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">${s.nombre.toUpperCase()}</h2>
-                        ${pct < 15 ? `<span class="badge badge-red text-[0.55rem] font-950 uppercase tracking-wider animate-pulse">BAJO STOCK</span>` : ''}
-                        <span style="font-size: 0.6rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px; margin-left: auto; display: inline-block;">Ficha →</span>
+                <div class="text-center md:text-left w-full md:w-auto" onclick="SilosView._abrirFichaSilo(${s.id})" style="cursor: pointer; flex: 1; min-width:0;" title="Ver ficha del silo">
+                    <div class="flex items-center justify-center md:justify-start gap-8 mb-6" style="min-width:0;">
+                        <h2 class="text-sm font-black uppercase tracking-wider text-white m-0 truncate min-w-0" style="font-family:'Archivo Expanded', sans-serif;">${s.nombre.toUpperCase()}</h2>
+                        ${pct < 15 ? `<span class="badge badge-red text-[0.55rem] font-950 uppercase tracking-wider animate-pulse flex-shrink-0">BAJO STOCK</span>` : ''}
+                        <span class="flex-shrink-0" style="font-size: 0.6rem; font-weight: 800; border: 1px solid var(--c-warning); color: var(--c-warning); background: rgba(255, 215, 0, 0.1); padding: 2px 6px; border-radius: 4px; margin-left: auto; display: inline-block;">Ficha →</span>
                     </div>
-                    <p class="text-xs font-900 uppercase tracking-widest text-gray-400 mb-8">${s.alimento.toUpperCase()}</p>
+                    <p class="text-xs font-900 uppercase tracking-widest text-gray-400 mb-8 truncate">${s.alimento.toUpperCase()}</p>
                     <div class="grid grid-cols-2 gap-x-15 gap-y-4" style="font-family:'IBM Plex Mono', monospace;">
                         <div>
                             <span class="text-gray-500 font-900 text-[0.55rem] tracking-wider uppercase block">CANTIDAD</span>

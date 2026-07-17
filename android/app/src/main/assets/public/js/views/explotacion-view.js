@@ -264,20 +264,20 @@ const ExplotacionView = {
       guia365BannerHtml = `
         <div class="card p-12 mb-14 border-222 animate-fade-in" style="background: linear-gradient(135deg, rgba(20,20,20,0.8), rgba(10,10,10,0.9)); border-left: 4px solid ${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'}; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
           <div class="flex items-center justify-between gap-10">
-            <div class="flex items-center gap-10">
-              <div class="flex items-center justify-center rounded-sm" style="width:36px; height:36px; background:#181818; color:${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'}; border:1px solid #222; font-weight:900; font-size: 0.8rem;">
+            <div class="flex items-center gap-10 min-w-0">
+              <div class="flex items-center justify-center rounded-sm flex-shrink-0" style="width:36px; height:36px; background:#181818; color:${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'}; border:1px solid #222; font-weight:900; font-size: 0.8rem;">
                 365
               </div>
-              <div>
+              <div class="min-w-0">
                 <div class="text-xs font-black text-white uppercase tracking-wider">GUÍA SANITARIA 365 DÍAS (SIGGAN)</div>
-                <div class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-tight mt-2 flex items-center gap-6">
+                <div class="text-[0.6rem] font-bold text-gray-400 uppercase tracking-tight mt-2 flex items-center flex-wrap gap-x-6 gap-y-2">
                   <span>${configCCAA?.label || 'Andalucía'}</span>
                   <span>•</span>
                   <span>ESTADO: <strong style="color:${isGuia365Active ? 'var(--c-success)' : 'var(--c-warning)'};">${isGuia365Active ? 'AUTORIZADA / ACTIVA' : 'INACTIVA (REQUIERE SANEAMIENTO)'}</strong></span>
                 </div>
               </div>
             </div>
-            <button onclick="window.WizardFinca.editar()" class="widget-link-btn widget-link-btn--neon neon-info px-10 py-6 min-h-0 h-auto" style="font-size:0.6rem; font-weight:800; text-transform:uppercase;">
+            <button onclick="window.WizardFinca.editar()" class="widget-link-btn widget-link-btn--neon neon-info px-10 py-6 min-h-0 h-auto flex-shrink-0" style="font-size:0.6rem; font-weight:800; text-transform:uppercase;">
               ${Icons.editar()} Ajustes
             </button>
           </div>
@@ -304,9 +304,9 @@ const ExplotacionView = {
             ${d.silosCriticos.map(s => {
               const cap = Number(s.capacidad) || 0;
               const pct = cap > 0 ? Math.round((Number(s.cantidadActual) || 0) / cap * 100) : 0;
-              return `<div class="flex items-center justify-between p-8 rounded-sm" style="background:#080808; border:1px solid #1a1a1a;">
-                <span class="text-[0.65rem] font-black text-white uppercase">${s.nombre || 'Silo'} (${s.alimento || 'Pienso'})</span>
-                <span class="text-xs font-mono font-950" style="color:var(--c-danger);">${UI.formatNumber(Number(s.cantidadActual)||0)} / ${UI.formatNumber(cap)} kg (${pct}%)</span>
+              return `<div class="flex items-center justify-between gap-8 p-8 rounded-sm" style="background:#080808; border:1px solid #1a1a1a;">
+                <span class="text-[0.65rem] font-black text-white uppercase truncate min-w-0">${s.nombre || 'Silo'} (${s.alimento || 'Pienso'})</span>
+                <span class="text-xs font-mono font-950 flex-shrink-0" style="color:var(--c-danger);">${UI.formatNumber(Number(s.cantidadActual)||0)} / ${UI.formatNumber(cap)} kg (${pct}%)</span>
               </div>`;
             }).join('')}
           </div>
