@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.9.0] - 2026-07-17
+### Added
+- **Interfaz Industrial Premium:** Rediseño completo optimizado para alta visibilidad en exteriores y pantallas OLED.
+- **Rediseño de Asistentes (Wizards):** Optimización para operación en campo con una sola mano en registros de Censo, Crotales y Movimientos.
+- **Tarjetas de Información Técnica:** Acceso directo a datos REGA y estados sanitarios por animal.
+- **Centro de Informes Ampliado:** Nuevos tipos de informe para Compradores, Proveedores, Fitosanitarios y Alertas.
+
+### Fixed
+- **Generación de PDFs:** Solucionado el error de documentos en blanco en dispositivos de alta resolución mediante mejoras en el motor de renderizado (html2canvas + logical scaling).
+- **Layout de KPIs:** Diseño responsive en vistas de Silos y Fitosanitarios para evitar desbordamiento de texto en pantallas pequeñas.
+- **Compatibilidad Android 13/14:** Corrección de cierres inesperados al compartir informes y exportaciones (PDF/Excel).
+- **Gestión Multi-Finca:** Mejoras de estabilidad y rendimiento en la navegación ExPro y sincronización de datos.
+
+### Changed
+- **Motor de Renderizado:** Implementación del Generador de PDF Industrial con barra de progreso animada y ajuste A4 perfecto.
+- **Limpieza de Repositorio:** Modernización de la estructura de carpetas y eliminación de archivos redundantes.
+
 ## [v4.8.1] - 2026-06-29
 ### Fixed
 - **Crash al compartir en Android 13/14:** corregido cierre inesperado de la aplicación al intentar compartir exportaciones (PDF, Excel, Informe general) en dispositivos con Android 13 (API 33) y Android 14 (API 34).

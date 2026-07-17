@@ -46,10 +46,10 @@ Livestock Manager gestiona **varias explotaciones (fincas) de forma simultánea*
 
 La aplicación se organiza en pilares interconectados que cubren todas las áreas críticas de una explotación ganadera profesional:
 
-### 🏠 Dashboard
+### <img src="docs/readme-icons/house.svg" width="22" height="22" align="absmiddle" alt=""> Dashboard
 Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritarias. Filtra automáticamente según el tipo de explotación activa (leche/carne).
 
-### 🐄 Ganadería y Animales
+### <img src="docs/readme-icons/cow.svg" width="22" height="22" align="absmiddle" alt=""> Ganadería y Animales
 - Censo completo con trazabilidad individual (crotal, DIB, pedigree)
 - Gestión de partos, celos y tratamientos reproductivos
 - Historial clínico completo por animal
