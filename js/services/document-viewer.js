@@ -112,10 +112,11 @@ const DocumentViewer = {
     try {
       updateProgress(20, 'Preparando documento...');
 
-      // Renderizar en un contenedor A4 fuera de pantalla, forzando texto negro
-      // sobre blanco (evita heredar el tema oscuro de la app).
+      // Renderizar en un contenedor A4 dentro del viewport (necesario para que
+      // html2canvas lo capture; posicionarlo fuera de pantalla produce un PDF en
+      // blanco). Queda oculto visualmente detrás del loader (z-index superior).
       tempContainer = document.createElement('div');
-      tempContainer.style.cssText = 'position:fixed; left:-9999px; top:0; width:800px; background:#fff; color:#000; padding:30px; box-sizing:border-box;';
+      tempContainer.style.cssText = 'position:fixed; left:0; top:0; width:800px; background:#fff; color:#000; padding:30px; box-sizing:border-box; z-index:1;';
       tempContainer.innerHTML = sourceEl.innerHTML;
       tempContainer.querySelectorAll('*').forEach(el => { el.style.color = '#000'; });
       document.body.appendChild(tempContainer);
@@ -131,7 +132,17 @@ const DocumentViewer = {
         margin: [12, 10, 12, 10],
         filename: pdfFilename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          width: 800,
+          windowWidth: 800,
+          scrollX: 0,
+          scrollY: 0,
+          height: tempContainer.scrollHeight,
+          windowHeight: tempContainer.scrollHeight
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
