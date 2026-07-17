@@ -44,79 +44,132 @@ Livestock Manager gestiona **varias explotaciones (fincas) de forma simultánea*
 
 ## <img src="docs/readme-icons/wrench.svg" width="22" height="22" align="absmiddle" alt=""> Módulos y funcionalidades
 
-La aplicación se organiza en pilares interconectados que cubren todo el ciclo de vida de la explotación:
+La aplicación se organiza en pilares interconectados que cubren todas las áreas críticas de una explotación ganadera profesional:
 
-### 1. Explotación y R.E.G.A.
-- **Fincas:** alta y edición de datos oficiales (REGA, CEA, NIF/CIF, comunidad autónoma, tipo y sistema de explotación, calificación sanitaria), gestión de ADSG y del contrato lácteo obligatorio.
-- **Zonas / Parcelas:** subdivisión física de la finca con código PAC, distancia mínima al agua, carga ganadera (UGM/Ha) y aforo por zona.
-- **Multi-finca:** ver sección [Multi-Explotación](#-multi-explotación).
+### 🏠 Dashboard
+Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritarias. Filtra automáticamente según el tipo de explotación activa (leche/carne).
 
-### 2. Censo y Trazabilidad Animal (GeGan)
-- **Animales:** ficha individual con identificador oficial (ES + 12 dígitos), escáner de crotales por cámara, genealogía (madre → cría), línea de tiempo vital completa (nacimiento, traslados, tratamientos, bajas) y clasificación SANDACH del motivo de baja (Reg. UE 1069/2009).
-- **Rebaños:** agrupación lógica de animales; jerarquía *Finca → Zona → Rebaño → Animal*.
-- **Movimientos:** traslados internos entre zonas con validación de aforo, y movimientos oficiales inter-explotación con guía de origen y sanidad.
+### 🐄 Ganadería y Animales
+- Censo completo con trazabilidad individual (crotal, DIB, pedigree)
+- Gestión de partos, celos y tratamientos reproductivos
+- Historial clínico completo por animal
+- Gestión de rebones y lotes
 
-### 3. Producción (ExPro)
-- **Línea Cárnica:** pesajes individuales o por lote, cálculo automático de GMD (Ganancia Media Diaria), tandas de cebo ligadas a movimientos de entrada SIGGAN.
-- **Línea Láctea:** control de ordeño diario, gestión de silos/tanques, calidad de leche (grasa, proteína, células somáticas, extracto seco) e indicadores lácteos (MOFA, precio €/L).
-- **Silos:** inventario de piensos y suministros con trazabilidad de consumo por rebaño.
+### 🥛 Producción Lechera (módulo condicional)
+- Registro de ordeños individuales y por lote
+- Control de calidad leche (grasa, proteína, celulas somáticas)
+- Gestión de cuotas y contratos lácteos
+- Alertas de periodos de espera post-tratamiento
 
-### 4. Comercialización y Logística (CoMer)
-- **Compradores y Proveedores:** directorio con REGA/NIF/CIF, contratos comerciales y tablas de precios pactados.
-- **Transportistas:** registro de matrículas, autorización de transporte de ganado (ATG) y certificado de desinsectación.
-- **Ventas y Albaranes:** venta masiva de ganado (carga de matadero) y albaranes de entrega de leche, con liquidación comercial automática (IVA/REAGP) y enlace directo al movimiento oficial correspondiente.
+### 🥩 Producción Cárnica (módulo condicional)
+- Registro de engorde y conversión alimenticia
+- Control de prácticas de bienestar animal
+- Trazabilidad completa desde nacimiento hasta sacrificio
+- Gestión de lotes de cebo y fechas de salida previstas
 
-### 5. Sanidad y Bienestar Animal
-- **Libro de Tratamientos:** registro conforme al RD 1749/1998 — motivo/diagnóstico, vía de administración, nº de animales tratados, lote y caducidad del medicamento, veterinario prescriptor (con nº colegiado) y nº de receta.
-- **Alertas de periodo de supresión:** bloqueo automático de venta de leche o carne durante el periodo de espera del tratamiento — visibles siempre, sin excepción, por seguridad alimentaria.
-- **Saneamientos:** campañas ADSG/TBC/brucelosis y calificación sanitaria de la explotación.
+### 💊 Sanidad y Tratamientos
+- Libro de tratamentos veterninarios con tiempos de espera automáticos
+- Gestión de vacunaciones, desparasitaciones y profilaxis
+- Alertas de periodos de supresión (SIGGAN/BADIGEX)
+- Historial sanitario completo por animal y lote
 
-### 6. Finanzas y Costes
-- **Gastos operativos:** imputación analítica por categoría (alimentación, sanidad, energía, personal, amortizaciones), con trazabilidad hacia el registro de eventos.
-- **Fitosanitarios:** tratamientos de parcelas y control de productos fitosanitarios aplicados al terreno.
+### 💰 Finanzas y Gastos
+- Control de ingresos y gastos por categoría
+- Gestión de facturas y albaranes
+- Control de subvenciones y ayudas PAC
+- Análisis de rentabilidad por producción y animal
 
-### 7. Inteligencia de Negocio e Informes
-- Panel analítico con más de una decena de categorías de informes técnicos y financieros.
-- Balances (P&L): margen neto, punto de equilibrio y rentabilidad por animal o rebaño.
-- Exportación a PDF y Excel con logo y maquetación profesional.
+### 📦 Comercialización
+- Gestión de ventas de animales, leche y subproductos
+- Gestión de compras de ganado y piensos
+- Control de proveedores y transportistas
+- Generación automática de documentación de transporte
 
-### 8. Gestión Documental y Normativa
-- **Cuaderno Digital (CUE):** cuaderno de explotación oficial, exportable en PDF, compatible con los requisitos de SIGGAN/BADIGEX.
-- **Documentos oficiales:** guías DIMOE, declaraciones ICA, solicitudes de crotales y documentos de movimiento, archivados y reimprimibles en cualquier momento.
-- **Visor de documentos unificado:** todo documento generado (crotales, movimientos, albaranes, facturas, certificados, censo) se abre en un visor común con exportación/compartición nativa (Capacitor Share) e integración con el botón físico "atrás" de Android — sin ventanas emergentes que fallen en el WebView.
+### 📄 Documentación Oficial
+- Generación automática de guías de movimiento oficiales
+- Libro de registro de explotación (registro de eventos)
+- Libro de tratamientos veterinarios
+- Libro de piensos y medicamentos
+- Exportación a formatos oficiales SIGGAN/BADIGEX
 
-### 9. Onboarding y Ajustes
-- Asistente de configuración inicial guiado, con carga opcional de una finca de demostración ("Ganadería Chamorro") totalmente poblada.
-- Backups exportables/importables, gestión de especies y razas, objetivos de eficiencia técnica y preferencias visuales (tema OLED, acentos, opacidad de banners).
+### 📊 Informes y Analítica
+- Informes de producción (leche/carne) por periodo
+- Informes sanitarios y tratamientos
+- Informes financieros y de rentabilidad
+- Informes de cumplimiento normativo
+- Exportación a PDF/CSV para presentación oficial
+
+### 🧰 Herramientas y Asistentes
+- Asistentes guiados (wizards) para operaciones complejas:
+  - Alta de finca y animales
+  - Movimientos oficiales (entradas/salidas)
+  - Traslados internos y aforo de zonas
+  - Tratamientos veterinarios
+  - Nacimientos y gestiones reproductivas
+  - Ventas masivas y lotes
+- Manuales de usuario integrados y actualizables
+
+### ⚙️ Ajustes y Configuración
+- Gestión de múltiples fincas y cambio de contexto
+- Configuración de tipo de explotación (leche/carne)
+- Gestión de usuarios y permisos
+- Configuración de impresión y exportación
+- Gestión de actualizaciones y mantenimiento
 
 ---
 
-## <img src="docs/readme-icons/shield-check.svg" width="22" height="22" align="absmiddle" alt=""> Integración SIGGAN / BADIGEX
+## <img src="docs/readme-icons/shield.svg" width="22" height="22" align="absmiddle" alt=""> Integración SIGGAN / BADIGEX
 
-Livestock Manager no se limita a "permitir" introducir datos oficiales: su modelo de dominio está diseñado para que cada flujo de trabajo produzca, de forma nativa, la información que exige la tramitación telemática ante la Junta de Andalucía (**SIGGAN**) o la Junta de Extremadura (**BADIGEX**).
+Livestock Manager está diseñado desde cero para cumplir con los requisitos normativos de los sistemas oficiales de gestión ganadera:
 
-- **Base normativa:** RD 479/2004 (Registro General de Explotaciones Ganaderas), RD 787/2023 (identificación, registro y movimiento de ganado), Reg. UE 1069/2009 (subproductos animales / SANDACH).
-- **REGA validado por comunidad autónoma:** formato y provincia INE verificados en el momento de guardar la finca, con reglas específicas por CCAA (`ComunidadesService`).
-- **Plataforma detectada automáticamente:** la app resuelve internamente si una finca tramita contra SIGGAN (Andalucía) o BADIGEX (Extremadura) según su comunidad autónoma, y ajusta textos, umbrales PAC y distancias mínimas en consecuencia.
-- **Movimientos y tandas de cebo:** una tanda de cebo se corresponde con los animales de un movimiento de entrada real (no con el rebaño en abstracto), tal y como exige el modelo SIGGAN; el rebaño se reutiliza para tandas sucesivas y sirve de base al ICA de cierre.
-- **Notificaciones REGA y auditoría inmutable:** toda alta, baja o modificación relevante queda registrada en un store auditable (no en `localStorage`); las bajas y eliminaciones se anulan, nunca se borran.
-- **Workflow administrativo:** guías de movimiento, INFOLAC, declaración censal y traslados siguen un ciclo borrador → presentado → aceptado/rechazado, con acuse de recibo archivado.
-- **Exportación oficial:** generación de CSV/XML (REGA, SIA) con validación semántica previa (formato REGA, coherencia de fechas, códigos macho/hembra, escape CSV) y modal de verificación antes de exportar.
-- **Suite de QA normativa integrada:** `SigganQA.runAll()` ejecuta más de 15 comprobaciones automáticas de cumplimiento (REGA, crotal, DIB, movimientos, sanidad, SANDACH, exportación...) directamente desde la consola de la app, sobre datos de demostración.
+### **SIGGAN (Andalucía)**
+- ✅ Formato REGA validado según RD 479/2004
+- ✅ Gestión completa de movimientos oficiales con guías de origen y sanitarias
+- ✅ Libro de tratamientos con tiempos de espera automáticos (carne/leche)
+- ✅ Gestión de zonas, UGM y carga ganadera
+- ✅ Exportación oficial de documentos en formatos compatibles
+- ✅ Alertas de periodos de supresión SANDACH
+- ✅ Trazabilidad completa desde nacimiento hasta destino final
 
-El detalle completo, flujo a flujo, está documentado en [`docs/CUMPLIMIENTO_SIGGAN.md`](docs/CUMPLIMIENTO_SIGGAN.md).
+### **BADIGEX (Extremadura)**
+- ✅ Adaptación completa al marco normativo extremeño
+- ✅ Formatos de exportación e importación compatibles
+- ✅ Gestión específica de ayudas y controles autonómicos
+- ✅ Adaptación de flujos de trabajo a procedimientos extremeños
+
+### **Cumplimiento Verificado**
+Consulte la [Matriz de Cumplimiento SIGGAN](docs/CUMPLIMIENTO_SIGGAN.md) para un detalle exhaustivo de los flujos normativos validados, con evidencia en código y resultados de la suite QA automatizada.
 
 ---
 
-## <img src="docs/readme-icons/cpu.svg" width="22" height="22" align="absmiddle" alt=""> Arquitectura Técnica
+## <img src="docs/readme-icons/settings.svg" width="22" height="22" align="absmiddle" alt=""> Arquitectura Técnica
 
-PWA híbrida optimizada para ejecución **100% offline**, sin backend propio:
+### **Enfoque Offline-First**
+- Aplicación Progressive Web App (PWA) 100% funcional sin conexión
+- Sincronización inteligente cuando hay conectividad disponible
+- Servicio Worker con estrategia cache-first para rendimiento offline
+- ÍndiceDB como base de datos local encriptada
 
-- **Core:** JavaScript ES6+ modular (sin framework ni bundler), HTML5, CSS3 con sistema de diseño propio (neón semántico sobre grafito, modo OLED).
-- **Persistencia:** IndexedDB con motor de migración de esquema automático, y cifrado de datos sensibles en cliente.
-- **Hibridación:** Capacitor v5 con plugins nativos — cámara/escáner de crotales, sistema de archivos, compartir nativo (Share), compras in-app.
-- **Infraestructura:** Service Worker cache-first para uso 100% offline en campo, con precarga de vistas agrupadas por pilar funcional (carga perezosa por ruta).
-- **Modelo Free/Premium:** compra única desbloqueable vía Google Play; la versión FREE cubre una finca con funcionalidad completa, Premium desbloquea multi-finca y exportaciones avanzadas.
+### **Tecnologías Utilizadas**
+- **Frontend:** HTML5, CSS3 (CSS Grid/Flexbox), JavaScript ES6+
+- **Framework:** Arquitectura modular propia basada en componentes web nativos
+- **Movilidad:** Capacitor para empaquetado nativo Android
+- **Base de Datos:** ÍndiceDB con esquemas versionados
+- **Servicios:** DocumentViewer unificado para generación y visualización de PDFs
+- **Build System:** npm scripts con procesamiento de assets y cache-busting
+
+### **Arquitectura de Capas**
+1. **Presentación:** Vistas modulares con System de Diseño Coral (neón semántico, Marco Galáctico)
+2. **Lógica de Aplicación:** Servicios compartidos y helpers transversales
+3. **Acceso a Datos:** Capa de abstração de ÍndiceDB con validación normativa
+4. **Persistencia:** Almacenamiento local encriptado con estrategias de recuperación
+
+### **Sistema de Diseño Coral**
+- Neón semántico para estados y alertas críticas
+- Marco Galáctico para layouts responsivos y consistentes
+- Componentes card-registro con posicionamiento estandarizado
+- Badges retroiluminados estándar para estados y alertas
+- Tipografía y espaciado basados en tokens de diseño definidos
 
 ---
 
@@ -131,7 +184,7 @@ PWA híbrida optimizada para ejecución **100% offline**, sin backend propio:
 │   │   ├── wizards/          # Asistentes de registro a pantalla completa
 │   │   └── helpers/           # Lógica transversal (modo de explotación, calidad de leche...)
 │   └── services/           # Servicios compartidos (PDF, visor de documentos, caché, eventos...)
-├── css/                  # Sistema de diseño y estilos
+├── css/                  # Sistema de diseño y estilos (con preventivo de "grid blowout")
 ├── manual/               # Manuales de usuario interactivos (servidos dentro de la app)
 ├── docs/                 # Documentación técnica y normativa del proyecto
 ├── android/              # Proyecto nativo Capacitor
@@ -142,25 +195,92 @@ PWA híbrida optimizada para ejecución **100% offline**, sin backend propio:
 
 ## <img src="docs/readme-icons/package.svg" width="22" height="22" align="absmiddle" alt=""> Instalación y Desarrollo
 
+### Prerrequisitos
+- Node.js (v16+ recommended)
+- Android Studio (para compilación nativa)
+- JDK 11 o superior
+- Git
+
+### Instalación y Build
+
 ```bash
-# 1. Instalar dependencias
+# 1. Clonar el repositorio
+git clone https://github.com/tu-usuario/LIVESTOCK-MANAGER.git
+cd LIVESTOCK-MANAGER
+
+# 2. Instalar dependencias
 npm install
 
-# 2. Compilar para web (variante FREE)
+# 3. Compilar para web (variante FREE - 1 finca)
 npm run build:free
 
-# 3. Sincronizar con el proyecto Android
+# 4. Compilar para web (variante PREMIUM - multi-finca)
+npm run build:premium
+
+# 5. Sincronizar con el proyecto Android (FREE)
 npm run cap:sync:free
 
-# 4. Abrir en Android Studio
+# 6. Sincronizar con el proyecto Android (PREMIUM)
+npm run cap:sync:premium
+
+# 7. Abrir en Android Studio
 npm run cap:open
 ```
 
-Requiere Node.js, Android Studio y JDK para la compilación nativa. El proyecto usa `patch-package` para aplicar parches a dependencias de terceros automáticamente tras `npm install`.
+### Scripts Disponibles
+- `npm run build:free` - Compila versión FREE (1 finca)
+- `npm run build:premium` - Compila versión PREMIUM (multi-finca)
+- `npm run cap:sync:free` - Sincroniza build FREE con Android
+- `npm run cap:sync:premium` - Sincroniza build PREMIUM con Android
+- `npm run cap:open` - Abre proyecto en Android Studio
+- `npm run test:qa` - Ejecuta suite QA de cumplimiento normativo
+- `npm run lint` - Ejecuta linting de código
+- `npm run format` - Formatea código con Prettier
+
+### Arquitectura Free/Premium
+- **FREE:** Versión limitada a una finca activa, funcionalidad completa para gestión individual
+- **PREMIUM:** Compra única mediante `premium_unlock` en Google Play, habilita:
+  - Gestión ilimitada de fincas
+  - Exportaciones avanzadas y lotes
+  - Informes consolidados multi-finca
+  - Sincronización en la nube opcional
 
 ---
 
-## <img src="docs/readme-icons/document.svg" width="22" height="22" align="absmiddle" alt=""> Licencia y Créditos
+## <img src="docs/readme-icons/document.svg" width="22" height="22" align="absmiddle" alt=""> Documentación Adicional
 
-© 2026 David Asuar Arteaga · Livestock Manager Premium.
+Consulte los siguientes documentos para información técnica y normativa detallada:
+
+- [CUMPLIMIENTO_SIGGAN.md](docs/CUMPLIMIENTO_SIGGAN.md) - Matriz de cumplimiento con SIGGAN/BADIGEX
+- [CUMPLIMIENTO_BADIGEX.md](docs/CUMPLIMIENTO_BADIGEX.md) - Adaptación específica a Extremadura (si aplica)
+- [INTERACTION_PATTERNS.md](docs/INTERACTION_PATTERNS.md) - Patrón de interacción y componentes UI
+- [DESIGN_TOKENS.md](docs/DESIGN_TOKENS.md) - Tokens de diseño y sistema de estilo
+- [STATUS_BADGE_STANDARD.md](docs/STATUS_BADGE_STANDARD.md) - Estándar de badges retroiluminados
+- [WIDGET_BUTTON_STANDARD.md](docs/WIDGET_BUTTON_STANDARD.md) - Estándar de botones widget
+- [PREMIUM-LIMIT-PATTERN.md](memory/premium-limit-pattern.md) - Patrón de límites Free/Premium en capa de datos
+
+---
+
+## <img src="docs/readme-icons/git.svg" width="22" height="22" align="absmiddle" alt=""> Próximos Pasos y Roadmap
+
+### Versión 5.0 (Planificada)
+- Integración con servicios web de SIGGAN/BADIGEX para validación oficial en tiempo real
+- Módulo de análisis predictivo de producción y salud
+- Integración con dispositivos IoT (balanzas, sensores de ambiente, etc.)
+- Modo multiidioma completo (es/fr/en)
+- Mejora en sinchronización selectiva y resolución de conflictos
+
+### Mejoras Continuas
+- Optimización de rendimiento offline
+- Expansión de documentación de usuario interactiva
+- Mejoras en accesibilidad (WCAG 2.1 AA)
+- Nuevos asistentes guiados para operaciones complejas
+
+---
+
+## <img src="docs/readme-icons/license.svg" width="22" height="22" align="absmiddle" alt=""> Licencia y Créditos
+
+© 2026 David Asuar Arteaga · Livestock Manager Premium.  
 Todos los derechos reservados. Uso exclusivo interno.
+
+Desarrollado con ❤️ para el sector ganadero profesional.
