@@ -142,15 +142,15 @@ const SilosView = {
             <!-- KPIs superiores (OLED dark design) -->
             <div class="grid grid-cols-3 gap-10 mb-20">
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block truncate min-w-0">CAPACIDAD TOTAL</span>
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">CAPACIDAD TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${totalCapacidad.toLocaleString()} kg</span>
                 </div>
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block truncate min-w-0">ALMACENADO</span>
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">ALMACENADO</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--p-gold);">${totalActual.toLocaleString()} kg</span>
                 </div>
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block truncate min-w-0">OCUPACIÓN MEDIA</span>
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">OCUPACIÓN MEDIA</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--c-success);">${pctMedio}%</span>
                 </div>
             </div>
