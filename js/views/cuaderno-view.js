@@ -597,25 +597,25 @@ const CuadernoDigitalView = {
   _abrirVistaImprimible() {
     App.toast("Preparando impresión...");
 
-    // Quitar modal previo si existe
-    const prev = document.getElementById('cuaderno-print-overlay');
-    if (prev) prev.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'cuaderno-print-overlay';
-    overlay.className = 'wizard-full-screen';
-    overlay.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background:#fff; overflow-y:auto; display:flex; flex-direction:column;';
-    overlay.innerHTML = `
-      <div style="position:sticky; top:0; z-index:10; background:#f5f5f5; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d97706; -webkit-print-color-adjust:exact;">
-        <span style="font-weight:bold; font-size:14px; color:#333;">Vista de Impresión — Cuaderno Digital</span>
-        <div style="display:flex; gap:10px;">
-          <button id="cuaderno-btn-print" style="padding:10px 24px; font-size:14px; cursor:pointer; background:#d97706; color:#fff; border:none; border-radius:6px; font-weight:bold;">Compartir / Imprimir PDF</button>
-          <button id="cuaderno-btn-cerrar" style="padding:10px 20px; font-size:14px; cursor:pointer; background:#666; color:#fff; border:none; border-radius:6px;">${Icons.cerrar()} Cerrar</button>
+    const contentHtml = `
+      <div style="width:100%; height:100%; display:flex; flex-direction:column; background:#fff; overflow-y:auto;">
+        <div style="position:sticky; top:0; z-index:10; background:#f5f5f5; padding:calc(12px + var(--safe-top, 0px)) 20px 12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d97706; -webkit-print-color-adjust:exact;">
+          <span style="font-weight:bold; font-size:14px; color:#333;">Vista de Impresión — Cuaderno Digital</span>
+          <div style="display:flex; gap:10px;">
+            <button id="cuaderno-btn-print" style="padding:10px 24px; font-size:14px; cursor:pointer; background:#d97706; color:#fff; border:none; border-radius:6px; font-weight:bold;">Compartir / Imprimir PDF</button>
+            <button id="cuaderno-btn-cerrar" style="padding:10px 20px; font-size:14px; cursor:pointer; background:#666; color:#fff; border:none; border-radius:6px;">${Icons.cerrar()} Cerrar</button>
+          </div>
         </div>
+        <div id="cuaderno-print-content" style="flex:1; padding:20px calc(20px) calc(20px + var(--safe-bottom, 0px)); font-family:'Courier New',monospace; color:#000; font-size:10px; line-height:1.4;"></div>
       </div>
-      <div id="cuaderno-print-content" style="flex:1; padding:20px; font-family:'Courier New',monospace; color:#000; font-size:10px; line-height:1.4;"></div>
     `;
-    document.body.appendChild(overlay);
+    const overlay = ModalManager.show('cuaderno-print-overlay', contentHtml, { closeOnOverlayClick: false });
+    overlay.style.alignItems = 'stretch';
+    overlay.style.justifyContent = 'stretch';
+    overlay.style.padding = '0';
+    overlay.style.background = '#000';
+    overlay.style.backdropFilter = 'none';
+    overlay.style.webkitBackdropFilter = 'none';
 
     // Cargar datos y renderizar
     this._recopilarDatos().then(data => {
@@ -727,7 +727,7 @@ const CuadernoDigitalView = {
     };
 
     // Cerrar
-    document.getElementById('cuaderno-btn-cerrar').onclick = () => overlay.remove();
+    document.getElementById('cuaderno-btn-cerrar').onclick = () => ModalManager.close('cuaderno-print-overlay');
   },
 
   _generarHTMLImprimible(d) {

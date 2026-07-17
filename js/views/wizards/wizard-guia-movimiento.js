@@ -496,14 +496,13 @@ window.WizardGuiaMovimiento = {
       </div>
     </div>`;
 
-    if (window.WizardCrotales && WizardCrotales._mostrarPDF) {
-      await WizardCrotales._mostrarPDF(html, 'Guia_Movimiento_' + mov.numero_guia, 'Gu\u00EDa de Movimiento');
-    } else {
-      const ov = document.createElement('div');
-      ov.style.cssText = 'position:fixed;inset:0;z-index:6000;background:#fff;display:flex;flex-direction:column;';
-      ov.innerHTML = '<div style="flex:1;overflow:auto;background:#fff;">' + html + '</div><div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;border-top:1px solid #ddd;"><button class="btn btn-primary" onclick="var w=window.open(\'\',\'_blank\');if(w){w.document.write(document.getElementById(\'pdf-fb\').innerHTML);w.document.close();w.print();}" style="width:auto;padding:0 30px;background:#10b981;color:#fff;">IMPRIMIR</button><button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()" style="width:auto;padding:0 30px;">CERRAR</button><div id="pdf-fb" style="display:none;">' + html.replace(/"/g, '&quot;') + '</div></div>';
-      document.body.appendChild(ov);
-    }
+    DocumentViewer.show({
+      id: 'doc-viewer-guia-movimiento',
+      title: 'Gu\u00EDa de Movimiento',
+      html,
+      filename: 'Guia_Movimiento_' + mov.numero_guia,
+      shareTitle: 'Gu\u00EDa de Movimiento'
+    });
   },
 
   async _onSelectTransportista(transportistaId) {

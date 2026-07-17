@@ -314,7 +314,7 @@ window.WizardCenso = {
           if (window.WizardCrotales && WizardCrotales._fallbackPDF) {
             WizardCrotales._fallbackPDF(el, filename);
           } else {
-            window.print();
+            App.toastError('Librería PDF no disponible');
           }
           return;
         }

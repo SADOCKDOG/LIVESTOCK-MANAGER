@@ -443,15 +443,10 @@ const DocumentosView = {
       const doc = (this._cachedDocs || []).find(d => d.id === id && d.tipo === tipo);
       if (!doc) { App.toastError("Documento no encontrado"); return; }
 
-      const color = { dimoe: 'var(--c-success)', factura: 'var(--c-info)', certificado: 'var(--c-warning)', dib: 'var(--c-purple)', crotales: 'var(--c-orange)' }[tipo] || '#666';
       const label = { dimoe: 'DIMOE (Guía)', factura: 'Factura', certificado: 'Certificado', dib: 'DIB (Identificación)', crotales: 'Pedido Crotales' }[tipo] || tipo;
 
-      const overlay = document.createElement('div');
-      overlay.id = 'doc-pdf-overlay';
-      overlay.className = 'wizard-full-screen';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:6000;background:#fff;color:#000;display:flex;flex-direction:column;';
-      overlay.innerHTML = `
-        <div id="doc-pdf-content" style="flex:1;padding:40px;font-family:serif;overflow-y:auto;">
+      const html = `
+        <div style="padding:40px; box-sizing:border-box; font-family:serif; color:#000;">
           <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:20px;margin-bottom:30px;">
             <h1 style="margin:0;font-size:1.4rem;text-transform:uppercase;">${label}</h1>
             <p style="color:#555;margin:5px 0 0 0;">${finca.nombre} · <span class="text-gold" style="color:var(--p-gold); font-weight:bold;">${finca.codigo_REGA || finca.rega || ''}</span></p>
@@ -467,27 +462,15 @@ const DocumentosView = {
             <p style="margin:0;"><strong>Documento generado por Livestock Manager Premium</strong></p>
             <p style="margin:5px 0 0 0;color:#555;">Plataforma profesional de gestión ganadera y trazabilidad industrial.</p>
           </div>
-        </div>
-        <div style="text-align:center;padding:16px;display:flex;gap:10px;justify-content:center;background:#eee;">
-          <button class="btn btn-primary" id="btn-doc-descargar" style="width:auto;padding:0 30px;background:${color};color:#fff;font-weight:bold;">${Icons.exportar()} DESCARGAR</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('doc-pdf-overlay').remove()" style="width:auto;padding:0 30px;">CERRAR</button>
         </div>`;
-      document.body.appendChild(overlay);
 
-      overlay.querySelector('#btn-doc-descargar').onclick = async () => {
-        try {
-          const el = document.getElementById('doc-pdf-content');
-          if (!el) return App.toastError("Contenido no disponible");
-          const filename = `${label.replace(/\s+/g, '_')}_${doc.numero || doc.id}_${Date.now()}.pdf`;
-          if (typeof html2pdf !== 'undefined' || await App._ensureHtml2Pdf()) {
-            await html2pdf().set({ margin: 10, filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save(filename);
-          } else {
-            const win = window.open('', '_blank');
-            if (win) { win.document.write('<html><head><title>' + filename + '</title><style>body{font-family:serif;padding:40px;color:#000;background:#fff;}</style></head><body>' + el.innerHTML + '</body></html>'); win.document.close(); win.print(); }
-          }
-          App.toast("Documento descargado", 'success');
-        } catch (e) { App.toastError("Error: " + e.message); }
-      };
+      DocumentViewer.show({
+        id: 'doc-viewer-documentos',
+        title: label,
+        html,
+        filename: `${label.replace(/\s+/g, '_')}_${doc.numero || doc.id}`,
+        shareTitle: label
+      });
     } catch (e) {
       App.toastError("Error al imprimir: " + e.message);
     }

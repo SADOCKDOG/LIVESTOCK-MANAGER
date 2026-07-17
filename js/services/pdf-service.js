@@ -15,105 +15,14 @@ const PdfService = {
    * @returns {HTMLElement} overlay
    */
   mostrarPDF({ title = 'Documento', filename = 'documento.pdf', contentHtml, onClose } = {}) {
-    const overlay = document.createElement("div");
-    overlay.id = "pdf-preview-overlay";
-    overlay.style = "position:fixed; top:0; left:0; right:0; bottom:0; background:white; z-index:5000; display:flex; flex-direction:column; padding:0; overflow:hidden;";
-
-    const contentId = `pdf-print-${Date.now()}`;
-    overlay.innerHTML = `
-      <div style="flex:1; width:100%; overflow-y:auto; margin:0; background:white; color:black; padding:30px; border-radius:0; font-family:serif; box-sizing:border-box;" id="${contentId}">
-        ${contentHtml}
-      </div>
-      <div style="text-align:center; padding:20px; display:flex; gap:10px; justify-content:center; background:#eee; border-top:1px solid #ddd; flex-shrink:0;">
-        <button class="btn btn-primary" id="btn-descargar-pdf" style="width:auto; padding:0 30px;">DESCARGAR PDF</button>
-        <button class="btn btn-secondary" id="btn-cerrar-pdf" style="width:auto; padding:0 30px;">CERRAR</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-
-    overlay.querySelector("#btn-descargar-pdf").onclick = async () => {
-      let loader;
-      try {
-        // Crear overlay de carga con barra de proceso
-        loader = document.createElement('div');
-        loader.id = 'pdf-loader-overlay';
-        loader.style.cssText = `
-          position:fixed; top:0; left:0; right:0; bottom:0; z-index:100000;
-          background:rgba(0,0,0,0.85); display:flex; flex-direction:column;
-          align-items:center; justify-content:center; color:#fff; font-family:sans-serif;
-        `;
-        loader.innerHTML = `
-          <div style="width:280px; text-align:center;">
-            <div class="pdf-loader-icon" style="color:var(--p-gold); margin-bottom:20px; transform:scale(2);">${window.Icons ? Icons.documento() : ''}</div>
-            <div style="font-weight:800; font-size:1.1rem; margin-bottom:8px;">Generando PDF</div>
-            <div style="font-size:0.85rem; color:#aaa; margin-bottom:20px;">${title}</div>
-            <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
-              <div id="pdf-progress-bar" style="position:absolute; left:0; top:0; height:100%; width:10%; background:#c9851f; transition:width 0.4s ease; border-radius:10px;"></div>
-            </div>
-            <div id="pdf-progress-text" style="font-size:0.7rem; color:#888; margin-top:8px; font-weight:700;">PROCESANDO...</div>
-          </div>
-          <style>
-            @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
-          </style>
-        `;
-        document.body.appendChild(loader);
-
-        const updateProgress = (pct, text) => {
-          const bar = loader.querySelector('#pdf-progress-bar');
-          const txt = loader.querySelector('#pdf-progress-text');
-          if (bar) bar.style.width = pct + '%';
-          if (txt) txt.textContent = text.toUpperCase();
-        };
-
-        updateProgress(30, 'Preparando documento...');
-        const sourceEl = overlay.querySelector(`#${contentId}`);
-        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-        const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = `position:absolute; left:0; top:${currentScroll}px; width:800px; z-index:9990; background:#fff; color:#000; padding:30px;`;
-        tempContainer.innerHTML = sourceEl.innerHTML;
-        document.body.appendChild(tempContainer);
-
-        const opt = {
-          margin: [12, 10, 12, 10],
-          filename: filename,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            width: 800,
-            scrollX: 0,
-            scrollY: currentScroll,
-            height: tempContainer.scrollHeight,
-            windowHeight: tempContainer.scrollHeight
-          },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        updateProgress(70, 'Generando archivo...');
-        if (typeof html2pdf === 'undefined') await App._ensureHtml2Pdf();
-        await html2pdf()
-          .set(opt)
-          .from(tempContainer)
-          .save();
-
-        document.body.removeChild(tempContainer);
-        updateProgress(100, '¡Listo!');
-        await new Promise(r => setTimeout(r, 500));
-        loader.remove();
-      } catch (e) {
-        console.error('[PdfService] Error:', e);
-        if (loader) loader.remove();
-      }
-    };
-
-    const cerrar = () => {
-      overlay.remove();
-      if (onClose) onClose();
-    };
-    overlay.querySelector("#btn-cerrar-pdf").onclick = cerrar;
-
-    return overlay;
+    return DocumentViewer.show({
+      id: 'doc-viewer-pdfservice',
+      title,
+      html: `<div style="padding:30px; box-sizing:border-box; font-family:serif; color:black;">${contentHtml}</div>`,
+      filename: filename.replace(/\.pdf$/i, ''),
+      shareTitle: title,
+      onClose
+    });
   },
 
   /**
