@@ -118,7 +118,7 @@ const SilosView = {
                         return `
                         <div class="flex items-center justify-between gap-8 p-8 rounded-sm bg-[#080808] border border-[#1a1a1a]">
                             <span class="text-[0.65rem] font-black text-white uppercase truncate min-w-0">${s.nombre} (${s.alimento})</span>
-                            <span class="text-xs font-mono font-950 text-red flex-shrink-0" style="color:var(--c-danger);">${s.cantidadActual.toLocaleString()} kg / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
+                            <span class="text-xs font-mono font-950 text-red flex-shrink-0 truncate min-w-0" style="color:var(--c-danger); max-width:150px;">${s.cantidadActual.toLocaleString()} kg / ${s.capacidad.toLocaleString()} kg (${pct}%)</span>
                         </div>
                         `;
                     }).join('')}
@@ -142,15 +142,15 @@ const SilosView = {
             <!-- KPIs superiores (OLED dark design) -->
             <div class="grid grid-cols-3 gap-10 mb-20">
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">CAPACIDAD TOTAL</span>
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block truncate min-w-0">CAPACIDAD TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${totalCapacidad.toLocaleString()} kg</span>
                 </div>
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">ALMACENADO</span>
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block truncate min-w-0">ALMACENADO</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--p-gold);">${totalActual.toLocaleString()} kg</span>
                 </div>
                 <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block">OCUPACIÓN MEDIA</span>
+                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block truncate min-w-0">OCUPACIÓN MEDIA</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--c-success);">${pctMedio}%</span>
                 </div>
             </div>
@@ -286,8 +286,8 @@ const SilosView = {
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-sm font-black uppercase tracking-wider text-white m-0" style="font-family:'Archivo Expanded', sans-serif;">${silo.nombre.toUpperCase()}</h2>
-                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mt-2 mb-4">${silo.alimento.toUpperCase()}</p>
+                    <h2 class="text-sm font-black uppercase tracking-wider text-white m-0 truncate min-w-0" style="font-family:'Archivo Expanded', sans-serif;">${silo.nombre.toUpperCase()}</h2>
+                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mt-2 mb-4 truncate min-w-0">${silo.alimento.toUpperCase()}</p>
                     <span class="badge badge-sm font-950 uppercase" style="background:${pct < 15 ? 'rgba(255,68,68,0.1)' : 'rgba(204,255,0,0.1)'}; color:${pct < 15 ? 'var(--c-danger)' : 'var(--c-success)'}; border:1px solid ${pct < 15 ? 'rgba(255,68,68,0.25)' : 'rgba(204,255,0,0.25)'};">
                         ${pct < 15 ? 'STOCK BAJO' : 'STOCK ESTABLE'}
                     </span>
