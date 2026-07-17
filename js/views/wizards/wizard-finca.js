@@ -62,6 +62,21 @@ window.WizardFinca = {
                 </div>
               </div>
 
+              <div class="wizard-input-group mt-10">
+                <label class="wizard-label">TIPO DE EXPLOTACIÓN DE ESTA FINCA</label>
+                <div class="flex flex-col gap-6 mt-6">
+                  <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+                    <input type="checkbox" id="w-fn-flag-leche" ${data.flag_leche ? 'checked' : ''} class="w-auto accent-neon">
+                    <span>${Icons.leche()} Lácteo</span>
+                  </label>
+                  <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+                    <input type="checkbox" id="w-fn-flag-carne" ${data.flag_carne ? 'checked' : ''} class="w-auto accent-neon">
+                    <span>${Icons.carne()} Cárnico</span>
+                  </label>
+                </div>
+                <p class="text-xs text-aaa mt-4">Cada finca tiene su propio tipo de explotación. Puedes cambiarlo luego en Ajustes. Debe permanecer al menos uno activo.</p>
+              </div>
+
               <div class="text-xs text-gray-500 mt-8 p-10 rounded-sm bg-darker flex items-center gap-6">
                 ${Icons.info()} Puedes completar los datos de ADSG, contrato lácteo y normativa desde Ajustes &gt; Editar Finca.
               </div>
@@ -78,6 +93,9 @@ window.WizardFinca = {
 
           const chks = document.querySelectorAll('input[name="w-fn-especies-chk"]:checked');
           data.especies_autorizadas = Array.from(chks).map(el => el.value);
+
+          data.flag_leche = document.getElementById('w-fn-flag-leche')?.checked ?? data.flag_leche;
+          data.flag_carne = document.getElementById('w-fn-flag-carne')?.checked ?? data.flag_carne;
         },
         validate: async (data) => {
           if (!data.nombre) {
@@ -86,6 +104,10 @@ window.WizardFinca = {
           }
           if (!data.propietario) {
             App.toastError("El nombre del propietario/titular es obligatorio");
+            return false;
+          }
+          if (!data.flag_leche && !data.flag_carne) {
+            App.toastError("Selecciona al menos un tipo de explotación (Lácteo y/o Cárnico)");
             return false;
           }
           return true;
@@ -97,7 +119,7 @@ window.WizardFinca = {
     window.WizardManager.create({
       id: 'wizard-nueva-finca',
       title: 'NUEVA FINCA',
-      initialData: { nombre: '', propietario: '', codigo_REGA: '', comunidad_autonoma: '', especies_autorizadas: [], superficie_total: '', coordenadas: '' },
+      initialData: { nombre: '', propietario: '', codigo_REGA: '', comunidad_autonoma: '', especies_autorizadas: [], superficie_total: '', coordenadas: '', flag_leche: true, flag_carne: false },
       steps: wizardSteps,
       onComplete: onComplete || (async (finalData) => {
         try {
