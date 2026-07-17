@@ -111,7 +111,25 @@ const Fincas = {
         window.dispatchEvent(new CustomEvent('fincaChanged', { detail: { id } }));
     },
 
+    /**
+     * Límite Free: 1 finca. Punto único de verificación para TODA vía de alta
+     * de finca (save() de una nueva, crearNueva(), importación futura...), para
+     * que ningún wizard/vista tenga que acordarse de comprobarlo por su cuenta.
+     * Lanza si no se cumple; no hace nada si se cumple.
+     */
+    async _assertPuedeCrearFinca(datos) {
+        if (datos && datos.demo) return; // datos de demostración: siempre permitido
+        if (!(window.PremiumManager && window.PremiumManager.isFree())) return; // Premium: sin límite
+        const existentes = await this.list();
+        if (existentes.length > 0) {
+            throw new Error('La creación de varias fincas solo está disponible en la versión Premium');
+        }
+    },
+
     async save(data) {
+        const esNueva = !(data && data.id !== undefined && data.id !== null && data.id !== '');
+        if (esNueva) await this._assertPuedeCrearFinca(data);
+
         if (data) {
             const regaVal = this._normalizarREGA(data.rega || data.codigo_REGA);
             if (regaVal && window.ComunidadesService?.validarFormatoREGA) {
@@ -135,7 +153,7 @@ const Fincas = {
         delete data.flag_leche;
         delete data.flag_carne;
 
-        const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
+        const esEdicion = !esNueva;
 
         // Process zonas to ensure they have unique IDs (for both new and updated fincas)
         if (data.zonas && Array.isArray(data.zonas)) {
@@ -273,9 +291,7 @@ const Fincas = {
      */
     async crearNueva(datos) {
         return await ErrorHandler.tryAsync(async () => {
-            if (window.PremiumManager && window.PremiumManager.isFree() && !datos.demo) {
-                throw new Error('La creación de fincas solo está disponible en la versión Premium');
-            }
+            await this._assertPuedeCrearFinca(datos);
             // Validar campos requeridos
             ErrorHandler.validateRequired('nombre', datos.nombre, 'Nombre es requerido');
             ErrorHandler.validateRequired('propietario', datos.propietario, 'Propietario es requerido');
