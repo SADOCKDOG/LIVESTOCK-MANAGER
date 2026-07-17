@@ -6,7 +6,25 @@
 const ModoContextoHelper = {
   FLAGS_KEY: 'lm.explotacion.flags',
   LEGACY_MODE_KEY: 'lm.explotacion.modo_global',
+  ACTIVE_FINCA_KEY: 'activeFincaIdLivestock',
   VALID_LEGACY_MODES: new Set(['carne', 'leche', 'hibrido']),
+
+  /**
+   * Id de la finca activa, leído de forma síncrona (misma clave que Fincas.getActiveId
+   * usa como caché rápida). Puede ser null si aún no hay finca activa.
+   */
+  _activeFincaId() {
+    try {
+      const id = localStorage.getItem(this.ACTIVE_FINCA_KEY);
+      return id || null;
+    } catch (_) {
+      return null;
+    }
+  },
+
+  _scopedKey(fincaId) {
+    return `${this.FLAGS_KEY}.${fincaId}`;
+  },
 
   getModeMeta(mode) {
     const map = {
@@ -51,15 +69,38 @@ const ModoContextoHelper = {
   },
 
   /**
-   * Lee los flags persistidos, migrando desde el antiguo modo único si hace falta.
+   * Lee los flags persistidos para una finca, migrando desde claves antiguas si hace falta.
+   * Los flags son por finca: cada finca puede tener su propia combinación Leche/Carne.
+   * @param {number|string} [fincaId] - Si se omite, se usa la finca activa (lectura síncrona de localStorage).
    */
-  getFlags() {
+  getFlags(fincaId) {
+    const fid = fincaId !== undefined && fincaId !== null ? fincaId : this._activeFincaId();
+
+    // Sin finca resuelta: no hay ámbito al que asociar la preferencia todavía.
+    if (fid === null) return null;
+
+    const scopedKey = this._scopedKey(fid);
     try {
-      const saved = localStorage.getItem(this.FLAGS_KEY);
+      const saved = localStorage.getItem(scopedKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && (parsed.leche || parsed.carne)) {
           return { leche: !!parsed.leche, carne: !!parsed.carne };
+        }
+      }
+    } catch (_) {}
+
+    // Migración: semilla desde la antigua clave global (una sola preferencia para toda la app).
+    // Se copia a la finca (no se borra la global) para que otras fincas sin preferencia propia
+    // también puedan heredarla la primera vez que se consulten.
+    try {
+      const savedGlobal = localStorage.getItem(this.FLAGS_KEY);
+      if (savedGlobal) {
+        const parsed = JSON.parse(savedGlobal);
+        if (parsed && (parsed.leche || parsed.carne)) {
+          const flags = { leche: !!parsed.leche, carne: !!parsed.carne };
+          this.setFlags(flags, fid);
+          return flags;
         }
       }
     } catch (_) {}
@@ -71,39 +112,47 @@ const ModoContextoHelper = {
         const flags = legacy === 'hibrido' ? { leche: true, carne: true }
           : legacy === 'carne' ? { leche: false, carne: true }
           : { leche: true, carne: false };
-        this.setFlags(flags);
+        this.setFlags(flags, fid);
         return flags;
       }
     } catch (_) {}
 
-    return null; // null indica que no hay preferencia establecida todavía
+    return null; // null indica que no hay preferencia establecida todavía para esta finca
   },
 
   /**
-   * Guarda los flags. Si ambos vienen desactivados, no hace nada (se exige al menos uno activo).
+   * Guarda los flags de una finca. Si ambos vienen desactivados, no hace nada (se exige al menos uno activo).
+   * @param {{leche:boolean, carne:boolean}} flags
+   * @param {number|string} [fincaId] - Si se omite, se usa la finca activa.
    */
-  setFlags(flags) {
+  setFlags(flags, fincaId) {
     const leche = !!flags.leche;
     const carne = !!flags.carne;
     if (!leche && !carne) return false;
+
+    const fid = fincaId !== undefined && fincaId !== null ? fincaId : this._activeFincaId();
+    if (fid === null) return false;
+
     try {
-      localStorage.setItem(this.FLAGS_KEY, JSON.stringify({ leche, carne }));
+      localStorage.setItem(this._scopedKey(fid), JSON.stringify({ leche, carne }));
     } catch (_) {}
     return true;
   },
 
   /**
-   * Flags efectivos: preferencia guardada, o detección automática (y persistencia) la primera vez.
+   * Flags efectivos de una finca: preferencia guardada, o detección automática
+   * a partir de sus rebaños (y persistencia) la primera vez.
    */
   async getEffectiveFlags(fincaId) {
-    const saved = this.getFlags();
+    const fid = fincaId !== undefined && fincaId !== null ? fincaId : this._activeFincaId();
+    const saved = this.getFlags(fid);
     if (saved) return saved;
 
     try {
-      if (fincaId !== undefined) {
-        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
+      if (fid !== null) {
+        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fid).catch(() => []);
         const detected = this.detectFlagsFromRebanos(rebanos);
-        this.setFlags(detected);
+        this.setFlags(detected, fid);
         return detected;
       }
     } catch (_) {}
@@ -111,13 +160,13 @@ const ModoContextoHelper = {
     return { leche: true, carne: false };
   },
 
-  isLecheActivo() {
-    const flags = this.getFlags();
+  isLecheActivo(fincaId) {
+    const flags = this.getFlags(fincaId);
     return flags ? flags.leche : true;
   },
 
-  isCarneActivo() {
-    const flags = this.getFlags();
+  isCarneActivo(fincaId) {
+    const flags = this.getFlags(fincaId);
     return flags ? !!flags.carne : false;
   },
 

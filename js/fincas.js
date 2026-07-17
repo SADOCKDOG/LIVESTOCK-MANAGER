@@ -127,6 +127,14 @@ const Fincas = {
             data.codigo_REGA = regaVal;
         }
 
+        // Flags de tipo de explotación (Leche/Carne) recogidos en el wizard, si vienen.
+        // Son por finca: se guardan vía ModoContextoHelper, no como campo del registro de finca.
+        const flagsExplotacion = (data.flag_leche !== undefined || data.flag_carne !== undefined)
+            ? { leche: !!data.flag_leche, carne: !!data.flag_carne }
+            : null;
+        delete data.flag_leche;
+        delete data.flag_carne;
+
         const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
 
         // Process zonas to ensure they have unique IDs (for both new and updated fincas)
@@ -151,6 +159,9 @@ const Fincas = {
         if (esEdicion) {
             data.id = Number(data.id);
             await window.db.put('fincas', data);
+            if (flagsExplotacion && window.ModoContextoHelper) {
+                window.ModoContextoHelper.setFlags(flagsExplotacion, data.id);
+            }
             return data.id;
         } else {
             delete data.id;
@@ -161,6 +172,9 @@ const Fincas = {
 
             if (!(await this.getActiveId())) {
                 await this.setActiveId(newId);
+            }
+            if (flagsExplotacion && window.ModoContextoHelper) {
+                window.ModoContextoHelper.setFlags(flagsExplotacion, newId);
             }
             return newId;
         }

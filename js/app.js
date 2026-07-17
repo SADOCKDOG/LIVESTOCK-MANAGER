@@ -2712,6 +2712,7 @@ const App = {
   async _cambiarFincaActiva(id) {
     await Fincas.setActiveId(id);
     this.toast("Finca activa cambiada");
+    if (typeof this.updateNavigationMenu === 'function') await this.updateNavigationMenu();
     this.renderAjustes();
   },
 
