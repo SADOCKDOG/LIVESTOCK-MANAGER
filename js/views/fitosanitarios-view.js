@@ -51,7 +51,7 @@ const FitosanitariosView = {
             </div>
 
             <!-- KPIs -->
-            <div class="grid grid-cols-3 gap-10 mb-20 font-sans">
+            <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-3 sm:gap-10 sm:mb-20 font-sans">
                 <div class="card p-12 text-center" style="background:#111; border:1px solid #222;">
                     <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">INVERSIÓN TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:#C5FA50;">${totalInversion.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</span>
