@@ -140,17 +140,17 @@ const SilosView = {
             </div>
 
             <!-- KPIs superiores (OLED dark design) -->
-            <div class="grid grid-cols-1 gap-6 mb-4 sm:grid-cols-3 sm:gap-10 sm:mb-20">
-                <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">CAPACIDAD TOTAL</span>
+            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3 sm:gap-6 sm:mb-20">
+                <div class="card p-6 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222; min-height: 100px;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.5rem] tracking-wider mb-2 leading-tight min-w-0 break-words">CAPACIDAD TOTAL</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace;">${totalCapacidad.toLocaleString()} kg</span>
                 </div>
-                <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">ALMACENADO</span>
+                <div class="card p-6 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222; min-height: 100px;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.5rem] tracking-wider mb-2 leading-tight min-w-0 break-words">ALMACENADO</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--p-gold);">${totalActual.toLocaleString()} kg</span>
                 </div>
-                <div class="card p-12 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222;">
-                    <span class="text-gray-500 font-950 uppercase text-[0.6rem] tracking-wider mb-4 d-block min-w-0">OCUPACIÓN MEDIA</span>
+                <div class="card p-6 text-center flex flex-col justify-between" style="background:#111; border:1px solid #222; min-height: 100px;">
+                    <span class="text-gray-500 font-950 uppercase text-[0.5rem] tracking-wider mb-2 leading-tight min-w-0 break-words">OCUPACIÓN MEDIA</span>
                     <span class="text-white font-black text-sm block" style="font-family:'IBM Plex Mono', monospace; color:var(--c-success);">${pctMedio}%</span>
                 </div>
             </div>
