@@ -1,21 +1,29 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# REGLAS PARA CAPACITOR (Optimización y Ofuscación)
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Conservar las anotaciones de Capacitor y la comunicación con JS
+-keepattributes *Annotation*
+-keepattributes JavascriptInterface
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# No ofuscar las clases que se comunican con el motor de Capacitor
+-keep class com.getcapacitor.** { *; }
+-keep class com.livestockmanager.app.manual.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Mantener los métodos marcados con @CapacitorPlugin y @NativeMethod
+-keep @interface com.getcapacitor.annotation.CapacitorPlugin
+-keep @interface com.getcapacitor.NativeMethod
+
+-keepclassmembers class * {
+    @com.getcapacitor.NativeMethod public *;
+    @com.getcapacitor.annotation.CapacitorPlugin public *;
+}
+
+# Mantener la clase principal BridgeActivity y sus componentes
+-keep public class * extends com.getcapacitor.BridgeActivity
+-keep public class * extends com.getcapacitor.Plugin
+
+# Reglas adicionales para Cordova Plugins (si se usan)
+-keep class org.apache.cordova.** { *; }
+-keep interface org.apache.cordova.** { *; }
+
+# Mantener Splash Screen
+-keep class androidx.core.splashscreen.** { *; }
