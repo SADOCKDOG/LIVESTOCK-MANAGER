@@ -1,5 +1,7 @@
-- Nueva interfaz "Industrial Premium" optimizada para alta visibilidad en exteriores y pantallas OLED.
-- Rediseño de asistentes (Wizards) de registro para operación rápida en campo con una sola mano.
-- Incorporación de tarjetas de información técnica con acceso directo a datos REGA y estados sanitarios.
-- Mejoras críticas en la estabilidad de la gestión de fincas y sincronización de datos.
-- Optimizaciones de rendimiento en el motor de renderizado web.
+- Nueva interfaz "Industrial Premium" optimizada para alta visibilidad y pantallas OLED.
+- Optimización de rendimiento R8: Activada la reducción de código y recursos para una app más ligera y rápida (cumplimiento de Google Play Console).
+- Correcciones críticas en la generación de informes PDF: solucionado el error de documentos en blanco en dispositivos de alta resolución.
+- Diseño responsive en KPIs: los indicadores de Silos y Fitosanitarios ahora se adaptan correctamente a pantallas pequeñas.
+- Mejoras en la gestión Multi-Finca: navegación ExPro optimizada para mayor fluidez.
+- Compatibilidad con Android 13 y 14: corregidos errores al compartir archivos y exportaciones.
+- Rediseño de asistentes (Wizards) para permitir la operación en campo con una sola mano.
