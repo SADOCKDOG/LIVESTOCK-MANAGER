@@ -8,7 +8,7 @@ android {
         applicationId "com.livestockmanager.app.manual"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 514
+        versionCode 515
         versionName "4.9.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -75,5 +75,5 @@ play {
     // track.set("alpha")
     
     defaultToAppBundles.set(true)
-    releaseName.set("4.9.0 - Industrial Premium Update")
+    releaseName.set("4.9.0 (515) - Industrial Premium Optimized")
 }
