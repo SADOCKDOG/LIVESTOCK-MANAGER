@@ -241,6 +241,14 @@ const AnimalesView = {
     // pueda repoblar el selector de tipo de crotal sin volver a consultar la BD.
     this._tiposIdentificadorPorEspecieIdCache = tiposIdentificadorPorEspecieId;
 
+    // Fallback: animales guardados antes de la migración v15 (o creados por seed-data)
+    // solo tienen `especie` (string), no `especieId`. El <select> de ESPECIE ya marca
+    // la opción correcta comparando por string, pero el de tipo de crotal necesita el id
+    // numérico — lo derivamos aquí para que también se pueble en la carga inicial.
+    const especieIdInicial = a.especieId != null
+      ? Number(a.especieId)
+      : especies.find((e) => e.nombre_display === a.especie)?.id ?? null;
+
     const idActual = esNuevo ? null : Number(id);
     const hembras = (todosAnimales || []).filter(
       (x) => x.sexo === "H" && (x.estado || "activo") !== "baja" && x.id !== idActual
@@ -304,7 +312,7 @@ const AnimalesView = {
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-tipo-crotal-oficial">TIPO DE CROTAL (NORMATIVA)</label>
                 <select id="a-tipo-crotal-oficial" class="wizard-input font-800">
-                  ${tiposIdentificadorPorEspecieId(a.especieId).map((t) => `<option value="${t.id}" ${a.tipoIdentificadorId === t.id ? "selected" : ""}>${t.nombre.toUpperCase()}</option>`).join("") || '<option value="">— Elige especie primero —</option>'}
+                  ${tiposIdentificadorPorEspecieId(especieIdInicial).map((t) => `<option value="${t.id}" ${a.tipoIdentificadorId === t.id ? "selected" : ""}>${t.nombre.toUpperCase()}</option>`).join("") || '<option value="">— Elige especie primero —</option>'}
                 </select>
               </div>
             </div>
