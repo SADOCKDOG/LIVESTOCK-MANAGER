@@ -1,6 +1,60 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 14;
+const DB_VERSION = 15;
+
+// Datos maestros oficiales de Especie / Tipo de Identificador — ver
+// docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
+// Compartidos entre InMemoryMockDB (fallback sandboxed) y populateDefaults
+// (IndexedDB real) para que ambos caminos vean siempre los mismos datos.
+
+// especies.id = código SIEX oficial del catálogo ESPECIE_ANIMAL del FEGA
+// (docs/AUDITAR/Catalogos_csv/Especies animales.csv). nombre_display conserva
+// la etiqueta coloquial que ya ve el usuario en el selector de especie.
+const ESPECIES_SEED = [
+    { id: 1, codigo_siex: '01', nombre_oficial: 'Bovino', nombre_display: 'Vacas', codigo_familia: '01' },
+    { id: 2, codigo_siex: '02', nombre_oficial: 'Porcino', nombre_display: 'Cerdos', codigo_familia: '02' },
+    { id: 3, codigo_siex: '03', nombre_oficial: 'Ovino', nombre_display: 'Ovejas', codigo_familia: '03' },
+    { id: 4, codigo_siex: '04', nombre_oficial: 'Caprino', nombre_display: 'Cabras', codigo_familia: '03' },
+    { id: 5, codigo_siex: '05', nombre_oficial: 'Équido', nombre_display: 'Équidos', codigo_familia: '04' },
+];
+
+// tipos_identificador.id = código oficial del catálogo RIIA_TIPO_IDENTIFICADOR
+// del FEGA (docs/AUDITAR/Catalogos_csv/Tipo de identificador.csv). Los que
+// tienen fecha_baja no deben ofrecerse en altas nuevas (ver UI), pero se
+// mantienen en el catálogo para poder leer/mostrar animales históricos.
+const TIPOS_IDENTIFICADOR_SEED = [
+    { id: 1, nombre: 'Crotal', fecha_baja: '2011-09-05' },
+    { id: 2, nombre: 'Bolo ruminal', fecha_baja: null },
+    { id: 3, nombre: 'Inyectable electrónico', fecha_baja: null },
+    { id: 4, nombre: 'Crotal electrónico', fecha_baja: null },
+    { id: 5, nombre: 'Fotografías', fecha_baja: null },
+    { id: 6, nombre: 'Reseña', fecha_baja: null },
+    { id: 7, nombre: 'Palatograma', fecha_baja: null },
+    { id: 8, nombre: 'Identificación biométrica por la retina', fecha_baja: null },
+    { id: 9, nombre: 'Tatuaje', fecha_baja: null },
+    { id: 10, nombre: 'Fuego', fecha_baja: null },
+    { id: 11, nombre: 'Nitrógeno líquido', fecha_baja: null },
+    { id: 12, nombre: 'Marcadores genéticos', fecha_baja: null },
+    { id: 13, nombre: 'Pulsera electrónica', fecha_baja: null },
+    { id: 14, nombre: 'DIE', fecha_baja: null },
+    { id: 15, nombre: 'Pasaporte', fecha_baja: '2012-06-28' },
+    { id: 16, nombre: 'Crotal visual', fecha_baja: null },
+];
+
+// Asociación especie -> tipos de identificador válidos, con el nombre del
+// patrón de validación a aplicar (ver ErrorHandler.CROTAL_FORMATOS). Equino
+// queda con formato:null (normativa aún no cerrada, ver NORMATIVA-CROTAL-ESPECIE.md).
+const ESPECIE_TIPO_IDENTIFICADOR_SEED = [
+    { especieId: 1, tipoIdentificadorId: 16, formato: 'bovino_fisico' },
+    { especieId: 2, tipoIdentificadorId: 16, formato: 'porcino_marca_explotacion' },
+    { especieId: 3, tipoIdentificadorId: 2, formato: 'ovino_caprino_eid' },
+    { especieId: 3, tipoIdentificadorId: 3, formato: 'ovino_caprino_eid' },
+    { especieId: 3, tipoIdentificadorId: 4, formato: 'ovino_caprino_eid' },
+    { especieId: 4, tipoIdentificadorId: 2, formato: 'ovino_caprino_eid' },
+    { especieId: 4, tipoIdentificadorId: 3, formato: 'ovino_caprino_eid' },
+    { especieId: 4, tipoIdentificadorId: 4, formato: 'ovino_caprino_eid' },
+    { especieId: 5, tipoIdentificadorId: 14, formato: null },
+];
 
 // Clase para base de datos en memoria (Fallback para entornos sandboxed o sin permisos de IndexedDB, como Open Design Desktop)
 class InMemoryMockDB {
@@ -13,8 +67,9 @@ class InMemoryMockDB {
                 'config_tipos_produccion', 'comercializacion_carne', 'comercializacion_leche', 
                 'meta', 'registro_eventos', 'reproduccion_eventos', 'compradores', 'proveedores', 
                 'contratos_compra', 'transportistas', 'documentos_legales', 'notificaciones_rega', 
-                'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs', 
-                'config_costes_referencia', 'config_silos'
+                'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs',
+                'config_costes_referencia', 'config_silos', 'especies', 'tipos_identificador',
+                'especie_tipo_identificador'
             ],
             contains(name) { return this.names.includes(name); }
         };
@@ -45,6 +100,9 @@ class InMemoryMockDB {
             { id: 3, nombre: 'Cabras', consumoAguaL: 8, creadoEn: Date.now() },
             { id: 4, nombre: 'Cerdos', consumoAguaL: 12, creadoEn: Date.now() }
         ];
+        this._stores['especies'] = ESPECIES_SEED.map(e => ({ ...e }));
+        this._stores['tipos_identificador'] = TIPOS_IDENTIFICADOR_SEED.map(t => ({ ...t }));
+        this._stores['especie_tipo_identificador'] = ESPECIE_TIPO_IDENTIFICADOR_SEED.map((a, i) => ({ id: i + 1, ...a }));
         this._stores['config_tipos_produccion'] = [
             { id: 1, nombre: 'Cárnica', creadoEn: Date.now() },
             { id: 2, nombre: 'Láctea', creadoEn: Date.now() },
@@ -174,7 +232,7 @@ class InMemoryMockDB {
                 return {
                     indexNames: {
                         contains: (indexName) => {
-                            const knownIndexes = ['fincaId', 'rebanoId', 'animalId', 'caravana', 'numero_identificacion', 'nif_cif', 'activo', 'especie', 'rega', 'dib', 'categoria', 'madre_id', 'numero_albaran', 'dimoe', 'transportistaId', 'autorizacion_veterinaria', 'tipo', 'fecha_emision', 'numero'];
+                            const knownIndexes = ['fincaId', 'rebanoId', 'animalId', 'caravana', 'numero_identificacion', 'nif_cif', 'activo', 'especie', 'rega', 'dib', 'categoria', 'madre_id', 'numero_albaran', 'dimoe', 'transportistaId', 'autorizacion_veterinaria', 'tipo', 'fecha_emision', 'numero', 'especieId'];
                             return knownIndexes.includes(indexName);
                         }
                     },
@@ -247,6 +305,24 @@ async function initDB() {
                     const store = db.createObjectStore('config_silos', { keyPath: 'id', autoIncrement: true });
                     store.createIndex('fincaId', 'fincaId');
                     store.createIndex('tipo', 'tipo'); // carne, leche, hibrido
+                }
+            }
+
+            // v15: Especie y Tipo de Identificador como datos maestros oficiales
+            // (ver docs/NORMATIVA-CROTAL-ESPECIE.md). keyPath = código oficial
+            // (SIEX del FEGA para especies, RIIA para tipos de identificador),
+            // no autoIncrement, para que el id sea estable y coincida con la
+            // codificación oficial.
+            if (oldVersion < 15) {
+                if (!db.objectStoreNames.contains('especies')) {
+                    db.createObjectStore('especies', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('tipos_identificador')) {
+                    db.createObjectStore('tipos_identificador', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('especie_tipo_identificador')) {
+                    const store = db.createObjectStore('especie_tipo_identificador', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('especieId', 'especieId');
                 }
             }
 
@@ -520,6 +596,24 @@ async function populateDefaults(db) {
         ];
         for (let t of tipos) { await db.add('config_tipos_produccion', { ...t, creadoEn: Date.now() }); }
     }
+
+    // Especies (dato maestro oficial, código SIEX del FEGA) — ver docs/NORMATIVA-CROTAL-ESPECIE.md
+    const especiesOficialesCount = await db.count('especies');
+    if (especiesOficialesCount === 0) {
+        for (const e of ESPECIES_SEED) { await db.put('especies', { ...e }); }
+    }
+
+    // Tipos de identificador (dato maestro oficial, código RIIA del FEGA)
+    const tiposIdentificadorCount = await db.count('tipos_identificador');
+    if (tiposIdentificadorCount === 0) {
+        for (const t of TIPOS_IDENTIFICADOR_SEED) { await db.put('tipos_identificador', { ...t }); }
+    }
+
+    // Asociación especie <-> tipo de identificador válido + patrón de crotal
+    const especieTipoCount = await db.count('especie_tipo_identificador');
+    if (especieTipoCount === 0) {
+        for (const a of ESPECIE_TIPO_IDENTIFICADOR_SEED) { await db.add('especie_tipo_identificador', { ...a }); }
+    }
 }
 
 /**
@@ -693,6 +787,40 @@ async function migrarV9(windowDb) {
     }
 }
 
+/**
+ * Migración v15: calcula y guarda `especieId` (código SIEX oficial) en los
+ * animales existentes, reutilizando ComunidadesService.getGrupoEspecie() para
+ * mapear el texto libre histórico ("Vacas", "Ovejas"...) al grupo zootécnico.
+ * NO modifica el campo `especie` (string) original — es puramente aditivo,
+ * para no romper ningún código existente que ya lea `especie` como texto.
+ * Ver docs/NORMATIVA-CROTAL-ESPECIE.md.
+ */
+async function migrarV15(windowDb) {
+    try {
+        console.log("[DB] Migración v15: especieId en animales existentes...");
+
+        const GRUPO_A_ESPECIE_ID = { bovino: 1, porcino: 2, ovino: 3, caprino: 4, equino: 5 };
+        const animales = await windowDb.getAll('animales');
+
+        for (const a of animales) {
+            if (a.especieId) continue; // ya migrado o ya asignado por la UI
+            const grupo = window.ComunidadesService
+                ? window.ComunidadesService.getGrupoEspecie(a.especie)
+                : null;
+            const especieId = grupo ? GRUPO_A_ESPECIE_ID[grupo] : null;
+            if (especieId) {
+                a.especieId = especieId;
+                await windowDb.put('animales', a);
+            }
+        }
+
+        await windowDb.put('meta', { key: 'migracion_v15', value: true, migradoEn: new Date().toISOString() });
+        console.log("[DB] Migración v15 completada.");
+    } catch (e) {
+        console.warn("[DB] Error en migración v15:", e);
+    }
+}
+
 console.log("[DB] Iniciando window.dbPromise...");
 const dbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('DB_TIMEOUT: IndexedDB no respondió en 15s')), 15000));
 window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
@@ -714,6 +842,16 @@ window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
         const metaV9 = await database.get('meta', 'migracion_v9');
         if (!metaV9) {
             await migrarV9(database);
+        }
+    } catch (e) {
+        console.log("[DB] Primera ejecución o store meta no disponible aún.");
+    }
+
+    // Ejecutar migración v15 (especieId en animales) si no se ha ejecutado antes
+    try {
+        const metaV15 = await database.get('meta', 'migracion_v15');
+        if (!metaV15) {
+            await migrarV15(database);
         }
     } catch (e) {
         console.log("[DB] Primera ejecución o store meta no disponible aún.");

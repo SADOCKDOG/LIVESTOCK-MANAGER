@@ -300,6 +300,92 @@ const ErrorHandler = {
   },
 
   /**
+   * Patrones de crotal por especie/tipo de identificador — ver
+   * docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada uno.
+   * Claves = campo `formato` de la tabla `especie_tipo_identificador` (js/db.js).
+   */
+  CROTAL_FORMATOS: {
+    // Bovino, doble crotal no electrónico: 1 dígito uso + 1 control + 2 CC.AA. + 8 animal, sin letras.
+    bovino_fisico: {
+      regex: /^\d{12}$/,
+      descripcion: "12 dígitos, sin letras (ej. 010112345678)",
+    },
+    // Ovino/caprino, identificación electrónica individual (RD 787/2023): ES + 2 dígitos CC.AA. + 10 dígitos.
+    ovino_caprino_eid: {
+      regex: /^ES\d{12}$/,
+      descripcion: "ES + 12 dígitos (ej. ES0112345678AB → ES012345678901)",
+    },
+    // Porcino / marca que identifica la explotación (RD 205/1996 modif. por RD 479/2004).
+    // Patrón best-effort: la normativa da longitudes máximas, no fijas — revisar con
+    // ejemplos reales antes de confiar en él para bloquear altas.
+    porcino_marca_explotacion: {
+      regex: /^(ES)?\d{1,3}[A-Z]{1,2}\d{1,7}$/,
+      descripcion: "(ES opcional) + municipio + siglas provincia + explotación",
+    },
+  },
+
+  /**
+   * Valida un crotal según la especie y el tipo de identificador del animal
+   * (dato maestro oficial, ver docs/NORMATIVA-CROTAL-ESPECIE.md). Si no se
+   * pasan especieId/tipoIdentificadorId, o no hay un formato asociado a esa
+   * combinación (ej. equino, aún sin cerrar en la normativa), cae al
+   * comportamiento genérico de validateCaravana — así no rompe ningún call
+   * site existente que todavía no tenga ese contexto (js/movimientos.js,
+   * wizard-guia-movimiento.js).
+   */
+  async validateCrotal(numero_identificacion, especieId, tipoIdentificadorId) {
+    if (!especieId || !tipoIdentificadorId || !window.db) {
+      return this.validateCaravana(numero_identificacion);
+    }
+
+    let asociacion = null;
+    try {
+      const todas = await window.db.getAllFromIndex(
+        "especie_tipo_identificador",
+        "especieId",
+        Number(especieId)
+      );
+      asociacion = (todas || []).find(
+        (a) => Number(a.tipoIdentificadorId) === Number(tipoIdentificadorId)
+      );
+    } catch (e) {
+      // Sin datos maestros disponibles (BD no lista todavía) -> fallback genérico
+      return this.validateCaravana(numero_identificacion);
+    }
+
+    const formato = asociacion && this.CROTAL_FORMATOS[asociacion.formato];
+    if (!formato) {
+      return this.validateCaravana(numero_identificacion);
+    }
+
+    if (!numero_identificacion) {
+      throw new this.AppError(
+        "El número de identificación (crotal) es obligatorio",
+        this.ERROR_TYPES.VALIDATION,
+        { field: "numero_identificacion", required: true }
+      );
+    }
+
+    const valorLimpio = String(numero_identificacion)
+      .trim()
+      .toUpperCase()
+      .replace(/[\s-]/g, "");
+
+    if (!formato.regex.test(valorLimpio)) {
+      throw new this.AppError(
+        `El número de identificación (crotal) no sigue el formato esperado para esta especie: ${formato.descripcion}`,
+        this.ERROR_TYPES.VALIDATION,
+        {
+          field: "numero_identificacion",
+          format: formato.descripcion,
+          value: valorLimpio,
+        }
+      );
+    }
+    return valorLimpio;
+  },
+
+  /**
    * Comprueba si una cadena tiene formato de crotal válido (2 letras + 12 dígitos).
    * No lanza excepción — útil para validaciones de snapshot.
    */

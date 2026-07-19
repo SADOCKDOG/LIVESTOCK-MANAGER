@@ -222,11 +222,24 @@ const AnimalesView = {
     };
     if (!esNuevo) a = await Animales.get(id);
 
-    const [especies, rebanos, todosAnimales] = await Promise.all([
-      window.db.getAll("config_especies"),
+    const [especies, tiposIdentificador, especieTipoIdentificador, rebanos, todosAnimales] = await Promise.all([
+      window.db.getAll("especies").catch(() => []),
+      window.db.getAll("tipos_identificador").catch(() => []),
+      window.db.getAll("especie_tipo_identificador").catch(() => []),
       Rebanos.list(),
       Animales.list().catch(() => []),
     ]);
+    // Tipos de identificador válidos para la especie ya guardada del animal (si la hay),
+    // excluyendo los dados de baja del catálogo oficial (ver docs/NORMATIVA-CROTAL-ESPECIE.md)
+    const tiposIdentificadorPorEspecieId = (especieId) => {
+      const idsValidos = especieTipoIdentificador
+        .filter((r) => Number(r.especieId) === Number(especieId))
+        .map((r) => r.tipoIdentificadorId);
+      return tiposIdentificador.filter((t) => idsValidos.includes(t.id) && !t.fecha_baja);
+    };
+    // Cache para que _onEspecieChange (onchange, sin acceso a estas const locales)
+    // pueda repoblar el selector de tipo de crotal sin volver a consultar la BD.
+    this._tiposIdentificadorPorEspecieIdCache = tiposIdentificadorPorEspecieId;
 
     const idActual = esNuevo ? null : Number(id);
     const hembras = (todosAnimales || []).filter(
@@ -275,7 +288,7 @@ const AnimalesView = {
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-especie">ESPECIE</label>
                 <select id="a-especie" required class="wizard-input" onchange="AnimalesView._onEspecieChange(this)">
-                  ${especies.map((e) => `<option value="${e.nombre}" ${a.especie === e.nombre ? "selected" : ""}>${e.nombre.toUpperCase()}</option>`).join("")}
+                  ${especies.map((e) => `<option value="${e.nombre_display}" data-especie-id="${e.id}" ${a.especie === e.nombre_display ? "selected" : ""}>${e.nombre_display.toUpperCase()}</option>`).join("")}
                 </select>
               </div>
               <div class="wizard-input-group">
@@ -284,6 +297,14 @@ const AnimalesView = {
                   <option value="H" ${a.sexo === "H" ? "selected" : ""}>HEMBRA (H)</option>
                   <option value="M" ${a.sexo === "M" ? "selected" : ""}>MACHO (M)</option>
                   <option value="C" ${a.sexo === "C" ? "selected" : ""}>CASTRADO (C)</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="a-tipo-crotal-oficial">TIPO DE CROTAL (NORMATIVA)</label>
+                <select id="a-tipo-crotal-oficial" class="wizard-input font-800">
+                  ${tiposIdentificadorPorEspecieId(a.especieId).map((t) => `<option value="${t.id}" ${a.tipoIdentificadorId === t.id ? "selected" : ""}>${t.nombre.toUpperCase()}</option>`).join("") || '<option value="">— Elige especie primero —</option>'}
                 </select>
               </div>
             </div>
@@ -571,6 +592,12 @@ const AnimalesView = {
         id: id ? Number(id) : undefined,
         numero_identificacion: crotal,
         especie: document.getElementById("a-especie").value,
+        especieId: document.getElementById("a-especie").selectedOptions[0]?.dataset.especieId
+          ? Number(document.getElementById("a-especie").selectedOptions[0].dataset.especieId)
+          : null,
+        tipoIdentificadorId: document.getElementById("a-tipo-crotal-oficial")?.value
+          ? Number(document.getElementById("a-tipo-crotal-oficial").value)
+          : null,
         sexo: document.getElementById("a-sexo").value,
         raza: document.getElementById("a-raza").value.trim(),
         tipo: document.getElementById("a-tipo").value.trim(),
@@ -718,6 +745,16 @@ const AnimalesView = {
       const cats = CS.getCategoriasAnimal(selectEl.value);
       catSel.innerHTML = '<option value="">— Sin clasificar —</option>' +
         cats.map((c) => `<option value="${c}" ${prev === c ? 'selected' : ''}>${c}</option>`).join('');
+    }
+    // Refrescar el catálogo oficial de tipos de crotal según la nueva especie
+    // (ver docs/NORMATIVA-CROTAL-ESPECIE.md)
+    const tipoCrotalSel = document.getElementById('a-tipo-crotal-oficial');
+    const especieId = selectEl.selectedOptions[0]?.dataset.especieId;
+    if (tipoCrotalSel && especieId && this._tiposIdentificadorPorEspecieIdCache) {
+      const tipos = this._tiposIdentificadorPorEspecieIdCache(especieId);
+      tipoCrotalSel.innerHTML = tipos.length
+        ? tipos.map((t) => `<option value="${t.id}">${t.nombre.toUpperCase()}</option>`).join('')
+        : '<option value="">— Sin tipos definidos —</option>';
     }
   },
 
