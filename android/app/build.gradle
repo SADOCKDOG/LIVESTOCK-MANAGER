@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.triplet.play'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace "com.livestockmanager.app.manual"
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -19,10 +25,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("upload.jks")
-            storePassword "livestock2026"
-            keyAlias "upload"
-            keyPassword "livestock2026"
+            storeFile file(keystoreProperties.getProperty("storeFile", System.getenv("KEYSTORE_FILE") ?: "upload.jks"))
+            storePassword keystoreProperties.getProperty("storePassword", System.getenv("KEYSTORE_PASSWORD"))
+            keyAlias keystoreProperties.getProperty("keyAlias", System.getenv("KEYSTORE_KEY_ALIAS"))
+            keyPassword keystoreProperties.getProperty("keyPassword", System.getenv("KEYSTORE_KEY_PASSWORD"))
         }
     }
     buildTypes {
