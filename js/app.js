@@ -1685,75 +1685,35 @@ const App = {
     const isCapacitor = window.Capacitor?.isNativePlatform?.() || window.hasOwnProperty('Capacitor');
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
 
-    // 1️⃣ Intentar con Capacitor nativo (Android)
+    // 1️⃣ Intentar con Capacitor nativo (Android) — plugin @capacitor-mlkit/barcode-scanning.
+    // scan() abre la UI del Google Code Scanner (fullscreen, con cancelar propio): sin
+    // manipular visibilidad del WebView ni botones flotantes como con el plugin antiguo.
     if (BarcodeScanner && isCapacitor) {
       try {
-        console.log('[SCAN] Intentando escáner nativo Capacitor...');
-        const perm = await BarcodeScanner.checkPermission({ force: true });
+        console.log('[SCAN] Intentando escáner nativo MLKit...');
+        const perm = await BarcodeScanner.requestPermissions();
         console.log('[SCAN] Permiso:', JSON.stringify(perm));
-        if (!perm.granted) {
-          App.toastError(perm.denied
+        if (perm.camera !== 'granted' && perm.camera !== 'limited') {
+          App.toastError(perm.camera === 'denied'
             ? 'Permiso denegado permanentemente. Actívalo en Ajustes > Apps > Permisos.'
             : 'Permiso de cámara no concedido');
           return;
         }
 
-        // Ocultar la UI del WebView para que la cámara del scanner nativo sea visible por detrás
-        const mainApp = document.getElementById('app-content');
-        const headerApp = document.querySelector('header');
-        if (mainApp) mainApp.style.visibility = 'hidden';
-        if (headerApp) headerApp.style.visibility = 'hidden';
-        document.body.classList.add('scanner-active');
-
-        await BarcodeScanner.prepare();
-        await BarcodeScanner.hideBackground();
-
-        // Crear botón de cancelar flotante en el body
-        const cancelBtn = document.createElement('button');
-        cancelBtn.id = 'scanner-cancel-btn';
-        cancelBtn.textContent = '✕ Cancelar Escaneo';
-        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#E8555F; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
-
-        const cleanupScanner = async () => {
-          document.body.classList.remove('scanner-active');
-          if (mainApp) mainApp.style.visibility = 'visible';
-          if (headerApp) headerApp.style.visibility = 'visible';
-          const btn = document.getElementById('scanner-cancel-btn');
-          if (btn) btn.remove();
-          try { await BarcodeScanner.showBackground(); } catch (_) {}
-        };
-
-        cancelBtn.onclick = async () => {
-          console.log('[SCAN] Cancelando escaneo nativo...');
-          await BarcodeScanner.stopScan();
-          await cleanupScanner();
-          App.toast('Escaneo cancelado');
-        };
-        document.body.appendChild(cancelBtn);
-
-        App.toast('Enfoca el código de barras del crotal...', 4000);
-        const result = await BarcodeScanner.startScan();
-
-        await cleanupScanner();
-
-        if (result.hasContent && result.content) {
-          return this._procesarCrotalEscaneado(inputId, result.content.trim());
+        const { barcodes } = await BarcodeScanner.scan();
+        const content = barcodes?.[0]?.rawValue;
+        if (content) {
+          return this._procesarCrotalEscaneado(inputId, content.trim());
         }
-        return;
+        return; // usuario canceló desde la UI nativa
       } catch (err) {
-        document.body.classList.remove('scanner-active');
-        const mainApp = document.getElementById('app-content');
-        const headerApp = document.querySelector('header');
-        if (mainApp) mainApp.style.visibility = 'visible';
-        if (headerApp) headerApp.style.visibility = 'visible';
-        const btn = document.getElementById('scanner-cancel-btn');
-        if (btn) btn.remove();
-
-        try { await BarcodeScanner.showBackground(); } catch (_) {}
+        // 'canceled' llega como excepción en algunas versiones: no es un error real
+        if (String(err?.message || err).toLowerCase().includes('cancel')) {
+          App.toast('Escaneo cancelado');
+          return;
+        }
         console.error('[SCAN] Error nativo:', err);
         App.toast('Escáner nativo falló, usando cámara web...', 2000);
-        // Wait for background to be restored before trying web scanner
-        await new Promise(r => setTimeout(r, 1000));
       }
     }
 
