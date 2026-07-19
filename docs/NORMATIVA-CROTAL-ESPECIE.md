@@ -1,7 +1,7 @@
 # Especie y Crotal como datos maestros — especificación
 
 **Estado**: especificación recopilada, implementación pendiente.
-**Relacionado**: [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md) (detalle específico ovino Andalucía/Extremadura, normativa vigente RD 787/2023), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md) (**confirma este modelo**: el fichero real de intercambio de SIGGAN para identificación individual de pequeño rumiante lleva campos explícitos `Espe` y `Tipo_Iden` con los mismos códigos oficiales del FEGA, y expone 3 formatos de crotal — 14 caracteres normal, 20 electrónico agrupado, 16 hexadecimal).
+**Relacionado**: [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md) (detalle específico ovino Andalucía/Extremadura, normativa vigente RD 787/2023), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md) (**confirma este modelo**: el fichero real de intercambio de SIGGAN para identificación individual de pequeño rumiante lleva campos explícitos `Espe` y `Tipo_Iden`, aunque con su **propia codificación interna**, distinta de los códigos del catálogo `ESPECIE_ANIMAL`/`RIIA_TIPO_IDENTIFICADOR` del FEGA — ver tabla oficial exacta más abajo).
 
 ## Modelo objetivo
 
@@ -25,6 +25,68 @@ Hoy el código trata "especie" como texto y aplica **una única regex de crotal 
 Notas:
 - La regex actual del crotal en el código, `^[A-Z]{2}\d{12}$` (`js/error-handler.js:282`, función `validateCaravana`), **solo coincide con el caso ovino/caprino electrónico**. No es válida para el crotal físico bovino descrito arriba (que no lleva letras) ni refleja la marca de explotación de porcino.
 - Pendiente: leer con detalle la normativa de equino (identificación por documento de identificación equina / microchip, estructura distinta) — no cubierta aún en esta especificación.
+
+## Especificación oficial y exacta: fichero de incorporación de datos a SIGGAN (pequeño rumiante)
+
+**Fuente**: `docs/AUDITAR/SIGGAN_Manual_Fichero_Incorporacion.pdf` — "Identificación individual de Pequeños Rumiantes: definición del fichero de incorporación de datos a SIGGAN", AGAPA/Junta de Andalucía, v0400, 10/07/2012. Este documento es la especificación técnica formal (8 páginas) del formato que hasta ahora solo habíamos deducido por un ejemplo en el manual de ADSG WEB — **corrige y precisa** varios detalles.
+
+- Fichero de texto plano, extensión `.txt`. Nombre: `AAAAMMDD_DESCRIPCION` (máx. 23 caracteres, sin espacios), ej. `20060801_ES140080009876`.
+- Primera fila: cabecera con los nombres de campo. Filas siguientes: una por animal.
+- Separador: `;`. Campos, en orden:
+
+| # | Campo | Tipo | Longitud | Obligatorio | Detalle |
+|---|---|---|---|---|---|
+| 1 | `ID` | Numérico | 12 | Sí | Los 12 últimos dígitos del crotal |
+| 2 | `Iden_elec` | Carácter | 16 | Sí | Identificación electrónica del bolo, formato **hexadecimal** |
+| 3 | `Pais` | Carácter | 4 | Sí | 4 dígitos numéricos (España = `0724`) |
+| 4 | `NumExplo` | Carácter | 14 | Sí | REGA: `ES` + PP (provincia, 2) + MMM (municipio, 3) + NNNNNNN (explotación, 7) |
+| 5 | `FNaci` | Carácter | 10 | Sí | Fecha de nacimiento, `YYYY-MM-DD` |
+| 6 | `FId` | Carácter | 10 | Sí | Fecha de identificación, `YYYY-MM-DD` |
+| 7 | `Espe` | Carácter | 2 | Sí | Código de especie **leído automáticamente del chip** (posiciones 3-4 de las 23 del identificador en formato decimal por grupos) — ver tabla propia abajo, **no coincide con el catálogo `ESPECIE_ANIMAL` del FEGA** |
+| 8 | `Espe_ID` | Numérico | 1 | Sí | Especie del animal identificado: `2` = caprino, `3` = ovino |
+| 9 | `Dupli` | Numérico | 1 | Sí | Leído del 2º carácter del chip; cuántas veces está duplicado |
+| 10 | `Raza` | Numérico | 1-2 | Sí | Código de raza según especie (Anexo — ver tabla abajo) |
+| 11 | `Tipo_Iden` | Carácter | 2 | Sí | Por defecto `02`; catálogo propio de 3 valores — ver tabla abajo |
+| 12 | `Tec` | Carácter | 10 | Sí | NIF del veterinario que coloca el bolo |
+| 13 | `Cr` | Carácter | 15 | **No** | Crotal antiguo o de explotación, si tuviera |
+| 14 | `Sexo` | Carácter | 2 | Sí | `01` = Macho, `02` = Hembra |
+| 15 | `Cebo` | Numérico | 1 | Sí | `1` = destinado a cebo, `0` = no |
+
+Ejemplo real (fichero de 1 animal):
+```
+ID;Iden_elec;Pais;NumExplo;FNaci;FId;Espe;Espe_ID;Dupli;Raza;Tipo_Iden;Tec;Cr;Sexo;Cebo
+000123456799;8000f9c0075bcd1f;0724;ES1400200001;2006-01-01;2006-01-15;04;2;0;4;02;099999997A;;01;0
+```
+
+### Tabla `Espe` (código de especie del chip — SIGGAN, distinta del catálogo FEGA)
+
+| Código | Significado |
+|---|---|
+| 00 | No codificada en el bolo |
+| 01 | Caballos, asnos, mulos y burdéganos |
+| 02 | Bovina |
+| 03 | Porcina |
+| 04 | Ovina **y** caprina (ambas comparten este código; se distinguen por `Espe_ID`) |
+| 05 | Gallos, gallinas, patos, gansos, pavos y pintadas |
+| 06 | Los demás animales vivos |
+
+### Tabla `Tipo_Iden` (específica de este fichero — subconjunto del catálogo general `RIIA_TIPO_IDENTIFICADOR`)
+
+| Código | Descripción |
+|---|---|
+| 02 | Bolo ruminal + crotal |
+| 03 | Inyectable + crotal |
+| 04 | Crotal electrónico + crotal |
+
+### Tabla `Raza` (Anexo, por especie — extracto; el documento trae el listado completo)
+
+Caprino (`Espe_ID=2`): 1 Blanca Celtibérica, 2 Blanca Andaluza, 3 Negra Serrana o Castiza, 4 Payoya, 5 Murciano-Granadina, 6 Malagueña, 7 Florida, 8 Otras puras, 9 Conjunto mestizo, 10 Saanen, 11 Alpina Francesa.
+
+Ovino (`Espe_ID=3`): 1 Merina, 2 Merino Precoz, 3 Segureña, 4 Montesina, 5 Churra Lebrijana, 6 Merino de Grazalema, 7 Manchega, 8 Ile de France, 9 Berrinchon du Cher, 10 Fleischschaf, 11 Landschaf, 12 Charmoise, 13 Suffolk, 14 Romanov, 15 Otras puras, 16 Conjunto mestizo, 17 Lacaune, 18 Muflón, 19 Awassi, 20 Karakul.
+
+### Implicación para el diseño
+
+Esto confirma el modelo (especie → tipo de identificador → estructura de código) pero con un matiz importante: **la app no puede limitarse a usar directamente los códigos del catálogo FEGA `ESPECIE_ANIMAL` para este fichero** — SIGGAN usa su propia codificación interna para los campos leídos del chip (`Espe`, con 04 agrupando ovino+caprino y diferenciándolos vía `Espe_ID`). El diseño del modelo de datos debe contemplar **una tabla de correspondencia** entre el código de especie "oficial" (FEGA, para catálogos y UI) y el código de especie "SIGGAN/chip" (para generar/leer ficheros de intercambio), no asumir que son el mismo código.
 
 ## Catálogos oficiales del FEGA (fuente de verdad recomendada)
 
@@ -109,6 +171,7 @@ También descargados y disponibles para uso futuro: `Catálogo oficial de razas 
 ## Próximos pasos (no iniciados)
 
 1. Terminar de acotar la normativa de equino.
-2. Diseñar el modelo de datos unificado: tabla `especies` con código SIEX oficial (01 Bovino, 02 Porcino, 03 Ovino, 04 Caprino, 05 Équido — ver tabla arriba) + tabla `tipos_identificador` con código RIIA oficial (excluyendo los dados de baja en altas nuevas) + tabla de asociación especie↔tipos de identificador permitidos + función de validación de crotal que reciba especie+tipo y aplique la regex correcta de las confirmadas en este documento.
+2. Diseñar el modelo de datos unificado: tabla `especies` con código SIEX oficial (01 Bovino, 02 Porcino, 03 Ovino, 04 Caprino, 05 Équido — ver tabla arriba) + tabla `tipos_identificador` con código RIIA oficial (excluyendo los dados de baja en altas nuevas) + tabla de asociación especie↔tipos de identificador permitidos + **tabla de correspondencia con la codificación interna de SIGGAN** (`Espe`/`Espe_ID`/`Tipo_Iden` del fichero de incorporación, distinta de los códigos FEGA) + función de validación de crotal que reciba especie+tipo y aplique la regex correcta de las confirmadas en este documento.
 3. Decidir el mecanismo de sincronización con la API del FEGA (build-time vs. acción manual vs. runtime con CORS) — de momento se puede semillar directamente desde los CSV ya descargados en `docs/AUDITAR/Catalogos_csv/`.
 4. Plan de migración de datos existentes (animales ya dados de alta con los catálogos actuales desincronizados, `Vacas`/`Ovejas`/`Cabras`/`Cerdos` → códigos SIEX 01/03/04/02).
+5. Si se aborda la generación/lectura de guías de movimiento compatibles con SIGGAN, revisar `docs/AUDITAR/GTA007E_MUS_Manual_Usuario_0400.pdf` ("GTA - Guía Telemática", solicitudes, generación/firma de guías, pago de tasa Modelo 046, notificaciones por especie, DIBs) — sistema complementario a ADSG WEB, relacionado con `js/views/wizards/wizard-guia-movimiento.js`. No revisado en detalle todavía.
