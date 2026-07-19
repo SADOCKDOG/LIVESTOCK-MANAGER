@@ -223,3 +223,25 @@ La implementación actual (`js/db.js`, tablas `especies`/`tipos_identificador`/`
 - La opción A es la que aprovecha directamente todo lo ya documentado (estructura de los `.rdf` = qué campos trae cada exportación) sin más incertidumbre técnica.
 
 **Pendiente real**: no tenemos todavía una muestra real de un fichero exportado por UniTransfer (Excel ni el "formato oficial CCAA") para confirmar el mapeo exacto de columnas — sería el siguiente artefacto útil si se decide implementar la Opción A.
+
+### Segundo fabricante confirmado: Datamars (GES3S / Rumisoft) — mismo ecosistema, más piezas
+
+**Fuente**: `docs/AUDITAR/LECTOR/GES3S - Configuración de Equivalencias v.1.0.pdf` + página oficial de descargas `https://www.livestock.datamars.es/descargas` (aportada por el usuario).
+
+Hay **dos fabricantes/ecosistemas distintos** detrás de los ficheros `.rdf` de este proyecto, ambos con el mismo tipo de flujo:
+
+| | Felixcan | Datamars |
+|---|---|---|
+| Lector | Lector Universal II (EI2061) | GES3S |
+| Software PC | UniTransfer | **Rumisoft** (v1.5.11) |
+| Formato export crudo | — (Excel / formato CCAA directo) | CSV: `EIC, Date, Time` (+ hasta 4 campos propios vía fichero de "equivalencias") |
+| Ficheros de programa/menú | `.uni` (`andalucia7.uni`, `extremadura_Continua3.uni`) cargados con `HHR ProgramLoader.exe` | `.rdf` ("definiciones", cargadas como "Definicion seleccionada" al iniciar un control) |
+
+**Hallazgo clave**: la página de descargas de Datamars confirma que sus 19 "definiciones" para GES3S son **exactamente el mismo catálogo de operaciones** que el usuario ya ha ido compartiendo (Altas, Bajas, Censos regionales, Control Lechero, Cubriciones, Montas, Partos, Reposiciones, Secados, Saneamientos, Tratamientos, Identidades regionales), más una que no teníamos: **Ecografías**.
+
+**Lo más importante — conversores oficiales ya existentes**: Datamars distribuye para GES3S un **"Conversor SIGGAN (Junta de Andalucía)"** y un **"Conversor XML (Junta de Castilla y León)"**. Esto significa que la generación del fichero oficial de intercambio con SIGGAN a partir de una lectura de campo **ya está resuelta por el fabricante del lector** — no haría falta que la app reimplementase esa conversión desde cero; el camino más corto sería:
+1. El ganadero/técnico lee en campo con el GES3S + programa "Andalucía" (SIGGAN).
+2. Convierte con Rumisoft + el Conversor SIGGAN oficial → obtiene el fichero de intercambio SIGGAN ya con el formato exacto de 15 campos documentado arriba en este mismo documento.
+3. La app **importaría ese fichero de intercambio SIGGAN** (formato ya 100% conocido y documentado aquí) en vez de intentar interpretar el export crudo del lector — evita depender de ingeniería inversa del CSV crudo de Rumisoft/UniTransfer.
+
+**Pendiente real (actualizado)**: no se ha descargado todavía ningún fichero de `https://www.livestock.datamars.es/descargas` (instaladores, manuales de Rumisoft, ni los conversores SIGGAN/XML) — se ha consultado solo el listado de la página. Si se quiere avanzar en la Opción A, el artefacto más valioso a por el que ir sería el **manual de Rumisoft** (documenta el conversor SIGGAN) y, si es descargable, una **muestra de fichero SIGGAN generado por el conversor oficial** para contrastar contra la especificación ya documentada del fichero de incorporación.
