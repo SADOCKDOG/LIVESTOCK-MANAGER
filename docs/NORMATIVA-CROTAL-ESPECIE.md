@@ -1,6 +1,6 @@
 # Especie y Crotal como datos maestros — especificación
 
-**Estado**: especificación recopilada, implementación pendiente.
+**Estado**: implementado (commit `20055ad`, 2026-07-19: tablas `especies`/`tipos_identificador`/`especie_tipo_identificador`, `ErrorHandler.validateCrotal()`, UI en ficha de animal). Ver advertencia importante sobre codificación regional más abajo — pendiente de decidir si se aplica a la implementación actual.
 **Relacionado**: [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md) (detalle específico ovino Andalucía/Extremadura, normativa vigente RD 787/2023), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md) (**confirma este modelo**: el fichero real de intercambio de SIGGAN para identificación individual de pequeño rumiante lleva campos explícitos `Espe` y `Tipo_Iden`, aunque con su **propia codificación interna**, distinta de los códigos del catálogo `ESPECIE_ANIMAL`/`RIIA_TIPO_IDENTIFICADOR` del FEGA — ver tabla oficial exacta más abajo).
 
 ## Modelo objetivo
@@ -175,3 +175,30 @@ También descargados y disponibles para uso futuro: `Catálogo oficial de razas 
 3. Decidir el mecanismo de sincronización con la API del FEGA (build-time vs. acción manual vs. runtime con CORS) — de momento se puede semillar directamente desde los CSV ya descargados en `docs/AUDITAR/Catalogos_csv/`.
 4. Plan de migración de datos existentes (animales ya dados de alta con los catálogos actuales desincronizados, `Vacas`/`Ovejas`/`Cabras`/`Cerdos` → códigos SIEX 01/03/04/02).
 5. Si se aborda la generación/lectura de guías de movimiento compatibles con SIGGAN, revisar `docs/AUDITAR/GTA007E_MUS_Manual_Usuario_0400.pdf` ("GTA - Guía Telemática", solicitudes, generación/firma de guías, pago de tasa Modelo 046, notificaciones por especie, DIBs) — sistema complementario a ADSG WEB, relacionado con `js/views/wizards/wizard-guia-movimiento.js`. No revisado en detalle todavía.
+
+## ⚠️ Advertencia importante: los códigos de especie/raza son POR REGIÓN, no nacionales
+
+**Fuente**: `docs/AUDITAR/LECTOR/ID Andalucia.zip` e `ID Extremadura.zip` — no son informes ni RDF semántico, son ficheros de configuración de menú de un **lector físico de crotales** (dispositivo de campo usado por técnicos/ADSG), uno por Comunidad Autónoma. Formato de texto plano con pares etiqueta+código.
+
+**Hallazgo**: comparando ambos ficheros, la codificación de especie **no coincide** entre Andalucía y Extremadura:
+
+| | Andalucía (SIGGAN) | Extremadura (BADIGEX) |
+|---|---|---|
+| Ovino | 3 | 2 |
+| Caprino | 2 | 3 |
+
+(Andalucía coincide con el `Espe_ID` del fichero SIGGAN ya documentado arriba — 2=caprino, 3=ovino. Extremadura usa exactamente lo contrario.)
+
+Los **códigos de raza tampoco coinciden** — son numeraciones completamente distintas e independientes:
+- Andalucía (ya documentado arriba): Ovino 1=Merina, 3=Segureña, 4=Montesina... Caprino 1=Blanca Celtibérica, 2=Blanca Andaluza...
+- Extremadura: Ovino `016`=Merina, `017`=Talaverana, `018`=Churra, `019`=Manchega, `023`=Ille France, `024`=Merino Precoz, `025`=Landschaf, `026`=Fleischaf, `027`=Berrinchon, `028`=Otras Nac., `029`=Otras Ext., `902`=Desconocida. Caprino: `020`=Serrana, `021`=Murciano-Gran, `022`=Malagueña, `030`=Verata, `031`=Saanen, `032`=Retinta Extr., `033`=Canaria, `034`=Cruzada, `035`=Otras, `903`=Desconocida.
+
+El catálogo `TIPO ID` de Extremadura sí coincide en significado con el RIIA del FEGA (`01`=Crotal, `02`=Bolo ruminal, `03`=Inyectable, `04`=Crotal electrónico), con la salvedad de que localmente Extremadura sigue ofreciendo `01 Crotal` como opción activa aunque el catálogo nacional del FEGA lo marca dado de baja en 2011 — puede ser una particularidad regional o un dato desactualizado del propio lector.
+
+### Implicación para la implementación ya hecha
+
+La implementación actual (`js/db.js`, tablas `especies`/`tipos_identificador`/`especie_tipo_identificador`) usa **una sola codificación nacional** (la del catálogo `ESPECIE_ANIMAL` del FEGA, códigos SIEX 01-05), que es correcta como *identificador interno* de la app y para el **formato del crotal en sí** (que sí es nacional, normativa RD 787/2023). Lo que este hallazgo afecta es **si en algún momento se genera/lee un fichero de intercambio directo con el sistema autonómico** (SIGGAN o BADIGEX) — en ese caso hará falta una **tabla de correspondencia por región** (especie SIEX → código regional) en vez de asumir un único mapeo, ya que Andalucía y Extremadura no comparten numeración. No se ha tocado código por esto todavía — es una decisión a tomar cuando se aborde la integración real de ficheros de intercambio (fuera del alcance de esta sesión).
+
+### Resto de `docs/AUDITAR/LECTOR/` — pendiente de revisar
+
+Mismos ficheros de configuración de lector, uno por operación (probablemente con estructura similar, por región donde aplique): `Altas`, `Bajas`, `Cebadero_CLM`, `Cebadero_Extremadura`, `Cebaderos_CYL`, `Censo Extremadura` (incluye además un `.rdf` suelto fuera del zip), `Control Lechero`, `Cubriciones`, `Montas`, `Partos`, `Reposiciones`, `Saneamientos`, `Secados`, `Tratamientos`. No abiertos todavía — candidatos a revisar cuando se trabaje en los módulos equivalentes de la app (`js/movimientos.js`, `js/reproduccion.js`, `js/sanitarios.js`, `js/produccion.js`).
