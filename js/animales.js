@@ -32,9 +32,12 @@ const Animales = {
   async save(data) {
     return await ErrorHandler.tryAsync(
       async () => {
-        // Validaciones
-        const crotal = ErrorHandler.validateCaravana(
-          data.numero_identificacion
+        // Validaciones (formato de crotal según especie/tipo de identificador
+        // si están disponibles; si no, cae al formato genérico)
+        const crotal = await ErrorHandler.validateCrotal(
+          data.numero_identificacion,
+          data.especieId,
+          data.tipoIdentificadorId
         );
         // El rebaño ya no es obligatorio según las nuevas reglas
 
@@ -99,6 +102,8 @@ const Animales = {
           numero_identificacion: crotal,
           rebanoId: data.rebanoId ? Number(data.rebanoId) : null,
           especie: data.especie || null,
+          especieId: data.especieId ? Number(data.especieId) : null,
+          tipoIdentificadorId: data.tipoIdentificadorId ? Number(data.tipoIdentificadorId) : null,
           tipo: data.tipo || "Sin Clasificar",
           estado: data.estado || "activo",
           fecha_nacimiento: data.fecha_nacimiento || null,
