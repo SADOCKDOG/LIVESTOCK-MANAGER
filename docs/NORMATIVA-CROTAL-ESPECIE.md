@@ -199,6 +199,27 @@ El catálogo `TIPO ID` de Extremadura sí coincide en significado con el RIIA de
 
 La implementación actual (`js/db.js`, tablas `especies`/`tipos_identificador`/`especie_tipo_identificador`) usa **una sola codificación nacional** (la del catálogo `ESPECIE_ANIMAL` del FEGA, códigos SIEX 01-05), que es correcta como *identificador interno* de la app y para el **formato del crotal en sí** (que sí es nacional, normativa RD 787/2023). Lo que este hallazgo afecta es **si en algún momento se genera/lee un fichero de intercambio directo con el sistema autonómico** (SIGGAN o BADIGEX) — en ese caso hará falta una **tabla de correspondencia por región** (especie SIEX → código regional) en vez de asumir un único mapeo, ya que Andalucía y Extremadura no comparten numeración. No se ha tocado código por esto todavía — es una decisión a tomar cuando se aborde la integración real de ficheros de intercambio (fuera del alcance de esta sesión).
 
-### Resto de `docs/AUDITAR/LECTOR/` — pendiente de revisar
+### Resto de `docs/AUDITAR/LECTOR/` — identificado el dispositivo y el flujo completo
 
-Mismos ficheros de configuración de lector, uno por operación (probablemente con estructura similar, por región donde aplique): `Altas`, `Bajas`, `Cebadero_CLM`, `Cebadero_Extremadura`, `Cebaderos_CYL`, `Censo Extremadura` (incluye además un `.rdf` suelto fuera del zip), `Control Lechero`, `Cubriciones`, `Montas`, `Partos`, `Reposiciones`, `Saneamientos`, `Secados`, `Tratamientos`. No abiertos todavía — candidatos a revisar cuando se trabaje en los módulos equivalentes de la app (`js/movimientos.js`, `js/reproduccion.js`, `js/sanitarios.js`, `js/produccion.js`).
+**Fuente añadida**: `docs/AUDITAR/LECTOR/UniTransfer_1.37.zip` (instalador del software de PC) + fichas técnicas `EI2061.pdf`, `Guia Instalación.pdf`, `GUIA RAPIDA MANEJO LECTOR UNIVERSAL.pdf`, `Posibles_Errores.pdf`.
+
+**Dispositivo identificado**: **Lector Universal II**, de **Felixcan Animal ID** (Albacete, España; código de fabricante ICAR 941; www.felixcan.com). Es un lector RFID de mano específico para ganadería:
+
+- **Compatibilidad**: ISO 11784, ISO 11784-AMD1, ISO 11785, UNE-ISO 11784/11785, UNE 68402. Lee tecnologías **FDX-B y HDX** (las dos variantes de RFID LF 134.2 kHz usadas en crotales/bolos electrónicos oficiales).
+- Distancia de lectura hasta 35 cm, pantalla LCD 128×64, teclado alfanumérico de 16 teclas, memoria no volátil de 512 kb (>20.000 lecturas), reloj interno, IP65.
+- **Conexión al PC**: cable USB 2.0 (el paquete base). Existen módulos opcionales de **Bluetooth**, RS232 y GPRS como accesorios, pero no vienen de serie.
+- Accesorio "antena panel": convierte el lector en un sistema de lectura dinámica autónomo para manga de manejo (lee automáticamente todos los crotales que pasen por el alcance de la antena, sin necesitar PC conectado).
+
+**Software de PC: UniTransfer** — confirma exactamente el rol de los ficheros `.rdf` que ya habíamos analizado:
+
+1. En el lector se carga un **"programa"** (fichero `.uni`, cargado vía `interno/HHR Loader/HHR ProgramLoader.exe`) que define los menús y campos a capturar — esto es lo que contienen los `.rdf` extraídos de cada zip (`ID Andalucia`, `ID Extremadura`, `Altas`, `Bajas`, `Partos`, `Cubriciones`, `Montas`, `Saneamientos`, `Tratamientos`, `Secados`, `Reposiciones`, `Control Lechero`, `Cebadero_CLM`/`_Extremadura`/`_CYL`, `Censo Extremadura`) — **uno por operación de campo y, cuando aplica, por Comunidad Autónoma** (coherente con el hallazgo de codificación regional ya documentado arriba). El propio `UniTransfer_1.37.zip` incluye de fábrica `programas/Gen_Gestion7.uni` ("Genérico de Gestión").
+2. En campo: el ganadero/técnico enciende el lector, selecciona el programa/menú, lee el crotal electrónico (pulsando el botón RFID) y rellena a mano los campos que pida ese programa (fecha, litros, tipo de tratamiento, etc. — igual que vimos en `Control Lechero.rdf`). Si el chip ya existía en memoria, el lector avisa "El microchip ya existe" y permite editar sus datos asociados.
+3. De vuelta en la oficina: se conecta el lector al PC por USB y se ejecuta **UniTransfer → "Recibir datos"**. El programa **convierte automáticamente** lo capturado a: Excel, Word, o **"formatos oficiales de identificación de las distintas CC.AA."** (cita textual de `EI2061.pdf`) — es decir, UniTransfer ya sabe generar el fichero de intercambio SIGGAN/BADIGEX directamente desde una lectura de campo.
+
+**Implicación para la app**: esto resuelve la pregunta de "cómo entra el RFID en la app". La vía realista **no es** que el teléfono lea el chip (confirmado inviable por incompatibilidad de frecuencia, ver `js/app.js:1483-1553`), sino:
+
+- **Opción A (mínima)**: soportar la **importación del Excel que exporta UniTransfer** tras una sesión de lectura de campo — mapeando sus columnas (variables según el programa/`.rdf` cargado) a los formularios de alta/movimiento/reproducción/sanidad ya existentes en la app. No requiere hardware nuevo ni acceso al protocolo propietario del lector.
+- **Opción B (a futuro, si se justifica)**: comunicación directa lector↔PC/móvil sin pasar por UniTransfer, vía el módulo Bluetooth opcional — requeriría documentación del protocolo serie de Felixcan (no incluida en lo aportado hasta ahora) y `navigator.bluetooth`/Web Serial.
+- La opción A es la que aprovecha directamente todo lo ya documentado (estructura de los `.rdf` = qué campos trae cada exportación) sin más incertidumbre técnica.
+
+**Pendiente real**: no tenemos todavía una muestra real de un fichero exportado por UniTransfer (Excel ni el "formato oficial CCAA") para confirmar el mapeo exacto de columnas — sería el siguiente artefacto útil si se decide implementar la Opción A.
