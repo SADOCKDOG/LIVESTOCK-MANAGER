@@ -23,7 +23,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 | # | Gap | Esfuerzo | Bloqueante para | Prioridad |
 |---|---|---|---|---|
 | 1 | Catálogo de razas (163 razas) | ✅ **Implementado** (commit `8675c08`, 2026-07-22) | — | — |
-| 2 | Tabla de correspondencia `Espe` SIGGAN | Bajo — solo datos, sin UI nueva | Cualquier exportador/importador SIGGAN real | **Alta** |
+| 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
 | 3 | Modelo jerárquico de vacunaciones | Medio — nueva tabla + UI | Alinear con ADSG WEB; informes oficiales de vacunación | Media |
 | 4 | Equino: aplicar validación de crotal ya cerrada | Bajo — 2 líneas de código | Nada (mejora aislada) | Media (ya diagnosticado, solo falta aplicar) |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | Medio-alto — nueva tabla + formularios | Nada urgente, mejora de completitud | Baja-media |
@@ -41,29 +41,13 @@ DB_VERSION 15→16, migración aditiva. Tabla `razas` (keyPath `id`, índice `es
 
 ---
 
-## 2. Tabla de correspondencia SIGGAN `Espe` (prioridad alta, requisito bloqueante)
+## 2. Tabla de correspondencia SIGGAN `Espe` — ✅ IMPLEMENTADO (commit `e2e8c76`, 2026-07-22)
 
-**El problema**: el fichero real de incorporación a SIGGAN usa una codificación de especie **distinta** de la ya implementada (catálogo SIEX del FEGA, `js/db.js` `ESPECIES_SEED`):
+Añadidos los campos `codigo_espe_siggan`/`espe_id_siggan` a `ESPECIES_SEED` en `js/db.js`: Bovino→`02`, Porcino→`03`, Ovino→`04`/`espe_id_siggan: 3`, Caprino→`04`/`espe_id_siggan: 2`, Équido→`01`. Migración de datos (`migrarEspeSiggan()`) para instalaciones que ya tenían la tabla `especies` sembrada antes de este cambio — sin bump de `DB_VERSION` (no crea tablas nuevas, solo añade campos). Verificado en navegador para instalación nueva e instalación existente migrada.
 
-| Codificación | 01 | 02 | 03 | 04 | 05 |
-|---|---|---|---|---|---|
-| **SIEX/FEGA** (ya en `js/db.js`) | Bovino | Porcino | Ovino | Caprino | Équido |
-| **`Espe` (SIGGAN, fichero incorporación)** | Équido | Bovino | Porcino | Ovino+Caprino combinados (distinguidos por `Espe_ID`: 2=caprino, 3=ovino) | Aves |
+**El catálogo `Tipo_Iden`** (3 valores: bolo ruminal+crotal, inyectable+crotal, crotal electrónico+crotal) ya coincidía con `TIPOS_IDENTIFICADOR_SEED` (ids 2, 3, 4) — no requirió trabajo adicional.
 
-Especificación completa del fichero de 15 campos (`ID;Iden_elec;Pais;NumExplo;FNaci;FId;Espe;Espe_ID;Dupli;Raza;Tipo_Iden;Tec;Cr;Sexo;Cebo`) ya documentada en detalle en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md#especificación-oficial-y-exacta-fichero-de-incorporación-de-datos-a-siggan-pequeño-rumiante) — no se repite aquí.
-
-**Buena noticia**: el catálogo `Tipo_Iden` (3 valores: bolo ruminal+crotal, inyectable+crotal, crotal electrónico+crotal) **ya coincide** con `TIPOS_IDENTIFICADOR_SEED` (ids 2, 3, 4) — no requiere trabajo adicional.
-
-**Diseño propuesto**: no una tabla nueva completa, sino un campo adicional en la tabla `especies` ya existente:
-```js
-{ id: 1, codigo_siex: '01', nombre_oficial: 'Bovino', ..., codigo_espe_siggan: '02' },
-{ id: 2, codigo_siex: '02', nombre_oficial: 'Porcino', ..., codigo_espe_siggan: '03' },
-{ id: 3, codigo_siex: '03', nombre_oficial: 'Ovino', ..., codigo_espe_siggan: '04', espe_id_siggan: 3 },
-{ id: 4, codigo_siex: '04', nombre_oficial: 'Caprino', ..., codigo_espe_siggan: '04', espe_id_siggan: 2 },
-{ id: 5, codigo_siex: '05', nombre_oficial: 'Équido', ..., codigo_espe_siggan: '01' },
-```
-
-**Nota de alcance**: este trabajo por sí solo NO construye un exportador funcional — solo deja los datos maestros listos para que, cuando se decida abordar la exportación/importación real de ficheros SIGGAN, no haga falta re-descubrir el mapeo. El campo `Cebo` del fichero debería vincularse al concepto de "tanda de cebo" ya modelado en la app (ver memoria `cebo-tandas-siggan-model`).
+**Sigue pendiente, fuera de este cambio**: esto solo deja los datos maestros listos — no construye ningún exportador/importador SIGGAN real. El campo `Cebo` del fichero (relacionado con "tanda de cebo") sigue sin vincularse. Especificación completa del fichero de 15 campos en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md#especificación-oficial-y-exacta-fichero-de-incorporación-de-datos-a-siggan-pequeño-rumiante).
 
 **Advertencia regional ya documentada** (sin acción requerida todavía): los códigos de especie/raza son por región, no nacionales — Andalucía (SIGGAN) y Extremadura (BADIGEX) usan numeraciones invertidas. Esta tabla de correspondencia cubre solo el caso SIGGAN/Andalucía. Detalle completo en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md#️-advertencia-importante-los-códigos-de-especierraza-son-por-región-no-nacionales).
 
