@@ -222,10 +222,11 @@ const AnimalesView = {
     };
     if (!esNuevo) a = await Animales.get(id);
 
-    const [especies, tiposIdentificador, especieTipoIdentificador, rebanos, todosAnimales] = await Promise.all([
+    const [especies, tiposIdentificador, especieTipoIdentificador, razas, rebanos, todosAnimales] = await Promise.all([
       window.db.getAll("especies").catch(() => []),
       window.db.getAll("tipos_identificador").catch(() => []),
       window.db.getAll("especie_tipo_identificador").catch(() => []),
+      window.db.getAll("razas").catch(() => []),
       Rebanos.list(),
       Animales.list().catch(() => []),
     ]);
@@ -237,9 +238,14 @@ const AnimalesView = {
         .map((r) => r.tipoIdentificadorId);
       return tiposIdentificador.filter((t) => idsValidos.includes(t.id) && !t.fecha_baja);
     };
+    // Razas del catálogo oficial FEGA válidas para la especie (ver
+    // docs/NORMATIVA-CROTAL-ESPECIE.md sección "Catálogo de razas").
+    const razasPorEspecieId = (especieId) =>
+      razas.filter((r) => Number(r.especieId) === Number(especieId)).sort((a, b) => a.nombre.localeCompare(b.nombre));
     // Cache para que _onEspecieChange (onchange, sin acceso a estas const locales)
-    // pueda repoblar el selector de tipo de crotal sin volver a consultar la BD.
+    // pueda repoblar los selectores de tipo de crotal y raza sin volver a consultar la BD.
     this._tiposIdentificadorPorEspecieIdCache = tiposIdentificadorPorEspecieId;
+    this._razasPorEspecieIdCache = razasPorEspecieId;
 
     // Fallback: animales guardados antes de la migración v15 (o creados por seed-data)
     // solo tienen `especie` (string), no `especieId`. El <select> de ESPECIE ya marca
@@ -318,8 +324,22 @@ const AnimalesView = {
             </div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
-                <label class="wizard-label" for="a-raza">RAZA</label>
-                <input type="text" id="a-raza" value="${a.raza || ""}" class="wizard-input uppercase font-800" placeholder="SIN RAZA">
+                <label class="wizard-label" for="a-raza">RAZA (CATÁLOGO OFICIAL)</label>
+                ${(() => {
+                  const razasIniciales = razasPorEspecieId(especieIdInicial);
+                  const razaCatalogada = a.raza && razasIniciales.find((r) => r.nombre.toUpperCase() === a.raza.toUpperCase());
+                  const esOtra = !!(a.raza && !razaCatalogada);
+                  return `
+                <select id="a-raza" class="wizard-input font-800" onchange="AnimalesView._onRazaChange(this)">
+                  <option value="">— SIN RAZA —</option>
+                  ${razasIniciales.map((r) => `<option value="${r.nombre}" ${razaCatalogada && razaCatalogada.nombre === r.nombre ? "selected" : ""}>${r.nombre.toUpperCase()}</option>`).join("")}
+                  <option value="__otra__" ${esOtra ? "selected" : ""}>OTRA (ESPECIFICAR)</option>
+                </select>
+                <input type="text" id="a-raza-otra" value="${esOtra ? a.raza : ""}"
+                       class="wizard-input uppercase font-800 mt-6"
+                       placeholder="Nombre de la raza"
+                       style="display: ${esOtra ? "block" : "none"};">`;
+                })()}
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-rebano">REBAÑO / LOTE</label>
@@ -607,7 +627,9 @@ const AnimalesView = {
           ? Number(document.getElementById("a-tipo-crotal-oficial").value)
           : null,
         sexo: document.getElementById("a-sexo").value,
-        raza: document.getElementById("a-raza").value.trim(),
+        raza: document.getElementById("a-raza").value === "__otra__"
+          ? document.getElementById("a-raza-otra").value.trim()
+          : document.getElementById("a-raza").value.trim(),
         tipo: document.getElementById("a-tipo").value.trim(),
         peso_inicial: parseFloat(document.getElementById("a-pesoinicial").value) || null,
         rebanoId: rebanoIdFinal,
@@ -764,6 +786,22 @@ const AnimalesView = {
         ? tipos.map((t) => `<option value="${t.id}">${t.nombre.toUpperCase()}</option>`).join('')
         : '<option value="">— Sin tipos definidos —</option>';
     }
+    // Refrescar el catálogo oficial de razas según la nueva especie
+    // (ver docs/NORMATIVA-CROTAL-ESPECIE.md sección "Catálogo de razas")
+    const razaSel = document.getElementById('a-raza');
+    if (razaSel && especieId && this._razasPorEspecieIdCache) {
+      const razasList = this._razasPorEspecieIdCache(especieId);
+      razaSel.innerHTML = '<option value="">— SIN RAZA —</option>' +
+        razasList.map((r) => `<option value="${r.nombre}">${r.nombre.toUpperCase()}</option>`).join('') +
+        '<option value="__otra__">OTRA (ESPECIFICAR)</option>';
+      const razaOtra = document.getElementById('a-raza-otra');
+      if (razaOtra) { razaOtra.style.display = 'none'; razaOtra.value = ''; }
+    }
+  },
+
+  _onRazaChange(selectEl) {
+    const otra = document.getElementById('a-raza-otra');
+    if (otra) otra.style.display = selectEl.value === '__otra__' ? 'block' : 'none';
   },
 
   _onEstadoChange(selectEl) {
