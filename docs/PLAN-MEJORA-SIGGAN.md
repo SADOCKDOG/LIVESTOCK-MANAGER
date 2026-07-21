@@ -16,6 +16,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 - Ofrecer un módulo de vacunación con el mismo nivel de detalle que exige ADSG (gap 3).
 - Capturar datos de campo con lectores RFID físicos sin perder información (gap 6).
 - Modelar la explotación física con el mismo detalle que SIGGAN (gap 5).
+- Modelar el nivel intermedio REGA→especie que SIEX exige formalmente (gap 7, detectado en la auditoría de pendientes prioritarios del 2026-07-22).
 
 ## Orden de implementación recomendado
 
@@ -27,6 +28,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 | 4 | Equino: aplicar validación de crotal ya cerrada | Bajo — 2 líneas de código | Nada (mejora aislada) | Media (ya diagnosticado, solo falta aplicar) |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | Medio-alto — nueva tabla + formularios | Nada urgente, mejora de completitud | Baja-media |
 | 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | Bajo por campo, medio en conjunto | Compatibilidad con lectores RFID físicos | Baja (según si el usuario usa esos lectores) |
+| 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | Alto — cambio de modelo de relación finca↔animal | Cumplimiento formal SIEX/REGA a nivel administrativo | Baja (estructural, evaluar si aporta valor real de uso) |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
 
 ---
@@ -130,6 +132,8 @@ Este es el gap con la ratio esfuerzo/beneficio más favorable de todo el plan �
 
 **No priorizar** salvo que el alcance de la app se amplíe a porcino/avícola industrial — en ese caso sí conviene evaluar una unidad de agrupación por encima del animal individual (nave/lote), ya anticipado conceptualmente por el modelo de "tandas de cebo".
 
+**Actualización (auditoría de pendientes prioritarios, 2026-07-22)**: el Anexo I de Variables Ganaderas del FEGA (`docs/AUDITAR/Catalogos_csv/20250514-Anexo_I_Definicion_de_Variables_Ganaderas_3.6.0...xlsx`, bloque "Edificaciones e instalaciones") confirma que este gap es más grande de lo estimado — no basta con un catálogo de tipos de instalación (`Edificaciones e instalaciones.csv`, 109 tipos, ya inventariado), sino un **formulario completo de 12-13 campos por instalación**: tipo (catálogo), referencia catastral, propia/ajena, coordenadas, cota, superficie m², nº unidades, año de construcción, régimen de tenencia, NIF del arrendador, **plazas máximas de alojamiento ganadero**, **volumen máximo de silos/depósitos en m³**. Si se implementa este gap, el diseño debe contemplar esta ficha completa, no solo un selector de tipo de instalación.
+
 ---
 
 ## 6. Campos de captura de campo — lectores RFID (prioridad baja, condicional)
@@ -147,6 +151,18 @@ Solo relevante si el usuario efectivamente usa o planea usar lectores RFID físi
 | Granularidad individual (nº tubo + sexo por animal) | Saneamientos — hoy agregado por campaña (`num_examinados`, `num_positivos`) | `js/saneamientos.js` |
 
 El último punto (saneamientos por animal) es el único con impacto real en trazabilidad SIGGAN si se necesita; el resto son mejoras de formulario de bajo riesgo.
+
+---
+
+## 7. Concepto "Subexplotación" (prioridad baja, gap estructural — añadido 2026-07-22)
+
+**Fuente**: `docs/AUDITAR/2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` (documento técnico SIEX más reciente, 2025) y el XLSX Anexo I de Variables Ganaderas (bloque "Subexplotación", 21 campos).
+
+**Qué falta**: el concepto **"Subexplotación" no existe en absoluto en el código** de Livestock Manager (confirmado por búsqueda exhaustiva en todo `js/`, cero coincidencias). Es la unidad real que usa SIEX/REGA por debajo de la explotación: **una subexplotación = un código REGA + una especie + su clasificación zootécnica**. Es decir, SIEX no relaciona animales directamente con la explotación (finca), sino con una subdivisión de esa explotación por especie.
+
+Livestock Manager hoy organiza los animales directamente bajo "finca" (`js/fincas.js`), sin ese nivel intermedio. El bloque XLSX de 21 campos incluye: censo por categoría, integradora comercial asociada, y datos de cría animal (asociación de criadores/raza/clasificación — coincide con el catálogo de razas ya priorizado en el punto 1 de este plan).
+
+**Por qué prioridad baja pese a ser un gap estructural**: introducir este nivel intermedio implicaría cambiar la relación fundamental animal↔finca en todo el código (un cambio de mayor alcance que cualquier otro punto de este plan). Antes de acometerlo, vale la pena confirmar si realmente aporta valor de uso a un ganadero que gestiona una sola explotación con una o pocas especies — el nivel de detalle formal que exige SIEX (pensado para la administración pública, no para el día a día del ganadero) puede no justificar la complejidad añadida en la mayoría de casos de uso reales de la app. Recomendación: no implementar salvo que se identifique un caso de uso concreto (ej. un ganadero con varias especies en la misma finca que necesite reportar censos separados por subexplotación a SIGGAN).
 
 ---
 
@@ -172,12 +188,20 @@ Detalle completo de los 12 estados en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADS
 
 ## Documentos que quedaron sin auditar a fondo (pendiente si se retoma este trabajo)
 
-- `2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` — es la versión **más reciente** (2025) del documento técnico SIEX, podría contener correcciones a los catálogos `ESPECIE_ANIMAL`/`RIIA_TIPO_IDENTIFICADOR` ya usados en `js/db.js`. Recomendado auditarlo antes de dar esos catálogos por definitivamente cerrados.
+**Actualizado 2026-07-22** — los 3 documentos que eran prioridad máxima ya están auditados (ver más abajo, sección "Auditoría de pendientes prioritarios cerrada"). Solo quedan de baja prioridad:
+
 - `GTA006E_MUS_Manual_Usuario_0400.odt`, `Anexo_I_Manual_ADSGWeb.ods` — no se pudieron abrir por falta de librería `odfpy` en el entorno de auditoría.
 - `Manual_SIGGAN_Diagnosticos.pdf` — identificado como módulo "SIGGAN - Saneamiento Bovino" (ALANA), solo portada leída.
-- `GUIA_AD-SIEX-DSI-PortalPublico.pdf` — no auditado en esta pasada.
 - Sección "Mensajes de error" (3.4) de `ADS005E...pdf` — ~4800 líneas, podría aportar reglas de validación de negocio adicionales.
 - Detalle operativo paso a paso (más allá del mapa 1.4) de Avícola, Porcino y Cunícola en ADSG WEB.
+
+### Auditoría de pendientes prioritarios cerrada (2026-07-22)
+
+Los 3 documentos marcados como prioritarios en `docs/AUDITAR/INVENTARIO-AUDITORIA.md` ya están auditados:
+
+- **`2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf`** (el más importante) — **confirmado sin cambios** respecto al catálogo `ESPECIE_ANIMAL` ya implementado en `js/db.js` (pese al nombre "corrección de errores", es el documento técnico SIEX v3.6.0 completo, no un changelog puntual). Cero riesgo para el modelo de datos ya cerrado. Aportó 2 hallazgos: catálogo de 23 "Tipos de explotación ganadera" (complementa el ya inventariado) y confirmación del gap "Subexplotación" (ver punto 7 arriba).
+- **`GUIA_AD-SIEX-DSI-PortalPublico.pdf`** — API REST del FEGA confirmada "sin autenticación"; CORS sigue sin documentarse explícitamente (pendiente de validar empíricamente). Endpoint nuevo útil no usado hoy: `GET /catalogos/{idTabla}/fecha` (para sincronización incremental de catálogos, solo descargar si cambió). 2 catálogos del grupo GANADERAS reclasificados desde "agrícola" a "ganadero": `Sistemas de sostenibilidad y control.csv`, `Datos de la integradora comercial.csv` (ver `INVENTARIO-AUDITORIA.md`).
+- **XLSX Anexo I de Variables Ganaderas** — auditado completo (los 11 bloques restantes, más allá de "Datos individuales de los animales" ya cubierto). Aportó el detalle de campos del gap "Instalaciones" (punto 5, actualizado arriba) y confirmó el gap nuevo "Subexplotación" (punto 7). Los bloques "Gerente de explotación", "Rendimiento económico", "Asociaciones/socios" y "Actividad secundaria" son gaps completos de prioridad baja, no incorporados a este plan por no chocar con nada ya implementado ni aportar valor claro al alcance operativo actual de la app — mencionados aquí solo para constancia de que fueron revisados.
 
 ---
 
