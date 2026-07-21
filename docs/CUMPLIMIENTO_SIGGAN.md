@@ -1,5 +1,5 @@
 # Matriz de Cumplimiento SIGGAN — Livestock Manager
-> Generada el **2026-06-24** · Actualizada el **2026-06-24** · App v4.5.0 · DB v11 · Suite QA: 18 tests
+> Generada el **2026-06-24** · Actualizada el **2026-07-21** · App v4.5.0 · DB v11 · Suite QA: 18 tests
 >
 > Vara de medir: modelo y flujos oficiales del **SIGGAN** (Sistema de Información de Gestión Ganadera, Andalucía) y marco **BADIGEX** (Extremadura), con base normativa RD 479/2004 (REGA), RD 787/2023 (identificación/registro/movimientos) y Reg. UE 1069/2009 (SANDACH).
 >
@@ -9,7 +9,11 @@
 
 ## 1. Resumen ejecutivo
 
-La adaptación SIGGAN está **prácticamente completa**. Todos los flujos normativos evaluados **cumplen** con validación en capa de dominio (no solo UI) y cobertura de QA automatizada. La deuda técnica que afectaba al cumplimiento (KPIs de zonas, notificaciones REGA en `localStorage`, manuales sin actualizar) ha sido **resuelta**. Quedan únicamente **dos puntos abiertos que dependen de recursos externos**: la ejecución de la suite QA en un dispositivo Android real y la validación del formato de exportación contra el importador oficial de SIGGAN/BADIGEX (requiere credenciales o ficha técnica de la Junta).
+La adaptación SIGGAN de los **flujos evaluados en esta matriz** (movimientos, sanidad básica, trazabilidad, comercialización) está **prácticamente completa**, con validación en capa de dominio y cobertura de QA automatizada. La deuda técnica original (KPIs de zonas, notificaciones REGA en `localStorage`, manuales sin actualizar) ha sido **resuelta**.
+
+**Actualización 2026-07-21**: una auditoría exhaustiva de toda la documentación normativa restante en `docs/AUDITAR/` (6 subagentes, ~150 documentos) detectó **6 gaps estructurales adicionales no cubiertos por esta matriz** — catálogo de razas, tabla de correspondencia de especie SIGGAN, modelo jerárquico de vacunaciones, identificación equina (normativa cerrada, aplicación en código pendiente), sub-modelo de instalaciones/geolocalización de finca, y campos de captura de lectores RFID. Ninguno invalida el ✅ de los puntos ya evaluados abajo, pero amplían el alcance de "cumplimiento SIGGAN" más allá de lo que esta matriz medía originalmente. **Ver [PLAN-MEJORA-SIGGAN.md](PLAN-MEJORA-SIGGAN.md) para el detalle completo y priorizado** — no se han añadido filas nuevas a la matriz de abajo porque esos gaps son de **modelo de datos/dato maestro**, de naturaleza distinta a los flujos ya evaluados aquí.
+
+Quedan además los **dos puntos abiertos que ya dependían de recursos externos**: la ejecución de la suite QA en un dispositivo Android real y la validación del formato de exportación contra el importador oficial de SIGGAN/BADIGEX (requiere credenciales o ficha técnica de la Junta).
 
 | Bloque | Estado global |
 |---|---|
@@ -81,10 +85,19 @@ La adaptación SIGGAN está **prácticamente completa**. Todos los flujos normat
 
 ## 4. Backlog priorizado (lo que queda)
 
-> Ambos puntos dependen de recursos externos al desarrollo.
+### De esta matriz (dependen de recursos externos)
 
 1. 🟡 **Validación end-to-end en Android** — `cap:sync` ya ejecutado; falta lanzar `SigganQA.runAll()` en un dispositivo real (acción manual del usuario).
 2. 🟡 **Validar export oficial** CSV/XML contra el formato de carga SIGGAN/BADIGEX real (requiere acceso al importador o ficha técnica oficial).
+
+### De la auditoría 2026-07-21 (no dependen de recursos externos, ver [PLAN-MEJORA-SIGGAN.md](PLAN-MEJORA-SIGGAN.md) para el detalle)
+
+3. **Catálogo de razas** (189 razas oficiales) — prioridad alta, mismo patrón ya probado con especie/crotal.
+4. **Tabla de correspondencia de especie SIGGAN** (`Espe`/`Espe_ID`) — prioridad alta, requisito bloqueante para cualquier exportador SIGGAN real.
+5. **Modelo jerárquico de vacunaciones** — prioridad media, gap sanitario más grande detectado.
+6. **Aplicar validación de crotal equino** ya cerrada normativamente — prioridad media, esfuerzo bajo (solo falta aplicar el cambio en código).
+7. **Sub-modelo Instalaciones + geolocalización + restricciones** en finca — prioridad baja-media.
+8. **Campos de captura de lectores RFID** (hora, lote, nº macho, saneamiento individual) — prioridad baja, condicional a uso real de lectores físicos.
 
 ---
 
