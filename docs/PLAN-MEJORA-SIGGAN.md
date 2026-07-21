@@ -4,7 +4,7 @@
 
 **Cómo leer este documento**: es el plan maestro. Cada sección enlaza al documento de detalle normativo correspondiente (`docs/NORMATIVA-CROTAL-ESPECIE.md`, `docs/ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md`) donde está la cita exacta de fuente y el razonamiento completo — aquí solo está lo accionable: qué falta, dónde, y en qué orden abordarlo.
 
-**Relacionado**: [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md).
+**Relacionado**: [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md), [AUDITAR/INVENTARIO-AUDITORIA.md](AUDITAR/INVENTARIO-AUDITORIA.md) (qué documento/fichero de `docs/AUDITAR/` está auditado, cuál no aplica, y cuál queda pendiente).
 
 ---
 
