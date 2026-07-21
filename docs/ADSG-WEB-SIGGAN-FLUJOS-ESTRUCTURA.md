@@ -7,11 +7,20 @@
 
 ADSG WEB es el sistema (canal web) mediante el cual las ADSG (Agrupaciones de Defensa Sanitaria Ganadera) consultan y operan sobre **SIGGAN** (Sistema Integrado de Gestión Ganadera de Andalucía) en nombre de los ganaderos: Registro de Explotaciones, Titulares y Animales, Control de Movimientos Pecuarios y Saneamiento Animal. Es la referencia más directa que tenemos del backend/modelo de datos real con el que Livestock Manager debería poder interoperar (import/export de ficheros, formatos de crotal, catálogos).
 
+## Objetivo y alcance del documento (auditoría dedicada, 2026-07-21)
+
+**Objeto (1.1, pág. 4)**, cita textual: *"Con el fin de facilitar y mejorar los servicios que las ADSG ofrecen a los ganaderos, se propone la realización de un Sistema de Gestión, basado en tecnología WEB, que permita al profesional de la ADSG realizar las consultas y procesos necesarios sobre el sistema SIGGAN."*
+
+**A quién va dirigido (1.2, pág. 4)**: dos perfiles declarados — las **ADSG** (gerentes, colaboradores, técnicos) y el **Sector Ganadero** (usuario final). El cuerpo del manual revela un **tercer perfil no mencionado en el índice de alcance**: el **Veterinario**, con su propio "Menú Principal Veterinarios" separado (pág. 80/81, 259/260, ~434), que solo puede operar (crear/modificar serologías) en explotaciones donde consta como responsable sanitario (2.5.3.1.2.4, pág. 81). Es un modelo de permisos por rol + por especie que Livestock Manager no tiene (app mono-usuario, sin roles) — no se recomienda implementarlo salvo que el alcance cambie a app multiusuario.
+
+**Qué cubre y qué NO (1.3, pág. 4-5)**: Registro de Explotaciones/Titulares/Animales, Control de Movimientos, Saneamiento — declara explícitamente *"no siendo el objetivo de esta aplicación aportar ni sustituir ninguna de las funcionalidades existentes"* de SIGGAN (1.3.1). Cubre 5 especies con sección operativa propia: Avícola, Porcino, Bovino, Pequeño Rumiante, Cunícola. **Equino NO tiene sección operativa propia** en este manual (aparece solo como rama del menú de Informes, sin desarrollo funcional) — confirma que el vacío de equino en Livestock Manager no es estar "por detrás" de SIGGAN, el propio SIGGAN de 2015 tampoco lo tenía resuelto ahí.
+
 ## Mapa completo de navegación
 
 ```
 1. Descripción del sistema
    1.4 Mapa del sistema (navegación por especie: Bovino, Porcino, Avícola, Pequeños Rumiantes, Cunícola)
+       — ver árbol completo de las 6 Unidades Productivas en la sección siguiente
 
 2. Operativa del sistema
    2.1 Anexos para Informes
@@ -55,6 +64,78 @@ ADSG WEB es el sistema (canal web) mediante el cual las ADSG (Agrupaciones de De
 4. Glosario
 5. Bibliografía
 ```
+
+## Árbol completo del punto 1.4 "Mapa del sistema" (auditoría dedicada, 2026-07-21)
+
+Texto introductorio del propio manual (pág. 5), cita: *"Desde este punto se podrá acceder a cada una de las especies que conforman el alcance del proyecto [...] También se accederá a un punto de carácter global, denominado Registro General, cuyas consultas no tendrá en cuenta la especie [...] Una vez localizadas las Explotaciones Ganaderas del cual se quiere actuar, se podrá acceder al grupo de pantallas que forma la estructura de las Unidades Productivas [...] según la especie que representa."* — es decir, el manual declara explícitamente que la navegación de "Unidades Productivas" está estructurada por especie, un árbol de menú distinto para cada una. Diagramas extraídos por rasterizado (no eran texto seleccionable), págs. 6-11.
+
+### 1.4.1 Unidades Productivas — BOVINO (pág. 6)
+```
+BOVINO
+├── Generales: Titulares | Responsables Sanitarios | Datos Geográficos | Censos "actuales" | Otros
+├── Estructura: Instalaciones | Sistemas | Características | Ganadería Integrada | Controles
+├── Animales: Búsqueda Animales
+├── Filiaciones: Explotaciones Normales | Explotaciones de Lidia
+└── Históricos: Restricciones
+```
+
+### 1.4.2 Unidades Productivas — PORCINO (pág. 7)
+```
+PORCINO
+├── Generales: Titulares | Responsables Sanitarios | Capacidades y Censos | Datos Sanitarios | Geográficos y Otros
+├── Estructura: Instalaciones | Gestión | Purines/Estercolero | Ganadería Integrada | Controles
+├── Saneamiento: Hco. Vacunaciones
+└── Históricos: Calificaciones | Censos | Capacidades | Restricciones
+```
+
+### 1.4.3 Unidades Productivas — AVÍCOLA (pág. 8)
+```
+AVÍCOLA
+├── Generales: Titulares | Responsables Sanitarios | Capacidades y Censos | Geográficos/Otros
+├── Estructura: Instalaciones | Ganadería Integrada | Controles
+├── Históricos: Censos | Naves | Capacidades | Restricciones
+└── Saneamiento: Analíticas
+```
+
+### 1.4.4 Unidades Productivas — PEQUEÑOS RUMIANTES (pág. 9)
+```
+PEQUEÑOS RUMIANTES
+├── Generales: Titulares | Responsables Sanitarios | Datos Geográficos | Censos | Datos Sanitarios | Otros
+├── Estructura: Instalaciones | Gestión | Purines/Estercoleros | Ganadería Integrada | Controles
+├── Animales: Identificación | Titular | Otros
+├── Históricos: Calificaciones | Censos | Restricciones
+└── Saneamiento: Indemnización | Vacunaciones
+```
+
+### 1.4.5 Unidades Productivas — CUNÍCOLA (pág. 10)
+```
+CUNÍCOLA
+├── Generales: Titulares | Responsables Sanitarios | Capacidades y Censos | Geográficos/Otros
+├── Estructura: Instalaciones | Gestión | Purines/Estercolero | Ganadería Integrada | Controles
+└── Históricos: Censos | Capacidades
+```
+
+### 1.4.6 Informes (pág. 11)
+
+Diagrama distinto: Menú Principal con 7 ramas de primer nivel — **Registro General, Bovino, Porcino, Avícola, Pequeño Rumiante, Equinos, Cunícola** — cada una con Registro/Sanitarios/Movimientos, alimentando informes concretos (Fichas de Titulares, Explotaciones por Localización, Histórico de Censos y Capacidades Máximas, Movimientos de Entrada/Salida, Vacunas por especie, Crotales Entregados y Asignados, Total de Animales Investigados, etc.).
+
+**Hallazgo**: "Equinos" aparece aquí como rama de primer nivel en pie de igualdad con las demás especies, pero **no tiene ningún subpunto 1.4.x dedicado** ni sección 2.x de "Operativa" en el índice completo del manual — confirma lo anotado en la sección "Objetivo y alcance" arriba.
+
+### Comparación de gap código-vs-1.4 (tabla resumida — detalle completo en memoria de sesión)
+
+El patrón general: los nodos **"Generales"** y **"Animales/Identificación"** son casi idénticos entre las 5 especies y casi todos tienen equivalente razonable en Livestock Manager (Titulares → `js/fincas.js` campo `propietario`, parcial; Censos → `js/views/ganaderia-view.js`; Identificación → modelo especie/tipo-identificador ya implementado). El gap real y sistemático está en el nodo **"Estructura"**:
+
+| Subnodo "Estructura" | Especies donde aparece | Estado en Livestock Manager |
+|---|---|---|
+| Instalaciones | Las 5 | **Gap total** — no existe modelo de instalaciones físicas (naves, corrales) en `js/fincas.js` |
+| Purines/Estercolero | Porcino, Cunícola, Pequeños Rumiantes | **Gap total** — 0 resultados en todo el repo |
+| Ganadería Integrada | Las 5 | **Gap total** — concepto de empresa integradora/ganadero integrado no existe |
+| Sistemas/Características | Bovino | **Gap total** |
+| Controles (visitas oficiales) | Las 5 | **Gap total**, salvo solape parcial con Sanidad |
+
+Otros gaps puntuales fuera de "Estructura": **Datos Geográficos** (latitud/longitud, gap total en `js/fincas.js`), **Históricos → Restricciones** (Bovino/Porcino/Pequeño Rumiante — estado operativo de "explotación restringida", hoy `js/saneamientos.js` solo tiene `calificacion`, no un flag de restricción), **Saneamiento → Indemnización** (solo Pequeño Rumiante — régimen de sacrificio obligatorio indemnizado por brucelosis, gap total), **Históricos → Naves** (solo Avícola — unidad productiva relevante ahí no es el animal individual sino la nave/lote, coherente con el patrón ya conocido de "tandas de cebo"), **Filiaciones → Explotaciones de Lidia** (Bovino — Livestock Manager tiene genealogía madre-cría genérica pero sin distinguir tipo de explotación "lidia").
+
+**Conclusión de la auditoría**: NO se justifica reestructurar Livestock Manager en módulos separados por especie (el coste de duplicar Generales/Animales, que ya son genéricos y funcionan, no compensa). Sí es accionable y de bajo riesgo: (1) sub-modelo "Instalaciones" en finca con campos condicionados por tipo de explotación, (2) campo latitud/longitud en finca, (3) flag "restricción de movimientos" en saneamientos. Si el alcance se amplía a porcino/avícola industrial, sí tendría sentido una unidad de agrupación por encima del animal individual (nave/lote) — ya anticipado por el concepto de tandas de cebo.
 
 ## Flujos detallados (leídos a fondo — los más relevantes para Livestock Manager)
 
@@ -122,5 +203,6 @@ Lógica de negocio del procesamiento (importante si se quiere generar/consumir f
 ## Pendiente de revisar
 
 - Sección completa de "Mensajes de error" (3.4) — muy extensa (~4800 líneas de texto extraído), no revisada en detalle; podría aportar validaciones de negocio adicionales si se necesita en el futuro.
-- Detalle de Avícola, Porcino y Cunícola — solo mapeados por título (ver mapa de navegación arriba), no leídos a fondo. Retomar si el alcance de la app se amplía a esas especies.
+- Detalle operativo (2.x, más allá del mapa 1.4) de Avícola, Porcino y Cunícola — el árbol de navegación (1.4) ya está completo (ver sección dedicada arriba), pero los flujos paso a paso de esas 3 secciones no se han leído a fondo como sí se hizo con Bovino/Pequeño Rumiante. Retomar si el alcance de la app se amplía a esas especies.
 - Formato exacto de fichero de "Carga de ficheros" para Bovino (si existe una sección equivalente) y para Movimientos/Guías — no localizado aún en esta pasada.
+- Plan de implementación completo y priorizado de todos los gaps de este documento (y de los otros 5 auditados en la misma sesión) en [PLAN-MEJORA-SIGGAN.md](PLAN-MEJORA-SIGGAN.md).
