@@ -10,12 +10,22 @@ const DB_VERSION = 16;
 // especies.id = código SIEX oficial del catálogo ESPECIE_ANIMAL del FEGA
 // (docs/AUDITAR/Catalogos_csv/Especies animales.csv). nombre_display conserva
 // la etiqueta coloquial que ya ve el usuario en el selector de especie.
+//
+// codigo_espe_siggan / espe_id_siggan: codificación de especie que usa el
+// PROPIO chip/fichero de incorporación SIGGAN (campo `Espe`), que es DISTINTA
+// de codigo_siex — ver docs/NORMATIVA-CROTAL-ESPECIE.md sección
+// "Especificación oficial y exacta: fichero de incorporación de datos a
+// SIGGAN". Ovino y Caprino comparten codigo_espe_siggan '04' y se distinguen
+// por espe_id_siggan (2=caprino, 3=ovino). Solo aplica al caso SIGGAN/
+// Andalucía; Extremadura/BADIGEX usa su propia numeración (ver advertencia
+// regional en el mismo documento). No usado todavía por ningún exportador —
+// son solo los datos maestros listos para cuando se aborde esa integración.
 const ESPECIES_SEED = [
-    { id: 1, codigo_siex: '01', nombre_oficial: 'Bovino', nombre_display: 'Vacas', codigo_familia: '01' },
-    { id: 2, codigo_siex: '02', nombre_oficial: 'Porcino', nombre_display: 'Cerdos', codigo_familia: '02' },
-    { id: 3, codigo_siex: '03', nombre_oficial: 'Ovino', nombre_display: 'Ovejas', codigo_familia: '03' },
-    { id: 4, codigo_siex: '04', nombre_oficial: 'Caprino', nombre_display: 'Cabras', codigo_familia: '03' },
-    { id: 5, codigo_siex: '05', nombre_oficial: 'Équido', nombre_display: 'Équidos', codigo_familia: '04' },
+    { id: 1, codigo_siex: '01', nombre_oficial: 'Bovino', nombre_display: 'Vacas', codigo_familia: '01', codigo_espe_siggan: '02', espe_id_siggan: null },
+    { id: 2, codigo_siex: '02', nombre_oficial: 'Porcino', nombre_display: 'Cerdos', codigo_familia: '02', codigo_espe_siggan: '03', espe_id_siggan: null },
+    { id: 3, codigo_siex: '03', nombre_oficial: 'Ovino', nombre_display: 'Ovejas', codigo_familia: '03', codigo_espe_siggan: '04', espe_id_siggan: 3 },
+    { id: 4, codigo_siex: '04', nombre_oficial: 'Caprino', nombre_display: 'Cabras', codigo_familia: '03', codigo_espe_siggan: '04', espe_id_siggan: 2 },
+    { id: 5, codigo_siex: '05', nombre_oficial: 'Équido', nombre_display: 'Équidos', codigo_familia: '04', codigo_espe_siggan: '01', espe_id_siggan: null },
 ];
 
 // tipos_identificador.id = código oficial del catálogo RIIA_TIPO_IDENTIFICADOR
@@ -1012,6 +1022,32 @@ async function migrarV15(windowDb) {
     }
 }
 
+/**
+ * Migración de datos: añade codigo_espe_siggan/espe_id_siggan a los registros
+ * de `especies` que ya existían antes de incorporar estos campos a
+ * ESPECIES_SEED (instalaciones con datos sembrados en v15, antes de que este
+ * mapeo existiera). No requiere bump de DB_VERSION porque no crea tablas
+ * nuevas, solo actualiza campos de registros existentes por id. Ver
+ * docs/NORMATIVA-CROTAL-ESPECIE.md y docs/PLAN-MEJORA-SIGGAN.md punto 2.
+ */
+async function migrarEspeSiggan(windowDb) {
+    try {
+        console.log("[DB] Migración: codigo_espe_siggan en especies existentes...");
+
+        for (const seed of ESPECIES_SEED) {
+            const actual = await windowDb.get('especies', seed.id);
+            if (actual && actual.codigo_espe_siggan == null) {
+                await windowDb.put('especies', { ...actual, codigo_espe_siggan: seed.codigo_espe_siggan, espe_id_siggan: seed.espe_id_siggan });
+            }
+        }
+
+        await windowDb.put('meta', { key: 'migracion_espe_siggan', value: true, migradoEn: new Date().toISOString() });
+        console.log("[DB] Migración codigo_espe_siggan completada.");
+    } catch (e) {
+        console.warn("[DB] Error en migración codigo_espe_siggan:", e);
+    }
+}
+
 console.log("[DB] Iniciando window.dbPromise...");
 const dbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('DB_TIMEOUT: IndexedDB no respondió en 15s')), 15000));
 window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
@@ -1043,6 +1079,16 @@ window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
         const metaV15 = await database.get('meta', 'migracion_v15');
         if (!metaV15) {
             await migrarV15(database);
+        }
+    } catch (e) {
+        console.log("[DB] Primera ejecución o store meta no disponible aún.");
+    }
+
+    // Ejecutar migración codigo_espe_siggan (especies existentes) si no se ha ejecutado antes
+    try {
+        const metaEspeSiggan = await database.get('meta', 'migracion_espe_siggan');
+        if (!metaEspeSiggan) {
+            await migrarEspeSiggan(database);
         }
     } catch (e) {
         console.log("[DB] Primera ejecución o store meta no disponible aún.");
