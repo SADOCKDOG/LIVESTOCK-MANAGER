@@ -35,8 +35,8 @@
 | `BOJA15-087-00024-8123-01_00069255.pdf` | ✅ | 🟡 Parcial | Orden 29/04/2015 ordenación de équidos — relevante solo porque define SIGGANnet/PIGGAN (usado en `PLAN-MEJORA-SIGGAN.md`), no aporta normativa porcina/equina adicional al ya cerrado. |
 | `BOJA24-221-00019-53812-01_00310760.pdf` | ✅ | Sí | Resolución 28/10/2024 — versión VIGENTE (más reciente del lote) del formulario Anexo V REGA + nuevo Plan de Producción y Gestión de Estiércoles (PPGE). Relación con gap "Purines/Estercolero" de `PLAN-MEJORA-SIGGAN.md` punto 5. |
 | `Texto noticia OCA.pdf` | ✅ | 🟡 No | Boletín interno "Modificaciones SIGGAN – Julio 2014" (changelog técnico histórico, cambios de hace 10+ años ya superados). No es normativa vigente. |
-| `GUIA_AD-SIEX-DSI-PortalPublico.pdf` | ⬜ | ? | No auditado en ninguna sesión. Guía de servicios públicos SIEX (API del FEGA) — ya se usa su contenido indirectamente (la URL del API está documentada en `NORMATIVA-CROTAL-ESPECIE.md`), pero el documento en sí no se ha leído a fondo. |
-| `2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` | ⬜ | ? | **No auditado — es la fuente más reciente (2025) del lote.** Podría contener correcciones a los catálogos `ESPECIE_ANIMAL`/`RIIA_TIPO_IDENTIFICADOR` ya usados en `js/db.js`. Recomendado auditarlo antes de dar esos catálogos por definitivamente cerrados (ver `PLAN-MEJORA-SIGGAN.md`, sección "Documentos que quedaron sin auditar a fondo"). |
+| `GUIA_AD-SIEX-DSI-PortalPublico.pdf` | ✅ | Sí | Especificación completa de la API REST del FEGA — confirmado "sin autenticación", CORS no documentado (sigue sin resolver empíricamente). Endpoint nuevo útil `GET /catalogos/{idTabla}/fecha` (sincronización incremental). Catálogos `idCatalogo` de grupo GANADERAS ya inventariados, más 2 nuevos: `SISTEMAS_SOST_CONTROL`, `INTEGRADORA_COMERCIAL`. Ver `PLAN-MEJORA-SIGGAN.md`. |
+| `2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` | ✅ | Sí | **Confirmado SIN CAMBIOS respecto al catálogo `ESPECIE_ANIMAL` ya implementado** (coincide código a código pese al nombre "corrección de errores" — es el Documento Técnico SIEX v3.6.0 completo, no un changelog puntual). Aporta 2 hallazgos nuevos: catálogo de 23 "Tipos de explotación ganadera" SIEX (complementa el CSV de 38 valores ya inventariado) y, sobre todo, confirma que el concepto **"Subexplotación" no existe en el código** — ver `PLAN-MEJORA-SIGGAN.md` gap nuevo. |
 | `Manual_SIGGAN_Diagnosticos.pdf` | 🟠 | Sí (probable) | Solo portada leída — identificado como módulo "SIGGAN - Saneamiento Bovino" (ALANA). Flujo de diagnósticos no extraído en detalle. |
 | `GTA006E_MUS_Manual_Usuario_0400.odt` | ⬜ | ? | No abierto — falta librería `odf`/`odfpy` en el entorno de auditoría. Formato .odt, no .pdf. |
 | `Anexo_I_Manual_ADSGWeb.ods` | ⬜ | ? | No abierto — falta `odfpy`. Formato .ods (hoja de cálculo). |
@@ -101,11 +101,15 @@
 
 `Actividad secundaria ligada a la actividad agraria`, `Agrupaciones de titulares de explotaciones agrarias preferentes`, `Agrupaciones para la gestión integrada de plagas`, `Aprovechamiento`, `Artrópodos y gasterópodos`, `Asociación de protección de variedades con riesgo de erosión genética`, `Autorizaciones excepcionales del producto fitosanitario`, `Autorizadas de algodón`, `Buenas prácticas`, `CUE-Comercial`, `Capacitación profesional`, `Certificación producción ecológica`, `Clasificación municipios según la ley de desarrollo sostenible del medio rural (LDSMR)`, `Coeficientes de Producción Estándar (CPE) por Comunidad Autónoma`, `Comunidades de usuarios de agua`, `Cooperativas agroalimentarias`, `Correspondencia entre Código CPE y CEE`, `Cultivo`, `Cálculo de Orientaciones Técnico Económicas (OTE)`, `Código del CPE de asociaciones de cultivos`, `Código del CPE destino cultivo`, `Código del CPE viticultura`, `Código del CPE aprovechamiento`, `Código del CPE cultivos protegidos`, `Código del CPE cultivos`, `Datos de la integradora comercial`, `Desmotadora`, `Destino del cultivo`, `Destino del resto vegetal`, `Detalle material fertilizante`, `Eficacia del tratamiento`, `Empresas productoras de semillas certificadas`, `Enfermedades` (⚠️ **es fitosanitario, no ganadero, pese al nombre genérico** — 603 entradas de hongos/patógenos de plantas, confirmado por lectura completa), `Entidad de asesoramiento`, `Entidad de certificación`, `Entidad habilitada`, `Estado fenológico`, `Estrato Política Agraria Común (PAC)`, `Estrato Producción Estándar Total (PET)`, `Finalidad de la cosecha`, `Identificación de Códigos de agrupaciones (CAG)`, `Justificación de la actuación`, `Macronutrientes`, `Malas hierbas`, `Material analizado`, `Material fertilizante`, `Material vegetal de reproducción`, `Medida preventiva - cultural`, `Metales pesados`, `Micronutrientes`, `Método de aplicación de fertilizante`, `Organizaciones de productores de plátanos (OPP)`, `Organizaciones interprofesionales agrarias`, `Organización de productores de frutas y hortalizas (OPFH)`, `Orientaciones Técnico Económicas (OTE) clasificación 2024-25`, `Orientaciones Técnico Económicas (OTE)`, `Periodos cultivo principal`, `Portainjerto`, `Procedencia del agua de riego`, `Procedencia del material vegetal`, `Producto Vegetal`, `Reguladores de crecimiento, rodenticidas y otros`, `Regímenes de calidad`, `Relación Cultivo-Uso SIGPAC`, `Relación aprovechamiento-uso SIGPAC`, `Sistema de conducción`, `Sistema de cultivo`, `Sistema de explotación` (⚠️ pese al nombre es uso de suelo Regadío/Secano, agrícola — no confundir con `Sistema productivo.csv` que sí es ganadero), `Sistema de riego`, `Sistemas de sostenibilidad y control`, `Superficies y elementos no productivos (SENP)`, `Sustancias activas detectadas en el análisis`, `Tipo de análisis`, `Tipo de autorización-derecho de origen de la superficie de viñedo`, `Tipo de ayuda de viñedo`, `Tipo de cobertura del suelo`, `Tipo de empresa conexa`, `Tipo de energía`, `Tipo de entidad - asociación`, `Tipo de fertilización`, `Tipo de labor`, `Tipo de maquinaria UNE`, `Tipo de medida fitosanitaria`, `Tipo de producto fitosanitario`, `Tipo de superficie plantada de uva de vinificación`, `Tipo de superficie potencial para plantaciones de uva de vinificación`, `Tipología municipios LDSMR (3 tipos)`, `Tipología municipios LDSMR (4 tipos)`, `Tratamiento semilla`, `UTAs desempeñadas`, `Unidades de medida`, `Variedad - Especie - Tipo` (confirmado por lectura: 9.7MB, todo cultivos — trigo, variedades vegetales).
 
-### ⬜ No auditados
+### ✅ XLSX — auditado completo (todos los bloques)
 
-| Fichero | Nota |
+| Fichero | Estado |
 |---|---|
-| `20250514-Anexo_I_Definicion_de_Variables_Ganaderas_3.6.0_Version_en_Trabajo.xlsx` | Extraído y usado parcialmente (bloque "Datos individuales de los animales" ya volcado en `NORMATIVA-CROTAL-ESPECIE.md`) — el resto de los 12 bloques (Titular, Socios, Rendimiento económico, Edificaciones, Maquinaria, Declaración de leche, Subexplotación, etc.) no se ha revisado campo a campo. |
+| `20250514-Anexo_I_Definicion_de_Variables_Ganaderas_3.6.0_Version_en_Trabajo.xlsx` | **Auditado completo (2026-07-22)** — los 12 bloques revisados campo a campo (bloque "Datos individuales de los animales" ya estaba hecho; los otros 11 —Titular, Socios, Gerente, Actividad secundaria, Rendimiento económico, Edificaciones, Maquinaria, Regímenes de calidad, Declaración de leche, Subexplotación— confirmados en esta segunda pasada). Hallazgo estructural: el bloque "Subexplotación" (21 campos) confirma que ese concepto **no existe en el código** — ver `PLAN-MEJORA-SIGGAN.md` gap nuevo. El bloque "Edificaciones" (12 campos) revela que el gap "Instalaciones" ya priorizado necesita un formulario completo por instalación, no solo el catálogo de tipos. |
+
+### Re-clasificación de 2 catálogos (confirmados GANADEROS, no agrícolas — corrige la lista de abajo)
+
+`Sistemas de sostenibilidad y control.csv` y `Datos de la integradora comercial.csv` estaban en la lista "agrícolas/no aplican" de la primera pasada; la Guía de la API SIEX (`GUIA_AD-SIEX-DSI-PortalPublico.pdf`) confirma que ambos pertenecen al grupo oficial **GANADERAS** de catálogos FEGA (`SISTEMAS_SOST_CONTROL`, `INTEGRADORA_COMERCIAL`) — reclasificados como ✅ ganaderos, sin uso todavía en el código.
 
 ---
 
@@ -133,19 +137,24 @@
 
 ## Resumen cuantitativo
 
+**Actualizado 2026-07-22** — los 3 documentos que quedaban pendientes prioritarios (⬜) ya están auditados. No queda ningún documento marcado como pendiente prioritario en este inventario; solo quedan 2 formatos `.odt`/`.ods` sin abrir por falta de librería (`GTA006E_MUS_Manual_Usuario_0400.odt`, `Anexo_I_Manual_ADSGWeb.ods`) y la sección "Mensajes de error" de `ADS005E...pdf`, de prioridad baja.
+
 | Categoría | Total | ✅ Aplica | 🟡 No aplica | ⬜/🟠 Pendiente |
 |---|---:|---:|---:|---:|
-| PDFs/documentos normativos (raíz) | 21 | 13 | 5 | 3 |
+| PDFs/documentos normativos (raíz) | 21 | 15 | 5 | 1 (`Manual_SIGGAN_Diagnosticos.pdf`, parcial) |
 | Anexos Orden de Equino | 5 | 4 | 1 | 0 |
-| Catálogos CSV | 122 | 24 (ganaderos) + 8 (transversales) | ~98 (agrícolas) | 0 |
-| XLSX | 1 | Parcial | — | 1 (revisión completa) |
+| Catálogos CSV | 122 | 26 (ganaderos) + 8 (transversales) | ~96 (agrícolas) | 0 |
+| XLSX | 1 | Sí, completo | — | 0 |
 | Lectores RFID (`LECTOR/`) | ~17 | 15 | 2 | 0 |
 | Generador SIGGAN | 2 | 1 | — | 1 (binario, no aplica) |
+| Formatos sin abrir (odt/ods) | 2 | — | — | 2 (falta librería `odfpy`) |
+
+**Hallazgo importante de esta segunda ronda**: el catálogo `ESPECIE_ANIMAL` ya implementado en `js/db.js` está **confirmado sin cambios** por la fuente más reciente (SIEX v3.6.0, 2025) — cero riesgo de que el modelo de datos maestro ya cerrado quede desactualizado. Se detectó en cambio un gap estructural nuevo (concepto "Subexplotación" ausente del código) documentado en `PLAN-MEJORA-SIGGAN.md`.
 
 ## Recomendación de limpieza de `docs/AUDITAR/`
 
-**No se recomienda borrar nada todavía** — incluso los ~98 CSV agrícolas descartados son parte de la descarga completa oficial (`/catalogos/zip` del FEGA) y sirven como constancia de que se revisó el catálogo completo, no solo una selección sesgada. Si se quiere reducir el volumen del repo:
+**No se recomienda borrar nada todavía** — incluso los ~96 CSV agrícolas descartados son parte de la descarga completa oficial (`/catalogos/zip` del FEGA) y sirven como constancia de que se revisó el catálogo completo, no solo una selección sesgada. Si se quiere reducir el volumen del repo:
 
-1. **Candidatos seguros a archivar fuera del repo** (mover a `Private/` o eliminar del control de versiones): los ~98 CSV agrícolas confirmados sin relación alguna con ganadería (lista completa en la sección "Agrícolas/no aplican" arriba).
+1. **Candidatos seguros a archivar fuera del repo** (mover a `Private/` o eliminar del control de versiones): los ~96 CSV agrícolas confirmados sin relación alguna con ganadería (lista completa en la sección "Agrícolas/no aplican" arriba).
 2. **Mantener en el repo**: todos los PDFs normativos (son la fuente de verdad citada en la documentación), los CSV ganaderos/transversales, y los ficheros de `LECTOR/` (documentan hardware real).
-3. **Pendiente antes de archivar nada**: terminar de auditar los 3 documentos marcados ⬜ como prioritarios (`2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6...pdf`, `GUIA_AD-SIEX-DSI-PortalPublico.pdf`, el XLSX completo) — podrían revelar más catálogos ganaderos que hoy están en la lista de "agrícolas descartados" por una clasificación rápida por nombre.
+3. **Ya no hay documentos prioritarios pendientes** — la auditoría de `docs/AUDITAR/` puede considerarse sustancialmente completa. Quedan solo de baja prioridad: `Manual_SIGGAN_Diagnosticos.pdf` (solo portada leída), los 2 ficheros `.odt`/`.ods`, y la sección "Mensajes de error" de `ADS005E...pdf`.
