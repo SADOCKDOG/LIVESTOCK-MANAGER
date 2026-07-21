@@ -22,7 +22,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 
 | # | Gap | Esfuerzo | Bloqueante para | Prioridad |
 |---|---|---|---|---|
-| 1 | Catálogo de razas (189 razas) | Bajo — mismo patrón ya probado | Cumplimentar campo `Raza` de cualquier fichero SIGGAN; validación de dato | **Alta** |
+| 1 | Catálogo de razas (163 razas) | ✅ **Implementado** (commit `8675c08`, 2026-07-22) | — | — |
 | 2 | Tabla de correspondencia `Espe` SIGGAN | Bajo — solo datos, sin UI nueva | Cualquier exportador/importador SIGGAN real | **Alta** |
 | 3 | Modelo jerárquico de vacunaciones | Medio — nueva tabla + UI | Alinear con ADSG WEB; informes oficiales de vacunación | Media |
 | 4 | Equino: aplicar validación de crotal ya cerrada | Bajo — 2 líneas de código | Nada (mejora aislada) | Media (ya diagnosticado, solo falta aplicar) |
@@ -33,24 +33,11 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 
 ---
 
-## 1. Catálogo de razas (prioridad alta)
+## 1. Catálogo de razas — ✅ IMPLEMENTADO (commit `8675c08`, 2026-07-22)
 
-**Qué falta**: `raza` es hoy texto libre en el animal (`js/db.js:93-95`, input en `js/views/animales-view.js:321`). Sin catálogo, sin FK a especie, sin clasificación.
+DB_VERSION 15→16, migración aditiva. Tabla `razas` (keyPath `id`, índice `especieId`) semillada con 163 de las 189 razas del catálogo oficial (filtradas a las 5 especies ya modeladas: 47 bovino, 16 porcino, 51 ovino, 22 caprino, 27 équido). `js/views/animales-view.js`: el campo RAZA es ahora un `<select>` filtrado por especie con opción "OTRA (ESPECIFICAR)" para razas fuera de catálogo. Comparación case-insensitive, sin migración forzosa del campo `raza` (string) de animales existentes — igual que se planteó, se mantiene intacto en paralelo. Detalle completo en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md#catálogo-de-razas--implementado-commit-8675c08-2026-07-22).
 
-**Fuente de datos ya descargada**: `docs/AUDITAR/Catalogos_csv/Catálogo oficial de razas de ganado de España.csv` (189 razas: Bovinos, Cerdos, Ovinos, Caprinos, Gallinas, Ocas, Conejos, Équidos, Dromedario) + `Clasificación en el catálogo oficial de razas de ganado de España.csv` (4 categorías: Autóctona, Autóctona Amenazada, Integrada en España, Otras reconocidas).
-
-**Diseño propuesto** (mismo patrón que `especies`/`tipos_identificador` en `js/db.js`):
-```js
-const RAZAS_SEED = [
-  { id: 1, codigo_siex: '10010', nombre: '...', especieId: 1, clasificacion: 1001, grado_amenaza: null },
-  // ... 189 filas, semilladas desde el CSV
-];
-```
-Tabla `razas` (keyPath `id`), índice por `especieId`. UI: convertir el `<input type="text" id="a-raza">` en un `<select>` filtrado por la especie ya seleccionada en el formulario (mismo patrón ya implementado para el selector "TIPO DE CROTAL").
-
-**⚠️ Cuidado con la confusión de catálogos**: existe un segundo catálogo de razas, mucho más corto, específico del fichero de incorporación SIGGAN (ver punto 2) — usa códigos numéricos **distintos** (1-20 por especie, solo caprino/ovino). Si se implementa el exportador SIGGAN del punto 2, hace falta una tabla de correspondencia `raza.codigo_siex → raza_siggan.codigo`, no asumir que son el mismo campo.
-
-**Migración de datos existentes**: los animales ya dados de alta tienen `raza` como texto libre (`'Frisona'`, `'Limusina'`, `'Assaf'`, etc.). Igual que se hizo con especie/tipo-identificador, mantener el campo string original intacto y añadir `razaId` en paralelo (nullable), sin migración automática agresiva — al editar un animal existente, la UI puede sugerir el match más cercano del catálogo por nombre, pero el usuario confirma.
+**Pendiente de este punto, no incluido en la implementación**: mostrar `clasificacion`/`grado_amenaza` en la UI (los campos ya están en la tabla, sin usar todavía); catálogo `Asociación de razas.csv`.
 
 ---
 
