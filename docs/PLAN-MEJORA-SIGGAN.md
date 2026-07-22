@@ -17,11 +17,11 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 - ✅ Datos maestros listos para generar/importar ficheros de intercambio SIGGAN reales (gaps 1 y 2).
 - ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3), con UI (wizard + listado en SanidadView).
 - ✅ Validación de identificación equina cerrada (gap 4).
-- ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5) — parcial, sin UI.
+- ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5), con UI (listado + ficha + wizard).
 - ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — parcial, sin granularidad individual de saneamientos.
 - ⬜ Nivel intermedio REGA→especie que SIEX exige formalmente (gap 7) — descartado por prioridad baja.
 
-**Pendiente transversal**: Vacunaciones ya tiene UI completa (commit `966735a`, 2026-07-22). Instalaciones sigue solo con capa de datos, sin vista/wizard — mismo patrón que `Saneamientos`, que tampoco la tiene. Si se quiere que estos gaps sean utilizables desde la UI, ese es el siguiente trabajo natural.
+**Pendiente transversal cerrado**: Vacunaciones (commit `966735a`) e Instalaciones (commit `c453090`) ya tienen UI completa. Solo `Saneamientos` sigue sin vista propia — es preexistente al plan, no un gap detectado en esta auditoría, así que queda fuera de su alcance.
 
 ## Orden de implementación recomendado
 
@@ -31,7 +31,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 | 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
 | 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado con UI** (commits `325d812`, `966735a`, 2026-07-22) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
-| 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado parcialmente** (commit `57202a5`, 2026-07-22; falta distinción "Lidia" y UI) | — | — |
+| 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado con UI** (commits `57202a5`, `c453090`, 2026-07-22; falta distinción "Lidia") | — | — |
 | 6 | Campos de captura de campo (hora, lote, nº macho) | ✅ **Implementado parcialmente** (commit `800e913`, 2026-07-22; falta saneamiento individual) | — | — |
 | 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | Alto — cambio de modelo de relación finca↔animal | Cumplimiento formal SIEX/REGA a nivel administrativo | Baja (estructural, evaluar si aporta valor real de uso) |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
@@ -93,7 +93,9 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 **DB_VERSION 17→18**, migración aditiva (nueva tabla `instalaciones_tipo`, dato maestro sin cambios en tablas existentes). Verificado en navegador: 36 tipos sembrados y re-sembrados correctamente, validación de latitud/longitud, instalación sin tipo rechazada, IDs secuenciales correctos, `restriccionActiva()` funcional.
 
-**No priorizado**: el diseño de 12-13 campos por instalación (referencia catastral, régimen de tenencia, año construcción, etc.) que reveló el Anexo I de Variables Ganaderas se simplificó a los campos mínimos verificados (`tipoId`, y campos libres como `superficie_m2`/`plazas_alojamiento`/`volumen_m3` según el tipo) — el array `instalaciones[]` no fuerza schema, así que se pueden añadir más campos sin migración cuando haya UI real que los use. Sin UI todavía (mismo patrón que Saneamientos; Vacunaciones ya tiene la suya, ver punto 3).
+**No priorizado**: el diseño de 12-13 campos por instalación (referencia catastral, régimen de tenencia, año construcción, etc.) que reveló el Anexo I de Variables Ganaderas se simplificó a los campos mínimos verificados (`tipoId`, y campos libres como `superficie_m2`/`plazas_alojamiento`/`volumen_m3` según el tipo) — el array `instalaciones[]` no fuerza schema, así que se pueden añadir más campos sin migración si hace falta.
+
+**✅ UI implementada (commit `c453090`, 2026-07-22)**: nuevo `js/views/instalaciones-view.js` (listado + ficha de detalle + wizard de alta, mismo patrón que `ZonasView`), rutas `/instalaciones` y `/instalacion`, acceso desde el menú "Más". Verificado en navegador con flujo de UI real completo. `Saneamientos` sigue siendo el único módulo de este plan sin vista propia (era preexistente al plan, fuera de su alcance).
 
 ---
 
