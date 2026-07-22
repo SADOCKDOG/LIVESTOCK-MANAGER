@@ -70,6 +70,7 @@ const App = {
     "/subexplotacion": "renderDetalleSubexplotacion",
     "/botiquin": "renderBotiquin",
     "/botiquin-producto": "renderDetalleBotiquin",
+    "/animal-bitacora": "renderBitacoraAnimal",
     "/animales": "renderAnimales",
     "/animal": "renderDetalleAnimal",
     "/explotacion": "renderExplotacion",
@@ -308,6 +309,7 @@ const App = {
     '/subexplotaciones': 'Subexplotaciones',
     '/botiquin': 'Botiquín',
     '/botiquin-producto': 'Detalle Producto',
+    '/animal-bitacora': 'Bitácora Animal',
     '/subexplotacion': 'Detalle Subexplotación',
     '/zona': 'Ficha Zona',
     '/animales': 'Animales',
@@ -509,6 +511,7 @@ const App = {
       '/subexplotacion': Icons.rebanos(),
       '/botiquin': Icons.sanidad(),
       '/botiquin-producto': Icons.sanidad(),
+      '/animal-bitacora': Icons.documento(),
       '/animales': Icons.animales(),
       '/animal': Icons.animales(),
       '/gastos': Icons.gastos(),
@@ -1652,7 +1655,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
     informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1666,7 +1669,7 @@ const App = {
 
   // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
   _routeGroups: {
-    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan',
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan', '/animal-bitacora': 'gegan',
     '/explotacion': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/proveedor': 'expro',
     '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
     '/informes': 'informes', '/alertas': 'informes',
@@ -2430,6 +2433,10 @@ const App = {
 
   async renderDetalleBotiquin(params) {
     if (window.BotiquinView) { await BotiquinView.renderDetalle(params); }
+  },
+
+  async renderBitacoraAnimal(params) {
+    if (window.BitacoraAnimalView) { await BitacoraAnimalView.render(params); }
   },
 
   async renderAnimales() {
