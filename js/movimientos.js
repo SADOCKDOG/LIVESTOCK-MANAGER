@@ -119,6 +119,11 @@ const Movimientos = {
         rega_origen: regaOrigen,
         rega_destino: regaDestino,
         explotacion_contraparte: (data.explotacion_contraparte || '').trim(),
+        // Autoguía SIGGAN/GTA: mismo titular en origen y destino, sin tasa modelo 046
+        // ni firma digital (ver docs/ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md, sección
+        // "Máquina de estados GTA" y docs/PLAN-MEJORA-SIGGAN.md). Flag informativo,
+        // declarado por el usuario — no automatiza el flujo de pago/firma real.
+        autoguia: !!data.autoguia,
         motivo: data.motivo || '',
         especie: data.especie || '',
         num_animales: numAnimalesDeclarado,
