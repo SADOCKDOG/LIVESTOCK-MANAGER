@@ -254,6 +254,7 @@ const AnimalesView = {
     const especieIdInicial = a.especieId != null
       ? Number(a.especieId)
       : especies.find((e) => e.nombre_display === a.especie)?.id ?? null;
+    this._razasPorNombreCache = razasPorEspecieId(especieIdInicial);
 
     const idActual = esNuevo ? null : Number(id);
     const hembras = (todosAnimales || []).filter(
@@ -338,7 +339,8 @@ const AnimalesView = {
                 <input type="text" id="a-raza-otra" value="${esOtra ? a.raza : ""}"
                        class="wizard-input uppercase font-800 mt-6"
                        placeholder="Nombre de la raza"
-                       style="display: ${esOtra ? "block" : "none"};">`;
+                       style="display: ${esOtra ? "block" : "none"};">
+                <div id="a-raza-info" class="text-[0.6rem] font-800 uppercase tracking-wide mt-6">${AnimalesView._razaInfoHTML(razaCatalogada)}</div>`;
                 })()}
               </div>
               <div class="wizard-input-group">
@@ -791,17 +793,42 @@ const AnimalesView = {
     const razaSel = document.getElementById('a-raza');
     if (razaSel && especieId && this._razasPorEspecieIdCache) {
       const razasList = this._razasPorEspecieIdCache(especieId);
+      this._razasPorNombreCache = razasList;
       razaSel.innerHTML = '<option value="">— SIN RAZA —</option>' +
         razasList.map((r) => `<option value="${r.nombre}">${r.nombre.toUpperCase()}</option>`).join('') +
         '<option value="__otra__">OTRA (ESPECIFICAR)</option>';
       const razaOtra = document.getElementById('a-raza-otra');
       if (razaOtra) { razaOtra.style.display = 'none'; razaOtra.value = ''; }
+      const info = document.getElementById('a-raza-info');
+      if (info) info.innerHTML = this._razaInfoHTML(null);
     }
   },
 
   _onRazaChange(selectEl) {
     const otra = document.getElementById('a-raza-otra');
     if (otra) otra.style.display = selectEl.value === '__otra__' ? 'block' : 'none';
+    const info = document.getElementById('a-raza-info');
+    if (info) {
+      const raza = (this._razasPorNombreCache || []).find((r) => r.nombre === selectEl.value);
+      info.innerHTML = this._razaInfoHTML(raza);
+    }
+  },
+
+  // Clasificación oficial FEGA de la raza seleccionada (ver docs/NORMATIVA-CROTAL-ESPECIE.md
+  // sección "Catálogo de razas"): 1001 Autóctona, 1002 Autóctona Amenazada (con grado_amenaza),
+  // 1003 Integrada en España, 1004 Otras reconocidas.
+  _razaInfoHTML(raza) {
+    if (!raza) return '';
+    const CLASIFICACIONES = {
+      1001: { texto: 'RAZA AUTÓCTONA', color: 'var(--c-emerald, #10b981)' },
+      1002: { texto: 'RAZA AUTÓCTONA EN PELIGRO DE EXTINCIÓN', color: 'var(--c-red, #ef4444)' },
+      1003: { texto: 'RAZA INTEGRADA EN ESPAÑA', color: 'var(--text-aaa, #999)' },
+      1004: { texto: 'OTRA RAZA RECONOCIDA', color: 'var(--text-aaa, #999)' },
+    };
+    const c = CLASIFICACIONES[raza.clasificacion];
+    if (!c) return '';
+    const grado = raza.clasificacion === 1002 && raza.grado_amenaza ? ` · GRADO DE AMENAZA: ${raza.grado_amenaza.toUpperCase()}` : '';
+    return `<span style="color: ${c.color};">${c.texto}${grado}</span>`;
   },
 
   _onEstadoChange(selectEl) {
