@@ -97,7 +97,9 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 **No priorizado**: el diseño de 12-13 campos por instalación (referencia catastral, régimen de tenencia, año construcción, etc.) que reveló el Anexo I de Variables Ganaderas se simplificó a los campos mínimos verificados (`tipoId`, y campos libres como `superficie_m2`/`plazas_alojamiento`/`volumen_m3` según el tipo) — el array `instalaciones[]` no fuerza schema, así que se pueden añadir más campos sin migración si hace falta.
 
-**✅ UI implementada (commit `c453090`, 2026-07-22)**: nuevo `js/views/instalaciones-view.js` (listado + ficha de detalle + wizard de alta, mismo patrón que `ZonasView`), rutas `/instalaciones` y `/instalacion`, acceso desde el menú "Más". Verificado en navegador con flujo de UI real completo. `Saneamientos` sigue siendo el único módulo de este plan sin vista propia (era preexistente al plan, fuera de su alcance).
+**✅ UI implementada (commit `c453090`, 2026-07-22)**: nuevo `js/views/instalaciones-view.js` (listado + ficha de detalle + wizard de alta, mismo patrón que `ZonasView`), rutas `/instalaciones` y `/instalacion`, acceso desde el menú "Más". Verificado en navegador con flujo de UI real completo.
+
+**✅ UI de Saneamientos implementada (2026-07-22)**: `js/saneamientos.js` tenía modelo de datos completo desde su implementación original pero **cero UI** (solo se usaba desde QA). Nuevo `js/views/saneamientos-view.js` (listado + ficha de detalle editable + wizard de alta), rutas `/saneamientos` y `/saneamiento`, acceso desde el menú de cabecera. Se añadió también `Saneamientos.anular(id, motivo)` (anulación trazable, mismo patrón que Movimientos/Vacunaciones/Instalaciones — antes solo existía `delete()` con borrado duro, sin usar desde ningún sitio) y `list()` ahora excluye anulados por defecto (`includeAnulados` para verlos). Verificado en navegador: alta por wizard, listado con badge de calificación y alerta de restricción de movimientos, edición de ficha, anulación trazable (desaparece del listado activo, se conserva con `includeAnulados: true`).
 
 ---
 
