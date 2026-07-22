@@ -322,16 +322,27 @@ const ErrorHandler = {
       regex: /^(ES)?\d{1,3}[A-Z]{1,2}\d{1,7}$/,
       descripcion: "(ES opcional) + municipio + siglas provincia + explotación",
     },
+    // Equino, microchip obligatorio (nacidos después del 01/07/2009): Número
+    // Permanente Único / UELN, ISO 11784/11785. 3 dígitos país (724=España) +
+    // 3 dígitos organización emisora + 9 dígitos correlativo.
+    equino_microchip: {
+      regex: /^\d{15}$/,
+      descripcion: "15 dígitos (UELN + correlativo, ISO 11784, ej. 724901000007790)",
+    },
   },
 
   /**
    * Valida un crotal según la especie y el tipo de identificador del animal
-   * (dato maestro oficial, ver docs/NORMATIVA-CROTAL-ESPECIE.md). Si no se
-   * pasan especieId/tipoIdentificadorId, o no hay un formato asociado a esa
-   * combinación (ej. equino, aún sin cerrar en la normativa), cae al
-   * comportamiento genérico de validateCaravana — así no rompe ningún call
-   * site existente que todavía no tenga ese contexto (js/movimientos.js,
-   * wizard-guia-movimiento.js).
+   * (dato maestro oficial, ver docs/NORMATIVA-CROTAL-ESPECIE.md).
+   *
+   * - Si no se pasan especieId/tipoIdentificadorId, o no existe ninguna
+   *   asociación especie<->tipo en absoluto, cae al comportamiento genérico
+   *   de validateCaravana — así no rompe ningún call site existente que
+   *   todavía no tenga ese contexto (js/movimientos.js, wizard-guia-movimiento.js).
+   * - Si SÍ existe la asociación pero su `formato` es explícitamente null
+   *   (ej. DIE equino, cuyo formato varía por entidad emisora — ver
+   *   NORMATIVA-CROTAL-ESPECIE.md), solo se exige que no esté vacío, sin
+   *   aplicarle por error la regex genérica de otra especie.
    */
   async validateCrotal(numero_identificacion, especieId, tipoIdentificadorId) {
     if (!especieId || !tipoIdentificadorId || !window.db) {
@@ -353,8 +364,7 @@ const ErrorHandler = {
       return this.validateCaravana(numero_identificacion);
     }
 
-    const formato = asociacion && this.CROTAL_FORMATOS[asociacion.formato];
-    if (!formato) {
+    if (!asociacion) {
       return this.validateCaravana(numero_identificacion);
     }
 
@@ -364,6 +374,13 @@ const ErrorHandler = {
         this.ERROR_TYPES.VALIDATION,
         { field: "numero_identificacion", required: true }
       );
+    }
+
+    const formato = this.CROTAL_FORMATOS[asociacion.formato];
+    if (!formato) {
+      // Asociación válida pero sin regex estricta definida (ej. DIE equino):
+      // solo se exige que no esté vacío, ya comprobado arriba.
+      return String(numero_identificacion).trim().toUpperCase();
     }
 
     const valorLimpio = String(numero_identificacion)
