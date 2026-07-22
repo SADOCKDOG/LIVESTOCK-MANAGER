@@ -16,6 +16,7 @@ window.MODULE_COLORS = Object.freeze({
   '/subexplotacion': '#CCFF00',
   '/botiquin': '#CCFF00',
   '/botiquin-producto': '#CCFF00',
+  '/animal-bitacora': '#F97316',
   '/carne': '#CCFF00',
   '/comercializacion': '#3B82F6',
   '/trazabilidad': '#3B82F6',
