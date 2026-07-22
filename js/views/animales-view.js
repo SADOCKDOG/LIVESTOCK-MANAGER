@@ -261,6 +261,13 @@ const AnimalesView = {
       (x) => x.sexo === "H" && (x.estado || "activo") !== "baja" && x.id !== idActual
     );
 
+    // Campo `Cebo` del fichero de incorporación SIGGAN (ver docs/PLAN-MEJORA-SIGGAN.md
+    // punto 2): derivado del motivo del último movimiento de entrada, no es un campo
+    // editable propio del animal.
+    const esDestinoCebo = !esNuevo && window.Movimientos
+      ? await window.Movimientos.esDestinoCebo(idActual).catch(() => false)
+      : false;
+
     const CS = window.ComunidadesService;
     const paisesNac = CS ? CS.getPaisesNacimiento() : [{ value: 'ES', label: 'España (ES)' }];
     const motivosBaja = CS ? CS.getMotivosBaja() : [];
@@ -349,6 +356,7 @@ const AnimalesView = {
                   <option value="">SIN ASIGNAR</option>
                   ${rebanos.map((r) => `<option value="${r.id}" ${a.rebanoId == r.id ? "selected" : ""}>${r.nombre.toUpperCase()}</option>`).join("")}
                 </select>
+                ${esDestinoCebo ? `<div class="text-[0.6rem] font-800 uppercase tracking-wide mt-6" style="color: var(--c-warning, #f59e0b);">DESTINO: CEBO / ENGORDE (SIGGAN)</div>` : ""}
               </div>
             </div>
             <div class="grid grid-cols-2 gap-12 mb-12">
