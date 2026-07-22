@@ -38,8 +38,8 @@
 | `GUIA_AD-SIEX-DSI-PortalPublico.pdf` | ✅ | Sí | Especificación completa de la API REST del FEGA — confirmado "sin autenticación", CORS no documentado (sigue sin resolver empíricamente). Endpoint nuevo útil `GET /catalogos/{idTabla}/fecha` (sincronización incremental). Catálogos `idCatalogo` de grupo GANADERAS ya inventariados, más 2 nuevos: `SISTEMAS_SOST_CONTROL`, `INTEGRADORA_COMERCIAL`. Ver `PLAN-MEJORA-SIGGAN.md`. |
 | `2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` | ✅ | Sí | **Confirmado SIN CAMBIOS respecto al catálogo `ESPECIE_ANIMAL` ya implementado** (coincide código a código pese al nombre "corrección de errores" — es el Documento Técnico SIEX v3.6.0 completo, no un changelog puntual). Aporta 2 hallazgos nuevos: catálogo de 23 "Tipos de explotación ganadera" SIEX (complementa el CSV de 38 valores ya inventariado) y, sobre todo, confirma que el concepto **"Subexplotación" no existe en el código** — ver `PLAN-MEJORA-SIGGAN.md` gap nuevo. |
 | `Manual_SIGGAN_Diagnosticos.pdf` | 🟠 | Sí (probable) | Solo portada leída — identificado como módulo "SIGGAN - Saneamiento Bovino" (ALANA). Flujo de diagnósticos no extraído en detalle. |
-| `GTA006E_MUS_Manual_Usuario_0400.odt` | ⬜ | ? | No abierto — falta librería `odf`/`odfpy` en el entorno de auditoría. Formato .odt, no .pdf. |
-| `Anexo_I_Manual_ADSGWeb.ods` | ⬜ | ? | No abierto — falta `odfpy`. Formato .ods (hoja de cálculo). |
+| `GTA006E_MUS_Manual_Usuario_0400.odt` | ✅ | Sí | Abierto sin `odfpy` (extracción directa del XML interno, un .odt es un ZIP). Es la versión "manual completo" de GTA (misma familia que `GTA007E...pdf` ya auditado) — aporta 2 secciones nuevas no cubiertas antes: **Cambio de titularidad de equinos** (flujo separado del movimiento normal, con estados propios `PENDIENTE GANADERO DESTINO` e iconografía de confirmación) y **Autorización expresa de entrada de équidos** (el titular destino puede autorizar antes de que el veterinario genere la guía). También confirma el catálogo extenso de mensajes de error de movimientos/censo (~300 códigos) y los acrónimos GO/GD/VO/VD ya usados en el análisis de la máquina de estados GTA. Ver `PLAN-MEJORA-SIGGAN.md`. |
+| `Anexo_I_Manual_ADSGWeb.ods` | ✅ | Sí | Abierto sin `odfpy` (extracción directa del XML). Es la definición de columnas del catálogo de "Actuaciones Sanitarias" SIGGAN (programa/subprograma/matriz de análisis/propósito analítico/enfermedades obligatorias/ámbito) — confirma y detalla los programas ya conocidos (TBC, Brucelosis, Lengua Azul, EET) con un nivel de granularidad (tipo de matriz, submuestra) mayor que el implementado en `CAMPANAS_SANEAMIENTO`. No se requiere acción — el detalle adicional no aporta un gap nuevo accionable, solo contexto. |
 
 ## `ANEXOS_autorrellenables incluidos en la Orden de Equino/`
 
@@ -137,7 +137,7 @@
 
 ## Resumen cuantitativo
 
-**Actualizado 2026-07-22** — los 3 documentos que quedaban pendientes prioritarios (⬜) ya están auditados. No queda ningún documento marcado como pendiente prioritario en este inventario; solo quedan 2 formatos `.odt`/`.ods` sin abrir por falta de librería (`GTA006E_MUS_Manual_Usuario_0400.odt`, `Anexo_I_Manual_ADSGWeb.ods`) y la sección "Mensajes de error" de `ADS005E...pdf`, de prioridad baja.
+**Actualizado 2026-07-22 (segunda pasada)** — los 2 ficheros `.odt`/`.ods` y la sección "Mensajes de error" de `ADS005E...pdf` ya están auditados (se abrieron sin `odfpy`, extrayendo el XML interno directamente — un `.odt`/`.ods` es un ZIP). Solo queda de baja prioridad `Manual_SIGGAN_Diagnosticos.pdf` (solo portada leída).
 
 | Categoría | Total | ✅ Aplica | 🟡 No aplica | ⬜/🟠 Pendiente |
 |---|---:|---:|---:|---:|
@@ -147,9 +147,12 @@
 | XLSX | 1 | Sí, completo | — | 0 |
 | Lectores RFID (`LECTOR/`) | ~17 | 15 | 2 | 0 |
 | Generador SIGGAN | 2 | 1 | — | 1 (binario, no aplica) |
-| Formatos sin abrir (odt/ods) | 2 | — | — | 2 (falta librería `odfpy`) |
+| Formatos odt/ods | 2 | 2 (sin librería, extracción directa del XML) | — | 0 |
+| Sección "Mensajes de error" ADS005E (páginas 254-340) | 1 | Revisada | Sí, ~300 códigos de validación interna de ADSG WEB, sin gap estructural nuevo | 0 |
 
-**Hallazgo importante de esta segunda ronda**: el catálogo `ESPECIE_ANIMAL` ya implementado en `js/db.js` está **confirmado sin cambios** por la fuente más reciente (SIEX v3.6.0, 2025) — cero riesgo de que el modelo de datos maestro ya cerrado quede desactualizado. Se detectó en cambio un gap estructural nuevo (concepto "Subexplotación" ausente del código) documentado en `PLAN-MEJORA-SIGGAN.md`.
+**Hallazgo importante de esta segunda ronda (2026-07-22)**: el catálogo `ESPECIE_ANIMAL` ya implementado en `js/db.js` está **confirmado sin cambios** por la fuente más reciente (SIEX v3.6.0, 2025) — cero riesgo de que el modelo de datos maestro ya cerrado quede desactualizado. Se detectó en cambio un gap estructural nuevo (concepto "Subexplotación" ausente del código) documentado en `PLAN-MEJORA-SIGGAN.md`.
+
+**Hallazgo de la tercera ronda (2026-07-22, cierre de documentos de baja prioridad)**: `GTA006E_MUS_Manual_Usuario_0400.odt` reveló un flujo no cubierto antes — **cambio de titularidad de equinos** (proceso separado del movimiento normal, con sus propios estados y confirmación del nuevo titular) y **autorización expresa de entrada de équidos** por el ganadero de destino. `Anexo_I_Manual_ADSGWeb.ods` y la sección "Mensajes de error" de `ADS005E` solo confirman/detallan lo ya conocido, sin gaps nuevos accionables.
 
 ## Recomendación de limpieza de `docs/AUDITAR/`
 
@@ -157,4 +160,4 @@
 
 1. **Candidatos seguros a archivar fuera del repo** (mover a `Private/` o eliminar del control de versiones): los ~96 CSV agrícolas confirmados sin relación alguna con ganadería (lista completa en la sección "Agrícolas/no aplican" arriba).
 2. **Mantener en el repo**: todos los PDFs normativos (son la fuente de verdad citada en la documentación), los CSV ganaderos/transversales, y los ficheros de `LECTOR/` (documentan hardware real).
-3. **Ya no hay documentos prioritarios pendientes** — la auditoría de `docs/AUDITAR/` puede considerarse sustancialmente completa. Quedan solo de baja prioridad: `Manual_SIGGAN_Diagnosticos.pdf` (solo portada leída), los 2 ficheros `.odt`/`.ods`, y la sección "Mensajes de error" de `ADS005E...pdf`.
+3. **La auditoría de `docs/AUDITAR/` está prácticamente completa** — solo queda `Manual_SIGGAN_Diagnosticos.pdf` sin leer más allá de la portada, de prioridad baja y sin bloquear nada.
