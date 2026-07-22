@@ -26,7 +26,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 | 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
 | 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado** (commit `325d812`, 2026-07-22; sin UI todavía) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
-| 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | Medio-alto — nueva tabla + formularios | Nada urgente, mejora de completitud | Baja-media |
+| 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado parcialmente** (commit `57202a5`, 2026-07-22; falta distinción "Lidia" y UI) | — | — |
 | 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | Bajo por campo, medio en conjunto | Compatibilidad con lectores RFID físicos | Baja (según si el usuario usa esos lectores) |
 | 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | Alto — cambio de modelo de relación finca↔animal | Cumplimiento formal SIEX/REGA a nivel administrativo | Baja (estructural, evaluar si aporta valor real de uso) |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
@@ -75,22 +75,20 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 ---
 
-## 5. Sub-modelo Instalaciones + geolocalización + restricciones en finca (prioridad baja-media)
+## 5. Sub-modelo Instalaciones + geolocalización + restricciones en finca — ✅ IMPLEMENTADO PARCIALMENTE (commit `57202a5`, 2026-07-22)
 
-**Fuente**: mapa de navegación 1.4 de ADSG WEB (`docs/AUDITAR/ADS005E_MUS_Manual_Usuario_0100.pdf`), auditoría dedicada — ver árbol completo en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md#árbol-completo-del-punto-14-mapa-del-sistema-auditoría-dedicada-2026-07-21).
+**Fuente**: mapa de navegación 1.4 de ADSG WEB (`docs/AUDITAR/ADS005E_MUS_Manual_Usuario_0100.pdf`) — ver árbol completo en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md#árbol-completo-del-punto-14-mapa-del-sistema-auditoría-dedicada-2026-07-21).
 
-**Conclusión de esa auditoría, importante**: NO se justifica reestructurar Livestock Manager en módulos separados por especie (como hace ADSG WEB) — la mayoría de nodos (Titulares, Responsables Sanitarios, Censos, Identificación) son casi idénticos entre las 5 especies del manual y ya tienen equivalente razonable en el código. Solo el nodo **"Estructura"** diverge de verdad y es donde hay gap total real:
+| Campo/módulo | Estado |
+|---|---|
+| `latitud`/`longitud` en finca | ✅ Implementado — validación de rango (España peninsular/insular/Canarias), opcional |
+| `instalaciones_tipo` (dato maestro) + `finca.instalaciones[]` | ✅ Implementado — 36 tipos curados del catálogo oficial FEGA (de 109, excluidos los puramente agrícolas); array embebido en finca, mismo patrón que `zonas[]`, cada instalación exige `tipoId` del catálogo |
+| Flag `restriccion_movimientos` en `js/saneamientos.js` | ✅ Implementado — distinto de `calificacion`, con `motivo_restriccion` y helper `restriccionActiva(fincaId)` |
+| Distinción "Explotación de Lidia" en filiaciones | ⬜ No implementado — sin caso de uso claro identificado, se deja fuera |
 
-| Campo/módulo nuevo | Gap hoy | Aplica a |
-|---|---|---|
-| `latitud`/`longitud` en finca | Gap total, trivial de implementar | Las 5 especies |
-| Sub-tabla `instalaciones` (naves/corrales/sistemas) | Gap total | Purines/Estercolero (porcino, cunícola, pequeños rumiantes); Naves (avícola); Sistemas/Características (bovino) |
-| Flag `restriccion_movimientos` en `js/saneamientos.js` | Hoy solo existe `calificacion`, sin estado operativo de restricción | Bovino, Porcino, Pequeño Rumiante |
-| Distinción "Explotación de Lidia" en filiaciones | Genealogía madre-cría genérica sin este tipo | Solo Bovino |
+**DB_VERSION 17→18**, migración aditiva (nueva tabla `instalaciones_tipo`, dato maestro sin cambios en tablas existentes). Verificado en navegador: 36 tipos sembrados y re-sembrados correctamente, validación de latitud/longitud, instalación sin tipo rechazada, IDs secuenciales correctos, `restriccionActiva()` funcional.
 
-**No priorizar** salvo que el alcance de la app se amplíe a porcino/avícola industrial — en ese caso sí conviene evaluar una unidad de agrupación por encima del animal individual (nave/lote), ya anticipado conceptualmente por el modelo de "tandas de cebo".
-
-**Actualización (auditoría de pendientes prioritarios, 2026-07-22)**: el Anexo I de Variables Ganaderas del FEGA (`docs/AUDITAR/Catalogos_csv/20250514-Anexo_I_Definicion_de_Variables_Ganaderas_3.6.0...xlsx`, bloque "Edificaciones e instalaciones") confirma que este gap es más grande de lo estimado — no basta con un catálogo de tipos de instalación (`Edificaciones e instalaciones.csv`, 109 tipos, ya inventariado), sino un **formulario completo de 12-13 campos por instalación**: tipo (catálogo), referencia catastral, propia/ajena, coordenadas, cota, superficie m², nº unidades, año de construcción, régimen de tenencia, NIF del arrendador, **plazas máximas de alojamiento ganadero**, **volumen máximo de silos/depósitos en m³**. Si se implementa este gap, el diseño debe contemplar esta ficha completa, no solo un selector de tipo de instalación.
+**No priorizado**: el diseño de 12-13 campos por instalación (referencia catastral, régimen de tenencia, año construcción, etc.) que reveló el Anexo I de Variables Ganaderas se simplificó a los campos mínimos verificados (`tipoId`, y campos libres como `superficie_m2`/`plazas_alojamiento`/`volumen_m3` según el tipo) — el array `instalaciones[]` no fuerza schema, así que se pueden añadir más campos sin migración cuando haya UI real que los use. Sin UI todavía (mismo patrón que Saneamientos y Vacunaciones).
 
 ---
 
