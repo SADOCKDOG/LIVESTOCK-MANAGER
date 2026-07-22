@@ -58,6 +58,12 @@ const Saneamientos = {
         num_examinados: examinados,
         num_positivos: positivos,
         calificacion: data.calificacion || 'sin_calificar',
+        // Estado operativo de restricción de movimientos (gap "Históricos ->
+        // Restricciones" del mapa ADSG WEB — distinto de `calificacion`, que es
+        // el resultado sanitario, no si la explotación tiene vetados los
+        // movimientos. Ver docs/PLAN-MEJORA-SIGGAN.md punto 5).
+        restriccion_movimientos: data.restriccion_movimientos === true,
+        motivo_restriccion: (data.motivo_restriccion || '').trim(),
         proxima_actuacion: data.proxima_actuacion || '',
         notas: (data.notas || '').trim(),
         actualizadoEn: new Date().toISOString(),
@@ -102,6 +108,19 @@ const Saneamientos = {
   async calificacionActual(fincaId) {
     const regs = await this.list({ fincaId });
     return regs.length > 0 ? regs[0].calificacion : 'sin_calificar';
+  },
+
+  /**
+   * Estado operativo de restricción de movimientos vigente en la finca
+   * (según el saneamiento más reciente). No es lo mismo que la calificación
+   * sanitaria: una explotación puede tener buena calificación histórica y
+   * seguir con movimientos restringidos por una actuación en curso.
+   */
+  async restriccionActiva(fincaId) {
+    const regs = await this.list({ fincaId });
+    if (regs.length === 0) return { activa: false, motivo: '' };
+    const ultimo = regs[0];
+    return { activa: !!ultimo.restriccion_movimientos, motivo: ultimo.motivo_restriccion || '' };
   },
 };
 
