@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 17;
+const DB_VERSION = 18;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -246,6 +246,52 @@ const ESPECIE_TIPO_IDENTIFICADOR_SEED = [
     { especieId: 5, tipoIdentificadorId: 14, formato: null },
 ];
 
+// Catálogo de tipos de instalación/edificación ganadera — subconjunto
+// curado (36 de los 109 valores oficiales) del catálogo FEGA
+// EDIFICACIONES_INSTALACIONES (docs/AUDITAR/Catalogos_csv/Edificaciones
+// e instalaciones.csv), excluyendo tipos puramente agrícolas
+// (invernaderos, viñedo, semillas...) fuera del alcance ganadero de la
+// app. codigo_siex conserva el código oficial para trazabilidad. Ver
+// docs/PLAN-MEJORA-SIGGAN.md punto 5.
+const INSTALACIONES_TIPO_SEED = [
+    { id: 1, codigo_siex: '1', nombre: 'Abrevadero y abastecimiento de agua' },
+    { id: 2, codigo_siex: '5', nombre: 'Alojamiento ganadero aves' },
+    { id: 3, codigo_siex: '6', nombre: 'Alojamiento ganadero bovino de carne' },
+    { id: 4, codigo_siex: '7', nombre: 'Alojamiento ganadero bovino de leche' },
+    { id: 5, codigo_siex: '8', nombre: 'Alojamiento ganadero conejos' },
+    { id: 6, codigo_siex: '9', nombre: 'Alojamiento ganadero equino' },
+    { id: 7, codigo_siex: '10', nombre: 'Alojamiento ganadero porcino' },
+    { id: 8, codigo_siex: '11', nombre: 'Alojamiento ganadero varios' },
+    { id: 9, codigo_siex: '12', nombre: 'Alojamiento ganadero visones y otros peleteros' },
+    { id: 10, codigo_siex: '13', nombre: 'Baño' },
+    { id: 11, codigo_siex: '14', nombre: 'Comedor' },
+    { id: 12, codigo_siex: '21', nombre: 'Construcción para reparación edificios e instalaciones' },
+    { id: 13, codigo_siex: '28', nombre: 'Nave ganadera' },
+    { id: 14, codigo_siex: '31', nombre: 'Nave para transformación de productos en origen, queserías y otros lácteos.' },
+    { id: 15, codigo_siex: '32', nombre: 'Ranchos' },
+    { id: 16, codigo_siex: '33', nombre: 'Refugios' },
+    { id: 17, codigo_siex: '42', nombre: 'Picaderos' },
+    { id: 18, codigo_siex: '43', nombre: 'Plazas de toros' },
+    { id: 19, codigo_siex: '44', nombre: 'Tentaderos' },
+    { id: 20, codigo_siex: '46', nombre: 'Caminos de la explotación' },
+    { id: 21, codigo_siex: '52', nombre: 'Estacionamientos maquinaria agrícola y de transporte' },
+    { id: 22, codigo_siex: '55', nombre: 'Muelles de carga' },
+    { id: 23, codigo_siex: '58', nombre: 'Recintos para el recibo y acopio de materias primas' },
+    { id: 24, codigo_siex: '59', nombre: 'Cámaras frigoríficas' },
+    { id: 25, codigo_siex: '63', nombre: 'Depuradoras' },
+    { id: 26, codigo_siex: '65', nombre: 'Saneamiento, desagües, drenajes y fosas' },
+    { id: 27, codigo_siex: '68', nombre: 'Depósito de líquido' },
+    { id: 28, codigo_siex: '69', nombre: 'Depósitos de gas' },
+    { id: 29, codigo_siex: '70', nombre: 'Estanques y balsas' },
+    { id: 30, codigo_siex: '71', nombre: 'Fosas de purín' },
+    { id: 31, codigo_siex: '72', nombre: 'Silos de grano' },
+    { id: 32, codigo_siex: '73', nombre: 'Silos forrajeros, heniles y pajares' },
+    { id: 33, codigo_siex: '89', nombre: 'Alojamiento ganadero ovino' },
+    { id: 34, codigo_siex: '90', nombre: 'Alojamiento ganadero caprino' },
+    { id: 35, codigo_siex: '94', nombre: 'Oficina' },
+    { id: 36, codigo_siex: '109', nombre: 'Cerramientos de la explotación' },
+];
+
 // Clase para base de datos en memoria (Fallback para entornos sandboxed o sin permisos de IndexedDB, como Open Design Desktop)
 class InMemoryMockDB {
     constructor() {
@@ -259,7 +305,7 @@ class InMemoryMockDB {
                 'contratos_compra', 'transportistas', 'documentos_legales', 'notificaciones_rega', 
                 'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs',
                 'config_costes_referencia', 'config_silos', 'especies', 'tipos_identificador',
-                'especie_tipo_identificador', 'razas', 'vacunaciones'
+                'especie_tipo_identificador', 'razas', 'vacunaciones', 'instalaciones_tipo'
             ],
             contains(name) { return this.names.includes(name); }
         };
@@ -294,6 +340,7 @@ class InMemoryMockDB {
         this._stores['tipos_identificador'] = TIPOS_IDENTIFICADOR_SEED.map(t => ({ ...t }));
         this._stores['especie_tipo_identificador'] = ESPECIE_TIPO_IDENTIFICADOR_SEED.map((a, i) => ({ id: i + 1, ...a }));
         this._stores['razas'] = RAZAS_SEED.map(r => ({ ...r }));
+        this._stores['instalaciones_tipo'] = INSTALACIONES_TIPO_SEED.map(i => ({ ...i }));
         this._stores['config_tipos_produccion'] = [
             { id: 1, nombre: 'Cárnica', creadoEn: Date.now() },
             { id: 2, nombre: 'Láctea', creadoEn: Date.now() },
@@ -539,6 +586,17 @@ async function initDB() {
                     store.createIndex('rebanoId', 'rebanoId');
                     store.createIndex('fecha', 'fecha');
                     store.createIndex('cerrada', 'cerrada');
+                }
+            }
+
+            // v18: Catálogo de tipos de instalación (dato maestro oficial FEGA,
+            // ver docs/PLAN-MEJORA-SIGGAN.md punto 5). Las instalaciones concretas
+            // de cada finca se guardan como array embebido `finca.instalaciones[]`
+            // (mismo patrón ya usado para `finca.zonas[]`) — no requieren tabla
+            // propia porque `fincas` no fuerza schema.
+            if (oldVersion < 18) {
+                if (!db.objectStoreNames.contains('instalaciones_tipo')) {
+                    db.createObjectStore('instalaciones_tipo', { keyPath: 'id' });
                 }
             }
 
@@ -835,6 +893,12 @@ async function populateDefaults(db) {
     const razasCount = await db.count('razas');
     if (razasCount === 0) {
         for (const r of RAZAS_SEED) { await db.put('razas', { ...r }); }
+    }
+
+    // Tipos de instalación ganadera (dato maestro oficial, catálogo EDIFICACIONES_INSTALACIONES del FEGA)
+    const instalacionesTipoCount = await db.count('instalaciones_tipo');
+    if (instalacionesTipoCount === 0) {
+        for (const i of INSTALACIONES_TIPO_SEED) { await db.put('instalaciones_tipo', { ...i }); }
     }
 }
 
