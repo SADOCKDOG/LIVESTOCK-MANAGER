@@ -18,8 +18,32 @@ const BotiquinView = {
       return;
     }
 
-    const todos = await window.db.getAllFromIndex('config_botiquin', 'fincaId', finca.id).catch(() => []);
-    this._cache = todos.filter(p => !p.anulado).sort((a, b) => a.nombre.localeCompare(b.nombre));
+    // Obtener productos activos
+    const productos = await window.db.getAllFromIndex('config_botiquin', 'fincaId', finca.id).catch(() => []);
+    const productosActivos = productos.filter(p => !p.anulado).sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    // Para cada producto, obtener sus lotes y calcular totales
+    this._cache = await Promise.all(productosActivos.map(async (producto) => {
+      const lotes = await window.db.getAllFromIndex('botiquin_lotes', 'productoId', producto.id).catch(() => []);
+
+      // Calcular cantidad total sumando todos los lotes
+      const cantidadTotal = lotes.reduce((sum, lote) => sum + (lote.cantidad || 0), 0);
+
+      // Encontrar la fecha de caducidad más temprana (para alertas)
+      const fechasCaducidad = lotes
+        .filter(lote => lote.caducidad)
+        .map(lote => new Date(lote.caducidad));
+      const proximaCaducidad = fechasCaducidad.length > 0
+        ? new Date(Math.min(...fechasCaducidad.map(d => d.getTime())))
+        : null;
+
+      return {
+        ...producto,
+        cantidadActual: cantidadTotal, // Para mantener compatibilidad con vistas existentes
+        lotes: lotes, // Guardar lotes para uso en vistas detalladas
+        proximaCaducidad: proximaCaducidad ? proximaCaducidad.toISOString().split('T')[0] : null
+      };
+    }));
 
     let html = '';
     if (this._cache.length === 0) {
@@ -30,14 +54,25 @@ const BotiquinView = {
       let fichasHtml = '';
       for (const p of this._cache) {
         const stockBajo = p.cantidadMinima != null && Number(p.cantidadActual) <= Number(p.cantidadMinima);
-        const diasCaducidad = p.caducidad ? Math.ceil((new Date(p.caducidad) - new Date(hoy)) / (24 * 3600 * 1000)) : null;
+        // Usar la fecha de caducidad más próxima de los lotes para alertas
+        const diasCaducidad = p.proximaCaducidad ? Math.ceil((new Date(p.proximaCaducidad) - new Date(hoy)) / (24 * 3600 * 1000)) : null;
         const caducado = diasCaducidad != null && diasCaducidad < 0;
         const caducidadProxima = diasCaducidad != null && diasCaducidad >= 0 && diasCaducidad <= 30;
 
         const metadata = [];
         metadata.push(`<span>${Number(p.cantidadActual || 0).toLocaleString()} ${p.unidad || ''}</span>`);
-        if (p.lote) metadata.push(`<span>Lote: ${p.lote}</span>`);
-        if (p.caducidad) metadata.push(`<span>Caduca: ${p.caducidad}</span>`);
+        // Mostrar información de lotes resumida
+        if (p.lotes && p.lotes.length > 0) {
+          const lotesConDatos = p.lotes.filter(l => l.lote && l.lote.trim() !== '');
+          if (lotesConDatos.length > 0) {
+            if (lotesConDatos.length === 1) {
+              metadata.push(`<span>Lote: ${lotesConDatos[0].lote}</span>`);
+            } else {
+              metadata.push(`<span>Lotes: ${lotesConDatos.length}</span>`);
+            }
+          }
+        }
+        if (p.proximaCaducidad) metadata.push(`<span>Caduca: ${p.proximaCaducidad}</span>`);
         if (stockBajo) metadata.push(`<span style="color: var(--c-danger);">STOCK BAJO</span>`);
         if (caducado) metadata.push(`<span style="color: var(--c-danger);">CADUCADO</span>`);
         else if (caducidadProxima) metadata.push(`<span style="color: var(--c-warning);">CADUCA EN ${diasCaducidad}D</span>`);
@@ -87,6 +122,9 @@ const BotiquinView = {
       .filter(e => e.tipo_entidad === 'botiquin' && Number(e.entidad_id) === id)
       .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+    // Obtener lotes del producto
+    const lotes = await window.db.getAllFromIndex('botiquin_lotes', 'productoId', id).catch(() => []);
+
     BotiquinView._guardado = false;
     App.setExitGuard(() => BotiquinView._confirmSalirEdicion());
 
@@ -129,6 +167,27 @@ const BotiquinView = {
           <textarea id="b-edit-notas" class="premium-input min-h-60 resize-none">${p.notas || ''}</textarea></div>
         </div>
 
+        <!-- Lotes del producto -->
+        <div class="mt-15">
+          <div class="text-[0.65rem] text-gray uppercase font-900 tracking-wide mb-8">LOTES</div>
+          ${lotes.length === 0 ? '<div class="text-center py-10 text-gray-500 font-bold uppercase text-[0.6rem]">No hay lotes registrados</div>' : `
+            <div class="space-y-4">
+              ${lotes.map(lote => `
+                <div class="flex justify-between items-center p-6 rounded-sm border border-222" style="background:#1a1a1a;">
+                  <div>
+                    <span class="text-[0.6rem] font-black text-white uppercase block">LOTE: ${lote.lote || 'SIN LOTE'}</span>
+                    ${lote.caducidad ? `<span class="text-[0.55rem] font-bold text-gray-500 block mt-1">Caduca: ${lote.caducidad}</span>` : ''}
+                    ${lote.creadoEn ? `<span class="text-[0.5rem] font-medium text-gray-400 block mt-1">Creado: ${new Date(lote.creadoEn).toLocaleDateString()}</span>` : ''}
+                  </div>
+                  <strong class="text-xs font-black" style="color:${lote.caducidad && new Date(lote.caducidad) < new Date() ? 'var(--c-danger)' : (lote.caducidad && new Date(lote.caducidad) - new Date() <= 30*24*3600*1000 ? 'var(--c-warning)' : 'var(--c-success)');}">
+                    ${lote.cantidad || 0} ${p.unidad || ''}
+                  </strong>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+
         <div class="grid grid-cols-2 gap-10 mt-15">
           <button class="btn btn-secondary" onclick="BotiquinView._abrirMovimiento(${id}, 'entrada')">${Icons.agregar()} Entrada de stock</button>
           <button class="btn btn-secondary" onclick="BotiquinView._abrirMovimiento(${id}, 'consumo')">${Icons.balanza()} Registrar consumo</button>
@@ -167,13 +226,41 @@ const BotiquinView = {
       p.nombre = document.getElementById('b-edit-nombre').value.trim();
       p.tipo = document.getElementById('b-edit-tipo').value;
       p.unidad = document.getElementById('b-edit-unidad').value;
-      p.lote = document.getElementById('b-edit-lote').value.trim();
-      p.caducidad = document.getElementById('b-edit-caducidad').value || null;
+      const loteInput = document.getElementById('b-edit-lote').value.trim();
+      p.lote = loteInput;
+      const caducidadInput = document.getElementById('b-edit-caducidad').value;
+      p.caducidad = caducidadInput || null;
       const minima = parseFloat(document.getElementById('b-edit-minima').value);
       p.cantidadMinima = isNaN(minima) ? null : minima;
       p.notas = document.getElementById('b-edit-notas').value.trim();
       if (!p.nombre) { App.toastError('El nombre es obligatorio.'); return; }
+
+      // Guardar información básica del producto
       await window.db.put('config_botiquin', p);
+
+      // Manejar lotes: crear o actualizar lote si se especifica
+      if (loteInput) {
+        // Buscar si ya existe un lote con este número para este producto
+        const lotesExistentes = await window.db.getAllFromIndex('botiquin_lotes', 'productoId', id);
+        const loteExistente = lotesExistentes.find(l => l.lote === loteInput);
+
+        if (loteExistente) {
+          // Actualizar lote existente
+          loteExistente.caducidad = p.caducidad;
+          loteExistente.cantidad = p.cantidadActual; // Asumimos que la cantidad actual es la del lote
+          await window.db.put('botiquin_lotes', loteExistente);
+        } else {
+          // Crear nuevo lote
+          await window.db.add('botiquin_lotes', {
+            productoId: id,
+            lote: loteInput,
+            caducidad: p.caducidad,
+            cantidad: p.cantidadActual,
+            creadoEn: new Date().toISOString()
+          });
+        }
+      }
+
       BotiquinView._guardado = true;
       App.toast("Producto actualizado", "success");
       location.hash = "#/botiquin";
@@ -266,7 +353,7 @@ const BotiquinView = {
       steps: wizardSteps,
       onComplete: async (finalData) => {
         try {
-          await window.db.add('config_botiquin', {
+          const productoId = await window.db.add('config_botiquin', {
             fincaId: finca.id,
             nombre: finalData.nombre,
             tipo: finalData.tipo,
@@ -278,6 +365,18 @@ const BotiquinView = {
             notas: '',
             creadoEn: new Date().toISOString(),
           });
+
+          // Crear registro de lote si se proporcionó información de lote
+          if (finalData.lote && finalData.lote.trim() !== '') {
+            await window.db.add('botiquin_lotes', {
+              productoId: productoId,
+              lote: finalData.lote.trim(),
+              caducidad: finalData.caducidad || null,
+              cantidad: finalData.cantidadActual || 0,
+              creadoEn: new Date().toISOString()
+            });
+          }
+
           App.toast("Producto registrado", "success");
           App.route();
         } catch (e) {
@@ -291,34 +390,123 @@ const BotiquinView = {
     const p = await window.db.get('config_botiquin', id);
     if (!p) return;
 
+    // Obtener lotes existentes del producto
+    const lotesExistentes = await window.db.getAllFromIndex('botiquin_lotes', 'productoId', id).catch(() => []);
+
     const wizardSteps = [
       {
-        content: (data) => `
-          <div class="mt-10">
-            <div class="text-center mb-15">
-              <div class="text-xs text-gray uppercase font-800">${tipo === 'entrada' ? 'ENTRADA DE STOCK' : 'CONSUMO'}</div>
-              <div class="text-white font-900 uppercase">${p.nombre}</div>
+        content: (data) => {
+          let loteOptions = '';
+          if (tipo === 'entrada') {
+            // Para entrada, permitir especificar lote y caducidad
+            loteOptions = `
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="w-mov-lote">LOTE</label>
+                <input type="text" id="w-mov-lote" value="${data.lote || ''}" class="wizard-input" placeholder="Opcional">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="w-mov-caducidad">CADUCIDAD</label>
+                <input type="date" id="w-mov-caducidad" value="${data.caducidad || ''}" class="wizard-input">
+              </div>
+            `;
+          } else {
+            // Para consumo, mostrar lotes disponibles ordenados por FEFO (primero en vencer, primero en salir)
+            const lotesValidos = lotesExistentes
+              .filter(lote => lote.cantidad > 0) // Solo lotes con stock disponible
+              .sort((a, b) => {
+                // Ordenar por fecha de caducidad (los que vencen primero primero)
+                const fechaA = a.caducidad ? new Date(a.caducidad) : new Date(8640000000000000); // Fecha muy lejana si no tiene caducidad
+                const fechaB = b.caducidad ? new Date(b.caducidad) : new Date(8640000000000000);
+                return fechaA - fechaB;
+              });
+
+            let loteSeleccionado = data.loteSeleccionado || '';
+            if (!loteSeleccionado && lotesValidos.length > 0) {
+              // Por defecto, seleccionar el primero en vencer (FEFO)
+              loteSeleccionado = lotesValidos[0].lote || '';
+            }
+
+            loteOptions = `
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="w-mov-lote">LOTE (FEFO - Primero en Vencer, Primero en Salir)</label>
+                <select id="w-mov-lote" class="wizard-input">
+                  <option value="">-- Seleccionar lote --</option>
+                  ${lotesValidos.map(lote => {
+                    const vencido = lote.caducidad && new Date(lote.caducidad) < new Date();
+                    const diasParaVencer = lote.caducidad ? Math.ceil((new Date(lote.caducidad) - new Date()) / (24 * 3600 * 1000)) : null;
+                    const estadoTexto = vencido ? 'VENCIDO' :
+                      diasParaVencer !== null && diasParaVencer <= 30 ? `PRONTO VENCER (${diasParaVencer}d)` :
+                      diasParaVencer !== null ? `Vence en ${diasParaVencer}d` : 'Sin caducidad';
+                    const estadoClass = vencido ? 'text-red-500' :
+                      diasParaVencer !== null && diasParaVencer <= 30 ? 'text-orange-500' :
+                      diasParaVencer !== null ? 'text-green-500' : 'text-gray-500';
+                    return `<option value="${lote.lote}" ${lote.lote === loteSeleccionado ? 'selected' : ''}>${lote.lote || 'SIN LOTE'} - ${estadoTexto}</option>`;
+                  }).join('')}
+                </select>
+              </div>
+              <div class="space-y-2 mt-4">
+                ${lotesValidos.map(lote => `
+                  <div class="text-sm flex justify-between">
+                    <span>Lote: ${lote.lote || 'SIN LOTE'}</span>
+                    <span class="font-medium">${lote.cantidad} ${p.unidad || ''}</span>
+                  </div>
+                  ${lote.caducidad ? `
+                  <div class="text-xs flex justify-between">
+                    <span>Caduca:</span>
+                    <span class="${lote.caducidad && new Date(lote.caducidad) < new Date() ? 'text-red-500' :
+                      lote.caducidad && new Date(lote.caducidad) - new Date() <= 30*24*3600*1000 ? 'text-orange-500' :
+                      'text-green-500'}">
+                      ${lote.caducidad} ${lote.caducidad && new Date(lote.caducidad) < new Date() ? '(VENCIDO)' : ''}
+                    </span>
+                  </div>
+                  ` : ''}
+                `).join('')}
+              </div>
+            `;
+          }
+
+          return `
+            <div class="mt-10">
+              <div class="text-center mb-15">
+                <div class="text-xs text-gray uppercase font-800">${tipo === 'entrada' ? 'ENTRADA DE STOCK' : 'CONSUMO'}</div>
+                <div class="text-white font-900 uppercase">${p.nombre}</div>
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="w-mov-cantidad">CANTIDAD (${(p.unidad || '').toUpperCase()})</label>
+                <input type="number" id="w-mov-cantidad" value="${data.cantidad || ''}" min="0.01" step="0.01" class="wizard-input font-900 text-lg">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="w-mov-fecha">FECHA</label>
+                <input type="date" id="w-mov-fecha" value="${data.fecha}" class="wizard-input font-800">
+              </div>
+              ${loteOptions}
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label" for="w-mov-cantidad">CANTIDAD (${(p.unidad || '').toUpperCase()})</label>
-              <input type="number" id="w-mov-cantidad" value="${data.cantidad || ''}" min="0.01" step="0.01" class="wizard-input font-900 text-lg">
-            </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label" for="w-mov-fecha">FECHA</label>
-              <input type="date" id="w-mov-fecha" value="${data.fecha}" class="wizard-input font-800">
-            </div>
-          </div>
-        `,
+          `;
+        },
         onChange: async (data) => {
           const c = parseFloat(document.getElementById('w-mov-cantidad')?.value);
           data.cantidad = isNaN(c) ? 0 : c;
           data.fecha = document.getElementById('w-mov-fecha')?.value || data.fecha;
+          if (tipo === 'entrada') {
+            data.lote = document.getElementById('w-mov-lote')?.value.trim() || '';
+            data.caducidad = document.getElementById('w-mov-caducidad')?.value || null;
+          } else {
+            data.loteSeleccionado = document.getElementById('w-mov-lote')?.value || '';
+          }
         },
         validate: async (data) => {
           if (!data.cantidad || data.cantidad <= 0) { App.toastError('Indica una cantidad válida.'); return false; }
           if (tipo === 'consumo' && data.cantidad > Number(p.cantidadActual || 0)) {
             App.toastError('No puedes consumir más stock del disponible.');
             return false;
+          }
+          // Para consumo, validar que se haya seleccionado un lote si hay lotes disponibles
+          if (tipo === 'consumo' && lotesExistentes.length > 0) {
+            const lotesConStock = lotesExistentes.filter(l => l.cantidad > 0);
+            if (lotesConStock.length > 0 && (!data.loteSeleccionado || data.loteSeleccionado === '')) {
+              App.toastError('Debe seleccionar un lote para el consumo.');
+              return false;
+            }
           }
           return true;
         }
@@ -332,10 +520,72 @@ const BotiquinView = {
       steps: wizardSteps,
       onComplete: async (finalData) => {
         try {
-          p.cantidadActual = tipo === 'entrada'
-            ? Number(p.cantidadActual || 0) + finalData.cantidad
-            : Number(p.cantidadActual || 0) - finalData.cantidad;
-          await window.db.put('config_botiquin', p);
+          if (tipo === 'entrada') {
+            // ENTRADA DE STOCK: Actualizar cantidad total y crear/actualizar lote
+            p.cantidadActual = Number(p.cantidadActual || 0) + finalData.cantidad;
+            await window.db.put('config_botiquin', p);
+
+            // Manejar lote para entrada
+            if (finalData.lote && finalData.lote.trim() !== '') {
+              const loteExistente = lotesExistentes.find(l => l.lote === finalData.lote);
+              if (loteExistente) {
+                // Actualizar lote existente (sumar cantidad)
+                loteExistente.cantidad = Number(loteExistente.cantidad || 0) + finalData.cantidad;
+                loteExistente.caducidad = finalData.caducidad || loteExistente.caducidad; // Mantener la caducidad más antigua si se proporciona
+                await window.db.put('botiquin_lotes', loteExistente);
+              } else {
+                // Crear nuevo lote
+                await window.db.add('botiquin_lotes', {
+                  productoId: id,
+                  lote: finalData.lote.trim(),
+                  caducidad: finalData.caducidad || null,
+                  cantidad: finalData.cantidad,
+                  creadoEn: new Date().toISOString()
+                });
+              }
+            }
+          } else {
+            // CONSUMO: Implementar FEFO (Primero en Vencer, Primero en Salir)
+            let cantidadRestante = finalData.cantidad;
+            const lotesParaConsumir = lotesExistentes
+              .filter(lote => lote => lote.cantidad > 0) // Solo lotes con stock disponible
+              .sort((a, b) => {
+                // Ordenar por fecha de caducidad (los que vencen primero primero)
+                const fechaA = a.caducidad ? new Date(a.caducidad) : new Date(8640000000000000); // Fecha muy lejana si no tiene caducidad
+                const fechaB = b.caducidad ? new Date(b.caducidad) : new Date(8640000000000000);
+                return fechaA - fechaB;
+              });
+
+            // Consumir de los lotes en orden FEFO
+            for (const lote of lotesParaConsumir) {
+              if (cantidadRestante <= 0) break;
+
+              const cantidadADeductir = Math.min(cantidadRestante, lote.cantidad);
+              lote.cantidad -= cantidadADeductir;
+              await window.db.put('botiquin_lotes', lote);
+              cantidadRestante -= cantidadADeductir;
+            }
+
+            // Actualizar cantidad total del producto
+            p.cantidadActual = Number(p.cantidadActual || 0) - finalData.cantidad;
+            await window.db.put('config_botiquin', p);
+
+            // Si se consumió todo de un lote específico (selección manual), actualizar específicamente ese lote
+            if (finalData.loteSeleccionado && finalData.loteSeleccionado !== '') {
+              const loteSeleccionado = lotesExistentes.find(l => l.lote === finalData.loteSeleccionado);
+              if (loteSeleccionado) {
+                // El lote ya fue actualizado en el bucle anterior si estaba en la lista FEFO y tenía stock
+                // Pero si no estaba (porque estaba fuera de orden por fecha), lo actualizamos aquí
+                if (!lotesParaConsumir.includes(loteSeleccionado)) {
+                  // Este caso no debería ocurrir con el ordenamiento correcto, pero por seguridad
+                  loteSeleccionado.cantidad = Math.max(0, loteSeleccionado.cantidad - finalData.cantidad);
+                  await window.db.put('botiquin_lotes', loteSeleccionado);
+                }
+              }
+            }
+          }
+
+          // Registrar el movimiento en el historial
           await window.db.add('registro_eventos', {
             fincaId: p.fincaId,
             entidad_id: p.id,
@@ -345,9 +595,14 @@ const BotiquinView = {
             fecha: finalData.fecha,
             valor_neto: finalData.cantidad,
             unidad: p.unidad,
-            descripcion: `${tipo === 'entrada' ? 'Entrada' : 'Consumo'} de ${finalData.cantidad} ${p.unidad} de ${p.nombre}`,
+            descripcion: `${tipo === 'entrada' ? 'Entrada' : 'Consumo'} de ${finalData.cantidad} ${p.unidad} de ${p.nombre}${
+              tipo === 'entrada' && finalData.lote ? ` (Lote: ${finalData.lote})` : ''
+            }${
+              tipo === 'consumo' && finalData.loteSeleccionado ? ` (Lote: ${finalData.loteSeleccionado})` : ''
+            }`,
             creadoEn: new Date().toISOString(),
           });
+
           App.toast(tipo === 'entrada' ? "Entrada registrada" : "Consumo registrado", "success");
           location.hash = `#/botiquin-producto?id=${p.id}`;
         } catch (e) {

@@ -39,6 +39,15 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 repositories {
@@ -57,6 +66,14 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.mlkit:barcode-scanning:17.3.0'
+        force 'com.google.mlkit:common:18.11.0'
+        force 'com.google.android.gms:play-services-code-scanner:16.1.0'
+    }
 }
 
 apply from: 'capacitor.build.gradle'

@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 19;
+const DB_VERSION = 22;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -556,6 +556,67 @@ async function initDB() {
                     store.createIndex('fincaId', 'fincaId');
                     store.createIndex('tipo', 'tipo'); // vacuna, medicamento, desparasitante, otro
                 }
+            }
+
+            // v20: Campo de pago pendiente para compras y ventas
+            if (oldVersion < 20) {
+                // Ensure compras_ganado store exists
+                if (!db.objectStoreNames.contains('compras_ganado')) {
+                    const comprasStore = db.createObjectStore('compras_ganado', { keyPath: 'id', autoIncrement: true });
+                }
+                // Añadir índice de pago_pendiente a comercializacion_carne si existe
+                if (db.objectStoreNames.contains('comercializacion_carne')) {
+                    const carneStore = transaction.objectStore('comercializacion_carne');
+                    if (!carneStore.indexNames.contains('pago_pendiente')) {
+                        carneStore.createIndex('pago_pendiente', 'pago_pendiente');
+                    }
+                }
+                // Añadir índice de pago_pendiente a compras_ganado (now exists)
+                const comprasStore = transaction.objectStore('compras_ganado');
+                if (!comprasStore.indexNames.contains('pago_pendiente')) {
+                    comprasStore.createIndex('pago_pendiente', 'pago_pendiente');
+                }
+            }
+
+            // v21: Gestión mejorada de lotes y vencimientos para botiquín
+            if (oldVersion < 21) {
+                // Tabla para lotes de productos de botiquín
+                if (!db.objectStoreNames.contains('botiquin_lotes')) {
+                    const lotesStore = db.createObjectStore('botiquin_lotes', { keyPath: 'id', autoIncrement: true });
+                    lotesStore.createIndex('productoId', 'productoId');
+                    lotesStore.createIndex('lote', 'lote');
+                    lotesStore.createIndex('caducidad', 'caducidad');
+                }
+            }
+
+            // v21: Mejora en gestión de lotes y vencimientos para botiquín
+            if (oldVersion < 21) {
+                // Mantener config_botiquin para compatibilidad hacia atrás
+                if (db.objectStoreNames.contains('config_botiquin')) {
+                    const botiquinStore = transaction.objectStore('config_botiquin');
+                    // Eliminar índices antiguos de lote y caducidad si existen (para recrearlos)
+                    if (botiquinStore.indexNames.contains('lote')) {
+                        botiquinStore.deleteIndex('lote');
+                    }
+                    if (botiquinStore.indexNames.contains('caducidad')) {
+                        botiquinStore.deleteIndex('caducidad');
+                    }
+                    // Los campos lote y caducidad se mantendrán por compatibilidad pero no se usarán activamente
+                }
+
+                // Crear tabla para lotes de botiquin
+                if (!db.objectStoreNames.contains('botiquin_lotes')) {
+                    const lotesStore = db.createObjectStore('botiquin_lotes', { keyPath: 'id', autoIncrement: true });
+                    lotesStore.createIndex('productoId', 'productoId');
+                    lotesStore.createIndex('lote', 'lote');
+                    lotesStore.createIndex('caducidad', 'caducidad');
+                }
+            }
+
+            // v22: Añadir turno y zona a la producción de leche, y motivo, trazabilidad y observaciones a ventas y compras (payload encriptado)
+            if (oldVersion < 22) {
+                // No cambiamos la estructura de la tienda, pero cambiamos el formato del payload cifrado.
+                // Manejaremos la retrocompatibilidad en la lógica de descifrado.
             }
 
             // v15: Especie y Tipo de Identificador como datos maestros oficiales
@@ -1170,6 +1231,42 @@ async function migrarEquinoMicrochip(windowDb) {
     }
 }
 
+/**
+ * Migración v21: migra los datos existentes de config_botiquin a botiquin_lotes
+ * para mejorar la gestión de lotes y vencimientos. Cada registro de producto
+ * se convierte en un lote con la cantidad actual.
+ */
+async function migrarV21(windowDb) {
+    try {
+        console.log("[DB] Migración v21: migrando lotes de botiquin...");
+
+        // Obtener todos los productos de botiquin existentes
+        const productos = await windowDb.getAll('config_botiquin');
+
+        for (const producto of productos) {
+            // Solo migrar si tiene lote o caducidad definidos, o si tiene cantidad > 0
+            if ((producto.lote && producto.lote.trim() !== '') ||
+                (producto.caducidad && producto.caducidad !== null) ||
+                (producto.cantidadActual && producto.cantidadActual > 0)) {
+
+                // Crear un lote para este producto
+                await windowDb.add('botiquin_lotes', {
+                    productoId: producto.id,
+                    lote: producto.lote || `LOTE-${producto.id}`, // Lote por defecto si no tiene
+                    caducidad: producto.caducidad || null,
+                    cantidad: producto.cantidadActual || 0,
+                    creadoEn: producto.creadoEn || new Date().toISOString()
+                });
+            }
+        }
+
+        await windowDb.put('meta', { key: 'migracion_v21', value: true, migradoEn: new Date().toISOString() });
+        console.log("[DB] Migración v21 completada.");
+    } catch (e) {
+        console.warn("[DB] Error en migración v21:", e);
+    }
+}
+
 console.log("[DB] Iniciando window.dbPromise...");
 const dbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('DB_TIMEOUT: IndexedDB no respondió en 15s')), 15000));
 window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
@@ -1221,6 +1318,26 @@ window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
         const metaEquinoMicrochip = await database.get('meta', 'migracion_equino_microchip');
         if (!metaEquinoMicrochip) {
             await migrarEquinoMicrochip(database);
+        }
+    } catch (e) {
+        console.log("[DB] Primera ejecución o store meta no disponible aún.");
+    }
+
+    // Ejecutar migración v21 (lotes de botiquin) si no se ha ejecutado antes
+    try {
+        const metaV21 = await database.get('meta', 'migracion_v21');
+        if (!metaV21) {
+            await migrarV21(database);
+        }
+    } catch (e) {
+        console.log("[DB] Primera ejecución o store meta no disponible aún.");
+    }
+
+    // Ejecutar migración v21 (mejora en gestión de lotes para botiquín) si no se ha ejecutado antes
+    try {
+        const metaV21 = await database.get('meta', 'migracion_v21');
+        if (!metaV21) {
+            await migrarV21(database);
         }
     } catch (e) {
         console.log("[DB] Primera ejecución o store meta no disponible aún.");
