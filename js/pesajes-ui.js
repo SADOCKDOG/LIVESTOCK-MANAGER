@@ -198,6 +198,19 @@ const PesajesUI = {
                          ${esModoLeche ? `
                          <div class="pesaje-leche-grid">
                              <div>
+                                 <label class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 d-block">TURNO</label>
+                                 <div class="flex space-x-4">
+                                     <label class="flex items-center">
+                                         <input type="radio" name="turno" value="AM" class="form-radio" checked>
+                                         <span class="ml-2">AM</span>
+                                     </label>
+                                     <label class="flex items-center">
+                                         <input type="radio" name="turno" value="PM" class="form-radio">
+                                         <span class="ml-2">PM</span>
+                                     </label>
+                                 </div>
+                             </div>
+                             <div>
                                  <label class="text-xs text-gray uppercase font-extrabold tracking-wider mb-6 d-block">GRASA (%)</label>
                                  <input type="number" id="w-leche-grasa" step="0.01" placeholder="0.00" class="wizard-input font-900 text-lg">
                              </div>
@@ -402,13 +415,18 @@ const PesajesUI = {
                             }
                         }
 
+                        // Get turno value
+                        const turnoInput = overlay.querySelector('input[name="turno"]:checked');
+                        const turno = turnoInput ? turnoInput.value : 'AM';
+
                         const pLecheId = await Produccion.saveLeche({
                             id: a.produccionLecheId || undefined,
                             vacaId: a.id,
                             fecha,
                             cantidad_litros: val,
                             analisis_grasa_proteina: { grasa, proteina },
-                            creadoEn: a.creadoEnLeche || new Date().toISOString()
+                            creadoEn: a.creadoEnLeche || new Date().toISOString(),
+                            turno: turno
                         }, activeFincaId);
                         a.produccionLecheId = pLecheId;
                         if (!a.creadoEnLeche) a.creadoEnLeche = new Date().toISOString();

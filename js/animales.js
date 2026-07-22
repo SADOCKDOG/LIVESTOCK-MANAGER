@@ -107,12 +107,34 @@ const Animales = {
           tipo: data.tipo || "Sin Clasificar",
           estado: data.estado || "activo",
           fecha_nacimiento: data.fecha_nacimiento || null,
+          // Nuevos campos para compra de animal
+          precio_compra: data.precio_compra ? Number(data.precio_compra) : null,
+          proveedor_id: data.proveedor_id ? Number(data.proveedor_id) : null,
+          factura_compra: data.factura_compra || null,
+          pago_pendiente: data.pago_pendiente !== undefined ? Boolean(data.pago_pendiente) : false,
           actualizadoEn: new Date().toISOString(),
         };
 
         // Gap 7: Mapear motivo_baja a categoría SANDACH
         if (data.motivo_baja && window.ComunidadesService) {
           animalData.sandach_categoria = ComunidadesService.getSANDACHCategoria(data.motivo_baja);
+        }
+
+        // Validar datos de compra si tipoAlta es "Compra"
+        if (data.tipoAlta === "Compra") {
+          if (data.precio_compra === undefined || data.precio_compra === null || data.precio_compra === '' || isNaN(parseFloat(data.precio_compra)) || parseFloat(data.precio_compra) <= 0) {
+            throw new Error('Precio de compra requerido y debe ser mayor a cero');
+          }
+          if (data.proveedor_id === undefined || data.proveedor_id === null || data.proveedor_id === '' || isNaN(parseInt(data.proveedor_id)) || parseInt(data.proveedor_id) <= 0) {
+            throw new Error('Proveedor requerido para compra de animal');
+          }
+          if (!data.factura_compra || data.factura_compra.trim() === '') {
+            throw new Error('Factura de compra requerida');
+          }
+          // Validar pago_pendiente (opcional, pero si se proporciona debe ser boolean)
+          if (data.pago_pendiente !== undefined && typeof data.pago_pendiente !== 'boolean' && ![0, 1, 'true', 'false'].includes(data.pago_pendiente)) {
+            throw new Error('pago_pendiente debe ser un valor booleano');
+          }
         }
 
         const animalAnterior = esEdicion ? await this.get(Number(data.id)) : null;

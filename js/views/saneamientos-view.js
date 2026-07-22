@@ -108,6 +108,16 @@ const SaneamientosView = {
             <div><label class="form-label" for="s-edit-positivos">Nº positivos</label>
             <input type="number" id="s-edit-positivos" value="${san.num_positivos || 0}" min="0" class="premium-input"></div>
           </div>
+          <div class="grid grid-cols-2 gap-10">
+            <div><label class="form-label" for="s-edit-tubo">NÚMERO DE TUBO</label>
+            <input type="text" id="s-edit-tubo" value="${san.tubo || ''}" class="premium-input"></div>
+            <div><label class="form-label" for="s-edit-sexo">SEXO</label>
+            <select id="s-edit-sexo" class="premium-input">
+              <option value="">— SIN ESPECIFICAR —</option>
+              <option value="M" ${san.sexo === 'M' ? 'selected' : ''}>MACHO</option>
+              <option value="F" ${san.sexo === 'F' ? 'selected' : ''}>HEMBRA</option>
+            </select></div>
+          </div>
           <div><label class="form-label" for="s-edit-calif">Calificación sanitaria</label>
           <select id="s-edit-calif" class="premium-input">
             ${calificaciones.map((c) => `<option value="${c.value}" ${san.calificacion === c.value ? 'selected' : ''}>${c.label}</option>`).join('')}
@@ -146,6 +156,8 @@ const SaneamientosView = {
         especie: san.especie,
         num_examinados: document.getElementById('s-edit-examinados').value,
         num_positivos: document.getElementById('s-edit-positivos').value,
+        tubo: document.getElementById('s-edit-tubo').value,
+        sexo: document.getElementById('s-edit-sexo').value,
         calificacion: document.getElementById('s-edit-calif').value,
         restriccion_movimientos: document.getElementById('s-edit-restriccion').checked,
         motivo_restriccion: document.getElementById('s-edit-motivo-restriccion').value,
@@ -232,6 +244,18 @@ const SaneamientosView = {
               <span class="uppercase font-900 tracking-tight leading-tight">RESTRICCIÓN DE MOVIMIENTOS ACTIVA</span>
             </label>
             <div class="wizard-input-group">
+              <label class="wizard-label" for="w-san-tubo">NÚMERO DE TUBO</label>
+              <input type="text" id="w-san-tubo" value="${data.tubo || ''}" class="wizard-input">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label" for="w-san-sexo">SEXO</label>
+              <select id="w-san-sexo" class="wizard-input font-800">
+                <option value="">— SELECCIONAR —</option>
+                <option value="M" ${data.sexo === 'M' ? 'selected' : ''}>MACHO</option>
+                <option value="F" ${data.sexo === 'F' ? 'selected' : ''}>HEMBRA</option>
+              </select>
+            </div>
+            <div class="wizard-input-group">
               <label class="wizard-label" for="w-san-notas">NOTAS</label>
               <input type="text" id="w-san-notas" value="${data.notas || ''}" class="wizard-input">
             </div>
@@ -247,6 +271,8 @@ const SaneamientosView = {
           data.num_positivos = document.getElementById('w-san-positivos')?.value || 0;
           data.calificacion = document.getElementById('w-san-calif')?.value || 'sin_calificar';
           data.restriccion_movimientos = !!document.getElementById('w-san-restriccion')?.checked;
+          data.tubo = document.getElementById('w-san-tubo')?.value || '';
+          data.sexo = document.getElementById('w-san-sexo')?.value || '';
           data.notas = document.getElementById('w-san-notas')?.value || '';
         },
         validate: async (data) => {
@@ -264,7 +290,7 @@ const SaneamientosView = {
     window.WizardManager.create({
       id: 'wizard-nuevo-saneamiento',
       title: 'NUEVO SANEAMIENTO',
-      initialData: { campana: campanas[0]?.value || '', fecha: new Date().toISOString().split('T')[0], especie: '', veterinario: '', adsg_nombre: '', num_examinados: 0, num_positivos: 0, calificacion: 'sin_calificar', restriccion_movimientos: false, notas: '' },
+      initialData: { campana: campanas[0]?.value || '', fecha: new Date().toISOString().split('T')[0], especie: '', veterinario: '', adsg_nombre: '', num_examinados: 0, num_positivos: 0, calificacion: 'sin_calificar', restriccion_movimientos: false, tubo: '', sexo: '', notas: '' },
       steps: wizardSteps,
       onComplete: async (finalData) => {
         try {

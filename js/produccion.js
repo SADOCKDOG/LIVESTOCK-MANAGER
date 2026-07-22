@@ -116,7 +116,12 @@ const Produccion = {
                 if (record.fincaId === fincaId) {
                     try {
                         const decryptedData = await window.CryptoUtils.decryptData(record.encrypted, record.iv, fincaId);
-                        decryptedRecords.push({ id: record.id, ...decryptedData });
+                        const fullData = {
+                            ...decryptedData,
+                            turno: decryptedData.turno !== undefined ? decryptedData.turno : null,
+                            zona: decryptedData.zona !== undefined ? decryptedData.zona : null
+                        };
+                        decryptedRecords.push({ id: record.id, ...fullData });
                     } catch (e) {
                         console.error(`Error descifrando produccion_leche ID ${record.id}:`, e);
                     }
@@ -227,7 +232,9 @@ const Produccion = {
                 analisis_grasa_proteina: data.analisis_grasa_proteina || {},
                 ...snapMetadata,
                 creadoEn: data.creadoEn || new Date().toISOString(),
-                actualizadoEn: new Date().toISOString()
+                actualizadoEn: new Date().toISOString(),
+                turno: data.turno,
+                zona: animal ? animal.zonaActual : null
             };
 
             const { encrypted, iv } = await window.CryptoUtils.encryptData(payload, fincaId);
@@ -268,13 +275,49 @@ const Produccion = {
             for (const record of records) {
                 try {
                     const decryptedData = await window.CryptoUtils.decryptData(record.encrypted, record.iv, fincaId);
-                    decryptedRecords.push({ id: record.id, ...decryptedData, fecha: record.fecha });
+                    const fullData = {
+                        ...decryptedData,
+                        motivo: decryptedData.motivo !== undefined ? decryptedData.motivo : null,
+                        trazabilidad: decryptedData.trazabilidad !== undefined ? decryptedData.trazabilidad : null,
+                        observaciones: decryptedData.observaciones !== undefined ? decryptedData.observaciones : null
+                    };
+                    decryptedRecords.push({ id: record.id, ...fullData, fecha: record.fecha });
                 } catch (e) {
                     console.error(`Error descifrando ventas_ganado ID ${record.id}:`, e);
                 }
             }
             return decryptedRecords.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         }, { entity: 'Produccion', action: 'listVentas' });
+    },
+
+    /**
+     * Lista las compras de ganado desencriptadas para una finca específica.
+     */
+    async listCompras(fincaId) {
+        return await ErrorHandler.tryAsync(async () => {
+            ErrorHandler.validateRequired('fincaId', fincaId, 'FincaId requerido para descifrar compras');
+
+            const records = await window.db.getAll('compras_ganado');
+            const decryptedRecords = [];
+
+            for (const record of records) {
+                if (record.fincaId === fincaId) {
+                    try {
+                        const decryptedData = await window.CryptoUtils.decryptData(record.encrypted, record.iv, fincaId);
+                        const fullData = {
+                            ...decryptedData,
+                            motivo: decryptedData.motivo !== undefined ? decryptedData.motivo : null,
+                            trazabilidad: decryptedData.trazabilidad !== undefined ? decryptedData.trazabilidad : null,
+                            observaciones: decryptedData.observaciones !== undefined ? decryptedData.observaciones : null
+                        };
+                        decryptedRecords.push({ id: record.id, ...fullData, fecha: record.fecha });
+                    } catch (e) {
+                        console.error(`Error descifrando compras_ganado ID ${record.id}:`, e);
+                    }
+                }
+            }
+            return decryptedRecords.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        }, { entity: 'Produccion', action: 'listCompras' });
     },
 
     /**
@@ -398,8 +441,12 @@ const Produccion = {
                 precio_total: Number(data.precio_total) || 0,
                 comprador: data.comprador || "",
                 documentacion: data.documentacion || "",
+                motivo: data.motivo || "",
+                trazabilidad: data.trazabilidad || "",
+                observaciones: data.observaciones || "",
                 creadoEn: data.creadoEn || new Date().toISOString(),
-                actualizadoEn: new Date().toISOString()
+                actualizadoEn: new Date().toISOString(),
+                pago_pendiente: data.pago_pendiente !== undefined ? Boolean(data.pago_pendiente) : false
             };
 
             const { encrypted, iv } = await window.CryptoUtils.encryptData(payload, fincaId);
@@ -426,6 +473,64 @@ const Produccion = {
                 return newId;
             }
         }, { entity: 'Produccion', action: 'saveVentas' });
+
+    // ---- COMPRAS DE GANADO (Cifradas con AES-GCM) ----
+    async saveCompras(data, fincaId) {
+        return await ErrorHandler.tryAsync(async () => {
+            ErrorHandler.validateRequired('fincaId', fincaId, 'FincaId requerido para cifrar compras');
+
+            const esEdicion = data.id !== undefined && data.id !== null && data.id !== '';
+
+            const compraData = {
+                animal_id_list: data.animal_id_list || [],
+                total_amount: data.total_amount !== undefined ? parseFloat(data.total_amount) : 0,
+                proveedor_id: data.proveedor_id ? Number(data.proveedor_id) : null,
+                factura: data.factura || null,
+                fecha: data.fecha || new Date().toISOString().split('T')[0],
+                pago_pendiente: data.pago_pendiente !== undefined ? Boolean(data.pago_pendiente) : false,
+                fincaId: fincaId,
+                creadoEn: data.creadoEn || new Date().toISOString(),
+                actualizadoEn: new Date().toISOString(),
+                motivo: data.motivo || "",
+                trazabilidad: data.trazabilidad || "",
+                observaciones: data.observaciones || ""
+            };
+
+            // Validaciones básicas
+            if (compraData.total_amount < 0) {
+                throw new Error('El importe total debe ser un número positivo');
+            }
+            if (!compraData.fecha) {
+                throw new Error('Fecha requerida');
+            }
+            if (!compraData.proveedor_id) {
+                throw new Error('Proveedor requerido');
+            }
+
+            const { encrypted, iv } = await window.CryptoUtils.encryptData(compraData, fincaId);
+
+            const dbRecord = {
+                fincaId: fincaId,
+                fecha: compraData.fecha,
+                encrypted,
+                iv
+            };
+
+            if (esEdicion) {
+                dbRecord.id = Number(data.id);
+                await window.db.put('compras_ganado', dbRecord);
+                if (window.EventBus) {
+                    window.EventBus.emit('compra:creada', { compra: compraData });
+                }
+                return dbRecord.id;
+            } else {
+                const newId = await window.db.add('compras_ganado', dbRecord);
+                if (window.EventBus) {
+                    window.EventBus.emit('compra:creada', { compra: compraData });
+                }
+                return newId;
+            }
+        }, { entity: 'Produccion', action: 'saveCompras' });
     }
 };
 
