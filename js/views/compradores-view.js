@@ -542,12 +542,14 @@ const CompradoresView = {
           <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
             <small class="s-lbl uppercase font-900" style="color: var(--c-success);">CARNE</small>
             <div class="s-val inf-val-lg text-green font-950">${resumen.total_ventas_carne}</div>
-            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg</small>
+            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.peso_canal_total.toLocaleString()} kg · ${resumen.importe_carne_real.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2})} €</small>
+            ${resumen.ventas_carne_sin_precio > 0 ? `<small class="text-[0.5rem] font-800 block mt-2" style="color: var(--c-warning);">${resumen.ventas_carne_sin_precio} sin precio</small>` : ''}
           </div>
           <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
             <small class="s-lbl uppercase font-900" style="color: var(--c-warning);">LECHE</small>
             <div class="s-val inf-val-lg text-amber font-950">${resumen.total_entregas_leche}</div>
-            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L</small>
+            <small class="text-gray-600 text-[0.5rem] font-800 block mt-2">${resumen.litros_totales.toLocaleString()} L · ${resumen.importe_leche_real.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2})} €</small>
+            ${resumen.entregas_leche_sin_precio > 0 ? `<small class="text-[0.5rem] font-800 block mt-2" style="color: var(--c-warning);">${resumen.entregas_leche_sin_precio} sin precio</small>` : ''}
           </div>
           <div class="info-box-center py-10" style="background: #1E1E1E; border: 1px solid #27272a; border-radius: 8px;">
             <small class="s-lbl uppercase font-900" style="color: var(--c-purple);">CONTRATOS</small>
