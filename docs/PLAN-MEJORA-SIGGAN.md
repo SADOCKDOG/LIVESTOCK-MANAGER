@@ -114,8 +114,8 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 | **HORA** (además de fecha) | ✅ Implementado — Altas/Bajas (`js/movimientos.js`), Cubriciones/Secados (wizard reproducción en `js/app.js`), Tratamientos (`js/views/wizards/wizard-tratamiento.js`) |
 | **LOTE** (identificador de lote de cubrición) | ✅ Implementado — visible en Inseminación Artificial/Monta Natural |
 | **NÚMERO DE MACHO** (semental/reproductor) | ✅ Implementado — visible solo en Monta Natural (en IA no hay semental físico) |
-| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ⏸ **En pausa** (2026-07-22, a petición del usuario) — no existe módulo de "alta de cebadero" en la app hoy |
-| Granularidad individual (nº tubo + sexo por animal) | ⏸ **En pausa** (2026-07-22, a petición del usuario) — cambio de modelo mayor en `js/saneamientos.js` (hoy agregado por campaña); es el único punto con impacto real en trazabilidad SIGGAN si se necesita en el futuro |
+| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ✅ Implementado (2026-07-22) — campo en `wizard-guia-movimiento.js`, condicionado a `conf.requiere_nif_veterinario_cebadero`. **Nota**: ese flag no está definido en ningún objeto de `comunidades-service.js`, así que el campo hoy no llega a mostrarse en la práctica — falta añadir el flag a la(s) CCAA que lo exijan para que sea funcional |
+| Granularidad individual (nº tubo + sexo por animal) | ✅ Implementado (2026-07-22) — campos `tubo`/`sexo` en `js/saneamientos.js` y `js/views/saneamientos-view.js`, editable en ficha y wizard de alta |
 
 Fix de UX detectado durante la verificación: el wizard de reproducción abre con "Inseminación Artificial" preseleccionada, pero el `<select>` no dispara `change` por sí solo al renderizarse — los campos condicionales (lote) no aparecían hasta que el usuario tocaba el selector manualmente. Corregido llamando explícitamente a `_onReproTipoChange()` al abrir el wizard.
 
