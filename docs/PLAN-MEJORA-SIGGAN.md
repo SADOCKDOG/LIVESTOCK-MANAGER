@@ -15,13 +15,13 @@
 La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 6 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`), y la mayoría ya se implementaron:
 
 - ✅ Datos maestros listos para generar/importar ficheros de intercambio SIGGAN reales (gaps 1 y 2).
-- ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3) — sin UI todavía.
+- ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3), con UI (wizard + listado en SanidadView).
 - ✅ Validación de identificación equina cerrada (gap 4).
 - ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5) — parcial, sin UI.
 - ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — parcial, sin granularidad individual de saneamientos.
 - ⬜ Nivel intermedio REGA→especie que SIEX exige formalmente (gap 7) — descartado por prioridad baja.
 
-**Pendiente transversal**: varios de los módulos nuevos (Vacunaciones, Instalaciones) tienen capa de datos completa pero sin vista/wizard de usuario — mismo patrón que `Saneamientos`, que tampoco la tiene. Si se quiere que estos gaps sean utilizables desde la UI, ese es el siguiente trabajo natural.
+**Pendiente transversal**: Vacunaciones ya tiene UI completa (commit `966735a`, 2026-07-22). Instalaciones sigue solo con capa de datos, sin vista/wizard — mismo patrón que `Saneamientos`, que tampoco la tiene. Si se quiere que estos gaps sean utilizables desde la UI, ese es el siguiente trabajo natural.
 
 ## Orden de implementación recomendado
 
@@ -29,7 +29,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 |---|---|---|---|---|
 | 1 | Catálogo de razas (163 razas) | ✅ **Implementado** (commit `8675c08`, 2026-07-22) | — | — |
 | 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
-| 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado** (commit `325d812`, 2026-07-22; sin UI todavía) | — | — |
+| 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado con UI** (commits `325d812`, `966735a`, 2026-07-22) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado parcialmente** (commit `57202a5`, 2026-07-22; falta distinción "Lidia" y UI) | — | — |
 | 6 | Campos de captura de campo (hora, lote, nº macho) | ✅ **Implementado parcialmente** (commit `800e913`, 2026-07-22; falta saneamiento individual) | — | — |
@@ -64,7 +64,7 @@ DB_VERSION 16→17, nueva tabla `vacunaciones` (índices `fincaId`, `rebanoId`, 
 
 **Modelo implementado**: Vacunación (cabecera: fecha, veterinario, observaciones) con array embebido `tipos_vacuna` (máx. 4 por normativa, truncado automáticamente: `tipo`, `lote`, `dosis`, `nombre_comercial`) y `animales_vacunados` (por categoría agregada o individual). Campo `completa` (% censo susceptible vacunado, exigido por ADSG y ausente en el libro genérico) y flag `cerrada` que bloquea edición/borrado una vez `true`. `anular()` es trazable (marca `anulada`/`motivo_anulacion`/`fecha_anulacion` sin borrar, funciona incluso sobre vacunaciones ya cerradas) — mismo patrón que movimientos.
 
-**Sin UI todavía**: mismo patrón que `Saneamientos` (que tampoco tiene vista propia) — se priorizó dejar la capa de datos completa y verificada; wizard/vista pendiente si se decide abordarla.
+**✅ UI implementada (commit `966735a`, 2026-07-22)**: nuevo `js/views/wizards/wizard-vacunacion.js` (wizard de 2 pasos: cabecera+tipos de vacuna, luego selección de animales) + sección "VACUNACIONES (LIBRO ADSG)" en `SanidadView` con listado y ficha de detalle (cerrar/anular). Verificado en navegador con flujo de UI real completo.
 
 Verificado en navegador: rechazo sin tipos de vacuna, alta con múltiples tipos, truncado a 4 máximo, cálculo de total de animales vacunados, edición antes/bloqueada después de cerrar, borrado bloqueado tras cerrar, anulación trazable funcional incluso cerrada, `list()` por rebaño.
 
@@ -93,7 +93,7 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 **DB_VERSION 17→18**, migración aditiva (nueva tabla `instalaciones_tipo`, dato maestro sin cambios en tablas existentes). Verificado en navegador: 36 tipos sembrados y re-sembrados correctamente, validación de latitud/longitud, instalación sin tipo rechazada, IDs secuenciales correctos, `restriccionActiva()` funcional.
 
-**No priorizado**: el diseño de 12-13 campos por instalación (referencia catastral, régimen de tenencia, año construcción, etc.) que reveló el Anexo I de Variables Ganaderas se simplificó a los campos mínimos verificados (`tipoId`, y campos libres como `superficie_m2`/`plazas_alojamiento`/`volumen_m3` según el tipo) — el array `instalaciones[]` no fuerza schema, así que se pueden añadir más campos sin migración cuando haya UI real que los use. Sin UI todavía (mismo patrón que Saneamientos y Vacunaciones).
+**No priorizado**: el diseño de 12-13 campos por instalación (referencia catastral, régimen de tenencia, año construcción, etc.) que reveló el Anexo I de Variables Ganaderas se simplificó a los campos mínimos verificados (`tipoId`, y campos libres como `superficie_m2`/`plazas_alojamiento`/`volumen_m3` según el tipo) — el array `instalaciones[]` no fuerza schema, así que se pueden añadir más campos sin migración cuando haya UI real que los use. Sin UI todavía (mismo patrón que Saneamientos; Vacunaciones ya tiene la suya, ver punto 3).
 
 ---
 
