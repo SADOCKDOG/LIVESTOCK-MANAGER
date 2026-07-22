@@ -50,8 +50,6 @@
 
 Cubierto de forma equivalente: razas (`js/db.js` `RAZAS_SEED`), movimientos internos (`js/movimientos.js`, `js/rebanos.js`), pesajes (`js/pesajes.js`), reproducción — monta/palpación/parto (`js/reproduccion.js`), saneamiento (`js/saneamientos.js`).
 
-**No modelado hoy en Livestock Manager**:
-- Escala de Condición Corporal (BCS 1-9) — no existe en ningún módulo.
-- Catálogo estructurado de enfermedades/diagnósticos con clasificación reproductivo/no-reproductivo — hoy `MOTIVOS_TRATAMIENTO` (`comunidades-service.js`) es una lista genérica de 10 categorías (profilaxis, vacunación, desparasitación...), no un catálogo de enfermedades específicas.
+**✅ Escala de Condición Corporal (BCS 1-9) — IMPLEMENTADO (2026-07-22)**: campo opcional `condicion_corporal` (1-9) añadido a `Pesajes.registrar()` (`js/pesajes.js`), capturado en el wizard de pesaje (`js/pesajes-ui.js`, select "CONDICIÓN CORPORAL" junto al peso, visible en pesajes de carne/control, no en control lechero). No es un dato exigido por SIGGAN — es una mejora de manejo ganadero de valor opcional, inspirada en `CONDCORP.DAT` de esta base de datos legacy. Verificado en navegador: pesaje individual con BCS, sin BCS (queda `null`), y en modo lote (varios animales con BCS distinto cada uno, persistido correctamente).
 
-Ninguno de los dos es una exigencia normativa SIGGAN — son buenas prácticas de manejo ganadero, de valor opcional. Ver evaluación de accionabilidad en el hilo de conversación de esta auditoría (2026-07-22).
+**No implementado, descartado por ahora**: catálogo estructurado de enfermedades/diagnósticos con clasificación reproductivo/no-reproductivo (`PROBPAL.DAT`) — el de esta base de datos es específico de Venezuela (Brucelosis, Fiebre Aftosa, Anaplasmosis...), no directamente aplicable a España. El patrón (catálogo de diagnósticos clasificados) podría ser útil pero necesitaría fuente normativa española propia, no esta.
