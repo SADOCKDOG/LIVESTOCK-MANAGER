@@ -179,7 +179,7 @@ const BotiquinView = {
                     ${lote.caducidad ? `<span class="text-[0.55rem] font-bold text-gray-500 block mt-1">Caduca: ${lote.caducidad}</span>` : ''}
                     ${lote.creadoEn ? `<span class="text-[0.5rem] font-medium text-gray-400 block mt-1">Creado: ${new Date(lote.creadoEn).toLocaleDateString()}</span>` : ''}
                   </div>
-                  <strong class="text-xs font-black" style="color:${lote.caducidad && new Date(lote.caducidad) < new Date() ? 'var(--c-danger)' : (lote.caducidad && new Date(lote.caducidad) - new Date() <= 30*24*3600*1000 ? 'var(--c-warning)' : 'var(--c-success)');}">
+                  <strong class="text-xs font-black" style="color:${lote.caducidad && new Date(lote.caducidad) < new Date() ? 'var(--c-danger)' : (lote.caducidad && new Date(lote.caducidad) - new Date() <= 30*24*3600*1000 ? 'var(--c-warning)' : 'var(--c-success)')}">
                     ${lote.cantidad || 0} ${p.unidad || ''}
                   </strong>
                 </div>

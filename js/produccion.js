@@ -473,6 +473,7 @@ const Produccion = {
                 return newId;
             }
         }, { entity: 'Produccion', action: 'saveVentas' });
+    },
 
     // ---- COMPRAS DE GANADO (Cifradas con AES-GCM) ----
     async saveCompras(data, fincaId) {
