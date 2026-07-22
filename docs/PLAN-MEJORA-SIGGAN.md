@@ -149,20 +149,18 @@ Detalle completo de los 12 estados en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADS
 
 ---
 
-## Documentos que quedaron sin auditar a fondo (pendiente si se retoma este trabajo)
+## Documentos auditados en las últimas pasadas (2026-07-22) — la auditoría de docs/AUDITAR/ está completa
 
-**Actualizado 2026-07-22 (tercera pasada)** — solo queda `Manual_SIGGAN_Diagnosticos.pdf` sin leer más allá de la portada (baja prioridad, no bloquea nada). El resto ya está auditado (ver secciones siguientes).
-
-- `Manual_SIGGAN_Diagnosticos.pdf` — identificado como módulo "SIGGAN - Saneamiento Bovino" (ALANA), solo portada leída.
-- Detalle operativo paso a paso (más allá del mapa 1.4) de Avícola, Porcino y Cunícola en ADSG WEB.
+**Único punto realmente sin cerrar**: detalle operativo paso a paso (más allá del mapa 1.4) de Avícola, Porcino y Cunícola en ADSG WEB — no se considera prioritario porque el mapa de navegación (1.4) ya está completo y esas 3 secciones no revelaron nada estructuralmente distinto al comparar con Bovino/Pequeño Rumiante (sí auditados a fondo).
 
 ### Cierre de documentos de baja prioridad (2026-07-22)
 
-Los 2 ficheros `.odt`/`.ods` y la sección de mensajes de error, marcados como "no auditados por falta de librería" o "baja prioridad", se abrieron sin `odfpy` (un `.odt`/`.ods` es un ZIP con XML dentro, extraíble directamente):
+Los 2 ficheros `.odt`/`.ods` se abrieron sin `odfpy` (un `.odt`/`.ods` es un ZIP con XML dentro, extraíble directamente):
 
 - **`GTA006E_MUS_Manual_Usuario_0400.odt`** — versión "manual completo" de GTA (misma familia que `GTA007E...pdf` ya auditado en detalle). Aportó **2 flujos no cubiertos antes**: (1) **Cambio de titularidad de equinos** — proceso separado de un movimiento normal, con sus propios estados (`PENDIENTE GANADERO DESTINO`) e iconografía de confirmación (flecha origen/destino, estrella amarilla = pendiente de confirmar) para cuando además de trasladarse el animal cambia de propietario; (2) **Autorización expresa de entrada de équidos** — el ganadero de destino puede autorizar la llegada antes de que el veterinario de origen genere la guía. Ninguno de los dos se incorpora como gap nuevo del plan: son parte de la misma máquina de estados GTA de 12 pasos que ya se decidió NO replicar (ver sección "Máquina de estados GTA" arriba) — solo se documentan aquí por completitud del inventario.
 - **`Anexo_I_Manual_ADSGWeb.ods`** — definición de columnas del catálogo de "Actuaciones Sanitarias" SIGGAN (programa/subprograma/matriz de análisis/propósito analítico/enfermedades obligatorias). Confirma y detalla (sin contradecir) los programas ya conocidos en `CAMPANAS_SANEAMIENTO` (TBC, Brucelosis, Lengua Azul, EET) con más granularidad de la implementada — no aporta gap accionable nuevo.
 - **Sección "Mensajes de error" de `ADS005E...pdf`** (páginas 254-340, ~300 códigos) — catálogo de validaciones internas muy específicas de la operativa de ADSG WEB (ej. "en una vacunación completa los totales de Ovino deben coincidir"). Útil como referencia de reglas de negocio si se quisiera afinar mensajes de error muy concretos en el futuro, pero no revela ningún gap estructural nuevo.
+- **`Manual_SIGGAN_Diagnosticos.pdf`** (17 páginas, leído completo) — protocolo de diagnóstico de tuberculosis bovina (módulo ALANA/SIGGAN): grabación de medidas IDTB simple/comparada por animal, diagnóstico automático por fórmula (incremento de medidas + signos clínicos → Positivo/Dudoso/Negativo), lotes de tuberculina, bolo ruminal en sacrificio. **Confirma con más detalle** el gap ya conocido de "granularidad individual de saneamientos" (punto 6 de este plan) — hoy `js/saneamientos.js` solo agrega examinados/positivos a nivel de campaña. No se incorpora como punto nuevo del plan por ser muy específico (una sola enfermedad, una sola especie, fórmula veterinaria concreta) frente al esfuerzo de implementarlo.
 
 ### Auditoría de pendientes prioritarios cerrada (2026-07-22)
 
