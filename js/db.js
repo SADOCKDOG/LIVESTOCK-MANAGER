@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 16;
+const DB_VERSION = 17;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -259,7 +259,7 @@ class InMemoryMockDB {
                 'contratos_compra', 'transportistas', 'documentos_legales', 'notificaciones_rega', 
                 'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs',
                 'config_costes_referencia', 'config_silos', 'especies', 'tipos_identificador',
-                'especie_tipo_identificador', 'razas'
+                'especie_tipo_identificador', 'razas', 'vacunaciones'
             ],
             contains(name) { return this.names.includes(name); }
         };
@@ -523,6 +523,22 @@ async function initDB() {
                 if (!db.objectStoreNames.contains('razas')) {
                     const store = db.createObjectStore('razas', { keyPath: 'id' });
                     store.createIndex('especieId', 'especieId');
+                }
+            }
+
+            // v17: Vacunaciones como modelo jerárquico (ADSG), separado del libro de
+            // tratamientos genérico ya existente (sanitarios_ganado). Ver
+            // docs/PLAN-MEJORA-SIGGAN.md punto 3 y docs/AUDITAR/ADSGVacunacionesRumiantes.pdf.
+            // Cabecera con array embebido `tipos_vacuna` (máx. 4 por normativa) y flag
+            // `cerrada` que, una vez true, bloquea edición (mismo patrón de anulación
+            // trazable que movimientos, no borrado físico).
+            if (oldVersion < 17) {
+                if (!db.objectStoreNames.contains('vacunaciones')) {
+                    const store = db.createObjectStore('vacunaciones', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('rebanoId', 'rebanoId');
+                    store.createIndex('fecha', 'fecha');
+                    store.createIndex('cerrada', 'cerrada');
                 }
             }
 
