@@ -24,7 +24,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 |---|---|---|---|---|
 | 1 | Catálogo de razas (163 razas) | ✅ **Implementado** (commit `8675c08`, 2026-07-22) | — | — |
 | 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
-| 3 | Modelo jerárquico de vacunaciones | Medio — nueva tabla + UI | Alinear con ADSG WEB; informes oficiales de vacunación | Media |
+| 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado** (commit `325d812`, 2026-07-22; sin UI todavía) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | Medio-alto — nueva tabla + formularios | Nada urgente, mejora de completitud | Baja-media |
 | 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | Bajo por campo, medio en conjunto | Compatibilidad con lectores RFID físicos | Baja (según si el usuario usa esos lectores) |
@@ -53,19 +53,15 @@ Añadidos los campos `codigo_espe_siggan`/`espe_id_siggan` a `ESPECIES_SEED` en 
 
 ---
 
-## 3. Modelo jerárquico de vacunaciones (prioridad media)
+## 3. Modelo jerárquico de vacunaciones — ✅ IMPLEMENTADO (commit `325d812`, 2026-07-22)
 
-**Qué falta**: `js/sanitarios.js` trata "Vacunación" como una entrada plana más en una lista de tipos de tratamiento genérico — sin lote, sin dosis, sin nombre comercial, sin estado de cierre.
+DB_VERSION 16→17, nueva tabla `vacunaciones` (índices `fincaId`, `rebanoId`, `fecha`, `cerrada`) + nuevo módulo `js/vacunaciones.js`, separado del libro de tratamientos genérico (`js/sanitarios.js`, que sigue existiendo sin cambios).
 
-**Modelo real exigido por ADSG** (fuente: `docs/AUDITAR/ADSGVacunacionesRumiantes.pdf`), jerarquía de 3 niveles:
+**Modelo implementado**: Vacunación (cabecera: fecha, veterinario, observaciones) con array embebido `tipos_vacuna` (máx. 4 por normativa, truncado automáticamente: `tipo`, `lote`, `dosis`, `nombre_comercial`) y `animales_vacunados` (por categoría agregada o individual). Campo `completa` (% censo susceptible vacunado, exigido por ADSG y ausente en el libro genérico) y flag `cerrada` que bloquea edición/borrado una vez `true`. `anular()` es trazable (marca `anulada`/`motivo_anulacion`/`fecha_anulacion` sin borrar, funciona incluso sobre vacunaciones ya cerradas) — mismo patrón que movimientos.
 
-1. **Vacunación** (cabecera): fecha, NIF del veterinario, observaciones, estado `abierta`/`cerrada` — una vez cerrada, ni ella ni sus tipos/lotes/animales se pueden modificar (mismo patrón de "anulación trazable, no borrado" que ya usas en movimientos, `js/movimientos.js:172-175`).
-2. **Tipo de Vacuna** (máx. 4 por vacunación): tipo de vacuna (catálogo), lote, dosis, nombre comercial.
-3. **Lotes/Animales vacunados**: totales por categoría en la UP, distinguiendo "animales totales" de "animales vacunados"; selección por edad/especie, por fichero de recensado, o repitiendo una vacunación anterior. Genera dos informes oficiales: "INFORME DE CERTIFICACIÓN DE VACUNA" e "INFORME DE VACUNACIÓN".
+**Sin UI todavía**: mismo patrón que `Saneamientos` (que tampoco tiene vista propia) — se priorizó dejar la capa de datos completa y verificada; wizard/vista pendiente si se decide abordarla.
 
-**Diseño propuesto**: nuevas tablas `vacunaciones` (cabecera, con flag `cerrada`) + `vacunaciones_tipos` (hasta 4 por vacunación, con `lote`/`dosis`/`nombre_comercial`) + relación con animales (por categoría agregada o individual, reutilizando el patrón ya usado en saneamientos para selección por lote).
-
-**Nota menor relacionada**: el campo "completa" (indica si se vacunó el 100% del censo susceptible) tampoco existe hoy — mismo documento fuente, gap menor, se puede añadir junto con este trabajo.
+Verificado en navegador: rechazo sin tipos de vacuna, alta con múltiples tipos, truncado a 4 máximo, cálculo de total de animales vacunados, edición antes/bloqueada después de cerrar, borrado bloqueado tras cerrar, anulación trazable funcional incluso cerrada, `list()` por rebaño.
 
 ---
 
