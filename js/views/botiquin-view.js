@@ -202,6 +202,7 @@ const BotiquinView = {
                   <div>
                     <span class="text-[0.6rem] font-black text-white uppercase block">${m.motivo_tarea === 'entrada_botiquin' ? 'ENTRADA' : 'CONSUMO'}</span>
                     <span class="text-[0.55rem] font-bold text-gray-500 block mt-2">${m.fecha}</span>
+                    ${m.origen_tipo ? `<span class="text-[0.5rem] font-bold text-info block mt-1 uppercase">Vinculado a ${m.origen_tipo === 'tratamiento' ? 'tratamiento' : 'vacunación'} #${m.origen_id}</span>` : ''}
                   </div>
                   <strong class="text-xs font-black" style="color:${m.motivo_tarea === 'entrada_botiquin' ? 'var(--c-success)' : 'var(--c-danger)'};">
                     ${m.motivo_tarea === 'entrada_botiquin' ? '+' : '-'}${m.valor_neto || 0} ${p.unidad || ''}
@@ -548,7 +549,7 @@ const BotiquinView = {
             // CONSUMO: Implementar FEFO (Primero en Vencer, Primero en Salir)
             let cantidadRestante = finalData.cantidad;
             const lotesParaConsumir = lotesExistentes
-              .filter(lote => lote => lote.cantidad > 0) // Solo lotes con stock disponible
+              .filter(lote => lote.cantidad > 0) // Solo lotes con stock disponible
               .sort((a, b) => {
                 // Ordenar por fecha de caducidad (los que vencen primero primero)
                 const fechaA = a.caducidad ? new Date(a.caducidad) : new Date(8640000000000000); // Fecha muy lejana si no tiene caducidad
