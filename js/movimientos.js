@@ -129,6 +129,11 @@ const Movimientos = {
         transportista_nombre: (data.transportista_nombre || '').trim(),
         matricula: (data.matricula || '').trim().toUpperCase(),
         fecha: data.fecha || new Date().toISOString().split('T')[0],
+        // Hora de la operación (campo que capturan los lectores RFID de campo en
+        // sus programas de Altas/Bajas, ver docs/PLAN-MEJORA-SIGGAN.md punto 6).
+        // Opcional: SIGGAN no la exige, es solo para no perder el dato si se
+        // importa de un lector físico.
+        hora: (data.hora || '').trim(),
         desinsectacion_certificada: !!data.desinsectacion_certificada,
         comunidad_autonoma: ccaa || '',
         plataforma: conf ? conf.sistema_movimiento : (data.plataforma || ''),

@@ -71,9 +71,15 @@ window.WizardTratamiento = {
             <div id="w-san-alerta-leche" class="p-10 bg-red-900 border-red-500 border rounded-sm mb-12 d-none">
                 <div class="text-white font-950 text-[0.6rem] uppercase tracking-tighter leading-tight">PROHIBIDO EN LACTACIÓN: NO DESTINAR LECHE A CONSUMO HUMANO</div>
             </div>
-            <div class="wizard-input-group mb-16">
-              <label class="wizard-label">FECHA APLICACIÓN</label>
-              <input type="date" id="w-san-fecha" class="wizard-input font-800" value="${data.fecha}">
+            <div class="grid grid-cols-2 gap-12 mb-16">
+              <div class="wizard-input-group">
+                <label class="wizard-label">FECHA APLICACIÓN</label>
+                <input type="date" id="w-san-fecha" class="wizard-input font-800" value="${data.fecha}">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">HORA (OPC.)</label>
+                <input type="time" id="w-san-hora" class="wizard-input font-800" value="${data.hora || ''}">
+              </div>
             </div>
             <div class="wizard-input-group mb-16">
               <label class="wizard-label">DESTINATARIO (INDIVIDUAL O COLECTIVO)</label>
@@ -178,6 +184,7 @@ window.WizardTratamiento = {
           data.tiempo_espera_carne_dias = parseInt(document.getElementById('w-san-carne')?.value) || 0;
           data.tiempo_espera_leche_dias = parseInt(document.getElementById('w-san-leche')?.value) || 0;
           data.fecha = document.getElementById('w-san-fecha')?.value || data.fecha;
+          data.hora = document.getElementById('w-san-hora')?.value || '';
 
           const animalVal = document.getElementById('w-san-animal')?.value;
           data.animalId = animalVal ? Number(animalVal) : null;
@@ -307,6 +314,7 @@ window.WizardTratamiento = {
         medicamento: "",
         tipo_tratamiento: "Otro",
         fecha: new Date().toISOString().split("T")[0],
+        hora: '',
         tiempo_espera_carne_dias: 0,
         tiempo_espera_leche_dias: 0,
         prohibidoLeche: false,

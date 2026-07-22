@@ -39,15 +39,22 @@ window.WizardGuiaMovimiento = {
                 ${motivos.map(m => `<option value="${m.value}" ${data.motivo === m.value ? 'selected' : ''}>${m.label.toUpperCase()}</option>`).join('')}
               </select>
             </div>
-            <div class="wizard-input-group">
-              <label class="wizard-label">FECHA DEL MOVIMIENTO</label>
-              <input type="date" id="w-mv-fecha" value="${data.fecha}" class="wizard-input font-800">
+            <div class="grid grid-cols-2 gap-10">
+              <div class="wizard-input-group">
+                <label class="wizard-label">FECHA DEL MOVIMIENTO</label>
+                <input type="date" id="w-mv-fecha" value="${data.fecha}" class="wizard-input font-800">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">HORA (OPC.)</label>
+                <input type="time" id="w-mv-hora" value="${data.hora || ''}" class="wizard-input font-800">
+              </div>
             </div>
           </div>`,
         onChange: async (data) => {
           data.tipo = document.getElementById('w-mv-tipo')?.value || data.tipo;
           data.motivo = document.getElementById('w-mv-motivo')?.value || data.motivo;
           data.fecha = document.getElementById('w-mv-fecha')?.value || data.fecha;
+          data.hora = document.getElementById('w-mv-hora')?.value || '';
         },
         validate: async (data) => {
           if (!data.fecha) { App.toastError("Indica la fecha del movimiento"); return false; }
