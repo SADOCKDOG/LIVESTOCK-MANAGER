@@ -227,8 +227,12 @@ const RAZAS_SEED = [
 ];
 
 // Asociación especie -> tipos de identificador válidos, con el nombre del
-// patrón de validación a aplicar (ver ErrorHandler.CROTAL_FORMATOS). Equino
-// queda con formato:null (normativa aún no cerrada, ver NORMATIVA-CROTAL-ESPECIE.md).
+// patrón de validación a aplicar (ver ErrorHandler.CROTAL_FORMATOS).
+// Equino: el microchip (tipoIdentificadorId 3, "Inyectable electrónico") es
+// obligatorio siempre y tiene formato cerrado (UELN 15 dígitos); el DIE/
+// pasaporte (id 14) es complementario pero su formato varía por entidad
+// emisora (hay ejemplos heredados no numéricos, ver NORMATIVA-CROTAL-ESPECIE.md),
+// por eso se deja sin regex estricta (formato:null).
 const ESPECIE_TIPO_IDENTIFICADOR_SEED = [
     { especieId: 1, tipoIdentificadorId: 16, formato: 'bovino_fisico' },
     { especieId: 2, tipoIdentificadorId: 16, formato: 'porcino_marca_explotacion' },
@@ -238,6 +242,7 @@ const ESPECIE_TIPO_IDENTIFICADOR_SEED = [
     { especieId: 4, tipoIdentificadorId: 2, formato: 'ovino_caprino_eid' },
     { especieId: 4, tipoIdentificadorId: 3, formato: 'ovino_caprino_eid' },
     { especieId: 4, tipoIdentificadorId: 4, formato: 'ovino_caprino_eid' },
+    { especieId: 5, tipoIdentificadorId: 3, formato: 'equino_microchip' },
     { especieId: 5, tipoIdentificadorId: 14, formato: null },
 ];
 
@@ -1048,6 +1053,31 @@ async function migrarEspeSiggan(windowDb) {
     }
 }
 
+/**
+ * Migración de datos: añade la fila { especieId: 5, tipoIdentificadorId: 3,
+ * formato: 'equino_microchip' } a `especie_tipo_identificador` en
+ * instalaciones donde ya se sembró ese store antes de cerrar la normativa
+ * equina (microchip UELN 15 dígitos, ISO 11784/11785). No requiere bump de
+ * DB_VERSION. Ver docs/NORMATIVA-CROTAL-ESPECIE.md y
+ * docs/PLAN-MEJORA-SIGGAN.md punto 4.
+ */
+async function migrarEquinoMicrochip(windowDb) {
+    try {
+        console.log("[DB] Migración: microchip equino en especie_tipo_identificador...");
+
+        const existentes = await windowDb.getAllFromIndex('especie_tipo_identificador', 'especieId', 5);
+        const yaTiene = existentes.some((a) => a.tipoIdentificadorId === 3);
+        if (!yaTiene) {
+            await windowDb.add('especie_tipo_identificador', { especieId: 5, tipoIdentificadorId: 3, formato: 'equino_microchip' });
+        }
+
+        await windowDb.put('meta', { key: 'migracion_equino_microchip', value: true, migradoEn: new Date().toISOString() });
+        console.log("[DB] Migración microchip equino completada.");
+    } catch (e) {
+        console.warn("[DB] Error en migración microchip equino:", e);
+    }
+}
+
 console.log("[DB] Iniciando window.dbPromise...");
 const dbTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('DB_TIMEOUT: IndexedDB no respondió en 15s')), 15000));
 window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
@@ -1089,6 +1119,16 @@ window.dbPromise = Promise.race([initDB(), dbTimeout]).then(async database => {
         const metaEspeSiggan = await database.get('meta', 'migracion_espe_siggan');
         if (!metaEspeSiggan) {
             await migrarEspeSiggan(database);
+        }
+    } catch (e) {
+        console.log("[DB] Primera ejecución o store meta no disponible aún.");
+    }
+
+    // Ejecutar migración microchip equino si no se ha ejecutado antes
+    try {
+        const metaEquinoMicrochip = await database.get('meta', 'migracion_equino_microchip');
+        if (!metaEquinoMicrochip) {
+            await migrarEquinoMicrochip(database);
         }
     } catch (e) {
         console.log("[DB] Primera ejecución o store meta no disponible aún.");
