@@ -10,13 +10,18 @@
 
 ## Resumen ejecutivo
 
-La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añade **6 gaps estructurales** no detectados hasta ahora, todos con fuente normativa oficial citada y cruzados contra el código actual (`file:line`). Ninguno es urgente en el sentido de "rompe algo hoy" — son extensiones que acercan la app a paridad de datos con el sistema real (SIGGAN/ADSG WEB), necesarias sobre todo si en algún momento se quiere:
+**Estado (2026-07-22): 6 de 7 gaps implementados** (5 completos, 2 parciales por diseño — sin UI o con alcance reducido a propósito). Solo queda sin abordar el punto 7 ("Subexplotación"), descartado deliberadamente por ser un cambio estructural de mayor alcance sin caso de uso claro identificado.
 
-- Generar/importar ficheros de intercambio SIGGAN reales (gaps 1 y 2 son bloqueantes para esto).
-- Ofrecer un módulo de vacunación con el mismo nivel de detalle que exige ADSG (gap 3).
-- Capturar datos de campo con lectores RFID físicos sin perder información (gap 6).
-- Modelar la explotación física con el mismo detalle que SIGGAN (gap 5).
-- Modelar el nivel intermedio REGA→especie que SIEX exige formalmente (gap 7, detectado en la auditoría de pendientes prioritarios del 2026-07-22).
+La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 6 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`), y la mayoría ya se implementaron:
+
+- ✅ Datos maestros listos para generar/importar ficheros de intercambio SIGGAN reales (gaps 1 y 2).
+- ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3) — sin UI todavía.
+- ✅ Validación de identificación equina cerrada (gap 4).
+- ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5) — parcial, sin UI.
+- ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — parcial, sin granularidad individual de saneamientos.
+- ⬜ Nivel intermedio REGA→especie que SIEX exige formalmente (gap 7) — descartado por prioridad baja.
+
+**Pendiente transversal**: varios de los módulos nuevos (Vacunaciones, Instalaciones) tienen capa de datos completa pero sin vista/wizard de usuario — mismo patrón que `Saneamientos`, que tampoco la tiene. Si se quiere que estos gaps sean utilizables desde la UI, ese es el siguiente trabajo natural.
 
 ## Orden de implementación recomendado
 
@@ -27,7 +32,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 | 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado** (commit `325d812`, 2026-07-22; sin UI todavía) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado parcialmente** (commit `57202a5`, 2026-07-22; falta distinción "Lidia" y UI) | — | — |
-| 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | Bajo por campo, medio en conjunto | Compatibilidad con lectores RFID físicos | Baja (según si el usuario usa esos lectores) |
+| 6 | Campos de captura de campo (hora, lote, nº macho) | ✅ **Implementado parcialmente** (commit `800e913`, 2026-07-22; falta saneamiento individual) | — | — |
 | 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | Alto — cambio de modelo de relación finca↔animal | Cumplimiento formal SIEX/REGA a nivel administrativo | Baja (estructural, evaluar si aporta valor real de uso) |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
 
@@ -92,21 +97,21 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 ---
 
-## 6. Campos de captura de campo — lectores RFID (prioridad baja, condicional)
+## 6. Campos de captura de campo — lectores RFID — ✅ IMPLEMENTADO PARCIALMENTE (commit `800e913`, 2026-07-22)
 
 **Fuente**: comparación de los `.rdf` de programas de lector físico (Felixcan/Datamars, carpeta `docs/AUDITAR/LECTOR/`) contra los formularios actuales de la app.
 
-Solo relevante si el usuario efectivamente usa o planea usar lectores RFID físicos de campo (Felixcan Universal II, Datamars GES3S) — la vía de entrada realista sigue siendo importar el fichero que exporta el software de PC del lector (UniTransfer/Rumisoft), no que el móvil lea el chip directamente (limitación de frecuencia ya documentada en `js/app.js:1483-1553`).
+| Campo que captura el lector | Estado |
+|---|---|
+| **HORA** (además de fecha) | ✅ Implementado — Altas/Bajas (`js/movimientos.js`), Cubriciones/Secados (wizard reproducción en `js/app.js`), Tratamientos (`js/views/wizards/wizard-tratamiento.js`) |
+| **LOTE** (identificador de lote de cubrición) | ✅ Implementado — visible en Inseminación Artificial/Monta Natural |
+| **NÚMERO DE MACHO** (semental/reproductor) | ✅ Implementado — visible solo en Monta Natural (en IA no hay semental físico) |
+| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ⬜ No implementado — no existe módulo de "alta de cebadero" en la app hoy, fuera de alcance |
+| Granularidad individual (nº tubo + sexo por animal) | ⬜ No implementado — cambio de modelo mayor en `js/saneamientos.js` (hoy agregado por campaña), es el único punto con impacto real en trazabilidad SIGGAN si se necesita en el futuro |
 
-| Campo que captura el lector | Falta en | Módulo app |
-|---|---|---|
-| **HORA** (además de fecha) | Altas, Bajas, Cubriciones, Secados, Tratamientos | `js/movimientos.js`, `js/reproduccion.js`, `js/sanitarios.js` |
-| **LOTE** (identificador de lote de cubrición) | Cubriciones | `js/reproduccion.js` |
-| **NÚMERO DE MACHO** (semental/reproductor) | Montas | `js/reproduccion.js`, wizard en `js/app.js:1990-1997` (hoy solo texto libre en "notas") |
-| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | Altas de cebadero | — |
-| Granularidad individual (nº tubo + sexo por animal) | Saneamientos — hoy agregado por campaña (`num_examinados`, `num_positivos`) | `js/saneamientos.js` |
+Fix de UX detectado durante la verificación: el wizard de reproducción abre con "Inseminación Artificial" preseleccionada, pero el `<select>` no dispara `change` por sí solo al renderizarse — los campos condicionales (lote) no aparecían hasta que el usuario tocaba el selector manualmente. Corregido llamando explícitamente a `_onReproTipoChange()` al abrir el wizard.
 
-El último punto (saneamientos por animal) es el único con impacto real en trazabilidad SIGGAN si se necesita; el resto son mejoras de formulario de bajo riesgo.
+Verificado en navegador: hora/lote/nº macho persistidos correctamente vía UI real, visibilidad condicional correcta al abrir y al cambiar tipo de evento.
 
 ---
 
