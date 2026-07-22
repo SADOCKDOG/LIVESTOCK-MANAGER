@@ -202,6 +202,18 @@ const Movimientos = {
   },
 
   /**
+   * Campo `Cebo` del fichero de incorporación SIGGAN (ver docs/NORMATIVA-CROTAL-ESPECIE.md,
+   * campo #15: "1 = destinado a cebo, 0 = no"). Se deriva del motivo del último movimiento
+   * de ENTRADA del animal — la app no pide este dato por separado, lo deriva del mismo
+   * movimiento que ya se captura en el wizard de guía (ver docs/PLAN-MEJORA-SIGGAN.md punto 2).
+   */
+  async esDestinoCebo(animalId) {
+    const movs = await this.getByAnimal(animalId);
+    const ultimaEntrada = movs.find(m => m.tipo === 'entrada');
+    return !!(ultimaEntrada && ultimaEntrada.motivo === 'cebo');
+  },
+
+  /**
    * Registra un evento en `registro_eventos` por cada animal del movimiento,
    * para que aparezca en el cuaderno digital y la trazabilidad 360º.
    */
