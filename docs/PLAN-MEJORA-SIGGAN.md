@@ -10,18 +10,20 @@
 
 ## Resumen ejecutivo
 
-**Estado (2026-07-22): 7 de 7 gaps implementados.** El punto 7 ("Subexplotación") se implementó como capa aditiva y opcional (`finca.subexplotaciones[]`), evitando el cambio de alto riesgo en la relación animal↔finca que motivaba originalmente su aplazamiento. Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX). Quedan en pausa, a petición explícita, la distinción "Explotación de Lidia", el NIF veterinario de alta de cebadero y la granularidad individual de saneamientos (nº tubo + sexo por animal).
+**Estado (2026-07-22): 7 de 7 gaps principales implementados** (incluido el punto 7, "Subexplotación", como capa aditiva y opcional sin tocar la relación animal↔finca existente). Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX, gaps adicionales de `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md` evaluados uno a uno). **En pausa, a petición explícita del usuario** (no descartados): distinción "Explotación de Lidia" (punto 5), NIF veterinario de alta de cebadero y granularidad individual de saneamientos — nº tubo + sexo por animal (punto 6).
 
-La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 6 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`), y la mayoría ya se implementaron:
+La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 7 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`):
 
-- ✅ Datos maestros listos para generar/importar ficheros de intercambio SIGGAN reales (gaps 1 y 2).
+- ✅ Datos maestros listos para generar/importar ficheros de intercambio SIGGAN reales, incluido el campo `Cebo` vinculado (gaps 1 y 2).
 - ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3), con UI (wizard + listado en SanidadView).
 - ✅ Validación de identificación equina cerrada (gap 4).
 - ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5), con UI (listado + ficha + wizard).
-- ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — parcial, sin granularidad individual de saneamientos.
-- ⬜ Nivel intermedio REGA→especie que SIEX exige formalmente (gap 7) — descartado por prioridad baja.
+- ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — hora/lote/nº macho implementados; NIF veterinario de cebadero y granularidad individual de saneamientos **en pausa** (ver detalle en el punto 6).
+- ✅ Subexplotación (gap 7), implementado como capa aditiva y opcional sin tocar el modelo animal↔finca existente.
+- ✅ Flag `autoguia` en movimientos GTA (único cambio recomendado de la sección "Máquina de estados GTA").
+- ✅ Vista propia de Saneamientos, que no tenía UI pese a existir su modelo de datos desde el origen del plan.
 
-**Pendiente transversal cerrado**: Vacunaciones (commit `966735a`) e Instalaciones (commit `c453090`) ya tienen UI completa. Solo `Saneamientos` sigue sin vista propia — es preexistente al plan, no un gap detectado en esta auditoría, así que queda fuera de su alcance.
+**En pausa (a petición explícita del usuario, 2026-07-22)**: distinción "Explotación de Lidia" (punto 5), NIF veterinario de alta de cebadero y granularidad individual de saneamientos — nº tubo + sexo por animal (punto 6). No están descartados: quedan documentados con su alcance ya investigado, listos para retomar cuando se decida.
 
 ## Orden de implementación recomendado
 
@@ -91,7 +93,7 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 | `latitud`/`longitud` en finca | ✅ Implementado — validación de rango (España peninsular/insular/Canarias), opcional |
 | `instalaciones_tipo` (dato maestro) + `finca.instalaciones[]` | ✅ Implementado — 36 tipos curados del catálogo oficial FEGA (de 109, excluidos los puramente agrícolas); array embebido en finca, mismo patrón que `zonas[]`, cada instalación exige `tipoId` del catálogo |
 | Flag `restriccion_movimientos` en `js/saneamientos.js` | ✅ Implementado — distinto de `calificacion`, con `motivo_restriccion` y helper `restriccionActiva(fincaId)` |
-| Distinción "Explotación de Lidia" en filiaciones | ⬜ No implementado — sin caso de uso claro identificado, se deja fuera |
+| Distinción "Explotación de Lidia" en filiaciones | ⏸ **En pausa** (2026-07-22, a petición del usuario) — sin caso de uso claro identificado por ahora |
 
 **DB_VERSION 17→18**, migración aditiva (nueva tabla `instalaciones_tipo`, dato maestro sin cambios en tablas existentes). Verificado en navegador: 36 tipos sembrados y re-sembrados correctamente, validación de latitud/longitud, instalación sin tipo rechazada, IDs secuenciales correctos, `restriccionActiva()` funcional.
 
@@ -112,8 +114,8 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 | **HORA** (además de fecha) | ✅ Implementado — Altas/Bajas (`js/movimientos.js`), Cubriciones/Secados (wizard reproducción en `js/app.js`), Tratamientos (`js/views/wizards/wizard-tratamiento.js`) |
 | **LOTE** (identificador de lote de cubrición) | ✅ Implementado — visible en Inseminación Artificial/Monta Natural |
 | **NÚMERO DE MACHO** (semental/reproductor) | ✅ Implementado — visible solo en Monta Natural (en IA no hay semental físico) |
-| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ⬜ No implementado — no existe módulo de "alta de cebadero" en la app hoy, fuera de alcance |
-| Granularidad individual (nº tubo + sexo por animal) | ⬜ No implementado — cambio de modelo mayor en `js/saneamientos.js` (hoy agregado por campaña), es el único punto con impacto real en trazabilidad SIGGAN si se necesita en el futuro |
+| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ⏸ **En pausa** (2026-07-22, a petición del usuario) — no existe módulo de "alta de cebadero" en la app hoy |
+| Granularidad individual (nº tubo + sexo por animal) | ⏸ **En pausa** (2026-07-22, a petición del usuario) — cambio de modelo mayor en `js/saneamientos.js` (hoy agregado por campaña); es el único punto con impacto real en trazabilidad SIGGAN si se necesita en el futuro |
 
 Fix de UX detectado durante la verificación: el wizard de reproducción abre con "Inseminación Artificial" preseleccionada, pero el `<select>` no dispara `change` por sí solo al renderizarse — los campos condicionales (lote) no aparecían hasta que el usuario tocaba el selector manualmente. Corregido llamando explícitamente a `_onReproTipoChange()` al abrir el wizard.
 
