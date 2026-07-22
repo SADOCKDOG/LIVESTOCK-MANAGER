@@ -63,7 +63,7 @@
 | `Tipo de identificador.csv` | Ya implementado (`TIPOS_IDENTIFICADOR_SEED`). |
 | `Catálogo oficial de razas de ganado de España.csv` | **Pendiente de implementar** — 189 razas, gap de dato maestro. Ver `PLAN-MEJORA-SIGGAN.md` punto 1. |
 | `Clasificación en el catálogo oficial de razas de ganado de España.csv` | Complementa el anterior (4 categorías de clasificación). |
-| `Asociación de razas.csv` | ~170 asociaciones de criadores por raza/especie — uso futuro opcional, no crítico. |
+| `Asociación de razas.csv` | 🟡 **Auditado, NO aplica** (2026-07-22) — 174 filas, no es un catálogo de razas sino un **directorio de contacto de asociaciones de criadores** (NIF, razón social, email, teléfono, autoridad competente) por especie (50 Bovinos, 44 Ovinos, 27 Équidos, 23 Caprinos, 17 Gallinas, 8 Cerdos, 1 Dromedario, 1 Conejos). Sin uso operativo para un ganadero individual gestionando su propia explotación (no es dato del animal ni de la finca, es un listado institucional). No se incorpora al modelo de datos. Ver `PLAN-MEJORA-SIGGAN.md` punto 1. |
 | `Sexo.csv` | Catálogo simple (Macho/Hembra/Indeterminado/Sin dato) — ya cubierto conceptualmente en el modelo de animal. |
 | `Causas de baja.csv` | A nivel explotación/DGC (cambio titularidad, fusión...), NO animal individual — no confundir con `MOTIVOS_BAJA` de la app. |
 | `Tipo de muerte.csv` | Solo 3 valores (Sacrificado/Muerto/Sacrificio urgencia) — más simple que `MOTIVOS_BAJA` ya implementado. |
