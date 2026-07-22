@@ -84,6 +84,12 @@ const Vacunaciones = {
           lote: (t.lote || '').trim(),
           dosis: (t.dosis || '').trim(),
           nombre_comercial: (t.nombre_comercial || '').trim(),
+          // Producto de botiquín vinculado para el consumo de stock (opcional,
+          // gestión interna — ver js/botiquin.js). El consumo real ya se
+          // ejecutó al guardar desde el wizard; aquí solo queda la referencia
+          // para trazabilidad en la ficha de la vacunación.
+          botiquinProductoId: t.botiquinProductoId != null ? Number(t.botiquinProductoId) : null,
+          botiquinCantidad: t.botiquinCantidad != null ? Number(t.botiquinCantidad) : null,
         })),
         animales_vacunados: animalesVacunados,
         animales_totales: data.animales_totales != null ? Number(data.animales_totales) : null,

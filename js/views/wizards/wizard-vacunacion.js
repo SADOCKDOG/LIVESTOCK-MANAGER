@@ -20,6 +20,17 @@ window.WizardVacunacion = {
       ? CS.getCategoriasAnimal(rebanos.find((r) => r.id == rebanoInicial)?.especie)
       : [];
 
+    // Productos del botiquín de la finca activa, para vincular opcionalmente
+    // el consumo de stock de vacunas a este registro (js/botiquin.js) —
+    // gestión interna, no exigida por SIGGAN, no condiciona el guardado.
+    let productosBotiquin = [];
+    try {
+      const fincaActiva = window.Fincas ? await window.Fincas.getActive() : null;
+      if (fincaActiva && window.Botiquin) {
+        productosBotiquin = await window.Botiquin.listActivos(fincaActiva.id);
+      }
+    } catch (e) { /* sin finca activa o módulo no disponible */ }
+
     const wizardSteps = [
       {
         // PASO 1: Cabecera + tipos de vacuna
@@ -85,6 +96,20 @@ window.WizardVacunacion = {
                   <label class="text-[0.55rem] text-gray uppercase font-800">NOMBRE COMERCIAL</label>
                   <input type="text" class="wizard-input h-35 text-xs font-800 tipo-vacuna-comercial" data-idx="${i}" value="${t.nombre_comercial || ''}">
                 </div>
+                ${productosBotiquin.length > 0 ? `
+                <div class="grid grid-cols-2 gap-8 mt-6 pt-6 border-top-222">
+                  <div class="wizard-input-group">
+                    <label class="text-[0.55rem] text-gray uppercase font-800">DESCONTAR DE BOTIQUÍN (OPC.)</label>
+                    <select class="wizard-input h-35 text-xs font-800 tipo-vacuna-botiquin-producto" data-idx="${i}">
+                      <option value="">— NO VINCULAR —</option>
+                      ${productosBotiquin.map(p => `<option value="${p.id}" ${t.botiquinProductoId == p.id ? 'selected' : ''}>${p.nombre.toUpperCase()} (${p.cantidadActual || 0} ${p.unidad || ''})</option>`).join('')}
+                    </select>
+                  </div>
+                  <div class="wizard-input-group">
+                    <label class="text-[0.55rem] text-gray uppercase font-800">CANTIDAD</label>
+                    <input type="number" min="0.01" step="0.01" class="wizard-input h-35 text-xs font-800 tipo-vacuna-botiquin-cantidad" data-idx="${i}" value="${t.botiquinCantidad || ''}" placeholder="Ej: 5">
+                  </div>
+                </div>` : ''}
               </div>
             `).join('');
 
@@ -111,11 +136,15 @@ window.WizardVacunacion = {
             // Capturar lo ya escrito antes de añadir una fila nueva
             listEl.querySelectorAll('[data-tipo-row]').forEach((row) => {
               const idx = Number(row.dataset.tipoRow);
+              const botiquinProductoVal = row.querySelector('.tipo-vacuna-botiquin-producto')?.value;
               data.tipos_vacuna[idx] = {
                 tipo: row.querySelector('.tipo-vacuna-tipo').value.trim(),
                 lote: row.querySelector('.tipo-vacuna-lote').value.trim(),
                 dosis: row.querySelector('.tipo-vacuna-dosis').value.trim(),
                 nombre_comercial: row.querySelector('.tipo-vacuna-comercial').value.trim(),
+                botiquinProductoId: botiquinProductoVal ? Number(botiquinProductoVal) : null,
+                botiquinCantidad: row.querySelector('.tipo-vacuna-botiquin-cantidad')?.value
+                  ? Number(row.querySelector('.tipo-vacuna-botiquin-cantidad').value) : null,
               };
             });
             data.tipos_vacuna.push({ tipo: '', lote: '', dosis: '', nombre_comercial: '' });
@@ -131,11 +160,15 @@ window.WizardVacunacion = {
           const listEl = document.getElementById('w-vac-tipos-list');
           const tipos = [];
           listEl.querySelectorAll('[data-tipo-row]').forEach((row) => {
+            const botiquinProductoVal = row.querySelector('.tipo-vacuna-botiquin-producto')?.value;
             tipos.push({
               tipo: row.querySelector('.tipo-vacuna-tipo').value.trim(),
               lote: row.querySelector('.tipo-vacuna-lote').value.trim(),
               dosis: row.querySelector('.tipo-vacuna-dosis').value.trim(),
               nombre_comercial: row.querySelector('.tipo-vacuna-comercial').value.trim(),
+              botiquinProductoId: botiquinProductoVal ? Number(botiquinProductoVal) : null,
+              botiquinCantidad: row.querySelector('.tipo-vacuna-botiquin-cantidad')?.value
+                ? Number(row.querySelector('.tipo-vacuna-botiquin-cantidad').value) : null,
             });
           });
           data.tipos_vacuna = tipos;
@@ -148,6 +181,11 @@ window.WizardVacunacion = {
           const tiposValidos = (data.tipos_vacuna || []).filter((t) => t.tipo);
           if (tiposValidos.length === 0) {
             App.toastError('Indica al menos un tipo de vacuna.');
+            return false;
+          }
+          const tipoConBotiquinSinCantidad = tiposValidos.find((t) => t.botiquinProductoId && (!t.botiquinCantidad || t.botiquinCantidad <= 0));
+          if (tipoConBotiquinSinCantidad) {
+            App.toastError('Indica la cantidad a descontar del botiquín para el tipo de vacuna vinculado.');
             return false;
           }
           data.tipos_vacuna = tiposValidos;
@@ -260,7 +298,23 @@ window.WizardVacunacion = {
       steps: wizardSteps,
       onComplete: async (finalData) => {
         try {
-          await window.Vacunaciones.save(finalData);
+          const vacunacionId = await window.Vacunaciones.save(finalData);
+
+          if (window.Botiquin) {
+            const tiposConStock = (finalData.tipos_vacuna || []).filter((t) => t.botiquinProductoId && t.botiquinCantidad > 0);
+            for (const t of tiposConStock) {
+              try {
+                await window.Botiquin.consumir(t.botiquinProductoId, t.botiquinCantidad, {
+                  fecha: finalData.fecha,
+                  origenTipo: 'vacunacion',
+                  origenId: vacunacionId
+                });
+              } catch (stockErr) {
+                App.toastError(`Vacunación guardada, pero no se pudo descontar stock de "${t.tipo}": ${stockErr.message}`);
+              }
+            }
+          }
+
           App.toast('Vacunación registrada correctamente.', 'success');
           if (options.onSaved) options.onSaved();
         } catch (e) {
