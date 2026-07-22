@@ -1878,9 +1878,25 @@ const App = {
               <option value="Secado">Secado</option>
             </select>
           </div>
-          <div class="wizard-input-group">
-            <label class="wizard-label">FECHA</label>
-            <input type="date" id="wiz-repro-fecha" class="wizard-input font-800" value="${new Date().toISOString().split('T')[0]}">
+          <div class="grid grid-cols-2 gap-10">
+            <div class="wizard-input-group">
+              <label class="wizard-label">FECHA</label>
+              <input type="date" id="wiz-repro-fecha" class="wizard-input font-800" value="${new Date().toISOString().split('T')[0]}">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">HORA (OPC.)</label>
+              <input type="time" id="wiz-repro-hora" class="wizard-input font-800">
+            </div>
+          </div>
+          <div id="wiz-repro-cubricion" class="d-none animate-in">
+            <div class="wizard-input-group">
+              <label class="wizard-label">Nº LOTE (OPC.)</label>
+              <input type="text" id="wiz-repro-lote" class="wizard-input uppercase font-800" placeholder="L-00A">
+            </div>
+            <div id="wiz-repro-macho-wrap" class="d-none wizard-input-group">
+              <label class="wizard-label">Nº MACHO / SEMENTAL (OPC.)</label>
+              <input type="text" id="wiz-repro-macho" class="wizard-input uppercase font-800" placeholder="Nº IDENTIFICACIÓN DEL SEMENTAL">
+            </div>
           </div>
           <div id="wiz-repro-parto" class="d-none animate-in">
             <div class="grid grid-cols-2 gap-10">
@@ -1913,6 +1929,9 @@ const App = {
           </div>
         </div>`;
       document.body.appendChild(overlay);
+      // Sincronizar visibilidad de campos condicionales (lote/nº macho) con el
+      // tipo de evento preseleccionado — el <select> no dispara 'change' solo.
+      this._onReproTipoChange(document.getElementById('wiz-repro-tipo')?.value);
     } catch (e) {
       console.error('[App] Error abriendo wizard reproducción:', e);
       this.toastError('Error al abrir wizard');
@@ -1921,13 +1940,22 @@ const App = {
 
   _onReproTipoChange(tipo) {
     const sec = document.getElementById('wiz-repro-parto');
-    if (!sec) return;
-    if (tipo === 'Parto') {
-      sec.style.display = 'block';
-      this._renderCriasParto();
-    } else {
-      sec.style.display = 'none';
+    if (sec) {
+      if (tipo === 'Parto') {
+        sec.style.display = 'block';
+        this._renderCriasParto();
+      } else {
+        sec.style.display = 'none';
+      }
     }
+    // Lote/nº macho: campos que capturan los lectores RFID de campo en
+    // Cubriciones/Montas (ver docs/PLAN-MEJORA-SIGGAN.md punto 6). El nº de
+    // macho solo aplica a monta natural (en IA no hay semental físico).
+    const esCubricion = tipo === 'Inseminación Artificial' || tipo === 'Monta Natural';
+    const cubricionWrap = document.getElementById('wiz-repro-cubricion');
+    if (cubricionWrap) cubricionWrap.style.display = esCubricion ? 'block' : 'none';
+    const machoWrap = document.getElementById('wiz-repro-macho-wrap');
+    if (machoWrap) machoWrap.style.display = tipo === 'Monta Natural' ? 'block' : 'none';
   },
 
   _renderCriasParto() {
@@ -1980,6 +2008,9 @@ const App = {
     const btn = document.getElementById('wiz-repro-guardar');
     const tipo = document.getElementById('wiz-repro-tipo')?.value;
     const fecha = document.getElementById('wiz-repro-fecha')?.value;
+    const hora = document.getElementById('wiz-repro-hora')?.value || '';
+    const lote = document.getElementById('wiz-repro-lote')?.value?.trim().toUpperCase() || '';
+    const numeroMacho = document.getElementById('wiz-repro-macho')?.value?.trim().toUpperCase() || '';
     const notas = document.getElementById('wiz-repro-notas')?.value?.trim() || '';
     if (!tipo || !fecha) { this._reproMsg('Completa el tipo de evento y la fecha', 'error'); return; }
     this._reproMsg('');
@@ -1991,10 +2022,17 @@ const App = {
         animalId: Number(animalId),
         tipo_evento: tipo,
         fecha,
+        hora,
         notas,
         resultado: notas,
         fincaId
       };
+      if (tipo === 'Inseminación Artificial' || tipo === 'Monta Natural') {
+        payload.lote = lote;
+      }
+      if (tipo === 'Monta Natural') {
+        payload.numero_macho = numeroMacho;
+      }
 
       if (tipo === 'Parto') {
         const muertas = parseInt(document.getElementById('wiz-repro-crias-muertas')?.value || '0', 10) || 0;
