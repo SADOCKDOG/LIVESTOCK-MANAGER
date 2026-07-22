@@ -222,13 +222,14 @@ const AnimalesView = {
     };
     if (!esNuevo) a = await Animales.get(id);
 
-    const [especies, tiposIdentificador, especieTipoIdentificador, razas, rebanos, todosAnimales] = await Promise.all([
+    const [especies, tiposIdentificador, especieTipoIdentificador, razas, rebanos, todosAnimales, proveedores] = await Promise.all([
       window.db.getAll("especies").catch(() => []),
       window.db.getAll("tipos_identificador").catch(() => []),
       window.db.getAll("especie_tipo_identificador").catch(() => []),
       window.db.getAll("razas").catch(() => []),
       Rebanos.list(),
       Animales.list().catch(() => []),
+      window.Proveedores ? window.Proveedores.list().catch(() => []) : Promise.resolve([]),
     ]);
     // Tipos de identificador válidos para la especie ya guardada del animal (si la hay),
     // excluyendo los dados de baja del catálogo oficial (ver docs/NORMATIVA-CROTAL-ESPECIE.md)
@@ -381,7 +382,53 @@ const AnimalesView = {
                 <input type="number" step="0.1" id="a-pesoinicial" value="${a.peso_inicial || ""}" class="wizard-input font-800" placeholder="EJ: 25.0">
               </div>
             </div>
+            ${a.tipoAlta === "Compra" ? `
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="a-precio-compra">PRECIO DE COMPRA (€)</label>
+                <input type="number" step="0.01" id="a-precio-compra" value="${a.precio_compra || ''}" class="wizard-input font-800" placeholder="EJ: 150.50">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="a-proveedor">PROVEEDOR</label>
+                <select id="a-proveedor" class="wizard-input font-800">
+                  <option value="">— SELECCIONAR PROVEEDOR —</option>
+                  ${proveedores.map(p => `<option value="${p.id}" ${a.proveedor_id === p.id ? 'selected' : ''}>${p.nombre || ''}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label" for="a-factura-compra">FACTURA COMPRA</label>
+              <input type="text" id="a-factura-compra" value="${a.factura_compra || ''}" class="wizard-input font-800" placeholder="NÚMERO DE FACTURA">
+            </div>
+            ` : ''}
           </div>
+
+          ${a.tipoAlta === "Compra" ? `
+          <div class="card p-16 mb-20" style="border: 1px solid var(--c-amber); background: rgba(255,255,255,0.02);">
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-amber); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-amber); margin-right: 4px;">|</span> ${Icons.shopping_cart()} DATOS DE COMPRA</div>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="a-precio-compra">PRECIO DE COMPRA (€)</label>
+                <input type="number" step="0.01" id="a-precio-compra" value="${a.precio_compra || ''}" class="wizard-input font-800" placeholder="EJ: 150.50">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="a-proveedor">PROVEEDOR</label>
+                <select id="a-proveedor" class="wizard-input font-800">
+                  <option value="">— SELECCIONAR PROVEEDOR —</option>
+                  ${proveedores.map(p => `<option value="${p.id}" ${a.proveedor_id === p.id ? 'selected' : ''}>${p.nombre || ''}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label" for="a-factura-compra">FACTURA COMPRA</label>
+              <input type="text" id="a-factura-compra" value="${a.factura_compra || ''}" class="wizard-input font-800" placeholder="NÚMERO DE FACTURA">
+            </div>
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label" for="a-pago-pendiente">PAGO PENDIENTE</label>
+              <input type="checkbox" id="a-pago-pendiente" ${a.pago_pendiente ? 'checked' : ''} class="wizard-input">
+            </div>
+          </div>
+          ` : ''}
 
           <div class="card p-16 mb-20" style="border: 1px solid #4FADF5; background: rgba(255,255,255,0.02);">
             <div class="section-header-theme mb-12" style="--theme-color: var(--c-info); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: #4FADF5; margin-right: 4px;">|</span> ${Icons.documento()} IDENTIFICACIÓN TÉCNICA</div>
@@ -664,6 +711,11 @@ const AnimalesView = {
         estado: document.getElementById("a-estado")?.value || existing.estado || "activo",
         motivo_baja: document.getElementById("a-motivo-baja")?.value || "",
         fecha_baja: document.getElementById("a-fecha-baja")?.value || "",
+        // Nuevos campos para compra de animal
+        precio_compra: parseFloat(document.getElementById("a-precio-compra").value) || null,
+        proveedor_id: document.getElementById("a-proveedor").value ? Number(document.getElementById("a-proveedor").value) : null,
+        factura_compra: document.getElementById("a-factura-compra").value.trim() || null,
+        pago_pendiente: document.getElementById("a-pago-pendiente").checked,
         actualizadoEn: new Date().toISOString(),
       };
 
@@ -673,6 +725,18 @@ const AnimalesView = {
         const ccaa = finca ? finca.comunidad_autonoma : null;
         const res = window.ComunidadesService.validarFormatoREGA(data.rega_origen, ccaa);
         if (!res.valido) return App.toastError("REGA de procedencia: " + res.mensaje);
+      }
+      // Validación de datos de compra
+      if (data.tipoAlta === "Compra") {
+        if (!data.precio_compra || data.precio_compra <= 0) {
+          return App.toastError("Indique un precio de compra válido para animales de tipo Compra.");
+        }
+        if (!data.proveedor_id) {
+          return App.toastError("Seleccione un proveedor para animales de tipo Compra.");
+        }
+        if (!data.factura_compra || data.factura_compra.trim() === "") {
+          return App.toastError("Indique el número de factura para animales de tipo Compra.");
+        }
       }
       // Coherencia de baja
       if (data.estado === "baja" && !data.motivo_baja) {

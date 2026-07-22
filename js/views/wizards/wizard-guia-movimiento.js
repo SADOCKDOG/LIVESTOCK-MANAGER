@@ -226,6 +226,11 @@ window.WizardGuiaMovimiento = {
               <label class="wizard-label">VETERINARIO / INSPECTOR AUTORIZANTE</label>
               <input type="text" id="w-mv-vet-autorizante" value="${data.veterinario_autorizante || ''}" placeholder="Ej: DR. ALFONSO GÓMEZ (COL. 2808)" class="wizard-input uppercase font-800">
             </div>
+            ${conf && conf.requiere_nif_veterinario_cebadero && data.tipo_operador_destino === 'cebadero' ? `
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">NIF VETERINARIO</label>
+              <input type="text" id="w-mv-vet-nif" value="${data.vet_nif || ''}" placeholder="NIF veterinario oficial" class="wizard-input uppercase font-800">
+            </div>` : ''}
             ${conf && conf.requiere_desinsectacion_movimiento ? `
             <div class="p-10 bg-red-900 border border-red-500 rounded-sm mb-12">
               <div class="text-[0.55rem] text-white uppercase font-950 tracking-widest">${Icons.alerta()} ${conf.label} EXIGE CERTIFICADO DE DESINSECTACIÓN</div>
@@ -243,11 +248,16 @@ window.WizardGuiaMovimiento = {
           data.desinfeccion_numero_talon = document.getElementById('w-mv-desinf-talon')?.value.trim() || '';
           data.desinfeccion_fecha = document.getElementById('w-mv-desinf-fecha')?.value || '';
           data.veterinario_autorizante = document.getElementById('w-mv-vet-autorizante')?.value.trim() || '';
+          data.vet_nif = document.getElementById('w-mv-vet-nif')?.value.trim() || '';
           data.notas = document.getElementById('w-mv-notas')?.value.trim() || '';
         },
         validate: async (data) => {
           if (conf && conf.requiere_desinsectacion_movimiento && !data.desinsectacion_certificada) {
             App.toastError("Debes certificar la desinsectación para esta comunidad");
+            return false;
+          }
+          if (conf && conf.requiere_nif_veterinario_cebadero && data.tipo_operador_destino === 'cebadero' && !data.vet_nif) {
+            App.toastError("Debes proporcionar el NIF del veterinario autorizante para operaciones con cebadero en esta comunidad");
             return false;
           }
           // Bloqueo duro de bioseguridad si el transportista tiene ficha registrada:
