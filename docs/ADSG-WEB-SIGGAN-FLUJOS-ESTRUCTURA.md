@@ -137,6 +137,18 @@ Otros gaps puntuales fuera de "Estructura": **Datos Geográficos** (latitud/long
 
 **Conclusión de la auditoría**: NO se justifica reestructurar Livestock Manager en módulos separados por especie (el coste de duplicar Generales/Animales, que ya son genéricos y funcionan, no compensa). Sí es accionable y de bajo riesgo: (1) sub-modelo "Instalaciones" en finca con campos condicionados por tipo de explotación, (2) campo latitud/longitud en finca, (3) flag "restricción de movimientos" en saneamientos. Si el alcance se amplía a porcino/avícola industrial, sí tendría sentido una unidad de agrupación por encima del animal individual (nave/lote) — ya anticipado por el concepto de tandas de cebo.
 
+### Veredicto final sobre los 5 gaps restantes de la tabla "Estructura" (2026-07-22)
+
+Los 3 puntos recomendados arriba ya están implementados (ver `PLAN-MEJORA-SIGGAN.md` punto 5). Los 5 gaps restantes de la tabla, que la auditoría original dejó sin veredicto explícito, se evaluaron uno a uno:
+
+| Gap | Veredicto | Motivo |
+|---|---|---|
+| **Sistemas/Características** (Bovino) | ✅ **Implementado** (2026-07-22) | No era un gap nuevo — el campo `sistema_explotacion` de finca ya existía y se usa en `wizard-finca.js`/informes/cuaderno, pero `SISTEMAS_EXPLOTACION` (`comunidades-service.js`) solo tenía 3 de los 7 valores oficiales del catálogo SIEX `Sistema productivo.csv`. Se completó a los 7 valores (Intensivo/Extensivo/Mixto/Estante/Trashumante/Semiextensivo/No extensivo), sin migración de datos (mismos valores en minúscula, compatible con lo ya guardado). |
+| **Purines/Estercolero** (Porcino/Cunícola/Pequeño Rumiante) | ❌ **Descartado** | Es el Plan de Producción y Gestión de Estiércoles (PPGE), un documento de cumplimiento completo (dimensiones/coordenadas de balsas y estercoleros) solo obligatorio para explotaciones intensivas por encima de umbrales de producción. No existe ni un tipo "Estercolero" en el catálogo curado de `instalaciones_tipo` (36 tipos) — sin punto de enganche natural. Mismo razonamiento que el gap "Subexplotación": complejidad de administración pública sin valor claro para el día a día de una explotación no intensiva. El catálogo `Tratamiento de estiércoles.csv` (9 valores) queda auditado y sin incorporar. |
+| **Ganadería Integrada** (las 5 especies) | ❌ **Descartado por ahora** | Es una relación contractual (empresa integradora que aporta pienso/animales al ganadero bajo contrato). El catálogo `Datos de la integradora comercial.csv` (1503 filas) es un directorio de empresas, no un catálogo operativo — mismo tratamiento que `Asociación de razas.csv`. Sin caso de uso concreto identificado. Revisable si aparece un caso de uso real. |
+| **Controles** (visitas oficiales, las 5 especies) | ❌ **Descartado** | En el manual solo aparece como etiqueta de menú (nodo de nivel 1.4), sin operativa desarrollada ni en las secciones auditadas a fondo (Bovino, Pequeño Rumiante). Sin especificación suficiente de qué campos captura (¿fecha? ¿inspector? ¿tipo de control? ¿resultado?) para poder modelarlo con criterio. |
+| **Saneamiento → Indemnización** (Pequeño Rumiante) | ❌ **Descartado por ahora** | Depende directamente de la granularidad individual de saneamientos (nº tubo + resultado por animal, ver `PLAN-MEJORA-SIGGAN.md` punto 6) — sin esa base no se puede saber qué animal concreto indemnizar. Diferido junto con ese punto. |
+
 ## Flujos detallados (leídos a fondo — los más relevantes para Livestock Manager)
 
 ### Registro General (2.3)

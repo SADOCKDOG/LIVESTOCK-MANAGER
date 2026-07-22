@@ -80,7 +80,8 @@
 | **`Organizaciones de productores de carne.csv`** | *(detectado en segunda pasada)* — asociaciones oficiales por especie/CCAA (incluye conejos, y presumiblemente otras). No usado en el código hoy; relevante si se añade gestión de comercialización asociativa. |
 | **`Organizaciones de productores de leche.csv`** | *(detectado en segunda pasada)* — asociaciones oficiales de productores lácteos. Mismo uso potencial que el anterior. |
 | **`Edificaciones e instalaciones.csv`** | *(detectado en segunda pasada)* — **catálogo de 109 tipos de instalación** (incluye explícitamente "Alojamiento ganadero bovino/ovino/caprino/porcino/equino/aves/conejos", "Fosas de purín", "Silos forrajeros"). **Fuente de datos directa para el gap "Instalaciones" de `PLAN-MEJORA-SIGGAN.md` punto 5** — no estaba enlazado en el plan original, actualizar cuando se implemente ese punto. |
-| **`Tratamiento de estiércoles.csv`** | *(detectado en segunda pasada)* — catálogo oficial de tratamiento de estiércoles, relacionado con el gap "Purines/Estercolero" del punto 5 del plan. |
+| **`Tratamiento de estiércoles.csv`** | 🟡 **Auditado, NO aplica** (2026-07-22) — 9 valores de tratamiento de estiércoles. El gap "Purines/Estercolero" (PPGE, Plan de Producción y Gestión de Estiércoles) se evaluó y se descartó: es un documento de cumplimiento completo (dimensiones/coordenadas de balsas) solo obligatorio para explotaciones intensivas por umbral de producción, sin punto de enganche en el catálogo actual de instalaciones. Ver `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md`. |
+| **`Datos de la integradora comercial.csv`** | 🟡 **Auditado, NO aplica por ahora** (2026-07-22) — 1503 filas, directorio de empresas integradoras (piensos/contrato de integración), no catálogo operativo. Gap "Ganadería Integrada" evaluado y descartado por falta de caso de uso concreto. Ver `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md`. |
 
 ### 🟡 Transversales — auditados, aplicación opcional/menor
 
