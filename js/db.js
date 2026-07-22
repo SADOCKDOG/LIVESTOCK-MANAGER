@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 18;
+const DB_VERSION = 19;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -305,7 +305,8 @@ class InMemoryMockDB {
                 'contratos_compra', 'transportistas', 'documentos_legales', 'notificaciones_rega', 
                 'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs',
                 'config_costes_referencia', 'config_silos', 'especies', 'tipos_identificador',
-                'especie_tipo_identificador', 'razas', 'vacunaciones', 'instalaciones_tipo'
+                'especie_tipo_identificador', 'razas', 'vacunaciones', 'instalaciones_tipo',
+                'config_botiquin'
             ],
             contains(name) { return this.names.includes(name); }
         };
@@ -543,6 +544,17 @@ async function initDB() {
                     const store = db.createObjectStore('config_silos', { keyPath: 'id', autoIncrement: true });
                     store.createIndex('fincaId', 'fincaId');
                     store.createIndex('tipo', 'tipo'); // carne, leche, hibrido
+                }
+            }
+
+            // v19: Botiquín/Almacén veterinario — inventario de medicamentos/vacunas
+            // (gestión interna de la finca, no es un dato exigido por SIGGAN/BADIGEX).
+            // Ver docs/AUDITAR/AUDITORIA-BASEDEDATOS-LEGACY.md ("Ingreso Almacén").
+            if (oldVersion < 19) {
+                if (!db.objectStoreNames.contains('config_botiquin')) {
+                    const store = db.createObjectStore('config_botiquin', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('tipo', 'tipo'); // vacuna, medicamento, desparasitante, otro
                 }
             }
 
