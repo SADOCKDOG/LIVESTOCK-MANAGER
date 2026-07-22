@@ -10,7 +10,7 @@
 
 ## Resumen ejecutivo
 
-**Estado (2026-07-22): 6 de 7 gaps implementados** (5 completos, 2 parciales por diseño — sin UI o con alcance reducido a propósito). Solo queda sin abordar el punto 7 ("Subexplotación"), descartado deliberadamente por ser un cambio estructural de mayor alcance sin caso de uso claro identificado.
+**Estado (2026-07-22): 7 de 7 gaps implementados.** El punto 7 ("Subexplotación") se implementó como capa aditiva y opcional (`finca.subexplotaciones[]`), evitando el cambio de alto riesgo en la relación animal↔finca que motivaba originalmente su aplazamiento. Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX). Quedan en pausa, a petición explícita, la distinción "Explotación de Lidia", el NIF veterinario de alta de cebadero y la granularidad individual de saneamientos (nº tubo + sexo por animal).
 
 La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 6 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`), y la mayoría ya se implementaron:
 
@@ -33,7 +33,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado con UI** (commits `57202a5`, `c453090`, 2026-07-22; falta distinción "Lidia") | — | — |
 | 6 | Campos de captura de campo (hora, lote, nº macho) | ✅ **Implementado parcialmente** (commit `800e913`, 2026-07-22; falta saneamiento individual) | — | — |
-| 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | Alto — cambio de modelo de relación finca↔animal | Cumplimiento formal SIEX/REGA a nivel administrativo | Baja (estructural, evaluar si aporta valor real de uso) |
+| 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | ✅ **Implementado como capa aditiva** (`finca.subexplotaciones[]`, 2026-07-22) | — | — |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
 
 ---
@@ -129,7 +129,9 @@ Verificado en navegador: hora/lote/nº macho persistidos correctamente vía UI r
 
 Livestock Manager hoy organiza los animales directamente bajo "finca" (`js/fincas.js`), sin ese nivel intermedio. El bloque XLSX de 21 campos incluye: censo por categoría, integradora comercial asociada, y datos de cría animal (asociación de criadores/raza/clasificación — coincide con el catálogo de razas ya priorizado en el punto 1 de este plan).
 
-**Por qué prioridad baja pese a ser un gap estructural**: introducir este nivel intermedio implicaría cambiar la relación fundamental animal↔finca en todo el código (un cambio de mayor alcance que cualquier otro punto de este plan). Antes de acometerlo, vale la pena confirmar si realmente aporta valor de uso a un ganadero que gestiona una sola explotación con una o pocas especies — el nivel de detalle formal que exige SIEX (pensado para la administración pública, no para el día a día del ganadero) puede no justificar la complejidad añadida en la mayoría de casos de uso reales de la app. Recomendación: no implementar salvo que se identifique un caso de uso concreto (ej. un ganadero con varias especies en la misma finca que necesite reportar censos separados por subexplotación a SIGGAN).
+**Por qué prioridad baja pese a ser un gap estructural**: introducir este nivel intermedio implicaría cambiar la relación fundamental animal↔finca en todo el código (un cambio de mayor alcance que cualquier otro punto de este plan). Antes de acometerlo, vale la pena confirmar si realmente aporta valor de uso a un ganadero que gestiona una sola explotación con una o pocas especies — el nivel de detalle formal que exige SIEX (pensado para la administración pública, no para el día a día del ganadero) puede no justificar la complejidad añadida en la mayoría de casos de uso reales de la app.
+
+**✅ IMPLEMENTADO como capa aditiva y opcional (2026-07-22)**: en vez de cambiar la relación fundamental animal↔finca (alto riesgo, tocaría todo el código existente), se añadió `finca.subexplotaciones[]` — mismo patrón array-en-finca que `zonas[]`/`instalaciones[]`, sin bump de `DB_VERSION`. Cada entrada: `{ especieId, tipo_explotacion, sistema_explotacion, capacidad_maxima, notas }`, con validación de una subexplotación activa por especie (`js/fincas.js`). Nuevo `js/views/subexplotaciones-view.js` (listado + ficha + wizard de alta), rutas `/subexplotaciones` y `/subexplotacion`, acceso desde el menú de cabecera. El listado calcula y muestra el **censo actual** por especie (a partir de `animal.especieId` + rebaños de la finca, sin campo nuevo). Una explotación de una sola especie puede ignorar este módulo por completo — `tipo_explotacion`/`sistema_explotacion` de finca siguen funcionando exactamente igual que antes, sin cambios ni migración. Verificado en navegador: alta de subexplotación, censo calculado correctamente (2 animales bovino → "2/50"), validación de especie duplicada (rechazada), anulación trazable y re-alta tras anular (permitida).
 
 ---
 
