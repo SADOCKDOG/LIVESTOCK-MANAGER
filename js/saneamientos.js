@@ -61,6 +61,9 @@ const Saneamientos = {
         num_examinados: examinados,
         num_positivos: positivos,
         calificacion: data.calificacion || 'sin_calificar',
+        // Granularidad individual de saneamientos (nº tubo + sexo)
+        tubo: (data.tubo || '').trim(),
+        sexo: data.sexo || '',
         // Estado operativo de restricción de movimientos (gap "Históricos ->
         // Restricciones" del mapa ADSG WEB — distinto de `calificacion`, que es
         // el resultado sanitario, no si la explotación tiene vetados los

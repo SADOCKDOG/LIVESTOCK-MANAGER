@@ -62,6 +62,15 @@ const App = {
     "/rebano": "renderDetalleRebano",
     "/zonas": "renderZonas",
     "/zona": "renderDetalleZona",
+    "/instalaciones": "renderInstalaciones",
+    "/instalacion": "renderDetalleInstalacion",
+    "/saneamientos": "renderSaneamientos",
+    "/saneamiento": "renderDetalleSaneamiento",
+    "/subexplotaciones": "renderSubexplotaciones",
+    "/subexplotacion": "renderDetalleSubexplotacion",
+    "/botiquin": "renderBotiquin",
+    "/botiquin-producto": "renderDetalleBotiquin",
+    "/animal-bitacora": "renderBitacoraAnimal",
     "/animales": "renderAnimales",
     "/animal": "renderDetalleAnimal",
     "/explotacion": "renderExplotacion",
@@ -293,6 +302,15 @@ const App = {
     '/rebano': 'Ficha Rebaño',
     '/explotacion': 'ExPro',
     '/zonas': 'Zonas',
+    '/instalaciones': 'Instalaciones',
+    '/instalacion': 'Ficha Instalación',
+    '/saneamientos': 'Saneamientos',
+    '/saneamiento': 'Detalle Saneamiento',
+    '/subexplotaciones': 'Subexplotaciones',
+    '/botiquin': 'Botiquín',
+    '/botiquin-producto': 'Detalle Producto',
+    '/animal-bitacora': 'Bitácora Animal',
+    '/subexplotacion': 'Detalle Subexplotación',
     '/zona': 'Ficha Zona',
     '/animales': 'Animales',
     '/animal': 'Ficha Animal',
@@ -369,6 +387,10 @@ const App = {
       { path: '/explotacion', label: 'ExPro', icon: Icons.dashboard() },
       { path: '/comercializacion', label: 'CoMer', icon: Icons.carne() },
       { path: '/zonas', label: 'Zonas', icon: Icons.zonas() },
+      { path: '/instalaciones', label: 'Instalaciones', icon: Icons.edificio() },
+      { path: '/saneamientos', label: 'Saneamientos', icon: Icons.sanidad() },
+      { path: '/subexplotaciones', label: 'Subexplotaciones', icon: Icons.rebanos() },
+      { path: '/botiquin', label: 'Botiquín', icon: Icons.sanidad() },
       { path: '/compradores', label: 'Compradores', icon: Icons.documento() },
       { path: '/proveedores', label: 'Proveedores', icon: Icons.documento() },
       { path: '/transportistas', label: 'Logística', icon: Icons.transportistas() },
@@ -481,6 +503,15 @@ const App = {
       '/explotacion': Icons.dashboard(),
       '/zonas': Icons.zonas(),
       '/zona': Icons.zonas(),
+      '/instalaciones': Icons.edificio(),
+      '/instalacion': Icons.edificio(),
+      '/saneamientos': Icons.sanidad(),
+      '/saneamiento': Icons.sanidad(),
+      '/subexplotaciones': Icons.rebanos(),
+      '/subexplotacion': Icons.rebanos(),
+      '/botiquin': Icons.sanidad(),
+      '/botiquin-producto': Icons.sanidad(),
+      '/animal-bitacora': Icons.documento(),
       '/animales': Icons.animales(),
       '/animal': Icons.animales(),
       '/gastos': Icons.gastos(),
@@ -1624,7 +1655,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
     informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1638,7 +1669,7 @@ const App = {
 
   // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
   _routeGroups: {
-    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan',
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan', '/animal-bitacora': 'gegan',
     '/explotacion': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/proveedor': 'expro',
     '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
     '/informes': 'informes', '/alertas': 'informes',
@@ -1685,75 +1716,35 @@ const App = {
     const isCapacitor = window.Capacitor?.isNativePlatform?.() || window.hasOwnProperty('Capacitor');
     const BarcodeScanner = window.Capacitor?.Plugins?.BarcodeScanner;
 
-    // 1️⃣ Intentar con Capacitor nativo (Android)
+    // 1️⃣ Intentar con Capacitor nativo (Android) — plugin @capacitor-mlkit/barcode-scanning.
+    // scan() abre la UI del Google Code Scanner (fullscreen, con cancelar propio): sin
+    // manipular visibilidad del WebView ni botones flotantes como con el plugin antiguo.
     if (BarcodeScanner && isCapacitor) {
       try {
-        console.log('[SCAN] Intentando escáner nativo Capacitor...');
-        const perm = await BarcodeScanner.checkPermission({ force: true });
+        console.log('[SCAN] Intentando escáner nativo MLKit...');
+        const perm = await BarcodeScanner.requestPermissions();
         console.log('[SCAN] Permiso:', JSON.stringify(perm));
-        if (!perm.granted) {
-          App.toastError(perm.denied
+        if (perm.camera !== 'granted' && perm.camera !== 'limited') {
+          App.toastError(perm.camera === 'denied'
             ? 'Permiso denegado permanentemente. Actívalo en Ajustes > Apps > Permisos.'
             : 'Permiso de cámara no concedido');
           return;
         }
 
-        // Ocultar la UI del WebView para que la cámara del scanner nativo sea visible por detrás
-        const mainApp = document.getElementById('app-content');
-        const headerApp = document.querySelector('header');
-        if (mainApp) mainApp.style.visibility = 'hidden';
-        if (headerApp) headerApp.style.visibility = 'hidden';
-        document.body.classList.add('scanner-active');
-
-        await BarcodeScanner.prepare();
-        await BarcodeScanner.hideBackground();
-
-        // Crear botón de cancelar flotante en el body
-        const cancelBtn = document.createElement('button');
-        cancelBtn.id = 'scanner-cancel-btn';
-        cancelBtn.textContent = '✕ Cancelar Escaneo';
-        cancelBtn.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:99999; background:#E8555F; color:#fff; border:none; padding:15px 30px; border-radius:30px; font-weight:bold; font-size:1.1rem; box-shadow: 0 15px 30px rgba(0,0,0,0.6);';
-
-        const cleanupScanner = async () => {
-          document.body.classList.remove('scanner-active');
-          if (mainApp) mainApp.style.visibility = 'visible';
-          if (headerApp) headerApp.style.visibility = 'visible';
-          const btn = document.getElementById('scanner-cancel-btn');
-          if (btn) btn.remove();
-          try { await BarcodeScanner.showBackground(); } catch (_) {}
-        };
-
-        cancelBtn.onclick = async () => {
-          console.log('[SCAN] Cancelando escaneo nativo...');
-          await BarcodeScanner.stopScan();
-          await cleanupScanner();
-          App.toast('Escaneo cancelado');
-        };
-        document.body.appendChild(cancelBtn);
-
-        App.toast('Enfoca el código de barras del crotal...', 4000);
-        const result = await BarcodeScanner.startScan();
-
-        await cleanupScanner();
-
-        if (result.hasContent && result.content) {
-          return this._procesarCrotalEscaneado(inputId, result.content.trim());
+        const { barcodes } = await BarcodeScanner.scan();
+        const content = barcodes?.[0]?.rawValue;
+        if (content) {
+          return this._procesarCrotalEscaneado(inputId, content.trim());
         }
-        return;
+        return; // usuario canceló desde la UI nativa
       } catch (err) {
-        document.body.classList.remove('scanner-active');
-        const mainApp = document.getElementById('app-content');
-        const headerApp = document.querySelector('header');
-        if (mainApp) mainApp.style.visibility = 'visible';
-        if (headerApp) headerApp.style.visibility = 'visible';
-        const btn = document.getElementById('scanner-cancel-btn');
-        if (btn) btn.remove();
-
-        try { await BarcodeScanner.showBackground(); } catch (_) {}
+        // 'canceled' llega como excepción en algunas versiones: no es un error real
+        if (String(err?.message || err).toLowerCase().includes('cancel')) {
+          App.toast('Escaneo cancelado');
+          return;
+        }
         console.error('[SCAN] Error nativo:', err);
         App.toast('Escáner nativo falló, usando cámara web...', 2000);
-        // Wait for background to be restored before trying web scanner
-        await new Promise(r => setTimeout(r, 1000));
       }
     }
 
@@ -1918,9 +1909,25 @@ const App = {
               <option value="Secado">Secado</option>
             </select>
           </div>
-          <div class="wizard-input-group">
-            <label class="wizard-label">FECHA</label>
-            <input type="date" id="wiz-repro-fecha" class="wizard-input font-800" value="${new Date().toISOString().split('T')[0]}">
+          <div class="grid grid-cols-2 gap-10">
+            <div class="wizard-input-group">
+              <label class="wizard-label">FECHA</label>
+              <input type="date" id="wiz-repro-fecha" class="wizard-input font-800" value="${new Date().toISOString().split('T')[0]}">
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label">HORA (OPC.)</label>
+              <input type="time" id="wiz-repro-hora" class="wizard-input font-800">
+            </div>
+          </div>
+          <div id="wiz-repro-cubricion" class="d-none animate-in">
+            <div class="wizard-input-group">
+              <label class="wizard-label">Nº LOTE (OPC.)</label>
+              <input type="text" id="wiz-repro-lote" class="wizard-input uppercase font-800" placeholder="L-00A">
+            </div>
+            <div id="wiz-repro-macho-wrap" class="d-none wizard-input-group">
+              <label class="wizard-label">Nº MACHO / SEMENTAL (OPC.)</label>
+              <input type="text" id="wiz-repro-macho" class="wizard-input uppercase font-800" placeholder="Nº IDENTIFICACIÓN DEL SEMENTAL">
+            </div>
           </div>
           <div id="wiz-repro-parto" class="d-none animate-in">
             <div class="grid grid-cols-2 gap-10">
@@ -1953,6 +1960,9 @@ const App = {
           </div>
         </div>`;
       document.body.appendChild(overlay);
+      // Sincronizar visibilidad de campos condicionales (lote/nº macho) con el
+      // tipo de evento preseleccionado — el <select> no dispara 'change' solo.
+      this._onReproTipoChange(document.getElementById('wiz-repro-tipo')?.value);
     } catch (e) {
       console.error('[App] Error abriendo wizard reproducción:', e);
       this.toastError('Error al abrir wizard');
@@ -1961,13 +1971,22 @@ const App = {
 
   _onReproTipoChange(tipo) {
     const sec = document.getElementById('wiz-repro-parto');
-    if (!sec) return;
-    if (tipo === 'Parto') {
-      sec.style.display = 'block';
-      this._renderCriasParto();
-    } else {
-      sec.style.display = 'none';
+    if (sec) {
+      if (tipo === 'Parto') {
+        sec.style.display = 'block';
+        this._renderCriasParto();
+      } else {
+        sec.style.display = 'none';
+      }
     }
+    // Lote/nº macho: campos que capturan los lectores RFID de campo en
+    // Cubriciones/Montas (ver docs/PLAN-MEJORA-SIGGAN.md punto 6). El nº de
+    // macho solo aplica a monta natural (en IA no hay semental físico).
+    const esCubricion = tipo === 'Inseminación Artificial' || tipo === 'Monta Natural';
+    const cubricionWrap = document.getElementById('wiz-repro-cubricion');
+    if (cubricionWrap) cubricionWrap.style.display = esCubricion ? 'block' : 'none';
+    const machoWrap = document.getElementById('wiz-repro-macho-wrap');
+    if (machoWrap) machoWrap.style.display = tipo === 'Monta Natural' ? 'block' : 'none';
   },
 
   _renderCriasParto() {
@@ -2020,6 +2039,9 @@ const App = {
     const btn = document.getElementById('wiz-repro-guardar');
     const tipo = document.getElementById('wiz-repro-tipo')?.value;
     const fecha = document.getElementById('wiz-repro-fecha')?.value;
+    const hora = document.getElementById('wiz-repro-hora')?.value || '';
+    const lote = document.getElementById('wiz-repro-lote')?.value?.trim().toUpperCase() || '';
+    const numeroMacho = document.getElementById('wiz-repro-macho')?.value?.trim().toUpperCase() || '';
     const notas = document.getElementById('wiz-repro-notas')?.value?.trim() || '';
     if (!tipo || !fecha) { this._reproMsg('Completa el tipo de evento y la fecha', 'error'); return; }
     this._reproMsg('');
@@ -2031,10 +2053,17 @@ const App = {
         animalId: Number(animalId),
         tipo_evento: tipo,
         fecha,
+        hora,
         notas,
         resultado: notas,
         fincaId
       };
+      if (tipo === 'Inseminación Artificial' || tipo === 'Monta Natural') {
+        payload.lote = lote;
+      }
+      if (tipo === 'Monta Natural') {
+        payload.numero_macho = numeroMacho;
+      }
 
       if (tipo === 'Parto') {
         const muertas = parseInt(document.getElementById('wiz-repro-crias-muertas')?.value || '0', 10) || 0;
@@ -2372,6 +2401,42 @@ const App = {
 
   async renderDetalleZona(params) {
     if (window.ZonasView) { await ZonasView.renderDetalle(params); }
+  },
+
+  async renderInstalaciones() {
+    if (window.InstalacionesView) { await InstalacionesView.render(); }
+  },
+
+  async renderDetalleInstalacion(params) {
+    if (window.InstalacionesView) { await InstalacionesView.renderDetalle(params); }
+  },
+
+  async renderSaneamientos() {
+    if (window.SaneamientosView) { await SaneamientosView.render(); }
+  },
+
+  async renderDetalleSaneamiento(params) {
+    if (window.SaneamientosView) { await SaneamientosView.renderDetalle(params); }
+  },
+
+  async renderSubexplotaciones() {
+    if (window.SubexplotacionesView) { await SubexplotacionesView.render(); }
+  },
+
+  async renderDetalleSubexplotacion(params) {
+    if (window.SubexplotacionesView) { await SubexplotacionesView.renderDetalle(params); }
+  },
+
+  async renderBotiquin() {
+    if (window.BotiquinView) { await BotiquinView.render(); }
+  },
+
+  async renderDetalleBotiquin(params) {
+    if (window.BotiquinView) { await BotiquinView.renderDetalle(params); }
+  },
+
+  async renderBitacoraAnimal(params) {
+    if (window.BitacoraAnimalView) { await BitacoraAnimalView.render(params); }
   },
 
   async renderAnimales() {
