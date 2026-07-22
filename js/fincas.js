@@ -216,6 +216,37 @@ const Fincas = {
             });
         }
 
+        // Subexplotaciones (gap "Subexplotación" de docs/PLAN-MEJORA-SIGGAN.md
+        // punto 7): SIEX no relaciona animales directamente con la finca, sino
+        // con una subdivisión por especie (REGA + especie + clasificación
+        // zootécnica). Capa aditiva y opcional — mismo patrón de IDs que
+        // zonas/instalaciones; una explotación de una sola especie puede
+        // ignorarla por completo y seguir usando tipo_explotacion/
+        // sistema_explotacion a nivel de finca como hasta ahora.
+        if (data.subexplotaciones && Array.isArray(data.subexplotaciones)) {
+            const maxExistingId = data.subexplotaciones.reduce((max, sub) => {
+                return sub.id && typeof sub.id === 'number' ? Math.max(max, sub.id) : max;
+            }, 0);
+            let nextId = Math.max(maxExistingId + 1, 1);
+
+            const especiesVistas = new Set();
+            data.subexplotaciones = data.subexplotaciones.map(sub => {
+                if (!sub.especieId) {
+                    throw new Error('Cada subexplotación debe tener una especie asignada.');
+                }
+                if (!sub.anulada) {
+                    if (especiesVistas.has(Number(sub.especieId))) {
+                        throw new Error('Ya existe una subexplotación activa para esa especie (una por especie, según SIEX).');
+                    }
+                    especiesVistas.add(Number(sub.especieId));
+                }
+                if (sub.id && typeof sub.id === 'number' && sub.id > 0) {
+                    return sub;
+                }
+                return { ...sub, id: nextId++ };
+            });
+        }
+
         if (esEdicion) {
             data.id = Number(data.id);
             await window.db.put('fincas', data);
