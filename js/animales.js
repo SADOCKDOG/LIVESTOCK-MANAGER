@@ -313,6 +313,37 @@ const Animales = {
       { entity: "Animales", action: "delete" }
     );
   },
+
+  /**
+   * Comentario libre sobre el animal (gap "Histórico Comentarios Animal" de
+   * docs/AUDITAR/AUDITORIA-BASEDEDATOS-LEGACY.md — no es un dato SIGGAN,
+   * es una nota de manejo). Se guarda en registro_eventos como cualquier
+   * otro evento de trazabilidad, motivo_tarea: 'comentario_animal'.
+   */
+  async agregarComentario(animalId, texto) {
+    return await ErrorHandler.tryAsync(async () => {
+      const comentario = (texto || "").trim();
+      if (!comentario) throw new Error("El comentario no puede estar vacío.");
+      const numId = Number(animalId);
+      const animal = await this.get(numId);
+      if (!animal) throw new Error("Animal no encontrado.");
+      const fincaId = await Fincas.getActiveId().catch(() => null);
+      const id = await window.db.add("registro_eventos", {
+        fincaId,
+        entidad_id: numId,
+        tipo_entidad: "animal",
+        tipo: "comentario",
+        motivo_tarea: "comentario_animal",
+        fecha: new Date().toISOString().split("T")[0],
+        descripcion: comentario,
+        creadoEn: new Date().toISOString(),
+      });
+      if (window.EventBus) {
+        window.EventBus.emit("animal:comentario", { animalId: numId, id });
+      }
+      return id;
+    }, { entity: "Animales", action: "agregarComentario" });
+  },
 };
 
 window.Animales = Animales;

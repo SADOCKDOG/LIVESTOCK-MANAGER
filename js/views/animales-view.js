@@ -494,11 +494,15 @@ const AnimalesView = {
             </div>` : ""}
         </div>
 
-        <div class="wizard-footer-fixed grid grid-cols-3 gap-8">
+        <div class="wizard-footer-fixed grid ${esNuevo ? 'grid-cols-3' : 'grid-cols-4'} gap-8">
           ${!esNuevo ? `
           <button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-info px-4">
             ${Icons.rotacion()}
             <span class="widget-link-label">360°</span>
+          </button>
+          <button type="button" onclick="location.hash='/animal-bitacora?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-accent px-4">
+            ${Icons.documento()}
+            <span class="widget-link-label">BITÁCORA</span>
           </button>` : '<div></div>'}
           <button type="button" onclick="AnimalesView._salirRegistro()" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
             ${Icons.cerrar()}
