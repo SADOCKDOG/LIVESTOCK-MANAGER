@@ -42,7 +42,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 
 DB_VERSION 15→16, migración aditiva. Tabla `razas` (keyPath `id`, índice `especieId`) semillada con 163 de las 189 razas del catálogo oficial (filtradas a las 5 especies ya modeladas: 47 bovino, 16 porcino, 51 ovino, 22 caprino, 27 équido). `js/views/animales-view.js`: el campo RAZA es ahora un `<select>` filtrado por especie con opción "OTRA (ESPECIFICAR)" para razas fuera de catálogo. Comparación case-insensitive, sin migración forzosa del campo `raza` (string) de animales existentes — igual que se planteó, se mantiene intacto en paralelo. Detalle completo en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md#catálogo-de-razas--implementado-commit-8675c08-2026-07-22).
 
-**Pendiente de este punto, no incluido en la implementación**: mostrar `clasificacion`/`grado_amenaza` en la UI (los campos ya están en la tabla, sin usar todavía); catálogo `Asociación de razas.csv`.
+**✅ Cierre de flecos (2026-07-22)**: `clasificacion`/`grado_amenaza` ahora se muestran como badge en la ficha de animal (`js/views/animales-view.js`), junto al selector de raza. `Asociación de razas.csv` auditado y **descartado explícitamente** — es un directorio de contacto de asociaciones de criadores (NIF/email/teléfono), no un catálogo de razas ni un dato relevante para la gestión de una explotación individual. Ver `docs/AUDITAR/INVENTARIO-AUDITORIA.md`.
 
 ---
 
