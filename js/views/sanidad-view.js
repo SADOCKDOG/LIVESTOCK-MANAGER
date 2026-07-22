@@ -157,6 +157,9 @@ const SanidadView = {
     if (!container) return;
     this._renderOpts = opts;
 
+    const vacunaciones = window.Vacunaciones
+      ? await window.Vacunaciones.list().catch(() => [])
+      : [];
     const tratamientos = await Sanitarios.list().catch(() => []);
     const filtro = this._filtro.trim().toLowerCase();
     const tratamientosFiltrados = filtro ? tratamientos.filter(t => {
@@ -205,6 +208,14 @@ const SanidadView = {
         </div>
 
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
+          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} VACUNACIONES (LIBRO ADSG)
+        </div>
+        <div class="mb-14">
+          <button class="widget-link-btn w-full" style="border:none; cursor:pointer;" onclick="window.WizardVacunacion ? window.WizardVacunacion.registrar(null, { onSaved: () => App.route() }) : App.toastError('Módulo de vacunación no disponible')">${Icons.fabPlus()} Registrar Vacunación</button>
+        </div>
+        ${this.renderVacunaciones(vacunaciones)}
+
+        <div class="inf-section-title mb-10 mt-14 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
           <span style="color: var(--c-purple); margin-right: 4px;">|</span> ${Icons.documento()} HISTORIAL CLÍNICO VETERINARIO
         </div>
 
@@ -222,6 +233,91 @@ const SanidadView = {
     if (this._renderOpts) {
       const container = document.getElementById('ganaderia-tab-content');
       if (container) this.render(container, this._renderOpts);
+    }
+  },
+
+  /** Listado de vacunaciones (cards clicables), más reciente primero. */
+  renderVacunaciones(vacunaciones, opts = {}) {
+    const limit = opts.limit || 20;
+    const lista = (vacunaciones || []).filter((v) => !v.anulada).slice(0, limit);
+    if (lista.length === 0) {
+      return `<div class="p-20 text-center rounded border border-222" style="background: rgba(255,255,255,0.015);">
+        <span class="text-555 text-xs uppercase font-800 tracking-wider">Sin vacunaciones registradas</span>
+      </div>`;
+    }
+    return `<div class="grid gap-10">${lista.map((v) => {
+      const tiposLabel = (v.tipos_vacuna || []).map((t) => t.tipo).filter(Boolean).join(', ') || 'Sin tipo';
+      return App._cardRegistro({
+        icon: Icons.sanidad(),
+        title: tiposLabel,
+        subtitle: `Animales: <strong style="color: var(--p-gold); font-weight: 950;">${v.animales_vacunados_total || 0}</strong>${v.veterinario ? ` · ${v.veterinario}` : ''}`,
+        metadata: `<span>${this._fmtFecha(v.fecha)}</span><span>·</span><span>${v.completa ? '100% CENSO' : 'PARCIAL'}</span>`,
+        badge: v.cerrada ? 'CERRADA' : 'ABIERTA',
+        color: v.cerrada ? 'var(--c-success)' : 'var(--c-info)',
+        onClick: `SanidadView._abrirOpcionesVacunacion(${v.id})`
+      });
+    }).join('')}</div>`;
+  },
+
+  async _abrirOpcionesVacunacion(id) {
+    try {
+      const v = await window.Vacunaciones.get(id);
+      if (!v) return;
+
+      const overlay = document.createElement('div');
+      overlay.className = 'wizard-full-screen';
+      overlay.style.justifyContent = 'center';
+      overlay.style.alignItems = 'center';
+      overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+      const tiposHtml = (v.tipos_vacuna || []).map((t) => `
+        <div class="p-8 mb-6 bg-black border border-222 rounded-sm">
+          <div class="text-white font-900 text-xs uppercase">${t.tipo}</div>
+          <div class="text-[0.6rem] text-gray uppercase">${[t.lote && `Lote: ${t.lote}`, t.dosis && `Dosis: ${t.dosis}`, t.nombre_comercial].filter(Boolean).join(' · ')}</div>
+        </div>`).join('');
+      overlay.innerHTML = `
+          <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-info); background: #1e1e1e; width: 100%;">
+              <h3 class="mt-0 text-white font-900 uppercase tracking-wider"><span style="color: var(--c-info); margin-right: 4px;">|</span> VACUNACIÓN — ${v.cerrada ? 'CERRADA' : 'ABIERTA'}</h3>
+              <p class="text-xs text-gray mb-15">${this._fmtFecha(v.fecha)} · ${v.veterinario || 'Sin veterinario'}</p>
+
+              <div class="mb-15">${tiposHtml}</div>
+
+              <div class="text-[0.65rem] text-gray uppercase font-800 mb-15">
+                Animales vacunados: <strong class="text-gold">${v.animales_vacunados_total || 0}</strong>
+                ${v.animales_totales ? ` / ${v.animales_totales} censo` : ''}
+                ${v.completa ? ' · 100% CENSO' : ''}
+              </div>
+
+              ${v.observaciones ? `<p class="text-xs text-ccc mb-15">${v.observaciones}</p>` : ''}
+
+              <div class="flex gap-10 mt-20">
+                  ${!v.cerrada ? `<button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-cerrar-vac">${Icons.check()} Cerrar</button>` : ''}
+                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-anular-vac">${Icons.eliminar()} Anular</button>
+                </div>
+                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} Cerrar ventana</button>
+            </div>
+          </div>`;
+      document.body.appendChild(overlay);
+
+      const btnCerrar = overlay.querySelector('#btn-cerrar-vac');
+      if (btnCerrar) {
+        btnCerrar.onclick = async () => {
+          if (!await Confirm.confirm('Cerrar vacunación', 'Una vez cerrada, no podrás editarla (solo anularla). ¿Continuar?', false)) return;
+          await window.Vacunaciones.cerrar(id);
+          App.toast('Vacunación cerrada', 'success');
+          overlay.remove();
+          App.route();
+        };
+      }
+
+      overlay.querySelector('#btn-anular-vac').onclick = async () => {
+        if (!await Confirm.confirm('Anular vacunación', '¿Anular esta vacunación de forma trazable? No se borrará, quedará marcada como anulada.', true)) return;
+        await window.Vacunaciones.anular(id, '');
+        App.toast('Vacunación anulada', 'success');
+        overlay.remove();
+        App.route();
+      };
+    } catch (e) {
+      App.toastError(e.message);
     }
   },
 
