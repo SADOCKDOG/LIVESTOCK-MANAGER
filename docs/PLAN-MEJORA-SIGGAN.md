@@ -25,7 +25,7 @@ La adaptación SIGGAN de Livestock Manager está en buen estado en los flujos ya
 | 1 | Catálogo de razas (163 razas) | ✅ **Implementado** (commit `8675c08`, 2026-07-22) | — | — |
 | 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
 | 3 | Modelo jerárquico de vacunaciones | Medio — nueva tabla + UI | Alinear con ADSG WEB; informes oficiales de vacunación | Media |
-| 4 | Equino: aplicar validación de crotal ya cerrada | Bajo — 2 líneas de código | Nada (mejora aislada) | Media (ya diagnosticado, solo falta aplicar) |
+| 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | Medio-alto — nueva tabla + formularios | Nada urgente, mejora de completitud | Baja-media |
 | 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | Bajo por campo, medio en conjunto | Compatibilidad con lectores RFID físicos | Baja (según si el usuario usa esos lectores) |
 | 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | Alto — cambio de modelo de relación finca↔animal | Cumplimiento formal SIEX/REGA a nivel administrativo | Baja (estructural, evaluar si aporta valor real de uso) |
@@ -69,22 +69,13 @@ Añadidos los campos `codigo_espe_siggan`/`espe_id_siggan` a `ESPECIES_SEED` en 
 
 ---
 
-## 4. Equino — aplicar la validación de crotal ya cerrada normativamente (prioridad media, esfuerzo bajo)
+## 4. Equino — ✅ IMPLEMENTADO (commit `acde2fa`, 2026-07-22)
 
-Este es el gap con la ratio esfuerzo/beneficio más favorable de todo el plan — la investigación normativa ya está cerrada, solo falta aplicar el cambio en código.
+Nueva entrada `equino_microchip` en `CROTAL_FORMATOS` (`js/error-handler.js`, regex 15 dígitos) + fila `{ especieId: 5, tipoIdentificadorId: 3, formato: 'equino_microchip' }` en `ESPECIE_TIPO_IDENTIFICADOR_SEED` (`js/db.js`), manteniendo el DIE (id 14) sin regex estricta. Migración de datos (`migrarEquinoMicrochip()`) para instalaciones existentes, sin bump de `DB_VERSION`.
 
-**Estructura confirmada** (detalle completo en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md)): microchip obligatorio siempre, Número Permanente Único/UELN de 15 dígitos (`724` + 3 dígitos organización + 9 dígitos correlativo, ej. `724901000007790`), basado en ISO 11784/11785. El DIE (documento/pasaporte) en sí no tiene formato fijo — no forzar regex ahí.
+**Fix relacionado detectado durante la verificación**: `validateCrotal()` aplicaba por error la regex genérica `ES+12 dígitos` de `validateCaravana` cuando la asociación especie↔tipo existía pero su `formato` era explícitamente `null` (el caso del propio DIE) — corregido para que en ese caso solo se exija que el campo no esté vacío, sin forzar el formato de otra especie.
 
-**Cambios concretos**:
-- `js/error-handler.js`, objeto `CROTAL_FORMATOS` (línea ~307): añadir
-  ```js
-  equino_microchip: {
-    regex: /^\d{15}$/,
-    descripcion: "15 dígitos (UELN + correlativo, ISO 11784, ej. 724901000007790)",
-  },
-  ```
-- `js/db.js`, `ESPECIE_TIPO_IDENTIFICADOR_SEED` (línea 56): sustituir `{ especieId: 5, tipoIdentificadorId: 14, formato: null }` por dos filas — mantener el DIE (id 14) sin formato estricto, y añadir `{ especieId: 5, tipoIdentificadorId: 3, formato: 'equino_microchip' }` (el microchip es complementario obligatorio al DIE, no una alternativa).
-- Esto requiere un bump de `DB_VERSION` y migración aditiva, mismo patrón que `migrarV15()`.
+Verificado en navegador: microchip válido/inválido, DIE con formato heredado variable (ej. `41/053850`) aceptado, DIE vacío rechazado, regresión OK en bovino/ovino/porcino, migración correcta en instalación nueva y existente.
 
 ---
 
