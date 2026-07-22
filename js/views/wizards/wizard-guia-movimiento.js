@@ -79,6 +79,10 @@ window.WizardGuiaMovimiento = {
               <label class="wizard-label">NOMBRE EXPLOTACIÓN CONTRAPARTE</label>
               <input type="text" id="w-mv-contra-nombre" value="${data.explotacion_contraparte}" placeholder="TITULAR O EXPLOTACIÓN" class="wizard-input uppercase font-800">
             </div>
+            <label class="flex items-center gap-8 text-[0.6rem] text-aaa cursor-pointer mb-12">
+              <input type="checkbox" id="w-mv-autoguia" ${data.autoguia ? 'checked' : ''} style="accent-color:var(--p-gold);">
+              <span class="uppercase font-900 tracking-tight leading-tight">AUTOGUÍA (MISMO TITULAR EN ORIGEN Y DESTINO — SIN TASA NI FIRMA DIGITAL)</span>
+            </label>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">TIPO OPERADOR DESTINO</label>
               <select id="w-mv-tipo-operador" class="wizard-input font-800">
@@ -137,6 +141,7 @@ window.WizardGuiaMovimiento = {
           if (esSalida) { data.rega_origen = propia; data.rega_destino = contra; }
           else { data.rega_destino = propia; data.rega_origen = contra; }
           data.explotacion_contraparte = document.getElementById('w-mv-contra-nombre')?.value.trim() || '';
+          data.autoguia = !!document.getElementById('w-mv-autoguia')?.checked;
           data.tipo_operador_destino = document.getElementById('w-mv-tipo-operador')?.value || '';
           data.especie = document.getElementById('w-mv-especie')?.value || '';
 
@@ -358,6 +363,7 @@ window.WizardGuiaMovimiento = {
             rega_origen: data.rega_origen,
             rega_destino: data.rega_destino,
             explotacion_contraparte: data.explotacion_contraparte,
+            autoguia: !!data.autoguia,
             motivo: data.motivo,
             especie: data.especie,
             num_animales: data.num_animales,
@@ -461,6 +467,7 @@ window.WizardGuiaMovimiento = {
         <p style="margin:6px 0 0 0; line-height:1.5;">
           <strong>N\u00BA Gu\u00EDa Oficial:</strong> <span style="font-weight:bold;color:#000;">${mov.numero_guia}</span> &nbsp;&nbsp;\u00B7&nbsp;&nbsp; <strong>Fecha Expedición:</strong> ${mov.fecha} &nbsp;&nbsp;\u00B7&nbsp;&nbsp; <strong>Motivo de Traslado:</strong> ${(mov.motivo || '\u2014').toUpperCase()}<br>
           <strong>Especie Ganadera:</strong> <span style="font-weight:700;">${(mov.especie || '\u2014').toUpperCase()}</span> &nbsp;&nbsp;\u00B7&nbsp;&nbsp; <strong>Censo de Cabezas:</strong> <span style="font-weight:900;color:#10b981;font-size:0.9rem;">${mov.num_animales} UDS</span>
+          ${mov.autoguia ? '<br><strong>Tipo:</strong> <span style="font-weight:900;color:#b8860b;">AUTOGU\u00CDA (MISMO TITULAR \u2014 SIN TASA NI FIRMA DIGITAL)</span>' : ''}
         </p>
         ${crotalesHtml}
       </div>
