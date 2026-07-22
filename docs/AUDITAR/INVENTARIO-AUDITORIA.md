@@ -37,7 +37,7 @@
 | `Texto noticia OCA.pdf` | ✅ | 🟡 No | Boletín interno "Modificaciones SIGGAN – Julio 2014" (changelog técnico histórico, cambios de hace 10+ años ya superados). No es normativa vigente. |
 | `GUIA_AD-SIEX-DSI-PortalPublico.pdf` | ✅ | Sí | Especificación completa de la API REST del FEGA — confirmado "sin autenticación", CORS no documentado (sigue sin resolver empíricamente). Endpoint nuevo útil `GET /catalogos/{idTabla}/fecha` (sincronización incremental). Catálogos `idCatalogo` de grupo GANADERAS ya inventariados, más 2 nuevos: `SISTEMAS_SOST_CONTROL`, `INTEGRADORA_COMERCIAL`. Ver `PLAN-MEJORA-SIGGAN.md`. |
 | `2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` | ✅ | Sí | **Confirmado SIN CAMBIOS respecto al catálogo `ESPECIE_ANIMAL` ya implementado** (coincide código a código pese al nombre "corrección de errores" — es el Documento Técnico SIEX v3.6.0 completo, no un changelog puntual). Aporta 2 hallazgos nuevos: catálogo de 23 "Tipos de explotación ganadera" SIEX (complementa el CSV de 38 valores ya inventariado) y, sobre todo, confirma que el concepto **"Subexplotación" no existe en el código** — ver `PLAN-MEJORA-SIGGAN.md` gap nuevo. |
-| `Manual_SIGGAN_Diagnosticos.pdf` | 🟠 | Sí (probable) | Solo portada leída — identificado como módulo "SIGGAN - Saneamiento Bovino" (ALANA). Flujo de diagnósticos no extraído en detalle. |
+| `Manual_SIGGAN_Diagnosticos.pdf` | ✅ | Sí, gap identificado | Manual completo (17 páginas) leído. Es el protocolo de diagnóstico de tuberculosis bovina (IDTB simple/comparada) dentro del saneamiento SIGGAN: grabación de medidas por animal (2 o 4 columnas según técnica), diagnóstico automático por fórmula (incremento de medidas + signos clínicos → Positivo/Dudoso/Negativo), lotes de tuberculina, y datos de bolo ruminal en sacrificio. Gap real: `js/saneamientos.js` hoy solo agrega `num_examinados`/`num_positivos` a nivel de campaña, sin granularidad de medida individual ni lógica de diagnóstico — mismo gap ya señalado en `PLAN-MEJORA-SIGGAN.md` punto 6 ("granularidad individual de saneamientos"), ahora con más detalle de lo que implicaría cerrarlo (haría falta modelar medidas IDTB + fórmula de diagnóstico, específico solo para TBC bovina). No incorporado como punto nuevo del plan por ser un caso muy específico (una sola enfermedad, una sola especie) de alta complejidad relativa al valor que aporta hoy. |
 | `GTA006E_MUS_Manual_Usuario_0400.odt` | ✅ | Sí | Abierto sin `odfpy` (extracción directa del XML interno, un .odt es un ZIP). Es la versión "manual completo" de GTA (misma familia que `GTA007E...pdf` ya auditado) — aporta 2 secciones nuevas no cubiertas antes: **Cambio de titularidad de equinos** (flujo separado del movimiento normal, con estados propios `PENDIENTE GANADERO DESTINO` e iconografía de confirmación) y **Autorización expresa de entrada de équidos** (el titular destino puede autorizar antes de que el veterinario genere la guía). También confirma el catálogo extenso de mensajes de error de movimientos/censo (~300 códigos) y los acrónimos GO/GD/VO/VD ya usados en el análisis de la máquina de estados GTA. Ver `PLAN-MEJORA-SIGGAN.md`. |
 | `Anexo_I_Manual_ADSGWeb.ods` | ✅ | Sí | Abierto sin `odfpy` (extracción directa del XML). Es la definición de columnas del catálogo de "Actuaciones Sanitarias" SIGGAN (programa/subprograma/matriz de análisis/propósito analítico/enfermedades obligatorias/ámbito) — confirma y detalla los programas ya conocidos (TBC, Brucelosis, Lengua Azul, EET) con un nivel de granularidad (tipo de matriz, submuestra) mayor que el implementado en `CAMPANAS_SANEAMIENTO`. No se requiere acción — el detalle adicional no aporta un gap nuevo accionable, solo contexto. |
 
@@ -137,11 +137,11 @@
 
 ## Resumen cuantitativo
 
-**Actualizado 2026-07-22 (segunda pasada)** — los 2 ficheros `.odt`/`.ods` y la sección "Mensajes de error" de `ADS005E...pdf` ya están auditados (se abrieron sin `odfpy`, extrayendo el XML interno directamente — un `.odt`/`.ods` es un ZIP). Solo queda de baja prioridad `Manual_SIGGAN_Diagnosticos.pdf` (solo portada leída).
+**Actualizado 2026-07-22 (tercera y última pasada)** — `Manual_SIGGAN_Diagnosticos.pdf` (17 páginas) leído completo. **Ya no queda ningún documento pendiente ni parcial en este inventario.**
 
 | Categoría | Total | ✅ Aplica | 🟡 No aplica | ⬜/🟠 Pendiente |
 |---|---:|---:|---:|---:|
-| PDFs/documentos normativos (raíz) | 21 | 15 | 5 | 1 (`Manual_SIGGAN_Diagnosticos.pdf`, parcial) |
+| PDFs/documentos normativos (raíz) | 21 | 16 | 5 | 0 |
 | Anexos Orden de Equino | 5 | 4 | 1 | 0 |
 | Catálogos CSV | 122 | 26 (ganaderos) + 8 (transversales) | ~96 (agrícolas) | 0 |
 | XLSX | 1 | Sí, completo | — | 0 |
@@ -152,7 +152,7 @@
 
 **Hallazgo importante de esta segunda ronda (2026-07-22)**: el catálogo `ESPECIE_ANIMAL` ya implementado en `js/db.js` está **confirmado sin cambios** por la fuente más reciente (SIEX v3.6.0, 2025) — cero riesgo de que el modelo de datos maestro ya cerrado quede desactualizado. Se detectó en cambio un gap estructural nuevo (concepto "Subexplotación" ausente del código) documentado en `PLAN-MEJORA-SIGGAN.md`.
 
-**Hallazgo de la tercera ronda (2026-07-22, cierre de documentos de baja prioridad)**: `GTA006E_MUS_Manual_Usuario_0400.odt` reveló un flujo no cubierto antes — **cambio de titularidad de equinos** (proceso separado del movimiento normal, con sus propios estados y confirmación del nuevo titular) y **autorización expresa de entrada de équidos** por el ganadero de destino. `Anexo_I_Manual_ADSGWeb.ods` y la sección "Mensajes de error" de `ADS005E` solo confirman/detallan lo ya conocido, sin gaps nuevos accionables.
+**Hallazgo de la tercera ronda (2026-07-22, cierre de documentos de baja prioridad)**: `GTA006E_MUS_Manual_Usuario_0400.odt` reveló un flujo no cubierto antes — **cambio de titularidad de equinos** (proceso separado del movimiento normal, con sus propios estados y confirmación del nuevo titular) y **autorización expresa de entrada de équidos** por el ganadero de destino. `Anexo_I_Manual_ADSGWeb.ods` y la sección "Mensajes de error" de `ADS005E` solo confirman/detallan lo ya conocido, sin gaps nuevos accionables. `Manual_SIGGAN_Diagnosticos.pdf` (17 páginas, leído completo) reveló el protocolo de diagnóstico de tuberculosis bovina (IDTB simple/comparada) con fórmula de diagnóstico automático — confirma con más detalle el gap ya conocido de "granularidad individual de saneamientos", sin incorporarse como punto nuevo del plan por su alta especificidad (una sola enfermedad, una sola especie).
 
 ## Recomendación de limpieza de `docs/AUDITAR/`
 
@@ -160,4 +160,4 @@
 
 1. **Candidatos seguros a archivar fuera del repo** (mover a `Private/` o eliminar del control de versiones): los ~96 CSV agrícolas confirmados sin relación alguna con ganadería (lista completa en la sección "Agrícolas/no aplican" arriba).
 2. **Mantener en el repo**: todos los PDFs normativos (son la fuente de verdad citada en la documentación), los CSV ganaderos/transversales, y los ficheros de `LECTOR/` (documentan hardware real).
-3. **La auditoría de `docs/AUDITAR/` está prácticamente completa** — solo queda `Manual_SIGGAN_Diagnosticos.pdf` sin leer más allá de la portada, de prioridad baja y sin bloquear nada.
+3. **La auditoría de `docs/AUDITAR/` está completa** — todos los documentos han sido revisados (auditados y aplican, auditados y no aplican, o auditados y confirman gaps ya conocidos). No queda ningún documento pendiente.
