@@ -654,13 +654,12 @@ const CompradoresView = {
 
       const main = document.getElementById("app-content");
       main.innerHTML = `
-        <div class="mb-14">
-          <button onclick="CompradoresView._salirFormulario('${destinoCancelar}')" class="widget-link-btn widget-link-btn--neon neon-danger px-16 py-8 min-h-0 h-auto">
-            <span class="text-[0.7rem] font-950 uppercase tracking-widest">${Icons.atras()} Cancelar</span>
-          </button>
+        <div class="wizard-full-screen">
+        <div class="wizard-header-fixed border-top-5-gold">
+          <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--c-warning); margin-right: 6px;">|</span> ${esEdicion ? Icons.editar() : Icons.agregar()} ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</h1>
         </div>
+        <div class="wizard-content-scrollable p-20">
         <div class="card p-20 bg-black" style="border: 1px solid #27272a;">
-          <div class="section-header-theme mb-20" style="--theme-color: var(--c-warning)"><span style="color: var(--c-amber); margin-right: 6px;">|</span> ${esEdicion ? 'EDITAR COMPRADOR' : 'NUEVO COMPRADOR'}</div>
 
           <div class="wizard-input-group mb-15">
               <label class="wizard-label uppercase font-900" for="c-nombre">Nombre / Razón Social *</label>
@@ -751,18 +750,16 @@ const CompradoresView = {
             <input type="checkbox" id="c-activo" ${c.activo !== false ? 'checked' : ''} style="accent-color:var(--c-warning);">
             <span class="uppercase font-950 tracking-widest text-[0.65rem]">Comprador activo en el sistema</span>
           </label>
-
-          <div class="grid grid-cols-2 gap-10 mt-20">
-              <button onclick="CompradoresView._guardar(${id || ''})" class="widget-link-btn widget-link-btn--neon neon-success">
-                ${Icons.guardar()} <span class="widget-link-label">GUARDAR</span>
-              </button>
-              <button onclick="CompradoresView._salirFormulario('${destinoCancelar}')" class="widget-link-btn widget-link-btn--neon neon-danger">
-                ${Icons.cerrar()} <span class="widget-link-label">CANCELAR</span>
-              </button>
-            </div>
-            ${esEdicion ? `<div class="mt-15 text-center"><button onclick="CompradoresView._eliminar(${id})" class="text-red font-900 text-[0.6rem] uppercase tracking-widest p-10 opacity-60 hover:opacity-100 transition-all">${Icons.eliminar()} Eliminar definitivamente</button></div>` : ''}
+        </div>
+        </div>
+        <div class="wizard-footer-fixed border-top-222">
+          ${esEdicion ? `<button type="button" onclick="CompradoresView._eliminar(${id})" class="wizard-btn-action wizard-btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
+          <div class="wizard-footer-buttons">
+            <button type="button" onclick="CompradoresView._salirFormulario('${destinoCancelar}')" class="wizard-btn-action wizard-btn-secondary">${Icons.cerrar()} Cancelar</button>
+            <button type="button" onclick="CompradoresView._guardar(${id || ''})" class="wizard-btn-action wizard-btn-success">${Icons.guardar()} Guardar</button>
           </div>
-          <div class="pb-40"></div>
+        </div>
+        </div>
         `;
     },
 

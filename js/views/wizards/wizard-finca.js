@@ -125,6 +125,7 @@ window.WizardFinca = {
         try {
           await Fincas.save(finalData);
           App.toast("Finca creada");
+          if (typeof App.updateNavigationMenu === 'function') await App.updateNavigationMenu();
           App.renderAjustes();
         } catch (e) {
           App.toastError(e.message);
@@ -140,6 +141,14 @@ window.WizardFinca = {
 
     const finca = await window.Fincas.getActive();
     if (!finca) return;
+
+    // Obtener flags actuales de modo (Leche/Carne)
+    const currentFlags = window.ModoContextoHelper ? window.ModoContextoHelper.getFlags(finca.id) : null;
+    const initialData = {
+      ...finca,
+      flag_leche: currentFlags ? !!currentFlags.leche : true,
+      flag_carne: currentFlags ? !!currentFlags.carne : false
+    };
 
     const opcionesCCAA = window.ComunidadesService
       ? window.ComunidadesService.getOpcionesComunidad()
@@ -182,7 +191,7 @@ window.WizardFinca = {
                 </select>
               </div>
               <div class="grid grid-cols-2 gap-8">
-                <div class="wizard-input-group"><label class="wizard-label">TIPO EXPLOTACIÓN</label>
+                <div class="wizard-input-group"><label class="wizard-label">TIPO EXPLOTACIÓN (SIGGAN)</label>
                   <select id="w-f-tipo" class="wizard-input wizard-select">
                     ${tiposExpl.map(t =>
                       `<option value="${t}" ${data.tipo_explotacion === t ? 'selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`
@@ -196,6 +205,21 @@ window.WizardFinca = {
                     ).join('')}
                   </select>
                 </div>
+              </div>
+
+              <div class="wizard-input-group mt-10">
+                <label class="wizard-label">MODO DE EXPLOTACIÓN (VISIBILIDAD MÓDULOS)</label>
+                <div class="flex flex-col gap-6 mt-6">
+                  <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+                    <input type="checkbox" id="w-f-flag-leche" ${data.flag_leche ? 'checked' : ''} class="w-auto accent-neon">
+                    <span>${Icons.leche()} Lácteo</span>
+                  </label>
+                  <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+                    <input type="checkbox" id="w-f-flag-carne" ${data.flag_carne ? 'checked' : ''} class="w-auto accent-neon">
+                    <span>${Icons.carne()} Cárnico</span>
+                  </label>
+                </div>
+                <p class="text-xs text-aaa mt-4">Active uno o ambos tipos según la producción. Los módulos ocultarán todo lo relativo al tipo desactivado. Debe permanecer al menos uno activo.</p>
               </div>
 
               <div class="grid grid-cols-2 gap-8">
@@ -274,6 +298,8 @@ window.WizardFinca = {
           data.especies_autorizadas = Array.from(chks).map(el => el.value);
 
           data.explotacion_lidia = document.getElementById('w-f-lidia')?.checked ?? data.explotacion_lidia ?? false;
+          data.flag_leche = document.getElementById('w-f-flag-leche')?.checked ?? data.flag_leche;
+          data.flag_carne = document.getElementById('w-f-flag-carne')?.checked ?? data.flag_carne;
 
           data.adsg_nombre = document.getElementById('w-f-adsg')?.value.trim() || data.adsg_nombre;
           data.adsg_codigo = document.getElementById('w-f-adsg-cod')?.value.trim() || data.adsg_codigo;
@@ -287,6 +313,10 @@ window.WizardFinca = {
         validate: async (data) => {
           if (!data.nombre) { App.toastError("El nombre es obligatorio"); return false; }
           if (!data.propietario) { App.toastError("El propietario/titular es obligatorio"); return false; }
+          if (!data.flag_leche && !data.flag_carne) {
+            App.toastError("Selecciona al menos un tipo de explotación (Lácteo y/o Cárnico)");
+            return false;
+          }
           return true;
         }
       },
@@ -332,11 +362,12 @@ window.WizardFinca = {
       }
     ];
     window.WizardManager.create({
-      id: 'wizard-editar-finca', title: 'EDITAR FINCA', initialData: finca, steps: wizardSteps,
+      id: 'wizard-editar-finca', title: 'EDITAR FINCA', initialData: initialData, steps: wizardSteps,
       onComplete: async (finalData) => {
         try {
           await window.Fincas.save(finalData);
           App.toast("Finca actualizada");
+          if (typeof App.updateNavigationMenu === 'function') await App.updateNavigationMenu();
           App.updateHeader();
           App.renderAjustes();
         } catch (e) {

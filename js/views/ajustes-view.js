@@ -173,24 +173,6 @@ const AjustesView = {
         </div>
       </div>
 
-      <!-- ===================== TIPO DE EXPLOTACIÓN ===================== -->
-      <div class="card">
-        <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
-          <span style="color: var(--c-warning);">|</span> ${Icons.finca()} TIPO DE EXPLOTACIÓN${activeFinca ? ` — ${activeFinca.nombre}` : ''}
-        </h3>
-        <p class="text-gray mt-5 text-sm">Active uno o ambos tipos según la explotación de esta finca. Los módulos ocultarán todo lo relativo al tipo desactivado.</p>
-        <div class="space-y-6 mt-15">
-          <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
-            <input type="checkbox" ${modoFlags.leche ? 'checked' : ''} onchange="AjustesView._toggleTipoExplotacion('leche', this.checked)">
-            <span>${Icons.leche()} Lácteo</span>
-          </label>
-          <label class="flex items-center gap-3 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
-            <input type="checkbox" ${modoFlags.carne ? 'checked' : ''} onchange="AjustesView._toggleTipoExplotacion('carne', this.checked)">
-            <span>${Icons.carne()} Cárnico</span>
-          </label>
-        </div>
-        <p class="text-xs text-aaa mt-4">Esta configuración es específica de esta finca (cada finca puede tener su propio tipo). Con ambos activos, cada módulo muestra sus secciones de leche y de carne por separado. Debe permanecer al menos uno activo.</p>
-      </div>
 
       <!-- ===================== ESPECIES Y RAZAS ===================== -->
       <div class="card">
@@ -332,26 +314,6 @@ const AjustesView = {
     App.toast('Preferencia guardada', 'success');
   },
 
-  async _toggleTipoExplotacion(tipo, activo) {
-    const activeId = await Fincas.getActiveId();
-    const flags = ModoContextoHelper.getFlags(activeId) || { leche: true, carne: false };
-    const nuevosFlags = { ...flags, [tipo]: activo };
-
-    if (!nuevosFlags.leche && !nuevosFlags.carne) {
-      App.toast('Debe permanecer al menos un tipo activo', 'error');
-      this.render();
-      return;
-    }
-
-    ModoContextoHelper.setFlags(nuevosFlags, activeId);
-    const partes = [nuevosFlags.leche ? 'Lácteo' : '', nuevosFlags.carne ? 'Cárnico' : ''].filter(Boolean);
-    App.toast(`Tipo de explotación: ${partes.join(' + ')}`, 'success');
-
-    if (window.App && typeof App.updateNavigationMenu === 'function') {
-      await App.updateNavigationMenu();
-    }
-    this.render();
-  },
 
   _renderEspecies(config) {
     const especies = config.especies || [];
