@@ -226,25 +226,16 @@ const ComercializacionView = {
     }
 
     main.innerHTML = `
-      <!-- Barra de Navegación Multipestaña Horizontal Comercialización (Scrollable) Premium, centrada arriba del todo -->
-      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
-        <div class="pestana-indicador-flecha pestana-flecha-izq" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft -= 100; })()">
-          ${Icons.atras()}
-        </div>
-        <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Comercialización">
-            <!-- Pestañas generadas dinámicamente según los tipos de explotación activos -->
-            ${['leche', 'carne', 'compradores', 'contratos', 'transportistas'].map(tab => {
-              if (!allowedSubModules.includes(tab)) return '';
-              const isActive = this._activeSubModule === tab;
-              const meta = this._getSubModuleMeta(tab);
-              return `<button class="pestanas-premium-btn ${isActive ? 'active' : ''}" role="tab" aria-selected="${isActive}" style="--mode-color:${meta.color};" onclick="ComercializacionView._cambiarSubModulo('${tab}')">${meta.icon} ${tab.toUpperCase()}</button>`;
-            }).join('')}
-          </div>
-        </div>
-        <div class="pestana-indicador-flecha pestana-flecha-der" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft += 100; })()">
-          ${Icons.siguiente()}
-        </div>
+      <!-- Carrusel circular de secciones de Comercialización: marco centrado con la sección activa -->
+      <div class="mb-14">
+        ${App.renderCarruselPestanas(
+          ['leche', 'carne', 'compradores', 'contratos', 'transportistas'].filter(tab => allowedSubModules.includes(tab)).map(tab => {
+            const meta = this._getSubModuleMeta(tab);
+            return { key: tab, icon: meta.icon, label: tab.toUpperCase(), color: meta.color };
+          }),
+          this._activeSubModule,
+          'ComercializacionView'
+        )}
       </div>
 
       <div class="module-header">
@@ -292,12 +283,6 @@ const ComercializacionView = {
           await TransportistasView.render();
         }
         break;
-    }
-
-    // Inicializar scroll dinámico para la barra de pestañas
-    const containerPestanas = document.querySelector('.pestanas-premium-container');
-    if (containerPestanas && window.App?.inicializarScrollPestanas) {
-      window.App.inicializarScrollPestanas(containerPestanas);
     }
   },
 
