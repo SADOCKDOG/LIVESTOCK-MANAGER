@@ -45,18 +45,23 @@ const AnimalesView = {
       const rebano = rebanoMap[a.rebanoId];
       return rebano && !window.ModoContextoHelper._matchTipoByMode(rebano.tipo, flagsModo);
     }).length;
-    const moduleColor = window.getModuleColor('/animales');
+    const modoMeta = window.ModoContextoHelper.getModeMetaEffective(flagsModo);
     html += `
-      <!-- Cabecera de Sección Estandarizada -->
-      <div class="flex items-center gap-12 mb-14">
-        <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.animales()}</span>
-        <div>
-          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> CENSO DE ANIMALES
-          </h1>
-          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            ${animales.length} ${animales.length === 1 ? 'registro' : 'registros'} · ${activos} activos
+      <!-- Cabecera de Módulo: chip de modo + KPI + acción principal -->
+      <div class="module-header">
+        <div class="module-header-kpis">
+          <span class="module-mode-chip" style="--mode-color: ${modoMeta.color};">${modoMeta.icon} ${modoMeta.label}</span>
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Censo</span>
+            <span class="module-header-kpi-value">${animales.length}</span>
           </div>
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Activos</span>
+            <span class="module-header-kpi-value" style="color: var(--c-success);">${activos}</span>
+          </div>
+        </div>
+        <div class="module-header-primary-action">
+          <button class="btn btn-create btn-lg" onclick="location.hash='/animal'">${Icons.agregar()} Nuevo Animal</button>
         </div>
       </div>
 
@@ -113,11 +118,6 @@ const AnimalesView = {
       html += App._cardRegistro(props);
     });
     html += `</div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="location.hash='/animal'">
-        <span class="fab-label">Nuevo Animal</span>
-        <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
-      </div>
       <div id="animales-empty-search" class="card mt-10 p-12 text-center d-none" style="background: rgba(255,255,255,0.01);">
         <div class="text-2xl mb-8" style="color:#555;">${Icons.buscar()}</div>
         <p class="text-gray-500 uppercase font-900 text-xs" style="margin: 0;">No se encontraron animales con ese criterio.</p>

@@ -207,21 +207,27 @@ const ZonasView = {
         `;
       }
 
-      // Cabecera de Sección Estandarizada + Resumen Colapsable sin anidación
-      const moduleColor = window.getModuleColor('/zonas');
+      // Cabecera de Módulo (chip de modo + KPI + acción principal) + Resumen Colapsable
       const pctGlobal = totalAforo > 0 ? Math.round((totalOcupacion / totalAforo) * 100) : 0;
       const colorGlobal = pctGlobal > 100 ? 'var(--c-danger)' : pctGlobal >= 80 ? 'var(--c-warning)' : 'var(--c-success)';
+      const flagsModoZonas = window.ModoContextoHelper.getFlags() || { leche: true, carne: false };
+      const modoMetaZonas = window.ModoContextoHelper.getModeMetaEffective(flagsModoZonas);
       html += `
-        <!-- Cabecera de Sección Estandarizada -->
-        <div class="flex items-center gap-12 mb-14">
-          <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.zonas()}</span>
-          <div>
-            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-              <span style="color:${moduleColor}; margin-right:4px;">|</span> ZONAS / PARCELAS
-            </h1>
-            <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-              ${zonasConIndice.length} ${zonasConIndice.length === 1 ? 'registro' : 'registros'} · ${totalOcupacion} cabezas
+        <!-- Cabecera de Módulo: chip de modo + KPI + acción principal -->
+        <div class="module-header">
+          <div class="module-header-kpis">
+            <span class="module-mode-chip" style="--mode-color: ${modoMetaZonas.color};">${modoMetaZonas.icon} ${modoMetaZonas.label}</span>
+            <div class="module-header-kpi">
+              <span class="module-header-kpi-label">Zonas</span>
+              <span class="module-header-kpi-value">${zonasConIndice.length}</span>
             </div>
+            <div class="module-header-kpi">
+              <span class="module-header-kpi-label">Cabezas</span>
+              <span class="module-header-kpi-value">${totalOcupacion}</span>
+            </div>
+          </div>
+          <div class="module-header-primary-action">
+            <button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()">${Icons.agregar()} Nueva Zona</button>
           </div>
         </div>
 
@@ -250,12 +256,7 @@ const ZonasView = {
         </div>
         <div class="grid gap-12">${fichasHtml}</div>`;
     }
-    main.innerHTML = html + `
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="ZonasView._crearZona()">
-        <span class="fab-label">Nueva Zona</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
-      </div>`;
+    main.innerHTML = html;
   },
 
   async renderDetalle(params) {
