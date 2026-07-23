@@ -136,17 +136,45 @@ const ExplotacionView = {
       this._activeSubModule = 'explotacion';
     }
 
+    // Datos + KPI/acción principal solo tienen sentido en la pestaña "explotacion"
+    // (balance leche/carne + FAB adaptativo ya existentes); se cargan aquí para
+    // poder pintarlos en la cabecera antes de la barra de pestañas.
+    let dHeader = null;
+    if (this._activeSubModule === 'explotacion') {
+      dHeader = this._cachedData || (await this._ensureData(fincaId, this._needsDataRefresh) || this._cachedData);
+    }
+    const flagsHeader = window.ModoContextoHelper?.getFlags() || { leche: true, carne: false };
+    const modoMetaHeader = window.ModoContextoHelper?.getModeMetaEffective(flagsHeader) || { icon: Icons.finca(), label: 'Explotación', color: 'var(--c-success)' };
+    const primaryOnclick = flagsHeader.leche && flagsHeader.carne ? "App._abrirSubmenuRegistros({ origen_modulo: 'explotacion' })"
+      : flagsHeader.carne ? "App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion' })"
+      : "App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion' })";
+    const primaryLabel = flagsHeader.leche && flagsHeader.carne ? 'Registrar Producción' : flagsHeader.carne ? 'Registrar Pesaje' : 'Registrar Ordeño';
+
     main.innerHTML = `
-      <!-- Cabecera Maestra ExPro Consolidada -->
-      <div class="flex items-center gap-12 mb-14 px-4">
-        <span class="text-2xl" style="color:var(--c-success); display:inline-flex; align-items:center;">${Icons.finca()}</span>
-        <div>
-          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:var(--c-success); margin-right:4px;">|</span> EXPLOTACIÓN & SOPORTE
-          </h1>
-          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            GESTIÓN DE INFRAESTRUCTURA, INSUMOS Y SOPORTE TERRESTRE
-          </div>
+      <!-- Cabecera de Módulo: chip de modo + KPI + acción principal + accesos rápidos a trámites -->
+      <div class="module-header px-4">
+        <div class="module-header-kpis">
+          <span class="module-mode-chip" style="--mode-color: ${modoMetaHeader.color};">${modoMetaHeader.icon} ${modoMetaHeader.label}</span>
+          ${dHeader && flagsHeader.leche ? `
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Litros</span>
+            <span class="module-header-kpi-value">${UI.formatNumber(dHeader.totalLitros)}</span>
+          </div>` : ''}
+          ${dHeader && flagsHeader.carne ? `
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Margen Carne</span>
+            <span class="module-header-kpi-value" style="color: var(--c-success);">${UI.formatCurrency(Math.round(dHeader.margenCarne))}</span>
+          </div>` : ''}
+        </div>
+        ${this._activeSubModule === 'explotacion' ? `
+        <div class="module-header-primary-action">
+          <button class="btn btn-create btn-lg" onclick="${primaryOnclick}">${Icons.fabPlus()} ${primaryLabel}</button>
+        </div>` : ''}
+        <div class="module-header-secondary-actions">
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('traslado')">${Icons.documento()}<span class="widget-link-label">Traslado</span></button>
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('censo')">${Icons.documento()}<span class="widget-link-label">Censo</span></button>
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('crotales')">${Icons.documento()}<span class="widget-link-label">Crotales</span></button>
+          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('guia')">${Icons.documento()}<span class="widget-link-label">Guía Mov.</span></button>
         </div>
       </div>
 
@@ -163,24 +191,20 @@ const ExplotacionView = {
             <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'gastos'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'proveedores'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
             <button class="pestanas-premium-btn ${this._activeSubModule === 'tramites' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'tramites'}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarSubModulo('tramites')">${Icons.documento()} TRÁMITES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'traslado' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'traslado'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('traslado')">${Icons.documento()} TRASLADO</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'censo' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'censo'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('censo')">${Icons.documento()} CENSO</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'crotales' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'crotales'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('crotales')">${Icons.documento()} CROTALES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'guia' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'guia'}" style="--mode-color:var(--c-warning);" onclick="ExplotacionView._cambiarSubModulo('guia')">${Icons.documento()} GUÍA MOVIMIENTO</button>
           </div>
         </div>
         <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
           ${Icons.siguiente()}
         </div>
       </div>
-      
+
       <!-- Contenedor Dinámico para la pestaña activa -->
       <div id="expro-tab-content"></div>`;
 
     // Delegación dinámica de renderizado
     switch (this._activeSubModule) {
       case 'explotacion':
-        const d = this._cachedData || (await this._ensureData(fincaId, this._needsDataRefresh) || this._cachedData);
+        const d = dHeader;
         this._renderModoExplotacion(document.getElementById('expro-tab-content'), d);
         break;
       case 'silos':
@@ -388,10 +412,6 @@ const ExplotacionView = {
         <div class="grid gap-10" id="expro-actividad-grid">
           ${this._renderActividadItems()}
         </div>
-      </div>
-      <div class="fab-container" style="--fab-neon-color: ${metaRef.color};" onclick="${flags.leche && flags.carne ? "App._abrirSubmenuRegistros({ origen_modulo: 'explotacion' })" : flags.carne ? "App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion' })" : "App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion' })"}">
-        <span class="fab-label">${flags.leche && flags.carne ? 'Registrar Producción' : flags.carne ? 'Registrar Pesaje' : 'Registrar Ordeño'}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
@@ -637,7 +657,7 @@ const ExplotacionView = {
           ${estadoHtml}
         </div>
         <div class="text-[0.65rem] text-gray font-bold uppercase tracking-wide mb-12">${subtitulo}</div>
-        <button class="btn btn-secondary w-full text-xs uppercase font-800 py-8" style="background:#141414; border:1px solid ${color}; color:${color}; border-radius:6px;" onclick="${onclick}">${accionLabel}</button>
+        <button class="widget-link-btn widget-link-btn--neon w-full" style="--neon-color:${color}; flex-direction:row;" onclick="${onclick}"><span class="widget-link-label">${accionLabel}</span></button>
       </div>`;
 
     container.innerHTML = `
