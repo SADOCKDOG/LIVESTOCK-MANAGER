@@ -96,6 +96,7 @@ const App = {
     "/albaranes-ventas": "renderAlbaranesVentas",
     "/silos": "renderSilos",
     "/fitosanitario": "renderFitosanitarios",
+    "/margen-animal": "renderMargenAnimal",
   },
 
   async init() {
@@ -1669,7 +1670,7 @@ const App = {
 
   // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
   _routeGroups: {
-    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan', '/animal-bitacora': 'gegan',
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan', '/animal-bitacora': 'gegan', '/margen-animal': 'gegan',
     '/explotacion': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/proveedor': 'expro',
     '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
     '/informes': 'informes', '/alertas': 'informes',
@@ -2502,6 +2503,10 @@ const App = {
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Cargando módulo de documentos...</div>';
     }
+  },
+
+  async renderMargenAnimal(params) {
+    if (window.MargenAnimalView) { await MargenAnimalView.render(); }
   },
 
   async renderAlbaranesVentas(params) {
