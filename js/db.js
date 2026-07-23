@@ -559,6 +559,13 @@ async function initDB() {
             }
 
             // v20: Campo de pago pendiente para compras y ventas
+            // NOTA (2026-07): compras_ganado quedó huérfano — Produccion.saveCompras/
+            // listCompras (y el módulo js/compras.js) se eliminaron por no tener nunca
+            // una UI real ni caso de uso confirmado. El equivalente real de "compra" en
+            // la BD legacy auditada (INGVAC.DAT) es una entrada de stock de almacén con
+            // precio, ya cubierto por precioUnitario/proveedorId/factura en
+            // botiquin_lotes y registro_eventos (ver js/views/botiquin-view.js). El store
+            // se conserva vacío para no forzar una migración destructiva de IndexedDB.
             if (oldVersion < 20) {
                 // Ensure compras_ganado store exists
                 if (!db.objectStoreNames.contains('compras_ganado')) {
