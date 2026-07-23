@@ -39,7 +39,7 @@ MargenAnimal.calcular(animalId) → {
   costeSanidad,        // suma de costes de tratamientos + vacunaciones de este animal
   costeTotal,           // costeCompra + costeSanidad
   litrosLeche,          // suma de cantidad_litros en produccion_leche para este vacaId
-  ingresoLeche,          // litrosLeche × precio_base_referencia del contrato activo
+  ingresoLeche,          // litrosLeche × precio_unitario de leche del contrato activo
   ingresoVenta,           // precio_total si el animal está en comercializacion_carne
   ingresoTotal,            // ingresoLeche + ingresoVenta
   margenNeto               // ingresoTotal - costeTotal
@@ -54,11 +54,11 @@ MargenAnimal.calcularParaFinca(fincaId) → [ {...margen de cada animal de todos
 - Tratamientos/vacunaciones sin `animalId` (masivos, todo el rebaño o una categoría): se toma el `costeTotal` del consumo de botiquín vinculado y se divide entre el número de animales activos del rebaño en la fecha del tratamiento; a este animal le corresponde una parte igual.
 - Mismo criterio para vacunaciones, teniendo en cuenta que cada `tipos_vacuna[]` puede tener su propio `botiquinProductoId`/consumo — se suma el coste de cada tipo vinculado a esa vacunación, prorrateado igual que los tratamientos si `animales_vacunados` no especifica `animalId` (modo categoría/agregado).
 
-**Cálculo del ingreso de leche**: se obtiene el contrato activo del comprador principal de la finca vía `Contratos.getActivo()`; si no hay contrato activo, `ingresoLeche` queda en `0` y se marca `sinContratoActivo: true` en el resultado para que la UI pueda avisarlo.
+**Cálculo del ingreso de leche**: no existe un "comprador principal" fijo por finca (se elige manualmente en cada albarán), así que se toma `Compradores.list({tipo: 'leche'})` y se recorre en orden hasta encontrar el primero que tenga `Contratos.getActivo(compradorId, 'leche')` no nulo. Dentro de `contrato.precios[]` (array de `{producto, precio_unitario, unidad, desde, hasta}`), se busca la primera fila cuyo `producto` coincida con "leche" (comparación case-insensitive) y esté vigente hoy según `desde`/`hasta` (fila válida si `desde` es null o ≤ hoy, y `hasta` es null o ≥ hoy). Se usa su `precio_unitario`. Si no hay ningún comprador de leche con contrato activo, o ninguno tiene fila de precio vigente para "leche", `ingresoLeche` queda en `0` y se marca `sinPrecioLeche: true` en el resultado para que la UI pueda avisarlo.
 
 ### 3. UI: nueva sección en la ficha del animal
 
-En `js/views/animales-view.js`, dentro de `renderDetalle()`, se añade una sección "MARGEN ECONÓMICO" (mismo patrón visual que las secciones existentes: "DATOS DE COMPRA", "LIBRO DE REGISTRO") mostrando: coste total, ingreso total, margen neto (con color verde/rojo según signo), y el desglose (coste compra, coste sanidad, litros/ingreso leche, ingreso venta). Si `sinContratoActivo` es `true`, se muestra un aviso de que el ingreso de leche es 0 por falta de contrato.
+En `js/views/animales-view.js`, dentro de `renderDetalle()`, se añade una sección "MARGEN ECONÓMICO" (mismo patrón visual que las secciones existentes: "DATOS DE COMPRA", "LIBRO DE REGISTRO") mostrando: coste total, ingreso total, margen neto (con color verde/rojo según signo), y el desglose (coste compra, coste sanidad, litros/ingreso leche, ingreso venta). Si `sinPrecioLeche` es `true`, se muestra un aviso de que el ingreso de leche es 0 por falta de contrato/precio de leche vigente.
 
 ### 4. UI: nueva vista de ranking
 
