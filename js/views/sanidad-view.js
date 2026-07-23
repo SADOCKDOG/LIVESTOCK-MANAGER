@@ -261,17 +261,13 @@ const SanidadView = {
       const v = await window.Vacunaciones.get(id);
       if (!v) return;
 
-      const overlay = document.createElement('div');
-      overlay.className = 'wizard-full-screen';
-      overlay.style.justifyContent = 'center';
-      overlay.style.alignItems = 'center';
-      overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+      const modalId = 'modal-opciones-vacunacion';
       const tiposHtml = (v.tipos_vacuna || []).map((t) => `
         <div class="p-8 mb-6 bg-black border border-222 rounded-sm">
           <div class="text-white font-900 text-xs uppercase">${t.tipo}</div>
           <div class="text-[0.6rem] text-gray uppercase">${[t.lote && `Lote: ${t.lote}`, t.dosis && `Dosis: ${t.dosis}`, t.nombre_comercial].filter(Boolean).join(' · ')}</div>
         </div>`).join('');
-      overlay.innerHTML = `
+      const html = `
           <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-info); background: #1e1e1e; width: 100%;">
               <h3 class="mt-0 text-white font-900 uppercase tracking-wider"><span style="color: var(--c-info); margin-right: 4px;">|</span> VACUNACIÓN — ${v.cerrada ? 'CERRADA' : 'ABIERTA'}</h3>
               <p class="text-xs text-gray mb-15">${this._fmtFecha(v.fecha)} · ${v.veterinario || 'Sin veterinario'}</p>
@@ -288,12 +284,14 @@ const SanidadView = {
 
               <div class="flex gap-10 mt-20">
                   ${!v.cerrada ? `<button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-cerrar-vac">${Icons.check()} Cerrar</button>` : ''}
-                  <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-anular-vac">${Icons.eliminar()} Anular</button>
+                  <button class="wizard-btn-action wizard-btn-danger ${v.cerrada ? 'w-full' : 'flex-1'}" id="btn-anular-vac">${Icons.eliminar()} Anular</button>
                 </div>
-                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="this.closest('.wizard-full-screen').remove()">${Icons.cerrar()} Cerrar ventana</button>
+                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" id="${modalId}-cancel">${Icons.cerrar()} Cerrar ventana</button>
             </div>
           </div>`;
-      document.body.appendChild(overlay);
+      const overlay = ModalManager.show(modalId, html, { closeOnOverlayClick: false });
+
+      overlay.querySelector('#' + modalId + '-cancel').onclick = () => ModalManager.close(modalId);
 
       const btnCerrar = overlay.querySelector('#btn-cerrar-vac');
       if (btnCerrar) {
@@ -301,7 +299,7 @@ const SanidadView = {
           if (!await Confirm.confirm('Cerrar vacunación', 'Una vez cerrada, no podrás editarla (solo anularla). ¿Continuar?', false)) return;
           await window.Vacunaciones.cerrar(id);
           App.toast('Vacunación cerrada', 'success');
-          overlay.remove();
+          ModalManager.close(modalId);
           App.route();
         };
       }
@@ -310,7 +308,7 @@ const SanidadView = {
         if (!await Confirm.confirm('Anular vacunación', '¿Anular esta vacunación de forma trazable? No se borrará, quedará marcada como anulada.', true)) return;
         await window.Vacunaciones.anular(id, '');
         App.toast('Vacunación anulada', 'success');
-        overlay.remove();
+        ModalManager.close(modalId);
         App.route();
       };
     } catch (e) {
@@ -323,12 +321,8 @@ const SanidadView = {
       const t = await Sanitarios.get(id);
       if (!t) return;
 
-      const overlay = document.createElement("div");
-      overlay.className = "wizard-full-screen";
-      overlay.style.justifyContent = "center";
-      overlay.style.alignItems = "center";
-      overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
-      overlay.innerHTML = `
+      const modalId = 'modal-editar-tratamiento';
+      const html = `
           <div class="card p-25" style="max-width:420px; overflow-y:auto; max-height:90vh; border: 1px solid var(--c-purple); background: #1e1e1e; width: 100%;">
               <h3 class="mt-0 text-white font-900 uppercase tracking-wider"><span style="color: var(--c-purple); margin-right: 4px;">|</span> EDITAR TRATAMIENTO</h3>
               <p class="text-xs text-gray mb-15">ID Interno: ${t.id}</p>
@@ -364,13 +358,15 @@ const SanidadView = {
                   <button class="wizard-btn-action wizard-btn-primary flex-2" id="btn-save-san">${Icons.guardar()} Guardar</button>
                   <button class="wizard-btn-action wizard-btn-danger flex-1" id="btn-del-san">${Icons.eliminar()} Borrar</button>
                 </div>
-                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" onclick="SanidadView._cerrarOverlayRegistro(this)">${Icons.cerrar()} Cancelar</button>
+                <button class="wizard-btn-action wizard-btn-secondary mt-10 w-full" id="${modalId}-cancel">${Icons.cerrar()} Cancelar</button>
             </div>
           </div>`;
-      document.body.appendChild(overlay);
+      const overlay = ModalManager.show(modalId, html, { closeOnOverlayClick: false });
 
       SanidadView._registroGuardado = false;
       App.setExitGuard(() => SanidadView._confirmSalirOverlayRegistro());
+
+      overlay.querySelector('#' + modalId + '-cancel').onclick = () => SanidadView._cerrarOverlayRegistro(modalId);
 
       overlay.querySelector('#btn-save-san').onclick = async () => {
         const medicamento = overlay.querySelector('#edit-san-medicamento').value.trim();
@@ -394,7 +390,7 @@ const SanidadView = {
         SanidadView._registroGuardado = true;
         App.clearExitGuard();
         App.toast("Tratamiento actualizado", "success");
-        overlay.remove();
+        ModalManager.close(modalId);
         App.route();
       };
 
@@ -404,7 +400,7 @@ const SanidadView = {
         SanidadView._registroGuardado = true;
         App.clearExitGuard();
         App.toast("Tratamiento eliminado", "success");
-        overlay.remove();
+        ModalManager.close(modalId);
         App.route();
       };
     } catch (e) {
@@ -418,11 +414,10 @@ const SanidadView = {
     return await Confirm.confirm("Salir sin guardar", "¿Cerrar sin guardar datos?", false);
   },
 
-  async _cerrarOverlayRegistro(btn) {
+  async _cerrarOverlayRegistro(modalId) {
     if (!(await this._confirmSalirOverlayRegistro())) return;
     App.clearExitGuard();
-    const overlay = btn.closest('.wizard-full-screen');
-    if (overlay) overlay.remove();
+    ModalManager.close(modalId);
   }
 };
 
