@@ -423,19 +423,10 @@ const RebanosView = {
 
         </div>
         <div class="wizard-footer-fixed border-top-222">
-          <div class="grid grid-cols-3 gap-8 w-full">
-            <button type="button" onclick="RebanosView._eliminarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
-              ${Icons.eliminar()}
-              <span class="widget-link-label">Eliminar</span>
-            </button>
-            <button type="button" onclick="RebanosView._salirDetalle()" class="widget-link-btn widget-link-btn--neon px-4">
-              ${Icons.cerrar()}
-              <span class="widget-link-label">Cancelar</span>
-            </button>
-            <button type="button" onclick="RebanosView._guardarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-success px-4">
-              ${Icons.guardar()}
-              <span class="widget-link-label">Guardar</span>
-            </button>
+          <button type="button" onclick="RebanosView._eliminarRebano(${id})" class="wizard-btn-action wizard-btn-danger">${Icons.eliminar()} Eliminar</button>
+          <div class="wizard-footer-buttons">
+            <button type="button" onclick="RebanosView._salirDetalle()" class="wizard-btn-action wizard-btn-secondary">${Icons.cerrar()} Cancelar</button>
+            <button type="button" onclick="RebanosView._guardarRebano(${id})" class="wizard-btn-action wizard-btn-success">${Icons.guardar()} Guardar</button>
           </div>
         </div>
       </div>`;
