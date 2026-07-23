@@ -3448,7 +3448,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
    Solo la sección activa se muestra, ampliada, en un marco centrado; el
    resto se accede con las flechas laterales (circular: de la última se
    vuelve a la primera), con los puntos de posición de abajo, o tocando el
-   marco activo para desplegar el menú con todos los submódulos. */
+   marco activo para desplegar el menú con todos los submódulos.
+   Cromática: --mode-color es el color de pantalla FIJO del módulo principal
+   (verde lima GeGan / azul ExPro / amarillo CoMer — igual para todos sus
+   submódulos); los iconos SVG (marco, vista previa de flechas, menú) llevan
+   su propio color de submódulo vía color inline, independiente del cromo. */
+.carrusel-modulo {
+  width: 100%;
+  box-sizing: border-box;
+}
 .carrusel-pestanas-wrapper {
   position: relative;
   width: 100%;
@@ -3475,8 +3483,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border: 1px solid var(--mode-color, rgba(255, 255, 255, 0.1));
   border-radius: var(--r-xl);
   box-shadow: 0 0 14px var(--mode-color), inset 0 0 8px color-mix(in srgb, var(--mode-color) 25%, transparent);
-  color: var(--mode-color);
-  text-shadow: 0 0 8px var(--mode-color);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.5px;
@@ -3488,16 +3494,27 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .carrusel-marco:disabled {
   cursor: default;
 }
-.carrusel-marco svg {
+/* Icono del marco: retroiluminado fijo con su propio color de submódulo (no el color de pantalla) */
+.carrusel-marco-icon {
+  display: inline-flex;
+  align-items: center;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+.carrusel-marco-icon svg {
   width: 17px;
   height: 17px;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 5px var(--mode-color));
+}
+/* Etiqueta de texto del marco: sigue el color de pantalla fijo del módulo */
+.carrusel-marco-label {
+  color: var(--mode-color);
+  text-shadow: 0 0 8px var(--mode-color);
 }
 .carrusel-marco-chevron {
   display: inline-flex;
   align-items: center;
   margin-left: 2px;
+  color: var(--mode-color);
   transition: transform 0.2s ease;
 }
 .carrusel-marco-chevron svg {
@@ -3559,11 +3576,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   text-align: left;
   flex-shrink: 0;
 }
-.carrusel-menu-item svg {
+/* Icono del menú: conserva su propio color de submódulo */
+.carrusel-menu-item-icon {
+  display: inline-flex;
+  align-items: center;
+}
+.carrusel-menu-item-icon svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: var(--mode-color);
 }
 .carrusel-menu-item:active {
   background: rgba(255, 255, 255, 0.06);
@@ -4127,8 +4148,10 @@ body.glow-botones-off .widget-link-btn--neon { box-shadow: none; }
 body.glow-botones-off .widget-link-btn--neon svg { filter: none; }
 body.glow-botones-off .more-sheet-item svg { filter: none; }
 body.glow-botones-off .more-sheet-item:active { box-shadow: none; }
-body.glow-botones-off .carrusel-marco { box-shadow: none; text-shadow: none; }
-body.glow-botones-off .carrusel-marco svg { filter: none; }
+body.glow-botones-off .carrusel-marco { box-shadow: none; }
+body.glow-botones-off .carrusel-marco-label { text-shadow: none; }
+body.glow-botones-off .carrusel-marco-icon { filter: none; }
+body.glow-botones-off .carrusel-menu-item.active { text-shadow: none; }
 body.glow-botones-off .carrusel-flecha { box-shadow: none; }
 body.glow-botones-off .carrusel-flecha-arrow { animation: none; filter: none; }
 body.glow-botones-off .carrusel-flecha-preview { filter: none; }

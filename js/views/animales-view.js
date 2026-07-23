@@ -8,7 +8,7 @@ const AnimalesView = {
   _filtroActivo: { especie: '', sexo: '', estado: '' },
 
   async render() {
-    if (window.App) App.updateHeaderColor('animales');
+    // Color de pantalla: lo fija GanaderiaView (color fijo de GeGan), esta vista siempre va embebida en su carrusel.
     const main = document.getElementById("ganaderia-tab-content") || document.getElementById("app-content");
     const animales = await Animales.list();
     const rebanos = await Rebanos.list();
