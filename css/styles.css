@@ -3454,6 +3454,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   box-sizing: border-box;
   padding: 4px 16px;
   position: relative;
+  scroll-behavior: smooth;
 }
 .pestanas-premium-container::-webkit-scrollbar {
   display: none;
