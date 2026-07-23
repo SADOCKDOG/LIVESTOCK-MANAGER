@@ -55,13 +55,16 @@ const Botiquin = {
         });
 
       let restante = cantidadNum;
+      let costeTotal = 0;
       for (const lote of lotesFEFO) {
         if (restante <= 0) break;
         const aDescontar = Math.min(restante, Number(lote.cantidad));
+        costeTotal += aDescontar * Number(lote.precioUnitario || 0);
         lote.cantidad = Number(lote.cantidad) - aDescontar;
         await window.db.put('botiquin_lotes', lote);
         restante -= aDescontar;
       }
+      costeTotal = Number(costeTotal.toFixed(2));
 
       p.cantidadActual = Number(p.cantidadActual || 0) - cantidadNum;
       await window.db.put('config_botiquin', p);
@@ -79,6 +82,7 @@ const Botiquin = {
         fecha: opts.fecha || new Date().toISOString().split('T')[0],
         valor_neto: cantidadNum,
         unidad: p.unidad,
+        costeTotal,
         descripcion: `Consumo de ${cantidadNum} ${p.unidad || ''} de ${p.nombre}${origenDesc ? ` (${origenDesc})` : ''}`,
         origen_tipo: opts.origenTipo || null,
         origen_id: opts.origenId != null ? Number(opts.origenId) : null,
@@ -89,7 +93,7 @@ const Botiquin = {
         window.EventBus.emit('botiquin:consumido', { productoId: p.id, cantidad: cantidadNum, origenTipo: opts.origenTipo || null, origenId: opts.origenId || null });
       }
 
-      return { productoId: p.id, consumido: cantidadNum, restante: p.cantidadActual };
+      return { productoId: p.id, consumido: cantidadNum, restante: p.cantidadActual, costeTotal };
     }, { entity: 'Botiquin', action: 'consumir', productoId, cantidad });
   },
 
