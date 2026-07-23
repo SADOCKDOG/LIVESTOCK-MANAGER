@@ -7,8 +7,8 @@ const NotificacionesService = {
     _plugin: null,
 
     async init() {
-        if (!window.Capacitor || !window.Capacitor.Plugins.LocalNotifications) {
-            console.warn('[NotificacionesService] Plugin no detectado (entorno web o plugin no instalado).');
+        if (!window.Capacitor?.Plugins?.LocalNotifications) {
+            console.warn('[NotificacionesService] Plugin LocalNotifications no detectado (entorno web o plugin no instalado).');
             return false;
         }
         this._plugin = window.Capacitor.Plugins.LocalNotifications;

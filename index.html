@@ -128,7 +128,7 @@
         const diag = document.getElementById('error-diag');
         if (diag) {
           diag.style.display = 'block';
-          diag.innerHTML = 'Se ha producido un error. Pulsa para continuar.\n\n<small style="opacity:0.5">Detalles técnicos disponibles en consola</small>';
+          diag.innerHTML = 'Se ha producido un error: ' + msg + '<br>en ' + url + ':' + line + ':' + col + '\n\n<small style="opacity:0.5">Detalles técnicos disponibles en consola</small>';
           diag.onclick = () => diag.style.display = 'none';
         }
         console.error('[Error]', msg, '\nArchivo:', url, '\nLínea:', line, '\nCol:', col, '\nStack:', err?.stack);
@@ -270,9 +270,6 @@
     <!-- Servicios del Sistema (Capa de Infraestructura) -->
     <script src="js/services/event-bus.js?v=6.28"></script>
     <script src="js/services/cache-service.js?v=6.28"></script>
-    <script src="js/services/alertas-service.js?v=6.28"></script>
-    <script src="js/services/agenda-service.js?v=1.0"></script>
-    <script src="js/services/notificaciones-service.js?v=1.0"></script>
     <script src="js/services/balance-service.js?v=6.28"></script>
     <script src="js/services/comunidades-service.js?v=6.28"></script>
     <script src="js/services/pdf-service.js?v=6.31"></script>
@@ -356,6 +353,11 @@
     <script src="js/pedidos-crotales.js?v=6.28"></script>
     <script src="js/notificaciones-rega.js?v=6.28"></script>
     <script src="js/liquidacion.js?v=6.28"></script>
+
+    <!-- 5cº Servicios de Agenda y Notificaciones (Cargar al final de modelos) -->
+    <script src="js/services/alertas-service.js?v=6.28"></script>
+    <script src="js/services/agenda-service.js?v=1.0"></script>
+    <script src="js/services/notificaciones-service.js?v=1.0"></script>
 
     <!-- 6º Arrancar el Controlador de la Aplicación (Orquestador Central) -->
     <script src="js/app.js?v=6.31"></script>

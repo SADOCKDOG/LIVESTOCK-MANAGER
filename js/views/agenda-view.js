@@ -104,7 +104,7 @@ const AgendaView = {
                             </div>
                             <h4 class="text-sm font-950 text-white uppercase truncate">${t.titulo}</h4>
                             <p class="text-[0.7rem] text-gray-400 font-bold uppercase mt-2">
-                                ${Icons.calendario()} ${UI.formatDate(t.fecha_planificada)}
+                                ${Icons.calendar()} ${UI.formatDate(t.fecha_planificada)}
                             </p>
                         </div>
                         <div class="flex flex-col gap-6 items-end">
@@ -184,7 +184,7 @@ const AgendaView = {
                                 <div class="min-w-0 flex-1">
                                     <div class="text-[0.75rem] font-900 text-white truncate uppercase">${t.titulo}</div>
                                     <div class="text-[0.55rem] font-800 uppercase mt-2 ${esVencida ? 'text-red' : 'text-gray-500'}">
-                                        ${Icons.calendario()} ${UI.formatDate(t.fecha_planificada)} ${esVencida ? '· VENCIDA' : ''}
+                                        ${Icons.calendar()} ${UI.formatDate(t.fecha_planificada)} ${esVencida ? '· VENCIDA' : ''}
                                     </div>
                                 </div>
                                 <button onclick="AgendaView._completarTareaRapido(${t.id}, '${moduloId}')" class="btn btn-sm btn-secondary px-8 py-4 min-h-0 h-auto font-950 text-[0.6rem] ml-10">OK</button>
