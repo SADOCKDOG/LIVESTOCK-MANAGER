@@ -125,6 +125,13 @@ const BotiquinView = {
     // Obtener lotes del producto
     const lotes = await window.db.getAllFromIndex('botiquin_lotes', 'productoId', id).catch(() => []);
 
+    // Proveedores para resolver el nombre en los movimientos de entrada con compra
+    const proveedoresMap = {};
+    if (window.Proveedores) {
+      const proveedores = await window.Proveedores.list().catch(() => []);
+      proveedores.forEach(pr => { proveedoresMap[pr.id] = pr.nombre; });
+    }
+
     BotiquinView._guardado = false;
     App.setExitGuard(() => BotiquinView._confirmSalirEdicion());
 
@@ -203,6 +210,7 @@ const BotiquinView = {
                     <span class="text-[0.6rem] font-black text-white uppercase block">${m.motivo_tarea === 'entrada_botiquin' ? 'ENTRADA' : 'CONSUMO'}</span>
                     <span class="text-[0.55rem] font-bold text-gray-500 block mt-2">${m.fecha}</span>
                     ${m.origen_tipo ? `<span class="text-[0.5rem] font-bold text-info block mt-1 uppercase">Vinculado a ${m.origen_tipo === 'tratamiento' ? 'tratamiento' : 'vacunación'} #${m.origen_id}</span>` : ''}
+                    ${m.precioTotal != null ? `<span class="text-[0.5rem] font-bold text-gold block mt-1 uppercase">Coste: ${m.precioTotal.toFixed(2)} €${m.proveedorId && proveedoresMap[m.proveedorId] ? ` · ${proveedoresMap[m.proveedorId]}` : ''}${m.factura ? ` · Fact. ${m.factura}` : ''}</span>` : ''}
                   </div>
                   <strong class="text-xs font-black" style="color:${m.motivo_tarea === 'entrada_botiquin' ? 'var(--c-success)' : 'var(--c-danger)'};">
                     ${m.motivo_tarea === 'entrada_botiquin' ? '+' : '-'}${m.valor_neto || 0} ${p.unidad || ''}
@@ -394,6 +402,12 @@ const BotiquinView = {
     // Obtener lotes existentes del producto
     const lotesExistentes = await window.db.getAllFromIndex('botiquin_lotes', 'productoId', id).catch(() => []);
 
+    // Proveedores activos, solo relevantes para entradas (equivalente a
+    // INGVAC.DAT de la BD legacy: entrada de stock con precio por dosis).
+    const proveedores = tipo === 'entrada' && window.Proveedores
+      ? await window.Proveedores.list({ activo: true }).catch(() => [])
+      : [];
+
     const wizardSteps = [
       {
         content: (data) => {
@@ -408,6 +422,26 @@ const BotiquinView = {
               <div class="wizard-input-group">
                 <label class="wizard-label" for="w-mov-caducidad">CADUCIDAD</label>
                 <input type="date" id="w-mov-caducidad" value="${data.caducidad || ''}" class="wizard-input">
+              </div>
+              <div class="border-top-222 pt-12 mt-8">
+                <div class="text-[0.6rem] text-gold uppercase font-950 tracking-wider mb-8">DATOS DE COMPRA (OPC.)</div>
+                <div class="grid grid-cols-2 gap-10">
+                  <div class="wizard-input-group">
+                    <label class="wizard-label" for="w-mov-precio">PRECIO UNITARIO (€)</label>
+                    <input type="number" id="w-mov-precio" value="${data.precioUnitario || ''}" min="0" step="0.01" class="wizard-input" placeholder="Ej: 1.25">
+                  </div>
+                  <div class="wizard-input-group">
+                    <label class="wizard-label" for="w-mov-proveedor">PROVEEDOR</label>
+                    <select id="w-mov-proveedor" class="wizard-input">
+                      <option value="">— SIN ESPECIFICAR —</option>
+                      ${proveedores.map(pr => `<option value="${pr.id}" ${data.proveedorId == pr.id ? 'selected' : ''}>${pr.nombre.toUpperCase()}</option>`).join('')}
+                    </select>
+                  </div>
+                </div>
+                <div class="wizard-input-group mt-8">
+                  <label class="wizard-label" for="w-mov-factura">Nº FACTURA</label>
+                  <input type="text" id="w-mov-factura" value="${data.factura || ''}" class="wizard-input uppercase" placeholder="Opcional">
+                </div>
               </div>
             `;
           } else {
@@ -491,6 +525,11 @@ const BotiquinView = {
           if (tipo === 'entrada') {
             data.lote = document.getElementById('w-mov-lote')?.value.trim() || '';
             data.caducidad = document.getElementById('w-mov-caducidad')?.value || null;
+            const precioVal = document.getElementById('w-mov-precio')?.value;
+            data.precioUnitario = precioVal ? Number(precioVal) : null;
+            const proveedorVal = document.getElementById('w-mov-proveedor')?.value;
+            data.proveedorId = proveedorVal ? Number(proveedorVal) : null;
+            data.factura = document.getElementById('w-mov-factura')?.value.trim() || '';
           } else {
             data.loteSeleccionado = document.getElementById('w-mov-lote')?.value || '';
           }
@@ -533,6 +572,9 @@ const BotiquinView = {
                 // Actualizar lote existente (sumar cantidad)
                 loteExistente.cantidad = Number(loteExistente.cantidad || 0) + finalData.cantidad;
                 loteExistente.caducidad = finalData.caducidad || loteExistente.caducidad; // Mantener la caducidad más antigua si se proporciona
+                if (finalData.precioUnitario != null) loteExistente.precioUnitario = finalData.precioUnitario;
+                if (finalData.proveedorId != null) loteExistente.proveedorId = finalData.proveedorId;
+                if (finalData.factura) loteExistente.factura = finalData.factura;
                 await window.db.put('botiquin_lotes', loteExistente);
               } else {
                 // Crear nuevo lote
@@ -541,6 +583,9 @@ const BotiquinView = {
                   lote: finalData.lote.trim(),
                   caducidad: finalData.caducidad || null,
                   cantidad: finalData.cantidad,
+                  precioUnitario: finalData.precioUnitario ?? null,
+                  proveedorId: finalData.proveedorId ?? null,
+                  factura: finalData.factura || '',
                   creadoEn: new Date().toISOString()
                 });
               }
@@ -601,6 +646,10 @@ const BotiquinView = {
             }${
               tipo === 'consumo' && finalData.loteSeleccionado ? ` (Lote: ${finalData.loteSeleccionado})` : ''
             }`,
+            precioUnitario: tipo === 'entrada' ? (finalData.precioUnitario ?? null) : null,
+            precioTotal: tipo === 'entrada' && finalData.precioUnitario != null ? Number((finalData.precioUnitario * finalData.cantidad).toFixed(2)) : null,
+            proveedorId: tipo === 'entrada' ? (finalData.proveedorId ?? null) : null,
+            factura: tipo === 'entrada' ? (finalData.factura || null) : null,
             creadoEn: new Date().toISOString(),
           });
 
