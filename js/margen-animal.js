@@ -29,48 +29,50 @@ const MargenAnimal = {
    * animales del rebaño en el momento del evento.
    */
   async calcularCosteSanidad(animalId) {
-    const animal = await window.Animales.get(Number(animalId));
-    if (!animal || !animal.rebanoId) return 0;
+    return await ErrorHandler.tryAsync(async () => {
+      const animal = await window.Animales.get(Number(animalId));
+      if (!animal || !animal.rebanoId) return 0;
 
-    const rebanoId = animal.rebanoId;
-    const costesPorOrigen = await this._costesPorOrigen(animal.fincaId ?? (await window.db.get('rebanos', rebanoId))?.fincaId);
-    const animalesDelRebano = await window.Animales.list(rebanoId);
-    const totalAnimalesRebano = animalesDelRebano.length || 1;
+      const rebanoId = animal.rebanoId;
+      const costesPorOrigen = await this._costesPorOrigen(animal.fincaId ?? (await window.db.get('rebanos', rebanoId))?.fincaId);
+      const animalesDelRebano = await window.Animales.list(rebanoId);
+      const totalAnimalesRebano = animalesDelRebano.length || 1;
 
-    let coste = 0;
+      let coste = 0;
 
-    // Tratamientos
-    const tratamientos = await window.Sanitarios.list(rebanoId);
-    for (const t of tratamientos) {
-      const costeEvento = costesPorOrigen.get(`tratamiento:${t.id}`) || 0;
-      if (costeEvento === 0) continue;
-      if (t.animalId != null) {
-        if (Number(t.animalId) === Number(animalId)) coste += costeEvento;
-      } else {
-        coste += costeEvento / totalAnimalesRebano;
-      }
-    }
-
-    // Vacunaciones
-    const vacunaciones = await window.Vacunaciones.list({ rebanoId });
-    for (const v of vacunaciones) {
-      const costeEvento = costesPorOrigen.get(`vacunacion:${v.id}`) || 0;
-      if (costeEvento === 0) continue;
-      const animalesVacunados = Array.isArray(v.animales_vacunados) ? v.animales_vacunados : [];
-      const esIndividual = animalesVacunados.some((av) => av.animalId != null);
-      if (esIndividual) {
-        const estaEsteAnimal = animalesVacunados.some((av) => Number(av.animalId) === Number(animalId));
-        if (estaEsteAnimal) {
-          // Coste repartido entre los animales individuales de esta vacunación
-          coste += costeEvento / animalesVacunados.length;
+      // Tratamientos
+      const tratamientos = await window.Sanitarios.list(rebanoId);
+      for (const t of tratamientos) {
+        const costeEvento = costesPorOrigen.get(`tratamiento:${t.id}`) || 0;
+        if (costeEvento === 0) continue;
+        if (t.animalId != null) {
+          if (Number(t.animalId) === Number(animalId)) coste += costeEvento;
+        } else {
+          coste += costeEvento / totalAnimalesRebano;
         }
-      } else {
-        // Modo categoría/agregado: prorratea entre todo el rebaño
-        coste += costeEvento / totalAnimalesRebano;
       }
-    }
 
-    return Number(coste.toFixed(2));
+      // Vacunaciones
+      const vacunaciones = await window.Vacunaciones.list({ rebanoId });
+      for (const v of vacunaciones) {
+        const costeEvento = costesPorOrigen.get(`vacunacion:${v.id}`) || 0;
+        if (costeEvento === 0) continue;
+        const animalesVacunados = Array.isArray(v.animales_vacunados) ? v.animales_vacunados : [];
+        const esIndividual = animalesVacunados.some((av) => av.animalId != null);
+        if (esIndividual) {
+          const estaEsteAnimal = animalesVacunados.some((av) => Number(av.animalId) === Number(animalId));
+          if (estaEsteAnimal) {
+            // Coste repartido entre los animales individuales de esta vacunación
+            coste += costeEvento / animalesVacunados.length;
+          }
+        } else {
+          // Modo categoría/agregado: prorratea entre todo el rebaño
+          coste += costeEvento / totalAnimalesRebano;
+        }
+      }
+
+      return Number(coste.toFixed(2));
+    }, { entity: 'MargenAnimal', action: 'calcularCosteSanidad', animalId });
   },
 };
 
