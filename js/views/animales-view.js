@@ -284,29 +284,6 @@ const AnimalesView = {
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
         <div class="wizard-header-fixed border-top-5-gold">
-          <div class="grid ${esNuevo ? 'grid-cols-3' : 'grid-cols-5'} gap-8 mb-10">
-            ${!esNuevo ? `
-            <button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-info px-4">
-              ${Icons.rotacion()}
-              <span class="widget-link-label">360°</span>
-            </button>
-            <button type="button" onclick="location.hash='/animal-bitacora?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-accent px-4">
-              ${Icons.documento()}
-              <span class="widget-link-label">BITÁCORA</span>
-            </button>
-            <button type="button" onclick="AnimalesView._eliminarAnimal(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
-              ${Icons.eliminar()}
-              <span class="widget-link-label">ELIMINAR</span>
-            </button>` : '<div></div>'}
-            <button type="button" onclick="AnimalesView._salirRegistro()" class="widget-link-btn widget-link-btn--neon px-4">
-              ${Icons.cerrar()}
-              <span class="widget-link-label">SALIR</span>
-            </button>
-            <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="widget-link-btn widget-link-btn--neon neon-success px-4">
-              ${Icons.guardar()}
-              <span class="widget-link-label">GUARDAR</span>
-            </button>
-          </div>
           <div class="flex justify-between items-center">
             <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.animales()} FICHA ANIMAL</h1>
             <div class="flex gap-10">
@@ -584,6 +561,31 @@ const AnimalesView = {
                 <span class="widget-link-label">Gestión Repro.</span>
               </button>
             </div>` : ""}
+        </div>
+        <div class="wizard-footer-fixed border-top-222">
+          <div class="grid ${esNuevo ? 'grid-cols-2' : 'grid-cols-5'} gap-8 w-full">
+            ${!esNuevo ? `
+            <button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-info px-4">
+              ${Icons.rotacion()}
+              <span class="widget-link-label">360°</span>
+            </button>
+            <button type="button" onclick="location.hash='/animal-bitacora?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-accent px-4">
+              ${Icons.documento()}
+              <span class="widget-link-label">BITÁCORA</span>
+            </button>
+            <button type="button" onclick="AnimalesView._eliminarAnimal(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
+              ${Icons.eliminar()}
+              <span class="widget-link-label">ELIMINAR</span>
+            </button>` : ''}
+            <button type="button" onclick="AnimalesView._salirRegistro()" class="widget-link-btn widget-link-btn--neon px-4">
+              ${Icons.cerrar()}
+              <span class="widget-link-label">SALIR</span>
+            </button>
+            <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="widget-link-btn widget-link-btn--neon neon-success px-4">
+              ${Icons.guardar()}
+              <span class="widget-link-label">GUARDAR</span>
+            </button>
+          </div>
         </div>
       </div>`;
 
