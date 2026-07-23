@@ -623,11 +623,11 @@ const App = {
     const flechaIzq = single ? '' : `
         <button type="button" class="carrusel-flecha carrusel-flecha-izq pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${cerrarYNavegar(prev.key)}" aria-label="Anterior: ${prev.label}" title="${prev.label}">
           <span class="carrusel-flecha-preview" style="color:${prev.color};">${prev.icon}</span>
-          ${Icons.atras()}
+          <span class="carrusel-flecha-arrow">${Icons.atras()}</span>
         </button>`;
     const flechaDer = single ? '' : `
         <button type="button" class="carrusel-flecha carrusel-flecha-der pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${cerrarYNavegar(next.key)}" aria-label="Siguiente: ${next.label}" title="${next.label}">
-          ${Icons.siguiente()}
+          <span class="carrusel-flecha-arrow">${Icons.siguiente()}</span>
           <span class="carrusel-flecha-preview" style="color:${next.color};">${next.icon}</span>
         </button>`;
     const dots = single ? '' : `

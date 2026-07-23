@@ -3589,9 +3589,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6), 0 0 6px var(--mode-color, rgba(255, 255, 255, 0.2));
   transition: transform 0.2s ease;
 }
-.carrusel-flecha.pestana-flecha-activa {
-  animation: pestanaPulse 2s infinite ease-in-out;
-}
 .carrusel-flecha:active {
   transform: scale(0.92);
 }
@@ -3601,14 +3598,28 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   stroke-width: 3;
   flex-shrink: 0;
 }
+/* Icono de vista previa (módulo adyacente): retroiluminado fijo, sin parpadeo */
 .carrusel-flecha-preview {
   display: inline-flex;
   align-items: center;
-  opacity: 0.6;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px currentColor);
 }
 .carrusel-flecha-preview svg {
   width: 14px;
   height: 14px;
+}
+/* Flecha de dirección: única parte con destello intermitente */
+.carrusel-flecha-arrow {
+  display: inline-flex;
+  align-items: center;
+}
+.carrusel-flecha.pestana-flecha-activa .carrusel-flecha-arrow {
+  animation: carruselFlechaDestello 2s infinite ease-in-out;
+}
+@keyframes carruselFlechaDestello {
+  0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 2px var(--mode-color, rgba(255, 255, 255, 0.2))); }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px var(--mode-color, rgba(255, 255, 255, 0.6))); }
 }
 .carrusel-dots {
   display: flex;
@@ -3723,17 +3734,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 .module-header-secondary-actions .widget-link-btn--neon svg { width: 18px; height: 18px; }
 .module-header-secondary-actions .widget-link-label { font-size: 0.62rem; }
-
-@keyframes pestanaPulse {
-  0%, 100% {
-    opacity: 0.4;
-    box-shadow: 0 0 4px var(--mode-color, rgba(255,255,255,0.1));
-  }
-  50% {
-    opacity: 1;
-    box-shadow: 0 0 12px var(--mode-color, rgba(255,255,255,0.5));
-  }
-}
 
 /* botón widget-link con efecto neon — color via CSS vars */
 .widget-link-btn--neon {
@@ -4129,7 +4129,9 @@ body.glow-botones-off .more-sheet-item svg { filter: none; }
 body.glow-botones-off .more-sheet-item:active { box-shadow: none; }
 body.glow-botones-off .carrusel-marco { box-shadow: none; text-shadow: none; }
 body.glow-botones-off .carrusel-marco svg { filter: none; }
-body.glow-botones-off .carrusel-flecha { box-shadow: none; animation: none; }
+body.glow-botones-off .carrusel-flecha { box-shadow: none; }
+body.glow-botones-off .carrusel-flecha-arrow { animation: none; filter: none; }
+body.glow-botones-off .carrusel-flecha-preview { filter: none; }
 body.glow-botones-off .carrusel-dot.active { box-shadow: none; }
 body.glow-botones-off .fab-btn {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important; /* !important: user preference */
