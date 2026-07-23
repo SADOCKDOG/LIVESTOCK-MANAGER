@@ -751,7 +751,9 @@ label {
 .wizard-footer-buttons {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-end;
 }
 
 /* ============================================
