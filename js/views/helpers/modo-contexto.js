@@ -29,9 +29,21 @@ const ModoContextoHelper = {
   getModeMeta(mode) {
     const map = {
       carne: { icon: Icons.carne(), label: 'Cárnico', color: 'var(--c-success)' },
-      leche: { icon: Icons.leche(), label: 'Lácteo', color: 'var(--c-info)' }
+      leche: { icon: Icons.leche(), label: 'Lácteo', color: 'var(--c-info)' },
+      hibrido: { icon: Icons.hibrido(), label: 'Híbrido', color: 'var(--c-success)' }
     };
     return map[mode] || map.leche;
+  },
+
+  /**
+   * Resuelve la meta de modo (icono/label/color) a partir de los flags efectivos
+   * {leche, carne} de una finca, sin que cada vista repita el if/else.
+   */
+  getModeMetaEffective(flags) {
+    const f = flags || { leche: true, carne: false };
+    if (f.leche && f.carne) return this.getModeMeta('hibrido');
+    if (f.carne) return this.getModeMeta('carne');
+    return this.getModeMeta('leche');
   },
 
   detectFlagsFromRebanos(rebanos) {

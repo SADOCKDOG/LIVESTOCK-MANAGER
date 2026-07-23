@@ -54,18 +54,23 @@ const RebanosView = {
       </div>`;
     }).join('');
 
-    const moduleColor = window.getModuleColor('/rebanos');
+    const modoMetaReb = window.ModoContextoHelper.getModeMetaEffective(flagsModo);
     main.innerHTML = `
-      <!-- Cabecera de Sección Estandarizada -->
-      <div class="flex items-center gap-12 mb-14">
-        <span class="text-2xl" style="color:${moduleColor}; display:inline-flex; align-items:center;">${Icons.rebanos()}</span>
-        <div>
-          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${moduleColor}; margin-right:4px;">|</span> REBAÑOS / LOTES
-          </h1>
-          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            ${rebanos.length} ${rebanos.length === 1 ? 'registro' : 'registros'} · ${rebanosActivos} activos
+      <!-- Cabecera de Módulo: chip de modo + KPI + acción principal -->
+      <div class="module-header">
+        <div class="module-header-kpis">
+          <span class="module-mode-chip" style="--mode-color: ${modoMetaReb.color};">${modoMetaReb.icon} ${modoMetaReb.label}</span>
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Rebaños</span>
+            <span class="module-header-kpi-value">${rebanos.length}</span>
           </div>
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Activos</span>
+            <span class="module-header-kpi-value" style="color: var(--c-success);">${rebanosActivos}</span>
+          </div>
+        </div>
+        <div class="module-header-primary-action">
+          <button class="btn btn-create btn-lg" onclick="RebanosView._crearRebano()">${Icons.agregar()} Nuevo Rebaño</button>
         </div>
       </div>
 
@@ -217,11 +222,6 @@ const RebanosView = {
         <div class="grid gap-10">
           ${recordsHtml}
         </div>
-      </div>
-      <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="${registrarHandler}">
-        <span class="fab-label">Nuevo ${registrarLabel}</span>
-        <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
       </div>`;
   },
 

@@ -191,8 +191,47 @@ const ComercializacionView = {
       App.updateHeaderColor(currentMeta.headerColorKey);
     }
 
+    // Cabecera de módulo: chip de modo + KPI de la métrica dominante (leche/carne) +
+    // acción principal cuando la pestaña activa es una de las dos comerciales.
+    const modoMetaComer = window.ModoContextoHelper.getModeMetaEffective(flagsModo);
+    let headerKpisHtml = '';
+    let headerPrimaryHtml = '';
+    if (this._activeSubModule === 'leche' || this._activeSubModule === 'carne') {
+      const dComer = await this._ensureData(fincaId, this._needsDataRefresh);
+      if (this._activeSubModule === 'leche') {
+        const litros = dComer.entregas.reduce((s, e) => s + (e.cantidad || 0), 0);
+        headerKpisHtml = `
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Entregas</span>
+            <span class="module-header-kpi-value">${dComer.entregas.length}</span>
+          </div>
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Litros</span>
+            <span class="module-header-kpi-value">${UI.formatNumber(litros)}</span>
+          </div>`;
+        headerPrimaryHtml = `<button class="btn btn-create btn-lg" onclick="App._abrirWizardAlbaranLeche()">${Icons.fabPlus()} Registrar Retirada</button>`;
+      } else {
+        const ingreso = dComer.ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
+        headerKpisHtml = `
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Ventas</span>
+            <span class="module-header-kpi-value">${dComer.ventas.length}</span>
+          </div>
+          <div class="module-header-kpi">
+            <span class="module-header-kpi-label">Ingreso</span>
+            <span class="module-header-kpi-value" style="color: var(--c-success);">${UI.formatCurrency(Math.round(ingreso))}</span>
+          </div>`;
+        headerPrimaryHtml = `<button class="btn btn-create btn-lg" onclick="App._abrirWizardVentaMasiva()">${Icons.fabPlus()} Registrar Venta</button>`;
+      }
+    }
+
     main.innerHTML = `
-      <div class="mb-14">
+      <div class="module-header">
+        <div class="module-header-kpis">
+          <span class="module-mode-chip" style="--mode-color: ${modoMetaComer.color};">${modoMetaComer.icon} ${modoMetaComer.label}</span>
+          ${headerKpisHtml}
+        </div>
+        ${headerPrimaryHtml ? `<div class="module-header-primary-action">${headerPrimaryHtml}</div>` : ''}
         <div class="text-left mb-6 uppercase" style="letter-spacing: 0.5px;">
           <h1 style="font-size: 1.25rem; font-weight: 900; color: #fff; margin: 0; display: flex; items-center;">
             <span style="color:${currentMeta.color}; margin-right:4px;">|</span> ${currentMeta.title}
@@ -423,10 +462,6 @@ const ComercializacionView = {
         <div class="grid gap-10">
           ${recordsHtml}
         </div>
-      </div>
-      <div class="fab-container" style="--fab-neon-color: ${color};" onclick="${registrarHandler}">
-        <span class="fab-label">${registrarLabel}</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 

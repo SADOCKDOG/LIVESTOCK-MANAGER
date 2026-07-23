@@ -172,34 +172,39 @@ const SanidadView = {
 
     const enriquecidos = this.enriquecer(tratamientos);
     const supresionesActivas = enriquecidos.filter(t => t.enSupresion);
+    const modoFlags = window.ModoContextoHelper ? window.ModoContextoHelper.getFlags() : null;
+    const modoMeta = window.ModoContextoHelper
+      ? window.ModoContextoHelper.getModeMetaEffective(modoFlags)
+      : { icon: Icons.sanidad(), label: 'Explotación', color: 'var(--c-purple)' };
 
     container.innerHTML = `
+      <div class="px-4">
+        <div class="module-header">
+          <div class="module-header-kpis">
+            <span class="module-mode-chip" style="--mode-color: ${modoMeta.color};">${modoMeta.icon} ${modoMeta.label}</span>
+            <div class="module-header-kpi">
+              <span class="module-header-kpi-label">Tratamientos</span>
+              <span class="module-header-kpi-value">${tratamientos.length}</span>
+            </div>
+            <div class="module-header-kpi">
+              <span class="module-header-kpi-label">En Supresión</span>
+              <span class="module-header-kpi-value" style="color:${supresionesActivas.length > 0 ? 'var(--c-danger)' : 'var(--c-success)'};">${supresionesActivas.length}</span>
+            </div>
+          </div>
+          <div class="module-header-primary-action">
+            <button class="btn btn-create btn-lg" onclick="window.WizardTratamiento ? window.WizardTratamiento.registrar(null) : App.toastError('Módulo de tratamiento no disponible')">${Icons.fabPlus()} Aplicar Tratamiento</button>
+          </div>
+          <div class="module-header-secondary-actions">
+            <button class="widget-link-btn widget-link-btn--neon neon-info" style="border:none; cursor:pointer;" onclick="window.WizardVacunacion ? window.WizardVacunacion.registrar(null, { onSaved: () => App.route() }) : App.toastError('Módulo de vacunación no disponible')">${Icons.documento()}<span class="widget-link-label">Vacunación</span></button>
+            <button class="widget-link-btn widget-link-btn--neon neon-accent" style="border:none; cursor:pointer;" onclick="App._abrirWizardCrotales()">${Icons.documento()}<span class="widget-link-label">Crotales</span></button>
+            <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="App._abrirWizardGuiaMovimiento()">${Icons.documento()}<span class="widget-link-label">Guía Mov.</span></button>
+          </div>
+        </div>
+      </div>
+
       ${this.renderAlertasSupresion(enriquecidos)}
 
       <div class="px-4">
-        <div class="card p-12 mb-14 border-222 card-total-3d card-resumen" style="background: rgba(255,255,255,0.02);">
-          <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex items-center justify-between gap-6">
-            <span class="flex items-center gap-6" style="color: var(--c-purple)">${Icons.sanidad()} BALANCE SANITARIO</span>
-            <button class="resumen-toggle" onclick="App.toggleResumen(this)">${Icons.chevronAbajo()}</button>
-          </div>
-          <div class="resumen-body flex flex-col">
-            <div class="py-10 flex justify-between items-center border-bottom-222">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Total Tratamientos</span>
-              <strong class="text-lg font-950">${tratamientos.length}</strong>
-            </div>
-            <div class="py-10 flex justify-between items-center">
-              <span class="text-[0.65rem] text-gray uppercase font-900">Tratamientos en Supresión</span>
-              <strong class="text-lg font-950" style="color:${supresionesActivas.length > 0 ? 'var(--c-danger)' : 'var(--c-success)'};">${supresionesActivas.length}</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Accesos directos a trámites oficiales -->
-        <div class="grid grid-cols-2 gap-8 mb-14">
-          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardCrotales()">${Icons.documento()} Pedido de Crotales</button>
-          <button class="widget-link-btn" style="border:none; cursor:pointer;" onclick="App._abrirWizardGuiaMovimiento()">${Icons.documento()} Guía de Movimiento</button>
-        </div>
-
         <div class="flex items-center gap-8 mb-14">
           <div class="search-input-wrapper flex-1" style="position: relative;">
             <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #555;">${Icons.buscar()}</span>
@@ -210,9 +215,6 @@ const SanidadView = {
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
           <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} VACUNACIONES (LIBRO ADSG)
         </div>
-        <div class="mb-14">
-          <button class="widget-link-btn w-full" style="border:none; cursor:pointer;" onclick="window.WizardVacunacion ? window.WizardVacunacion.registrar(null, { onSaved: () => App.route() }) : App.toastError('Módulo de vacunación no disponible')">${Icons.fabPlus()} Registrar Vacunación</button>
-        </div>
         ${this.renderVacunaciones(vacunaciones)}
 
         <div class="inf-section-title mb-10 mt-14 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
@@ -220,11 +222,6 @@ const SanidadView = {
         </div>
 
         ${this.renderHistorial(this.enriquecer(tratamientosFiltrados))}
-      </div>
-
-      <div class="fab-container" style="--fab-neon-color: var(--c-purple);" onclick="window.WizardTratamiento ? window.WizardTratamiento.registrar(null) : App.toastError('Módulo de tratamiento no disponible')">
-        <span class="fab-label">Aplicar Tratamiento</span>
-        <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
 
