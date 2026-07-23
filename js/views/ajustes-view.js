@@ -113,6 +113,10 @@ const AjustesView = {
             <div><span class="text-gray">CCAA:</span> <strong class="text-white">${activeFinca.comunidad_autonoma ? activeFinca.comunidad_autonoma.toUpperCase() : 'N/D'}</strong></div>
             <div><span class="text-gray">Animales:</span> <strong class="text-white">${animales.length}</strong></div>
           </div>
+          ${activeFinca.explotacion_lidia ? `
+          <div class="mt-10">
+            <span class="badge badge-sm uppercase" style="background:color-mix(in srgb, var(--c-danger) 12%, transparent); color:var(--c-danger); border:1px solid color-mix(in srgb, var(--c-danger) 30%, transparent); padding:4px 8px; border-radius:4px; font-weight:900; letter-spacing:0.5px; font-size:0.62rem;">${Icons.alerta()} EXPLOTACIÓN DE LIDIA</span>
+          </div>` : ''}
         </div>
         <div class="grid grid-cols-2 gap-10">
           <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="AjustesView._editarFincaPrincipal()">
@@ -133,7 +137,7 @@ const AjustesView = {
         <div class="grid gap-10 mt-15">${fincas.map((f) => `
           <div class="flex justify-between items-center rounded-sm bg-black border border-222 p-12">
             <div>
-              <div class="font-bold text-white uppercase text-sm">${f.nombre}</div>
+              <div class="font-bold text-white uppercase text-sm flex items-center gap-6">${f.nombre}${f.explotacion_lidia ? `<span class="badge badge-sm uppercase" style="background:color-mix(in srgb, var(--c-danger) 12%, transparent); color:var(--c-danger); border:1px solid color-mix(in srgb, var(--c-danger) 30%, transparent); padding:2px 6px; border-radius:4px; font-weight:900; font-size:0.55rem;">LIDIA</span>` : ''}</div>
               <div class="text-gray text-xs mt-4">REGA: <span class="text-gold font-bold">${f.codigo_REGA || f.rega || "N/D"}</span></div>
             </div>
             <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary btn-sm">Activar</button>` : `<span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204,255,0,0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">ACTIVA</span>`}</div>

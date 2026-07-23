@@ -231,6 +231,14 @@ window.WizardFinca = {
                 </div>
               </div>
 
+              <div class="wizard-input-group mt-10">
+                <label class="flex items-center gap-8 text-sm text-white cursor-pointer bg-black border border-222 p-10 rounded-sm">
+                  <input type="checkbox" id="w-f-lidia" ${data.explotacion_lidia ? 'checked' : ''} class="w-auto accent-neon">
+                  <span>Explotación de Lidia (ganado de toro bravo)</span>
+                </label>
+                <p class="text-xs text-aaa mt-4">Clasificación SIGGAN (Bovino &gt; Filiaciones). Solo etiqueta esta finca; no cambia censos, movimientos ni sanidad.</p>
+              </div>
+
               <hr class="border-333 my-16">
               <h4 class="text-red text-sm mt-0 mb-12 flex items-center gap-6">${Icons.sanidad()} ADSG (Agrupación Defensa Sanitaria)</h4>
 
@@ -264,6 +272,8 @@ window.WizardFinca = {
 
           const chks = document.querySelectorAll('input[name="w-f-especies-chk"]:checked');
           data.especies_autorizadas = Array.from(chks).map(el => el.value);
+
+          data.explotacion_lidia = document.getElementById('w-f-lidia')?.checked ?? data.explotacion_lidia ?? false;
 
           data.adsg_nombre = document.getElementById('w-f-adsg')?.value.trim() || data.adsg_nombre;
           data.adsg_codigo = document.getElementById('w-f-adsg-cod')?.value.trim() || data.adsg_codigo;
