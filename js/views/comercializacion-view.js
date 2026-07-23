@@ -187,8 +187,9 @@ const ComercializacionView = {
 
     const currentMeta = this._getSubModuleMeta(this._activeSubModule);
 
+    // Color de pantalla fijo de CoMer (amarillo), igual para todos sus submódulos
     if (window.App && App.updateHeaderColor) {
-      App.updateHeaderColor(currentMeta.headerColorKey);
+      App.updateHeaderColor('var(--c-warning)');
     }
 
     // Cabecera de módulo: chip de modo + KPI de la métrica dominante (leche/carne) +
@@ -303,11 +304,11 @@ const ComercializacionView = {
 
   _getSubModuleMeta(sub) {
     const map = {
-      leche: { icon: Icons.leche(), color: 'var(--c-info)', title: 'CONTRATOS Y ENTREGAS LÁCTEAS', desc: 'Control de cisternas, analíticas y albaranes de leche', headerColorKey: 'leche' },
-      carne: { icon: Icons.carne(), color: 'var(--c-success)', title: 'COMERCIALIZACIÓN CÁRNICA', desc: 'Ventas de ganado, rendimientos de canal y facturación', headerColorKey: 'carne' },
-      compradores: { icon: Icons.compradores(), color: 'var(--c-purple)', title: 'CARTERA DE CLIENTES', desc: 'Registro de mataderos, cooperativas y centrales lecheras', headerColorKey: 'compradores' },
-      contratos: { icon: Icons.documento(), color: 'var(--c-purple)', title: 'CONTRATOS DE COMPRA', desc: 'Acuerdos comerciales de suministro y trazabilidad de precios', headerColorKey: 'contratos' },
-      transportistas: { icon: Icons.transportistas(), color: 'var(--c-pink)', title: 'LOGÍSTICA Y TRANSPORTISTAS', desc: 'Flota de transporte ganadero calificado y cisternas', headerColorKey: 'transportistas' }
+      leche: { icon: Icons.leche(), color: 'var(--c-info)', title: 'CONTRATOS Y ENTREGAS LÁCTEAS', desc: 'Control de cisternas, analíticas y albaranes de leche' },
+      carne: { icon: Icons.carne(), color: 'var(--c-success)', title: 'COMERCIALIZACIÓN CÁRNICA', desc: 'Ventas de ganado, rendimientos de canal y facturación' },
+      compradores: { icon: Icons.compradores(), color: 'var(--c-purple)', title: 'CARTERA DE CLIENTES', desc: 'Registro de mataderos, cooperativas y centrales lecheras' },
+      contratos: { icon: Icons.documento(), color: 'var(--c-purple)', title: 'CONTRATOS DE COMPRA', desc: 'Acuerdos comerciales de suministro y trazabilidad de precios' },
+      transportistas: { icon: Icons.transportistas(), color: 'var(--c-pink)', title: 'LOGÍSTICA Y TRANSPORTISTAS', desc: 'Flota de transporte ganadero calificado y cisternas' }
     };
     return map[sub] || map.leche;
   },

@@ -129,7 +129,8 @@ const ExplotacionView = {
     const fincaId = await Fincas?.getActiveId();
     if (!fincaId) { main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">Sin finca activa.</p></div>`; return; }
 
-    if (window.App?.updateHeaderColor) App.updateHeaderColor('explotacion');
+    // Color de pantalla fijo de ExPro (azul), igual para todos sus submódulos
+    if (window.App?.updateHeaderColor) App.updateHeaderColor('var(--c-info)');
 
     // Inicializar sub-módulo activo por defecto si no está definido
     if (!this._activeSubModule) {

@@ -6,7 +6,7 @@
 
 const ZonasView = {
   async render() {
-    if (window.App) App.updateHeaderColor('zonas');
+    // Color de pantalla: lo fija GanaderiaView (color fijo de GeGan), esta vista siempre va embebida en su carrusel.
     const main = document.getElementById("ganaderia-tab-content") || document.getElementById("app-content");
     const finca = await Fincas.getActive();
     const rebanos = await Rebanos.list();
