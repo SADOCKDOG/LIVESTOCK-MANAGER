@@ -611,12 +611,14 @@ const App = {
       const hayScrollIzq = el.scrollLeft > 10;
       flechaIzq.style.opacity = hayScrollIzq ? '1' : '0.35';
       flechaIzq.style.pointerEvents = hayScrollIzq ? 'auto' : 'none';
+      flechaIzq.classList.toggle('pestana-flecha-activa', hayScrollIzq);
     }
     if (flechaDer) {
       const maxScroll = el.scrollWidth - el.clientWidth;
       const hayScrollDer = el.scrollLeft < maxScroll - 10;
       flechaDer.style.opacity = hayScrollDer ? '1' : '0.35';
       flechaDer.style.pointerEvents = hayScrollDer ? 'auto' : 'none';
+      flechaDer.classList.toggle('pestana-flecha-activa', hayScrollDer);
     }
   },
 
@@ -643,13 +645,18 @@ const App = {
       const btnEnd = bRect.right - cRect.left + el.scrollLeft;
       const viewStart = el.scrollLeft;
       const viewEnd = viewStart + el.clientWidth;
-      // scrollLeft directo (en vez de scrollTo({behavior:'smooth'}), poco fiable
-      // en algunos WebView) — la animación la da scroll-behavior:smooth del CSS.
+      // scrollLeft directo sin animación: scrollTo/scrollBy con behavior:'smooth'
+      // (o scroll-behavior:smooth en CSS, que intercepta también la asignación
+      // directa a scrollLeft) resultan poco fiables en algunos WebView/entornos
+      // — el salto instantáneo es el único comportamiento que se puede garantizar.
       if (btnStart < viewStart) {
         el.scrollLeft = btnStart;
       } else if (btnEnd > viewEnd) {
         el.scrollLeft = btnEnd - el.clientWidth;
       }
+      // Reevaluar tras el ajuste: no todos los entornos disparan el evento
+      // 'scroll' de forma fiable para una asignación programática de scrollLeft.
+      this.evaluarScrollPestanas(el);
       // Si la pestaña activa ya está totalmente visible, no se mueve nada.
     }, 150);
   },
