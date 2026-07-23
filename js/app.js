@@ -601,8 +601,10 @@ const App = {
    * de entrada); las flechas laterales navegan a la sección anterior/
    * siguiente (circular: de la última se vuelve a la primera) y llevan junto
    * al icono de flecha una vista previa en miniatura —con su propio color de
-   * módulo— de a qué sección llevan. Los puntos de abajo dan acceso directo
-   * a cualquier sección y sirven de indicador de "hay N secciones en total".
+   * módulo— de a qué sección llevan. Como el carrusel no es deslizable, tocar
+   * el marco activo despliega un menú con todos los submódulos disponibles
+   * del módulo principal. Los puntos de abajo dan acceso directo a cualquier
+   * sección y sirven de indicador de "hay N secciones en total".
    * @param {Array<{key:string, icon:string, label:string, color:string}>} tabs
    * @param {string} activeKey
    * @param {string} viewName - nombre global de la vista (p.ej. 'GanaderiaView') para el onclick.
@@ -615,29 +617,71 @@ const App = {
     const single = n <= 1;
     const prev = tabs[(idx - 1 + n) % n];
     const next = tabs[(idx + 1) % n];
+    const menuId = `carrusel-menu-${viewName}`;
+    const cerrarYNavegar = (key) => `App.cerrarCarruselMenu(); ${viewName}._cambiarSubModulo('${key}')`;
 
     const flechaIzq = single ? '' : `
-        <button type="button" class="carrusel-flecha carrusel-flecha-izq pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${viewName}._cambiarSubModulo('${prev.key}')" aria-label="Anterior: ${prev.label}" title="${prev.label}">
+        <button type="button" class="carrusel-flecha carrusel-flecha-izq pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${cerrarYNavegar(prev.key)}" aria-label="Anterior: ${prev.label}" title="${prev.label}">
           <span class="carrusel-flecha-preview" style="color:${prev.color};">${prev.icon}</span>
           ${Icons.atras()}
         </button>`;
     const flechaDer = single ? '' : `
-        <button type="button" class="carrusel-flecha carrusel-flecha-der pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${viewName}._cambiarSubModulo('${next.key}')" aria-label="Siguiente: ${next.label}" title="${next.label}">
+        <button type="button" class="carrusel-flecha carrusel-flecha-der pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${cerrarYNavegar(next.key)}" aria-label="Siguiente: ${next.label}" title="${next.label}">
           ${Icons.siguiente()}
           <span class="carrusel-flecha-preview" style="color:${next.color};">${next.icon}</span>
         </button>`;
     const dots = single ? '' : `
       <div class="carrusel-dots" role="tablist" aria-label="Todas las secciones">
-        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" style="--mode-color:${t.color};" onclick="${viewName}._cambiarSubModulo('${t.key}')" title="${t.label}"></span>`).join('')}
+        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" style="--mode-color:${t.color};" onclick="${cerrarYNavegar(t.key)}" title="${t.label}"></span>`).join('')}
+      </div>`;
+    const menu = single ? '' : `
+      <div class="carrusel-menu" id="${menuId}" role="listbox" aria-label="Todos los submódulos">
+        ${tabs.map(t => `<button type="button" class="carrusel-menu-item ${t.key === activeKey ? 'active' : ''}" role="option" aria-selected="${t.key === activeKey}" style="--mode-color:${t.color};" onclick="${cerrarYNavegar(t.key)}">${t.icon}<span>${t.label}</span></button>`).join('')}
       </div>`;
 
     return `
-      <div class="carrusel-pestanas" style="--mode-color: ${active.color};">
-        ${flechaIzq}
-        <div class="carrusel-marco" role="tablist" aria-label="Sección activa">${active.icon} ${active.label}</div>
-        ${flechaDer}
-      </div>
-      ${dots}`;
+      ${dots}
+      <div class="carrusel-pestanas-wrapper">
+        <div class="carrusel-pestanas" style="--mode-color: ${active.color};">
+          ${flechaIzq}
+          <button type="button" class="carrusel-marco" id="${menuId}-trigger" onclick="App.toggleCarruselMenu('${menuId}')" aria-haspopup="listbox" aria-expanded="false" ${single ? 'disabled' : ''}>
+            ${active.icon} ${active.label}
+            ${single ? '' : `<span class="carrusel-marco-chevron">${Icons.chevronAbajo()}</span>`}
+          </button>
+          ${flechaDer}
+        </div>
+        ${menu}
+      </div>`;
+  },
+
+  /** Abre/cierra el menú desplegable de submódulos del carrusel (id de .renderCarruselPestanas). */
+  toggleCarruselMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    const yaAbierto = menu.classList.contains('open');
+    App.cerrarCarruselMenu();
+    if (yaAbierto) return;
+    menu.classList.add('open');
+    const trigger = document.getElementById(menuId + '-trigger');
+    if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    setTimeout(() => document.addEventListener('click', App._cerrarCarruselMenuFuera, true), 0);
+  },
+
+  /** Cierra cualquier menú de carrusel abierto (llamado antes de navegar y desde el clic exterior). */
+  cerrarCarruselMenu() {
+    document.querySelectorAll('.carrusel-menu.open').forEach(m => {
+      m.classList.remove('open');
+      const trigger = document.getElementById(m.id + '-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+    document.removeEventListener('click', App._cerrarCarruselMenuFuera, true);
+  },
+
+  _cerrarCarruselMenuFuera(e) {
+    const menu = document.querySelector('.carrusel-menu.open');
+    if (!menu) return;
+    if (menu.contains(e.target) || e.target.closest(`#${menu.id}-trigger`)) return;
+    App.cerrarCarruselMenu();
   },
 
   /**
