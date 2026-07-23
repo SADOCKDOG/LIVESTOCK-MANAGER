@@ -563,28 +563,13 @@ const AnimalesView = {
             </div>` : ""}
         </div>
         <div class="wizard-footer-fixed border-top-222">
-          <div class="grid ${esNuevo ? 'grid-cols-2' : 'grid-cols-5'} gap-8 w-full">
+          ${!esNuevo ? `<button type="button" onclick="AnimalesView._eliminarAnimal(${id})" class="wizard-btn-action wizard-btn-danger">${Icons.eliminar()} Eliminar</button>` : '<div></div>'}
+          <div class="wizard-footer-buttons">
             ${!esNuevo ? `
-            <button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-info px-4">
-              ${Icons.rotacion()}
-              <span class="widget-link-label">360°</span>
-            </button>
-            <button type="button" onclick="location.hash='/animal-bitacora?id=${id}'" class="widget-link-btn widget-link-btn--neon neon-accent px-4">
-              ${Icons.documento()}
-              <span class="widget-link-label">BITÁCORA</span>
-            </button>
-            <button type="button" onclick="AnimalesView._eliminarAnimal(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
-              ${Icons.eliminar()}
-              <span class="widget-link-label">ELIMINAR</span>
-            </button>` : ''}
-            <button type="button" onclick="AnimalesView._salirRegistro()" class="widget-link-btn widget-link-btn--neon px-4">
-              ${Icons.cerrar()}
-              <span class="widget-link-label">SALIR</span>
-            </button>
-            <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="widget-link-btn widget-link-btn--neon neon-success px-4">
-              ${Icons.guardar()}
-              <span class="widget-link-label">GUARDAR</span>
-            </button>
+            <button type="button" onclick="location.hash='/trazabilidad?id=${id}'" class="wizard-btn-action wizard-btn-secondary">${Icons.rotacion()} 360°</button>
+            <button type="button" onclick="location.hash='/animal-bitacora?id=${id}'" class="wizard-btn-action wizard-btn-secondary">${Icons.documento()} Bitácora</button>` : ''}
+            <button type="button" onclick="AnimalesView._salirRegistro()" class="wizard-btn-action wizard-btn-secondary">${Icons.cerrar()} Salir</button>
+            <button type="button" id="btn-guardar-main" onclick="AnimalesView._guardarAnimalDetalle('${id || ""}')" class="wizard-btn-action wizard-btn-success">${Icons.guardar()} Guardar</button>
           </div>
         </div>
       </div>`;
