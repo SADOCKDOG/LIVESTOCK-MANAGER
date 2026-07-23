@@ -3444,80 +3444,105 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 /* mode switch container para ExplotacionView */
 .expro-mode-switch { display: inline-flex; background: var(--surface-input); padding: 4px; border-radius: var(--r-xl); border: 1px solid var(--border); width: 100%; max-width: 480px; box-sizing: border-box; }
 
-/* BARRA DE PESTAÑAS MULTIPESTAÑA PREMIUM */
-.pestanas-premium-container {
-  overflow-x: auto;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+/* CARRUSEL CIRCULAR DE PESTAÑAS DE SUBMÓDULO
+   Solo la sección activa se muestra, ampliada, en un marco centrado; el
+   resto se accede con las flechas laterales (circular: de la última se
+   vuelve a la primera) o con los puntos de posición de abajo. */
+.carrusel-pestanas {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   box-sizing: border-box;
-  padding: 4px 16px;
-  position: relative;
 }
-.pestanas-premium-container::-webkit-scrollbar {
-  display: none;
-}
-.pestanas-premium-switch {
-  display: inline-flex;
-  width: auto;
-  min-width: 100%;
+.carrusel-marco {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 4px;
+  padding: 12px 14px;
   background: rgba(18, 18, 18, 0.6);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--r-pill);
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
-}
-.pestanas-premium-btn {
-  flex: none;
-  padding: 10px 18px;
-  border: 1px solid transparent;
+  border: 1px solid var(--mode-color, rgba(255, 255, 255, 0.1));
   border-radius: var(--r-xl);
-  background: transparent;
+  box-shadow: 0 0 14px var(--mode-color), inset 0 0 8px color-mix(in srgb, var(--mode-color) 25%, transparent);
   color: var(--mode-color);
-  opacity: 0.55;
-  font-size: 0.7rem;
-  font-weight: 800;
+  text-shadow: 0 0 8px var(--mode-color);
+  font-size: 0.72rem;
+  font-weight: 900;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  animation: carruselMarcoIn 0.25s ease;
+}
+.carrusel-marco svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 5px var(--mode-color));
+}
+@keyframes carruselMarcoIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+.carrusel-flecha {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  background: rgba(18, 18, 18, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--r-pill);
+  color: var(--mode-color, var(--c-success));
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6), 0 0 6px var(--mode-color, rgba(255, 255, 255, 0.2));
+  transition: transform 0.2s ease;
+}
+.carrusel-flecha.pestana-flecha-activa {
+  animation: pestanaPulse 2s infinite ease-in-out;
+}
+.carrusel-flecha:active {
+  transform: scale(0.92);
+}
+.carrusel-flecha svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
+  flex-shrink: 0;
+}
+.carrusel-flecha-preview {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.6;
+}
+.carrusel-flecha-preview svg {
+  width: 14px;
+  height: 14px;
+}
+.carrusel-dots {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  margin-top: 8px;
 }
-.pestanas-premium-btn svg {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
+.carrusel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
-.pestanas-premium-btn:hover {
-  opacity: 0.85;
-}
-.pestanas-premium-btn.active {
-  opacity: 1;
-  background: transparent;
-  border-color: var(--mode-color);
-  box-shadow: 0 0 14px var(--mode-color), inset 0 0 8px color-mix(in srgb, var(--mode-color) 25%, transparent);
-  text-shadow: 0 0 8px var(--mode-color);
-}
-.pestanas-premium-btn.active svg {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 5px var(--mode-color));
-}
-.pestanas-premium-btn:active {
-  transform: scale(0.94);
-}
-
-/* Wrapper del selector de pestañas premium */
-.pestanas-premium-wrapper {
-  position: relative;
-  width: 100%;
-  box-sizing: border-box;
+.carrusel-dot.active {
+  width: 16px;
+  border-radius: 3px;
+  background: var(--mode-color, var(--c-success));
+  box-shadow: 0 0 6px var(--mode-color, var(--c-success));
 }
 
 /* ── CABECERA DE MÓDULO (jerarquía por modelo de negocio) ──
@@ -3611,49 +3636,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 .module-header-secondary-actions .widget-link-btn--neon svg { width: 18px; height: 18px; }
 .module-header-secondary-actions .widget-link-label { font-size: 0.62rem; }
-
-/* Flechas indicadoras de desplazamiento */
-.pestana-indicador-flecha {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
-  background: rgba(18, 18, 18, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--mode-color, var(--c-success));
-  box-shadow: 0 0 10px rgba(0,0,0,0.6), 0 0 6px var(--mode-color, rgba(255,255,255,0.2));
-  cursor: pointer;
-  z-index: 10;
-  transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.pestana-indicador-flecha.pestana-flecha-activa {
-  animation: pestanaPulse 2s infinite ease-in-out;
-}
-
-.pestana-indicador-flecha svg {
-  width: 14px;
-  height: 14px;
-  stroke-width: 3;
-}
-
-.pestana-flecha-izq {
-  left: 6px;
-}
-
-.pestana-flecha-der {
-  right: 6px;
-}
-
-.pestana-indicador-flecha:active {
-  transform: translateY(-50%) scale(0.85);
-}
 
 @keyframes pestanaPulse {
   0%, 100% {
@@ -4058,6 +4040,10 @@ body.glow-botones-off .widget-link-btn--neon { box-shadow: none; }
 body.glow-botones-off .widget-link-btn--neon svg { filter: none; }
 body.glow-botones-off .more-sheet-item svg { filter: none; }
 body.glow-botones-off .more-sheet-item:active { box-shadow: none; }
+body.glow-botones-off .carrusel-marco { box-shadow: none; text-shadow: none; }
+body.glow-botones-off .carrusel-marco svg { filter: none; }
+body.glow-botones-off .carrusel-flecha { box-shadow: none; animation: none; }
+body.glow-botones-off .carrusel-dot.active { box-shadow: none; }
 body.glow-botones-off .fab-btn {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important; /* !important: user preference */
     filter: none !important; /* !important: user preference */

@@ -596,69 +596,48 @@ const App = {
   },
 
   /**
-   * Evalúa el scroll de las pestañas premium. Las flechas permanecen SIEMPRE
-   * visibles (nunca desaparecen) como indicador constante de que hay más
-   * pestañas deslizando a los lados — solo se atenúan/deshabilitan cuando ya
-   * no hay más recorrido posible en esa dirección.
+   * Genera el HTML del carrusel circular de pestañas de submódulo: un marco
+   * centrado muestra solo la sección activa (ampliada, con desvanecimiento
+   * de entrada); las flechas laterales navegan a la sección anterior/
+   * siguiente (circular: de la última se vuelve a la primera) y llevan junto
+   * al icono de flecha una vista previa en miniatura —con su propio color de
+   * módulo— de a qué sección llevan. Los puntos de abajo dan acceso directo
+   * a cualquier sección y sirven de indicador de "hay N secciones en total".
+   * @param {Array<{key:string, icon:string, label:string, color:string}>} tabs
+   * @param {string} activeKey
+   * @param {string} viewName - nombre global de la vista (p.ej. 'GanaderiaView') para el onclick.
    */
-  evaluarScrollPestanas(el) {
-    const wrapper = el.parentElement;
-    if (!wrapper) return;
-    const flechaIzq = wrapper.querySelector('.pestana-flecha-izq');
-    const flechaDer = wrapper.querySelector('.pestana-flecha-der');
+  renderCarruselPestanas(tabs, activeKey, viewName) {
+    if (!tabs || tabs.length === 0) return '';
+    const n = tabs.length;
+    const idx = Math.max(0, tabs.findIndex(t => t.key === activeKey));
+    const active = tabs[idx];
+    const single = n <= 1;
+    const prev = tabs[(idx - 1 + n) % n];
+    const next = tabs[(idx + 1) % n];
 
-    if (flechaIzq) {
-      const hayScrollIzq = el.scrollLeft > 10;
-      flechaIzq.style.opacity = hayScrollIzq ? '1' : '0.35';
-      flechaIzq.style.pointerEvents = hayScrollIzq ? 'auto' : 'none';
-      flechaIzq.classList.toggle('pestana-flecha-activa', hayScrollIzq);
-    }
-    if (flechaDer) {
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      const hayScrollDer = el.scrollLeft < maxScroll - 10;
-      flechaDer.style.opacity = hayScrollDer ? '1' : '0.35';
-      flechaDer.style.pointerEvents = hayScrollDer ? 'auto' : 'none';
-      flechaDer.classList.toggle('pestana-flecha-activa', hayScrollDer);
-    }
-  },
+    const flechaIzq = single ? '' : `
+        <button type="button" class="carrusel-flecha carrusel-flecha-izq pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${viewName}._cambiarSubModulo('${prev.key}')" aria-label="Anterior: ${prev.label}" title="${prev.label}">
+          <span class="carrusel-flecha-preview" style="color:${prev.color};">${prev.icon}</span>
+          ${Icons.atras()}
+        </button>`;
+    const flechaDer = single ? '' : `
+        <button type="button" class="carrusel-flecha carrusel-flecha-der pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${viewName}._cambiarSubModulo('${next.key}')" aria-label="Siguiente: ${next.label}" title="${next.label}">
+          ${Icons.siguiente()}
+          <span class="carrusel-flecha-preview" style="color:${next.color};">${next.icon}</span>
+        </button>`;
+    const dots = single ? '' : `
+      <div class="carrusel-dots" role="tablist" aria-label="Todas las secciones">
+        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" style="--mode-color:${t.color};" onclick="${viewName}._cambiarSubModulo('${t.key}')" title="${t.label}"></span>`).join('')}
+      </div>`;
 
-  /**
-   * Inicializa el scroll de las pestañas premium. A diferencia del centrado
-   * agresivo anterior (que sacaba de la vista las pestañas de los extremos
-   * al seleccionar una del medio), aquí solo se desplaza lo mínimo
-   * imprescindible para que la pestaña activa quede visible — maximizando
-   * cuántas pestañas quedan a la vista a la vez.
-   */
-  inicializarScrollPestanas(el) {
-    if (!el) return;
-    el.addEventListener('scroll', () => this.evaluarScrollPestanas(el));
-    setTimeout(() => {
-      this.evaluarScrollPestanas(el);
-      const activeBtn = el.querySelector('.pestanas-premium-btn.active');
-      if (!activeBtn) return;
-      // getBoundingClientRect() en vez de offsetLeft: el offsetParent real del
-      // botón es .pestanas-premium-switch (con su propio padding), no el
-      // contenedor con scroll — offsetLeft daría una posición incorrecta.
-      const cRect = el.getBoundingClientRect();
-      const bRect = activeBtn.getBoundingClientRect();
-      const btnStart = bRect.left - cRect.left + el.scrollLeft;
-      const btnEnd = bRect.right - cRect.left + el.scrollLeft;
-      const viewStart = el.scrollLeft;
-      const viewEnd = viewStart + el.clientWidth;
-      // scrollLeft directo sin animación: scrollTo/scrollBy con behavior:'smooth'
-      // (o scroll-behavior:smooth en CSS, que intercepta también la asignación
-      // directa a scrollLeft) resultan poco fiables en algunos WebView/entornos
-      // — el salto instantáneo es el único comportamiento que se puede garantizar.
-      if (btnStart < viewStart) {
-        el.scrollLeft = btnStart;
-      } else if (btnEnd > viewEnd) {
-        el.scrollLeft = btnEnd - el.clientWidth;
-      }
-      // Reevaluar tras el ajuste: no todos los entornos disparan el evento
-      // 'scroll' de forma fiable para una asignación programática de scrollLeft.
-      this.evaluarScrollPestanas(el);
-      // Si la pestaña activa ya está totalmente visible, no se mueve nada.
-    }, 150);
+    return `
+      <div class="carrusel-pestanas" style="--mode-color: ${active.color};">
+        ${flechaIzq}
+        <div class="carrusel-marco" role="tablist" aria-label="Sección activa">${active.icon} ${active.label}</div>
+        ${flechaDer}
+      </div>
+      ${dots}`;
   },
 
   /**
