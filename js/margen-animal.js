@@ -23,6 +23,42 @@ const MargenAnimal = {
     return mapa;
   },
 
+  /** Precio unitario de leche vigente hoy, o null si no hay ninguno. */
+  async _precioLecheVigente() {
+    if (!window.Compradores || !window.Contratos) return null;
+    const compradoresLeche = await window.Compradores.list({ tipo: 'leche' }).catch(() => []);
+    const hoy = new Date();
+    for (const comprador of compradoresLeche) {
+      const contrato = await window.Contratos.getActivo(comprador.id, 'leche');
+      if (!contrato || !Array.isArray(contrato.precios)) continue;
+      const filaLeche = contrato.precios.find((p) => {
+        if (!(p.producto || '').toLowerCase().includes('leche')) return false;
+        const desdeOk = !p.desde || new Date(p.desde) <= hoy;
+        const hastaOk = !p.hasta || new Date(p.hasta) >= hoy;
+        return desdeOk && hastaOk;
+      });
+      if (filaLeche) return Number(filaLeche.precio_unitario) || 0;
+    }
+    return null;
+  },
+
+  /** Litros e ingreso estimado de leche de un animal, acumulado histórico. */
+  async calcularIngresoLeche(animalId, fincaId) {
+    return await ErrorHandler.tryAsync(async () => {
+      if (!window.Produccion) return { litros: 0, ingreso: 0, sinPrecioLeche: true };
+      const registros = await window.Produccion.listLeche(fincaId).catch(() => []);
+      const litros = registros
+        .filter((r) => Number(r.vacaId) === Number(animalId))
+        .reduce((sum, r) => sum + (Number(r.cantidad_litros) || 0), 0);
+
+      const precioLitro = await this._precioLecheVigente();
+      if (precioLitro == null) {
+        return { litros: Number(litros.toFixed(2)), ingreso: 0, sinPrecioLeche: true };
+      }
+      return { litros: Number(litros.toFixed(2)), ingreso: Number((litros * precioLitro).toFixed(2)), sinPrecioLeche: false };
+    }, { entity: 'MargenAnimal', action: 'calcularIngresoLeche', animalId, fincaId });
+  },
+
   /**
    * Coste total de sanidad (tratamientos + vacunaciones) imputado a un
    * animal, prorrateando los eventos masivos (sin animalId) entre los
@@ -62,7 +98,7 @@ const MargenAnimal = {
         if (esIndividual) {
           const estaEsteAnimal = animalesVacunados.some((av) => Number(av.animalId) === Number(animalId));
           if (estaEsteAnimal) {
-            // Coste repartido entre los animales individuales de esta vacunación
+            // Coste repartido entre los animales individuales de esta vacunazione
             coste += costeEvento / animalesVacunados.length;
           }
         } else {
@@ -73,6 +109,62 @@ const MargenAnimal = {
 
       return Number(coste.toFixed(2));
     }, { entity: 'MargenAnimal', action: 'calcularCosteSanidad', animalId });
+  },
+
+  /** Margen económico completo de un animal, acumulado histórico. */
+  async calcular(animalId) {
+    return await ErrorHandler.tryAsync(async () => {
+      const animal = await window.Animales.get(Number(animalId));
+      if (!animal) throw new Error('Animal no encontrado');
+
+      const rebano = animal.rebanoId ? await window.db.get('rebanos', Number(animal.rebanoId)) : null;
+      const fincaId = rebano ? rebano.fincaId : null;
+
+      const costeCompra = Number(animal.precio_compra || 0);
+      const costeSanidad = await this.calcularCosteSanidad(animalId);
+      const costeTotal = Number((costeCompra + costeSanidad).toFixed(2));
+
+      const { litros: litrosLeche, ingreso: ingresoLeche, sinPrecioLeche } = fincaId
+        ? await this.calcularIngresoLeche(animalId, fincaId)
+        : { litros: 0, ingreso: 0, sinPrecioLeche: true };
+
+      const ventas = await window.db.getAllFromIndex('comercializacion_carne', 'animalId', Number(animalId)).catch(() => []);
+      const ingresoVenta = Number(ventas.reduce((sum, v) => sum + (Number(v.precio_total) || 0), 0).toFixed(2));
+
+      const ingresoTotal = Number((ingresoLeche + ingresoVenta).toFixed(2));
+      const margenNeto = Number((ingresoTotal - costeTotal).toFixed(2));
+
+      return {
+        animalId: Number(animalId),
+        costeCompra, costeSanidad, costeTotal,
+        litrosLeche, ingresoLeche, sinPrecioLeche,
+        ingresoVenta, ingresoTotal, margenNeto,
+      };
+    }, { entity: 'MargenAnimal', action: 'calcular', animalId });
+  },
+
+  /** Margen de todos los animales de un rebaño. */
+  async calcularParaRebano(rebanoId) {
+    return await ErrorHandler.tryAsync(async () => {
+      const animales = await window.Animales.list(Number(rebanoId));
+      const resultados = [];
+      for (const a of animales) {
+        resultados.push(await this.calcular(a.id));
+      }
+      return resultados;
+    }, { entity: 'MargenAnimal', action: 'calcularParaRebano', rebanoId });
+  },
+
+  /** Margen de todos los animales de todos los rebaños de una finca. */
+  async calcularParaFinca(fincaId) {
+    return await ErrorHandler.tryAsync(async () => {
+      const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', Number(fincaId)).catch(() => []);
+      let resultados = [];
+      for (const r of rebanos) {
+        resultados = resultados.concat(await this.calcularParaRebano(r.id));
+      }
+      return resultados;
+    }, { entity: 'MargenAnimal', action: 'calcularParaFinca', fincaId });
   },
 };
 
