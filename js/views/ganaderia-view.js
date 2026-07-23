@@ -45,24 +45,13 @@ const GanaderiaView = {
     }
 
     main.innerHTML = `
-      <!-- Barra de Navegación Multipestaña Horizontal Ganadería (Scrollable) Premium, centrada arriba del todo -->
-      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
-        <div class="pestana-indicador-flecha pestana-flecha-izq" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft -= 100; })()">
-          ${Icons.atras()}
-        </div>
-        <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Ganadería">
-            ${['animales', 'rebanos', 'patrimonio', 'zonas', 'sanidad'].map(tab => {
-            if (!allowedSubModules.includes(tab)) return '';
-            const isActive = this._activeSubModule === tab;
-            const meta = moduloMeta[tab];
-            return `<button class="pestanas-premium-btn ${isActive ? 'active' : ''}" role="tab" aria-selected="${isActive}" style="--mode-color:${meta.color};" onclick="GanaderiaView._cambiarSubModulo('${tab}')">${meta.icon} ${tab.toUpperCase()}</button>`;
-          }).join('')}
-          </div>
-        </div>
-        <div class="pestana-indicador-flecha pestana-flecha-der" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft += 100; })()">
-          ${Icons.siguiente()}
-        </div>
+      <!-- Carrusel circular de secciones de Ganadería: marco centrado con la sección activa -->
+      <div class="mb-14">
+        ${App.renderCarruselPestanas(
+          ['animales', 'rebanos', 'patrimonio', 'zonas', 'sanidad'].filter(tab => allowedSubModules.includes(tab)).map(tab => ({ key: tab, icon: moduloMeta[tab].icon, label: tab.toUpperCase(), color: moduloMeta[tab].color })),
+          this._activeSubModule,
+          'GanaderiaView'
+        )}
       </div>
 
       <!-- Cabecera Maestra de Ganadería Consolidada -->
@@ -98,12 +87,6 @@ const GanaderiaView = {
       case 'sanidad':
         if (window.SanidadView) await SanidadView.render(document.getElementById('ganaderia-tab-content'));
         break;
-    }
-
-    // Inicializar scroll dinámico para la barra de pestañas
-    const containerPestanas = document.querySelector('.pestanas-premium-container');
-    if (containerPestanas && window.App?.inicializarScrollPestanas) {
-      window.App.inicializarScrollPestanas(containerPestanas);
     }
   },
 
