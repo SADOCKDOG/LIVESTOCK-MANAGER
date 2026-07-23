@@ -292,7 +292,25 @@ const RebanosView = {
     App.setExitGuard(() => RebanosView._confirmSalirEdicion());
 
     document.getElementById("app-content").innerHTML = `
-      <div class="mb-20"><a href="#" onclick="RebanosView._salirDetalle(); return false;" class="link-back">← Volver</a><h2 class="mt-10 flex items-center gap-8">${Icons.rebanos()} ${rebano.nombre}</h2></div>
+      <div class="wizard-full-screen">
+        <div class="wizard-header-fixed border-top-5-gold">
+          <div class="grid grid-cols-3 gap-8 mb-10">
+            <button type="button" onclick="RebanosView._eliminarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
+              ${Icons.eliminar()}
+              <span class="widget-link-label">Eliminar</span>
+            </button>
+            <button type="button" onclick="RebanosView._salirDetalle()" class="widget-link-btn widget-link-btn--neon px-4">
+              ${Icons.cerrar()}
+              <span class="widget-link-label">Cancelar</span>
+            </button>
+            <button type="button" onclick="RebanosView._guardarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-success px-4">
+              ${Icons.guardar()}
+              <span class="widget-link-label">Guardar</span>
+            </button>
+          </div>
+          <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.rebanos()} ${rebano.nombre}</h1>
+        </div>
+        <div class="wizard-content-scrollable p-20">
 
       <!-- KPIs -->
       <div class="grid grid-cols-3 gap-8 mb-20">
@@ -352,20 +370,6 @@ const RebanosView = {
           </select></div>
           <div><label class="form-label uppercase font-900 text-[0.65rem] text-gray">Notas / Observaciones</label>
           <textarea id="r-edit-notas" class="premium-input font-700 uppercase" style="height:80px; resize:none;">${rebano.notas || ''}</textarea></div>
-        </div>
-        <div class="flex gap-10 mt-20">
-          <button class="widget-link-btn widget-link-btn--neon neon-danger flex-1" onclick="RebanosView._eliminarRebano(${id})">
-            ${Icons.eliminar()}
-            <span class="widget-link-label">Eliminar</span>
-          </button>
-          <button class="widget-link-btn widget-link-btn--neon flex-1" onclick="RebanosView._salirDetalle()">
-            ${Icons.cerrar()}
-            <span class="widget-link-label">Cancelar</span>
-          </button>
-          <button class="widget-link-btn widget-link-btn--neon neon-success flex-2" onclick="RebanosView._guardarRebano(${id})">
-            ${Icons.guardar()}
-            <span class="widget-link-label">Guardar Datos</span>
-          </button>
         </div>
       </div>
 
@@ -429,6 +433,9 @@ const RebanosView = {
             </div>`;
           }).join("") || '<div class="text-gray text-center p-20">Sin animales en este rebaño</div>'}
         </div>
+      </div>
+
+        </div>
       </div>`;
     this._cargarHistorialSanitario(id);
     this._cargarGastosRebano(Number(id));
@@ -459,12 +466,8 @@ const RebanosView = {
       return;
     }
 
-    const overlay = document.createElement("div");
-    overlay.className = "wizard-full-screen";
-    overlay.style.justifyContent = "center";
-    overlay.style.alignItems = "center";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
-    overlay.innerHTML = `
+    const modalId = 'modal-consumo-pienso';
+    const html = `
       <div class="card p-25" style="max-width:380px; width: 100%; border: 1px solid var(--c-gray); background: #1e1e1e;">
         <h3 class="mt-0 text-white font-900 flex items-center gap-8"><span style="color: var(--c-gray); margin-right: 4px;">|</span> ${Icons.paquete()} CONSUMO DE PIENSO</h3>
         <label class="wizard-label mb-10">Selecciona el silo de origen:</label>
@@ -473,15 +476,17 @@ const RebanosView = {
         </select>
         <div class="flex gap-10">
           <button class="wizard-btn-action wizard-btn-primary flex-1" id="btn-consumo-next">Proceder ${Icons.siguiente()}</button>
-          <button class="wizard-btn-action wizard-btn-secondary" onclick="this.closest('.wizard-full-screen').remove()">Cancelar</button>
+          <button class="wizard-btn-action wizard-btn-secondary" id="${modalId}-cancel">Cancelar</button>
         </div>
       </div>
     `;
-    document.body.appendChild(overlay);
+    const overlay = ModalManager.show(modalId, html, { closeOnOverlayClick: false });
+
+    overlay.querySelector('#' + modalId + '-cancel').onclick = () => ModalManager.close(modalId);
 
     overlay.querySelector('#btn-consumo-next').onclick = async () => {
       const siloId = parseInt(overlay.querySelector('#w-consumo-silo').value);
-      overlay.remove();
+      ModalManager.close(modalId);
       await SilosView._abrirConsumirSilo(siloId, rebanoId, onSaved);
     };
   },
