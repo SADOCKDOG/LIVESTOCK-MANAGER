@@ -41,6 +41,7 @@ window.MODULE_COLORS = Object.freeze({
   '/transportistas': '#EC4899',
   // Neutro
   '/ajustes': '#B1B1B1',
+  '/importar-rfid': '#B1B1B1',
   // Alias de rutas de detalle (heredan el color de su módulo)
   '/animal': '#F97316',
   '/rebano': '#3B82F6',

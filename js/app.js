@@ -97,6 +97,7 @@ const App = {
     "/silos": "renderSilos",
     "/fitosanitario": "renderFitosanitarios",
     "/margen-animal": "renderMargenAnimal",
+    "/importar-rfid": "renderImportadorRFID",
   },
 
   async init() {
@@ -400,6 +401,7 @@ const App = {
       { path: '/alertas', label: 'Alertas', icon: Icons.campana() },
       { path: '/cuaderno', label: 'Cuaderno', icon: Icons.libro() },
       { path: '/manuales', label: 'Manuales', icon: Icons.libro() },
+      { path: '/importar-rfid', label: 'Importar RFID', icon: Icons.importar() },
       { path: '/ajustes', label: 'Ajustes', icon: Icons.ajustes() },
     ];
 
@@ -2507,6 +2509,10 @@ const App = {
 
   async renderMargenAnimal(params) {
     if (window.MargenAnimalView) { await MargenAnimalView.render(); }
+  },
+
+  async renderImportadorRFID(params) {
+    if (window.ImportadorRFIDView) { await ImportadorRFIDView.render(); }
   },
 
   async renderAlbaranesVentas(params) {
