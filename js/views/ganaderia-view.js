@@ -45,22 +45,9 @@ const GanaderiaView = {
     }
 
     main.innerHTML = `
-      <!-- Cabecera Maestra de Ganadería Consolidada -->
-      <div class="flex items-center gap-12 mb-14 px-4 animate-fade-in">
-        <span class="text-2xl" style="color:${currentMeta.color}; display:inline-flex; align-items:center;">${currentMeta.icon}</span>
-        <div>
-          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${currentMeta.color}; margin-right:4px;">|</span> ${currentMeta.title}
-          </h1>
-          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            ${currentMeta.desc}
-          </div>
-        </div>
-      </div>
-
-      <!-- Barra de Navegación Multipestaña Horizontal Ganadería (Scrollable) Premium con Indicadores Animados -->
+      <!-- Barra de Navegación Multipestaña Horizontal Ganadería (Scrollable) Premium, centrada arriba del todo -->
       <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
-        <div class="pestana-indicador-flecha pestana-flecha-izq" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: -100, behavior: 'smooth' })">
+        <div class="pestana-indicador-flecha pestana-flecha-izq" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft -= 100; })()">
           ${Icons.atras()}
         </div>
         <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
@@ -73,8 +60,21 @@ const GanaderiaView = {
           }).join('')}
           </div>
         </div>
-        <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
+        <div class="pestana-indicador-flecha pestana-flecha-der" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft += 100; })()">
           ${Icons.siguiente()}
+        </div>
+      </div>
+
+      <!-- Cabecera Maestra de Ganadería Consolidada -->
+      <div class="flex items-center gap-12 mb-14 px-4 animate-fade-in">
+        <span class="text-2xl" style="color:${currentMeta.color}; display:inline-flex; align-items:center;">${currentMeta.icon}</span>
+        <div>
+          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
+            <span style="color:${currentMeta.color}; margin-right:4px;">|</span> ${currentMeta.title}
+          </h1>
+          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
+            ${currentMeta.desc}
+          </div>
         </div>
       </div>
 

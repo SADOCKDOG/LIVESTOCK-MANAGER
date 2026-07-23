@@ -595,41 +595,62 @@ const App = {
     if (card) card.classList.toggle('collapsed');
   },
 
-  /** Evalúa el scroll de las pestañas premium para mostrar/ocultar indicadores de deslizamiento */
+  /**
+   * Evalúa el scroll de las pestañas premium. Las flechas permanecen SIEMPRE
+   * visibles (nunca desaparecen) como indicador constante de que hay más
+   * pestañas deslizando a los lados — solo se atenúan/deshabilitan cuando ya
+   * no hay más recorrido posible en esa dirección.
+   */
   evaluarScrollPestanas(el) {
     const wrapper = el.parentElement;
     if (!wrapper) return;
     const flechaIzq = wrapper.querySelector('.pestana-flecha-izq');
     const flechaDer = wrapper.querySelector('.pestana-flecha-der');
-    
+
     if (flechaIzq) {
-      flechaIzq.style.opacity = el.scrollLeft > 10 ? '1' : '0';
-      flechaIzq.style.pointerEvents = el.scrollLeft > 10 ? 'auto' : 'none';
+      const hayScrollIzq = el.scrollLeft > 10;
+      flechaIzq.style.opacity = hayScrollIzq ? '1' : '0.35';
+      flechaIzq.style.pointerEvents = hayScrollIzq ? 'auto' : 'none';
     }
     if (flechaDer) {
       const maxScroll = el.scrollWidth - el.clientWidth;
-      const tieneMasScroll = el.scrollLeft < maxScroll - 10;
-      flechaDer.style.opacity = tieneMasScroll ? '1' : '0';
-      flechaDer.style.pointerEvents = tieneMasScroll ? 'auto' : 'none';
+      const hayScrollDer = el.scrollLeft < maxScroll - 10;
+      flechaDer.style.opacity = hayScrollDer ? '1' : '0.35';
+      flechaDer.style.pointerEvents = hayScrollDer ? 'auto' : 'none';
     }
   },
 
-  /** Inicializa y fuerza la primera evaluación del scroll de las pestañas premium, autocentrando la activa */
+  /**
+   * Inicializa el scroll de las pestañas premium. A diferencia del centrado
+   * agresivo anterior (que sacaba de la vista las pestañas de los extremos
+   * al seleccionar una del medio), aquí solo se desplaza lo mínimo
+   * imprescindible para que la pestaña activa quede visible — maximizando
+   * cuántas pestañas quedan a la vista a la vez.
+   */
   inicializarScrollPestanas(el) {
     if (!el) return;
-    // Escuchar el evento de scroll dinámicamente si no está en línea
     el.addEventListener('scroll', () => this.evaluarScrollPestanas(el));
     setTimeout(() => {
       this.evaluarScrollPestanas(el);
-      // Centrar el botón activo desplazando únicamente este contenedor (nunca la página):
-      // scrollIntoView() puede hacer scroll en cualquier ancestro para lograr el centrado,
-      // arrastrando también el viewport completo cuando la pestaña activa queda cerca del borde.
       const activeBtn = el.querySelector('.pestanas-premium-btn.active');
-      if (activeBtn) {
-        const destino = activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - el.clientWidth / 2;
-        const maxScroll = el.scrollWidth - el.clientWidth;
-        el.scrollTo({ left: Math.max(0, Math.min(destino, maxScroll)), behavior: 'smooth' });
+      if (!activeBtn) return;
+      // getBoundingClientRect() en vez de offsetLeft: el offsetParent real del
+      // botón es .pestanas-premium-switch (con su propio padding), no el
+      // contenedor con scroll — offsetLeft daría una posición incorrecta.
+      const cRect = el.getBoundingClientRect();
+      const bRect = activeBtn.getBoundingClientRect();
+      const btnStart = bRect.left - cRect.left + el.scrollLeft;
+      const btnEnd = bRect.right - cRect.left + el.scrollLeft;
+      const viewStart = el.scrollLeft;
+      const viewEnd = viewStart + el.clientWidth;
+      // scrollLeft directo (en vez de scrollTo({behavior:'smooth'}), poco fiable
+      // en algunos WebView) — la animación la da scroll-behavior:smooth del CSS.
+      if (btnStart < viewStart) {
+        el.scrollLeft = btnStart;
+      } else if (btnEnd > viewEnd) {
+        el.scrollLeft = btnEnd - el.clientWidth;
       }
+      // Si la pestaña activa ya está totalmente visible, no se mueve nada.
     }, 150);
   },
 
