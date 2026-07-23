@@ -23,6 +23,8 @@ const AgendaService = {
             }
 
             if (window.EventBus) {
+                window.EventBus.emit('agenda:task-added', { id, ...data });
+            }
 
             return id;
         } catch (e) {
