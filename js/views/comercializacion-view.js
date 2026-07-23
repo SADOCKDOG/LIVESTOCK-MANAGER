@@ -226,6 +226,27 @@ const ComercializacionView = {
     }
 
     main.innerHTML = `
+      <!-- Barra de Navegación Multipestaña Horizontal Comercialización (Scrollable) Premium, centrada arriba del todo -->
+      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
+        <div class="pestana-indicador-flecha pestana-flecha-izq" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft -= 100; })()">
+          ${Icons.atras()}
+        </div>
+        <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
+          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Comercialización">
+            <!-- Pestañas generadas dinámicamente según los tipos de explotación activos -->
+            ${['leche', 'carne', 'compradores', 'contratos', 'transportistas'].map(tab => {
+              if (!allowedSubModules.includes(tab)) return '';
+              const isActive = this._activeSubModule === tab;
+              const meta = this._getSubModuleMeta(tab);
+              return `<button class="pestanas-premium-btn ${isActive ? 'active' : ''}" role="tab" aria-selected="${isActive}" style="--mode-color:${meta.color};" onclick="ComercializacionView._cambiarSubModulo('${tab}')">${meta.icon} ${tab.toUpperCase()}</button>`;
+            }).join('')}
+          </div>
+        </div>
+        <div class="pestana-indicador-flecha pestana-flecha-der" onclick="(() => { const c = this.parentElement.querySelector('.pestanas-premium-container'); c.scrollLeft += 100; })()">
+          ${Icons.siguiente()}
+        </div>
+      </div>
+
       <div class="module-header">
         <div class="module-header-kpis">
           <span class="module-mode-chip" style="--mode-color: ${modoMetaComer.color};">${modoMetaComer.icon} ${modoMetaComer.label}</span>
@@ -244,27 +265,6 @@ const ComercializacionView = {
 
       ${alertaContratosHtml}
 
-      <!-- Barra de Navegación Multipestaña Horizontal Comercialización (Scrollable) Premium con Indicadores Animados -->
-      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${currentMeta.color};">
-        <div class="pestana-indicador-flecha pestana-flecha-izq" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: -100, behavior: 'smooth' })">
-          ${Icons.atras()}
-        </div>
-        <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Comercialización">
-            <!-- Pestañas generadas dinámicamente según los tipos de explotación activos -->
-            ${['leche', 'carne', 'compradores', 'contratos', 'transportistas'].map(tab => {
-              if (!allowedSubModules.includes(tab)) return '';
-              const isActive = this._activeSubModule === tab;
-              const meta = this._getSubModuleMeta(tab);
-              return `<button class="pestanas-premium-btn ${isActive ? 'active' : ''}" role="tab" aria-selected="${isActive}" style="--mode-color:${meta.color};" onclick="ComercializacionView._cambiarSubModulo('${tab}')">${meta.icon} ${tab.toUpperCase()}</button>`;
-            }).join('')}
-          </div>
-        </div>
-        <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
-          ${Icons.siguiente()}
-        </div>
-      </div>
-      
       <!-- Contenedor Dinámico para la pestaña activa -->
       <div id="comercializacion-tab-content" class="animate-fade-in"></div>`;
 
