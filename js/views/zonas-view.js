@@ -287,20 +287,6 @@ const ZonasView = {
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
         <div class="wizard-header-fixed border-top-5-gold">
-          <div class="grid grid-cols-3 gap-8 mb-10">
-            <button type="button" onclick="ZonasView._eliminarZona(${index})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
-              ${Icons.eliminar()}
-              <span class="widget-link-label">Eliminar</span>
-            </button>
-            <button type="button" onclick="ZonasView._salirEdicionZona()" class="widget-link-btn widget-link-btn--neon px-4">
-              ${Icons.cerrar()}
-              <span class="widget-link-label">Cancelar</span>
-            </button>
-            <button type="button" onclick="ZonasView._guardarZona(${index})" class="widget-link-btn widget-link-btn--neon neon-success px-4">
-              ${Icons.guardar()}
-              <span class="widget-link-label">Guardar</span>
-            </button>
-          </div>
           <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.zonas()} DETALLE ZONA</h1>
         </div>
         <div class="wizard-content-scrollable p-20">
@@ -328,6 +314,21 @@ const ZonasView = {
           <textarea id="z-edit-localizacion" class="premium-input min-h-60 resize-none">${zona.localizacion || ""}</textarea></div>
         </div>
       </div>
+        <div class="wizard-footer-fixed border-top-222">
+          <div class="grid grid-cols-3 gap-8 w-full">
+            <button type="button" onclick="ZonasView._eliminarZona(${index})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
+              ${Icons.eliminar()}
+              <span class="widget-link-label">Eliminar</span>
+            </button>
+            <button type="button" onclick="ZonasView._salirEdicionZona()" class="widget-link-btn widget-link-btn--neon px-4">
+              ${Icons.cerrar()}
+              <span class="widget-link-label">Cancelar</span>
+            </button>
+            <button type="button" onclick="ZonasView._guardarZona(${index})" class="widget-link-btn widget-link-btn--neon neon-success px-4">
+              ${Icons.guardar()}
+              <span class="widget-link-label">Guardar</span>
+            </button>
+          </div>
         </div>
       </div>`;
   },

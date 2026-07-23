@@ -129,7 +129,8 @@ const ExplotacionView = {
     const fincaId = await Fincas?.getActiveId();
     if (!fincaId) { main.innerHTML = `<div class="p-20 text-center"><p class="text-gray">Sin finca activa.</p></div>`; return; }
 
-    if (window.App?.updateHeaderColor) App.updateHeaderColor('explotacion');
+    // Color de pantalla fijo de ExPro (azul), igual para todos sus submódulos
+    if (window.App?.updateHeaderColor) App.updateHeaderColor('var(--c-info)');
 
     // Inicializar sub-módulo activo por defecto si no está definido
     if (!this._activeSubModule) {
@@ -151,6 +152,18 @@ const ExplotacionView = {
     const primaryLabel = flagsHeader.leche && flagsHeader.carne ? 'Registrar Producción' : flagsHeader.carne ? 'Registrar Pesaje' : 'Registrar Ordeño';
 
     main.innerHTML = `
+      <!-- Carrusel circular de secciones de Explotación y Soporte: marco centrado con la sección activa -->
+      <div class="mb-14">
+        ${App.renderCarruselPestanas([
+          { key: 'explotacion', icon: Icons.finca(), label: 'EXPRO', color: 'var(--c-success)' },
+          { key: 'silos', icon: Icons.silos(), label: 'SILOS', color: 'var(--c-success)' },
+          { key: 'fitosanitarios', icon: Icons.sanidad(), label: 'FITOSANITARIOS', color: 'var(--c-purple)' },
+          { key: 'gastos', icon: Icons.dinero(), label: 'FINANZAS', color: 'var(--c-purple)' },
+          { key: 'proveedores', icon: Icons.proveedores(), label: 'PROVEEDORES', color: 'var(--c-purple)' },
+          { key: 'tramites', icon: Icons.documento(), label: 'TRÁMITES', color: 'var(--c-info)' },
+        ], this._activeSubModule, 'ExplotacionView')}
+      </div>
+
       <!-- Cabecera de Módulo: chip de modo + KPI + acción principal + accesos rápidos a trámites -->
       <div class="module-header px-4">
         <div class="module-header-kpis">
@@ -175,26 +188,6 @@ const ExplotacionView = {
           <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('censo')">${Icons.documento()}<span class="widget-link-label">Censo</span></button>
           <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('crotales')">${Icons.documento()}<span class="widget-link-label">Crotales</span></button>
           <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('guia')">${Icons.documento()}<span class="widget-link-label">Guía Mov.</span></button>
-        </div>
-      </div>
-
-      <!-- Barra de Navegación Multipestaña Horizontal ExPro (Scrollable) Premium con Indicadores Animados -->
-      <div class="pestanas-premium-wrapper mb-14" style="--mode-color: ${this._getSubModuleMeta(this._activeSubModule).color};">
-        <div class="pestana-indicador-flecha pestana-flecha-izq" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: -100, behavior: 'smooth' })">
-          ${Icons.atras()}
-        </div>
-        <div class="pestanas-premium-container" onscroll="App.evaluarScrollPestanas(this)">
-          <div class="pestanas-premium-switch" role="tablist" aria-label="Secciones de Explotación y Soporte">
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'explotacion' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'explotacion'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('explotacion')">${Icons.finca()} EXPRO</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'silos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'silos'}" style="--mode-color:var(--c-success);" onclick="ExplotacionView._cambiarSubModulo('silos')">${Icons.silos()} SILOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'fitosanitarios' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'fitosanitarios'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('fitosanitarios')">${Icons.sanidad()} FITOSANITARIOS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'gastos' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'gastos'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('gastos')">${Icons.dinero()} FINANZAS</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'proveedores' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'proveedores'}" style="--mode-color:var(--c-purple);" onclick="ExplotacionView._cambiarSubModulo('proveedores')">${Icons.proveedores()} PROVEEDORES</button>
-            <button class="pestanas-premium-btn ${this._activeSubModule === 'tramites' ? 'active' : ''}" role="tab" aria-selected="${this._activeSubModule === 'tramites'}" style="--mode-color:var(--c-info);" onclick="ExplotacionView._cambiarSubModulo('tramites')">${Icons.documento()} TRÁMITES</button>
-          </div>
-        </div>
-        <div class="pestana-indicador-flecha pestana-flecha-der" style="opacity: 0; pointer-events: none;" onclick="this.parentElement.querySelector('.pestanas-premium-container').scrollBy({ left: 100, behavior: 'smooth' })">
-          ${Icons.siguiente()}
         </div>
       </div>
 
@@ -260,12 +253,6 @@ const ExplotacionView = {
           window._wizardCallFromExpro = false;
         }
         break;
-    }
-
-    // Inicializar scroll dinámico para la barra de pestañas
-    const containerPestanas = document.querySelector('.pestanas-premium-container');
-    if (containerPestanas && window.App?.inicializarScrollPestanas) {
-      window.App.inicializarScrollPestanas(containerPestanas);
     }
   },
 
@@ -710,18 +697,6 @@ const ExplotacionView = {
         </div>` : ''}
       </div>`;
   },
-
-  _getSubModuleMeta(sub) {
-    const map = {
-      explotacion: { color: 'var(--c-success)' },
-      silos: { color: 'var(--c-success)' },
-      fitosanitarios: { color: 'var(--c-purple)' },
-      gastos: { color: 'var(--c-purple)' },
-      proveedores: { color: 'var(--c-purple)' },
-      tramites: { color: 'var(--c-info)' }
-    };
-    return map[sub] || map.explotacion;
-  }
 };
 
 window.ExplotacionView = ExplotacionView;

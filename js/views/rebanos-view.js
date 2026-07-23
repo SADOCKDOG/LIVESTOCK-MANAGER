@@ -294,20 +294,6 @@ const RebanosView = {
     document.getElementById("app-content").innerHTML = `
       <div class="wizard-full-screen">
         <div class="wizard-header-fixed border-top-5-gold">
-          <div class="grid grid-cols-3 gap-8 mb-10">
-            <button type="button" onclick="RebanosView._eliminarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
-              ${Icons.eliminar()}
-              <span class="widget-link-label">Eliminar</span>
-            </button>
-            <button type="button" onclick="RebanosView._salirDetalle()" class="widget-link-btn widget-link-btn--neon px-4">
-              ${Icons.cerrar()}
-              <span class="widget-link-label">Cancelar</span>
-            </button>
-            <button type="button" onclick="RebanosView._guardarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-success px-4">
-              ${Icons.guardar()}
-              <span class="widget-link-label">Guardar</span>
-            </button>
-          </div>
           <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.rebanos()} ${rebano.nombre}</h1>
         </div>
         <div class="wizard-content-scrollable p-20">
@@ -435,6 +421,22 @@ const RebanosView = {
         </div>
       </div>
 
+        </div>
+        <div class="wizard-footer-fixed border-top-222">
+          <div class="grid grid-cols-3 gap-8 w-full">
+            <button type="button" onclick="RebanosView._eliminarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-danger px-4">
+              ${Icons.eliminar()}
+              <span class="widget-link-label">Eliminar</span>
+            </button>
+            <button type="button" onclick="RebanosView._salirDetalle()" class="widget-link-btn widget-link-btn--neon px-4">
+              ${Icons.cerrar()}
+              <span class="widget-link-label">Cancelar</span>
+            </button>
+            <button type="button" onclick="RebanosView._guardarRebano(${id})" class="widget-link-btn widget-link-btn--neon neon-success px-4">
+              ${Icons.guardar()}
+              <span class="widget-link-label">Guardar</span>
+            </button>
+          </div>
         </div>
       </div>`;
     this._cargarHistorialSanitario(id);
