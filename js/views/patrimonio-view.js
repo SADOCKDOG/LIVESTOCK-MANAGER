@@ -64,9 +64,9 @@ const PatrimonioView = {
 
         <!-- Accesos directos táctiles -->
         <div class="grid grid-cols-3 gap-8 mb-16">
-          <a href="#/animales" class="widget-link-btn">${Icons.animales()} Animales</a>
-          <a href="#/rebanos" class="widget-link-btn">${Icons.rebanos()} Rebaños</a>
-          <a href="#/zonas" class="widget-link-btn">${Icons.zonas()} Zonas</a>
+          <a href="#/animales" class="widget-link-btn widget-link-btn--neon neon-info"><span class="widget-link-label">${Icons.animales()} Animales</span></a>
+          <a href="#/rebanos" class="widget-link-btn widget-link-btn--neon neon-info"><span class="widget-link-label">${Icons.rebanos()} Rebaños</span></a>
+          <a href="#/zonas" class="widget-link-btn widget-link-btn--neon neon-info"><span class="widget-link-label">${Icons.zonas()} Zonas</span></a>
         </div>
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-6 pb-5">
