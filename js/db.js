@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 22;
+const DB_VERSION = 23;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -306,7 +306,7 @@ class InMemoryMockDB {
                 'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs',
                 'config_costes_referencia', 'config_silos', 'especies', 'tipos_identificador',
                 'especie_tipo_identificador', 'razas', 'vacunaciones', 'instalaciones_tipo',
-                'config_botiquin'
+                'config_botiquin', 'agenda_tareas'
             ],
             contains(name) { return this.names.includes(name); }
         };
@@ -914,6 +914,20 @@ async function initDB() {
                     store.createIndex('campana', 'campana');
                     store.createIndex('fecha', 'fecha');
                     store.createIndex('calificacion', 'calificacion');
+                }
+            }
+
+            // v23: Sistema Unificado de Eventos, Tareas y Alertas (Agenda)
+            if (oldVersion < 23) {
+                if (!db.objectStoreNames.contains('agenda_tareas')) {
+                    const store = db.createObjectStore('agenda_tareas', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('modulo_id', 'modulo_id');
+                    store.createIndex('entidad_id', 'entidad_id');
+                    store.createIndex('fecha_planificada', 'fecha_planificada');
+                    store.createIndex('estado', 'estado');
+                    store.createIndex('prioridad', 'prioridad');
+                    store.createIndex('es_alerta', 'es_alerta');
                 }
             }
         },

@@ -728,8 +728,8 @@ const SilosView = {
             </div>
 
             <div class="flex gap-10 justify-end">
-                <button class="btn btn-dark" onclick="ModalManager.close('silo-form-modal')">CANCELAR</button>
-                <button class="btn btn-primary" onclick="SilosView._guardarFormularioSilo(${id})">GUARDAR SILO</button>
+                <button type="button" class="wizard-btn-action wizard-btn-secondary" onclick="ModalManager.close('silo-form-modal')">${Icons.cerrar()} Cancelar</button>
+                <button type="button" class="wizard-btn-action wizard-btn-success" onclick="SilosView._guardarFormularioSilo(${id})">${Icons.guardar()} Guardar Silo</button>
             </div>
         </div>
         `;

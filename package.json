@@ -33,6 +33,7 @@
     "@capacitor-mlkit/barcode-scanning": "^7.5.0",
     "@capacitor/app": "^7.1.2",
     "@capacitor/filesystem": "^7.1.8",
+    "@capacitor/local-notifications": "^7.1.5",
     "@capacitor/share": "^7.0.4",
     "@capawesome/capacitor-file-picker": "^7.2.0",
     "cordova-plugin-purchase": "^13.18.0"

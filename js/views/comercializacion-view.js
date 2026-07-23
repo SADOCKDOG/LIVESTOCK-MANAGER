@@ -258,7 +258,13 @@ const ComercializacionView = {
       ${alertaContratosHtml}
 
       <!-- Contenedor Dinámico para la pestaña activa -->
+      <div id="comer-agenda-widget"></div>
       <div id="comercializacion-tab-content" class="animate-fade-in"></div>`;
+
+    // Inyectar widget de agenda si el módulo está disponible
+    if (window.AgendaView) {
+        window.AgendaView.renderWidget(document.getElementById('comer-agenda-widget'), 'contratos');
+    }
 
     // Delegación dinámica de renderizado de pestañas
     switch (this._activeSubModule) {

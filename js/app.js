@@ -98,6 +98,8 @@ const App = {
     "/fitosanitario": "renderFitosanitarios",
     "/margen-animal": "renderMargenAnimal",
     "/importar-rfid": "renderImportadorRFID",
+    "/agenda": "renderAgenda",
+  },
   },
 
   async init() {
@@ -109,6 +111,7 @@ const App = {
 
       // Inicializar servicios del sistema
       if (window.CacheService) window.CacheService.init();
+      if (window.NotificacionesService) await window.NotificacionesService.init();
 
       this._setupOfflineIndicator();
 
@@ -2598,6 +2601,12 @@ const App = {
   async renderManuales() {
     if (window.ManualesView) {
       await ManualesView.render();
+    }
+  },
+
+  async renderAgenda(params) {
+    if (window.AgendaView) { await AgendaView.render(params); }
+  },
     } else {
       document.getElementById("app-content").innerHTML = '<div class="loader">Cargando manuales...</div>';
     }
