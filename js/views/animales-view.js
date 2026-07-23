@@ -221,6 +221,8 @@ const AnimalesView = {
       peso_inicial: ""
     };
     if (!esNuevo) a = await Animales.get(id);
+    // Calculate economic margin for existing animals
+    const margen = !esNuevo && window.MargenAnimal ? await window.MargenAnimal.calcular(a.id).catch(() => null) : null;
 
     const [especies, tiposIdentificador, especieTipoIdentificador, razas, rebanos, todosAnimales, proveedores] = await Promise.all([
       window.db.getAll("especies").catch(() => []),
@@ -427,6 +429,24 @@ const AnimalesView = {
               <label class="wizard-label" for="a-pago-pendiente">PAGO PENDIENTE</label>
               <input type="checkbox" id="a-pago-pendiente" ${a.pago_pendiente ? 'checked' : ''} class="wizard-input">
             </div>
+          </div>
+          ` : ''}
+
+          ${margen ? `
+          <div class="card p-16 mb-20" style="border: 1px solid ${margen.margenNeto >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}; background: rgba(255,255,255,0.02);">
+            <div class="section-header-theme mb-12" style="--theme-color: ${margen.margenNeto >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: ${margen.margenNeto >= 0 ? 'var(--c-success)' : 'var(--c-danger)'}; margin-right: 4px;">|</span> ${Icons.dinero ? Icons.dinero() : Icons.documento()} MARGEN ECONÓMICO</div>
+            <div class="grid grid-cols-2 gap-12 mb-12">
+              <div><span class="text-xs text-gray uppercase font-extrabold tracking-wider">COSTE TOTAL</span><br><span class="text-white font-950 text-lg">${margen.costeTotal.toFixed(2)} €</span></div>
+              <div><span class="text-xs text-gray uppercase font-extrabold tracking-wider">INGRESO TOTAL</span><br><span class="text-white font-950 text-lg">${margen.ingresoTotal.toFixed(2)} €</span></div>
+            </div>
+            <div class="mb-12"><span class="text-xs text-gray uppercase font-extrabold tracking-wider">MARGEN NETO</span><br><span class="font-950 text-xl" style="color: ${margen.margenNeto >= 0 ? 'var(--c-success)' : 'var(--c-danger)'};">${margen.margenNeto.toFixed(2)} €</span></div>
+            <div class="grid grid-cols-2 gap-8 text-xs">
+              <div>Compra: ${margen.costeCompra.toFixed(2)} €</div>
+              <div>Sanidad: ${margen.costeSanidad.toFixed(2)} €</div>
+              <div>Leche: ${margen.litrosLeche.toFixed(1)} L · ${margen.ingresoLeche.toFixed(2)} €</div>
+              <div>Venta: ${margen.ingresoVenta.toFixed(2)} €</div>
+            </div>
+            ${margen.sinPrecioLeche ? `<div class="text-xs mt-8" style="color: var(--c-warning);">${Icons.alerta ? Icons.alerta() : ''} Sin contrato de leche activo con precio vigente — ingreso de leche estimado en 0 €.</div>` : ''}
           </div>
           ` : ''}
 

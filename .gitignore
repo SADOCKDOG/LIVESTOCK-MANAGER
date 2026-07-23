@@ -57,3 +57,4 @@ tmp_test/
 android/app/*.jks
 android/app/service-account.json
 android/keystore.properties
+android/app/src/main/assets/public/js/
