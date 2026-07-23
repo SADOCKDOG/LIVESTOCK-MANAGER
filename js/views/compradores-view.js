@@ -12,7 +12,7 @@ const CompradoresView = {
     tipo: ''
   },
   async render() {
-    if (window.App) App.updateHeaderColor('compradores');
+    // Color de pantalla: lo fija ComercializacionView (color fijo de CoMer), esta vista siempre va embebida en su carrusel.
     const main = document.getElementById("comercializacion-tab-content") || document.getElementById("app-content");
 
     // Cargar datos necesarios según el módulo activo

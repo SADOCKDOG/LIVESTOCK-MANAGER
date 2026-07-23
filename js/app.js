@@ -563,7 +563,10 @@ const App = {
   },
 
   /** Actualiza el color neon de la cabecera según el mapa único MODULE_COLORS.
-   *  Con mode explícito (carne/leche/...) usa ese módulo; sin mode, el color de la ruta actual. */
+   *  Con mode explícito (carne/leche/...) usa ese módulo; sin mode, el color de la ruta actual.
+   *  Si mode ya es un color literal (empieza por '#' o 'var(') se usa tal cual, sin pasar por
+   *  MODULE_COLORS — así los hubs GeGan/ExPro/CoMer pueden fijar su color de pantalla único por
+   *  módulo principal (ver App.CARRUSEL_COLOR_MODULO) sin duplicar/alterar el mapa compartido. */
   updateHeaderColor(mode) {
     const cfg = this._config;
     let color;
@@ -572,6 +575,8 @@ const App = {
 
     if (isFixed) {
       color = fixedColor;
+    } else if (mode && (mode.startsWith('#') || mode.startsWith('var('))) {
+      color = mode;
     } else {
       const path = mode ? '/' + mode : (window.location.hash.slice(1).split('?')[0] || '/');
       color = window.getModuleColor(path);
@@ -595,6 +600,15 @@ const App = {
     if (card) card.classList.toggle('collapsed');
   },
 
+  /** Color de pantalla fijo por módulo principal (verde lima GeGan / azul ExPro / amarillo CoMer,
+   *  ver .agent/AGENTS.md §1). Unifica la cromática del carrusel y del marco de cabecera para que
+   *  no varíe entre submódulos; los iconos SVG y las tarjetas de registro conservan su color propio. */
+  CARRUSEL_COLOR_MODULO: {
+    GanaderiaView: 'var(--c-success)',
+    ExplotacionView: 'var(--c-info)',
+    ComercializacionView: 'var(--c-warning)',
+  },
+
   /**
    * Genera el HTML del carrusel circular de pestañas de submódulo: un marco
    * centrado muestra solo la sección activa (ampliada, con desvanecimiento
@@ -604,7 +618,10 @@ const App = {
    * módulo— de a qué sección llevan. Como el carrusel no es deslizable, tocar
    * el marco activo despliega un menú con todos los submódulos disponibles
    * del módulo principal. Los puntos de abajo dan acceso directo a cualquier
-   * sección y sirven de indicador de "hay N secciones en total".
+   * sección y sirven de indicador de "hay N secciones en total". El cromo
+   * (bordes, resplandores, puntos) usa el color fijo del módulo principal
+   * (CARRUSEL_COLOR_MODULO); los iconos SVG conservan su color individual
+   * de submódulo.
    * @param {Array<{key:string, icon:string, label:string, color:string}>} tabs
    * @param {string} activeKey
    * @param {string} viewName - nombre global de la vista (p.ej. 'GanaderiaView') para el onclick.
@@ -618,39 +635,43 @@ const App = {
     const prev = tabs[(idx - 1 + n) % n];
     const next = tabs[(idx + 1) % n];
     const menuId = `carrusel-menu-${viewName}`;
+    const colorModulo = App.CARRUSEL_COLOR_MODULO[viewName] || active.color;
     const cerrarYNavegar = (key) => `App.cerrarCarruselMenu(); ${viewName}._cambiarSubModulo('${key}')`;
 
     const flechaIzq = single ? '' : `
-        <button type="button" class="carrusel-flecha carrusel-flecha-izq pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${cerrarYNavegar(prev.key)}" aria-label="Anterior: ${prev.label}" title="${prev.label}">
+        <button type="button" class="carrusel-flecha carrusel-flecha-izq pestana-flecha-activa" onclick="${cerrarYNavegar(prev.key)}" aria-label="Anterior: ${prev.label}" title="${prev.label}">
           <span class="carrusel-flecha-preview" style="color:${prev.color};">${prev.icon}</span>
           <span class="carrusel-flecha-arrow">${Icons.atras()}</span>
         </button>`;
     const flechaDer = single ? '' : `
-        <button type="button" class="carrusel-flecha carrusel-flecha-der pestana-flecha-activa" style="--mode-color:${active.color};" onclick="${cerrarYNavegar(next.key)}" aria-label="Siguiente: ${next.label}" title="${next.label}">
+        <button type="button" class="carrusel-flecha carrusel-flecha-der pestana-flecha-activa" onclick="${cerrarYNavegar(next.key)}" aria-label="Siguiente: ${next.label}" title="${next.label}">
           <span class="carrusel-flecha-arrow">${Icons.siguiente()}</span>
           <span class="carrusel-flecha-preview" style="color:${next.color};">${next.icon}</span>
         </button>`;
     const dots = single ? '' : `
       <div class="carrusel-dots" role="tablist" aria-label="Todas las secciones">
-        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" style="--mode-color:${t.color};" onclick="${cerrarYNavegar(t.key)}" title="${t.label}"></span>`).join('')}
+        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" onclick="${cerrarYNavegar(t.key)}" title="${t.label}"></span>`).join('')}
       </div>`;
     const menu = single ? '' : `
       <div class="carrusel-menu" id="${menuId}" role="listbox" aria-label="Todos los submódulos">
-        ${tabs.map(t => `<button type="button" class="carrusel-menu-item ${t.key === activeKey ? 'active' : ''}" role="option" aria-selected="${t.key === activeKey}" style="--mode-color:${t.color};" onclick="${cerrarYNavegar(t.key)}">${t.icon}<span>${t.label}</span></button>`).join('')}
+        ${tabs.map(t => `<button type="button" class="carrusel-menu-item ${t.key === activeKey ? 'active' : ''}" role="option" aria-selected="${t.key === activeKey}" onclick="${cerrarYNavegar(t.key)}"><span class="carrusel-menu-item-icon" style="color:${t.color};">${t.icon}</span><span>${t.label}</span></button>`).join('')}
       </div>`;
 
     return `
-      ${dots}
-      <div class="carrusel-pestanas-wrapper">
-        <div class="carrusel-pestanas" style="--mode-color: ${active.color};">
-          ${flechaIzq}
-          <button type="button" class="carrusel-marco" id="${menuId}-trigger" onclick="App.toggleCarruselMenu('${menuId}')" aria-haspopup="listbox" aria-expanded="false" ${single ? 'disabled' : ''}>
-            ${active.icon} ${active.label}
-            ${single ? '' : `<span class="carrusel-marco-chevron">${Icons.chevronAbajo()}</span>`}
-          </button>
-          ${flechaDer}
+      <div class="carrusel-modulo" style="--mode-color: ${colorModulo};">
+        ${dots}
+        <div class="carrusel-pestanas-wrapper">
+          <div class="carrusel-pestanas">
+            ${flechaIzq}
+            <button type="button" class="carrusel-marco" id="${menuId}-trigger" onclick="App.toggleCarruselMenu('${menuId}')" aria-haspopup="listbox" aria-expanded="false" ${single ? 'disabled' : ''}>
+              <span class="carrusel-marco-icon" style="color:${active.color};">${active.icon}</span>
+              <span class="carrusel-marco-label">${active.label}</span>
+              ${single ? '' : `<span class="carrusel-marco-chevron">${Icons.chevronAbajo()}</span>`}
+            </button>
+            ${flechaDer}
+          </div>
+          ${menu}
         </div>
-        ${menu}
       </div>`;
   },
 

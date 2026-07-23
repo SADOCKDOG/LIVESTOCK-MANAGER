@@ -9,7 +9,7 @@ const ContratosView = {
     tipo: '' // activo, inactivo, todos
   },
   async render() {
-    if (window.App) App.updateHeaderColor('contratos');
+    // Color de pantalla: lo fija ComercializacionView (color fijo de CoMer), esta vista siempre va embebida en su carrusel.
     const main = document.getElementById("comercializacion-tab-content") || document.getElementById("app-content");
     const moduleColor = window.getModuleColor ? getModuleColor('/contrato') : '#4FADF5';
 

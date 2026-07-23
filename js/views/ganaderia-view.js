@@ -39,9 +39,9 @@ const GanaderiaView = {
 
     const currentMeta = moduloMeta[this._activeSubModule] || moduloMeta.animales;
 
-    // Sincronizar color de cabecera con el sub-módulo activo
+    // Color de pantalla fijo de GeGan (verde lima), igual para todos sus submódulos
     if (window.App && App.updateHeaderColor) {
-      App.updateHeaderColor(this._activeSubModule === 'animales' ? 'animales' : (this._activeSubModule === 'rebanos' ? 'rebanos' : this._activeSubModule));
+      App.updateHeaderColor('var(--c-success)');
     }
 
     main.innerHTML = `
