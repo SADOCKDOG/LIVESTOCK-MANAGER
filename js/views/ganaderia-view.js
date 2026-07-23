@@ -68,7 +68,13 @@ const GanaderiaView = {
       </div>
 
       <!-- Contenedor Dinámico para la pestaña activa -->
+      <div id="ganaderia-agenda-widget"></div>
       <div id="ganaderia-tab-content" class="animate-fade-in"></div>`;
+
+    // Inyectar widget de agenda si el módulo está disponible
+    if (window.AgendaView) {
+        window.AgendaView.renderWidget(document.getElementById('ganaderia-agenda-widget'), 'gegan');
+    }
 
     // Delegación dinámica de renderizado
     switch (this._activeSubModule) {
