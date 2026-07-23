@@ -2602,15 +2602,13 @@ const App = {
   async renderManuales() {
     if (window.ManualesView) {
       await ManualesView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando manuales...</div>';
     }
   },
 
   async renderAgenda(params) {
     if (window.AgendaView) { await AgendaView.render(params); }
-  },
-    } else {
-      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando manuales...</div>';
-    }
   },
 
   async renderSilos() {
