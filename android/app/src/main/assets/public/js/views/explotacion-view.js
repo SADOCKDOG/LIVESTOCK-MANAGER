@@ -385,6 +385,8 @@ const ExplotacionView = {
           </div>
         </div>` : ''}
 
+        <div id="expro-agenda-widget"></div>
+
         <div class="inf-section-title mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
           <span style="color: ${metaRef.color}; margin-right: 4px;">|</span> ${Icons.documento()} ACTIVIDAD RECIENTE
         </div>
@@ -400,6 +402,11 @@ const ExplotacionView = {
           ${this._renderActividadItems()}
         </div>
       </div>`;
+
+    // Inyectar widget de agenda si el módulo está disponible
+    if (window.AgendaView) {
+        window.AgendaView.renderWidget(document.getElementById('expro-agenda-widget'));
+    }
   },
 
   /** Filtra la lista de "Actividad Reciente" por crotal o zona, sin re-renderizar toda la vista (conserva el foco del buscador). */

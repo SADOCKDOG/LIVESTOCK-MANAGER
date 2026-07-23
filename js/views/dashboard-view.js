@@ -405,7 +405,7 @@ const DashboardView = {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="color: #FFF; font-weight: 900; font-size: var(--fs-body); text-transform: uppercase; letter-spacing: 0.5px;">${a.mensaje}</div>
-                    <div style="color: var(--text-s); font-size: var(--fs-tiny); margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.calendario()} PROGRAMADO: ${UI.formatDate(a.fecha)}</div>
+                    <div style="color: var(--text-s); font-size: var(--fs-tiny); margin-top: 4px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">${Icons.calendar()} PROGRAMADO: ${UI.formatDate(a.fecha)}</div>
                   </div>
                   <div style="color: var(--c-danger); font-size: var(--fs-h1);">${Icons.alerta()}</div>
                 </div>
@@ -447,7 +447,7 @@ const DashboardView = {
                     <div style="flex: 1; min-width: 0;">
                       <div style="color: #FFF; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.titulo}</div>
                       <div style="color: ${esVencida ? 'var(--c-danger)' : 'var(--text-s)'}; font-size: 0.6rem; margin-top: 4px; font-weight: 800; text-transform: uppercase;">
-                        ${Icons.calendario()} ${UI.formatDate(t.fecha_planificada)} ${esVencida ? '· VENCIDA' : ''}
+                        ${Icons.calendar()} ${UI.formatDate(t.fecha_planificada)} ${esVencida ? '· VENCIDA' : ''}
                       </div>
                     </div>
                     <span style="color: ${colorPrioridad}; opacity: 0.8;">${Icons.siguiente()}</span>

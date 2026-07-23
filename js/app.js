@@ -100,7 +100,6 @@ const App = {
     "/importar-rfid": "renderImportadorRFID",
     "/agenda": "renderAgenda",
   },
-  },
 
   async init() {
     try {
@@ -111,7 +110,9 @@ const App = {
 
       // Inicializar servicios del sistema
       if (window.CacheService) window.CacheService.init();
-      if (window.NotificacionesService) await window.NotificacionesService.init();
+      if (window.NotificacionesService) {
+        window.NotificacionesService.init().catch(e => console.warn('[App] Error init notificaciones:', e));
+      }
 
       this._setupOfflineIndicator();
 
