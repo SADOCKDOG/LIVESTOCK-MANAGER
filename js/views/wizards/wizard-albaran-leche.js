@@ -16,6 +16,9 @@ window.AlbaranLecheWizard = {
       ? window.ComunidadesService.PRECIO_EXTRACTO_SECO_REF
       : { precio_base_referencia: 0.45, precio_por_punto_extracto: 0.045, tasa_INLAC_defecto: 0.0012 };
 
+    const tanquesActivos = window.TanquesLeche ? await window.TanquesLeche.getActivos(fincaId) : [];
+    const laboratorios = window.ComunidadesService ? window.ComunidadesService.getLaboratoriosLeche() : [];
+
     // Definición de funciones de cálculo en el ámbito global del App para los onchange/oninput
     App._recalcularPrecioLeche = function() {
       const pbInput = document.getElementById('w-l-pb');
@@ -69,6 +72,32 @@ window.AlbaranLecheWizard = {
                 <input type="number" id="w-l-cant" value="${data.l}" class="wizard-input border-green font-950 text-xl text-green">
               </div>
             </div>
+
+            <div class="grid grid-cols-2 gap-10 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">ESPECIE</label>
+                <select id="w-l-especie" class="wizard-input font-800 text-xs">
+                  <option value="vacuno" ${data.especie_leche === 'vacuno' ? 'selected' : ''}>VACUNO</option>
+                  <option value="ovino" ${data.especie_leche === 'ovino' ? 'selected' : ''}>OVINO</option>
+                  <option value="caprino" ${data.especie_leche === 'caprino' ? 'selected' : ''}>CAPRINO</option>
+                </select>
+              </div>
+              ${tanquesActivos.length > 0 ? `
+              <div class="wizard-input-group">
+                <label class="wizard-label">TANQUE ORIGEN</label>
+                <select id="w-l-tanque" class="wizard-input font-800 text-xs">
+                  <option value="">— SELECCIONAR —</option>
+                  ${tanquesActivos.map(t => `<option value="${t.id}" ${data.tanqueId == t.id ? 'selected' : ''}>${t.nombre} (${t.codigo_letra_q})</option>`).join('')}
+                </select>
+              </div>
+              ` : `
+              <div class="wizard-input-group">
+                <label class="wizard-label">TANQUE</label>
+                <div class="text-[0.6rem] font-800 text-red p-8">Sin tanques registrados</div>
+              </div>
+              `}
+            </div>
+            <div id="w-l-tanque-stock" class="text-[0.6rem] font-800 mb-8" style="color:var(--c-info);"></div>
 
             <div class="grid grid-cols-2 gap-10 mb-12">
               <div class="wizard-input-group">
@@ -141,9 +170,22 @@ window.AlbaranLecheWizard = {
           data.comunidad_autonoma = document.getElementById('w-l-ccaa')?.value || data.comunidad_autonoma;
           data.cadena_frio_cumplida = document.getElementById('w-l-frio')?.checked || false;
           data.inh = document.getElementById('w-l-inh')?.checked || false;
+          data.especie_leche = document.getElementById('w-l-especie')?.value || 'vacuno';
+          data.tanqueId = parseInt(document.getElementById('w-l-tanque')?.value) || null;
           
           data.estado_tramite_infolac = data.estado_tramite_infolac || 'borrador';
           data.adsg_codigo = data.adsg_codigo || finca.adsg_codigo || '';
+
+          if (data.tanqueId && window.BalanceLacteo) {
+            const stock = await window.BalanceLacteo.getStockTanque(data.tanqueId);
+            const tanque = tanquesActivos.find(t => t.id === data.tanqueId);
+            const stockEl = document.getElementById('w-l-tanque-stock');
+            if (stockEl) {
+              const pct = tanque && tanque.capacidad_litros > 0 ? Math.round((stock / tanque.capacidad_litros) * 100) : 0;
+              stockEl.textContent = `Stock tanque: ${stock.toLocaleString('es-ES')}L (${pct}% capacidad)`;
+              stockEl.style.color = data.l > stock ? 'var(--c-danger)' : 'var(--c-info)';
+            }
+          }
         },
         validate: async (data) => {
           if (!data.fecha) { App.toastError("La fecha de recogida es obligatoria"); return false; }
@@ -151,6 +193,32 @@ window.AlbaranLecheWizard = {
           if (!data.comunidad_autonoma) { App.toastError("Selecciona la comunidad autónoma"); return false; }
           if (data.temp > 6) { App.toast("ALERTA SANITARIA: Temperatura > 6°C detectada.", 'warning'); }
           if (!data.inh) { App.toastError("Debes certificar la ausencia de inhibidores."); return false; }
+
+          if (data.tanqueId && window.BalanceLacteo) {
+            const validacion = await window.BalanceLacteo.validarStockSuficiente(data.tanqueId, data.l);
+            if (!validacion.valido) {
+              App.toastError(`Litros (${data.l}L) superan stock del tanque (${validacion.stockActual}L)`);
+              return false;
+            }
+          }
+
+          if (window.MotorLacteo) {
+            const validacionCom = await window.MotorLacteo.validarComercializacion({
+              fincaId,
+              tanqueId: data.tanqueId,
+              cantidad: data.l,
+              especie_leche: data.especie_leche,
+              temperatura: data.temp,
+            });
+            for (const err of validacionCom.errores) {
+              App.toastError(err);
+            }
+            if (!validacionCom.valido) return false;
+            for (const w of validacionCom.warnings) {
+              App.toast(w, 'warning');
+            }
+          }
+
           return true;
         }
       },
@@ -191,11 +259,39 @@ window.AlbaranLecheWizard = {
                 <input type="number" id="w-l-som" value="${data.somaticas || ''}" class="wizard-input font-800">
               </div>
             </div>
+
+            <div class="border-top-222 pt-12 mt-4 mb-12">
+              <div class="section-header-theme mb-10" style="--theme-color: var(--c-danger); font-size: var(--fs-tiny);">AFLATOXINA M1 (PLAN PIVCA)</div>
+              <div class="grid grid-cols-2 gap-10 mb-10">
+                <div class="wizard-input-group">
+                  <label class="wizard-label">AFLATOXINA M1 (ng/kg)</label>
+                  <input type="number" id="w-l-afm1" value="${data.aflatoxina_m1 || ''}" step="0.1" class="wizard-input font-800">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="wizard-label">MÉTODO</label>
+                  <select id="w-l-afm1-metodo" class="wizard-input font-800 text-xs">
+                    <option value="">— NINGUNO —</option>
+                    <option value="kit_rapido" ${data.aflatoxina_m1_metodo === 'kit_rapido' ? 'selected' : ''}>KIT RÁPIDO</option>
+                    <option value="ELISA" ${data.aflatoxina_m1_metodo === 'ELISA' ? 'selected' : ''}>ELISA</option>
+                    <option value="HPLC" ${data.aflatoxina_m1_metodo === 'HPLC' ? 'selected' : ''}>HPLC</option>
+                  </select>
+                </div>
+              </div>
+            </div>
             
             <div class="wizard-input-group mb-12">
               <label class="wizard-label">FECHA ANÁLISIS</label>
               <input type="date" id="w-l-fec-an" value="${data.fecha_analisis || ''}" class="wizard-input font-800">
             </div>
+
+            ${laboratorios.length > 0 ? `
+            <div class="wizard-input-group mb-12">
+              <label class="wizard-label">LABORATORIO</label>
+              <select id="w-l-lab" class="wizard-input font-800 text-xs">
+                ${laboratorios.map(l => `<option value="${l.codigo}" ${data.laboratorio_nombre === l.codigo || data.laboratorio_nombre === l.nombre ? 'selected' : ''}>${l.nombre}</option>`).join('')}
+              </select>
+            </div>
+            ` : ''}
 
             <div class="p-10 bg-black border border-222 rounded-sm mb-12">
               <label class="flex items-center gap-10 text-xs text-white cursor-pointer">
@@ -257,6 +353,9 @@ window.AlbaranLecheWizard = {
           data.antibioticos = document.getElementById('w-l-antb')?.checked || false;
           data.coste_alimentacion_diario = parseFloat(document.getElementById('w-l-coste-diario')?.value) || 0;
           data.coste_alimentacion_periodo = parseFloat(document.getElementById('w-l-coste-periodo')?.value) || 0;
+          data.aflatoxina_m1 = parseFloat(document.getElementById('w-l-afm1')?.value) || null;
+          data.aflatoxina_m1_metodo = document.getElementById('w-l-afm1-metodo')?.value || null;
+          data.laboratorio_nombre = document.getElementById('w-l-lab')?.value || data.laboratorio_nombre;
         },
         validate: async (data) => {
           return true;
@@ -265,7 +364,7 @@ window.AlbaranLecheWizard = {
     ];
 
     window.WizardManager.create({
-      id: 'wizard-leche-colectivo-container',
+      id: `wizard-leche-colectivo-container-${borrador ? borrador.id : 'nuevo'}`,
       title: 'SALIDA LÁCTEA',
       initialData: {
         id: borrador ? borrador.id : undefined,
@@ -282,14 +381,18 @@ window.AlbaranLecheWizard = {
         temp: borrador ? borrador.temperatura : 4.5,
         cadena_frio_cumplida: borrador ? !!borrador.cadena_frio_cumplida : true,
         inh: borrador ? !!borrador.certificadoInhibidores : true,
-        grasa: borrador ? borrador.laboratorio?.grasa : '',
-        proteina: borrador ? borrador.laboratorio?.proteina : '',
-        germenes: borrador ? borrador.laboratorio?.germenes : '',
-        somaticas: borrador ? borrador.laboratorio?.somaticas : '',
+        especie_leche: borrador ? (borrador.especie_leche || 'vacuno') : 'vacuno',
+        tanqueId: borrador ? (borrador.tanqueId || null) : null,
+        grasa: borrador ? (borrador.laboratorio?.grasa || borrador.analitica?.grasa) : '',
+        proteina: borrador ? (borrador.laboratorio?.proteina || borrador.analitica?.proteina) : '',
+        germenes: borrador ? (borrador.laboratorio?.germenes || borrador.laboratorio?.gemenes || borrador.analitica?.germenes_30C) : '',
+        somaticas: borrador ? (borrador.laboratorio?.somaticas || borrador.analitica?.celulas_somaticas) : '',
         antibioticos: borrador ? !!borrador.laboratorio?.antibioticos : false,
-        fecha_analisis: borrador ? borrador.laboratorio?.fecha_analisis : new Date().toISOString().split("T")[0],
-        nro_boletin: borrador ? borrador.laboratorio?.nro_boletin : '',
-        laboratorio_nombre: borrador ? borrador.laboratorio?.laboratorio_nombre : 'LIGAL',
+        fecha_analisis: borrador ? (borrador.laboratorio?.fecha_analisis || borrador.analitica?.fecha_muestreo) : new Date().toISOString().split("T")[0],
+        nro_boletin: borrador ? (borrador.laboratorio?.nro_boletin || borrador.analitica?.nro_boletin) : '',
+        laboratorio_nombre: borrador ? (borrador.laboratorio?.laboratorio_nombre || borrador.analitica?.laboratorio_nombre) : 'CICAP',
+        aflatoxina_m1: borrador ? (borrador.analitica?.aflatoxina_m1 || '') : '',
+        aflatoxina_m1_metodo: borrador ? (borrador.analitica?.aflatoxina_m1_metodo || '') : '',
         estado_tramite_infolac: borrador ? borrador.estado_tramite_infolac : 'borrador',
         fecha_presentacion_infolac: borrador ? borrador.fecha_presentacion_infolac : '',
         numero_registro_infolac: borrador ? borrador.numero_registro_infolac : '',
@@ -366,6 +469,17 @@ window.AlbaranLecheWizard = {
             cadena_frio_cumplida: dataLeche.cadena_frio_cumplida || false,
             hora_ordeno: dataLeche.hora_ordeno || '',
             hora_carga: dataLeche.hora_carga || '',
+            tanqueId: dataLeche.tanqueId || null,
+            especie_leche: dataLeche.especie_leche || 'vacuno',
+            codigo_letra_q_tanque: null,
+            recibo_letra_q: {
+              identificacion_productor: finca.nombre_titular || finca.nombre || '',
+              codigo_explotacion: finca.codigo_REGA || finca.rega || '',
+              fecha_hora_recogida: `${dataLeche.fecha}T${dataLeche.hora_carga || '00:00'}`,
+              cantidad_litros: cantidad,
+              operador_cisterna: dataLeche.matricula,
+              muestra_tomada: !!dataLeche.q,
+            },
             laboratorio: {
               grasa: dataLeche.grasa || 0,
               proteina: dataLeche.proteina || 0,
@@ -376,7 +490,7 @@ window.AlbaranLecheWizard = {
               extracto_seco: extractoSeco,
               recuento_bacterias: dataLeche.germenes || 0,
               antibioticos_positivos: dataLeche.antibioticos || false,
-              laboratorio_nombre: dataLeche.laboratorio_nombre || 'LIGAL',
+              laboratorio_nombre: dataLeche.laboratorio_nombre || 'CICAP',
               nro_boletin: dataLeche.nro_boletin || '',
             },
             precio_extracto_seco: pExt,
@@ -388,6 +502,11 @@ window.AlbaranLecheWizard = {
             mofa: mofa,
             creadoEn: borrador ? borrador.creadoEn : new Date().toISOString(),
           };
+
+          if (dataLeche.tanqueId) {
+            const tanque = await window.TanquesLeche.getById(dataLeche.tanqueId);
+            if (tanque) reg.codigo_letra_q_tanque = tanque.codigo_letra_q;
+          }
 
           // ═══════════════════════════════════════════════════════════════════
           // FASE 1 — P1: BLOQUEO SANITARIO AUTOMÁTICO EN VENTA DE LECHE
@@ -471,13 +590,61 @@ window.AlbaranLecheWizard = {
           }
 
           let idL;
-          if (dataLeche.id) {
-            reg.id = Number(dataLeche.id);
+          const idNumerico = Number(dataLeche.id);
+          if (dataLeche.id && Number.isFinite(idNumerico)) {
+            reg.id = idNumerico;
             await window.db.put("comercializacion_leche", reg);
             idL = reg.id;
           } else {
             idL = await window.db.add("comercializacion_leche", reg);
           }
+
+          if (dataLeche.grasa || dataLeche.germenes || dataLeche.somaticas || dataLeche.aflatoxina_m1) {
+            try {
+              const analiticaData = {
+                fincaId,
+                comercializacionId: idL,
+                tanqueId: dataLeche.tanqueId || null,
+                fecha_muestreo: dataLeche.fecha_analisis || dataLeche.fecha,
+                tipo_muestreo: 'autocontrol',
+                laboratorio_nombre: dataLeche.laboratorio_nombre || 'CICAP',
+                nro_boletin: dataLeche.nro_boletin || null,
+                grasa: dataLeche.grasa || null,
+                proteina: dataLeche.proteina || null,
+                germenes_30C: dataLeche.germenes || null,
+                celulas_somaticas: dataLeche.somaticas || null,
+                inhibidores: !dataLeche.inh,
+                antibioticos_detectados: dataLeche.antibioticos || false,
+                aflatoxina_m1: dataLeche.aflatoxina_m1 || null,
+                aflatoxina_m1_metodo: dataLeche.aflatoxina_m1_metodo || null,
+                numero_muestra_letra_q: dataLeche.q || null,
+                especie: dataLeche.especie_leche || 'vacuno',
+              };
+              const analiticaId = await window.db.add('analiticas_leche', analiticaData);
+              reg.analiticaId = analiticaId;
+              await window.db.put("comercializacion_leche", reg);
+            } catch (analErr) {
+              console.warn('[Leche] Error guardando analítica:', analErr);
+            }
+          }
+
+          if (dataLeche.tanqueId && window.BalanceLacteo) {
+            try {
+              await window.BalanceLacteo.registrar({
+                fincaId,
+                tanqueId: dataLeche.tanqueId,
+                tipo_movimiento: 'salida',
+                fecha: dataLeche.fecha,
+                cantidad_litros: cantidad,
+                referencia_tipo: 'comercializacion_leche',
+                referencia_id: idL,
+                temperatura: dataLeche.temp,
+              });
+            } catch (balErr) {
+              console.warn('[Leche] Error registrando salida en balance:', balErr);
+            }
+          }
+
           const numeroDocInfolac = `INFOLAC-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${idL}`;
           
           const docsLegales = await window.db.getAll('documentos_legales').catch(() => []);
