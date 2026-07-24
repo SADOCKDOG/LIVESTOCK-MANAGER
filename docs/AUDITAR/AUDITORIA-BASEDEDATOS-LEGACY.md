@@ -42,13 +42,17 @@
 - `PALPCNES.DAT` — palpación/diagnóstico de gestación (fecha, resultado, próxima palpación, peso estimado, fecha probable de parto, meses de preñez)
 - `PARTOS.DAT` — partos (fecha, nº machos/hembras/muertos, peso, tipo de parto)
 - `PESO.DAT` — pesajes (fecha, peso, tipo de pesaje)
-- `PRDCCION.DAT` — producción de leche (fecha, litros AM/PM, por cuadra/lote/potrero) — control lechero diario
+- `PRDCCION.DAT` — producción de leche (fecha, litros AM/PM, por cuadra/lote/potrero) — control lechero diario. Esquema real verificado: `CODSEMPD` (animal, C13), `FECPROD` (fecha, D8), `AM`/`PM` (litros por turno, N6 c/u), `NROCDRA`/`NROLOTE`/`NROPTRO` (cuadra/lote/potrero, C13 c/u). Tabla vacía en este volcado (0 registros) — diseñada pero nunca usada en esta instancia.
 - `REVVET.DAT` — revisión veterinaria (fecha, diagnóstico, comentario)
 - `HISTCOMEN.DAT` / `HISTCORP.DAT` / `HISTREUB.DAT` — histórico de comentarios / condición corporal / reubicaciones
 
 ## Comparación con Livestock Manager
 
 Cubierto de forma equivalente: razas (`js/db.js` `RAZAS_SEED`), movimientos internos (`js/movimientos.js`, `js/rebanos.js`), pesajes (`js/pesajes.js`), reproducción — monta/palpación/parto (`js/reproduccion.js`), saneamiento (`js/saneamientos.js`).
+
+**✅ Producción lechera (`PRDCCION.DAT`) — IMPLEMENTADO Y AMPLIADO (Control Lechero, `js/produccion.js` `saveLeche()` + `js/pesajes-ui.js`)**: cada ordeño se registra por animal (`vacaId`) con `turno` ('AM'/'PM', mismo concepto que las columnas `AM`/`PM` del legacy) y `zona` (heredada de `rebano.zonaActual`, cubre la función de `NROCDRA`/`NROLOTE`/`NROPTRO` con un único campo consolidado en vez de 3 independientes — simplificación razonable, no un gap). A diferencia del legacy, cada registro captura además análisis de **grasa/proteína** (`analisis_grasa_proteina`), dato que `PRDCCION.DAT` no contemplaba. La entrega a industria (Albarán Leche, `comercializacion_leche`) añade encima grasa, proteína, gérmenes, somáticas y antibióticos a nivel de recogida — cobertura de calidad muy por encima del legacy.
+
+**Gap real (no heredado del legacy, detectado en auditoría de flujo 2026-07-24)**: ni el software legacy ni Livestock Manager modelan un "tanque/cisterna" como stock intermedio entre el ordeño diario (`produccion_leche`) y la salida a industria (`comercializacion_leche`). Hoy no hay forma de conciliar que los litros declarados en un albarán coincidan con lo ordeñado desde la última recogida. Pendiente de decisión de diseño, no de auditoría normativa.
 
 **✅ Escala de Condición Corporal (BCS 1-9) — IMPLEMENTADO (2026-07-22)**: campo opcional `condicion_corporal` (1-9) añadido a `Pesajes.registrar()` (`js/pesajes.js`), capturado en el wizard de pesaje (`js/pesajes-ui.js`, select "CONDICIÓN CORPORAL" junto al peso, visible en pesajes de carne/control, no en control lechero). No es un dato exigido por SIGGAN — es una mejora de manejo ganadero de valor opcional, inspirada en `CONDCORP.DAT` de esta base de datos legacy. Verificado en navegador: pesaje individual con BCS, sin BCS (queda `null`), y en modo lote (varios animales con BCS distinto cada uno, persistido correctamente).
 
