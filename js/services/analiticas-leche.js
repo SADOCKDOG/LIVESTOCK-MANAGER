@@ -68,6 +68,12 @@ window.AnaliticasLeche = (() => {
     };
 
     const id = await window.db.add('analiticas_leche', analitica);
+    
+    // Emitir evento para actualizar alertas
+    if (window.EventBus) {
+      window.EventBus.emit('analitica:created', { id, fincaId: analitica.fincaId });
+    }
+    
     return { ...analitica, id };
   }
 
