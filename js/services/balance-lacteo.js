@@ -46,6 +46,16 @@ window.BalanceLacteo = (() => {
     };
 
     const id = await window.db.add('balance_lacteo', movimiento);
+    
+    // Emitir evento para actualizar alertas
+    if (window.EventBus) {
+      window.EventBus.emit('balance:registered', { 
+        id, 
+        tanqueId: movimiento.tanqueId, 
+        tipo: movimiento.tipo_movimiento 
+      });
+    }
+    
     return { ...movimiento, id };
   }
 

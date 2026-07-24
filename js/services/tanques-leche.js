@@ -49,6 +49,12 @@ window.TanquesLeche = (() => {
     };
 
     const id = await window.db.add('tanques_leche', tanque);
+    
+    // Emitir evento para actualizar alertas
+    if (window.EventBus) {
+      window.EventBus.emit('tanque:created', { id, fincaId: tanque.fincaId });
+    }
+    
     return { ...tanque, id };
   }
 
@@ -69,6 +75,12 @@ window.TanquesLeche = (() => {
     };
 
     await window.db.put('tanques_leche', updated);
+    
+    // Emitir evento para actualizar alertas
+    if (window.EventBus) {
+      window.EventBus.emit('tanque:updated', { id, fincaId: updated.fincaId });
+    }
+    
     return updated;
   }
 
