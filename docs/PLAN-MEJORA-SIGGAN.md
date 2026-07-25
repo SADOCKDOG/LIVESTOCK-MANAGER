@@ -10,7 +10,7 @@
 
 ## Resumen ejecutivo
 
-**Estado (2026-07-22): 7 de 7 gaps principales implementados** (incluido el punto 7, "Subexplotación", como capa aditiva y opcional sin tocar la relación animal↔finca existente). Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX, gaps adicionales de `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md` evaluados uno a uno). **En pausa, a petición explícita del usuario** (no descartados): distinción "Explotación de Lidia" (punto 5), NIF veterinario de alta de cebadero y granularidad individual de saneamientos — nº tubo + sexo por animal (punto 6).
+**Estado (2026-07-25): 7 de 7 gaps principales implementados** (incluido el punto 7, "Subexplotación", como capa aditiva y opcional sin tocar la relación animal↔finca existente). Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), granularidad individual de saneamientos (nº tubo + sexo, con UI completa), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX, gaps adicionales de `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md` evaluados uno a uno). **En pausa, a petición explícita del usuario** (no descartada): distinción "Explotación de Lidia" (punto 5). **Marcado como no aplica al alcance actual** (decisión 2026-07-25): NIF veterinario de alta de cebadero (punto 6) — requiere modelar Castilla y León como CCAA nueva, fuera del alcance SIGGAN/BADIGEX.
 
 La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 7 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`):
 
@@ -18,7 +18,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 - ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3), con UI (wizard + listado en SanidadView).
 - ✅ Validación de identificación equina cerrada (gap 4).
 - ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5), con UI (listado + ficha + wizard).
-- ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — hora/lote/nº macho implementados; NIF veterinario de cebadero y granularidad individual de saneamientos **en pausa** (ver detalle en el punto 6).
+- ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — hora/lote/nº macho y granularidad individual de saneamientos implementados; NIF veterinario de cebadero **no aplica al alcance actual** (ver detalle en el punto 6).
 - ✅ Subexplotación (gap 7), implementado como capa aditiva y opcional sin tocar el modelo animal↔finca existente.
 - ✅ Flag `autoguia` en movimientos GTA (único cambio recomendado de la sección "Máquina de estados GTA").
 - ✅ Vista propia de Saneamientos, que no tenía UI pese a existir su modelo de datos desde el origen del plan.
@@ -34,7 +34,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 | 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado con UI** (commits `325d812`, `966735a`, 2026-07-22) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
 | 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado con UI** (commits `57202a5`, `c453090`, 2026-07-22; falta distinción "Lidia") | — | — |
-| 6 | Campos de captura de campo (hora, lote, nº macho) | ✅ **Implementado parcialmente** (commit `800e913`, 2026-07-22; falta saneamiento individual) | — | — |
+| 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | ✅ **Implementado** (commit `800e913` + granularidad saneamientos, 2026-07-22; NIF cebadero no aplica — ver detalle) | — | — |
 | 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | ✅ **Implementado como capa aditiva** (`finca.subexplotaciones[]`, 2026-07-22) | — | — |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
 
@@ -114,7 +114,7 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 | **HORA** (además de fecha) | ✅ Implementado — Altas/Bajas (`js/movimientos.js`), Cubriciones/Secados (wizard reproducción en `js/app.js`), Tratamientos (`js/views/wizards/wizard-tratamiento.js`) |
 | **LOTE** (identificador de lote de cubrición) | ✅ Implementado — visible en Inseminación Artificial/Monta Natural |
 | **NÚMERO DE MACHO** (semental/reproductor) | ✅ Implementado — visible solo en Monta Natural (en IA no hay semental físico) |
-| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ✅ Implementado (2026-07-22) — campo en `wizard-guia-movimiento.js`, condicionado a `conf.requiere_nif_veterinario_cebadero`. **Nota**: ese flag no está definido en ningún objeto de `comunidades-service.js`, así que el campo hoy no llega a mostrarse en la práctica — falta añadir el flag a la(s) CCAA que lo exijan para que sea funcional |
+| **NIF VETERINARIO** vinculado a alta de cebadero (Castilla y León) | ⚪ **No aplica al alcance actual** (decisión 2026-07-25) — campo ya escrito en `wizard-guia-movimiento.js`, condicionado a `conf.requiere_nif_veterinario_cebadero`, pero ese flag no está definido en ningún objeto de `comunidades-service.js` porque **Castilla y León no es una CCAA modelada** en la app (solo Andalucía/Extremadura, alcance SIGGAN/BADIGEX). Activarlo exigiría dar de alta CyL como CCAA nueva — expansión de alcance real, no un ajuste de config. Código dejado tal cual: inerte pero inofensivo; base ya lista si se decide soportar CyL en el futuro |
 | Granularidad individual (nº tubo + sexo por animal) | ✅ Implementado (2026-07-22) — campos `tubo`/`sexo` en `js/saneamientos.js` y `js/views/saneamientos-view.js`, editable en ficha y wizard de alta |
 
 Fix de UX detectado durante la verificación: el wizard de reproducción abre con "Inseminación Artificial" preseleccionada, pero el `<select>` no dispara `change` por sí solo al renderizarse — los campos condicionales (lote) no aparecían hasta que el usuario tocaba el selector manualmente. Corregido llamando explícitamente a `_onReproTipoChange()` al abrir el wizard.
