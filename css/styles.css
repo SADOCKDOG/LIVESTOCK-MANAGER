@@ -482,11 +482,14 @@ nav.bottom-nav {
 }
 
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ── BOTÓN FLOTANTE (FAB) CON ETIQUETA DINÁMICA ── */
 .fab-container {
     position: fixed;
-    bottom: calc(80px + var(--safe-bottom));
-    right: 20px;
+    bottom: calc(90px + var(--safe-bottom));
+    right: 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
