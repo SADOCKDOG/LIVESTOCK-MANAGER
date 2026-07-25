@@ -33,6 +33,8 @@ const ExplotacionView = {
     const subTabs = [
       { key: 'dashboard', label: 'Dashboard' },
       { key: 'tanques', label: 'Tanques' },
+      { key: 'control', label: 'Control' },
+      { key: 'balance', label: 'Balance' },
     ];
 
     // Tarjeta de Resumen Lácteo (unifica KPIs sueltos)
@@ -68,9 +70,14 @@ const ExplotacionView = {
         <div id="expro-lacteo-subtab-content"></div>
       </div>`;
     const subContainer = document.getElementById('expro-lacteo-subtab-content');
+    if (!window.ExplotacionLacteaView) return;
     if (this._lacteoSubTab === 'tanques' && window.TanquesView) {
       await TanquesView.render(subContainer);
-    } else if (window.ExplotacionLacteaView) {
+    } else if (this._lacteoSubTab === 'control') {
+      await ExplotacionLacteaView.renderControl(subContainer);
+    } else if (this._lacteoSubTab === 'balance') {
+      await ExplotacionLacteaView.renderBalance(subContainer);
+    } else {
       await ExplotacionLacteaView.render(subContainer);
     }
   },
