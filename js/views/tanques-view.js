@@ -13,7 +13,7 @@ window.TanquesView = {
     <div class="p-16">
       <div class="flex items-center justify-between mb-16">
         <h2 class="text-lg font-900 uppercase tracking-tight" style="color:var(--c-info);">Tanques de Leche</h2>
-        <button onclick="window.TanqueWizard.open()" class="btn-primary text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-info);">+ Nuevo Tanque</button>
+        <button onclick="window.TanqueWizard.open()" class="text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-info); color:#000; border:none; border-radius:6px;">+ Nuevo Tanque</button>
       </div>`;
 
     if (tanques.length === 0) {
@@ -21,7 +21,7 @@ window.TanquesView = {
       <div class="card p-30 text-center">
         <div class="text-aaa text-sm mb-12">No hay tanques registrados</div>
         <div class="text-[0.6rem] text-666 mb-16">Registra los tanques de frío de tu explotación con su código oficial Letra Q para poder comercializar leche.</div>
-        <button onclick="window.TanqueWizard.open()" class="btn-primary px-20 py-10 font-900" style="background:var(--c-info);">Registrar primer tanque</button>
+        <button onclick="window.TanqueWizard.open()" class="px-20 py-10 font-900" style="background:var(--c-info); color:#000; border:none; border-radius:6px;">Registrar primer tanque</button>
       </div>`;
     }
 

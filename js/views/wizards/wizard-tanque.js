@@ -73,6 +73,13 @@ window.TanqueWizard = {
           if (!data.nombre) { App.toastError("El nombre es obligatorio"); return false; }
           if (!data.codigo_letra_q) { App.toastError("El código Letra Q es obligatorio"); return false; }
           if (data.codigo_letra_q.length < 3) { App.toastError("Código Letra Q demasiado corto"); return false; }
+          if (window.TanquesLeche) {
+            const otro = await window.TanquesLeche.getByCodigoLetraQ(data.codigo_letra_q.trim().toUpperCase());
+            if (otro && (!esEdicion || otro.id !== tanque.id)) {
+              App.toastError(`Ya existe un tanque con código Letra Q: ${data.codigo_letra_q}`);
+              return false;
+            }
+          }
           return true;
         }
       }

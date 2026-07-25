@@ -770,7 +770,8 @@
               { fincaId: fincaId, tanqueId: tanquePrincipalId, tipo_movimiento: 'salida', fecha: hace15d, cantidad_litros: 1390, referencia_tipo: 'comercializacion_leche', temperatura: 3.5 },
               { fincaId: fincaId, tanqueId: tanquePrincipalId, tipo_movimiento: 'entrada', fecha: hace5d, cantidad_litros: 690, referencia_tipo: 'produccion_leche', turno: 'AM', temperatura: 3.6 },
               { fincaId: fincaId, tanqueId: tanquePrincipalId, tipo_movimiento: 'entrada', fecha: hace5d, cantidad_litros: 700, referencia_tipo: 'produccion_leche', turno: 'PM', temperatura: 3.7 },
-              { fincaId: fincaId, tanqueId: tanquePrincipalId, tipo_movimiento: 'salida', fecha: hace5d, cantidad_litros: 1390, referencia_tipo: 'comercializacion_leche', temperatura: 3.5 }
+              // Deja stock residual (no vacía el tanque del todo): simula recogida pendiente
+              { fincaId: fincaId, tanqueId: tanquePrincipalId, tipo_movimiento: 'salida', fecha: hace5d, cantidad_litros: 1090, referencia_tipo: 'comercializacion_leche', temperatura: 3.5 }
             ];
             for (var bl = 0; bl < balanceDefs.length; bl++) {
               try { await window.BalanceLacteo.registrar(balanceDefs[bl]); }
