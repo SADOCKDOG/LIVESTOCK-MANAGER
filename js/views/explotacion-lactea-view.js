@@ -246,14 +246,17 @@ window.ExplotacionLacteaView = {
 
     container.innerHTML = `
       <div class="p-16">
-        <div class="flex items-center gap-12 mb-14">
-          <span class="text-2xl" style="color: var(--c-accent); display: inline-flex; align-items: center;">${Icons.analitica()}</span>
-          <div>
-            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
-              <span style="color: var(--c-accent); margin-right: 4px;">|</span> Control Lechero
-            </h1>
-            <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Analíticas y controles oficiales</div>
+        <div class="flex items-center justify-between mb-14">
+          <div class="flex items-center gap-12">
+            <span class="text-2xl" style="color: var(--c-accent); display: inline-flex; align-items: center;">${Icons.analitica()}</span>
+            <div>
+              <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
+                <span style="color: var(--c-accent); margin-right: 4px;">|</span> Control Lechero
+              </h1>
+              <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Analíticas y controles oficiales</div>
+            </div>
           </div>
+          <button onclick="window.AnaliticaLecheWizard.open()" class="text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-accent); color:#000; border:none; border-radius:6px;">+ Analítica</button>
         </div>
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px; margin-top: 15px;">
@@ -296,14 +299,17 @@ window.ExplotacionLacteaView = {
 
     container.innerHTML = `
       <div class="p-16">
-        <div class="flex items-center gap-12 mb-14">
-          <span class="text-2xl" style="color: var(--c-info); display: inline-flex; align-items: center;">${Icons.documento()}</span>
-          <div>
-            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
-              <span style="color: var(--c-info); margin-right: 4px;">|</span> Balance Lácteo
-            </h1>
-            <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Movimientos de tanque (más reciente primero)</div>
+        <div class="flex items-center justify-between mb-14">
+          <div class="flex items-center gap-12">
+            <span class="text-2xl" style="color: var(--c-info); display: inline-flex; align-items: center;">${Icons.documento()}</span>
+            <div>
+              <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
+                <span style="color: var(--c-info); margin-right: 4px;">|</span> Balance Lácteo
+              </h1>
+              <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Movimientos de tanque (más reciente primero)</div>
+            </div>
           </div>
+          <button onclick="window.MovimientoBalanceWizard.open()" class="text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-info); color:#000; border:none; border-radius:6px;">+ Movimiento</button>
         </div>
 
         ${movimientosHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin movimientos registrados</span></div>'}
