@@ -286,6 +286,12 @@
   async function runAllTests() {
     console.log(' === INICIANDO PRUEBAS MÓDULO LÁCTEO v24 ===\n');
 
+    // Reset: evita arrastrar fallos de una ejecución anterior (p.ej. el auto-run
+    // al cargar el script, antes de que exista finca activa).
+    TestResults.passed = 0;
+    TestResults.failed = 0;
+    TestResults.errors = [];
+
     try {
       await testDatosDemo();
       await testUmbralesEspecie();

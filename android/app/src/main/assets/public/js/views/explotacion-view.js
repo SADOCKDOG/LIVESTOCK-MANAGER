@@ -9,10 +9,37 @@ const ExplotacionView = {
   _needsDataRefresh: false,
   _loadingPromise: null,
   _filtroActividad: '',
+  _lacteoSubTab: 'dashboard',
 
   _cambiarSubModulo(subModulo) {
     this._activeSubModule = subModulo;
     this.render();
+  },
+
+  _cambiarLacteoSubTab(subTab) {
+    this._lacteoSubTab = subTab;
+    this.render();
+  },
+
+  async _renderLacteoView(container) {
+    if (!container) return;
+    const subTabs = [
+      { key: 'dashboard', label: 'Dashboard' },
+      { key: 'tanques', label: 'Tanques' },
+    ];
+    container.innerHTML = `
+      <div class="flex gap-8 px-16 pt-12 mb-4">
+        ${subTabs.map(t => `
+          <button class="text-[0.6rem] font-900 uppercase px-12 py-6 rounded-sm" style="background:${this._lacteoSubTab === t.key ? 'var(--c-info)' : 'var(--c-222)'}; color:${this._lacteoSubTab === t.key ? '#000' : 'var(--c-aaa)'};" onclick="ExplotacionView._cambiarLacteoSubTab('${t.key}')">${t.label}</button>
+        `).join('')}
+      </div>
+      <div id="expro-lacteo-subtab-content"></div>`;
+    const subContainer = document.getElementById('expro-lacteo-subtab-content');
+    if (this._lacteoSubTab === 'tanques' && window.TanquesView) {
+      await TanquesView.render(subContainer);
+    } else if (window.ExplotacionLacteaView) {
+      await ExplotacionLacteaView.render(subContainer);
+    }
   },
 
   _fmtFecha(dateStr) {
@@ -156,6 +183,7 @@ const ExplotacionView = {
       <div class="mb-14">
         ${App.renderCarruselPestanas([
           { key: 'explotacion', icon: Icons.finca(), label: 'EXPRO', color: 'var(--c-success)' },
+          { key: 'lacteo', icon: Icons.leche(), label: 'LÁCTEA', color: 'var(--c-info)' },
           { key: 'silos', icon: Icons.silos(), label: 'SILOS', color: 'var(--c-success)' },
           { key: 'fitosanitarios', icon: Icons.sanidad(), label: 'FITOSANITARIOS', color: 'var(--c-purple)' },
           { key: 'gastos', icon: Icons.dinero(), label: 'FINANZAS', color: 'var(--c-purple)' },
@@ -199,6 +227,9 @@ const ExplotacionView = {
       case 'explotacion':
         const d = dHeader;
         this._renderModoExplotacion(document.getElementById('expro-tab-content'), d);
+        break;
+      case 'lacteo':
+        await this._renderLacteoView(document.getElementById('expro-tab-content'));
         break;
       case 'silos':
         if (window.SilosView) await SilosView.render();

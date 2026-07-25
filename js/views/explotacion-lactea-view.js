@@ -51,7 +51,7 @@ window.ExplotacionLacteaView = {
       <div class="flex items-center justify-between mb-16">
         <h2 class="text-lg font-900 uppercase tracking-tight" style="color:var(--c-info);">Explotación Láctea</h2>
         <div class="flex gap-8">
-          <button onclick="window.OrdeñoWizard.open()" class="btn-primary text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-info);">+ Ordeño</button>
+          <button onclick="window.OrdeñoWizard.open()" class="text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-info); color:#000; border:none; border-radius:6px;">+ Ordeño</button>
           <button onclick="window.TanqueWizard.open()" class="btn-secondary text-xs px-12 py-6 font-900 uppercase">+ Tanque</button>
         </div>
       </div>`;

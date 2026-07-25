@@ -9,20 +9,9 @@ window.MotorLacteo = (() => {
     const alertas = [];
     if (!finca) return alertas;
 
-    const animales = await window.db.getAll('animales');
-    const rebanos = await window.db.getAll('rebanos');
-    const rebanosFinca = rebanos.filter(r => Number(r.fincaId) === Number(finca.id));
-    const rebanosLeche = rebanosFinca.filter(r => r.tipo === 'leche' || r.produccion === 'leche');
-
-    let vacasLeche = 0;
-    for (const reb of rebanosLeche) {
-      const animals = animales.filter(a => Number(a.rebanoId) === Number(reb.id));
-      const hembras = animals.filter(a => {
-        const sexo = (a.sexo || '').toString().toLowerCase();
-        return sexo === 'hembra' || sexo === 'female';
-      });
-      vacasLeche += hembras.length;
-    }
+    // Capacidad autorizada, igual que validarAmbiental: el bienestar se dimensiona
+    // sobre las plazas declaradas, no sobre el censo real del día.
+    const vacasLeche = finca.plazas_vacuno_leche || finca.plazas_autorizadas_rega || 0;
 
     if (vacasLeche === 0) return alertas;
 

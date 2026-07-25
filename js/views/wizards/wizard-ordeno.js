@@ -23,7 +23,7 @@ window.OrdeñoWizard = {
       const anims = animales.filter(a => Number(a.rebanoId) === Number(reb.id) && a.estado === 'activo');
       const hembras = anims.filter(a => {
         const sexo = (a.sexo || '').toString().toLowerCase();
-        return sexo === 'hembra' || sexo === 'female';
+        return sexo === 'h' || sexo === 'hembra' || sexo === 'female';
       });
       animalesLeche.push(...hembras);
     }

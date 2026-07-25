@@ -443,7 +443,7 @@ const ProduccionView = {
       </div>
 
       <!-- Listado -->
-      ${tanquesHtml || '<div class="p-20 text-center"><div class="text-aaa text-sm mb-12">No hay tanques registrados</div><button onclick="window.TanqueWizard.open()" class="btn-primary px-20 py-10 font-900" style="background: var(--c-info);">Registrar primer tanque</button></div>'}
+      ${tanquesHtml || '<div class="p-20 text-center"><div class="text-aaa text-sm mb-12">No hay tanques registrados</div><button onclick="window.TanqueWizard.open()" class="px-20 py-10 font-900" style="background: var(--c-info); color:#000; border:none; border-radius:6px;">Registrar primer tanque</button></div>'}
     `;
   },
 
