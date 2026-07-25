@@ -56,26 +56,30 @@ const CompradoresView = {
     const activeColor = colorCompradores;
 
     main.innerHTML = `
-      <!-- Cabecera de Sección Estandarizada -->
-      <div class="flex items-center gap-12 mb-14">
-        <span class="text-2xl" style="color:${activeColor}; display:inline-flex; align-items:center;">
-          ${Icons.compradores()}
-        </span>
-        <div>
-          <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin:0; line-height:1.2;">
-            <span style="color:${activeColor}; margin-right:4px;">|</span> GESTIÓN COMERCIAL
-          </h1>
-          <div class="text-gray" style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-            Gestión de Clientes y Compradores
+      <!-- Cabecera de Módulo: Resumen y acción principal -->
+      <div class="module-header">
+        <div class="card p-16 mb-16 border-222 animate-fade-in" style="background: linear-gradient(135deg, rgba(168,85,247,0.05) 0%, rgba(0,0,0,0.2) 100%); border-left: 4px solid var(--c-purple);">
+          <div class="flex items-center gap-12 mb-10">
+            <span class="text-3xl" style="color:var(--c-purple);">${Icons.compradores()}</span>
+            <div>
+              <h2 class="text-white font-950 text-base uppercase tracking-wider mb-2">CARTERA DE CLIENTES</h2>
+              <p class="text-[0.65rem] text-gray font-700 uppercase leading-relaxed">Registro de mataderos, cooperativas y centrales lecheras.</p>
+            </div>
           </div>
+          <div class="grid grid-cols-2 gap-8 mt-12 py-8 border-top-222">
+            <div class="text-[0.6rem] text-gray uppercase font-900">Total Clientes: <strong class="text-white">${this._cachedCompradores?.length || 0}</strong></div>
+            <div class="text-[0.6rem] text-gray uppercase font-900">Activos: <strong class="text-success">${this._cachedCompradores?.filter(c => c.activo !== false).length || 0}</strong></div>
+          </div>
+        </div>
+        <div class="module-header-primary-action">
+          <button class="btn btn-create btn-lg w-full" onclick="CompradoresView._crearComprador()">${Icons.agregar()} Nuevo Comprador</button>
         </div>
       </div>
 
-      <!-- Evolución Mensual (Estandarizada como Card de Fondo OLED sin bordes de color) -->
-      <div class="card mb-14 p-12 card-resumen" style="background:rgba(59,130,246,0.015); width:100%;">
-        <div class="text-xs text-white font-black uppercase tracking-wider mb-6 flex justify-between items-center" style="border-bottom:none; padding-bottom:0; margin-bottom:12px;">
-          <span><span style="color: ${activeColor}; margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
-          <span class="text-xs text-gray font-bold lowercase" style="font-variant: normal;">(${this._activeModule === 'compradores' ? this._cachedCompradores?.length || 0 : this._cachedContratos?.length || 0} total)</span>
+      <!-- Evolución Mensual -->
+      <div class="card mb-14 p-12 card-resumen" style="background:rgba(255,255,255,0.01); width:100%;">
+        <div class="text-xs text-white font-black uppercase tracking-wider mb-8 flex justify-between items-center">
+          <span><span style="color: var(--c-purple); margin-right:4px;">|</span> EVOLUCIÓN MENSUAL</span>
         </div>
         <div class="flex gap-6">${mesesHtml}</div>
       </div>
