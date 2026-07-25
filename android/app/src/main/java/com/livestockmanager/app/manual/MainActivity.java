@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.webkit.WebView;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.WindowCompat;
 import com.getcapacitor.BridgeActivity;
@@ -14,6 +15,9 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // Debe ir ANTES de super para que el tema se aplique correctamente
         SplashScreen.installSplashScreen(this);
+
+        // Habilitar debugging del WebView ANTES de que Capacitor lo cree
+        WebView.setWebContentsDebuggingEnabled(true);
 
         super.onCreate(savedInstanceState);
 
