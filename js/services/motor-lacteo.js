@@ -240,11 +240,58 @@ window.MotorLacteo = (() => {
     return alertas;
   }
 
+  function validarMovimientoLetraQ(data) {
+    const errores = [];
+    const warnings = [];
+    const CS = window.ComunidadesService;
+    if (!CS) return { valido: true, errores, warnings };
+
+    const tipos = CS.getTiposMovimientoLetraQ();
+    const tipo = data.tipo_movimiento_letra_q;
+    if (tipo && !tipos.find(t => t.value === tipo)) {
+      errores.push(`Tipo de movimiento "${tipo}" no válido en Letra Q 2.0`);
+      return { valido: false, errores, warnings };
+    }
+
+    if (data.agente_recogida_nif && !data.agente_destino_nif) {
+      warnings.push('Agente de destino no informado — puede afectar al plazo de comunicación');
+    }
+
+    if (data.resultado_inhibidores_in_situ === 'no_conforme') {
+      warnings.push('Resultado inhibidores NO CONFORME en explotación — requiere comunicación a Letra Q en 2 días hábiles');
+    }
+
+    if (data.muestra_tomada && !data.nif_tomador_muestra) {
+      errores.push('NIF del tomador de muestra obligatorio cuando se ha realizado toma de muestras');
+    }
+
+    if (tipo === 'cisterna_a_cisterna') {
+      if (!data.codigo_cisterna_origen_letra_q) {
+        errores.push('Código Letra Q de cisterna origen obligatorio para movimiento cisterna→cisterna');
+      }
+      if (!data.codigo_cisterna_destino_letra_q) {
+        errores.push('Código Letra Q de cisterna destino obligatorio para movimiento cisterna→cisterna');
+      }
+    }
+
+    return { valido: errores.length === 0, errores, warnings };
+  }
+
+  function calcularPlazoComunicacion(tipoAgenteDestino, fechaRecogida) {
+    const CS = window.ComunidadesService;
+    if (!CS || !fechaRecogida) return '';
+    const plazos = CS.getPlazosComunicacionLetraQ();
+    const dias = plazos[tipoAgenteDestino] || 3;
+    return CS.diasHabiles(fechaRecogida, dias);
+  }
+
   return {
     validarBienestarAnimal,
     validarAmbiental,
     validarTrazabilidadLetraQ,
     validarComercializacion,
+    validarMovimientoLetraQ,
+    calcularPlazoComunicacion,
     getAllAlertas,
   };
 })();

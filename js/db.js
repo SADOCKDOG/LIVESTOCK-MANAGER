@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 25;
+const DB_VERSION = 26;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -977,6 +977,43 @@ async function initDB() {
                     }
                     if (!lecheStore.indexNames.contains('especie_leche')) {
                         lecheStore.createIndex('especie_leche', 'especie_leche');
+                    }
+                }
+            }
+
+            // v26: Nuevos campos RD 989/2022 — Letra Q (índices adicionales, sin nuevos stores)
+            if (oldVersion < 26) {
+                if (db.objectStoreNames.contains('comercializacion_leche')) {
+                    const lecheStore = transaction.objectStore('comercializacion_leche');
+                    if (!lecheStore.indexNames.contains('estado_letra_q')) {
+                        lecheStore.createIndex('estado_letra_q', 'estado_letra_q');
+                    }
+                    if (!lecheStore.indexNames.contains('tipo_movimiento_letra_q')) {
+                        lecheStore.createIndex('tipo_movimiento_letra_q', 'tipo_movimiento_letra_q');
+                    }
+                    if (!lecheStore.indexNames.contains('agente_recogida_nif')) {
+                        lecheStore.createIndex('agente_recogida_nif', 'agente_recogida_nif');
+                    }
+                }
+                if (db.objectStoreNames.contains('compradores')) {
+                    const compStore = transaction.objectStore('compradores');
+                    if (!compStore.indexNames.contains('tipo_operador_lacteo')) {
+                        compStore.createIndex('tipo_operador_lacteo', 'tipo_operador_lacteo');
+                    }
+                }
+                if (db.objectStoreNames.contains('tanques_leche')) {
+                    const tanqStore = transaction.objectStore('tanques_leche');
+                    if (!tanqStore.indexNames.contains('matricula_vehiculo')) {
+                        tanqStore.createIndex('matricula_vehiculo', 'matricula_vehiculo');
+                    }
+                    if (!tanqStore.indexNames.contains('nif_transportista')) {
+                        tanqStore.createIndex('nif_transportista', 'nif_transportista');
+                    }
+                }
+                if (db.objectStoreNames.contains('analiticas_leche')) {
+                    const analStore = transaction.objectStore('analiticas_leche');
+                    if (!analStore.indexNames.contains('codigo_letra_q_laboratorio')) {
+                        analStore.createIndex('codigo_letra_q_laboratorio', 'codigo_letra_q_laboratorio');
                     }
                 }
             }

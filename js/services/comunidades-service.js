@@ -297,13 +297,41 @@ window.ComunidadesService = (() => {
     Object.freeze({ value: 'otra', label: 'Otra', compatible_letra_q: false }),
   ]);
 
+  // Tipos de operador del sector lácteo (RD 989/2022 Art.2)
+  const TIPO_OPERADOR_LACTEO = Object.freeze([
+    Object.freeze({ value: 'primer_comprador',     label: 'Primer comprador',                    desc: 'Compra leche directamente del productor' }),
+    Object.freeze({ value: 'centro_operacion',      label: 'Centro de operación',                desc: 'Oficina comercial (intermediario con contenedor propio)' }),
+    Object.freeze({ value: 'centro_descarga',       label: 'Centro lácteo de primera descarga',  desc: 'Establecimiento donde se descarga y analiza la leche' }),
+    Object.freeze({ value: 'intermediario',         label: 'Intermediario',                      desc: 'Compra/venta sin cambio de contenedor (solo propiedad)' }),
+    Object.freeze({ value: 'transportista',         label: 'Transportista',                      desc: 'Empresa de transporte de leche cruda' }),
+  ]);
+
+  // Plazos de comunicación a Letra Q (Art.8 RD 989/2022)
+  const PLAZOS_COMUNICACION_LETRA_Q = Object.freeze({
+    primer_comprador: 3,
+    centro_descarga: 3,
+    centro_operacion: 5,
+    intermediario: 5,
+    transportista: 3,
+  });
+
+  // Movimientos permitidos en Letra Q 2.0 (Nota Aclaratoria Intermediarios)
+  const TIPOS_MOVIMIENTO_LETRA_Q = Object.freeze([
+    Object.freeze({ value: 'explotacion_a_cisterna',           label: 'Explotación → Cisterna',                 permite_intermediario: false }),
+    Object.freeze({ value: 'explotacion_a_rechazo',            label: 'Explotación → Rechazo',                  permite_intermediario: false }),
+    Object.freeze({ value: 'explotacion_a_establecimiento',     label: 'Explotación → Establecimiento',          permite_intermediario: false }),
+    Object.freeze({ value: 'cisterna_a_cisterna',              label: 'Cisterna → Cisterna',                    permite_intermediario: true }),
+    Object.freeze({ value: 'cisterna_a_rechazo',               label: 'Cisterna → Rechazo',                     permite_intermediario: false }),
+    Object.freeze({ value: 'cisterna_a_establecimiento',       label: 'Cisterna → Establecimiento',             permite_intermediario: false }),
+  ]);
+
   // Laboratorios de autocontrol homologados (Andalucía)
   const LABORATORIOS_LECHE = Object.freeze([
-    Object.freeze({ codigo: 'CICAP', nombre: 'CICAP (Centro de Investigación y Calidad Agroalimentaria)', ubicacion: 'Pozoblanco, Córdoba', default: true }),
-    Object.freeze({ codigo: 'LILC', nombre: 'LILC (Laboratorio Interprofesional de Cantabria)', ubicacion: 'Cantabria', default: false }),
-    Object.freeze({ codigo: 'LILCAM', nombre: 'LILCAM (Castilla-La Mancha)', ubicacion: 'Castilla-La Mancha', default: false }),
-    Object.freeze({ codigo: 'LILCYL', nombre: 'LILCYL (Castilla y León)', ubicacion: 'Castilla y León', default: false }),
-    Object.freeze({ codigo: 'LPSA_CORDOBA', nombre: 'Lab. Producción y Sanidad Animal de Córdoba', ubicacion: 'Córdoba', oficial: true }),
+    Object.freeze({ codigo: 'CICAP', nombre: 'CICAP (Centro de Investigación y Calidad Agroalimentaria)', ubicacion: 'Pozoblanco, Córdoba', default: true, codigo_letra_q: '' }),
+    Object.freeze({ codigo: 'LILC', nombre: 'LILC (Laboratorio Interprofesional de Cantabria)', ubicacion: 'Cantabria', default: false, codigo_letra_q: '' }),
+    Object.freeze({ codigo: 'LILCAM', nombre: 'LILCAM (Castilla-La Mancha)', ubicacion: 'Castilla-La Mancha', default: false, codigo_letra_q: '' }),
+    Object.freeze({ codigo: 'LILCYL', nombre: 'LILCYL (Castilla y León)', ubicacion: 'Castilla y León', default: false, codigo_letra_q: '' }),
+    Object.freeze({ codigo: 'LPSA_CORDOBA', nombre: 'Lab. Producción y Sanidad Animal de Córdoba', ubicacion: 'Córdoba', oficial: true, codigo_letra_q: '' }),
   ]);
   // Catálogo oficial SIEX "Sistema productivo" (docs/AUDITAR/Catalogos_csv/Sistema
   // productivo.csv) — ver docs/PLAN-MEJORA-SIGGAN.md, gap "Sistemas/Características"
@@ -842,6 +870,30 @@ window.ComunidadesService = (() => {
     ).join('');
   }
 
+  function getTiposOperadorLacteo() {
+    return TIPO_OPERADOR_LACTEO;
+  }
+
+  function getPlazosComunicacionLetraQ() {
+    return { ...PLAZOS_COMUNICACION_LETRA_Q };
+  }
+
+  function getTiposMovimientoLetraQ() {
+    return TIPOS_MOVIMIENTO_LETRA_Q;
+  }
+
+  function diasHabiles(fecha, numDias) {
+    if (!fecha) return '';
+    const d = new Date(fecha);
+    let count = 0;
+    while (count < numDias) {
+      d.setDate(d.getDate() + 1);
+      const diaSem = d.getDay();
+      if (diaSem !== 0 && diaSem !== 6) count++;
+    }
+    return d.toISOString().split('T')[0];
+  }
+
   // API pública
   return {
     COMUNIDADES,
@@ -857,6 +909,9 @@ window.ComunidadesService = (() => {
     CLASIFICACION_ZOOTECNICA,
     CLASIFICACION_ZOOTECNICA_LETRA_Q,
     LABORATORIOS_LECHE,
+    TIPO_OPERADOR_LACTEO,
+    PLAZOS_COMUNICACION_LETRA_Q,
+    TIPOS_MOVIMIENTO_LETRA_Q,
     ESPECIES_AUTORIZABLES,
     ESPECIES_CON_DIB,
     PAISES_NACIMIENTO,
@@ -915,5 +970,9 @@ window.ComunidadesService = (() => {
     calcularMOFA,
     badgeEstadoAnalitica,
     badgesCalidadLeche,
+    getTiposOperadorLacteo,
+    getPlazosComunicacionLetraQ,
+    getTiposMovimientoLetraQ,
+    diasHabiles,
   };
 })();

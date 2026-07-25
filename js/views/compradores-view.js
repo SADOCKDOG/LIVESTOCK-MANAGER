@@ -648,7 +648,7 @@ const CompradoresView = {
       const esEdicion = !!id;
       const c = esEdicion ? await Compradores.get(id) : {
           nombre: '', nif_cif: '', direccion: '', codigo_postal: '', ciudad: '', provincia: '',
-          telefono: '', email: '', tipo_comprador: 'híbrido', tipo_operador: 'operador_comercial',
+          telefono: '', email: '', tipo_comprador: 'híbrido', tipo_operador: 'operador_comercial', tipo_operador_lacteo: '',
           rega: '', comunidad_autonoma: '', condiciones_pago: '', notas: '', activo: true
       };
 
@@ -693,6 +693,17 @@ const CompradoresView = {
                 <option value="industria_lactea" ${c.tipo_operador === 'industria_lactea' ? 'selected' : ''}>INDUSTRIA LÁCTEA</option>
                 <option value="operador_comercial" ${!c.tipo_operador || c.tipo_operador === 'operador_comercial' ? 'selected' : ''}>OPERADOR COMERCIAL</option>
                 <option value="tratante" ${c.tipo_operador === 'tratante' ? 'selected' : ''}>TRATANTE</option>
+              </select>
+            </div>
+            <div class="wizard-input-group">
+              <label class="wizard-label uppercase font-900" for="c-tipo-operador-lacteo">Operador Lácteo (Letra Q)</label>
+              <select id="c-tipo-operador-lacteo" class="wizard-input wizard-select font-800 uppercase">
+                <option value="">— NO APLICA —</option>
+                <option value="primer_comprador" ${c.tipo_operador_lacteo === 'primer_comprador' ? 'selected' : ''}>PRIMER COMPRADOR</option>
+                <option value="centro_operacion" ${c.tipo_operador_lacteo === 'centro_operacion' ? 'selected' : ''}>CENTRO DE OPERACIÓN</option>
+                <option value="centro_descarga" ${c.tipo_operador_lacteo === 'centro_descarga' ? 'selected' : ''}>CENTRO DE DESCARGA</option>
+                <option value="intermediario" ${c.tipo_operador_lacteo === 'intermediario' ? 'selected' : ''}>INTERMEDIARIO</option>
+                <option value="transportista" ${c.tipo_operador_lacteo === 'transportista' ? 'selected' : ''}>TRANSPORTISTA</option>
               </select>
             </div>
             <div class="wizard-input-group">
@@ -775,6 +786,7 @@ const CompradoresView = {
                 nif_cif: document.getElementById('c-nif').value.trim(),
                 tipo_comprador: document.getElementById('c-tipo').value,
                 tipo_operador: document.getElementById('c-tipo-operador').value,
+                tipo_operador_lacteo: document.getElementById('c-tipo-operador-lacteo').value,
                 rega: document.getElementById('c-rega').value.trim(),
                 comunidad_autonoma: document.getElementById('c-ccaa').value,
                 direccion: document.getElementById('c-dir').value.trim(),
