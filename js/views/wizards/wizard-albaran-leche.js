@@ -17,6 +17,7 @@ window.AlbaranLecheWizard = {
       : { precio_base_referencia: 0.45, precio_por_punto_extracto: 0.045, tasa_INLAC_defecto: 0.0012 };
 
     const tanquesActivos = window.TanquesLeche ? await window.TanquesLeche.getActivos(fincaId) : [];
+    const compradoresLacteos = window.Compradores ? (await window.Compradores.list({ tipo: 'láctico' })).filter(c => c.activo !== false) : [];
     const laboratorios = window.ComunidadesService ? window.ComunidadesService.getLaboratoriosLeche() : [];
 
     // Definición de funciones de cálculo en el ámbito global del App para los onchange/oninput
@@ -113,6 +114,72 @@ window.AlbaranLecheWizard = {
               <input type="text" id="w-l-q" value="${data.q}" placeholder="CÓDIGO MUESTRA..." class="wizard-input uppercase font-800">
             </div>
 
+            <div class="grid grid-cols-2 gap-10 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">NIF TOMADOR MUESTRA</label>
+                <input type="text" id="w-l-nif-tomador" value="${data.nif_tomador_muestra || ''}" placeholder="NIF..." class="wizard-input uppercase font-800 text-xs">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">INHIBIDORES IN SITU</label>
+                <select id="w-l-inh-situ" class="wizard-input font-800 text-xs">
+                  <option value="no_realizada" ${(!data.resultado_inhibidores_in_situ || data.resultado_inhibidores_in_situ === 'no_realizada') ? 'selected' : ''}>NO REALIZADA</option>
+                  <option value="conforme" ${data.resultado_inhibidores_in_situ === 'conforme' ? 'selected' : ''}>CONFORME</option>
+                  <option value="no_conforme" ${data.resultado_inhibidores_in_situ === 'no_conforme' ? 'selected' : ''}>NO CONFORME</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-10 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">AGENTE RECOGIDA</label>
+                <select id="w-l-agente-recogida" class="wizard-input font-800 text-xs">
+                  <option value="">— 1er COMPRADOR (DEFECTO) —</option>
+                  ${compradoresLacteos.map(c => `<option value="${c.nif_cif}" ${data.agente_recogida_nif === c.nif_cif ? 'selected' : ''}>${c.nombre} (${c.nif_cif})</option>`).join('')}
+                </select>
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">AGENTE DESTINO</label>
+                <select id="w-l-agente-destino" class="wizard-input font-800 text-xs">
+                  <option value="">— 1er COMPRADOR (DEFECTO) —</option>
+                  ${compradoresLacteos.map(c => `<option value="${c.nif_cif}" ${data.agente_destino_nif === c.nif_cif ? 'selected' : ''}>${c.nombre} (${c.nif_cif})</option>`).join('')}
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-10 mb-12">
+              <div class="wizard-input-group">
+                <label class="wizard-label">TIPO MOVIMIENTO LETRA Q</label>
+                <select id="w-l-tipo-mov" class="wizard-input font-800 text-xs">
+                  <option value="explotacion_a_cisterna" ${(data.tipo_movimiento_letra_q || 'explotacion_a_cisterna') === 'explotacion_a_cisterna' ? 'selected' : ''}>EXPLOTACIÓN → CISTERNA</option>
+                  <option value="explotacion_a_rechazo" ${data.tipo_movimiento_letra_q === 'explotacion_a_rechazo' ? 'selected' : ''}>EXPLOTACIÓN → RECHAZO</option>
+                  <option value="explotacion_a_establecimiento" ${data.tipo_movimiento_letra_q === 'explotacion_a_establecimiento' ? 'selected' : ''}>EXPLOTACIÓN → ESTABLECIMIENTO</option>
+                  <option value="cisterna_a_cisterna" ${data.tipo_movimiento_letra_q === 'cisterna_a_cisterna' ? 'selected' : ''}>CISTERNA → CISTERNA</option>
+                  <option value="cisterna_a_rechazo" ${data.tipo_movimiento_letra_q === 'cisterna_a_rechazo' ? 'selected' : ''}>CISTERNA → RECHAZO</option>
+                  <option value="cisterna_a_establecimiento" ${data.tipo_movimiento_letra_q === 'cisterna_a_establecimiento' ? 'selected' : ''}>CISTERNA → ESTABLECIMIENTO</option>
+                </select>
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">ESTADO LETRA Q</label>
+                <select id="w-l-estado-q" class="wizard-input font-800 text-xs">
+                  <option value="pendiente" ${(data.estado_letra_q || 'pendiente') === 'pendiente' ? 'selected' : ''}>PENDIENTE</option>
+                  <option value="comunicado" ${data.estado_letra_q === 'comunicado' ? 'selected' : ''}>COMUNICADO</option>
+                  <option value="rechazado" ${data.estado_letra_q === 'rechazado' ? 'selected' : ''}>RECHAZADO</option>
+                  <option value="exento" ${data.estado_letra_q === 'exento' ? 'selected' : ''}>EXENTO</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="w-l-cisterna-fields" class="grid grid-cols-2 gap-10 mb-12" style="display:${data.tipo_movimiento_letra_q === 'cisterna_a_cisterna' ? 'grid' : 'none'};">
+              <div class="wizard-input-group">
+                <label class="wizard-label">CÓD. CISTERNA ORIGEN (LETRA Q)</label>
+                <input type="text" id="w-l-cist-origen" value="${data.codigo_cisterna_origen_letra_q || ''}" placeholder="CÓDIGO..." class="wizard-input uppercase font-800 text-xs">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label">CÓD. CISTERNA DESTINO (LETRA Q)</label>
+                <input type="text" id="w-l-cist-destino" value="${data.codigo_cisterna_destino_letra_q || ''}" placeholder="CÓDIGO..." class="wizard-input uppercase font-800 text-xs">
+              </div>
+            </div>
+
             <div class="grid grid-cols-3 gap-10 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label">Nº MUESTREO OFICIAL</label>
@@ -163,6 +230,14 @@ window.AlbaranLecheWizard = {
           data.matricula = document.getElementById('w-l-mat')?.value.trim() || data.matricula;
           data.temp = parseFloat(document.getElementById('w-l-temp')?.value) || 0;
           data.q = document.getElementById('w-l-q')?.value.trim() || data.q;
+          data.nif_tomador_muestra = document.getElementById('w-l-nif-tomador')?.value.trim().toUpperCase() || '';
+          data.resultado_inhibidores_in_situ = document.getElementById('w-l-inh-situ')?.value || 'no_realizada';
+          data.agente_recogida_nif = document.getElementById('w-l-agente-recogida')?.value || null;
+          data.agente_destino_nif = document.getElementById('w-l-agente-destino')?.value || null;
+          data.tipo_movimiento_letra_q = document.getElementById('w-l-tipo-mov')?.value || 'explotacion_a_cisterna';
+          data.estado_letra_q = document.getElementById('w-l-estado-q')?.value || 'pendiente';
+          data.codigo_cisterna_origen_letra_q = document.getElementById('w-l-cist-origen')?.value.trim().toUpperCase() || '';
+          data.codigo_cisterna_destino_letra_q = document.getElementById('w-l-cist-destino')?.value.trim().toUpperCase() || '';
           data.numero_muestreo_oficial = document.getElementById('w-l-muestreo')?.value.trim() || '';
           data.hora_ordeno = document.getElementById('w-l-hora-ordeno')?.value || '';
           data.hora_carga = document.getElementById('w-l-hora-carga')?.value || '';
@@ -172,6 +247,12 @@ window.AlbaranLecheWizard = {
           data.inh = document.getElementById('w-l-inh')?.checked || false;
           data.especie_leche = document.getElementById('w-l-especie')?.value || 'vacuno';
           data.tanqueId = parseInt(document.getElementById('w-l-tanque')?.value) || null;
+
+          // Mostrar/ocultar campos de cisterna según tipo de movimiento
+          const cisternaFields = document.getElementById('w-l-cisterna-fields');
+          if (cisternaFields) {
+            cisternaFields.style.display = data.tipo_movimiento_letra_q === 'cisterna_a_cisterna' ? 'grid' : 'none';
+          }
           
           data.estado_tramite_infolac = data.estado_tramite_infolac || 'borrador';
           data.adsg_codigo = data.adsg_codigo || finca.adsg_codigo || '';
@@ -193,6 +274,36 @@ window.AlbaranLecheWizard = {
           if (!data.comunidad_autonoma) { App.toastError("Selecciona la comunidad autónoma"); return false; }
           if (data.temp > 6) { App.toast("ALERTA SANITARIA: Temperatura > 6°C detectada.", 'warning'); }
           if (!data.inh) { App.toastError("Debes certificar la ausencia de inhibidores."); return false; }
+
+          // Regla de intermediarios (Nota Aclaratoria MAPA)
+          if (data.tipo_movimiento_letra_q && !data.tipo_movimiento_letra_q.startsWith('cisterna_a') && data.agente_recogida_nif) {
+            const agente = compradoresLacteos.find(c => c.nif_cif === data.agente_recogida_nif);
+            if (agente && agente.tipo_operador_lacteo === 'intermediario') {
+              App.toastError('Los movimientos de solo cambio de propiedad (Intermediario 1) no se registran en Letra Q 2.0. Si hay cambio de cisterna, seleccione tipo "Cisterna → Cisterna".');
+              return false;
+            }
+          }
+
+          // Validación movimiento Letra Q
+          if (window.MotorLacteo) {
+            const movVal = await window.MotorLacteo.validarMovimientoLetraQ({
+              tipo_movimiento_letra_q: data.tipo_movimiento_letra_q,
+              agente_recogida_nif: data.agente_recogida_nif,
+              agente_destino_nif: data.agente_destino_nif,
+              resultado_inhibidores_in_situ: data.resultado_inhibidores_in_situ,
+              muestra_tomada: !!data.q,
+              nif_tomador_muestra: data.nif_tomador_muestra,
+              codigo_cisterna_origen_letra_q: data.codigo_cisterna_origen_letra_q,
+              codigo_cisterna_destino_letra_q: data.codigo_cisterna_destino_letra_q,
+            });
+            for (const err of movVal.errores) {
+              App.toastError(err);
+            }
+            if (!movVal.valido) return false;
+            for (const w of movVal.warnings) {
+              App.toast(w, 'warning');
+            }
+          }
 
           if (data.tanqueId && window.BalanceLacteo) {
             const validacion = await window.BalanceLacteo.validarStockSuficiente(data.tanqueId, data.l);
@@ -420,6 +531,16 @@ window.AlbaranLecheWizard = {
         primas_penalizaciones: borrador ? borrador.primas_penalizaciones : 0,
         coste_alimentacion_diario: borrador ? borrador.coste_alimentacion_diario : 0,
         coste_alimentacion_periodo: borrador ? borrador.coste_alimentacion_periodo : 0,
+        nif_tomador_muestra: borrador ? borrador.nif_tomador_muestra : '',
+        resultado_inhibidores_in_situ: borrador ? borrador.resultado_inhibidores_in_situ : 'no_realizada',
+        tipo_movimiento_letra_q: borrador ? borrador.tipo_movimiento_letra_q : 'explotacion_a_cisterna',
+        agente_recogida_nif: borrador ? borrador.agente_recogida_nif : null,
+        agente_destino_nif: borrador ? borrador.agente_destino_nif : null,
+        codigo_cisterna_origen_letra_q: borrador ? borrador.codigo_cisterna_origen_letra_q : '',
+        codigo_cisterna_destino_letra_q: borrador ? borrador.codigo_cisterna_destino_letra_q : '',
+        estado_letra_q: borrador ? borrador.estado_letra_q : 'pendiente',
+        fecha_limite_comunicacion_letra_q: borrador ? borrador.fecha_limite_comunicacion_letra_q : '',
+        fecha_comunicado_letra_q: borrador ? borrador.fecha_comunicado_letra_q : '',
       },
       steps: wizardSteps,
       onComplete: async (dataLeche) => {
@@ -517,8 +638,32 @@ window.AlbaranLecheWizard = {
             coste_alimentacion_diario: dataLeche.coste_alimentacion_diario || 0,
             coste_alimentacion_periodo: costeAlim,
             mofa: mofa,
+            // Nuevos campos RD 989/2022
+            nif_tomador_muestra: dataLeche.nif_tomador_muestra || '',
+            resultado_inhibidores_in_situ: dataLeche.resultado_inhibidores_in_situ || 'no_realizada',
+            tipo_movimiento_letra_q: dataLeche.tipo_movimiento_letra_q || 'explotacion_a_cisterna',
+            agente_recogida_nif: dataLeche.agente_recogida_nif || null,
+            agente_destino_nif: dataLeche.agente_destino_nif || null,
+            codigo_cisterna_origen_letra_q: dataLeche.codigo_cisterna_origen_letra_q || null,
+            codigo_cisterna_destino_letra_q: dataLeche.codigo_cisterna_destino_letra_q || null,
+            estado_letra_q: dataLeche.estado_letra_q || 'pendiente',
+            fecha_limite_comunicacion_letra_q: null,
+            fecha_comunicado_letra_q: dataLeche.fecha_comunicado_letra_q || null,
             creadoEn: borrador ? borrador.creadoEn : new Date().toISOString(),
           };
+
+          // Calcular fecha límite de comunicación a Letra Q
+          if (window.MotorLacteo && dataLeche.fecha) {
+            const nifDestino = dataLeche.agente_destino_nif || null;
+            let tipoAgenteDestino = 'primer_comprador';
+            if (nifDestino) {
+              const agenteDest = compradoresLacteos.find(c => c.nif_cif === nifDestino);
+              if (agenteDest && agenteDest.tipo_operador_lacteo) {
+                tipoAgenteDestino = agenteDest.tipo_operador_lacteo;
+              }
+            }
+            reg.fecha_limite_comunicacion_letra_q = window.MotorLacteo.calcularPlazoComunicacion(tipoAgenteDestino, dataLeche.fecha);
+          }
 
           if (dataLeche.tanqueId) {
             const tanque = await window.TanquesLeche.getById(dataLeche.tanqueId);
