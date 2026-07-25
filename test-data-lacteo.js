@@ -57,7 +57,7 @@
         const fechas = [];
         for (let i = 0; i < 7; i++) {
             const fecha = new Date(hoy);
-            fecha.setDate(hoja.getDate() - i);
+            fecha.setDate(hoy.getDate() - i);
             fechas.push(fecha.toISOString().split('T')[0]);
         }
 

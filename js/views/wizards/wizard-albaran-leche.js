@@ -109,7 +109,9 @@ window.AlbaranLecheWizard = {
                 <label class="wizard-label">TEMPERATURA (°C)</label>
                 <input type="number" id="w-l-temp" value="${data.temp}" step="0.1" class="wizard-input font-950 text-xl" style="color:${data.temp <= 4 ? 'var(--c-success)' : 'var(--c-danger)'};">
               </div>
-                    <div class="wizard-input-group mb-12">
+            </div>
+
+            <div class="wizard-input-group mb-12">
               <label class="wizard-label">NÚMERO MUESTRA LETRA Q</label>
               <input type="text" id="w-l-q" value="${data.q}" placeholder="CÓDIGO MUESTRA..." class="wizard-input uppercase font-800">
             </div>

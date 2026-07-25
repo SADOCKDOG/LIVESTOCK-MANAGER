@@ -40,7 +40,7 @@ window.ExplotacionLacteaView = {
         const gastos = await window.db.getAll('gastos_ganaderia').catch(() => []);
         return gastos
           .filter(g => Number(g.fincaId) === Number(fincaId) && g.categoria === 'Alimentacion' && new Date(g.fecha) >= hace30)
-          .reduce((s, g) => s + (g.importe || 0), 0);
+          .reduce((s, g) => s + (g.monto || 0), 0);
       } catch (e) { return 0; }
     })();
 
