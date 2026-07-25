@@ -175,5 +175,139 @@ window.ExplotacionLacteaView = {
 
     html += `</div>`;
     container.innerHTML = html;
+  },
+
+  async renderControl(container) {
+    if (!container) return;
+    const fincaId = await window.Fincas.getActiveId();
+    const analiticas = window.AnaliticasLeche ? await window.AnaliticasLeche.getAll(fincaId).catch(() => []) : [];
+    const controlLechero = await window.db.getAllFromIndex('control_lechero', 'fincaId', fincaId).catch(() => []);
+
+    const analiticasHtml = analiticas.slice(0, 20).map(a => {
+      const estadoColor = a.estado === 'validado' ? 'var(--c-success)' : (a.estado === 'alerta' ? 'var(--c-warning)' : 'var(--c-danger)');
+      return `
+        <div class="card p-12 mb-10" style="border-left: 3px solid var(--c-accent);">
+          <div class="flex items-center justify-between mb-6">
+            <div class="text-sm font-900 uppercase">${a.tipo_muestreo || 'Autocontrol'} — ${UI.formatDate(a.fecha_muestreo)}</div>
+            <span class="badge badge-sm" style="background: ${estadoColor}15; color: ${estadoColor}; border: 1px solid ${estadoColor}40; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; padding: 2px 8px; border-radius: 6px;">${a.estado}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-6 text-center">
+            <div>
+              <div class="text-xs text-aaa uppercase">Grasa</div>
+              <div class="text-sm font-900">${a.grasa || '—'}%</div>
+            </div>
+            <div>
+              <div class="text-xs text-aaa uppercase">Proteína</div>
+              <div class="text-sm font-900">${a.proteina || '—'}%</div>
+            </div>
+            <div>
+              <div class="text-xs text-aaa uppercase">E. Seco</div>
+              <div class="text-sm font-900">${a.extracto_seco ? a.extracto_seco.toFixed(2) + '%' : '—'}</div>
+            </div>
+            <div>
+              <div class="text-xs text-aaa uppercase">Gérmenes</div>
+              <div class="text-sm font-900">${a.germenes_30C ? (a.germenes_30C / 1000).toFixed(0) + 'k' : '—'}</div>
+            </div>
+            <div>
+              <div class="text-xs text-aaa uppercase">Somáticas</div>
+              <div class="text-sm font-900">${a.celulas_somaticas ? (a.celulas_somaticas / 1000).toFixed(0) + 'k' : '—'}</div>
+            </div>
+            <div>
+              <div class="text-xs text-aaa uppercase">Lab</div>
+              <div class="text-xs font-800">${a.laboratorio_nombre || '—'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const controlLecheroHtml = controlLechero.slice(0, 10).map(c => `
+      <div class="card p-12 mb-10" style="border-left: 3px solid var(--c-purple);">
+        <div class="flex items-center justify-between mb-6">
+          <div class="text-sm font-900 uppercase">Control Lechero — ${UI.formatDate(c.fecha_control)}</div>
+          <span class="badge badge-sm badge-purple" style="font-size: 0.6rem; font-weight: 900; text-transform: uppercase; padding: 2px 8px; border-radius: 6px;">${c.organismo_control || 'DHI'}</span>
+        </div>
+        <div class="grid grid-cols-3 gap-6 text-center">
+          <div>
+            <div class="text-xs text-aaa uppercase">Media Litros</div>
+            <div class="text-sm font-900">${c.media_rebano_litros || '—'} L</div>
+          </div>
+          <div>
+            <div class="text-xs text-aaa uppercase">Media Grasa</div>
+            <div class="text-sm font-900">${c.media_rebano_grasa || '—'}%</div>
+          </div>
+          <div>
+            <div class="text-xs text-aaa uppercase">Media Proteína</div>
+            <div class="text-sm font-900">${c.media_rebano_proteina || '—'}%</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="p-16">
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color: var(--c-accent); display: inline-flex; align-items: center;">${Icons.analitica()}</span>
+          <div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
+              <span style="color: var(--c-accent); margin-right: 4px;">|</span> Control Lechero
+            </h1>
+            <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Analíticas y controles oficiales</div>
+          </div>
+        </div>
+
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px; margin-top: 15px;">
+          ${Icons.analitica()} Analíticas de Leche
+        </div>
+        ${analiticasHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin analíticas registradas</span></div>'}
+
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px; margin-top: 15px;">
+          ${Icons.documento()} Controles Oficiales (DHI)
+        </div>
+        ${controlLecheroHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin controles lecheros registrados</span></div>'}
+      </div>
+    `;
+  },
+
+  async renderBalance(container) {
+    if (!container) return;
+    const fincaId = await window.Fincas.getActiveId();
+    const balanceMovs = await window.db.getAllFromIndex('balance_lacteo', 'fincaId', fincaId).catch(() => []);
+    balanceMovs.sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+    const movimientosHtml = balanceMovs.slice(0, 30).map(m => {
+      const icon = m.tipo_movimiento === 'entrada' ? '↓' : (m.tipo_movimiento === 'salida' ? '↑' : '•');
+      const color = m.tipo_movimiento === 'entrada' ? 'var(--c-success)' : 'var(--c-danger)';
+      return `
+        <div class="card p-10 mb-8" style="border-left: 3px solid ${color};">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-900" style="color: ${color};">${icon} ${m.tipo_movimiento.toUpperCase()}</div>
+              <div class="text-xs text-aaa">${m.referencia_tipo || 'Manual'} ${m.referencia_id ? '#' + m.referencia_id : ''}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-900">${m.cantidad_litros.toLocaleString('es-ES')} L</div>
+              <div class="text-xs text-aaa">${UI.formatDate(m.fecha)} ${m.turno ? '(' + m.turno + ')' : ''}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="p-16">
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color: var(--c-info); display: inline-flex; align-items: center;">${Icons.documento()}</span>
+          <div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
+              <span style="color: var(--c-info); margin-right: 4px;">|</span> Balance Lácteo
+            </h1>
+            <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Movimientos de tanque (más reciente primero)</div>
+          </div>
+        </div>
+
+        ${movimientosHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin movimientos registrados</span></div>'}
+      </div>
+    `;
   }
 };
