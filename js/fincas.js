@@ -429,6 +429,7 @@ const Fincas = {
                 num_cubiculos: datos.num_cubiculos != null ? Number(datos.num_cubiculos) : null,
                 capacidad_balsa_purines_m3: datos.capacidad_balsa_purines_m3 != null ? Number(datos.capacidad_balsa_purines_m3) : null,
                 tiene_evaluacion_ambiental: !!datos.tiene_evaluacion_ambiental,
+                numero_infolac: (datos.numero_infolac || '').trim(),
                 creadoEn: new Date().toISOString()
             };
 

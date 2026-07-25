@@ -10,21 +10,29 @@ window.BalanceLacteo = (() => {
     if (!data.tanqueId) throw new Error('tanqueId requerido');
     if (!data.tipo_movimiento) throw new Error('tipo_movimiento requerido');
 
+    const tanque = await window.db.get('tanques_leche', data.tanqueId);
+    if (!tanque) throw new Error(`Tanque ${data.tanqueId} no existe`);
+
+    const cantidad = parseFloat(data.cantidad_litros) || 0;
+    if (data.tipo_movimiento !== 'ajuste' && cantidad <= 0) {
+      throw new Error('cantidad_litros debe ser mayor que 0');
+    }
+
     const stockAnterior = await getStockTanque(data.tanqueId);
     let litrosAcumulados;
 
     switch (data.tipo_movimiento) {
       case 'entrada':
-        litrosAcumulados = stockAnterior + (parseFloat(data.cantidad_litros) || 0);
+        litrosAcumulados = stockAnterior + cantidad;
         break;
       case 'salida':
-        litrosAcumulados = stockAnterior - (parseFloat(data.cantidad_litros) || 0);
+        litrosAcumulados = stockAnterior - cantidad;
         break;
       case 'merma':
-        litrosAcumulados = stockAnterior - (parseFloat(data.cantidad_litros) || 0);
+        litrosAcumulados = stockAnterior - cantidad;
         break;
       case 'ajuste':
-        litrosAcumulados = parseFloat(data.cantidad_litros) || 0;
+        litrosAcumulados = cantidad;
         break;
       default:
         throw new Error(`tipo_movimiento inválido: ${data.tipo_movimiento}`);
@@ -35,7 +43,7 @@ window.BalanceLacteo = (() => {
       tanqueId: data.tanqueId,
       tipo_movimiento: data.tipo_movimiento,
       fecha: data.fecha || new Date().toISOString(),
-      cantidad_litros: parseFloat(data.cantidad_litros) || 0,
+      cantidad_litros: cantidad,
       referencia_tipo: data.referencia_tipo || null,
       referencia_id: data.referencia_id || null,
       litros_acumulados: litrosAcumulados,
