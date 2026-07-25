@@ -35,6 +35,7 @@ const ExplotacionView = {
       { key: 'tanques', label: 'Tanques' },
       { key: 'control', label: 'Control' },
       { key: 'balance', label: 'Balance' },
+      { key: 'graficos', label: 'Gráficos' },
     ];
 
     // Tarjeta de Resumen Lácteo (unifica KPIs sueltos)
@@ -77,6 +78,8 @@ const ExplotacionView = {
       await ExplotacionLacteaView.renderControl(subContainer);
     } else if (this._lacteoSubTab === 'balance') {
       await ExplotacionLacteaView.renderBalance(subContainer);
+    } else if (this._lacteoSubTab === 'graficos') {
+      await ExplotacionLacteaView.renderGraficos(subContainer);
     } else {
       await ExplotacionLacteaView.render(subContainer);
     }
