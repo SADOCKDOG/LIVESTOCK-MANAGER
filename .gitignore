@@ -28,6 +28,11 @@ Private/
 .vscode/
 .agent/
 .artifacts/
+android/.proxyai/
+
+# Logs de sesión y herramientas ad-hoc de asistentes IA (ver repo-cleanup-2026-07)
+session-*.md
+tools/
 .claude/
 .codebuddy/
 .codex/
