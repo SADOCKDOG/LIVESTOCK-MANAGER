@@ -358,6 +358,23 @@ window.AlbaranLecheWizard = {
           data.laboratorio_nombre = document.getElementById('w-l-lab')?.value || data.laboratorio_nombre;
         },
         validate: async (data) => {
+          if (window.ComunidadesService) {
+            const especie = data.especie_leche || 'vacuno';
+            const evalResult = window.ComunidadesService.evaluarCalidadLecheEspecie({
+              grasa: data.grasa,
+              proteina: data.proteina,
+              germenes_30C: data.germenes,
+              celulas_somaticas: data.somaticas,
+              inhibidores: data.antibioticos,
+              aflatoxina_m1: data.aflatoxina_m1,
+            }, especie);
+
+            if (evalResult.bloqueante) {
+              evalResult.alertas.forEach(a => App.toastError(a));
+              return false;
+            }
+            evalResult.alertas.forEach(a => App.toast(a, 'warning'));
+          }
           return true;
         }
       }
