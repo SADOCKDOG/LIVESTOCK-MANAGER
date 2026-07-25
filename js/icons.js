@@ -254,6 +254,13 @@ const Icons = {
       '<line x1="16" y1="17" x2="8" y2="17"/>'
     );
   },
+  analitica() {
+    return this._svg(
+      '<path d="M9 2v6.5L4 18a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3l-5-9.5V2"/>' +
+      '<line x1="8" y1="2" x2="16" y2="2"/>' +
+      '<line x1="7" y1="15" x2="17" y2="15"/>'
+    );
+  },
   imprimir() {
     return this._svg(
       '<polyline points="6 9 6 2 18 2 18 9"/>' +
