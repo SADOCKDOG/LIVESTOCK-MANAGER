@@ -10,6 +10,7 @@ const ExplotacionView = {
   _loadingPromise: null,
   _filtroActividad: '',
   _lacteoSubTab: 'dashboard',
+  _tramiteSubTab: 'guias',
 
   _cambiarSubModulo(subModulo) {
     this._activeSubModule = subModulo;
@@ -18,6 +19,11 @@ const ExplotacionView = {
 
   _cambiarLacteoSubTab(subTab) {
     this._lacteoSubTab = subTab;
+    this.render();
+  },
+
+  _cambiarTramiteSubTab(subTab) {
+    this._tramiteSubTab = subTab;
     this.render();
   },
 
@@ -653,6 +659,14 @@ const ExplotacionView = {
     if (!container) return;
     container.innerHTML = `<div class="p-16 text-center text-gray text-xs uppercase font-800">Cargando trámites…</div>`;
 
+    const subTabs = [
+      { key: 'guias', label: 'Guías', color: 'var(--c-info)' },
+      { key: 'censo', label: 'Censo', color: 'var(--c-warning)' },
+      { key: 'crotales', label: 'Crotales', color: 'var(--c-success)' },
+      { key: 'traslado', label: 'Traslado', color: 'var(--c-purple)' },
+      { key: 'infolac', label: 'Infolac', color: 'var(--c-info)' },
+    ];
+
     const [docs, pedidos, entregas, animales] = await Promise.all([
       window.db?.getAll('documentos_legales').catch(() => []),
       window.db?.getAllFromIndex('pedidos_crotales', 'fincaId', fincaId).catch(() => []),
@@ -674,7 +688,7 @@ const ExplotacionView = {
     const pendientesInfolac = entregasMes.filter(e => !['presentado', 'aceptado'].includes(e.estado_tramite_infolac)).length;
 
     const renderCard = (cfg) => `
-      <div class="card p-14 mb-12 border-222 card-resumen" style="background: rgba(255,255,255,0.02); border-left: 4px solid ${cfg.color};">
+      <div class="card p-14 mb-12 border-222 card-resumen animate-fade-in" style="background: rgba(255,255,255,0.02); border-left: 4px solid ${cfg.color};">
         <div class="flex items-center justify-between gap-8 mb-8">
           <span class="flex items-center gap-8 text-white font-900 text-sm uppercase tracking-wider" style="color:${cfg.color};">${cfg.icon} ${cfg.title}</span>
           ${cfg.badge || ''}
@@ -682,12 +696,90 @@ const ExplotacionView = {
         <div class="text-[0.65rem] text-gray font-bold uppercase tracking-wide mb-2">${cfg.desc}</div>
         <div class="text-[0.7rem] text-white font-900 mb-12">${cfg.data || 'Sin registros recientes'}</div>
         <div class="flex gap-8">
-          <button class="widget-link-btn widget-link-btn--neon flex-1 py-8" style="--neon-color:${cfg.color}; flex-direction:row;" onclick="${cfg.action}">
+          <button class="widget-link-btn widget-link-btn--neon flex-1 py-10" style="--neon-color:${cfg.color}; flex-direction:row;" onclick="${cfg.action}">
             <span class="widget-link-label">${cfg.actionLabel}</span>
           </button>
           ${cfg.history ? `<button class="btn btn-dark px-12" onclick="${cfg.history}">${Icons.historial()}</button>` : ''}
         </div>
       </div>`;
+
+    let contentHtml = '';
+    switch (this._tramiteSubTab) {
+      case 'guias':
+        contentHtml = renderCard({
+          title: 'GUÍAS DIMOE',
+          icon: Icons.documento(),
+          color: 'var(--c-info)',
+          desc: 'Movimientos oficiales entre explotaciones',
+          data: ultimaGuia ? `Última: ${ultimaGuia.numero || ultimaGuia.numero_documento} (${this._fmtFecha(ultimaGuia.fecha || ultimaGuia.creadoEn)})` : null,
+          badge: `<span class="text-[0.6rem] font-950 uppercase px-6 py-2 rounded-sm" style="background:rgba(79,173,245,0.1); color:var(--c-info); border:1px solid var(--c-info);">OFICIAL</span>`,
+          action: "if(window.App&&App._abrirWizardGuiaMovimiento)App._abrirWizardGuiaMovimiento();else if(window.WizardGuiaMovimiento)WizardGuiaMovimiento.abrir();",
+          actionLabel: 'Emitir Guía',
+          history: guiasFinca.length > 0 ? "ExplotacionView._verHistorialGuias()" : null
+        });
+        if (guiasFinca.length > 0) {
+          contentHtml += `
+          <div class="inf-section-title mt-16 mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
+            <span style="color: var(--c-info); margin-right: 4px;">|</span> GUÍAS DIMOE RECIENTES
+          </div>
+          <div class="grid gap-10">
+            ${guiasFinca.slice(0, 10).map(g => App._cardRegistro({
+              icon: Icons.documento(),
+              title: g.numero_documento || g.numero || `Guía #${g.id}`,
+              metadata: `<span>${this._fmtFecha(g.fecha || g.creadoEn)}</span><span>·</span><span>${(g.destino || g.motivo || 'Movimiento').toString().toUpperCase()}</span>`,
+              badge: (g.estado_tramite || 'registrada').toString().toUpperCase(),
+              color: 'var(--c-info)'
+            })).join('')}
+          </div>`;
+        }
+        break;
+      case 'censo':
+        contentHtml = renderCard({
+          title: 'CENSO ANUAL',
+          icon: Icons.animales(),
+          color: 'var(--c-warning)',
+          desc: 'Declaración de existencias a 1 de Enero',
+          data: ultimoCenso ? `Declarado: ${this._fmtFecha(ultimoCenso.fecha)}` : `Censo actual: ${animales.length} animales`,
+          badge: ultimoCenso?.fecha?.startsWith(new Date().getFullYear().toString()) ? `<span style="color:var(--c-success); font-size:0.6rem; font-weight:900;">AL DÍA</span>` : `<span style="color:var(--c-danger); font-size:0.6rem; font-weight:900;">PENDIENTE ${new Date().getFullYear()}</span>`,
+          action: "if(window.App&&App._abrirWizardCenso)App._abrirWizardCenso();else if(window.WizardCenso)WizardCenso.abrir();",
+          actionLabel: 'Generar Censo'
+        });
+        break;
+      case 'crotales':
+        contentHtml = renderCard({
+          title: 'CROTALES',
+          icon: Icons.paquete(),
+          color: 'var(--c-success)',
+          desc: 'Solicitud de identificación animal',
+          data: ultimoPedido ? `Último pedido: ${this._fmtFecha(ultimoPedido.fecha_pedido)} (${ultimoPedido.estado})` : null,
+          action: "if(window.App&&App._abrirWizardCrotales)App._abrirWizardCrotales();else if(window.WizardCrotales)WizardCrotales.abrir();",
+          actionLabel: 'Pedir Crotales'
+        });
+        break;
+      case 'traslado':
+        contentHtml = renderCard({
+          title: 'TRASLADO',
+          icon: Icons.documento(),
+          color: 'var(--c-purple)',
+          desc: 'Movimiento interno de animales entre rebaños',
+          data: 'Gestión de lotes y ubicaciones',
+          action: "if(window.App&&App._abrirWizardTraslado)App._abrirWizardTraslado();else if(window.WizardTraslado)WizardTraslado.abrir();",
+          actionLabel: 'Iniciar Traslado'
+        });
+        break;
+      case 'infolac':
+        contentHtml = renderCard({
+          title: 'INFOLAC',
+          icon: Icons.leche(),
+          color: 'var(--c-info)',
+          desc: 'Declaración mensual de producción láctea',
+          data: `${pendientesInfolac} entregas sin declarar este mes`,
+          badge: pendientesInfolac > 0 ? `<span style="color:var(--c-danger); font-size:0.6rem; font-weight:900;">PENDIENTE</span>` : `<span style="color:var(--c-success); font-size:0.6rem; font-weight:900;">AL DÍA</span>`,
+          action: "window.location.hash='#/comercializacion'",
+          actionLabel: 'Ver Comercialización'
+        });
+        break;
+    }
 
     container.innerHTML = `
       <div class="report-section px-4">
@@ -695,79 +787,18 @@ const ExplotacionView = {
           <span style="color: var(--c-info); margin-right: 4px;">|</span> HUB DE GESTIÓN ADMINISTRATIVA
         </div>
 
-        <div class="grid gap-4">
-          ${renderCard({
-            title: 'GUÍAS DIMOE',
-            icon: Icons.documento(),
-            color: 'var(--c-info)',
-            desc: 'Movimientos oficiales entre explotaciones',
-            data: ultimaGuia ? `Última: ${ultimaGuia.numero || ultimaGuia.numero_documento} (${this._fmtFecha(ultimaGuia.fecha || ultimaGuia.creadoEn)})` : null,
-            badge: `<span class="text-[0.6rem] font-950 uppercase px-6 py-2 rounded-sm" style="background:rgba(79,173,245,0.1); color:var(--c-info); border:1px solid var(--c-info);">OFICIAL</span>`,
-            action: "if(window.App&&App._abrirWizardGuiaMovimiento)App._abrirWizardGuiaMovimiento();else if(window.WizardGuiaMovimiento)WizardGuiaMovimiento.abrir();",
-            actionLabel: 'Emitir Guía',
-            history: guiasFinca.length > 0 ? "ExplotacionView._verHistorialGuias()" : null
-          })}
-
-          ${renderCard({
-            title: 'CENSO ANUAL',
-            icon: Icons.animales(),
-            color: 'var(--c-warning)',
-            desc: 'Declaración de existencias a 1 de Enero',
-            data: ultimoCenso ? `Declarado: ${this._fmtFecha(ultimoCenso.fecha)}` : `Censo actual: ${animales.length} animales`,
-            badge: ultimoCenso?.fecha?.startsWith(new Date().getFullYear().toString()) ? `<span style="color:var(--c-success); font-size:0.6rem; font-weight:900;">AL DÍA</span>` : `<span style="color:var(--c-danger); font-size:0.6rem; font-weight:900;">PENDIENTE ${new Date().getFullYear()}</span>`,
-            action: "if(window.App&&App._abrirWizardCenso)App._abrirWizardCenso();else if(window.WizardCenso)WizardCenso.abrir();",
-            actionLabel: 'Generar Censo',
-            history: null
-          })}
-
-          ${renderCard({
-            title: 'CROTALES',
-            icon: Icons.paquete(),
-            color: 'var(--c-success)',
-            desc: 'Solicitud de identificación animal',
-            data: ultimoPedido ? `Último pedido: ${this._fmtFecha(ultimoPedido.fecha_pedido)} (${ultimoPedido.estado})` : null,
-            action: "if(window.App&&App._abrirWizardCrotales)App._abrirWizardCrotales();else if(window.WizardCrotales)WizardCrotales.abrir();",
-            actionLabel: 'Pedir Crotales',
-            history: null
-          })}
-
-          ${renderCard({
-            title: 'TRASLADO',
-            icon: Icons.documento(),
-            color: 'var(--c-purple)',
-            desc: 'Movimiento interno de animales entre rebaños',
-            data: 'Gestión de lotes y ubicaciones',
-            action: "if(window.App&&App._abrirWizardTraslado)App._abrirWizardTraslado();else if(window.WizardTraslado)WizardTraslado.abrir();",
-            actionLabel: 'Iniciar Traslado',
-            history: null
-          })}
-
-          ${renderCard({
-            title: 'INFOLAC',
-            icon: Icons.leche(),
-            color: 'var(--c-info)',
-            desc: 'Declaración mensual de producción láctea',
-            data: `${pendientesInfolac} entregas sin declarar este mes`,
-            badge: pendientesInfolac > 0 ? `<span style="color:var(--c-danger); font-size:0.6rem; font-weight:900;">PENDIENTE</span>` : `<span style="color:var(--c-success); font-size:0.6rem; font-weight:900;">AL DÍA</span>`,
-            action: "window.location.hash='#/comercializacion'",
-            actionLabel: 'Ver Comercialización',
-            history: null
-          })}
+        <div class="flex gap-8 px-12 pt-4 mb-14 overflow-x-auto no-scrollbar">
+          ${subTabs.map(t => `
+            <button class="text-[0.6rem] font-900 uppercase px-12 py-6 rounded-sm whitespace-nowrap"
+                    style="background:${this._tramiteSubTab === t.key ? t.color : 'var(--c-222)'};
+                           color:${this._tramiteSubTab === t.key ? '#000' : 'var(--c-aaa)'};"
+                    onclick="ExplotacionView._cambiarTramiteSubTab('${t.key}')">${t.label}</button>
+          `).join('')}
         </div>
 
-        ${guiasFinca.length > 0 ? `
-        <div class="inf-section-title mt-16 mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
-          <span style="color: var(--c-info); margin-right: 4px;">|</span> GUÍAS DIMOE RECIENTES
+        <div id="tramites-tab-content" class="animate-fade-in">
+          ${contentHtml}
         </div>
-        <div class="grid gap-10">
-          ${guiasFinca.slice(0, 10).map(g => App._cardRegistro({
-            icon: Icons.documento(),
-            title: g.numero_documento || g.numero || `Guía #${g.id}`,
-            metadata: `<span>${this._fmtFecha(g.fecha || g.creadoEn)}</span><span>·</span><span>${(g.destino || g.motivo || 'Movimiento').toString().toUpperCase()}</span>`,
-            badge: (g.estado_tramite || 'registrada').toString().toUpperCase(),
-            color: 'var(--c-info)'
-          })).join('')}
-        </div>` : ''}
       </div>`;
   },
 };
