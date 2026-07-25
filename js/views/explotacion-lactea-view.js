@@ -342,6 +342,9 @@ window.ExplotacionLacteaView = {
           <div class="card p-12">
             <canvas id="chart-comparativa-tanques" style="height: 250px;"></canvas>
           </div>
+          <div class="card p-12">
+            <canvas id="chart-curva-lactacion" style="height: 300px;"></canvas>
+          </div>
         </div>
       </div>
     `;
@@ -354,6 +357,52 @@ window.ExplotacionLacteaView = {
         window.GraficosLacteoService.renderComposicion('chart-composicion', fincaId),
         window.GraficosLacteoService.renderComparativaTanques('chart-comparativa-tanques', fincaId)
       ]);
+      
+      // Curva de lactación - requiere selector de animal
+      await this._renderCurvaLactacionSelector(fincaId);
+    }
+  },
+
+  async _renderCurvaLactacionSelector(fincaId) {
+    // Obtener animales del rebaño lechero
+    const rebanos = await window.db.getAll('rebanos').catch(() => []);
+    const rebanosLeche = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('lech'));
+    
+    let animalesLeche = [];
+    for (const reb of rebanosLeche) {
+      const animales = await window.db.getAllFromIndex('animales', 'rebanoId', reb.id).catch(() => []);
+      animalesLeche.push(...animales);
+    }
+
+    const opcionesAnimal = animalesLeche.map(a => 
+      `<option value="${a.id}">${a.numero_identificacion || a.nombre || `Animal ${a.id}`}</option>`
+    ).join('');
+
+    // Insertar selector antes del canvas
+    const canvas = document.getElementById('chart-curva-lactacion');
+    if (!canvas) return;
+    
+    const selectorHtml = `
+      <div class="flex items-center gap-10 mb-12">
+        <label class="text-sm font-900 uppercase">Seleccionar Animal:</label>
+        <select id="select-animal-lactacion" class="wizard-input font-800" style="flex: 1;">
+          <option value="">— Seleccionar —</option>
+          ${opcionesAnimal}
+        </select>
+      </div>
+    `;
+    
+    canvas.insertAdjacentHTML('beforebegin', selectorHtml);
+
+    // Event listener para cambiar de animal
+    const select = document.getElementById('select-animal-lactacion');
+    if (select) {
+      select.addEventListener('change', async (e) => {
+        const animalId = parseInt(e.target.value);
+        if (animalId && window.GraficosLacteoService) {
+          await window.GraficosLacteoService.renderCurvaLactacion('chart-curva-lactacion', fincaId, animalId);
+        }
+      });
     }
   },
 
