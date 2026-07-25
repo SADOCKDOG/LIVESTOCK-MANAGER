@@ -342,6 +342,100 @@ const GraficosLacteoService = {
     const chart = new Chart(ctx, config);
     this._charts.set(containerId, chart);
     return chart;
+  },
+
+  /**
+   * Curva de lactación por animal
+   * @param {string} containerId - ID del canvas
+   * @param {number} fincaId - ID de la finca
+   * @param {number} animalId - ID del animal
+   */
+  async renderCurvaLactacion(containerId, fincaId, animalId) {
+    if (!(await App._ensureChartJs())) return;
+
+    this.destroy(containerId);
+    const ctx = document.getElementById(containerId)?.getContext('2d');
+    if (!ctx) return;
+
+    // Obtener datos del animal
+    const animal = await window.db.get('animales', animalId).catch(() => null);
+    if (!animal) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Animal no encontrado', ctx.canvas.width / 2, ctx.canvas.height / 2);
+      return;
+    }
+
+    // Obtener producción individual del animal
+    const produccion = await window.db.getAllFromIndex('produccion_leche', 'animalId', animalId).catch(() => []);
+    
+    // Ordenar por fecha
+    produccion.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+    // Calcular días en lactación (DEL) desde la primera fecha
+    const fechaInicio = produccion.length > 0 ? new Date(produccion[0].fecha) : new Date();
+    
+    const labels = produccion.map(p => {
+      const fecha = new Date(p.fecha);
+      const dias = Math.floor((fecha - fechaInicio) / (1000 * 60 * 60 * 24));
+      return `Día ${dias}`;
+    });
+
+    const litros = produccion.map(p => p.cantidad_litros || 0);
+
+    const config = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: `Producción (${animal.numero_identificacion || animal.nombre || 'Animal'})`,
+          data: litros,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        ...this._getDefaultConfig(),
+        plugins: {
+          ...this._getDefaultConfig().plugins,
+          title: {
+            display: true,
+            text: 'Curva de Lactación',
+            color: '#f8fafc',
+            font: { size: 14, weight: '900' }
+          }
+        },
+        scales: {
+          ...this._getDefaultConfig().scales,
+          x: {
+            ...this._getDefaultConfig().scales.x,
+            title: {
+              display: true,
+              text: 'Días en Lactación',
+              color: '#94a3b8'
+            }
+          },
+          y: {
+            ...this._getDefaultConfig().scales.y,
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Litros',
+              color: '#94a3b8'
+            }
+          }
+        }
+      }
+    };
+
+    const chart = new Chart(ctx, config);
+    this._charts.set(containerId, chart);
+    return chart;
   }
 };
 

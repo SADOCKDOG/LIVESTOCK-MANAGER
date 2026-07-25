@@ -355,5 +355,63 @@ window.ExplotacionLacteaView = {
         window.GraficosLacteoService.renderComparativaTanques('chart-comparativa-tanques', fincaId)
       ]);
     }
+  },
+
+  async renderCurvaLactacion(container) {
+    if (!container) return;
+    const fincaId = await window.Fincas.getActiveId();
+
+    // Obtener animales del rebaño lechero
+    const rebanos = await window.db.getAll('rebanos').catch(() => []);
+    const rebanosLeche = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('lech'));
+    
+    let animalesLeche = [];
+    for (const reb of rebanosLeche) {
+      const animales = await window.db.getAllFromIndex('animales', 'rebanoId', reb.id).catch(() => []);
+      animalesLeche.push(...animales);
+    }
+
+    const opcionesAnimal = animalesLeche.map(a => 
+      `<option value="${a.id}">${a.numero_identificacion || a.nombre || `Animal ${a.id}`}</option>`
+    ).join('');
+
+    container.innerHTML = `
+      <div class="p-16">
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color: var(--c-info); display: inline-flex; align-items: center;">${Icons.animales()}</span>
+          <div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
+              <span style="color: var(--c-info); margin-right: 4px;">|</span> Curva de Lactación
+            </h1>
+            <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Producción individual por animal</div>
+          </div>
+        </div>
+
+        <div class="card p-12 mb-12">
+          <div class="flex items-center gap-10">
+            <label class="text-sm font-900 uppercase">Seleccionar Animal:</label>
+            <select id="select-animal-lactacion" class="wizard-input font-800" style="flex: 1;">
+              <option value="">— Seleccionar —</option>
+              ${opcionesAnimal}
+            </select>
+          </div>
+        </div>
+
+        <div class="card p-12">
+          <canvas id="chart-curva-lactacion" style="height: 300px;"></canvas>
+        </div>
+      </div>
+    `;
+
+    // Event listener para cambiar de animal
+    const select = document.getElementById('select-animal-lactacion');
+    if (select && window.GraficosLacteoService) {
+      select.addEventListener('change', async (e) => {
+        const animalId = parseInt(e.target.value);
+        if (animalId) {
+          await window.GraficosLacteoService.renderCurvaLactacion('chart-curva-lactacion', fincaId, animalId);
+        }
+      });
+    }
   }
 };
