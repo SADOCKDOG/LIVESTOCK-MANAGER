@@ -172,7 +172,6 @@ const ExplotacionView = {
       dHeader = this._cachedData || (await this._ensureData(fincaId, this._needsDataRefresh) || this._cachedData);
     }
     const flagsHeader = window.ModoContextoHelper?.getFlags() || { leche: true, carne: false };
-    const modoMetaHeader = window.ModoContextoHelper?.getModeMetaEffective(flagsHeader) || { icon: Icons.finca(), label: 'Explotación', color: 'var(--c-success)' };
     const primaryOnclick = flagsHeader.leche && flagsHeader.carne ? "App._abrirSubmenuRegistros({ origen_modulo: 'explotacion' })"
       : flagsHeader.carne ? "App._abrirAsistenteProduccion('carne', { origen_modulo: 'explotacion' })"
       : "App._abrirAsistenteProduccion('leche', { origen_modulo: 'explotacion' })";
@@ -192,10 +191,9 @@ const ExplotacionView = {
         ], this._activeSubModule, 'ExplotacionView')}
       </div>
 
-      <!-- Cabecera de Módulo: chip de modo + KPI + acción principal + accesos rápidos a trámites -->
+      <!-- Cabecera de Módulo: KPI + acción principal -->
       <div class="module-header px-4">
         <div class="module-header-kpis">
-          <span class="module-mode-chip" style="--mode-color: ${modoMetaHeader.color};">${modoMetaHeader.icon} ${modoMetaHeader.label}</span>
           ${dHeader && flagsHeader.leche ? `
           <div class="module-header-kpi">
             <span class="module-header-kpi-label">Litros</span>
@@ -211,12 +209,6 @@ const ExplotacionView = {
         <div class="module-header-primary-action">
           <button class="btn btn-create btn-lg" onclick="${primaryOnclick}">${Icons.fabPlus()} ${primaryLabel}</button>
         </div>` : ''}
-        <div class="module-header-secondary-actions">
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('traslado')">${Icons.documento()}<span class="widget-link-label">Traslado</span></button>
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('censo')">${Icons.documento()}<span class="widget-link-label">Censo</span></button>
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('crotales')">${Icons.documento()}<span class="widget-link-label">Crotales</span></button>
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" style="border:none; cursor:pointer;" onclick="ExplotacionView._cambiarSubModulo('guia')">${Icons.documento()}<span class="widget-link-label">Guía Mov.</span></button>
-        </div>
       </div>
 
       <!-- Contenedor Dinámico para la pestaña activa -->
@@ -656,75 +648,112 @@ const ExplotacionView = {
     if (overlay) overlay.remove();
   },
 
-  // Pestaña TRÁMITES: hub administrativo consolidado (Tarea B.1 del plan v5).
-  // Reúne los tres trámites oficiales dispersos —INFOLAC, guías DIMOE y Censo— en
-  // un único punto, delegando las acciones a los wizards existentes.
+  // Pestaña TRÁMITES: Hub de Gestión Administrativa consolidado.
   async _renderTramitesView(container, fincaId) {
     if (!container) return;
     container.innerHTML = `<div class="p-16 text-center text-gray text-xs uppercase font-800">Cargando trámites…</div>`;
 
-    const [guias, entregasLeche] = await Promise.all([
+    const [docs, pedidos, entregas, animales] = await Promise.all([
       window.db?.getAll('documentos_legales').catch(() => []),
-      window.db?.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => [])
+      window.db?.getAllFromIndex('pedidos_crotales', 'fincaId', fincaId).catch(() => []),
+      window.db?.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+      window.db?.getAll('animales').catch(() => [])
     ]);
 
     // Guías DIMOE registradas para esta finca
-    const guiasFinca = (guias || []).filter(g =>
+    const guiasFinca = (docs || []).filter(g =>
       (g.tipo === 'guia_movimiento' || g.tipo_documento === 'guia_movimiento') &&
       (g.fincaId === undefined || Number(g.fincaId) === Number(fincaId)) && !g.anulado
     ).sort((a, b) => new Date(b.fecha || b.creadoEn || 0) - new Date(a.fecha || a.creadoEn || 0));
 
-    // Estado INFOLAC: entregas del mes en curso sin declaración presentada/aceptada
+    const ultimaGuia = guiasFinca[0];
+    const ultimoCenso = docs.filter(d => (d.tipo === 'DECLARACION_CENSAL' || d.tipo === 'censo_anual')).sort((a,b) => new Date(b.fecha || 0) - new Date(a.fecha || 0))[0];
+    const ultimoPedido = (pedidos || []).sort((a,b) => new Date(b.fecha_pedido || 0) - new Date(a.fecha_pedido || 0))[0];
     const mesActual = new Date().toISOString().slice(0, 7);
-    const entregasMes = (entregasLeche || []).filter(e => (e.fechaRecogida || e.fecha || '').slice(0, 7) === mesActual && !e.anulado);
-    const infolacPendiente = entregasMes.filter(e => !['presentado', 'aceptado'].includes(e.estado_tramite_infolac)).length;
+    const entregasMes = (entregas || []).filter(e => (e.fechaRecogida || e.fecha || '').slice(0, 7) === mesActual && !e.anulado);
+    const pendientesInfolac = entregasMes.filter(e => !['presentado', 'aceptado'].includes(e.estado_tramite_infolac)).length;
 
-    const badge = (txt, color) => `<span class="text-[0.6rem] font-950 uppercase px-8 py-4 rounded-sm" style="background:color-mix(in srgb, ${color} 12%, transparent); border:1px solid color-mix(in srgb, ${color} 30%, transparent); color:${color};">${txt}</span>`;
-
-    const tramiteCard = (icon, titulo, subtitulo, estadoHtml, accionLabel, onclick, color) => `
-      <div class="card p-14 mb-12 border-222 card-resumen" style="background: rgba(255,255,255,0.02); border-left: 4px solid ${color};">
+    const renderCard = (cfg) => `
+      <div class="card p-14 mb-12 border-222 card-resumen" style="background: rgba(255,255,255,0.02); border-left: 4px solid ${cfg.color};">
         <div class="flex items-center justify-between gap-8 mb-8">
-          <span class="flex items-center gap-8 text-white font-900 text-sm uppercase tracking-wider" style="color:${color};">${icon} ${titulo}</span>
-          ${estadoHtml}
+          <span class="flex items-center gap-8 text-white font-900 text-sm uppercase tracking-wider" style="color:${cfg.color};">${cfg.icon} ${cfg.title}</span>
+          ${cfg.badge || ''}
         </div>
-        <div class="text-[0.65rem] text-gray font-bold uppercase tracking-wide mb-12">${subtitulo}</div>
-        <button class="widget-link-btn widget-link-btn--neon w-full" style="--neon-color:${color}; flex-direction:row;" onclick="${onclick}"><span class="widget-link-label">${accionLabel}</span></button>
+        <div class="text-[0.65rem] text-gray font-bold uppercase tracking-wide mb-2">${cfg.desc}</div>
+        <div class="text-[0.7rem] text-white font-900 mb-12">${cfg.data || 'Sin registros recientes'}</div>
+        <div class="flex gap-8">
+          <button class="widget-link-btn widget-link-btn--neon flex-1 py-8" style="--neon-color:${cfg.color}; flex-direction:row;" onclick="${cfg.action}">
+            <span class="widget-link-label">${cfg.actionLabel}</span>
+          </button>
+          ${cfg.history ? `<button class="btn btn-dark px-12" onclick="${cfg.history}">${Icons.historial()}</button>` : ''}
+        </div>
       </div>`;
 
     container.innerHTML = `
       <div class="report-section px-4">
         <div class="inf-section-title mb-12 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">
-          <span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} GESTIÓN DE TRÁMITES OFICIALES
+          <span style="color: var(--c-info); margin-right: 4px;">|</span> HUB DE GESTIÓN ADMINISTRATIVA
         </div>
 
-        ${tramiteCard(
-          Icons.leche(), 'INFOLAC',
-          'Declaración mensual de producción láctea (Letra Q / Paquete Lácteo UE).',
-          infolacPendiente > 0
-            ? badge(`${infolacPendiente} entregas sin declarar`, 'var(--c-danger)')
-            : badge(entregasMes.length > 0 ? 'Al día' : 'Sin entregas este mes', entregasMes.length > 0 ? 'var(--c-success)' : 'var(--c-gray)'),
-          'Ver comercialización láctea',
-          "window.location.hash='#/comercializacion'",
-          'var(--c-info)'
-        )}
+        <div class="grid gap-4">
+          ${renderCard({
+            title: 'GUÍAS DIMOE',
+            icon: Icons.documento(),
+            color: 'var(--c-info)',
+            desc: 'Movimientos oficiales entre explotaciones',
+            data: ultimaGuia ? `Última: ${ultimaGuia.numero || ultimaGuia.numero_documento} (${this._fmtFecha(ultimaGuia.fecha || ultimaGuia.creadoEn)})` : null,
+            badge: `<span class="text-[0.6rem] font-950 uppercase px-6 py-2 rounded-sm" style="background:rgba(79,173,245,0.1); color:var(--c-info); border:1px solid var(--c-info);">OFICIAL</span>`,
+            action: "if(window.App&&App._abrirWizardGuiaMovimiento)App._abrirWizardGuiaMovimiento();else if(window.WizardGuiaMovimiento)WizardGuiaMovimiento.abrir();",
+            actionLabel: 'Emitir Guía',
+            history: guiasFinca.length > 0 ? "ExplotacionView._verHistorialGuias()" : null
+          })}
 
-        ${tramiteCard(
-          Icons.documento(), 'GUÍAS DIMOE',
-          `${guiasFinca.length} guía(s) de movimiento registrada(s).${guiasFinca[0] ? ' Última: ' + this._fmtFecha(guiasFinca[0].fecha || guiasFinca[0].creadoEn) + '.' : ''}`,
-          badge(guiasFinca.length > 0 ? `${guiasFinca.length} emitidas` : 'Ninguna', guiasFinca.length > 0 ? 'var(--c-success)' : 'var(--c-gray)'),
-          'Emitir nueva guía DIMOE',
-          "if(window.App&&App._abrirWizardGuiaMovimiento)App._abrirWizardGuiaMovimiento();else if(window.WizardGuiaMovimiento)WizardGuiaMovimiento.abrir();",
-          'var(--c-info)'
-        )}
+          ${renderCard({
+            title: 'CENSO ANUAL',
+            icon: Icons.animales(),
+            color: 'var(--c-warning)',
+            desc: 'Declaración de existencias a 1 de Enero',
+            data: ultimoCenso ? `Declarado: ${this._fmtFecha(ultimoCenso.fecha)}` : `Censo actual: ${animales.length} animales`,
+            badge: ultimoCenso?.fecha?.startsWith(new Date().getFullYear().toString()) ? `<span style="color:var(--c-success); font-size:0.6rem; font-weight:900;">AL DÍA</span>` : `<span style="color:var(--c-danger); font-size:0.6rem; font-weight:900;">PENDIENTE ${new Date().getFullYear()}</span>`,
+            action: "if(window.App&&App._abrirWizardCenso)App._abrirWizardCenso();else if(window.WizardCenso)WizardCenso.abrir();",
+            actionLabel: 'Generar Censo',
+            history: null
+          })}
 
-        ${tramiteCard(
-          Icons.documento(), 'CENSO ANUAL',
-          'Declaración censal oficial por especie, edad y sexo a fecha de referencia.',
-          badge('Bajo demanda', 'var(--c-warning)'),
-          'Generar censo oficial',
-          "if(window.App&&App._abrirWizardCenso)App._abrirWizardCenso();else if(window.WizardCenso)WizardCenso.abrir();",
-          'var(--c-info)'
-        )}
+          ${renderCard({
+            title: 'CROTALES',
+            icon: Icons.paquete(),
+            color: 'var(--c-success)',
+            desc: 'Solicitud de identificación animal',
+            data: ultimoPedido ? `Último pedido: ${this._fmtFecha(ultimoPedido.fecha_pedido)} (${ultimoPedido.estado})` : null,
+            action: "if(window.App&&App._abrirWizardCrotales)App._abrirWizardCrotales();else if(window.WizardCrotales)WizardCrotales.abrir();",
+            actionLabel: 'Pedir Crotales',
+            history: null
+          })}
+
+          ${renderCard({
+            title: 'TRASLADO',
+            icon: Icons.documento(),
+            color: 'var(--c-purple)',
+            desc: 'Movimiento interno de animales entre rebaños',
+            data: 'Gestión de lotes y ubicaciones',
+            action: "if(window.App&&App._abrirWizardTraslado)App._abrirWizardTraslado();else if(window.WizardTraslado)WizardTraslado.abrir();",
+            actionLabel: 'Iniciar Traslado',
+            history: null
+          })}
+
+          ${renderCard({
+            title: 'INFOLAC',
+            icon: Icons.leche(),
+            color: 'var(--c-info)',
+            desc: 'Declaración mensual de producción láctea',
+            data: `${pendientesInfolac} entregas sin declarar este mes`,
+            badge: pendientesInfolac > 0 ? `<span style="color:var(--c-danger); font-size:0.6rem; font-weight:900;">PENDIENTE</span>` : `<span style="color:var(--c-success); font-size:0.6rem; font-weight:900;">AL DÍA</span>`,
+            action: "window.location.hash='#/comercializacion'",
+            actionLabel: 'Ver Comercialización',
+            history: null
+          })}
+        </div>
 
         ${guiasFinca.length > 0 ? `
         <div class="inf-section-title mt-16 mb-10 flex items-center gap-8 uppercase font-900 tracking-wider text-[0.7rem] text-gray">

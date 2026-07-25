@@ -8,7 +8,7 @@
     "url": "git+https://github.com/SADOCKDOG/LIVESTOCK-MANAGER.git"
   },
   "scripts": {
-    "build": "powershell -NoProfile -Command \"if (-not (Test-Path www)) { New-Item -ItemType Directory -Path www | Out-Null }; Copy-Item -Path index.html, manifest.webmanifest, sw.js -Destination www -Force; foreach ($d in 'css','js','icons','manual') { Copy-Item -Path $d -Destination www -Recurse -Force } \"",
+    "build": "powershell -NoProfile -Command \"if (-not (Test-Path www)) { New-Item -ItemType Directory -Path www | Out-Null }; Copy-Item -Path index.html, manifest.webmanifest, sw.js -Destination www -Force; foreach ($d in 'css','js','icons','manual','tests') { Copy-Item -Path $d -Destination www -Recurse -Force } \"",
     "prebuild:free": "powershell -NoProfile -Command \"Copy-Item -Path js/mode-config.free.js -Destination js/mode-config.js -Force\"",
     "prebuild:premium": "powershell -NoProfile -Command \"Copy-Item -Path js/mode-config.premium.js -Destination js/mode-config.js -Force\"",
     "build:free": "npm run prebuild:free && npm run build",
