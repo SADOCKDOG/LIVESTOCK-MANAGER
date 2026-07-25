@@ -366,7 +366,10 @@ window.ExplotacionLacteaView = {
   async _renderCurvaLactacionSelector(fincaId) {
     // Obtener animales del rebaño lechero
     const rebanos = await window.db.getAll('rebanos').catch(() => []);
-    const rebanosLeche = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('lech'));
+    const rebanosLeche = rebanos.filter(r => {
+      const tipo = (r.tipo || '').toLowerCase();
+      return tipo.includes('láct') || tipo.includes('lact') || tipo.includes('mixt');
+    });
     
     let animalesLeche = [];
     for (const reb of rebanosLeche) {
@@ -412,7 +415,10 @@ window.ExplotacionLacteaView = {
 
     // Obtener animales del rebaño lechero
     const rebanos = await window.db.getAll('rebanos').catch(() => []);
-    const rebanosLeche = rebanos.filter(r => (r.tipo || '').toLowerCase().includes('lech'));
+    const rebanosLeche = rebanos.filter(r => {
+      const tipo = (r.tipo || '').toLowerCase();
+      return tipo.includes('láct') || tipo.includes('lact') || tipo.includes('mixt');
+    });
     
     let animalesLeche = [];
     for (const reb of rebanosLeche) {
