@@ -93,9 +93,11 @@
 
         <!-- Right: Viñeta de Finca (REGA con haz de luz) -->
         <div class="flex items-center gap-10 justify-end" style="justify-self: end; display: flex; align-items: flex-end; padding-bottom: 8px;">
-            <div id="finca-badge" class="rega-badge-container" onclick="App.route('/fincas')" style="margin-left: 4px;">
-                <div id="finca-mode-chip-header" style="display:none;"></div>
+            <div id="finca-badge" class="rega-badge-container flex-col" onclick="App.route('/fincas')" style="margin-left: 4px; display: flex; align-items: flex-end; gap: 2px;">
                 <span id="nombre-finca-header">Cargando...</span>
+                <div id="finca-mode-container" style="display:none; font-size: 0.55rem; font-weight: 900; text-transform: uppercase; color: var(--c-aaa); gap: 4px;">
+                    Tipo Explo: <span id="finca-mode-chip-header"></span>
+                </div>
             </div>
         </div>
       <!-- Dropdown del Header -->

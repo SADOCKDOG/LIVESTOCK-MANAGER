@@ -300,16 +300,18 @@ const App = {
         headerEl.style.cursor = "pointer";
       }
 
-      if (modeEl && window.ModoContextoHelper) {
+      const modeContainer = document.getElementById("finca-mode-container");
+      if (modeEl && modeContainer && window.ModoContextoHelper) {
         const flags = await window.ModoContextoHelper.getEffectiveFlags(finca.id);
         const meta = window.ModoContextoHelper.getModeMetaEffective(flags);
-        modeEl.innerHTML = `<span style="background:${meta.color}; color:#000; padding:1px 6px; border-radius:3px; font-size:0.55rem; font-weight:900; margin-right:4px; text-transform:uppercase; border:1px solid rgba(0,0,0,0.1);">${meta.label}</span>`;
-        modeEl.style.display = 'flex';
-        modeEl.style.alignItems = 'center';
+        modeEl.innerHTML = meta.label;
+        modeEl.style.color = meta.color;
+        modeContainer.style.display = 'flex';
       }
     } else if (headerEl) {
       headerEl.innerHTML = 'SIN FINCA';
-      if (modeEl) modeEl.style.display = 'none';
+      const modeContainer = document.getElementById("finca-mode-container");
+      if (modeContainer) modeContainer.style.display = 'none';
     }
   },
 
