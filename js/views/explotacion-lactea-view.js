@@ -309,5 +309,51 @@ window.ExplotacionLacteaView = {
         ${movimientosHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin movimientos registrados</span></div>'}
       </div>
     `;
+  },
+
+  async renderGraficos(container) {
+    if (!container) return;
+    const fincaId = await window.Fincas.getActiveId();
+
+    container.innerHTML = `
+      <div class="p-16">
+        <div class="flex items-center gap-12 mb-14">
+          <span class="text-2xl" style="color: var(--c-info); display: inline-flex; align-items: center;">${Icons.grafico()}</span>
+          <div>
+            <h1 class="text-white font-900 text-lg uppercase tracking-wider" style="margin: 0; line-height: 1.2;">
+              <span style="color: var(--c-info); margin-right: 4px;">|</span> Gráficos y Análisis
+            </h1>
+            <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Visualización de datos lácteos</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-12">
+          <div class="card p-12">
+            <canvas id="chart-produccion-mensual" style="height: 300px;"></canvas>
+          </div>
+          <div class="grid grid-cols-2 gap-12">
+            <div class="card p-12">
+              <canvas id="chart-calidad-leche" style="height: 250px;"></canvas>
+            </div>
+            <div class="card p-12">
+              <canvas id="chart-composicion" style="height: 250px;"></canvas>
+            </div>
+          </div>
+          <div class="card p-12">
+            <canvas id="chart-comparativa-tanques" style="height: 250px;"></canvas>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Cargar Chart.js y renderizar gráficos
+    if (window.GraficosLacteoService) {
+      await Promise.all([
+        window.GraficosLacteoService.renderProduccionMensual('chart-produccion-mensual', fincaId),
+        window.GraficosLacteoService.renderCalidadLeche('chart-calidad-leche', fincaId),
+        window.GraficosLacteoService.renderComposicion('chart-composicion', fincaId),
+        window.GraficosLacteoService.renderComparativaTanques('chart-comparativa-tanques', fincaId)
+      ]);
+    }
   }
 };
