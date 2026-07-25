@@ -60,6 +60,7 @@ window.AnaliticasLeche = (() => {
 
       numero_muestra_letra_q: data.numero_muestra_letra_q || data.numero_Muestra_Letra_Q || null,
       resultado_letra_q: data.resultado_letra_q || null,
+      codigo_letra_q_laboratorio: (data.codigo_letra_q_laboratorio || '').trim() || null,
 
       especie: especie,
       estado: data.estado || calcularEstado(data, especie),
