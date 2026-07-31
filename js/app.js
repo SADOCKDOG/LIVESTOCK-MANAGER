@@ -1757,7 +1757,7 @@ const App = {
     gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'],
-    informes: ['js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
+    informes: ['js/views/informes-analytics.js', 'js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
     cuaderno: ['js/views/cuaderno-view.js'],
     documentos: ['js/views/documentos-view.js'],
     manuales: ['js/views/manuales-view.js'],
@@ -1792,7 +1792,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.29.3';
+        s.src = src + '?v=6.29.7';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;

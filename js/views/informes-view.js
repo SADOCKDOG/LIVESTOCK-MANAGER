@@ -237,7 +237,8 @@ const InformesView = {
         ventasPorRebano, lechePorRebano,
         pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
-        tanqueStock, controlLechero, marAnimalMedio
+        tanqueStock, controlLechero, marAnimalMedio,
+        rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche
       ] = await Promise.all([
         Analitica.obtenerRentabilidadFinca(fId).catch(() => null),
         Analitica.obtenerMargenPorAnimal(fId).catch(() => []),
@@ -278,6 +279,9 @@ const InformesView = {
         this._obtenerStockTanques(fId).catch(() => []),
         this._obtenerControlLechero(fId).catch(() => {}),
         this._obtenerMargenAnimalMedio(fId).catch(() => ({promedio: 0, total: 0, count: 0})),
+        this._obtenerRendimientoLechePorAnimal(fId).catch(() => ({promedio: 0, totalLitros: 0, totalAnimalesDias: 0})),
+        this._obtenerIndiceRenuevo(fId).catch(() => ({promedio: 0, totalAnimales: 0, nuevasEntradas: 0})),
+        this._obtenerCostoProduccionLeche(fId).catch(() => ({costoPorLitro: 0, totalCostosSanidad: 0, totalLitrosLeche: 0})),
       ]);
 
       // Cachear data para los tabs
@@ -291,7 +295,8 @@ const InformesView = {
         ventasPorRebano, lechePorRebano,
         pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
-        tanqueStock, controlLechero, marAnimalMedio
+        tanqueStock, controlLechero, marAnimalMedio,
+        rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche
       };
 
       await chartLoadPromise;
@@ -610,7 +615,7 @@ const InformesView = {
   },
 
   _renderLeche(content, d) {
-    const { lecheStats, lechePorRebano, _cachedLeche, tanqueStock, controlLechero, marAnimalMedio } = d;
+    const { lecheStats, lechePorRebano, _cachedLeche, tanqueStock, controlLechero, marAnimalMedio, rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche } = d;
     const rawLeche = _cachedLeche || [];
     if (!lecheStats || lecheStats.totalLitros === 0) {
       content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.leche()}</div><p class="empty-state-text">No hay datos de producción lechera registrados.</p></div>`;
@@ -715,6 +720,21 @@ const InformesView = {
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Medio</small>
               <span class="text-xl text-white font-950">${InformesView._fmt(marAnimalMedio.promedio || 0, 2)} €/cab</span>
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Rendimiento Leche/Animal</small>
+              <span class="text-xl text-white font-950">${rendimientoLechePorAnimal ? InformesView._fmt(rendimientoLechePorAnimal.promedio, 2) : '0,00'} L/día</span>
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Índice de Renovación</small>
+              <span class="text-xl text-white font-950">${indiceRenuevo ? InformesView._fmt(indiceRenuevo.promedio, 2) : '0,00'} %</span>
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Costo Producción Leche</small>
+              <span class="text-xl text-white font-950">${costoProduccionLeche ? InformesView._fmt(costoProduccionLeche.costoPorLitro, 4) : '0,0000'} €/L</span>
             </div>
           </div>
         </div>
