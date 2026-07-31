@@ -71,6 +71,17 @@ const ConfigSistemaView = {
               <span class="text-[0.65rem] text-aaa">Optimizado para pantallas AMOLED.</span>
             </div>
           </label>
+          ${config.temaOscuro === false ? `
+          <div class="wizard-input-group">
+            <label class="wizard-label">PALETA DE MODO CLARO</label>
+            <select class="wizard-input font-800 text-xs" onchange="ConfigSistemaView._action('cambiarTemaClaroColor', this.value)">
+              <option value="arena" ${(!config.temaClaroColor || config.temaClaroColor === 'arena') ? 'selected' : ''}>ARENA (POR DEFECTO)</option>
+              <option value="gris" ${config.temaClaroColor === 'gris' ? 'selected' : ''}>GRIS</option>
+              <option value="oliva" ${config.temaClaroColor === 'oliva' ? 'selected' : ''}>OLIVA</option>
+              <option value="beige" ${config.temaClaroColor === 'beige' ? 'selected' : ''}>BEIGE</option>
+            </select>
+          </div>
+          ` : ''}
           <label class="wizard-check-label">
             <input type="checkbox" ${config.mostrarContextos !== false ? 'checked' : ''} onchange="ConfigSistemaView._action('toggleContextos', this.checked)">
             <div class="flex flex-col">
