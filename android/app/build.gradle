@@ -14,7 +14,7 @@ android {
         applicationId "com.livestockmanager.app.manual"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 517
+        versionCode 518
         versionName "4.10.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
