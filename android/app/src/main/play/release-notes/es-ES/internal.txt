@@ -1,7 +1,5 @@
-- Nueva interfaz "Industrial Premium" optimizada para alta visibilidad y pantallas OLED.
-- Optimización de rendimiento R8: Activada la reducción de código y recursos para una app más ligera y rápida (cumplimiento de Google Play Console).
-- Correcciones críticas en la generación de informes PDF: solucionado el error de documentos en blanco en dispositivos de alta resolución.
-- Diseño responsive en KPIs: los indicadores de Silos y Fitosanitarios ahora se adaptan correctamente a pantallas pequeñas.
-- Mejoras en la gestión Multi-Finca: navegación ExPro optimizada para mayor fluidez.
-- Compatibilidad con Android 13 y 14: corregidos errores al compartir archivos y exportaciones.
-- Rediseño de asistentes (Wizards) para permitir la operación en campo con una sola mano.
+- Nuevo módulo de trazabilidad Letra Q (RD 989/2022) para explotaciones lácteas: control de movimientos, plazos de comunicación y operadores autorizados.
+- Corregidos errores críticos en el módulo lácteo: cálculo de margen MOFA, validación de tanques, y visualización del formulario de recogida.
+- Nuevos accesos directos para registrar analíticas de leche y movimientos de tanque desde las pestañas de Control y Balance.
+- Mejorada la navegación por pestañas en pantallas móviles: ahora se pueden deslizar correctamente en dispositivos de gama estrecha.
+- Corregido un problema de configuración que afectaba a los enlaces de la aplicación.
