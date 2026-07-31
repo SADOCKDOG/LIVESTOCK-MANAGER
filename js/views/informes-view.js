@@ -236,7 +236,8 @@ const InformesView = {
         compradoresData, proveedoresData,         fitosanitarioData, alertasData, porFincaData,
         ventasPorRebano, lechePorRebano,
         pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
-        rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw
+        rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
+        tanqueStock, controlLechero, marAnimalMedio
       ] = await Promise.all([
         Analitica.obtenerRentabilidadFinca(fId).catch(() => null),
         Analitica.obtenerMargenPorAnimal(fId).catch(() => []),
@@ -274,6 +275,9 @@ const InformesView = {
         Analitica.obtenerBreakEven(fId).catch(() => ({ costesFijos: 0, costesVariables: 0, ingresosTotal: 0, breakEvenKg: 0, breakEvenLitros: 0, margenSeguridadKg: '0%', margenSeguridadLitros: '0%', cubiertoCarne: false, cubiertoLeche: false, numRebanos: 0, numMeses: 0 })),
         this._obtenerDatosPAC(fId),
         window.db.getAll('sanitarios_ganado').catch(() => []),
+        this._obtenerStockTanques(fId).catch(() => []),
+        this._obtenerControlLechero(fId).catch(() => {}),
+        this._obtenerMargenAnimalMedio(fId).catch(() => ({promedio: 0, total: 0, count: 0})),
       ]);
 
       // Cachear data para los tabs
@@ -286,7 +290,8 @@ const InformesView = {
         compradoresData, proveedoresData, fitosanitarioData, alertasData, porFincaData,
         ventasPorRebano, lechePorRebano,
         pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
-        rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw
+        rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
+        tanqueStock, controlLechero, marAnimalMedio
       };
 
       await chartLoadPromise;
@@ -605,7 +610,7 @@ const InformesView = {
   },
 
   _renderLeche(content, d) {
-    const { lecheStats, lechePorRebano, _cachedLeche } = d;
+    const { lecheStats, lechePorRebano, _cachedLeche, tanqueStock, controlLechero, marAnimalMedio } = d;
     const rawLeche = _cachedLeche || [];
     if (!lecheStats || lecheStats.totalLitros === 0) {
       content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.leche()}</div><p class="empty-state-text">No hay datos de producción lechera registrados.</p></div>`;
@@ -621,8 +626,9 @@ const InformesView = {
     const mofaTotal = rawLeche.reduce((s, e) => s + (e.mofa || 0), 0);
     const importeTotal = rawLeche.reduce((s, e) => s + (e.importe_total || e.cantidad * e.precioBase || 0), 0);
     const mofaRatio = importeTotal > 0 ? InformesView._fmt(((mofaTotal / importeTotal) * 100), 1) : 0;
-    // Umbrales de calidad
-    const umbrales = window.ComunidadesService?.CALIDAD_LECHE_OVINO_UMBRALES || null;
+    // Umbrales de calidad - usar especie específica
+    const especieAnimal = (d._cachedLeche || [])[0]?.especie_leche || 'vacuno';
+    const umbrales = window.ComunidadesService?.getUmbralesCalidadEspecie(especieAnimal) || null;
     const semaforo = (valor, min, max) => {
       if (valor == null) return '#555';
       if (min != null && valor < min) return 'var(--c-danger)';
@@ -662,6 +668,54 @@ const InformesView = {
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">MOFA Total</small>
               <span class="text-xl font-950 ${mofaTotal >= 0 ? 'text-green' : 'text-red'} truncate w-full px-4" title="${(mofaTotal >= 0 ? '+' : '')}${UI.formatCurrency(Math.round(mofaTotal))}">${(mofaTotal >= 0 ? '+' : '')}${UI.formatCurrency(Math.round(mofaTotal))}</span>
             </div>
+
+            <!-- Nuevos indicadores: Tanques, Control Lechero, Margen Animal -->
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Stock Tanques</small>
+              <span class="text-xl text-white font-950">
+                ${tanqueStock && tanqueStock.length > 0
+                  ? `${InformesView._fmt(tanqueStock.reduce((sum, t) => sum + (t.stock_actual || 0), 0))} L`
+                  : '0 L'
+                }
+              </span>
+              ${tanqueStock && tanqueStock.length > 0
+                ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Cap: ${InformesView._fmt(tanqueStock.reduce((sum, t) => sum + (t.capacidad_litros || 0), 0))} L</small>`
+                : ''
+              }
+            </div>
+
+            <div class="info-box-center py-10"
+                 style="border-left:3px solid ${controlLechero && Object.keys(controlLechero).length > 0
+                   ? semaforo(
+                       (controlLechero.media_rebano_grasa || 0) + (controlLechero.media_rebano_proteina || 0),
+                       (umbrales?.grasa?.min || 0) + (umbrales?.proteina?.min || 0),
+                       null
+                     )
+                   : '#555'}"
+            >
+              <small class="s-lbl uppercase font-900">Grasa + Proteína</small>
+              <div class="inf-val-md font-950" style="color:${controlLechero && Object.keys(controlLechero).length > 0
+                ? semaforo(
+                    (controlLechero.media_rebano_grasa || 0) + (controlLechero.media_rebano_proteina || 0),
+                    (umbrales?.grasa?.min || 0) + (umbrales?.proteina?.min || 0),
+                    null
+                  )
+                : '#555'}">
+                ${controlLechero && Object.keys(controlLechero).length > 0
+                  ? `${((controlLechero.media_rebano_grasa || 0) + (controlLechero.media_rebano_proteina || 0)).toFixed(2)}%`
+                  : '—'
+                }
+              </div>
+              ${controlLechero && Object.keys(controlLechero).length > 0 && umbrales
+                ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${((umbrales?.grasa?.min || 0) + (umbrales?.proteina?.min || 0)).toFixed(2)}%</small>`
+                : ''
+              }
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Medio</small>
+              <span class="text-xl text-white font-950">${InformesView._fmt(marAnimalMedio.promedio || 0, 2)} €/cab</span>
+            </div>
           </div>
         </div>
 
@@ -684,10 +738,10 @@ const InformesView = {
               <div class="inf-val-md font-950" style="color:${semaforo(esMedia, umbrales?.extracto_seco?.min, null)}">${InformesView._fmt(esMedia, 2)}%</div>
               ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≥${umbrales.extracto_seco.min}%</small>` : ''}
             </div>
-            <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)};">
+            <div class="info-box-center py-10" style="border-left:3px solid ${semaforo(somaticasMedia, null, umbrales?.celulas_somaticas?.max)};">
               <small class="s-lbl uppercase font-900">CÉL. SOMÁTICAS</small>
-              <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.somaticas?.max)}">${UI.formatNumber(Math.round(somaticasMedia))}</div>
-              ${umbrales ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≤${InformesView._fmt((umbrales.somaticas.max / 1000), 0)}k</small>` : ''}
+              <div class="inf-val-md font-950" style="color:${semaforo(somaticasMedia, null, umbrales?.celulas_somaticas?.max)}">${UI.formatNumber(Math.round(somaticasMedia))}</div>
+              ${umbrales?.celulas_somaticas?.max ? `<small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Obj: ≤${InformesView._fmt((umbrales.celulas_somaticas.max / 1000), 0)}k</small>` : ''}
             </div>
           </div>
         </div>` : ''}
