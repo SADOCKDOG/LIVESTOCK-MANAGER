@@ -192,6 +192,11 @@ const InformesView = {
 
   _cambiarTab(tab) {
     this._currentTab = tab;
+    // Sincroniza la categoría activa con la del tab destino — necesario cuando
+    // se navega directamente a un tab de otra categoría (ej. atajos del menú
+    // "Más": Libro Ventas -> comer, Informe REGA/Exportación -> libros), ya
+    // que _cambiarTab no pasa por _cambiarCategoria.
+    this._currentCategory = this._obtenerCategoriaDeTab(tab);
     this._actualizarHeader();
     // Scroll automático al sub-tab activo
     requestAnimationFrame(() => {
@@ -237,7 +242,8 @@ const InformesView = {
         ventasPorRebano, lechePorRebano,
         pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
-        tanqueStock, controlLechero, marAnimalMedio
+        tanqueStock, controlLechero, marAnimalMedio,
+        rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche
       ] = await Promise.all([
         Analitica.obtenerRentabilidadFinca(fId).catch(() => null),
         Analitica.obtenerMargenPorAnimal(fId).catch(() => []),
@@ -278,6 +284,9 @@ const InformesView = {
         this._obtenerStockTanques(fId).catch(() => []),
         this._obtenerControlLechero(fId).catch(() => {}),
         this._obtenerMargenAnimalMedio(fId).catch(() => ({promedio: 0, total: 0, count: 0})),
+        this._obtenerRendimientoLechePorAnimal(fId).catch(() => ({promedio: 0, totalLitros: 0, totalAnimalesDias: 0})),
+        this._obtenerIndiceRenuevo(fId).catch(() => ({promedio: 0, totalAnimales: 0, nuevasEntradas: 0})),
+        this._obtenerCostoProduccionLeche(fId).catch(() => ({costoPorLitro: 0, totalCostosSanidad: 0, totalLitrosLeche: 0})),
       ]);
 
       // Cachear data para los tabs
@@ -291,7 +300,8 @@ const InformesView = {
         ventasPorRebano, lechePorRebano,
         pygData, costeProdData, rotacionData, cargasData, eficienciaData, flujoCajaData,
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
-        tanqueStock, controlLechero, marAnimalMedio
+        tanqueStock, controlLechero, marAnimalMedio,
+        rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche
       };
 
       await chartLoadPromise;
@@ -610,7 +620,7 @@ const InformesView = {
   },
 
   _renderLeche(content, d) {
-    const { lecheStats, lechePorRebano, _cachedLeche, tanqueStock, controlLechero, marAnimalMedio } = d;
+    const { lecheStats, lechePorRebano, _cachedLeche, tanqueStock, controlLechero, marAnimalMedio, rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche } = d;
     const rawLeche = _cachedLeche || [];
     if (!lecheStats || lecheStats.totalLitros === 0) {
       content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.leche()}</div><p class="empty-state-text">No hay datos de producción lechera registrados.</p></div>`;
@@ -715,6 +725,21 @@ const InformesView = {
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Medio</small>
               <span class="text-xl text-white font-950">${InformesView._fmt(marAnimalMedio.promedio || 0, 2)} €/cab</span>
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Rendimiento Leche/Animal</small>
+              <span class="text-xl text-white font-950">${rendimientoLechePorAnimal ? InformesView._fmt(rendimientoLechePorAnimal.promedio, 2) : '0,00'} L/día</span>
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Índice de Renovación</small>
+              <span class="text-xl text-white font-950">${indiceRenuevo ? InformesView._fmt(indiceRenuevo.promedio, 2) : '0,00'} %</span>
+            </div>
+
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Costo Producción Leche</small>
+              <span class="text-xl text-white font-950">${costoProduccionLeche ? InformesView._fmt(costoProduccionLeche.costoPorLitro, 4) : '0,0000'} €/L</span>
             </div>
           </div>
         </div>
@@ -1026,7 +1051,7 @@ const InformesView = {
           </div>
         </div>
 
-        ${ventas.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.exportacion()}</div><p class="empty-state-text">No hay ventas registradas</p></div>' : `
+        ${ventas.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.exportacion()}</div><p class="empty-state-text">No hay ventas registradas</p></div>` : `
         <div class="table-scroll scroll-shadow-container mt-10">
           <table class="inf-table tbl-accent-blue">
             <thead>
@@ -1063,7 +1088,7 @@ const InformesView = {
                   <td class="text-right text-blue">${InformesView._fmt((v.importe_iva || 0), 2)}€</td>
                   <td class="text-right text-red">${InformesView._fmt(irpf, 2)}€</td>
                   <td class="text-right font-bold text-green">${InformesView._fmt(neto, 2)}€</td>
-                  <td class="text-center">${tieneDimoe ? '${Icons.check()} DIMOE' : '${Icons.check()} SIGGAN'}</td>
+                  <td class="text-center">${tieneDimoe ? `${Icons.check()} DIMOE` : `${Icons.check()} SIGGAN`}</td>
                 </tr>`;
               }).join('')}
             </tbody>
@@ -1160,7 +1185,7 @@ const InformesView = {
           </div>
         </div>` : ''}
 
-        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.edificio()}</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>' : `
+        ${data.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.edificio()}</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>` : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-blue">
             <thead><tr>
@@ -1277,7 +1302,7 @@ const InformesView = {
           </div>
         </div>` : ''}
 
-        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>' : `
+        ${data.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>` : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-amber">
             <thead><tr>
@@ -1381,7 +1406,7 @@ const InformesView = {
           ${data.zonas.map(z => `<span class="badge badge-green text-2xs">${Icons.fitosanitario()} ${z}</span>`).join('')}
         </div>` : ''}
 
-        ${data.registros.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.fitosanitario()}</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>' : `
+        ${data.registros.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.fitosanitario()}</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>` : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-green">
             <thead><tr>
@@ -1790,7 +1815,7 @@ const InformesView = {
         <!-- Movimientos recientes -->
         <div class="card report-section   report-card style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
           <div class="inf-card-title">${Icons.paquete()} Últimos Movimientos</div>
-          ${eventosRecientes.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>' : `
+          ${eventosRecientes.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>` : `
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr>

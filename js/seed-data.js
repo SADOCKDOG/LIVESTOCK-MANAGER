@@ -350,8 +350,29 @@
           enfermedad: 'Mamitis'
         }
       ];
+      // Coste de cada tratamiento (€), usado para vincular en registro_eventos
+      // y que MargenAnimal.calcularCosteSanidad() tenga algo que prorratear.
+      var sanCostes = [180, 96, 45];
       for (var s = 0; s < sanDefs.length; s++) {
-        try { await Sanitarios.save(sanDefs[s]); } catch (e) { console.log('[SEED] Error sanitario:', e.message); }
+        try {
+          var sanId = await Sanitarios.save(sanDefs[s]);
+          // Vincular coste al botiquín (Libro Maestro) para que MargenAnimal
+          // pueda prorratear el gasto de sanidad entre los animales del rebaño.
+          await window.db.add('registro_eventos', {
+            demo: true,
+            fincaId: fincaId,
+            fecha: sanDefs[s].fecha,
+            tipo_entidad: 'botiquin',
+            origen_tipo: 'tratamiento',
+            origen_id: sanId,
+            costeTotal: sanCostes[s],
+            valor_neto: sanCostes[s],
+            unidad: '€',
+            motivo_tarea: 'sanidad',
+            rol_contable: 'GASTO',
+            creadoEn: new Date().toISOString()
+          });
+        } catch (e) { console.log('[SEED] Error sanitario:', e.message); }
         await sleep(80);
       }
 
@@ -477,8 +498,14 @@
       }
 
       // 13. Producción de leche (Individual, Lote y Expedición Tanque)
+      // Fechas relativas a "hoy" (no fijas de calendario) para que coincidan
+      // con la ventana temporal del resto de datos lácteos demo (comercializacion_leche,
+      // balance_lacteo) y MargenAnimal.calcularIngresoLeche() tenga litros recientes
+      // que sumar, en vez de depender de que el usuario use "Registrar Ordeño" a mano.
       var prodLecheVacas = [vaca1, vaca2, vaca3];
-      var lecheFechas = [`${currentYear}-03-01`, `${currentYear}-03-15`, `${currentYear}-04-01`, `${currentYear}-04-15`, `${currentYear}-05-01`];
+      var lecheFechas = [28, 21, 14, 7, 1].map(function (d) {
+        return new Date(Date.now() - d * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      });
       for (var plv = 0; plv < prodLecheVacas.length; plv++) {
         if (!prodLecheVacas[plv]) continue;
         for (var lf = 0; lf < lecheFechas.length; lf++) {

@@ -293,6 +293,90 @@ Object.assign(window.InformesView, {
       console.error('[MargenAnimalMedio]', e);
       return { promedio: 0, total: 0, count: 0 };
     }
+  },
+
+  /** Rendimiento de leche por animal (litros por animal-día) */
+  async _obtenerRendimientoLechePorAnimal(fId) {
+    try {
+      const controles = await window.db.getAllFromIndex('control_lechero', 'fincaId', Number(fId));
+      return window.InformesAnalytics.calcularRendimientoLecheDesdeRegistros(controles);
+    } catch (e) {
+      console.error('[RendimientoLechePorAnimal]', e);
+      return { promedio: 0, totalLitros: 0, totalAnimalesDias: 0 };
+    }
+  },
+
+  /** Índice de renovación del ganado (porcentaje) */
+  async _obtenerIndiceRenuevo(fId) {
+    try {
+      // Get all animals for the finca
+      // We need to get animals by fincaId. Since we don't have a direct index, we can get by rebano?
+      // Alternative: get all rebanos for the finca, then get animals by rebanoId.
+      const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', Number(fId));
+      if (!rebanos || rebanos.length === 0) {
+        return { promedio: 0, totalAnimales: 0, nuevasEntradas: 0 };
+      }
+
+      let animales = [];
+      for (const rebano of rebanos) {
+        const animalesRebano = await window.db.getAllFromIndex('animales', 'rebanoId', rebano.id);
+        animales = animales.concat(animalesRebano);
+      }
+
+      if (!animales || animales.length === 0) {
+        return { promedio: 0, totalAnimales: 0, nuevasEntradas: 0 };
+      }
+
+      const unoJa = new Date();
+      unoJa.setFullYear(unoJa.getFullYear() - 1);
+      const fechaUnYearAgo = unoJa.toISOString().split('T')[0];
+
+      let totalAnimales = animales.length;
+      let nuevasEntradas = 0;
+      let sumaDiasEnEstablo = 0;
+
+      for (const animal of animales) {
+        const fechaAlta = animal.fecha_alta;
+        if (fechaAlta && fechaAlta >= fechaUnYearAgo) {
+          nuevasEntradas++;
+        }
+        // For simplicity, we assume each animal has been in the herd for the entire year if fecha_alta is within the year,
+        // or for the time since fecha_alta if it's older than a year?
+        // We don't have fecha_baja, so we assume the animal is still in the herd.
+        // We'll calculate the days since fecha_alta until today, but capped at 365 days.
+        if (fechaAlta) {
+          const fechaAltaDate = new Date(fechaAlta);
+          const hoy = new Date();
+          let dias = Math.floor((hoy - fechaAltaDate) / (1000 * 60 * 60 * 24));
+          // Cap at 365 days for the year calculation
+          dias = Math.min(dias, 365);
+          sumaDiasEnEstablo += dias;
+        }
+      }
+
+      const promedioAnimales = sumaDiasEnEstablo / 365;
+      const indiceRenuevo = promedioAnimales > 0 ? (nuevasEntradas / promedioAnimales) * 100 : 0;
+
+      return {
+        promedio: parseFloat(indiceRenuevo.toFixed(2)),
+        totalAnimales,
+        nuevasEntradas
+      };
+    } catch (e) {
+      console.error('[IndiceRenuevo]', e);
+      return { promedio: 0, totalAnimales: 0, nuevasEntradas: 0 };
+    }
+  },
+
+  /** Costo de producción de leche (€/L) */
+  async _obtenerCostoProduccionLeche(fId) {
+    try {
+      const margenAnimalData = await window.MargenAnimal.calcularParaFinca(fId);
+      return window.InformesAnalytics.sumarCostosSanidadSobreLitros(margenAnimalData);
+    } catch (e) {
+      console.error('[CostoProduccionLeche]', e);
+      return { costoPorLitro: 0, totalCostosSanidad: 0, totalLitrosLeche: 0 };
+    }
   }
 
 });
