@@ -258,4 +258,41 @@ Object.assign(window.InformesView, {
     } catch (e) { console.error('[PAC]', e); return { registros: [], totalSolicitado: 0, totalCobrado: 0, totalPendiente: 0, numRegistros: 0, porAnio: [] }; }
   },
 
+  /** Stock actual de tanques de leche */
+  async _obtenerStockTanques(fId) {
+    try {
+      return await window.BalanceLacteo.getTanqueConStock(fId);
+    } catch (e) {
+      console.error('[StockTanques]', e);
+      return [];
+    }
+  },
+
+  /** Último control lechero registrado */
+  async _obtenerControlLechero(fId) {
+    try {
+      const registros = await window.db.getAllFromIndex('control_lechero', 'fincaId', Number(fId));
+      if (!registros || registros.length === 0) return {};
+      const sorted = registros.sort((a, b) => new Date(b.fecha_control) - new Date(a.fecha_control));
+      return sorted[0];
+    } catch (e) {
+      console.error('[ControlLechero]', e);
+      return {};
+    }
+  },
+
+  /** Margen animal medio por animal en la finca */
+  async _obtenerMargenAnimalMedio(fId) {
+    try {
+      const margenes = await window.MargenAnimal.calcularParaFinca(fId);
+      if (!margenes || margenes.length === 0) return { promedio: 0, total: 0, count: 0 };
+      const total = margenes.reduce((sum, m) => sum + (m.margenNeto || 0), 0);
+      const promedio = total / margenes.length;
+      return { promedio, total, count: margenes.length };
+    } catch (e) {
+      console.error('[MargenAnimalMedio]', e);
+      return { promedio: 0, total: 0, count: 0 };
+    }
+  }
+
 });
