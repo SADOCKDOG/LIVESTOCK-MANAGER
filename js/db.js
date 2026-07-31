@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 26;
+const DB_VERSION = 27;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -1014,6 +1014,30 @@ async function initDB() {
                     const analStore = transaction.objectStore('analiticas_leche');
                     if (!analStore.indexNames.contains('codigo_letra_q_laboratorio')) {
                         analStore.createIndex('codigo_letra_q_laboratorio', 'codigo_letra_q_laboratorio');
+                    }
+                }
+            }
+            // v27: Índices para módulo Informes
+            if (oldVersion < 27) {
+                // control_lechero: índice compuesto por fincaId y fecha_control
+                if (db.objectStoreNames.contains('control_lechero')) {
+                    const store = transaction.objectStore('control_lechero');
+                    if (!store.indexNames.contains('fincaId_fecha_control')) {
+                        store.createIndex('fincaId_fecha_control', ['fincaId', 'fecha_control']);
+                    }
+                }
+                // animales: índice compuesto por fincaId y estado
+                if (db.objectStoreNames.contains('animales')) {
+                    const store = transaction.objectStore('animales');
+                    if (!store.indexNames.contains('fincaId_estado')) {
+                        store.createIndex('fincaId_estado', ['fincaId', 'estado']);
+                    }
+                }
+                // eventos: índice compuesto por fincaId, motivo_tarea y fecha
+                if (db.objectStoreNames.contains('eventos')) {
+                    const store = transaction.objectStore('eventos');
+                    if (!store.indexNames.contains('fincaId_motivo_fecha')) {
+                        store.createIndex('fincaId_motivo_fecha', ['fincaId', 'motivo_tarea', 'fecha']);
                     }
                 }
             }
