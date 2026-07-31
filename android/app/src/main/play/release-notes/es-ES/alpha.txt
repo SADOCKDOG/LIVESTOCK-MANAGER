@@ -1,5 +1,5 @@
-- Nueva interfaz "Industrial Premium" optimizada para alta visibilidad en exteriores y pantallas OLED.
-- Rediseño de asistentes (Wizards) de registro para operación rápida en campo con una sola mano.
-- Incorporación de tarjetas de información técnica con acceso directo a datos REGA y estados sanitarios.
-- Mejoras críticas en la estabilidad de la gestión de fincas y sincronización de datos.
-- Optimizaciones de rendimiento en el motor de renderizado web.
+- Nuevo módulo de trazabilidad Letra Q (RD 989/2022) para explotaciones lácteas: control de movimientos, plazos de comunicación y operadores autorizados.
+- Corregidos errores críticos en el módulo lácteo: cálculo de margen MOFA, validación de tanques, y visualización del formulario de recogida.
+- Nuevos accesos directos para registrar analíticas de leche y movimientos de tanque desde las pestañas de Control y Balance.
+- Mejorada la navegación por pestañas en pantallas móviles: ahora se pueden deslizar correctamente en dispositivos de gama estrecha.
+- Corregido un problema de configuración que afectaba a los enlaces de la aplicación.
