@@ -377,6 +377,99 @@ Object.assign(window.InformesView, {
       console.error('[CostoProduccionLeche]', e);
       return { costoPorLitro: 0, totalCostosSanidad: 0, totalLitrosLeche: 0 };
     }
+  },
+
+  /** Silos de la finca: stock actual vs. capacidad, % ocupación, alertas de stock bajo (<20%) */
+  async _obtenerSilos(fId) {
+    try {
+      const silos = await window.db.getAllFromIndex('config_silos', 'fincaId', Number(fId));
+      if (!silos || silos.length === 0) return { silos: [], totalCapacidad: 0, totalStock: 0, alertasStockBajo: 0 };
+
+      const conPct = silos.map(s => {
+        const capacidad = Number(s.capacidad) || 0;
+        const stock = Number(s.cantidadActual) || 0;
+        const pct = capacidad > 0 ? Math.round((stock / capacidad) * 100) : 0;
+        return { id: s.id, nombre: s.nombre || 'Silo', alimento: s.alimento || '', capacidad, stock, pct };
+      });
+
+      return {
+        silos: conPct,
+        totalCapacidad: conPct.reduce((s, x) => s + x.capacidad, 0),
+        totalStock: conPct.reduce((s, x) => s + x.stock, 0),
+        alertasStockBajo: conPct.filter(x => x.pct < 20).length
+      };
+    } catch (e) {
+      console.error('[Silos]', e);
+      return { silos: [], totalCapacidad: 0, totalStock: 0, alertasStockBajo: 0 };
+    }
+  },
+
+  /** Trámites y estado sanitario: último saneamiento por campaña + restricciones de movimiento activas */
+  async _obtenerTramites(fId) {
+    try {
+      const saneamientos = await window.Saneamientos.list({ fincaId: Number(fId) });
+      if (!saneamientos || saneamientos.length === 0) {
+        return { porCampana: [], restriccionesActivas: 0, totalSaneamientos: 0 };
+      }
+
+      // Último saneamiento (por fecha) de cada campaña
+      const porCampanaMap = new Map();
+      for (const s of saneamientos) {
+        const actual = porCampanaMap.get(s.campana);
+        if (!actual || new Date(s.fecha) > new Date(actual.fecha)) {
+          porCampanaMap.set(s.campana, s);
+        }
+      }
+      const porCampana = Array.from(porCampanaMap.values());
+
+      return {
+        porCampana,
+        restriccionesActivas: saneamientos.filter(s => s.restriccion_movimientos).length,
+        totalSaneamientos: saneamientos.length
+      };
+    } catch (e) {
+      console.error('[Tramites]', e);
+      return { porCampana: [], restriccionesActivas: 0, totalSaneamientos: 0 };
+    }
+  },
+
+  /** Contratos de compra/venta próximos a vencer (dentro de 60 días) o ya vencidos */
+  async _obtenerContratosVencimiento(fId) {
+    try {
+      if (!window.Contratos) return { contratos: [], proximosAVencer: 0, vencidos: 0 };
+      const todos = await window.Contratos.list();
+      // Ni contratos_compra ni compradores tienen fincaId propio en este modelo de
+      // datos (son globales a la instalación, igual que MargenAnimal._precioLecheVigente()
+      // los trata) — no se filtra por finca, se listan todos los contratos existentes.
+      const compradores = window.Compradores ? await window.Compradores.list() : [];
+
+      const hoy = new Date();
+      const en60dias = new Date(hoy.getTime() + 60 * 24 * 60 * 60 * 1000);
+
+      const contratos = (todos || [])
+        .map(c => {
+          const comprador = compradores.find(cp => cp.id === c.compradorId);
+          const fechaFin = c.fecha_fin ? new Date(c.fecha_fin) : null;
+          const vencido = fechaFin && fechaFin < hoy;
+          const proximoAVencer = fechaFin && !vencido && fechaFin <= en60dias;
+          const diasRestantes = fechaFin ? Math.ceil((fechaFin - hoy) / (1000 * 60 * 60 * 24)) : null;
+          return {
+            id: c.id, numero_contrato: c.numero_contrato, tipo: c.tipo,
+            comprador: comprador?.nombre || 'Desconocido',
+            fecha_fin: c.fecha_fin, diasRestantes, vencido, proximoAVencer
+          };
+        })
+        .sort((a, b) => (a.diasRestantes ?? Infinity) - (b.diasRestantes ?? Infinity));
+
+      return {
+        contratos,
+        proximosAVencer: contratos.filter(c => c.proximoAVencer).length,
+        vencidos: contratos.filter(c => c.vencido).length
+      };
+    } catch (e) {
+      console.error('[ContratosVencimiento]', e);
+      return { contratos: [], proximosAVencer: 0, vencidos: 0 };
+    }
   }
 
 });
