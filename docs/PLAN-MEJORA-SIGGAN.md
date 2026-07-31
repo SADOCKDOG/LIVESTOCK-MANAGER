@@ -10,20 +10,20 @@
 
 ## Resumen ejecutivo
 
-**Estado (2026-07-25): 7 de 7 gaps principales implementados** (incluido el punto 7, "Subexplotación", como capa aditiva y opcional sin tocar la relación animal↔finca existente). Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), granularidad individual de saneamientos (nº tubo + sexo, con UI completa), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX, gaps adicionales de `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md` evaluados uno a uno). **En pausa, a petición explícita del usuario** (no descartada): distinción "Explotación de Lidia" (punto 5). **Marcado como no aplica al alcance actual** (decisión 2026-07-25): NIF veterinario de alta de cebadero (punto 6) — requiere modelar Castilla y León como CCAA nueva, fuera del alcance SIGGAN/BADIGEX.
+**Estado (2026-07-31): 7 de 7 gaps principales implementados**, incluido el punto 7 ("Subexplotación", capa aditiva) y la distinción "Explotación de Lidia" (punto 5, commit `b2a5787`/PR #66 — verificado end-to-end 2026-07-31). Además: flag `autoguia` en movimientos GTA, vista propia de Saneamientos (antes sin UI), granularidad individual de saneamientos (nº tubo + sexo, con UI completa), y varios flecos menores cerrados (clasificación de razas en UI, campo `Cebo` vinculado, catálogo `SISTEMAS_EXPLOTACION` completo a los 7 valores oficiales SIEX, gaps adicionales de `ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md` evaluados uno a uno). **Único punto marcado como no aplica al alcance actual** (decisión 2026-07-25): NIF veterinario de alta de cebadero (punto 6) — requiere modelar Castilla y León como CCAA nueva, fuera del alcance SIGGAN/BADIGEX. **Con esto, la auditoría SIGGAN queda cerrada al 100%** — cero puntos pendientes o en pausa.
 
 La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujos cubiertos por `CUMPLIMIENTO_SIGGAN.md` (movimientos, sanidad básica, trazabilidad, comercialización). Esta auditoría añadió 7 gaps estructurales no detectados hasta entonces, todos con fuente normativa oficial citada y cruzados contra el código (`file:line`):
 
 - ✅ Datos maestros listos para generar/importar ficheros de intercambio SIGGAN reales, incluido el campo `Cebo` vinculado (gaps 1 y 2).
 - ✅ Modelo de vacunación con el nivel de detalle que exige ADSG (gap 3), con UI (wizard + listado en SanidadView).
 - ✅ Validación de identificación equina cerrada (gap 4).
-- ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5), con UI (listado + ficha + wizard).
+- ✅ Instalaciones/geolocalización/restricciones de la explotación (gap 5), con UI (listado + ficha + wizard), incluida la distinción "Explotación de Lidia" (commit `b2a5787`/PR #66).
 - ✅ Campos de captura compatibles con lectores RFID físicos (gap 6) — hora/lote/nº macho y granularidad individual de saneamientos implementados; NIF veterinario de cebadero **no aplica al alcance actual** (ver detalle en el punto 6).
 - ✅ Subexplotación (gap 7), implementado como capa aditiva y opcional sin tocar el modelo animal↔finca existente.
 - ✅ Flag `autoguia` en movimientos GTA (único cambio recomendado de la sección "Máquina de estados GTA").
 - ✅ Vista propia de Saneamientos, que no tenía UI pese a existir su modelo de datos desde el origen del plan.
 
-**En pausa (a petición explícita del usuario, 2026-07-22)**: distinción "Explotación de Lidia" (punto 5), NIF veterinario de alta de cebadero y granularidad individual de saneamientos — nº tubo + sexo por animal (punto 6). No están descartados: quedan documentados con su alcance ya investigado, listos para retomar cuando se decida.
+**Histórico**: "Explotación de Lidia" y granularidad individual de saneamientos estuvieron en pausa desde el 2026-07-22 a petición del usuario; ambos se implementaron en sesiones posteriores (ver puntos 5 y 6 de la tabla). NIF veterinario de cebadero es el único punto que sigue sin aplicar, por estar fuera del alcance geográfico actual (ver arriba).
 
 ## Orden de implementación recomendado
 
@@ -33,7 +33,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 | 2 | Tabla de correspondencia `Espe` SIGGAN | ✅ **Implementado** (commit `e2e8c76`, 2026-07-22) | — | — |
 | 3 | Modelo jerárquico de vacunaciones | ✅ **Implementado con UI** (commits `325d812`, `966735a`, 2026-07-22) | — | — |
 | 4 | Equino: aplicar validación de crotal ya cerrada | ✅ **Implementado** (commit `acde2fa`, 2026-07-22) | — | — |
-| 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado con UI** (commits `57202a5`, `c453090`, 2026-07-22; falta distinción "Lidia") | — | — |
+| 5 | Sub-modelo Instalaciones + geolocalización + restricciones en finca | ✅ **Implementado con UI** (commits `57202a5`, `c453090`, 2026-07-22) + distinción "Lidia" (commit `b2a5787`, PR #66) | — | — |
 | 6 | Campos de captura de campo (hora, lote, nº macho, saneamiento individual) | ✅ **Implementado** (commit `800e913` + granularidad saneamientos, 2026-07-22; NIF cebadero no aplica — ver detalle) | — | — |
 | 7 | Concepto "Subexplotación" (REGA→especie→clasificación zootécnica) | ✅ **Implementado como capa aditiva** (`finca.subexplotaciones[]`, 2026-07-22) | — | — |
 | — | Máquina de estados GTA completa (12 estados) | Alto | — | **No recomendado implementar** — ver razonamiento abajo |
@@ -93,7 +93,7 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 | `latitud`/`longitud` en finca | ✅ Implementado — validación de rango (España peninsular/insular/Canarias), opcional |
 | `instalaciones_tipo` (dato maestro) + `finca.instalaciones[]` | ✅ Implementado — 36 tipos curados del catálogo oficial FEGA (de 109, excluidos los puramente agrícolas); array embebido en finca, mismo patrón que `zonas[]`, cada instalación exige `tipoId` del catálogo |
 | Flag `restriccion_movimientos` en `js/saneamientos.js` | ✅ Implementado — distinto de `calificacion`, con `motivo_restriccion` y helper `restriccionActiva(fincaId)` |
-| Distinción "Explotación de Lidia" en filiaciones | ⏸ **En pausa** (2026-07-22, a petición del usuario) — sin caso de uso claro identificado por ahora |
+| Distinción "Explotación de Lidia" en filiaciones | ✅ **Implementado** (commit `b2a5787`, PR #66) — flag `explotacion_lidia` en `finca` (checkbox en el wizard de edición, `js/views/wizards/wizard-finca.js`), badge visible en Ajustes. Verificado end-to-end 2026-07-31: persiste correctamente vía `Fincas.save()`, se refleja en el badge. Nota: solo disponible desde el wizard de **edición**, no en el de alta de finca nueva — mismo patrón que `numero_infolac` (ver punto 1 de la auditoría lácteo) |
 
 **DB_VERSION 17→18**, migración aditiva (nueva tabla `instalaciones_tipo`, dato maestro sin cambios en tablas existentes). Verificado en navegador: 36 tipos sembrados y re-sembrados correctamente, validación de latitud/longitud, instalación sin tipo rechazada, IDs secuenciales correctos, `restriccionActiva()` funcional.
 
