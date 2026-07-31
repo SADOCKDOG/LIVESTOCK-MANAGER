@@ -1792,7 +1792,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.29.7';
+        s.src = src + '?v=6.29.9';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;

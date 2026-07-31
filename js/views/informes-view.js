@@ -192,6 +192,11 @@ const InformesView = {
 
   _cambiarTab(tab) {
     this._currentTab = tab;
+    // Sincroniza la categoría activa con la del tab destino — necesario cuando
+    // se navega directamente a un tab de otra categoría (ej. atajos del menú
+    // "Más": Libro Ventas -> comer, Informe REGA/Exportación -> libros), ya
+    // que _cambiarTab no pasa por _cambiarCategoria.
+    this._currentCategory = this._obtenerCategoriaDeTab(tab);
     this._actualizarHeader();
     // Scroll automático al sub-tab activo
     requestAnimationFrame(() => {
@@ -1046,7 +1051,7 @@ const InformesView = {
           </div>
         </div>
 
-        ${ventas.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.exportacion()}</div><p class="empty-state-text">No hay ventas registradas</p></div>' : `
+        ${ventas.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.exportacion()}</div><p class="empty-state-text">No hay ventas registradas</p></div>` : `
         <div class="table-scroll scroll-shadow-container mt-10">
           <table class="inf-table tbl-accent-blue">
             <thead>
@@ -1083,7 +1088,7 @@ const InformesView = {
                   <td class="text-right text-blue">${InformesView._fmt((v.importe_iva || 0), 2)}€</td>
                   <td class="text-right text-red">${InformesView._fmt(irpf, 2)}€</td>
                   <td class="text-right font-bold text-green">${InformesView._fmt(neto, 2)}€</td>
-                  <td class="text-center">${tieneDimoe ? '${Icons.check()} DIMOE' : '${Icons.check()} SIGGAN'}</td>
+                  <td class="text-center">${tieneDimoe ? `${Icons.check()} DIMOE` : `${Icons.check()} SIGGAN`}</td>
                 </tr>`;
               }).join('')}
             </tbody>
@@ -1180,7 +1185,7 @@ const InformesView = {
           </div>
         </div>` : ''}
 
-        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.edificio()}</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>' : `
+        ${data.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.edificio()}</div><p class="empty-state-text">No hay ventas registradas con compradores.</p></div>` : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-blue">
             <thead><tr>
@@ -1297,7 +1302,7 @@ const InformesView = {
           </div>
         </div>` : ''}
 
-        ${data.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>' : `
+        ${data.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">No hay gastos registrados con proveedores.</p></div>` : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-amber">
             <thead><tr>
@@ -1401,7 +1406,7 @@ const InformesView = {
           ${data.zonas.map(z => `<span class="badge badge-green text-2xs">${Icons.fitosanitario()} ${z}</span>`).join('')}
         </div>` : ''}
 
-        ${data.registros.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.fitosanitario()}</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>' : `
+        ${data.registros.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.fitosanitario()}</div><p class="empty-state-text">No hay gastos fitosanitarios registrados.</p></div>` : `
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table tbl-accent-green">
             <thead><tr>
@@ -1810,7 +1815,7 @@ const InformesView = {
         <!-- Movimientos recientes -->
         <div class="card report-section   report-card style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
           <div class="inf-card-title">${Icons.paquete()} Últimos Movimientos</div>
-          ${eventosRecientes.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>' : `
+          ${eventosRecientes.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>` : `
           <div class="table-scroll scroll-shadow-container">
             <table class="inf-table inf-table-sm tbl-accent-purple">
               <thead><tr>
