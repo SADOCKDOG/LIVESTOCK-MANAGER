@@ -1144,6 +1144,58 @@
       }
       console.log('[SEED] Botiquín creado: 4 productos, 3 lotes');
 
+      // 22. Vacunaciones de rebaño (GeGan > Sanidad; modelo jerárquico ADSG)
+      var vacFecha1 = new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var vacFecha2 = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var vacProxDosis = new Date(Date.now() + 155 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var vacunacionesDefs = [
+        {
+          fincaId: fincaId,
+          rebanoId: rebVacas.id,
+          fecha: vacFecha1,
+          veterinario: DEMO_FINCA.adsg_veterinario,
+          veterinario_colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          observaciones: 'Campaña obligatoria lengua azul 2026 — rebaño completo.',
+          tipos_vacuna: [
+            { tipo: 'Lengua azul (BTV-4)', lote: 'LBTV4-2026-012', dosis: '2 ml', nombre_comercial: 'Bluevac BTV4' }
+          ],
+          animales_vacunados: [
+            { categoria: 'Vacas adultas', cantidad: 3 }
+          ],
+          animales_totales: 3,
+          completa: true,
+          cerrada: true
+        },
+        {
+          fincaId: fincaId,
+          rebanoId: rebOvejas.id,
+          fecha: vacFecha2,
+          veterinario: DEMO_FINCA.adsg_veterinario,
+          veterinario_colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          observaciones: 'Primovacunación madres. Próxima dosis recuerdo: ' + vacProxDosis + '.',
+          tipos_vacuna: [
+            { tipo: 'Clostridiosis (Covexin 10)', lote: 'CVX-2026-045', dosis: '2 ml', nombre_comercial: 'Covexin 10' }
+          ],
+          animales_vacunados: [
+            { categoria: 'Ovejas adultas', cantidad: 3 },
+            { categoria: 'Corderos', cantidad: 1 }
+          ],
+          animales_totales: 4,
+          completa: false,
+          cerrada: false
+        }
+      ];
+      for (var vc = 0; vc < vacunacionesDefs.length; vc++) {
+        try {
+          var vacId = await Vacunaciones.save(vacunacionesDefs[vc]);
+          // Vacunaciones.save construye su propio objeto y NO propaga `demo`: parchear
+          var vacObj = await window.db.get('vacunaciones', vacId);
+          if (vacObj) { vacObj.demo = true; await window.db.put('vacunaciones', vacObj); }
+        } catch (e) { console.log('[SEED] Error vacunación:', e.message); }
+        await sleep(80);
+      }
+      console.log('[SEED] Vacunaciones creadas: 2');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
