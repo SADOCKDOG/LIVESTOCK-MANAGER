@@ -9,7 +9,7 @@ const AsistenteConfiguracion = {
         if (window.SeedData && typeof window.SeedData.run === 'function') return true;
         await new Promise((resolve, reject) => {
             const s = document.createElement('script');
-            s.src = 'js/seed-data.js?v=6.44';
+            s.src = 'js/seed-data.js?v=6.45';
             s.onload = resolve;
             s.onerror = reject;
             document.body.appendChild(s);
