@@ -369,6 +369,7 @@ const InformesView = {
         case 'rega': this._renderRega(content, d); break;
         case 'cargas': this._renderCargas(content, d); break;
         case 'produccion': this._renderProduccion(content, d); break;
+        case 'gastos': this._renderGastos(content, d); break;
         case 'pyg': this._renderPyG(content, d); break;
         case 'flujo-caja': this._renderFlujoCaja(content, d); break;
         case 'breakeven': this._renderBreakEven(content, d); break;
@@ -558,6 +559,81 @@ const InformesView = {
 
     // Renderizar gráficos del tab general
     this._renderGraficosGeneral(d);
+  },
+
+  _renderGastos(content, d) {
+    const { gastosOperativos } = d;
+    const porCategoria = (gastosOperativos?.porCategoria || []);
+    const porProveedor = (gastosOperativos?.porProveedor || []);
+    const porMes = (gastosOperativos?.porMes || []);
+    const totalGastos = porCategoria.reduce((s, c) => s + c.total, 0);
+
+    content.innerHTML = this._sectionActionsHTML('gastos', 'Gastos') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.gastos()} Gastos Operativos</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Gastos</small>
+              <span class="text-xl text-amber font-950">${UI.formatCurrency(totalGastos)}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Categorías</small>
+              <span class="text-xl text-blue font-950">${porCategoria.length}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Proveedores</small>
+              <span class="text-xl text-green font-950">${porProveedor.length}</span>
+            </div>
+          </div>
+        </div>
+
+        ${porCategoria.length > 0 ? `
+        <div class="inf-section-title uppercase font-900 mb-8">Por categoría</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          ${porCategoria.map(c => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-ccc text-sm uppercase font-900">${c.categoria}</span>
+              <span class="text-white font-950 text-md">${UI.formatCurrency(c.total)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${porProveedor.length > 0 ? `
+        <div class="inf-section-title uppercase font-900 mb-8">Por proveedor</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          ${porProveedor.map(p => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-ccc text-sm uppercase font-900">${p.proveedor}</span>
+              <span class="text-white font-950 text-md">${UI.formatCurrency(p.total)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${porMes.length > 1
+        ? '<div class="chart-wrap"><canvas id="chart-gastos-mes" class="chart-canvas"></canvas></div>'
+        : ''}
+      </div>
+    `;
+    setTimeout(() => {
+      if (porMes.length > 1) {
+        const ctx = document.getElementById('chart-gastos-mes');
+        if (ctx) {
+          new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels: porMes.map(m => m.mes),
+              datasets: [{
+                label: 'Gastos',
+                data: porMes.map(m => m.total),
+                backgroundColor: 'rgba(251,191,36,0.6)',
+                borderColor: '#fbbf24',
+                borderWidth: 1
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+          });
+        }
+      }
+    }, 50);
   },
 
   _renderCarne(content, d) {
