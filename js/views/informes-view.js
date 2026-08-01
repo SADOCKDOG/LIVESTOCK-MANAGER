@@ -2570,7 +2570,7 @@ const InformesView = {
 
   /** Trámites: estado sanitario por campaña de saneamiento + restricciones de movimiento activas */
   _renderTramites(content, d) {
-    const { tramitesData } = d;
+    const { tramitesData, docsLegales, pedidosCrotales } = d;
     const data = tramitesData || { porCampana: [], restriccionesActivas: 0, totalSaneamientos: 0 };
     const colorCalificacion = (c) => (c || '').toLowerCase().includes('indemne') || (c || '').toLowerCase().startsWith('t3') || (c || '').toLowerCase().startsWith('m3') || (c || '').toLowerCase().startsWith('b4') ? 'var(--c-success)' : 'var(--c-warning)';
 
@@ -2606,7 +2606,45 @@ const InformesView = {
               </tr>`).join('')}</tbody>
           </table>
         </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.documento()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin saneamientos registrados.</p></div>`}
-      </div>`;
+      </div>
+
+      ${(docsLegales || []).filter(d => d.tipo === 'dimoe').length > 0 ? `
+      <div class="inf-report card report-section   report-card mt-14">
+        <div class="inf-card-title flex items-center gap-6">${Icons.documento()} Guías DIMOE Emitidas</div>
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
+            <thead><tr><th>Fecha emisión</th><th>Destinatario</th><th>NIF</th><th>Estado</th><th>Firma</th></tr></thead>
+            <tbody>${docsLegales.filter(d => d.tipo === 'dimoe').map(d => `
+              <tr>
+                <td>${d.fecha_emision ? UI.formatDate(d.fecha_emision) : '-'}</td>
+                <td>${d.destinatario || '-'}</td>
+                <td class="text-gray text-xs">${d.nif || '-'}</td>
+                <td><span class="badge badge-sm ${d.estado === 'firmado' ? 'badge-green' : 'badge-amber'}">${d.estado || 'pendiente'}</span></td>
+                <td class="text-xs text-gray">${d.firma ? 'Firmado' : 'Pendiente'}</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>` : ''}
+
+      ${(pedidosCrotales || []).length > 0 ? `
+      <div class="inf-report card report-section   report-card mt-14">
+        <div class="inf-card-title flex items-center gap-6">${Icons.documento()} Pedidos de Crotales</div>
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
+            <thead><tr><th>Fecha pedido</th><th>Especie</th><th>Tipo</th><th>Cantidad</th><th>Estado</th><th>Seguimiento</th></tr></thead>
+            <tbody>${pedidosCrotales.map(p => `
+              <tr>
+                <td>${p.fecha_pedido ? UI.formatDate(p.fecha_pedido) : '-'}</td>
+                <td>${p.especie || '-'}</td>
+                <td>${p.tipo || '-'}</td>
+                <td class="text-right font-900">${p.cantidad || 0}</td>
+                <td><span class="badge badge-sm ${p.estado === 'entregado' ? 'badge-green' : (p.estado === 'pendiente' ? 'badge-amber' : 'badge-blue')}">${p.estado || 'pendiente'}</span></td>
+                <td class="text-xs text-gray">${p.numero_seguimiento || '-'}</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>` : ''}
+    `;
   },
 
   /** Contratos próximos a vencer o ya vencidos */
