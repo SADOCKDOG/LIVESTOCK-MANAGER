@@ -979,6 +979,77 @@
       }
       console.log('[SEED] Pedidos de crotales creados: 2');
 
+      // 18. Gastos fitosanitarios (ExPro > Fitosanitarios; informe ExPro > Fitosanitario)
+      // Vía Gastos.save como el wizard real; snap_zona se preserva gracias al fix de gastos.js
+      var fitoFecha1 = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var fitoFecha2 = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var fitoFecha3 = new Date(Date.now() - 70 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var fitosDefs = [
+        {
+          demo: true,
+          fincaId: fincaId,
+          concepto: 'Herbicida Glifosato 36% — Parcela Norte',
+          fecha: fitoFecha1,
+          monto: 214.50,
+          categoria: 'Fitosanitarios',
+          snap_zona: 'Parcela Norte 42ha',
+          origen_modulo: 'general',
+          modo_explotacion: null,
+          proveedorId: null,
+          control_normativo: {
+            registroProducto: 'ES-00124-GLF',
+            dosisAplicada: '3 L/ha',
+            plazoSeguridadDias: 15,
+            aptoComercializacion: true,
+            verificadoEn: fitoFecha1 + 'T09:00:00.000Z'
+          }
+        },
+        {
+          demo: true,
+          fincaId: fincaId,
+          concepto: 'Tratamiento barbecho — Parcela Sur',
+          fecha: fitoFecha2,
+          monto: 156.75,
+          categoria: 'Fitosanitarios',
+          snap_zona: 'Parcela Sur 28ha',
+          origen_modulo: 'general',
+          modo_explotacion: null,
+          proveedorId: null,
+          control_normativo: {
+            registroProducto: 'ES-00331-24D',
+            dosisAplicada: '2 L/ha',
+            plazoSeguridadDias: 7,
+            aptoComercializacion: true,
+            verificadoEn: fitoFecha2 + 'T10:30:00.000Z'
+          }
+        },
+        {
+          demo: true,
+          fincaId: fincaId,
+          concepto: 'Fungicida preventivo — Parcela Norte',
+          fecha: fitoFecha3,
+          monto: 98.20,
+          categoria: 'Fitosanitarios',
+          snap_zona: 'Parcela Norte 42ha',
+          origen_modulo: 'general',
+          modo_explotacion: null,
+          proveedorId: null,
+          control_normativo: {
+            registroProducto: 'ES-00876-AZO',
+            dosisAplicada: '1,5 L/ha',
+            plazoSeguridadDias: 21,
+            aptoComercializacion: false,
+            verificadoEn: fitoFecha3 + 'T08:15:00.000Z'
+          }
+        }
+      ];
+      for (var ft = 0; ft < fitosDefs.length; ft++) {
+        try { await Gastos.save(fitosDefs[ft]); }
+        catch (e) { console.log('[SEED] Error gasto fitosanitario:', e.message); }
+        await sleep(80);
+      }
+      console.log('[SEED] Gastos fitosanitarios creados: 3');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
