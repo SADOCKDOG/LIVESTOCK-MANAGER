@@ -368,6 +368,7 @@ const InformesView = {
         case 'proveedores': this._renderProveedores(content, d); break;
         case 'rega': this._renderRega(content, d); break;
         case 'cargas': this._renderCargas(content, d); break;
+        case 'produccion': this._renderProduccion(content, d); break;
         case 'pyg': this._renderPyG(content, d); break;
         case 'flujo-caja': this._renderFlujoCaja(content, d); break;
         case 'breakeven': this._renderBreakEven(content, d); break;
@@ -646,6 +647,75 @@ const InformesView = {
         if (margenA?.length > 0) this._renderScatter('chart-margen-animal-carne', margenA, 'var(--c-warning)');
         if (rentZ?.length > 0) this._renderBarrasZonas('chart-rentabilidad-zonas-carne', rentZ);
       } catch (e) { console.error('[Carne charts]', e); }
+    }, 50);
+  },
+
+  _renderProduccion(content, d) {
+    const { produccion } = d;
+    const porTipo = (produccion?.porTipo || []);
+    const total = produccion?.total || 0;
+    const timeline = (produccion?.timeline || []);
+
+    content.innerHTML = this._sectionActionsHTML('produccion', 'Producción') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Control de Producción</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Registros (90d)</small>
+              <span class="text-xl text-blue font-950">${total}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Tipos activos</small>
+              <span class="text-xl text-green font-950">${porTipo.length}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total kg pesados</small>
+              <span class="text-xl text-amber font-950">${InformesView._fmt(porTipo.filter(t => /pesaje|control/i.test(t.tipo)).reduce((s, t) => s + (t.totalKg || 0), 0), 1)}</span>
+            </div>
+          </div>
+        </div>
+
+        ${porTipo.length > 0 ? `
+        <div class="inf-section-title uppercase font-900 mb-8">Por tipo de evento</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          ${porTipo.map(t => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-ccc text-sm uppercase font-900">${t.tipo}</span>
+              <div class="text-right">
+                <span class="text-white font-950 text-md">${t.count}</span>
+                <span class="text-gray text-xs ml-6">${InformesView._fmt(t.totalKg || 0, 1)} kg</span>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${timeline.length > 1
+        ? '<div class="chart-wrap"><canvas id="chart-prod-timeline" class="chart-canvas"></canvas></div>'
+        : '<div class="inf-small p-16 text-center text-555">Se necesitan al menos 2 registros para mostrar la evolución.</div>'}
+      </div>
+    `;
+    setTimeout(() => {
+      if (timeline.length > 1) {
+        const ctx = document.getElementById('chart-prod-timeline');
+        if (ctx) {
+          new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: timeline.map(t => t.fecha),
+              datasets: [{
+                label: 'Producción',
+                data: timeline.map(t => t.cantidad),
+                borderColor: '#4FADF5',
+                backgroundColor: 'rgba(79,173,245,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+          });
+        }
+      }
     }, 50);
   },
 
