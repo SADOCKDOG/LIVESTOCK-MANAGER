@@ -177,12 +177,19 @@
 
       // 4. Pesajes de seguimiento de peso para vaca1 (vaca lechera — motivo control_peso para no contaminar cárnica)
       if (vaca1) {
+        // Los 2 últimos usan fechas relativas a "hoy" (dentro de los 90 días) para que
+        // Informes > ExPro > Producción tenga kg pesados recientes que sumar; el resto
+        // queda con fechas fijas de calendario como histórico de seguimiento.
+        var pesajeHace60d = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        var pesajeHace20d = new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         var pesajes = [
           { fecha: '2025-01-15', valor_neto: 585 },
           { fecha: '2025-02-15', valor_neto: 590 },
           { fecha: '2025-03-15', valor_neto: 588 },
           { fecha: '2025-04-15', valor_neto: 592 },
-          { fecha: '2025-05-15', valor_neto: 595 }
+          { fecha: '2025-05-15', valor_neto: 595 },
+          { fecha: pesajeHace60d, valor_neto: 598 },
+          { fecha: pesajeHace20d, valor_neto: 601 }
         ];
         for (var p = 0; p < pesajes.length; p++) {
           try {
@@ -761,6 +768,42 @@
             creadoEn: new Date().toISOString()
           });
         } catch (e) { console.log('[SEED] Error com. carne:', e.message); }
+      }
+
+      // 15b. Segunda venta de carne (oveja4, mes distinto) — para que Informes > CoMer >
+      // Ventas tenga >1 mes con datos y pueda dibujar la evolución temporal de precios.
+      if (oveja4 && compCarne) {
+        try {
+          var pesoVivoV2 = 45, pesoCanalV2 = 22;
+          var fechaSacrificio2 = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+          await window.db.add('comercializacion_carne', {
+            demo: true,
+            animalId: oveja4.id,
+            compradorId: compCarne.id,
+            contratoId: contCarneId || null,
+            fechaSacrificio: fechaSacrificio2,
+            codigoMatadero: 'ES10.05/M',
+            pesoVivo: pesoVivoV2,
+            pesoCanal: pesoCanalV2,
+            rendimientoCanal: +((pesoCanalV2 / pesoVivoV2) * 100).toFixed(2),
+            fincaId: fincaId,
+            snap_zona: rebOvejas.zonaActual,
+            snap_especie: rebOvejas.especie,
+            snap_tipo: rebOvejas.tipo,
+            nifComprador: compCarne.nif_cif,
+            razonSocial: compCarne.nombre,
+            IVA: 10,
+            retencionREAGP: 0,
+            Gasto_Transporte: 12,
+            Gasto_Matanza: 9,
+            numero_albaran: 'ALB-2025-0008',
+            precio_total: +(pesoCanalV2 * 4.6).toFixed(2),
+            creadoEn: new Date().toISOString()
+          });
+          var oveja4Vendida = await Animales.get(oveja4.id);
+          if (oveja4Vendida) { oveja4Vendida.estado = 'vendido'; await Animales.save(oveja4Vendida); }
+        } catch (e) { console.log('[SEED] Error 2ª venta carne:', e.message); }
+        await sleep(80);
       }
 
       // ═══════════════════════════════════════════════════════════════════

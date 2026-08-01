@@ -196,6 +196,24 @@ const InformesView = {
     return catsHtml + subTabsHtml;
   },
 
+  /**
+   * Centra `el` horizontalmente dentro de su contenedor de scroll más cercano,
+   * calculando scrollLeft a mano en vez de usar el.scrollIntoView(). scrollIntoView
+   * con inline:'center' puede "escaparse" al contenedor padre (o al documento) en
+   * algunos motores WebView de Android bajo llamadas repetidas con behavior:'smooth',
+   * produciendo un desplazamiento horizontal de página completa que no se reproduce
+   * en Chrome de escritorio. container.scrollTo() está acotado por definición al
+   * propio elemento, así que no puede arrastrar el scroll de nada fuera de él.
+   */
+  _centrarEnScroll(el) {
+    if (!el) return;
+    const container = el.closest('.scroll-shadow-container');
+    if (!container) return;
+    const target = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2;
+    const max = container.scrollWidth - container.clientWidth;
+    container.scrollTo({ left: Math.max(0, Math.min(target, max)), behavior: 'smooth' });
+  },
+
   _cambiarCategoria(catKey) {
     this._currentCategory = catKey;
     const firstTab = Object.keys(this._categories[catKey].tabs).find(t => this._esTabPermitida(t));
@@ -203,10 +221,8 @@ const InformesView = {
     this._actualizarHeader();
     // Scroll automático al tab activo de categoría
     requestAnimationFrame(() => {
-      const el = document.getElementById(`inf-cat-${catKey}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      const tel = document.getElementById(`inf-tab-${firstTab}`);
-      if (tel) tel.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      this._centrarEnScroll(document.getElementById(`inf-cat-${catKey}`));
+      this._centrarEnScroll(document.getElementById(`inf-tab-${firstTab}`));
     });
     this._renderTabActual();
   },
@@ -221,8 +237,7 @@ const InformesView = {
     this._actualizarHeader();
     // Scroll automático al sub-tab activo
     requestAnimationFrame(() => {
-      const el = document.getElementById(`inf-tab-${tab}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      this._centrarEnScroll(document.getElementById(`inf-tab-${tab}`));
     });
     this._renderTabActual();
   },
@@ -265,7 +280,9 @@ const InformesView = {
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
         tanqueStock, controlLechero, marAnimalMedio,
         rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche,
-        silosData, tramitesData, contratosVencimientoData
+        silosData, tramitesData, contratosVencimientoData,
+        produccion, gastosOperativos, margenes, albaranes,
+        movimientosEntrada, botiquinStock, pedidosCrotales
       ] = await Promise.all([
         Analitica.obtenerRentabilidadFinca(fId).catch(() => null),
         Analitica.obtenerMargenPorAnimal(fId).catch(() => []),
@@ -312,6 +329,13 @@ const InformesView = {
         this._obtenerSilos(fId).catch(() => ({silos: [], totalCapacidad: 0, totalStock: 0, alertasStockBajo: 0})),
         this._obtenerTramites(fId).catch(() => ({porCampana: [], restriccionesActivas: 0, totalSaneamientos: 0})),
         this._obtenerContratosVencimiento(fId).catch(() => ({contratos: [], proximosAVencer: 0, vencidos: 0})),
+        this._obtenerProduccion(fId).catch(() => ({porTipo: [], total: 0, timeline: []})),
+        this._obtenerGastosOperativos(fId).catch(() => ({porCategoria: [], porProveedor: [], porMes: []})),
+        this._obtenerMargenes(fId).catch(() => ({margenCarneNeto: 0, mofaLeche: 0, margenTotal: 0})),
+        this._obtenerAlbaranes(fId).catch(() => []),
+        window.db.getAllFromIndex('movimientos_ganado', 'fincaId', Number(fId)).catch(() => []),
+        this._obtenerBotiquinStock(fId).catch(() => ({productos: [], lotes: [], stockBajo: [], proxCaducar: [], totalProductos: 0, totalLotes: 0})),
+        (window.PedidosCrotales ? window.PedidosCrotales.list(fId) : Promise.resolve([])).catch(() => []),
       ]);
 
       // Cachear data para los tabs
@@ -327,7 +351,9 @@ const InformesView = {
         rentEspData, curvaProdData, breakEvenData, pacData, sanitariosRaw,
         tanqueStock, controlLechero, marAnimalMedio,
         rendimientoLechePorAnimal, indiceRenuevo, costoProduccionLeche,
-        silosData, tramitesData, contratosVencimientoData
+        silosData, tramitesData, contratosVencimientoData,
+        produccion, gastosOperativos, margenes, albaranes,
+        movimientosEntrada, botiquinStock, pedidosCrotales
       };
 
       await chartLoadPromise;
@@ -754,7 +780,7 @@ const InformesView = {
   },
 
   _renderCarne(content, d) {
-    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos, movimientosEntrada } = d;
+    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos, movimientosEntrada, animales } = d;
     const totalIngresos = rent?.detalles?.carne || 0;
     const totalVentas = ventasHist.length;
     const kgTotal = ventasHist.reduce((s, v) => s + (v.kg || 0), 0);
@@ -831,6 +857,8 @@ const InformesView = {
               </div>
             </div>`).join('')}
         </div>` : ''}
+
+        <div id="chart-ica-cebo"></div>
       </div>
     `;
 
@@ -843,10 +871,15 @@ const InformesView = {
     }, 50);
 
     // ICA de Cierre — Tandas de Cebo (SIGGAN)
+    // Una tanda = animales de un movimiento de entrada con motivo 'cebo' (movimientos_ganado,
+    // ver js/movimientos.js — NO existen los campos origen/motivo_tarea/tandaId/movimientoId
+    // en este store). El vínculo con pesajes/consumos se hace por animalId/rebanoId, no por
+    // un id de tanda explícito, porque el modelo no lo tiene.
     const movimientosEntradaSiggan = (movimientosEntrada || []).filter(m => m.tipo === 'entrada');
-    const tandasCebo = movimientosEntradaSiggan.filter(m => m.origen === 'cebo' || (m.motivo_tarea || '').includes('entrada_cebo'));
-    const pesajesTanda = (eventos || []).filter(e => e.motivo_tarea === 'pesaje' && e.tandaId);
-    const consumosSilo = (eventos || []).filter(e => e.motivo_tarea === 'consumo_silo');
+    const tandasCebo = movimientosEntradaSiggan.filter(m => m.motivo === 'cebo');
+    const pesajesTotal = (eventos || []).filter(e => e.motivo_tarea === 'control_peso');
+    const consumosSiloTotal = (eventos || []).filter(e => e.motivo_tarea === 'alimentacion');
+    const animalesPorId = new Map((animales || []).map(a => [Number(a.id), a]));
 
     const icaSection = document.getElementById('chart-ica-cebo');
     if (icaSection) {
@@ -860,31 +893,37 @@ const InformesView = {
           </div>
           <div class="info-box-center py-8">
             <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Animales en tanda</small>
-            <span class="text-xl text-green font-950">${InformesView._fmt(tandasCebo.reduce((s, t) => s + (t.numAnimales || 0), 0), 0)}</span>
+            <span class="text-xl text-green font-950">${InformesView._fmt(tandasCebo.reduce((s, t) => s + (t.num_animales || 0), 0), 0)}</span>
           </div>
           <div class="info-box-center py-8">
             <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Pesajes registrados</small>
-            <span class="text-xl text-amber font-950">${pesajesTanda.length}</span>
+            <span class="text-xl text-amber font-950">${pesajesTotal.length}</span>
           </div>
           <div class="info-box-center py-8">
             <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Consumos silo</small>
-            <span class="text-xl text-violet font-950">${consumosSilo.length}</span>
+            <span class="text-xl text-violet font-950">${consumosSiloTotal.length}</span>
           </div>
         </div>
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table inf-table-sm tbl-accent-blue">
-            <thead><tr><th>Movimiento</th><th>Fecha entrada</th><th>Animales</th><th>Peso entrada (kg)</th><th>Pesajes</th><th>Consumo silo (kg)</th></tr></thead>
+            <thead><tr><th>Movimiento</th><th>Fecha entrada</th><th>Animales</th><th>Peso último control (kg)</th><th>Pesajes</th><th>Consumo silo (kg)</th></tr></thead>
             <tbody>${tandasCebo.map(t => {
-              const pesajes = pesajesTanda.filter(p => p.tandaId === t.id || p.movimientoId === t.id);
-              const consumos = consumosSilo.filter(c => c.tandaId === t.id || c.movimientoId === t.id);
-              const pesoEntrada = pesajes.length > 0 ? pesajes[pesajes.length - 1].peso_kg : (t.peso_entrada || 0);
+              const idsTanda = (t.animalId || []).map(Number);
+              const pesajes = pesajesTotal.filter(p => idsTanda.includes(Number(p.entidad_id)));
+              // Consumo de silo se registra por rebaño, no por animal — se atribuye a la
+              // tanda vía el rebaño del primer animal de la tanda.
+              const rebanoId = idsTanda.length > 0 ? animalesPorId.get(idsTanda[0])?.rebanoId : null;
+              const consumos = rebanoId != null
+                ? consumosSiloTotal.filter(c => Number(c.rebanoId) === Number(rebanoId) && new Date(c.fecha) >= new Date(t.fecha))
+                : [];
+              const ultimoPesaje = pesajes.length > 0 ? pesajes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0] : null;
               return `<tr>
-                <td><strong>${t.numero_seguimiento || t.id}</strong></td>
+                <td><strong>${t.numero_guia || t.id}</strong></td>
                 <td>${t.fecha ? UI.formatDate(t.fecha) : '-'}</td>
-                <td class="font-900">${t.numAnimales || 0}</td>
-                <td class="text-right">${InformesView._fmt(pesoEntrada, 1)}</td>
+                <td class="font-900">${t.num_animales || 0}</td>
+                <td class="text-right">${ultimoPesaje ? InformesView._fmt(ultimoPesaje.valor_neto, 1) : '—'}</td>
                 <td class="text-center">${pesajes.length}</td>
-                <td class="text-right">${InformesView._fmt(consumos.reduce((s, c) => s + (c.cantidad || 0), 0), 1)}</td>
+                <td class="text-right">${InformesView._fmt(consumos.reduce((s, c) => s + (c.valor_neto || 0), 0), 1)}</td>
               </tr>`;
             }).join('')}</tbody>
           </table>
@@ -2124,7 +2163,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('rega', 'REGA') + `
       <div class="inf-report mb-14">
         <!-- KPIs Unificados -->
-        <div class="card p-12 mb-14 border-222 style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card p-12 mb-14 border-222" style="--registro-color: var(--c-gray); background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Censo Total</small>
@@ -2145,7 +2184,7 @@ const InformesView = {
           </div>
         </div>
         <!-- Datos Explotación -->
-        <div class="card report-section   report-card style="--registro-color: var(--c-gold);"--registro-color: var(--c-gold);"">
+        <div class="card report-section   report-card" style="--registro-color: var(--c-gold);">
           <div class="inf-card-title">${Icons.finca()} Datos de la Explotación</div>
           <div class="grid grid-cols-2 gap-8 text-sm">
             <div><span class="text-gray">Nombre:</span> <strong>${finca.nombre || 'N/D'}</strong></div>
@@ -2171,9 +2210,9 @@ const InformesView = {
         </div>
 
         <!-- Resumen Censo -->
-        <div class="card report-section   report-card style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+        <div class="card report-section   report-card" style="--registro-color: var(--c-success);">
           <div class="inf-card-title">${Icons.animales()} Censo Actual</div>
-          <div class="card p-12 mb-12 border-222 style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+          <div class="card p-12 mb-12 border-222" style="--registro-color: var(--c-gray); background:rgba(255,255,255,0.02);">
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Animales</small>
@@ -2273,7 +2312,7 @@ const InformesView = {
         </div>
 
         <!-- Movimientos recientes -->
-        <div class="card report-section   report-card style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
+        <div class="card report-section   report-card" style="--registro-color: var(--c-purple);">
           <div class="inf-card-title">${Icons.paquete()} Últimos Movimientos</div>
           ${eventosRecientes.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>` : `
           <div class="table-scroll scroll-shadow-container">
@@ -2682,14 +2721,14 @@ const InformesView = {
         <div class="inf-card-title flex items-center gap-6">${Icons.documento()} Guías DIMOE Emitidas</div>
         <div class="table-scroll scroll-shadow-container">
           <table class="inf-table inf-table-sm tbl-accent-blue">
-            <thead><tr><th>Fecha emisión</th><th>Destinatario</th><th>NIF</th><th>Estado</th><th>Firma</th></tr></thead>
+            <thead><tr><th>Fecha emisión</th><th>Nº guía</th><th>Destino</th><th>Motivo</th><th>Transportista</th></tr></thead>
             <tbody>${docsLegales.filter(d => d.tipo === 'dimoe').map(d => `
               <tr>
                 <td>${d.fecha_emision ? UI.formatDate(d.fecha_emision) : '-'}</td>
-                <td>${d.destinatario || '-'}</td>
-                <td class="text-gray text-xs">${d.nif || '-'}</td>
-                <td><span class="badge badge-sm ${d.estado === 'firmado' ? 'badge-green' : 'badge-amber'}">${d.estado || 'pendiente'}</span></td>
-                <td class="text-xs text-gray">${d.firma ? 'Firmado' : 'Pendiente'}</td>
+                <td>${d.numero || '-'}</td>
+                <td>${d.destino_nombre || '-'}</td>
+                <td class="text-gray text-xs">${d.motivo || '-'}</td>
+                <td class="text-xs text-gray">${d.transportista_nombre || '-'}${d.transportista_nif ? ` (${d.transportista_nif})` : ''}</td>
               </tr>`).join('')}</tbody>
           </table>
         </div>
