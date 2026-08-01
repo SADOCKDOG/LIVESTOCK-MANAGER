@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.github.triplet.play'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -14,7 +13,7 @@ android {
         applicationId "com.livestockmanager.app.manual"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 521
+        versionCode 522
         versionName "4.10.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -37,6 +36,9 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
     compileOptions {
@@ -85,18 +87,4 @@ try {
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
-}
-
-play {
-    // Configuración para subida automática a Google Play
-    serviceAccountCredentials.set(file("service-account.json"))
-    
-    // Track por defecto (se puede sobrescribir por línea de comandos)
-    track.set("internal")
-    
-    // Si quieres subir a Alpha automáticamente usa:
-    // track.set("alpha")
-    
-    defaultToAppBundles.set(true)
-    releaseName.set("4.10.1 (521)")
 }
