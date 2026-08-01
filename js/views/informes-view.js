@@ -7,8 +7,8 @@
  */
 
 const InformesView = {
-  _currentTab: 'carne',
-  _currentCategory: 'gegan',
+  _currentTab: 'general',
+  _currentCategory: 'general',
   _cachedData: null,
 
   /** Formatea un número en es-ES con decimales fijos (auditoría F5: coherencia decimal). */
@@ -17,44 +17,54 @@ const InformesView = {
   },
 
   _categories: {
-    gegan: {
-      label: "GeGan",
-      icon: 'animales',
+    general: {
+      label: "General",
+      icon: 'grafico',
       tabs: {
         "general": "General",
         "por-finca": "Por Finca",
         "alertas": "Alertas",
-        "carne": "Cárnico",
-        "leche": "Lácteo",
-        "reproductivo": "Repro",
-        "sanidad": "Sanidad",
-        "curva-prod": "Curva",
-        "censo": "Censo",
-        "coste-prod": "Coste/Animal",
         "eficiencia": "Eficiencia",
-        "rotacion": "Rotación",
         "rent-esp": "Rent. Especie"
       }
     },
+    gegan: {
+      label: "GeGan",
+      icon: 'animales',
+      tabs: {
+        "censo": "Censo",
+        "rotacion": "Rotación",
+        "reproductivo": "Repro",
+        "sanidad": "Sanidad",
+        "carne": "Cárnico",
+        "coste-prod": "Coste/Animal"
+      }
+    },
     expro: {
-      label: "Expro",
+      label: "ExPro",
       icon: 'finca',
       tabs: {
+        "produccion": "Producción",
+        "leche": "Lácteo",
+        "curva-prod": "Curva",
         "cargas": "Aforos",
         "fitosanitario": "Fitosanitario",
         "silos": "Silos",
         "tramites": "Trámites",
-        "proveedores": "Proveedores"
+        "proveedores": "Proveedores",
+        "gastos": "Gastos"
       }
     },
     comer: {
-      label: "Comer",
+      label: "CoMer",
       icon: 'compradores',
       tabs: {
         "ventas": "Ventas",
+        "margenes": "Márgenes",
         "compradores": "Compradores",
         "contratos-vencimiento": "Contratos",
-        "transportistas-resumen": "Transportistas"
+        "transportistas-resumen": "Transportistas",
+        "albaranes": "Albaranes"
       }
     },
     libros: {
@@ -82,7 +92,7 @@ const InformesView = {
     for (const [catKey, cat] of Object.entries(this._categories)) {
       if (tab in cat.tabs) return catKey;
     }
-    return 'gegan'; // Default to gegan instead of general
+    return 'general'; // Default to general
   },
 
   _obtenerIconoDeSubTab(tab) {
@@ -115,6 +125,11 @@ const InformesView = {
       case 'tramites': return Icons.documento();
       case 'contratos-vencimiento': return Icons.contratos();
       case 'transportistas-resumen': return Icons.transportistas();
+      // Nuevas pestañas Fase B
+      case 'produccion': return Icons.grafico();
+      case 'gastos': return Icons.gastos();
+      case 'margenes': return Icons.dinero();
+      case 'albaranes': return Icons.libroVentas();
       default: return '';
     }
   },
@@ -123,9 +138,10 @@ const InformesView = {
     const activeCatKey = this._currentCategory;
     // Colores por categoría
     const catColors = {
+      general: 'var(--c-primary)',    // Primary for General (transversal entry point)
       gegan: 'var(--c-success)',      // Green for GeGan (livestock/production)
-      expro: 'var(--c-info)',         // Blue for Expro (farm operations)
-      comer: 'var(--c-warning)',      // Orange/Yellow for Comer (commerce/trade)
+      expro: 'var(--c-info)',         // Blue for ExPro (farm operations)
+      comer: 'var(--c-warning)',      // Orange/Yellow for CoMer (commerce/trade)
       libros: 'var(--c-purple)'       // Purple for Libros (record books/ledgers)
     };
     const activeColor = catColors[activeCatKey] || 'var(--c-success)';
