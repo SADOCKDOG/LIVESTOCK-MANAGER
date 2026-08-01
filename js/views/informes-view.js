@@ -1211,7 +1211,7 @@ const InformesView = {
   },
 
   _renderSanidad(content, d) {
-    const { estadisticasSanidad, gastosCat, rebanos, animales, eventos, sanitariosRaw } = d;
+    const { estadisticasSanidad, gastosCat, rebanos, animales, eventos, sanitariosRaw, botiquinStock } = d;
     // Calcular coste sanitario por animal
     const gastosSanitarios = (gastosCat || []).filter(g => (g.categoria || '').toLowerCase() === 'sanidad');
     const totalGastoSanidad = gastosSanitarios.reduce((s, g) => s + g.total, 0);
@@ -1286,6 +1286,54 @@ const InformesView = {
         });
       }
     }, 50);
+
+    // Botiquín stock/caducidades
+    if (botiquinStock?.totalProductos > 0) {
+      const botiquinEl = document.createElement('div');
+      botiquinEl.className = 'inf-report card report-section   report-card mt-14';
+      botiquinEl.innerHTML = `
+        <div class="inf-card-title flex items-center gap-6">${Icons.sanidad()} Stock Botiquín</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-8">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Productos</small>
+              <span class="text-xl text-blue font-950">${botiquinStock.totalProductos}</span>
+            </div>
+            <div class="info-box-center py-8">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Lotes</small>
+              <span class="text-xl text-green font-950">${botiquinStock.totalLotes}</span>
+            </div>
+            <div class="info-box-center py-8">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Stock bajo</small>
+              <span class="text-xl font-950 ${botiquinStock.stockBajo.length > 0 ? 'text-red' : 'text-green'}">${botiquinStock.stockBajo.length}</span>
+            </div>
+          </div>
+        </div>
+        ${botiquinStock.proxCaducar.length > 0 ? `
+        <div class="card card-tint-amber mb-10 p-12">
+          <div class="inf-section-title mb-8 text-amber uppercase font-900">${Icons.alerta()} Próximos a caducar (30 días)</div>
+          <div class="grid grid-cols-1 gap-6">
+            ${botiquinStock.proxCaducar.map(p => `
+              <div class="info-box-sm flex justify-between items-center">
+                <span class="text-ccc text-sm font-900">${p.nombre}</span>
+                <span class="text-amber font-800 text-xs">Lote: ${p.lote || '-'} — Caduca: ${p.caducidad}</span>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+        ${botiquinStock.stockBajo.length > 0 ? `
+        <div class="card card-tint-red mb-10 p-12">
+          <div class="inf-section-title mb-8 text-red uppercase font-900">${Icons.alerta()} Stock bajo</div>
+          <div class="grid grid-cols-1 gap-6">
+            ${botiquinStock.stockBajo.map(p => `
+              <div class="info-box-sm flex justify-between items-center">
+                <span class="text-ccc text-sm font-900">${p.nombre}</span>
+                <span class="text-red font-800 text-xs">${InformesView._fmt(p.cantidadActual, 0)} / ${InformesView._fmt(p.cantidadMinima, 0)} ${p.unidad || 'dosis'}</span>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+      `;
+      content.querySelector('.report-section:last-child')?.appendChild(botiquinEl);
+    }
   },
 
   _renderCenso(content, d) {
