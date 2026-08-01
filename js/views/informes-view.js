@@ -368,6 +368,10 @@ const InformesView = {
         case 'proveedores': this._renderProveedores(content, d); break;
         case 'rega': this._renderRega(content, d); break;
         case 'cargas': this._renderCargas(content, d); break;
+        case 'produccion': this._renderProduccion(content, d); break;
+        case 'gastos': this._renderGastos(content, d); break;
+        case 'margenes': this._renderMargenes(content, d); break;
+        case 'albaranes': this._renderAlbaranes(content, d); break;
         case 'pyg': this._renderPyG(content, d); break;
         case 'flujo-caja': this._renderFlujoCaja(content, d); break;
         case 'breakeven': this._renderBreakEven(content, d); break;
@@ -559,8 +563,198 @@ const InformesView = {
     this._renderGraficosGeneral(d);
   },
 
+  _renderGastos(content, d) {
+    const { gastosOperativos } = d;
+    const porCategoria = (gastosOperativos?.porCategoria || []);
+    const porProveedor = (gastosOperativos?.porProveedor || []);
+    const porMes = (gastosOperativos?.porMes || []);
+    const totalGastos = porCategoria.reduce((s, c) => s + c.total, 0);
+
+    content.innerHTML = this._sectionActionsHTML('gastos', 'Gastos') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.gastos()} Gastos Operativos</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Gastos</small>
+              <span class="text-xl text-amber font-950">${UI.formatCurrency(totalGastos)}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Categorías</small>
+              <span class="text-xl text-blue font-950">${porCategoria.length}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Proveedores</small>
+              <span class="text-xl text-green font-950">${porProveedor.length}</span>
+            </div>
+          </div>
+        </div>
+
+        ${porCategoria.length > 0 ? `
+        <div class="inf-section-title uppercase font-900 mb-8">Por categoría</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          ${porCategoria.map(c => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-ccc text-sm uppercase font-900">${c.categoria}</span>
+              <span class="text-white font-950 text-md">${UI.formatCurrency(c.total)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${porProveedor.length > 0 ? `
+        <div class="inf-section-title uppercase font-900 mb-8">Por proveedor</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          ${porProveedor.map(p => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-ccc text-sm uppercase font-900">${p.proveedor}</span>
+              <span class="text-white font-950 text-md">${UI.formatCurrency(p.total)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${porMes.length > 1
+        ? '<div class="chart-wrap"><canvas id="chart-gastos-mes" class="chart-canvas"></canvas></div>'
+        : ''}
+      </div>
+    `;
+    setTimeout(() => {
+      if (porMes.length > 1) {
+        const ctx = document.getElementById('chart-gastos-mes');
+        if (ctx) {
+          new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels: porMes.map(m => m.mes),
+              datasets: [{
+                label: 'Gastos',
+                data: porMes.map(m => m.total),
+                backgroundColor: 'rgba(251,191,36,0.6)',
+                borderColor: '#fbbf24',
+                borderWidth: 1
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+          });
+        }
+      }
+    }, 50);
+  },
+
+  _renderMargenes(content, d) {
+    const { margenes } = d;
+    const margenCarne = margenes?.margenCarneNeto || 0;
+    const mofaLeche = margenes?.mofaLeche || 0;
+    const margenTotal = margenes?.margenTotal || 0;
+
+    content.innerHTML = this._sectionActionsHTML('margenes', 'Márgenes') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Márgenes Comerciales</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Neto Carne</small>
+              <span class="text-xl ${margenCarne >= 0 ? 'text-green' : 'text-red'} font-950">${margenCarne >= 0 ? '+' : ''}${UI.formatCurrency(margenCarne)}</span>
+              <small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Transporte + Matanza deducidos</small>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">MOFA Leche</small>
+              <span class="text-xl ${mofaLeche >= 0 ? 'text-green' : 'text-red'} font-950">${mofaLeche >= 0 ? '+' : ''}${UI.formatCurrency(mofaLeche)}</span>
+              <small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Ingresos − Alimentación (período)</small>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Total</small>
+              <span class="text-xl ${margenTotal >= 0 ? 'text-green' : 'text-red'} font-950">${margenTotal >= 0 ? '+' : ''}${UI.formatCurrency(margenTotal)}</span>
+              <small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Carne + Leche combinado</small>
+            </div>
+          </div>
+        </div>
+
+        ${margenCarne !== 0 || mofaLeche !== 0
+        ? '<div class="chart-wrap"><canvas id="chart-margenes" class="chart-canvas"></canvas></div>'
+        : '<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.dinero()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de margen. Registra ventas y albaranes para ver el cálculo.</p></div>'}
+      </div>
+    `;
+    setTimeout(() => {
+      const ctx = document.getElementById('chart-margenes');
+      if (ctx && (margenCarne !== 0 || mofaLeche !== 0)) {
+        new Chart(ctx.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Margen Carne', 'MOFA Leche'],
+            datasets: [{
+              data: [Math.abs(margenCarne), Math.abs(mofaLeche)],
+              backgroundColor: ['#4FADF5', '#4ADE80'],
+              borderColor: '#111',
+              borderWidth: 2
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+        });
+      }
+    }, 50);
+  },
+
+  _renderAlbaranes(content, d) {
+    const { albaranes } = d;
+    const lista = (albaranes || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    const totalImporte = lista.reduce((s, a) => s + (a.importe || 0), 0);
+    const totalKg = lista.reduce((s, a) => s + (a.cantidad || 0), 0);
+
+    content.innerHTML = this._sectionActionsHTML('albaranes', 'Albaranes') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.libroVentas()} Albaranes Emitidos</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Albaranes</small>
+              <span class="text-xl text-blue font-950">${lista.length}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Importe Total</small>
+              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${UI.formatCurrency(totalImporte)}">${UI.formatCurrency(totalImporte)}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total kg</small>
+              <span class="text-xl text-green font-950">${InformesView._fmt(totalKg, 1)}</span>
+            </div>
+          </div>
+        </div>
+
+        ${lista.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.libroVentas()}</div><p class="empty-state-text">No hay albaranes registrados</p></div>` : `
+        <div class="table-scroll scroll-shadow-container mt-10">
+          <table class="inf-table tbl-accent-blue">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>TIPO</th>
+                <th>Importe</th>
+                <th>Cantidad (kg/L)</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>${lista.map(a => `
+              <tr>
+                <td class="nowrap">${a.fecha ? UI.formatDate(a.fecha) : '-'}</td>
+                <td><span class="badge badge-sm ${a.tipo === 'Leche' ? 'badge-gold' : 'badge-amber'}">${a.tipo}</span></td>
+                <td class="text-right font-bold text-amber">${UI.formatCurrency(a.importe)}</td>
+                <td class="text-right">${InformesView._fmt(a.cantidad, 1)}</td>
+                <td><span class="badge badge-sm ${a.estado === 'entregado' ? 'badge-green' : 'badge-amber'}">${a.estado || '—'}</span></td>
+              </tr>`).join('')}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" class="text-right text-gray">TOTALES</td>
+                <td class="text-right font-bold text-amber">${UI.formatCurrency(totalImporte)}</td>
+                <td class="text-right font-bold">${InformesView._fmt(totalKg, 1)}</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>`}
+      </div>
+    `;
+  },
+
   _renderCarne(content, d) {
-    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos } = d;
+    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos, movimientosEntrada } = d;
     const totalIngresos = rent?.detalles?.carne || 0;
     const totalVentas = ventasHist.length;
     const kgTotal = ventasHist.reduce((s, v) => s + (v.kg || 0), 0);
@@ -646,6 +840,125 @@ const InformesView = {
         if (margenA?.length > 0) this._renderScatter('chart-margen-animal-carne', margenA, 'var(--c-warning)');
         if (rentZ?.length > 0) this._renderBarrasZonas('chart-rentabilidad-zonas-carne', rentZ);
       } catch (e) { console.error('[Carne charts]', e); }
+    }, 50);
+
+    // ICA de Cierre — Tandas de Cebo (SIGGAN)
+    const movimientosEntradaSiggan = (movimientosEntrada || []).filter(m => m.tipo === 'entrada');
+    const tandasCebo = movimientosEntradaSiggan.filter(m => m.origen === 'cebo' || (m.motivo_tarea || '').includes('entrada_cebo'));
+    const pesajesTanda = (eventos || []).filter(e => e.motivo_tarea === 'pesaje' && e.tandaId);
+    const consumosSilo = (eventos || []).filter(e => e.motivo_tarea === 'consumo_silo');
+
+    const icaSection = document.getElementById('chart-ica-cebo');
+    if (icaSection) {
+      icaSection.innerHTML = tandasCebo.length > 0 ? `
+      <div class="inf-section-title uppercase font-900 mt-14">ICA de Cierre — Tandas de Cebo (SIGGAN)</div>
+      <div class="card p-12 mb-14 border-222" style="background: rgba(79,173,245,0.03);">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center mb-10">
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Tandas activas</small>
+            <span class="text-xl text-blue font-950">${tandasCebo.length}</span>
+          </div>
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Animales en tanda</small>
+            <span class="text-xl text-green font-950">${InformesView._fmt(tandasCebo.reduce((s, t) => s + (t.numAnimales || 0), 0), 0)}</span>
+          </div>
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Pesajes registrados</small>
+            <span class="text-xl text-amber font-950">${pesajesTanda.length}</span>
+          </div>
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Consumos silo</small>
+            <span class="text-xl text-violet font-950">${consumosSilo.length}</span>
+          </div>
+        </div>
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
+            <thead><tr><th>Movimiento</th><th>Fecha entrada</th><th>Animales</th><th>Peso entrada (kg)</th><th>Pesajes</th><th>Consumo silo (kg)</th></tr></thead>
+            <tbody>${tandasCebo.map(t => {
+              const pesajes = pesajesTanda.filter(p => p.tandaId === t.id || p.movimientoId === t.id);
+              const consumos = consumosSilo.filter(c => c.tandaId === t.id || c.movimientoId === t.id);
+              const pesoEntrada = pesajes.length > 0 ? pesajes[pesajes.length - 1].peso_kg : (t.peso_entrada || 0);
+              return `<tr>
+                <td><strong>${t.numero_seguimiento || t.id}</strong></td>
+                <td>${t.fecha ? UI.formatDate(t.fecha) : '-'}</td>
+                <td class="font-900">${t.numAnimales || 0}</td>
+                <td class="text-right">${InformesView._fmt(pesoEntrada, 1)}</td>
+                <td class="text-center">${pesajes.length}</td>
+                <td class="text-right">${InformesView._fmt(consumos.reduce((s, c) => s + (c.cantidad || 0), 0), 1)}</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>` : '';
+    }
+  },
+
+  _renderProduccion(content, d) {
+    const { produccion } = d;
+    const porTipo = (produccion?.porTipo || []);
+    const total = produccion?.total || 0;
+    const timeline = (produccion?.timeline || []);
+
+    content.innerHTML = this._sectionActionsHTML('produccion', 'Producción') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.grafico()} Control de Producción</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Registros (90d)</small>
+              <span class="text-xl text-blue font-950">${total}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Tipos activos</small>
+              <span class="text-xl text-green font-950">${porTipo.length}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total kg pesados</small>
+              <span class="text-xl text-amber font-950">${InformesView._fmt(porTipo.filter(t => /pesaje|control/i.test(t.tipo)).reduce((s, t) => s + (t.totalKg || 0), 0), 1)}</span>
+            </div>
+          </div>
+        </div>
+
+        ${porTipo.length > 0 ? `
+        <div class="inf-section-title uppercase font-900 mb-8">Por tipo de evento</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          ${porTipo.map(t => `
+            <div class="info-box-sm flex justify-between items-center">
+              <span class="text-ccc text-sm uppercase font-900">${t.tipo}</span>
+              <div class="text-right">
+                <span class="text-white font-950 text-md">${t.count}</span>
+                <span class="text-gray text-xs ml-6">${InformesView._fmt(t.totalKg || 0, 1)} kg</span>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
+
+        ${timeline.length > 1
+        ? '<div class="chart-wrap"><canvas id="chart-prod-timeline" class="chart-canvas"></canvas></div>'
+        : '<div class="inf-small p-16 text-center text-555">Se necesitan al menos 2 registros para mostrar la evolución.</div>'}
+      </div>
+    `;
+    setTimeout(() => {
+      if (timeline.length > 1) {
+        const ctx = document.getElementById('chart-prod-timeline');
+        if (ctx) {
+          new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: timeline.map(t => t.fecha),
+              datasets: [{
+                label: 'Producción',
+                data: timeline.map(t => t.cantidad),
+                borderColor: '#4FADF5',
+                backgroundColor: 'rgba(79,173,245,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+          });
+        }
+      }
     }, 50);
   },
 
@@ -898,7 +1211,7 @@ const InformesView = {
   },
 
   _renderSanidad(content, d) {
-    const { estadisticasSanidad, gastosCat, rebanos, animales, eventos, sanitariosRaw } = d;
+    const { estadisticasSanidad, gastosCat, rebanos, animales, eventos, sanitariosRaw, botiquinStock } = d;
     // Calcular coste sanitario por animal
     const gastosSanitarios = (gastosCat || []).filter(g => (g.categoria || '').toLowerCase() === 'sanidad');
     const totalGastoSanidad = gastosSanitarios.reduce((s, g) => s + g.total, 0);
@@ -973,6 +1286,54 @@ const InformesView = {
         });
       }
     }, 50);
+
+    // Botiquín stock/caducidades
+    if (botiquinStock?.totalProductos > 0) {
+      const botiquinEl = document.createElement('div');
+      botiquinEl.className = 'inf-report card report-section   report-card mt-14';
+      botiquinEl.innerHTML = `
+        <div class="inf-card-title flex items-center gap-6">${Icons.sanidad()} Stock Botiquín</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-8">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Productos</small>
+              <span class="text-xl text-blue font-950">${botiquinStock.totalProductos}</span>
+            </div>
+            <div class="info-box-center py-8">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Lotes</small>
+              <span class="text-xl text-green font-950">${botiquinStock.totalLotes}</span>
+            </div>
+            <div class="info-box-center py-8">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Stock bajo</small>
+              <span class="text-xl font-950 ${botiquinStock.stockBajo.length > 0 ? 'text-red' : 'text-green'}">${botiquinStock.stockBajo.length}</span>
+            </div>
+          </div>
+        </div>
+        ${botiquinStock.proxCaducar.length > 0 ? `
+        <div class="card card-tint-amber mb-10 p-12">
+          <div class="inf-section-title mb-8 text-amber uppercase font-900">${Icons.alerta()} Próximos a caducar (30 días)</div>
+          <div class="grid grid-cols-1 gap-6">
+            ${botiquinStock.proxCaducar.map(p => `
+              <div class="info-box-sm flex justify-between items-center">
+                <span class="text-ccc text-sm font-900">${p.nombre}</span>
+                <span class="text-amber font-800 text-xs">Lote: ${p.lote || '-'} — Caduca: ${p.caducidad}</span>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+        ${botiquinStock.stockBajo.length > 0 ? `
+        <div class="card card-tint-red mb-10 p-12">
+          <div class="inf-section-title mb-8 text-red uppercase font-900">${Icons.alerta()} Stock bajo</div>
+          <div class="grid grid-cols-1 gap-6">
+            ${botiquinStock.stockBajo.map(p => `
+              <div class="info-box-sm flex justify-between items-center">
+                <span class="text-ccc text-sm font-900">${p.nombre}</span>
+                <span class="text-red font-800 text-xs">${InformesView._fmt(p.cantidadActual, 0)} / ${InformesView._fmt(p.cantidadMinima, 0)} ${p.unidad || 'dosis'}</span>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+      `;
+      content.querySelector('.report-section:last-child')?.appendChild(botiquinEl);
+    }
   },
 
   _renderCenso(content, d) {
@@ -1170,8 +1531,77 @@ const InformesView = {
           </div>
         </div>`;
         })() : ''}
+
+        ${ventas.length > 1 ? (() => {
+          const porMes = {};
+          ventas.forEach(v => {
+            const mes = (v.fechaSacrificio || v.fecha_emision || '').slice(0, 7);
+            if (!mes) return;
+            const kg = v.pesoCanal || v.pesoVivo || 0;
+            const base = (v.precio_total || 0) - (v.importe_iva || 0);
+            if (!porMes[mes]) porMes[mes] = { kg: 0, base: 0, num: 0 };
+            porMes[mes].kg += kg;
+            porMes[mes].base += base;
+            porMes[mes].num++;
+          });
+          const evolucion = Object.entries(porMes).map(([mes, d]) => ({
+            mes,
+            precioMedio: d.kg > 0 ? (d.base / d.kg) : 0,
+            kg: d.kg,
+            num: d.num
+          })).sort((a, b) => a.mes.localeCompare(b.mes));
+
+          return evolucion.length > 1 ? `
+        <div class="inf-section-title uppercase font-900 mt-14">Evolución temporal — Precio medio €/kg</div>
+        <div class="chart-wrap mb-10"><canvas id="chart-ventas-evolucion" class="chart-canvas"></canvas></div>` : '';
+        })() : ''}
       </div>
     `;
+
+    // Gráfico de evolución temporal de precios medios
+    setTimeout(() => {
+      const evolucionData = (() => {
+        const porMes = {};
+        ventas.forEach(v => {
+          const mes = (v.fechaSacrificio || v.fecha_emision || '').slice(0, 7);
+          if (!mes) return;
+          const kg = v.pesoCanal || v.pesoVivo || 0;
+          const base = (v.precio_total || 0) - (v.importe_iva || 0);
+          if (!porMes[mes]) porMes[mes] = { kg: 0, base: 0, num: 0 };
+          porMes[mes].kg += kg;
+          porMes[mes].base += base;
+          porMes[mes].num++;
+        });
+        return Object.entries(porMes).map(([mes, d]) => ({
+          mes,
+          precioMedio: d.kg > 0 ? (d.base / d.kg) : 0,
+          kg: d.kg,
+          num: d.num
+        })).sort((a, b) => a.mes.localeCompare(b.mes));
+      })();
+
+      if (evolucionData.length > 1) {
+        const ctxE = document.getElementById('chart-ventas-evolucion');
+        if (ctxE) {
+          new Chart(ctxE.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: evolucionData.map(e => e.mes),
+              datasets: [{
+                label: '€/kg medio',
+                data: evolucionData.map(e => InformesView._fmt(e.precioMedio, 2)),
+                borderColor: '#4FADF5',
+                backgroundColor: 'rgba(79,173,245,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+          });
+        }
+      }
+    }, 100);
   },
 
   // ===================== INFORME COMPRADORES =====================
@@ -2209,7 +2639,7 @@ const InformesView = {
 
   /** Trámites: estado sanitario por campaña de saneamiento + restricciones de movimiento activas */
   _renderTramites(content, d) {
-    const { tramitesData } = d;
+    const { tramitesData, docsLegales, pedidosCrotales } = d;
     const data = tramitesData || { porCampana: [], restriccionesActivas: 0, totalSaneamientos: 0 };
     const colorCalificacion = (c) => (c || '').toLowerCase().includes('indemne') || (c || '').toLowerCase().startsWith('t3') || (c || '').toLowerCase().startsWith('m3') || (c || '').toLowerCase().startsWith('b4') ? 'var(--c-success)' : 'var(--c-warning)';
 
@@ -2245,7 +2675,45 @@ const InformesView = {
               </tr>`).join('')}</tbody>
           </table>
         </div>` : `<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.documento()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin saneamientos registrados.</p></div>`}
-      </div>`;
+      </div>
+
+      ${(docsLegales || []).filter(d => d.tipo === 'dimoe').length > 0 ? `
+      <div class="inf-report card report-section   report-card mt-14">
+        <div class="inf-card-title flex items-center gap-6">${Icons.documento()} Guías DIMOE Emitidas</div>
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
+            <thead><tr><th>Fecha emisión</th><th>Destinatario</th><th>NIF</th><th>Estado</th><th>Firma</th></tr></thead>
+            <tbody>${docsLegales.filter(d => d.tipo === 'dimoe').map(d => `
+              <tr>
+                <td>${d.fecha_emision ? UI.formatDate(d.fecha_emision) : '-'}</td>
+                <td>${d.destinatario || '-'}</td>
+                <td class="text-gray text-xs">${d.nif || '-'}</td>
+                <td><span class="badge badge-sm ${d.estado === 'firmado' ? 'badge-green' : 'badge-amber'}">${d.estado || 'pendiente'}</span></td>
+                <td class="text-xs text-gray">${d.firma ? 'Firmado' : 'Pendiente'}</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>` : ''}
+
+      ${(pedidosCrotales || []).length > 0 ? `
+      <div class="inf-report card report-section   report-card mt-14">
+        <div class="inf-card-title flex items-center gap-6">${Icons.documento()} Pedidos de Crotales</div>
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
+            <thead><tr><th>Fecha pedido</th><th>Especie</th><th>Tipo</th><th>Cantidad</th><th>Estado</th><th>Seguimiento</th></tr></thead>
+            <tbody>${pedidosCrotales.map(p => `
+              <tr>
+                <td>${p.fecha_pedido ? UI.formatDate(p.fecha_pedido) : '-'}</td>
+                <td>${p.especie || '-'}</td>
+                <td>${p.tipo || '-'}</td>
+                <td class="text-right font-900">${p.cantidad || 0}</td>
+                <td><span class="badge badge-sm ${p.estado === 'entregado' ? 'badge-green' : (p.estado === 'pendiente' ? 'badge-amber' : 'badge-blue')}">${p.estado || 'pendiente'}</span></td>
+                <td class="text-xs text-gray">${p.numero_seguimiento || '-'}</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>` : ''}
+    `;
   },
 
   /** Contratos próximos a vencer o ya vencidos */
