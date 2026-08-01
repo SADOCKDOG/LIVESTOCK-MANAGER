@@ -1531,8 +1531,77 @@ const InformesView = {
           </div>
         </div>`;
         })() : ''}
+
+        ${ventas.length > 1 ? (() => {
+          const porMes = {};
+          ventas.forEach(v => {
+            const mes = (v.fechaSacrificio || v.fecha_emision || '').slice(0, 7);
+            if (!mes) return;
+            const kg = v.pesoCanal || v.pesoVivo || 0;
+            const base = (v.precio_total || 0) - (v.importe_iva || 0);
+            if (!porMes[mes]) porMes[mes] = { kg: 0, base: 0, num: 0 };
+            porMes[mes].kg += kg;
+            porMes[mes].base += base;
+            porMes[mes].num++;
+          });
+          const evolucion = Object.entries(porMes).map(([mes, d]) => ({
+            mes,
+            precioMedio: d.kg > 0 ? (d.base / d.kg) : 0,
+            kg: d.kg,
+            num: d.num
+          })).sort((a, b) => a.mes.localeCompare(b.mes));
+
+          return evolucion.length > 1 ? `
+        <div class="inf-section-title uppercase font-900 mt-14">Evolución temporal — Precio medio €/kg</div>
+        <div class="chart-wrap mb-10"><canvas id="chart-ventas-evolucion" class="chart-canvas"></canvas></div>` : '';
+        })() : ''}
       </div>
     `;
+
+    // Gráfico de evolución temporal de precios medios
+    setTimeout(() => {
+      const evolucionData = (() => {
+        const porMes = {};
+        ventas.forEach(v => {
+          const mes = (v.fechaSacrificio || v.fecha_emision || '').slice(0, 7);
+          if (!mes) return;
+          const kg = v.pesoCanal || v.pesoVivo || 0;
+          const base = (v.precio_total || 0) - (v.importe_iva || 0);
+          if (!porMes[mes]) porMes[mes] = { kg: 0, base: 0, num: 0 };
+          porMes[mes].kg += kg;
+          porMes[mes].base += base;
+          porMes[mes].num++;
+        });
+        return Object.entries(porMes).map(([mes, d]) => ({
+          mes,
+          precioMedio: d.kg > 0 ? (d.base / d.kg) : 0,
+          kg: d.kg,
+          num: d.num
+        })).sort((a, b) => a.mes.localeCompare(b.mes));
+      })();
+
+      if (evolucionData.length > 1) {
+        const ctxE = document.getElementById('chart-ventas-evolucion');
+        if (ctxE) {
+          new Chart(ctxE.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: evolucionData.map(e => e.mes),
+              datasets: [{
+                label: '€/kg medio',
+                data: evolucionData.map(e => InformesView._fmt(e.precioMedio, 2)),
+                borderColor: '#4FADF5',
+                backgroundColor: 'rgba(79,173,245,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+          });
+        }
+      }
+    }, 100);
   },
 
   // ===================== INFORME COMPRADORES =====================
