@@ -127,7 +127,9 @@ vistas afectadas comprobando que ninguna sale vacía. Mantener `runLacteoTests()
 
 ## 5. Diseño — FASE B: Reorganización de Informes (5 categorías)
 
-Estructura final de `_categories` en `js/views/informes-view.js`:
+Estructura final de `_categories` en `js/views/informes-view.js`. Orden en la barra:
+**General · GeGan · ExPro · CoMer · Libros** — General va primera por ser la vista de entrada
+más genérica (decisión UX de la revisión del spec, 2026-08-01):
 
 ### GeGan — gestión del rebaño (6)
 | Pestaña | Estado |
@@ -165,8 +167,10 @@ Estructura final de `_categories` en `js/views/informes-view.js`:
 ### Libros — económico/oficial (6, sin cambios)
 PyG · Flujo Caja · Break-Even · PAC · Exportar · REGA
 
-### General — transversal (5, nueva categoría)
-General · Por Finca · Alertas · Eficiencia · Rent. Especie (todas **movidas desde GeGan**)
+### General — transversal (5, nueva categoría, **primera posición** en la barra)
+General · Por Finca · Alertas · Eficiencia · Rent. Especie (todas **movidas desde GeGan**).
+Al entrar a Informes, la pestaña por defecto pasa de `carne` (GeGan) a `general` (General):
+vista de entrada transversal en lugar de una pestaña sujeta a flag.
 
 ### Backlog "visión C" (documentado, NO implementado en esta fase)
 Requieren captura de datos nuevos en modelos:
@@ -181,6 +185,8 @@ Requieren captura de datos nuevos en modelos:
   automáticamente (`informes-view.js:198-212`).
 - Se actualizan `_obtenerCategoriaDeTab`, `_obtenerIconoDeSubTab` y los colores de categoría
   (añadir color para `general`).
+- Los valores por defecto `_currentTab`/`_currentCategory` pasan de `carne`/`gegan` a
+  `general`/`general` (`informes-view.js:10-11`).
 - Las pestañas con flag (`carne`, `leche`) mantienen `_esTabPermitida` (`informes-view.js:75-79`).
 
 ## 7. Manejo de errores y estados vacíos
