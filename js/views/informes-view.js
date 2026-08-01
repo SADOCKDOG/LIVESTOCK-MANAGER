@@ -2148,7 +2148,7 @@ const InformesView = {
     content.innerHTML = this._sectionActionsHTML('rega', 'REGA') + `
       <div class="inf-report mb-14">
         <!-- KPIs Unificados -->
-        <div class="card p-12 mb-14 border-222 style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background: rgba(255, 255, 255, 0.02);">
+        <div class="card p-12 mb-14 border-222" style="--registro-color: var(--c-gray); background: rgba(255, 255, 255, 0.02);">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div class="info-box-center py-10">
               <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Censo Total</small>
@@ -2169,7 +2169,7 @@ const InformesView = {
           </div>
         </div>
         <!-- Datos Explotación -->
-        <div class="card report-section   report-card style="--registro-color: var(--c-gold);"--registro-color: var(--c-gold);"">
+        <div class="card report-section   report-card" style="--registro-color: var(--c-gold);">
           <div class="inf-card-title">${Icons.finca()} Datos de la Explotación</div>
           <div class="grid grid-cols-2 gap-8 text-sm">
             <div><span class="text-gray">Nombre:</span> <strong>${finca.nombre || 'N/D'}</strong></div>
@@ -2195,9 +2195,9 @@ const InformesView = {
         </div>
 
         <!-- Resumen Censo -->
-        <div class="card report-section   report-card style="--registro-color: var(--c-success);"--registro-color: var(--c-success);"">
+        <div class="card report-section   report-card" style="--registro-color: var(--c-success);">
           <div class="inf-card-title">${Icons.animales()} Censo Actual</div>
-          <div class="card p-12 mb-12 border-222 style="--registro-color: var(--c-gray);"--registro-color: var(--c-gray);"" style="background:rgba(255,255,255,0.02);">
+          <div class="card p-12 mb-12 border-222" style="--registro-color: var(--c-gray); background:rgba(255,255,255,0.02);">
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
               <div class="info-box-center py-6">
                 <small class="text-neutral block text-[0.6rem] mb-4 uppercase font-800">Total Animales</small>
@@ -2297,7 +2297,7 @@ const InformesView = {
         </div>
 
         <!-- Movimientos recientes -->
-        <div class="card report-section   report-card style="--registro-color: var(--c-purple);"--registro-color: var(--c-purple);"">
+        <div class="card report-section   report-card" style="--registro-color: var(--c-purple);">
           <div class="inf-card-title">${Icons.paquete()} Últimos Movimientos</div>
           ${eventosRecientes.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.paquete()}</div><p class="empty-state-text">Sin movimientos registrados</p></div>` : `
           <div class="table-scroll scroll-shadow-container">

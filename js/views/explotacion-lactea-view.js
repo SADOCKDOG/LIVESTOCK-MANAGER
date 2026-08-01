@@ -335,21 +335,21 @@ window.ExplotacionLacteaView = {
 
         <div class="grid grid-cols-1 gap-12">
           <div class="card p-12">
-            <canvas id="chart-produccion-mensual" style="height: 300px;"></canvas>
+            <div class="chart-wrap"><canvas id="chart-produccion-mensual" class="chart-canvas"></canvas></div>
           </div>
           <div class="grid grid-cols-2 gap-12">
             <div class="card p-12">
-              <canvas id="chart-calidad-leche" style="height: 250px;"></canvas>
+              <div class="chart-wrap"><canvas id="chart-calidad-leche" class="chart-canvas"></canvas></div>
             </div>
             <div class="card p-12">
-              <canvas id="chart-composicion" style="height: 250px;"></canvas>
+              <div class="chart-wrap"><canvas id="chart-composicion" class="chart-canvas"></canvas></div>
             </div>
           </div>
           <div class="card p-12">
-            <canvas id="chart-comparativa-tanques" style="height: 250px;"></canvas>
+            <div class="chart-wrap"><canvas id="chart-comparativa-tanques" class="chart-canvas"></canvas></div>
           </div>
           <div class="card p-12">
-            <canvas id="chart-curva-lactacion" style="height: 300px;"></canvas>
+            <div class="chart-wrap"><canvas id="chart-curva-lactacion" class="chart-canvas"></canvas></div>
           </div>
         </div>
       </div>
