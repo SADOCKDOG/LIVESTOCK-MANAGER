@@ -884,6 +884,59 @@
         }
       }
 
+      // 16. Saneamientos (GeGan > Sanidad > Saneamientos; alimenta ExPro > Trámites y banner Guía 365)
+      var sanFecha2025 = '2025-11-14';
+      var sanFecha2026 = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var sanProxima = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var saneamientosDefs = [
+        {
+          fincaId: fincaId,
+          campana: 'tuberculosis',
+          fecha: sanFecha2025,
+          veterinario: DEMO_FINCA.adsg_veterinario,
+          veterinario_colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          adsg_nombre: DEMO_FINCA.adsg_nombre,
+          especie: 'Bovino',
+          num_examinados: 6,
+          num_positivos: 0,
+          calificacion: 'indemne',
+          tubo: '',
+          sexo: '',
+          restriccion_movimientos: false,
+          motivo_restriccion: '',
+          proxima_actuacion: '',
+          notas: 'Campaña anual TBC 2025. Explotación oficialmente indemne (T3).'
+        },
+        {
+          fincaId: fincaId,
+          campana: 'brucelosis_b',
+          fecha: sanFecha2026,
+          veterinario: DEMO_FINCA.adsg_veterinario,
+          veterinario_colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          adsg_nombre: DEMO_FINCA.adsg_nombre,
+          especie: 'Bovino',
+          num_examinados: 6,
+          num_positivos: 1,
+          calificacion: 'calificada',
+          tubo: '',
+          sexo: '',
+          restriccion_movimientos: true,
+          motivo_restriccion: 'Positivo en brucelosis bovina',
+          proxima_actuacion: sanProxima,
+          notas: '1 positivo en rasquiña — animal aislado. Reconocimiento de resaneo programado.'
+        }
+      ];
+      for (var sn = 0; sn < saneamientosDefs.length; sn++) {
+        try {
+          var saneaId = await Saneamientos.save(saneamientosDefs[sn]);
+          // Saneamientos.save construye su propio objeto y NO propaga `demo`: parchear
+          var sanObj = await window.db.get('saneamientos', saneaId);
+          if (sanObj) { sanObj.demo = true; await window.db.put('saneamientos', sanObj); }
+        } catch (e) { console.log('[SEED] Error saneamiento:', e.message); }
+        await sleep(80);
+      }
+      console.log('[SEED] Saneamientos creados: 2');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
