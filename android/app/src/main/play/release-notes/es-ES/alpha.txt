@@ -1,5 +1,3 @@
-- Nuevo módulo de trazabilidad Letra Q (RD 989/2022) para explotaciones lácteas: control de movimientos, plazos de comunicación y operadores autorizados.
-- Corregidos errores críticos en el módulo lácteo: cálculo de margen MOFA, validación de tanques, y visualización del formulario de recogida.
-- Nuevos accesos directos para registrar analíticas de leche y movimientos de tanque desde las pestañas de Control y Balance.
-- Mejorada la navegación por pestañas en pantallas móviles: ahora se pueden deslizar correctamente en dispositivos de gama estrecha.
-- Corregido un problema de configuración que afectaba a los enlaces de la aplicación.
+- Reorganización completa del módulo Informes en 5 categorías (General, GeGan, ExPro, CoMer, Libros) alineadas con los módulos reales de la app.
+- Nuevos informes: Producción, Gastos operativos, Márgenes comerciales, Albaranes, ICA de tandas de cebo, stock de Botiquín, Guías DIMOE y pedidos de crotales.
+- Corregidos: desplazamiento de pantalla en Informe REGA y gráficos que se salían de pantalla en Explotación Láctea.
