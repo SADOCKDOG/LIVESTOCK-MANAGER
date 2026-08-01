@@ -98,5 +98,5 @@ play {
     // track.set("alpha")
     
     defaultToAppBundles.set(true)
-    releaseName.set("4.9.0 (515) - Industrial Premium Optimized")
+    releaseName.set("4.10.1 (521)")
 }
