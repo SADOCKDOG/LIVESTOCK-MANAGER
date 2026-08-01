@@ -1103,6 +1103,47 @@
       }
       console.log('[SEED] Documentos PAC creados: 2');
 
+      // 21. Botiquín (GeGan > Sanidad > Botiquín) — productos + lotes
+      var botCaducaPronto = new Date(Date.now() + 18 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var botCaducaLejos = new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var botCaducaMedio = new Date(Date.now() + 150 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var botiquinDefs = [
+        { nombre: 'Vacuna Lengua Azul BTV-4', tipo: 'vacuna', unidad: 'dosis', cantidadActual: 42, cantidadMinima: 20, lote: 'LBTV4-2026-031', caducidad: botCaducaPronto },
+        { nombre: 'Oxitetraciclina 20% LA', tipo: 'antibiotico', unidad: 'ml', cantidadActual: 15, cantidadMinima: 100, lote: 'OXI-2025-118', caducidad: botCaducaMedio },
+        { nombre: 'Ivermectina 1% inyectable', tipo: 'desparasitante', unidad: 'dosis', cantidadActual: 60, cantidadMinima: 30, lote: '', caducidad: null },
+        { nombre: 'Meloxicam 20 mg/ml', tipo: 'medicamento', unidad: 'ml', cantidadActual: 3, cantidadMinima: 50, lote: 'MLX-2026-007', caducidad: botCaducaLejos }
+      ];
+      for (var bq = 0; bq < botiquinDefs.length; bq++) {
+        try {
+          var bqDef = botiquinDefs[bq];
+          var bqId = await window.db.add('config_botiquin', {
+            demo: true,
+            fincaId: fincaId,
+            nombre: bqDef.nombre,
+            tipo: bqDef.tipo,
+            unidad: bqDef.unidad,
+            cantidadActual: bqDef.cantidadActual,
+            cantidadMinima: bqDef.cantidadMinima,
+            lote: bqDef.lote,
+            caducidad: bqDef.caducidad,
+            notas: '',
+            creadoEn: new Date().toISOString()
+          });
+          if (bqDef.lote) {
+            await window.db.add('botiquin_lotes', {
+              demo: true,
+              productoId: bqId,
+              lote: bqDef.lote,
+              caducidad: bqDef.caducidad,
+              cantidad: bqDef.cantidadActual,
+              creadoEn: new Date().toISOString()
+            });
+          }
+        } catch (e) { console.log('[SEED] Error producto botiquín:', e.message); }
+        await sleep(60);
+      }
+      console.log('[SEED] Botiquín creado: 4 productos, 3 lotes');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
