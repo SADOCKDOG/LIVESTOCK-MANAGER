@@ -754,7 +754,7 @@ const InformesView = {
   },
 
   _renderCarne(content, d) {
-    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos } = d;
+    const { rent, margenA, ventasHist, gastosCat, rentZ, ventasPorRebano, eventos, movimientosEntrada } = d;
     const totalIngresos = rent?.detalles?.carne || 0;
     const totalVentas = ventasHist.length;
     const kgTotal = ventasHist.reduce((s, v) => s + (v.kg || 0), 0);
@@ -841,6 +841,56 @@ const InformesView = {
         if (rentZ?.length > 0) this._renderBarrasZonas('chart-rentabilidad-zonas-carne', rentZ);
       } catch (e) { console.error('[Carne charts]', e); }
     }, 50);
+
+    // ICA de Cierre — Tandas de Cebo (SIGGAN)
+    const movimientosEntradaSiggan = (movimientosEntrada || []).filter(m => m.tipo === 'entrada');
+    const tandasCebo = movimientosEntradaSiggan.filter(m => m.origen === 'cebo' || (m.motivo_tarea || '').includes('entrada_cebo'));
+    const pesajesTanda = (eventos || []).filter(e => e.motivo_tarea === 'pesaje' && e.tandaId);
+    const consumosSilo = (eventos || []).filter(e => e.motivo_tarea === 'consumo_silo');
+
+    const icaSection = document.getElementById('chart-ica-cebo');
+    if (icaSection) {
+      icaSection.innerHTML = tandasCebo.length > 0 ? `
+      <div class="inf-section-title uppercase font-900 mt-14">ICA de Cierre — Tandas de Cebo (SIGGAN)</div>
+      <div class="card p-12 mb-14 border-222" style="background: rgba(79,173,245,0.03);">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center mb-10">
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Tandas activas</small>
+            <span class="text-xl text-blue font-950">${tandasCebo.length}</span>
+          </div>
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Animales en tanda</small>
+            <span class="text-xl text-green font-950">${InformesView._fmt(tandasCebo.reduce((s, t) => s + (t.numAnimales || 0), 0), 0)}</span>
+          </div>
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Pesajes registrados</small>
+            <span class="text-xl text-amber font-950">${pesajesTanda.length}</span>
+          </div>
+          <div class="info-box-center py-8">
+            <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Consumos silo</small>
+            <span class="text-xl text-violet font-950">${consumosSilo.length}</span>
+          </div>
+        </div>
+        <div class="table-scroll scroll-shadow-container">
+          <table class="inf-table inf-table-sm tbl-accent-blue">
+            <thead><tr><th>Movimiento</th><th>Fecha entrada</th><th>Animales</th><th>Peso entrada (kg)</th><th>Pesajes</th><th>Consumo silo (kg)</th></tr></thead>
+            <tbody>${tandasCebo.map(t => {
+              const pesajes = pesajesTanda.filter(p => p.tandaId === t.id || p.movimientoId === t.id);
+              const consumos = consumosSilo.filter(c => c.tandaId === t.id || c.movimientoId === t.id);
+              const pesoEntrada = pesajes.length > 0 ? pesajes[pesajes.length - 1].peso_kg : (t.peso_entrada || 0);
+              return `<tr>
+                <td><strong>${t.numero_seguimiento || t.id}</strong></td>
+                <td>${t.fecha ? UI.formatDate(t.fecha) : '-'}</td>
+                <td class="font-900">${t.numAnimales || 0}</td>
+                <td class="text-right">${InformesView._fmt(pesoEntrada, 1)}</td>
+                <td class="text-center">${pesajes.length}</td>
+                <td class="text-right">${InformesView._fmt(consumos.reduce((s, c) => s + (c.cantidad || 0), 0), 1)}</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>` : '';
+    }
   },
 
   _renderProduccion(content, d) {
