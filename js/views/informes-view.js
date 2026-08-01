@@ -370,6 +370,8 @@ const InformesView = {
         case 'cargas': this._renderCargas(content, d); break;
         case 'produccion': this._renderProduccion(content, d); break;
         case 'gastos': this._renderGastos(content, d); break;
+        case 'margenes': this._renderMargenes(content, d); break;
+        case 'albaranes': this._renderAlbaranes(content, d); break;
         case 'pyg': this._renderPyG(content, d); break;
         case 'flujo-caja': this._renderFlujoCaja(content, d); break;
         case 'breakeven': this._renderBreakEven(content, d); break;
@@ -634,6 +636,121 @@ const InformesView = {
         }
       }
     }, 50);
+  },
+
+  _renderMargenes(content, d) {
+    const { margenes } = d;
+    const margenCarne = margenes?.margenCarneNeto || 0;
+    const mofaLeche = margenes?.mofaLeche || 0;
+    const margenTotal = margenes?.margenTotal || 0;
+
+    content.innerHTML = this._sectionActionsHTML('margenes', 'Márgenes') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.dinero()} Márgenes Comerciales</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Neto Carne</small>
+              <span class="text-xl ${margenCarne >= 0 ? 'text-green' : 'text-red'} font-950">${margenCarne >= 0 ? '+' : ''}${UI.formatCurrency(margenCarne)}</span>
+              <small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Transporte + Matanza deducidos</small>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">MOFA Leche</small>
+              <span class="text-xl ${mofaLeche >= 0 ? 'text-green' : 'text-red'} font-950">${mofaLeche >= 0 ? '+' : ''}${UI.formatCurrency(mofaLeche)}</span>
+              <small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Ingresos − Alimentación (período)</small>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Margen Total</small>
+              <span class="text-xl ${margenTotal >= 0 ? 'text-green' : 'text-red'} font-950">${margenTotal >= 0 ? '+' : ''}${UI.formatCurrency(margenTotal)}</span>
+              <small class="text-gray text-[0.55rem] uppercase font-800 mt-4">Carne + Leche combinado</small>
+            </div>
+          </div>
+        </div>
+
+        ${margenCarne !== 0 || mofaLeche !== 0
+        ? '<div class="chart-wrap"><canvas id="chart-margenes" class="chart-canvas"></canvas></div>'
+        : '<div class="empty-state border border-222"><div class="empty-state-icon" style="color:#555;">${Icons.dinero()}</div><p class="empty-state-text uppercase font-900 text-xs">Sin datos de margen. Registra ventas y albaranes para ver el cálculo.</p></div>'}
+      </div>
+    `;
+    setTimeout(() => {
+      const ctx = document.getElementById('chart-margenes');
+      if (ctx && (margenCarne !== 0 || mofaLeche !== 0)) {
+        new Chart(ctx.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Margen Carne', 'MOFA Leche'],
+            datasets: [{
+              data: [Math.abs(margenCarne), Math.abs(mofaLeche)],
+              backgroundColor: ['#4FADF5', '#4ADE80'],
+              borderColor: '#111',
+              borderWidth: 2
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+        });
+      }
+    }, 50);
+  },
+
+  _renderAlbaranes(content, d) {
+    const { albaranes } = d;
+    const lista = (albaranes || []).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    const totalImporte = lista.reduce((s, a) => s + (a.importe || 0), 0);
+    const totalKg = lista.reduce((s, a) => s + (a.cantidad || 0), 0);
+
+    content.innerHTML = this._sectionActionsHTML('albaranes', 'Albaranes') + `
+      <div class="inf-report card report-section   report-card">
+        <div class="inf-card-title flex items-center gap-6">${Icons.libroVentas()} Albaranes Emitidos</div>
+        <div class="card p-12 mb-14 border-222" style="background: rgba(255, 255, 255, 0.02);">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 text-center">
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total Albaranes</small>
+              <span class="text-xl text-blue font-950">${lista.length}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Importe Total</small>
+              <span class="text-xl text-amber font-950 truncate w-full px-4" title="${UI.formatCurrency(totalImporte)}">${UI.formatCurrency(totalImporte)}</span>
+            </div>
+            <div class="info-box-center py-10">
+              <small class="text-neutral block text-[0.62rem] mb-4 uppercase font-800">Total kg</small>
+              <span class="text-xl text-green font-950">${InformesView._fmt(totalKg, 1)}</span>
+            </div>
+          </div>
+        </div>
+
+        ${lista.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">${Icons.libroVentas()}</div><p class="empty-state-text">No hay albaranes registrados</p></div>` : `
+        <div class="table-scroll scroll-shadow-container mt-10">
+          <table class="inf-table tbl-accent-blue">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>TIPO</th>
+                <th>Importe</th>
+                <th>Cantidad (kg/L)</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>${lista.map(a => `
+              <tr>
+                <td class="nowrap">${a.fecha ? UI.formatDate(a.fecha) : '-'}</td>
+                <td><span class="badge badge-sm ${a.tipo === 'Leche' ? 'badge-gold' : 'badge-amber'}">${a.tipo}</span></td>
+                <td class="text-right font-bold text-amber">${UI.formatCurrency(a.importe)}</td>
+                <td class="text-right">${InformesView._fmt(a.cantidad, 1)}</td>
+                <td><span class="badge badge-sm ${a.estado === 'entregado' ? 'badge-green' : 'badge-amber'}">${a.estado || '—'}</span></td>
+              </tr>`).join('')}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" class="text-right text-gray">TOTALES</td>
+                <td class="text-right font-bold text-amber">${UI.formatCurrency(totalImporte)}</td>
+                <td class="text-right font-bold">${InformesView._fmt(totalKg, 1)}</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>`}
+      </div>
+    `;
   },
 
   _renderCarne(content, d) {
