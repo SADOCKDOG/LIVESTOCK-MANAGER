@@ -259,9 +259,9 @@ Localizar en `js/seed-data.js` el comentario `// Seed completado` (~línea 887) 
       ];
       for (var sn = 0; sn < saneamientosDefs.length; sn++) {
         try {
-          var sanId = await Saneamientos.save(saneamientosDefs[sn]);
+          var saneaId = await Saneamientos.save(saneamientosDefs[sn]);
           // Saneamientos.save construye su propio objeto y NO propaga `demo`: parchear
-          var sanObj = await window.db.get('saneamientos', sanId);
+          var sanObj = await window.db.get('saneamientos', saneaId);
           if (sanObj) { sanObj.demo = true; await window.db.put('saneamientos', sanObj); }
         } catch (e) { console.log('[SEED] Error saneamiento:', e.message); }
         await sleep(80);
@@ -338,8 +338,8 @@ git push origin feat/demo-chamorro-siembra-ampliada
           acuse_manual: ''
         }
       ];
-      for (var pc = 0; pc < pedidosCrotalesDefs.length; pc++) {
-        try { await PedidosCrotales.save(pedidosCrotalesDefs[pc]); }
+      for (var crotI = 0; crotI < pedidosCrotalesDefs.length; crotI++) {
+        try { await PedidosCrotales.save(pedidosCrotalesDefs[crotI]); }
         catch (e) { console.log('[SEED] Error pedido crotales:', e.message); }
         await sleep(80);
       }
