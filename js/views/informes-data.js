@@ -470,6 +470,131 @@ Object.assign(window.InformesView, {
       console.error('[ContratosVencimiento]', e);
       return { contratos: [], proximosAVencer: 0, vencidos: 0 };
     }
+  },
+
+  // ===================== LOADERS NUEVOS (Fase B) =====================
+
+  async _obtenerProduccion(fincaId) {
+    try {
+      const eventos = await window.db.getAllFromIndex('registro_eventos', 'fincaId', Number(fincaId)).catch(() => []);
+      if (!eventos?.length) return { porTipo: [], total: 0, timeline: [] };
+      const hoy = new Date();
+      const hace90d = new Date(hoy.getTime() - 90 * 24 * 60 * 60 * 1000);
+      const recientes = eventos.filter(e => new Date(e.fecha) >= hace90d);
+      const porTipo = {};
+      recientes.forEach(e => {
+        const tipo = e.motivo_tarea || e.tipo_evento || 'otro';
+        if (!porTipo[tipo]) porTipo[tipo] = { tipo, count: 0, totalKg: 0, totalLitros: 0 };
+        porTipo[tipo].count++;
+        if (e.peso_kg) porTipo[tipo].totalKg += (e.peso_kg || 0);
+        if (e.cantidad_litros) porTipo[tipo].totalLitros += (e.cantidad_litros || 0);
+      });
+      return {
+        porTipo: Object.values(porTipo).sort((a, b) => b.count - a.count),
+        total: recientes.length,
+        timeline: recientes
+          .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+          .map(e => ({ fecha: e.fecha, tipo: e.motivo_tarea || e.tipo_evento || 'otro', cantidad: e.peso_kg || e.cantidad_litros || 0 }))
+      };
+    } catch (e) {
+      console.error('[Produccion]', e);
+      return { porTipo: [], total: 0, timeline: [] };
+    }
+  },
+
+  async _obtenerGastosOperativos(fincaId) {
+    try {
+      const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', Number(fincaId)).catch(() => []);
+      if (!gastos?.length) return { porCategoria: [], porProveedor: [], porMes: [] };
+      const cats = ['Alimentacion', 'Sanidad', 'Fitosanitarios', 'Electricidad', 'Personal', 'Amortizacion'];
+      const porCat = {};
+      const porProv = {};
+      const porMes = {};
+      gastos.forEach(g => {
+        const cat = g.categoria || 'Otros';
+        const proveedor = g.proveedorId || 'N/D';
+        const mes = (g.fecha || '').slice(0, 7);
+        porCat[cat] = (porCat[cat] || 0) + (g.monto || 0);
+        porProv[proveedor] = (porProv[proveedor] || 0) + (g.monto || 0);
+        if (mes) porMes[mes] = (porMes[mes] || 0) + (g.monto || 0);
+      });
+      return {
+        porCategoria: Object.entries(porCat).map(([c, t]) => ({ categoria: c, total: t })).sort((a, b) => b.total - a.total),
+        porProveedor: Object.entries(porProv).map(([p, t]) => ({ proveedor: p, total: t })).sort((a, b) => b.total - a.total),
+        porMes: Object.entries(porMes).map(([m, t]) => ({ mes: m, total: t })).sort((a, b) => a.mes.localeCompare(b.mes))
+      };
+    } catch (e) {
+      console.error('[GastosOperativos]', e);
+      return { porCategoria: [], porProveedor: [], porMes: [] };
+    }
+  },
+
+  async _obtenerMargenes(fincaId) {
+    try {
+      const [ventas, entregas] = await Promise.all([
+        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', Number(fincaId)).catch(() => []),
+        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', Number(fincaId)).catch(() => [])
+      ]);
+      const ingresoCarne = ventas.reduce((s, v) => s + (v.precio_total || 0), 0);
+      const gastoTransporte = ventas.reduce((s, v) => s + (parseFloat(v.Gasto_Transporte) || 0), 0);
+      const gastoMatanza = ventas.reduce((s, v) => s + (parseFloat(v.Gasto_Matanza) || 0), 0);
+      const margenCarneNeto = ingresoCarne - gastoTransporte - gastoMatanza;
+      const ingresosLeche = entregas.reduce((s, e) => s + (e.importe_total || 0), 0);
+      const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []);
+      const gastosAlim = gastos.filter(g => {
+        const cat = (g.categoria || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        return cat.includes('aliment') && !g.anulado;
+      });
+      const fechasRecogida = entregas.map(e => new Date(e.fechaRecogida || e.fecha)).filter(d => !isNaN(d));
+      let mofaLeche = 0;
+      if (fechasRecogida.length > 0) {
+        const fechaMin = new Date(Math.min(...fechasRecogida));
+        const fechaMax = new Date(Math.max(...fechasRecogida));
+        const totalGastosAlim = gastosAlim.reduce((s, g) => {
+          const fGasto = new Date(g.fecha);
+          return (fGasto >= fechaMin && fGasto <= fechaMax) ? s + (parseFloat(g.importe) || 0) : s;
+        }, 0);
+        mofaLeche = ingresosLeche - totalGastosAlim;
+      }
+      return { margenCarneNeto, mofaLeche, margenTotal: margenCarneNeto + mofaLeche };
+    } catch (e) {
+      console.error('[Margenes]', e);
+      return { margenCarneNeto: 0, mofaLeche: 0, margenTotal: 0 };
+    }
+  },
+
+  async _obtenerAlbaranes(fincaId) {
+    try {
+      const [leche, carne] = await Promise.all([
+        window.db.getAllFromIndex('comercializacion_leche', 'fincaId', Number(fincaId)).catch(() => []),
+        window.db.getAllFromIndex('comercializacion_carne', 'fincaId', Number(fincaId)).catch(() => [])
+      ]);
+      const albaranes = [];
+      leche.forEach(e => {
+        albaranes.push({
+          fecha: e.fechaRecogida || e.fecha,
+          tipo: 'Leche',
+          importe: e.importe_total || 0,
+          cantidad: e.cantidad || 0,
+          estado: e.estado || 'entregado',
+          id: e.id
+        });
+      });
+      carne.forEach(v => {
+        albaranes.push({
+          fecha: v.fechaSacrificio || v.fecha,
+          tipo: 'Carne',
+          importe: v.precio_total || 0,
+          cantidad: v.pesoCanal || v.pesoVivo || 0,
+          estado: v.estado || 'entregado',
+          id: v.id
+        });
+      });
+      return albaranes.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    } catch (e) {
+      console.error('[Albaranes]', e);
+      return [];
+    }
   }
 
 });
