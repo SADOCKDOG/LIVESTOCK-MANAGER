@@ -483,18 +483,20 @@ Object.assign(window.InformesView, {
       const recientes = eventos.filter(e => new Date(e.fecha) >= hace90d);
       const porTipo = {};
       recientes.forEach(e => {
-        const tipo = e.motivo_tarea || e.tipo_evento || 'otro';
+        const tipo = e.motivo_tarea || 'otro';
         if (!porTipo[tipo]) porTipo[tipo] = { tipo, count: 0, totalKg: 0, totalLitros: 0 };
         porTipo[tipo].count++;
-        if (e.peso_kg) porTipo[tipo].totalKg += (e.peso_kg || 0);
-        if (e.cantidad_litros) porTipo[tipo].totalLitros += (e.cantidad_litros || 0);
+        // registro_eventos usa un único campo valor_neto + unidad ('kg'/'L'/'€'...), no
+        // peso_kg/cantidad_litros separados (ver js/pesajes.js, js/produccion.js).
+        if (e.unidad === 'kg') porTipo[tipo].totalKg += (e.valor_neto || 0);
+        if (e.unidad === 'L') porTipo[tipo].totalLitros += (e.valor_neto || 0);
       });
       return {
         porTipo: Object.values(porTipo).sort((a, b) => b.count - a.count),
         total: recientes.length,
         timeline: recientes
           .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
-          .map(e => ({ fecha: e.fecha, tipo: e.motivo_tarea || e.tipo_evento || 'otro', cantidad: e.peso_kg || e.cantidad_litros || 0 }))
+          .map(e => ({ fecha: e.fecha, tipo: e.motivo_tarea || 'otro', cantidad: e.valor_neto || 0 }))
       };
     } catch (e) {
       console.error('[Produccion]', e);
@@ -552,7 +554,7 @@ Object.assign(window.InformesView, {
         const fechaMax = new Date(Math.max(...fechasRecogida));
         const totalGastosAlim = gastosAlim.reduce((s, g) => {
           const fGasto = new Date(g.fecha);
-          return (fGasto >= fechaMin && fGasto <= fechaMax) ? s + (parseFloat(g.importe) || 0) : s;
+          return (fGasto >= fechaMin && fGasto <= fechaMax) ? s + (parseFloat(g.monto) || 0) : s;
         }, 0);
         mofaLeche = ingresosLeche - totalGastosAlim;
       }
