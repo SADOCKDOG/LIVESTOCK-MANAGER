@@ -45,7 +45,9 @@
       { nombre: 'Parcela Sur 28ha', superficieGrafica: 28, superficie: 28, aforoMax: 150, aforo_maximo: 150, usoPrincipal: 'Barbecho', uso: 'Barbecho', localizacion: 'Rotación y barbecho', descripcion: 'Rotación y barbecho', codigo_pac: 'ES-AN-21005-002', distancia_agua_m: 300 },
       { nombre: 'Pastos Este 15ha', superficieGrafica: 15, superficie: 15, aforoMax: 250, aforo_maximo: 250, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Pastos de ovino', descripcion: 'Pastos de ovino', codigo_pac: 'ES-AN-21005-003', distancia_agua_m: 80 },
       { nombre: 'Cercado de Cebo 1ha', superficieGrafica: 1, superficie: 1, aforoMax: 10, aforo_maximo: 10, usoPrincipal: 'Pasto', uso: 'Pasto', localizacion: 'Cercado intensivo temporal', descripcion: 'Pruebas de sobrepastoreo', codigo_pac: 'ES-AN-21005-004', distancia_agua_m: 10 }
-    ]
+    ],
+    instalaciones: [],
+    subexplotaciones: []
   };
 
   function sleep(ms) {
@@ -109,6 +111,26 @@
         console.log('[SEED] ADSG demo registrada');
       } catch (e) {
         console.log('[SEED] Error registrando ADSG:', e.message);
+      }
+
+      // 1b. Instalaciones y subexplotaciones (viven dentro del documento finca, patrón zonas[])
+      try {
+        var fincaObj = await window.db.get('fincas', fincaId);
+        var tiposInst = await window.db.getAll('instalaciones_tipo').catch(() => []);
+        var _tipoPorNombre = function (nombre) { var t = tiposInst.find(function (x) { return x.nombre === nombre; }); return t ? t.id : (tiposInst[0] ? tiposInst[0].id : null); };
+        fincaObj.instalaciones = [
+          { tipoId: _tipoPorNombre('Alojamiento ganadero bovino de leche'), superficie_m2: 850, plazas_alojamiento: 50, volumen_m3: null, notas: 'Nave de ordeño 2x12 espina de pez con sala de espera', creadoEn: Date.now() },
+          { tipoId: _tipoPorNombre('Alojamiento ganadero bovino de carne'), superficie_m2: 420, plazas_alojamiento: 30, volumen_m3: null, notas: 'Establo de cebo — cercado intensivo', creadoEn: Date.now() },
+          { tipoId: _tipoPorNombre('Cámaras frigoríficas'), superficie_m2: 45, plazas_alojamiento: null, volumen_m3: 120, notas: 'Sala de tanques — 2 tanques refrigeración 8.000 L', creadoEn: Date.now() }
+        ];
+        fincaObj.subexplotaciones = [
+          { especieId: 1, tipo_explotacion: 'Producción y reproducción', sistema_explotacion: 'semiextensivo', capacidad_maxima: 50, notas: 'Vacuno de leche — núcleo frisona', creadoEn: Date.now() },
+          { especieId: 3, tipo_explotacion: 'Cebo o engorde (Cebadero)', sistema_explotacion: 'extensivo', capacidad_maxima: 200, notas: 'Ovino de carne — merina en pastos este', creadoEn: Date.now() }
+        ];
+        await Fincas.save(fincaObj);
+        console.log('[SEED] Instalaciones (3) y subexplotaciones (2) añadidas a la finca');
+      } catch (e) {
+        console.log('[SEED] Error instalaciones/subexplotaciones:', e.message);
       }
 
       // 2. Rebaños
