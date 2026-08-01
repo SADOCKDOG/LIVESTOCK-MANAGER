@@ -1050,6 +1050,25 @@
       }
       console.log('[SEED] Gastos fitosanitarios creados: 3');
 
+      // 19. Costes fijos (Break-Even: catsFijas de js/analitica.js — reconocidos sin tilde
+      // gracias a la normalización NFD; las categorías replican las del wizard)
+      var cfFecha1 = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var cfFecha2 = new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var cfFecha3 = new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var costesFijosDefs = [
+        { demo: true, concepto: 'Factura eléctrica nave ordeño', fecha: cfFecha1, monto: 412.30, categoria: 'Electricidad', snap_zona: 'Parcela Norte 42ha', proveedorId: null },
+        { demo: true, concepto: 'Factura eléctrica sala tanques', fecha: cfFecha2, monto: 287.95, categoria: 'Electricidad', snap_zona: 'Parcela Norte 42ha', proveedorId: null },
+        { demo: true, concepto: 'Nómina operario ordeño (mes)', fecha: cfFecha3, monto: 1350.00, categoria: 'Personal', proveedorId: null },
+        { demo: true, concepto: 'Seguro explotación anual (recibo)', fecha: cfFecha2, monto: 640.00, categoria: 'Seguros', proveedorId: null },
+        { demo: true, concepto: 'Gestoría — trimestre', fecha: cfFecha1, monto: 210.00, categoria: 'Gestoria', proveedorId: null }
+      ];
+      for (var cf = 0; cf < costesFijosDefs.length; cf++) {
+        try { await Gastos.save(costesFijosDefs[cf]); }
+        catch (e) { console.log('[SEED] Error coste fijo:', e.message); }
+        await sleep(80);
+      }
+      console.log('[SEED] Costes fijos creados: 5');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
