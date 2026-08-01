@@ -937,6 +937,48 @@
       }
       console.log('[SEED] Saneamientos creados: 2');
 
+      // 17. Pedidos de crotales (ExPro > Trámites > Crotales)
+      var crotFechaEntregado = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+      var crotFechaPendiente = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+      var pedidosCrotalesDefs = [
+        {
+          demo: true,
+          fincaId: fincaId,
+          especie: 'Bovino',
+          tipo: 'Bandera + Botón (EID)',
+          cantidad: 25,
+          adsg_nombre: DEMO_FINCA.adsg_nombre,
+          adsg_codigo: DEMO_FINCA.adsg_codigo,
+          adsg_veterinario: DEMO_FINCA.adsg_veterinario,
+          adsg_vet_colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          adsg_vet_nif: DEMO_FINCA.adsg_vet_nif,
+          estado: 'entregado',
+          fecha_pedido: crotFechaEntregado,
+          acuse_manual: 'ACUSE-2026-0412'
+        },
+        {
+          demo: true,
+          fincaId: fincaId,
+          especie: 'Ovino',
+          tipo: 'Crotal Visual Clásico',
+          cantidad: 100,
+          adsg_nombre: DEMO_FINCA.adsg_nombre,
+          adsg_codigo: DEMO_FINCA.adsg_codigo,
+          adsg_veterinario: DEMO_FINCA.adsg_veterinario,
+          adsg_vet_colegiado: DEMO_FINCA.adsg_vet_colegiado,
+          adsg_vet_nif: DEMO_FINCA.adsg_vet_nif,
+          estado: 'pendiente',
+          fecha_pedido: crotFechaPendiente,
+          acuse_manual: ''
+        }
+      ];
+      for (var crotI = 0; crotI < pedidosCrotalesDefs.length; crotI++) {
+        try { await PedidosCrotales.save(pedidosCrotalesDefs[crotI]); }
+        catch (e) { console.log('[SEED] Error pedido crotales:', e.message); }
+        await sleep(80);
+      }
+      console.log('[SEED] Pedidos de crotales creados: 2');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
