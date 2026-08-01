@@ -1069,6 +1069,40 @@
       }
       console.log('[SEED] Costes fijos creados: 5');
 
+      // 20. Subvenciones PAC (Informes > Libros > PAC; en la app real se crean desde el propio informe)
+      var pacDefs = [
+        {
+          demo: true,
+          tipo: 'pac',
+          anio: 2024,
+          concepto: 'PAC 2024 — Ayuda básica + eco-esquemas',
+          regimen: 'PAC Base',
+          importe_solicitado: 18500.00,
+          importe_cobrado: 18500.00,
+          fecha_emision: '2024-12-16',
+          fincaId: fincaId,
+          creadoEn: '2024-12-16T10:00:00.000Z'
+        },
+        {
+          demo: true,
+          tipo: 'pac',
+          anio: 2025,
+          concepto: 'PAC 2025 — Ayuda básica + eco-esquemas',
+          regimen: 'PAC Verde',
+          importe_solicitado: 19200.00,
+          importe_cobrado: 12480.00,
+          fecha_emision: '2025-12-15',
+          fincaId: fincaId,
+          creadoEn: '2025-12-15T10:00:00.000Z'
+        }
+      ];
+      for (var pd = 0; pd < pacDefs.length; pd++) {
+        try { await window.db.add('documentos_legales', pacDefs[pd]); }
+        catch (e) { console.log('[SEED] Error documento PAC:', e.message); }
+        await sleep(60);
+      }
+      console.log('[SEED] Documentos PAC creados: 2');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
