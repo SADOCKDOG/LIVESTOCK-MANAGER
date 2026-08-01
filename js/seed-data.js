@@ -1218,6 +1218,38 @@
       }
       console.log('[SEED] Vacunaciones creadas: 2');
 
+      // 23. Agenda (Menú Más > Agenda + widgets) — db.add directo para no disparar
+      // NotificacionesService con datos demo (AgendaService.add las programaría)
+      var agVencida = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var agManana = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var agMes = new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      var agendaDefs = [
+        { modulo_id: 'sanidad', entidad_id: rebVacas.id, titulo: 'Recuerdo vacuna lengua azul', descripcion: 'Segunda dosis rebaño vacas frisonas — campaña obligatoria', fecha_planificada: vacProxDosis, prioridad: 'alta', es_alerta: true },
+        { modulo_id: 'lacteos', entidad_id: null, titulo: 'Limpieza circuito tanque 1', descripcion: 'Limpieza alcalina + ácida del circuito de ordeño', fecha_planificada: agManana, prioridad: 'media', es_alerta: false },
+        { modulo_id: 'general', entidad_id: null, titulo: 'Revisión documentación PAC 2026', descripcion: 'Preparar justificantes eco-esquemas para la solicitud', fecha_planificada: agMes, prioridad: 'baja', es_alerta: false },
+        { modulo_id: 'silos', entidad_id: null, titulo: 'Pedido pienso concentrado', descripcion: 'Silo 1 por debajo del 25% — llamar a Piensos El Trébol', fecha_planificada: agVencida, prioridad: 'alta', es_alerta: false }
+      ];
+      for (var ag = 0; ag < agendaDefs.length; ag++) {
+        try {
+          await window.db.add('agenda_tareas', {
+            demo: true,
+            fincaId: fincaId,
+            modulo_id: agendaDefs[ag].modulo_id,
+            entidad_id: agendaDefs[ag].entidad_id,
+            titulo: agendaDefs[ag].titulo,
+            descripcion: agendaDefs[ag].descripcion,
+            fecha_planificada: agendaDefs[ag].fecha_planificada,
+            prioridad: agendaDefs[ag].prioridad,
+            es_alerta: agendaDefs[ag].es_alerta,
+            estado: 'pendiente',
+            creadoEn: new Date().toISOString(),
+            actualizadoEn: new Date().toISOString()
+          });
+        } catch (e) { console.log('[SEED] Error tarea agenda:', e.message); }
+        await sleep(60);
+      }
+      console.log('[SEED] Tareas de agenda creadas: 4');
+
       // Seed completado
       localStorage.setItem('seed_data_completed', 'true');
       showToast('Datos demo CHAMORRO cargados correctamente', '#22c55e');
