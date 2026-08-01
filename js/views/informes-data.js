@@ -595,6 +595,32 @@ Object.assign(window.InformesView, {
       console.error('[Albaranes]', e);
       return [];
     }
+  },
+
+  async _obtenerBotiquinStock(fincaId) {
+    try {
+      const productos = await window.db.getAllFromIndex('config_botiquin', 'fincaId', Number(fincaId)).catch(() => []);
+      const lotes = await window.db.getAll('botiquin_lotes').catch(() => []);
+      const hoy = new Date();
+      const proximos30d = new Date(hoy.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const stockBajo = productos.filter(p => (p.cantidadActual || 0) < (p.cantidadMinima || 0));
+      const proxCaducar = productos.filter(p => {
+        if (!p.caducidad) return false;
+        const cad = new Date(p.caducidad);
+        return cad >= hoy && cad <= proximos30d;
+      });
+      return {
+        productos,
+        lotes,
+        stockBajo: stockBajo.map(p => ({ ...p, alerta: 'stock_bajo' })),
+        proxCaducar: proxCaducar.map(p => ({ ...p, alerta: 'caducidad_proxima' })),
+        totalProductos: productos.length,
+        totalLotes: lotes.length
+      };
+    } catch (e) {
+      console.error('[BotiquinStock]', e);
+      return { productos: [], lotes: [], stockBajo: [], proxCaducar: [], totalProductos: 0, totalLotes: 0 };
+    }
   }
 
 });
