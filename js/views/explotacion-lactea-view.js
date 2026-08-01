@@ -337,13 +337,11 @@ window.ExplotacionLacteaView = {
           <div class="card p-12">
             <div class="chart-wrap"><canvas id="chart-produccion-mensual" class="chart-canvas"></canvas></div>
           </div>
-          <div class="grid grid-cols-2 gap-12">
-            <div class="card p-12">
-              <div class="chart-wrap"><canvas id="chart-calidad-leche" class="chart-canvas"></canvas></div>
-            </div>
-            <div class="card p-12">
-              <div class="chart-wrap"><canvas id="chart-composicion" class="chart-canvas"></canvas></div>
-            </div>
+          <div class="card p-12">
+            <div class="chart-wrap"><canvas id="chart-calidad-leche" class="chart-canvas"></canvas></div>
+          </div>
+          <div class="card p-12">
+            <div class="chart-wrap"><canvas id="chart-composicion" class="chart-canvas"></canvas></div>
           </div>
           <div class="card p-12">
             <div class="chart-wrap"><canvas id="chart-comparativa-tanques" class="chart-canvas"></canvas></div>

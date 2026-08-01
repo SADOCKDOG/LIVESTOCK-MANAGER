@@ -196,6 +196,24 @@ const InformesView = {
     return catsHtml + subTabsHtml;
   },
 
+  /**
+   * Centra `el` horizontalmente dentro de su contenedor de scroll más cercano,
+   * calculando scrollLeft a mano en vez de usar el.scrollIntoView(). scrollIntoView
+   * con inline:'center' puede "escaparse" al contenedor padre (o al documento) en
+   * algunos motores WebView de Android bajo llamadas repetidas con behavior:'smooth',
+   * produciendo un desplazamiento horizontal de página completa que no se reproduce
+   * en Chrome de escritorio. container.scrollTo() está acotado por definición al
+   * propio elemento, así que no puede arrastrar el scroll de nada fuera de él.
+   */
+  _centrarEnScroll(el) {
+    if (!el) return;
+    const container = el.closest('.scroll-shadow-container');
+    if (!container) return;
+    const target = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2;
+    const max = container.scrollWidth - container.clientWidth;
+    container.scrollTo({ left: Math.max(0, Math.min(target, max)), behavior: 'smooth' });
+  },
+
   _cambiarCategoria(catKey) {
     this._currentCategory = catKey;
     const firstTab = Object.keys(this._categories[catKey].tabs).find(t => this._esTabPermitida(t));
@@ -203,10 +221,8 @@ const InformesView = {
     this._actualizarHeader();
     // Scroll automático al tab activo de categoría
     requestAnimationFrame(() => {
-      const el = document.getElementById(`inf-cat-${catKey}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      const tel = document.getElementById(`inf-tab-${firstTab}`);
-      if (tel) tel.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      this._centrarEnScroll(document.getElementById(`inf-cat-${catKey}`));
+      this._centrarEnScroll(document.getElementById(`inf-tab-${firstTab}`));
     });
     this._renderTabActual();
   },
@@ -221,8 +237,7 @@ const InformesView = {
     this._actualizarHeader();
     // Scroll automático al sub-tab activo
     requestAnimationFrame(() => {
-      const el = document.getElementById(`inf-tab-${tab}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      this._centrarEnScroll(document.getElementById(`inf-tab-${tab}`));
     });
     this._renderTabActual();
   },
