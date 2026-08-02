@@ -224,7 +224,11 @@ const SanidadView = {
         </div>
 
         ${this.renderHistorial(this.enriquecer(tratamientosFiltrados))}
-      </div>`;
+        </div>`;
+    // FAB Guía interactiva
+    if (window.App && typeof App.renderGuideFab === 'function') {
+      App.renderGuideFab('/ganaderia', 'sanidad');
+    }
   },
 
   _buscar(value) {
