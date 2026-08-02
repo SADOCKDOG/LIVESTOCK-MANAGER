@@ -43,7 +43,7 @@
       {
         title: 'FAB Registrar Retirada',
         body: 'Botón flotante azul (--c-info) «Registrar Retirada» abre **WizardAlbaranLeche**: industria (selector de compradores tipo láctico/híbrido), matrícula cisterna, fecha/hora recogida, litros, temperatura, datos laboratorio (grasa, proteína, extracto seco, urea, recuento celular), antibióticos (sí/no), observaciones. Genera comercializacion_leche + evento registro_eventos.',
-        target: '.fab-container[onclick*="App._abrirWizardAlbaranLeche"]',
+        target: '[onclick*="App._abrirWizardAlbaranLeche"]',
         waitFor: 1500,
         position: 'above'
       },

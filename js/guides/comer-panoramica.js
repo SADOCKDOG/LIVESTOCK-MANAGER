@@ -44,7 +44,7 @@
       {
         title: 'Pestaña Leche — Entregas y analíticas (si Leche=ON)',
         body: 'Seguimiento de **cisternas**: matrícula, litros, fecha, analizadora (grasa/proteína/urea/Esc/Células), estado analítica (Pendiente/Conforme/Alerta/Rechazado/Incorrecto/Antibióticos), MOFA real. Gráfico de barras últimos 6 meses de producción láctea. FAB "Registrar Retirada" abre WizardAlbaranLeche.',
-        target: '.carrusel-pestanas button[data-tab="leche"]',
+        target: '.carrusel-dot[data-tab="leche"]',
         waitFor: 1500,
         position: 'below',
         optional: true,
@@ -53,7 +53,7 @@
       {
         title: 'Pestaña Carne — Ventas y rendimientos (si Carne=ON)',
         body: 'Listado de **ventas a mataderos**: comprador, fecha sacrificio, peso canal, rendimiento %, clasificación EUROP/S, ingreso total, gastos transporte/matanza, margen neto real. Gráfico de barras último semestre peso canal. FAB "Registrar Venta" abre WizardVentaMasiva.',
-        target: '.carrusel-pestanas button[data-tab="carne"]',
+        target: '.carrusel-dot[data-tab="carne"]',
         waitFor: 1500,
         position: 'below',
         optional: true,
@@ -62,21 +62,21 @@
       {
         title: 'Pestaña Compradores — Cartera de clientes',
         body: 'Gestión de **mataderos, cooperativas y centrales lecheras**. Fichas con NIF, REGA, tipo (cárnico/láctico/híbrido), contratos vinculados, historial carne/leche con volúmenes e importes. Filtros por texto (nombre/NIF/ciudad) y tipo. FAB "Nuevo Comprador".',
-        target: '.carrusel-pestanas button[data-tab="compradores"]',
+        target: '.carrusel-dot[data-tab="compradores"]',
         waitFor: 1500,
         position: 'below'
       },
       {
         title: 'Pestaña Contratos — Acuerdos de suministro',
         body: 'Contratos de compra vinculados a compradores. Nº contrato, tipo (leche/carne), vigencia, precios por producto/unidad, estados (ACTIVO/INACTIVO). Accesos: editar contrato, ficha comprador. FAB "Nuevo Contrato". Alertas de vencimiento en cabecera global CoMer.',
-        target: '.carrusel-pestanas button[data-tab="contratos"]',
+        target: '.carrusel-dot[data-tab="contratos"]',
         waitFor: 1500,
         position: 'below'
       },
       {
         title: 'Pestaña Transportistas — Flota y certificados',
         body: 'Registro de **transportistas calificados**: matrícula, ATG, tipo vehículo (camión/furgoneta/remolque/cisterna), capacidad, certificado bienestar (con vencimiento), desinsectación, termoneutralidad. Badges de urgencia (rojo=caducado/sin cert, ámbar=≤30d, verde=OK). FAB "Nuevo Transportista".',
-        target: '.carrusel-pestanas button[data-tab="transportistas"]',
+        target: '.carrusel-dot[data-tab="transportistas"]',
         waitFor: 1500,
         position: 'below'
       },

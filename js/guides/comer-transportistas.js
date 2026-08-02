@@ -50,7 +50,7 @@
       {
         title: 'FAB Nuevo Transportista',
         body: 'FAB rosa «Nuevo Transportista» abre **wizard modal centrado** (card-registro, z-index 6000): nombre, NIF/CIF, matrícula, nº registro transporte, ATG (obligatorio), desinsectación (fecha + vencimiento), teléfono, email, dirección/CP/ciudad/provincia, tipo vehículo (camión/furgoneta/remolque/cisterna), capacidad (animales), certificado bienestar (check + vencimiento), termoneutral (check), activo (check), notas. Guarda en `config_transportistas`.',
-        target: '.fab-container[onclick*="TransportistasView._abrirFormulario"]',
+        target: '.fab-container',
         waitFor: 1500,
         position: 'above'
       },
