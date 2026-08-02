@@ -22,14 +22,14 @@
       {
         title: 'KPIs globales (capacidad / almacenado / ocupación)',
         body: '3 tarjetas superiores: **Capacidad Total** (kg), **Almacenado** (kg, dorado), **Ocupación Media** (% verde/ámbar/rojo). Resumen instantáneo del estado de todos los silos.',
-        target: '.grid.grid-cols-3 .card, .card:has-text("CAPACIDAD TOTAL")',
+        target: '.grid .card',
         waitFor: 1000,
         position: 'below'
       },
       {
         title: 'Alerta Stock Crítico (<15%)',
         body: 'Si algún silo está <15% capacidad, aparece **tarjeta de alerta Bento roja** listando silos críticos con kg actual / capacidad (%). Click en silo → ficha → recargar. Requiere silos configurados.',
-        target: '.card-resumen:has-text("STOCK BAJO"), .card:has([style*="border-left: 4px solid var(--c-danger)"])',
+        target: '.card-resumen[style*="border-left: 4px solid var(--c-danger)"]',
         waitFor: 1500,
         position: 'below',
         optional: true,
@@ -38,7 +38,7 @@
       {
         title: 'Tarjeta de silo: Gauge circular y autonomía',
         body: 'Cada silo muestra: **gauge SVG circular** (% nivel, color verde/ámbar/rojo), nombre + tipo alimento, badge "BAJO STOCK" si <15% (pulsante), **cantidad/capacidad kg**, **última carga**, **autonomía** (días, calculada por consumo real 30d). Click en gauge → recalibrar; click en cuerpo → ficha completa.',
-        target: '#silo-card- .card-registro, .silo-gauge-container',
+        target: '.silo-gauge-container',
         waitFor: 1500,
         position: 'above'
       },
@@ -52,7 +52,7 @@
       {
         title: 'Ficha de silo (click en tarjeta)',
         body: 'Modal full-screen: gauge grande, histórico de cargas/consumos (fecha, cantidad, tipo, origen/destino), autonomía actual, botones Cargar/Consumo/Editar/Eliminar. Trazabilidad completa del stock.',
-        target: '#silo-card- [onclick*="_abrirFichaSilo"]',
+        target: '[onclick*="SilosView._abrirFichaSilo"]',
         waitFor: 2000,
         position: 'above'
       },
