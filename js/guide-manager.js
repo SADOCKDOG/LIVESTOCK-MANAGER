@@ -67,6 +67,20 @@
     }
   }
 
+  /**
+   * ¿El elemento ocupa superficie real en pantalla? Un selector puede casar con un nodo
+   * envoltorio de tamaño 0, oculto o colapsado; resaltarlo dibujaba un anillo diminuto en
+   * una zona arbitraria (visto en las capturas de ExPro). En ese caso es mejor tratar el
+   * paso como narrativo.
+   */
+  function _esResaltable(el) {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    if (r.width < 8 || r.height < 8) return false;
+    const cs = getComputedStyle(el);
+    return cs.visibility !== 'hidden' && cs.display !== 'none' && parseFloat(cs.opacity || '1') > 0.05;
+  }
+
   /** Genera ID único para elementos del overlay */
   function _uid(prefix) {
     return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -100,9 +114,11 @@
   function _createOverlay(target, color) {
     const overlay = document.createElement('div');
     overlay.className = 'guide-overlay';
+    // SIN background ni backdrop-filter propios: el oscurecimiento lo aporta EXCLUSIVAMENTE
+    // el rectángulo enmascarado del SVG. Si el div pinta su propio fondo, tapa el hueco de
+    // la máscara y el spotlight no revela nada — la pantalla queda uniformemente negra.
     overlay.style.cssText = `
       position:fixed; inset:0; z-index:3500; pointer-events:none;
-      background:rgba(0,0,0,0.82); backdrop-filter:blur(2px);
     `;
 
     const svgNS = 'http://www.w3.org/2000/svg';
@@ -583,7 +599,8 @@
     }
 
     // Si hay target visible, anclar overlay + popover sobre él
-    const target = state.step.target ? _qs(state.step.target) : null;
+    const candidatoTarget = state.step.target ? _qs(state.step.target) : null;
+    const target = _esResaltable(candidatoTarget) ? candidatoTarget : null;
     if (target) {
       _ensureVisible(target);
       _updateSpotlight(state.overlay, target);
@@ -681,6 +698,11 @@
         if (!target) {
           console.warn('[GuideManager] Target no encontrado tras waitFor:', firstStep.target);
           // Seguir sin target (paso narrativo centrado)
+        } else if (!_esResaltable(target)) {
+          console.warn('[GuideManager] Target sin superficie visible, se omite el spotlight:', firstStep.target);
+          target = null;
+        } else {
+          _ensureVisible(target);
         }
       }
 
