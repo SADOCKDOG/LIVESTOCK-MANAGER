@@ -415,7 +415,7 @@ const AnimalesView = {
 
           ${a.tipoAlta === "Compra" ? `
           <div class="card p-16 mb-20" style="border: 1px solid var(--c-amber); background: rgba(255,255,255,0.02);">
-            <div class="section-header-theme mb-12" style="--theme-color: var(--c-amber); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-amber); margin-right: 4px;">|</span> ${Icons.shopping_cart()} DATOS DE COMPRA</div>
+            <div class="section-header-theme mb-12" style="--theme-color: var(--c-amber); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;"><span style="color: var(--c-amber); margin-right: 4px;">|</span> ${Icons.dinero()} DATOS DE COMPRA</div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-precio-compra">PRECIO DE COMPRA (€)</label>

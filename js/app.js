@@ -1182,6 +1182,12 @@ const App = {
 
     main.innerHTML = '<div class="loader">Cargando...</div>';
     App.clearExitGuard(); // La vista que se va a renderizar registrará su propia guarda si la necesita
+
+    // El FAB "Guía" y el tour cuelgan de <body>, no de #app-content, así que no se
+    // limpian solos al cambiar de vista: en rutas sin guía (Ajustes, Informes…) el FAB
+    // de la vista anterior seguía flotando. Cada vista con guía vuelve a pintarlo.
+    document.getElementById('guide-fab')?.remove();
+    if (window.GuideManager && typeof GuideManager.skip === 'function') GuideManager.skip();
     try {
       await App._ensureRouteScripts(path);
       const methodName = App.routes[path];
