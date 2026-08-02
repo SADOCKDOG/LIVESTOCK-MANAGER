@@ -52,14 +52,14 @@
       {
         title: 'Vacunaciones recientes',
         body: 'Lista de vacunaciones (más reciente primero). Cada tarjeta muestra tipo(s), animales vacunados, veterinario y estado (cerrada/abierta). Click para opciones.',
-        target: '.inf-section-title:has-text("VACUNACIONES") ~ .grid.gap-10',
+        target: '#sanidad-filtro-buscar ~ .inf-section-title + .grid.gap-10',
         waitFor: 1000,
         position: 'above'
       },
       {
         title: 'Historial clínico',
         body: 'Registro completo de tratamientos aplicados. Cada tarjeta muestra medicamento, dosis, animal, fecha, veterinario y **badges de supresión** (carne/leche) con cuenta regresiva en días.',
-        target: '.inf-section-title:has-text("HISTORIAL") ~ .grid.gap-10',
+        target: '#sanidad-filtro-buscar ~ .inf-section-title ~ .inf-section-title + .grid.gap-10',
         waitFor: 1000,
         position: 'above'
       },

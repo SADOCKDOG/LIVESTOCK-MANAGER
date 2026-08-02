@@ -22,14 +22,14 @@
       {
         title: 'Ocupación global (colapsable)',
         body: 'Panel superior: **Total Zonas** y **Ocupación** (cabezas / aforo total + %). Barra de progreso coloreada: verde <80%, ámbar 80-100%, rojo >100% (sobrecarga). Click en chevron para colapsar.',
-        target: '.card-resumen, .card-total-3d:has-text("Ocupación Global")',
+        target: '.card-resumen.card-total-3d',
         waitFor: 1000,
         position: 'below'
       },
       {
         title: 'Alerta de sobrepastoreo (Bento rojo)',
         body: 'Si alguna parcela supera **1.0 UGM/ha** (aforo ecológico máximo pastoreo extensivo), aparece una **alerta Bento rojo pulsante** listando parcelas afectadas con su carga UGM/ha. Botón «Sugerir Rotación Preventiva» abre asistente de interfaz.',
-        target: '.card.border-danger, .animate-pulse:has-text("SOBREPASTOREO")',
+        target: '.card.border-danger.animate-pulse, [data-guide="btn-sugerir-rotacion"]',
         waitFor: 1500,
         position: 'below'
       },
@@ -51,14 +51,14 @@
       {
         title: 'Rotación de pastos (SIGGAN)',
         body: 'Botón **«Rotar Lote / Rebaño»** en cada zona (o modal desde alerta) abre selector: (1) elige rebaño/lote en zona origen; (2) elige parcela destino (muestra **bloqueadas en rojo** con fecha fin cuarentena); (3) motivo opcional. **Chequeo fitosanitario estricto** al confirmar: aborta si destino tiene cuarentena activa. Registra evento de traslado en auditoría.',
-        target: '.widget-link-btn--neon.neon-success:has-text("Rotar"), #btn-confirmar-rotacion',
+        target: '[data-guide="btn-rotar-lote"], #btn-confirmar-rotacion',
         waitFor: 2000,
         position: 'above'
       },
       {
         title: 'Cuarentena fitosanitaria (tiempo real)',
         body: 'Si una parcela tiene gastos de **fitosanitarios** con plazo de seguridad >0, se muestra **banner rojo pulsante**: «CUARENTENA ACTIVA (concepto) - BLOQUEADA HASTA fecha (Días restantes)». Botón rotación se deshabilita (rojo, cursor not-allowed). Se evalúa en render y al abrir rotación.',
-        target: '.animate-pulse:has-text("CUARENTENA"), .widget-link-btn--neon.neon-danger:has-text("BLOQUEADO")',
+        target: '.animate-pulse.text-danger, [data-guide="btn-rotar-bloqueado"]',
         waitFor: 2000,
         position: 'above'
       },
