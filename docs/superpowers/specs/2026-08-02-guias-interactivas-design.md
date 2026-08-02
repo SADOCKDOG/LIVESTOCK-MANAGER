@@ -62,15 +62,21 @@ No se parchea `wizard-manager.js`. La coordinación tour↔wizard se hace por ob
 
 ### 3.2 Z-index saneado
 
+(z-index verificados en `styles.css`/`modal-manager.js`)
+
 | Elemento | z-index | Notas |
 |---|---|---|
 | Header fijo | 2000 | existente |
 | Overlay guide | **3500** | encima del header y el DOM de la vista; debajo del wizard (4000) |
 | `.wizard-full-screen` | 4000 | existente (`styles.css:667`) — el wizard tapa el tour automáticamente |
-| `#tour-flotante-overlay` (bienvenida) | 4000 | existente — el guide se oculta si éste está presente |
-| Chip "Reanudar guía" | **9500** | encima del wizard (4000); debajo de `.asistente-loading-overlay` (9999) y toasts/confirm (9999+) |
-| `.asistente-loading-overlay` | 9999 | existente — el chip se auto-oculta si está presente |
-| Toast / Confirm | 100000 | existente |
+| `#tour-flotante-overlay` (bienvenida) | 4000 | existente (`styles.css:2160`) — el guide/chip se auto-oculta si está presente |
+| Chip "Reanudar guía" | **4500** | entre wizard (4000) y toast (6000); evita `.btn-pesaje-close` (5001, `styles.css:3894`). Auto-oculto si `#tour-flotante-overlay` o `.asistente-loading-overlay` están en el DOM |
+| `.btn-pesaje-close` | 5001 | existente — el chip (4500) queda por debajo |
+| `.toast` | 6000 | existente (`styles.css:596`) — el chip (4500) queda por debajo, no lo tapa |
+| Modales (ModalManager) | 10000 + 10·n | dinámico (`modal-manager.js:19`) |
+| `.asistente-loading-overlay` | 9999 | existente (`styles.css:2148`) |
+| `.error-overlay` | 99999 | existente (`styles.css:2227`) |
+| `.pdf-loader-overlay` | 100000 | existente (`styles.css:3211`) |
 
 ### 3.3 Estado y persistencia
 
@@ -147,27 +153,22 @@ Una guía = un módulo `js/guides/*.js`. Se auto-registra al cargarse:
 - **Datos imprescindibles**: inferidos de `db.js` (stores/índices → campos obligatorios), de `validate()` de cada wizard real, y de `docs/GUIA_*.html` (normativa SIGGAN/BADIGEX). Se marcan con `**negrita**` en `body`.
 - **Sin emojis**: tipografía estricta (`.agent/AGENTS.md`, regla 2026-07-03). Negrita y `Icons.*` sólo.
 
-**Catálogo de guías (granularidad por tab, filtrado por flags):**
+**Catálogo de guías (granularidad por TAB REAL del carrusel, verificado en el `renderCarruselPestanas` de cada vista — no derivado del `redirectMap`, que está incompleto):**
 
-| Pilar | id de guía | route / tab | condicional |
-|---|---|---|---|
-| GeGan | `gegan.animales` | `/ganaderia` / animales | siempre |
-| GeGan | `gegan.rebanos` | `/ganaderia` / rebanos | siempre |
-| GeGan | `gegan.patrimonio` | `/ganaderia` / patrimonio | `flags.carne` |
-| GeGan | `gegan.zonas` | `/ganaderia` / zonas | siempre |
-| GeGan | `gegan.sanidad` | `/ganaderia` / sanidad | siempre |
-| GeGan | `gegan.panoramica` | `/ganaderia` (intro de pilar) | siempre |
-| ExPro | `expro.silos` | `/explotacion` / silos | siempre |
-| ExPro | `expro.fitosanitarios` | `/explotacion` / fitosanitarios | siempre |
-| ExPro | `expro.gastos` | `/explotacion` / gastos | siempre |
-| ExPro | `expro.proveedores` | `/explotacion` / proveedores | siempre |
-| ExPro | `expro.panoramica` | `/explotacion` (intro) | siempre |
-| CoMer | `comer.compradores` | `/comercializacion` / compradores | siempre |
-| CoMer | `comer.contratos` | `/comercializacion` / contratos | siempre |
-| CoMer | `comer.transportistas` | `/comercializacion` / transportistas | siempre |
-| CoMer | `comer.panoramica` | `/comercializacion` (intro) | siempre |
+| Pilar | vista | tabs reales (carrusel) | guía | condicional `applies(flags)` |
+|---|---|---|---|---|
+| GeGan | `GanaderiaView` (`ganaderia-view.js:22-27,51`) | animales, rebanos, patrimonio¹, zonas, sanidad | `gegan.animales`, `gegan.rebanos`, `gegan.patrimonio`, `gegan.zonas`, `gegan.sanidad` | patrimonio solo `flags.carne` (`:32-33`); resto siempre |
+| GeGan | `GanaderiaView` | — (intro de pilar) | `gegan.panoramica` (`tab: null`) | siempre |
+| ExPro | `ExplotacionView` (`explotacion-view.js:228-236`) | explotacion², lacteo, silos, fitosanitarios, gastos, proveedores, tramites | `expro.explotacion`, `expro.lacteo`, `expro.silos`, `expro.fitosanitarios`, `expro.gastos`, `expro.proveedores`, `expro.tramites` | todos siempre |
+| ExPro | `ExplotacionView` | — (intro) | `expro.panoramica` (`tab: null`) | siempre |
+| CoMer | `ComercializacionView` (`comercializacion-view.js:126-128,268-291`) | leche³, carne, compradores, contratos, transportistas | `comer.leche`, `comer.carne`, `comer.compradores`, `comer.contratos`, `comer.transportistas` | leche `flags.leche`; carne `flags.carne`; resto siempre |
+| CoMer | `ComercializacionView` | — (intro) | `comer.panoramica` (`tab: null`) | siempre |
 
-**Total: 16 guías** (13 por submódulo + 3 panorámicas de pilar). Las "~20 originales" se reducen porque varias "sub-vistas" son tabs internos de las 3 rutas consolidadas (`redirectMap`, `app.js:1058-1072`), no rutas independientes.
+¹ `patrimonio` sólo se añade al carrusel si `flags.carne` (`ganaderia-view.js:32-33`); en fincas solo-leche el tab no existe y la guía no aplica (auto-arranque filtrado por `applies`).
+² `explotacion` es el tab por defecto de ExPro (`explotacion-view.js:209`) — modo de explotación, balance leche/carne, FAB adaptativo.
+³ `leche` es el tab por defecto de CoMer (`priorityOrder`, `comercializacion-view.js:132`) cuando `flags.leche`.
+
+**Total: 21 guías** (18 por tab + 3 panorámicas de pilar). Son los **tabs por defecto de ExPro (`explotacion`) y CoMer (`leche`)** los que el usuario ve primero — por eso eran bloqueante.
 
 ---
 
@@ -218,25 +219,29 @@ El parche es **incompleto por construcción**: una salida vive fuera del módulo
 
 **Pseudocódigo (aproximado, ~40 líneas):**
 
+> **Corrección B-1:** el nodo del wizard no existe antes de `step.launch()`, así que `_nodoPausa` se captura **desde `addedNodes`** en el callback, no con un `querySelector` previo al `launch`. Una sola rama cubre dos casos: (a) el wizard que abre el propio `launch`, y (b) un wizard abierto por el usuario fuera del guion.
+
 ```js
 // Al ejecutar un paso con launch:
 async _runLaunchStep(step) {
-  this._nodoPausa = document.querySelector('.wizard-full-screen'); // si ya hay uno abierto
+  this._nodoPausa = null; // aún no existe el wizard
   this._observer = new MutationObserver(muts => {
     for (const m of muts) {
+      // Capturar el nodo del wizard cuando aparece (caso a y b):
+      if (!this._nodoPausa) {
+        const nuevo = [...m.addedNodes].find(n => n.classList?.contains('wizard-full-screen'));
+        if (nuevo) { this._nodoPausa = nuevo; this._hidePopover(); continue; }
+      }
+      // Cierre (3 salidas convergen aquí):
       if (this._nodoPausa && [...m.removedNodes].includes(this._nodoPausa)) {
         this._teardownObserver();
         this._resumeAfterWizard();
         return;
       }
-      // wizard abierto por el usuario fuera del guion:
-      if ([...m.addedNodes].some(n => n.classList?.contains('wizard-full-screen'))) {
-        this._hidePopover(); // pausa visual hasta que cierre
-      }
     }
   });
-  this._observer.observe(document.body, { childList: true });
-  step.launch(); // abre el wizard real
+  this._observer.observe(document.body, { childList: true }); // sin subtree
+  step.launch(); // abre el wizard real → entra por la rama addedNodes
 }
 ```
 
@@ -249,7 +254,7 @@ async _runLaunchStep(step) {
 - **Botones**: Anterior / Siguiente / Saltar / **"No mostrar de nuevo"**. Touch-min `var(--touch-min)` (50px), `:active{transform:scale(.95)}` (feedback táctil). SÓLO iconos `Icons.*` (cero emoji).
 - **Recalcular posición** on `resize`/`scroll`/`orientationchange`.
 - **Focus trap** accesible (Tab dentro del popover; Escape = Saltar).
-- **Chip "Reanudar guía"**: `.fab` flotante z-9500, visible cuando el tour está pausado por wizard. **Auto-oculto** si `#tour-flotante-overlay` o `.asistente-loading-overlay` están en el DOM (no flota sobre la bienvenida).
+- **Chip "Reanudar guía"**: `.fab` flotante z-4500, visible cuando el tour está pausado por wizard. **Auto-oculto** si `#tour-flotante-overlay` o `.asistente-loading-overlay` están en el DOM (no flota sobre la bienvenida). Debajo de toasts (6000) para no taparlos.
 
 ---
 
@@ -257,7 +262,18 @@ async _runLaunchStep(step) {
 
 ### 6.1 Auto-arranque
 
-- **Punto de inyección**: `app.js:1188`, inmediatamente tras `await App[methodName](params)` (DOM de la vista ya montado). Llama `GuideManager.maybeStart(path, currentTab)`.
+- **Punto de inyección**: `app.js:1188`, inmediatamente tras `await App[methodName](params)` (DOM de la vista ya montado). Llama `GuideManager.maybeStart(path, tab)`.
+
+> **Corrección B-4 — origen del `tab` (no se lee del `?tab=` del query param).** Las 3 vistas no tratan igual el parámetro: `GanaderiaView.render()` no acepta argumentos (`ganaderia-view.js:10`) e ignora `?tab=` pese a que el `redirectMap` lo genera; `ExplotacionView.render(options)` lo recibe pero no lo usa para el tab (`:199-211`); solo `ComercializacionView` lo lee (`comercializacion-view.js:131`). La **única fuente fiable** es el estado interno de la propia vista: `window[viewName]._activeSubModule`. En `app.js:1188` se conoce `methodName` y, de él, el `viewName` (p.ej. `renderGanaderia` → `GanaderiaView`), así:
+
+```js
+// hook en app.js, tras await App[methodName](params):
+const viewName = App._viewForMethod(methodName); // mapa metodo→vista ('renderGanaderia'→'GanaderiaView')
+const tab = window[viewName]?._activeSubModule ?? null;
+GuideManager.maybeStart(path, tab);
+```
+
+  (El helper `App._viewForMethod` es nuevo y trivial; se alimenta de las mismas vistas que ya carga `_viewGroups`.)
 - **Precondiciones** (todas deben cumplirse): `fincaId` activa (respeta `app.js:1179`); sin `#tour-flotante-overlay` ni `.asistente-loading-overlay` en el DOM; `isEnabled()`; `!seen(id)`; `!dismissed(id)`; `applies(flags)`.
 - **Prioridad de selección** (resuelve la coexistencia de guía panorámica de pilar y guía por tab, ambas con el mismo `route`):
   1. Si existe guía **panorámica** para el `route` (campo `tab: null`) y no está vista ni desactivada → arranca la panorámica, ignorando el `tab` actual. La panorámica recorre el carrusel de submódulos del pilar en ~4 pasos sin entrar en detaille por tab.
@@ -267,12 +283,26 @@ async _runLaunchStep(step) {
 
 ### 6.2 Cambio de tab (sin cambio de hash)
 
-- Patch único en `app.js:663` (`cerrarYNavegar`): tras `${viewName}._cambiarSubModulo(key)`, emitir `EventBus.emit('view:tabChanged', { viewName, tab: key })`.
-- `GuideManager` escucha `view:tabChanged`: si hay tour activo, **re-ancla** el paso actual (recalcula `target`) tras `requestAnimationFrame` ×2 (el `_cambiarSubModulo` → `this.render()` destruye el DOM antiguo). Si no hay tour activo, evalúa `maybeStart(route, newTab)` para auto-arrancar la guía del nuevo tab.
+> **Corrección B-5 — el emit debe ir tras el render, no con el DOM viejo.** `_cambiarSubModulo` **no es async** y llama `this.render()` **sin `await`** (`ganaderia-view.js:108`, `explotacion-view.js:16`, `comercializacion-view.js:306`); además `render()` tiene `await` a IndexedDB por delante. Un `EventBus.emit` encadenado en `cerrarYNavegar` (`app.js:663`) se ejecutaría con el DOM viejo, y `requestAnimationFrame` ×2 no cubre esos awaits. **Arreglo mínimo:**
+> 1. En cada vista, `_cambiarSubModulo` pasa a hacer `return this.render()` (devuelve la promesa) — **una línea por vista** (3 vistas). Es retrocompatible: los `onclick` existentes ignoran el valor de retorno.
+> 2. Sustituyo el inline `cerrarYNavegar` por un helper `App._cambiarSubmoduloConGuia(viewName, key)` que **awaitea** el render antes de emitir:
+>
+> ```js
+> // js/app.js (nuevo helper, reemplaza el inline de cerrarYNavegar en :663)
+> async _cambiarSubmoduloConGuia(viewName, key) {
+>   await window[viewName]._cambiarSubModulo(key); // ahora devuelve la promesa
+>   EventBus.emit('view:tabChanged', { viewName, tab: key });
+> }
+> // app.js:663 => `App.cerrarCarruselMenu(); App._cambiarSubmoduloConGuia('${viewName}','${key}')`
+> ```
+>
+> Esto **contradice el "no se tocan las vistas" de §11** — lo asumo explícitamente: es una palabra (`return`) por vista y es lo correcto para ordenar el ciclo de vida. §11 queda actualizado.
+
+- `GuideManager` escucha `view:tabChanged`: si hay tour activo, **re-ancla** el paso actual (recalcula `target`) — ya con el DOM nuevo montado. Si no hay tour activo, evalúa `maybeStart(route, newTab)` para auto-arrancar la guía del nuevo tab. (Seguridad extra: `maybeStart` re-valida `fincaId` y ausencia de bienvenida antes de arrancar.)
 
 ### 6.3 Controles del usuario
 
-- **FAB "Guía"** por subvista: relanza la guía **del tab actual** (no la panorámica) sin importar `seen`/`dismissed`. Visible si `isEnabled()`. Icono `Icons.ayuda()` o similar.
+- **FAB "Guía"** por subvista: relanza la guía **del tab actual** (no la panorámica) sin importar `seen`/`dismissed`. Visible si `isEnabled()`. Icono: como **`Icons.ayuda()` no existe** en `js/icons.js` (verificado — solo `info()`, `:445`), hay que **añadir un método nuevo** `ayuda()` que devuelva un SVG de interrogación/ayuda en `currentColor`. Podría reutilizarse un icono existente próximo si lo hay (a decidir en implementación), pero por ahora se asume icono nuevo. Ir a §11.
 - **Toggle global** en `ajustes-view.js`: "Guías interactivas" (on/off). Persiste `appConfig.guides.enabled`.
 - **Botón "Reiniciar todas las guías"** en Ajustes: limpia `seen` y `dismissed` (vuelve a auto-arrancar todo). Confirma con `Confirm.confirm`.
 - **"No mostrar de nuevo"** por guía: botón en el popover. Marca `dismissed[id]=true`. El FAB aún puede relanzarla.
@@ -292,16 +322,16 @@ async _runLaunchStep(step) {
 - Tests unitarios del motor (mock DOM / jsdom o equivalente ligero del proyecto).
 
 ### Fase 1 — GeGan (~2 sesiones)
-- Guías: `animales`, `rebanos`, `patrimonio` (condicional a carne), `zonas`, `sanidad`, `panoramica`.
+- Guías (6): `animales`, `rebanos`, `patrimonio` (condicional a carne), `zonas`, `sanidad`, `panoramica`.
 - Atributos `data-guide` mínimos en las vistas GeGan.
 - Verificación en navegador (web + emulador WebView) por guía.
 
 ### Fase 2 — ExPro (~2 sesiones)
-- Guías: `silos`, `fitosanitarios`, `gastos`, `proveedores`, `panoramica`.
+- Guías (8): `explotacion` (tab por defecto — primero que ve el usuario), `lacteo`, `silos`, `fitosanitarios`, `gastos`, `proveedores`, `tramites`, `panoramica`.
 - Atributos `data-guide` en vistas ExPro. Verificación.
 
 ### Fase 3 — CoMer (~1.5 sesiones)
-- Guías: `compradores`, `contratos`, `transportistas`, `panoramica`.
+- Guías (6): `leche` (tab por defecto — `flags.leche`), `carne` (`flags.carne`), `compradores`, `contratos`, `transportistas`, `panoramica`.
 - Atributos `data-guide` en vistas CoMer. Verificación.
 
 ### Fase 4 — Cierre (~0.5 sesión)
@@ -320,8 +350,8 @@ async _runLaunchStep(step) {
 |---|---|
 | Targets DOM ausentes al render (lazy load, modales) | `waitFor: true` reintenta `querySelector` hasta 2s antes de mostrar el paso. Pasos puramente narrativos usan `target: null`. |
 | Sub-pestañas re-renderan el DOM en cada cambio | Re-anclaje en `requestAnimationFrame` ×2 tras `view:tabChanged`. El observer no depende del DOM vivo del target. |
-| Wizard full-screen tapa el spotlight | Por diseño: overlay guide z-3500 < wizard z-4000. El tour se pausa; chip "Reanudar" z-9500 queda visible (auto-oculto si bienvenida activa). |
-| Overrides de config al actualizar la app | Merge con defaults al cargar (`{ enabled:true, seen:[], dismissed:[] }`). `_loadConfig` ya mergea defaults (`ajustes-view.js:241`). |
+| Wizard full-screen tapa el spotlight | Por diseño: overlay guide z-3500 < wizard z-4000. El tour se pausa; chip "Reanudar" z-4500 queda visible (auto-oculto si bienvenida activa; debajo de toasts z-6000 y `.btn-pesaje-close` z-5001). |
+| Overrides de config al actualizar la app | Merge con defaults al cargar (`{ enabled:true, seen:[], dismissed:[] }`). `_loadConfig` ya mergea defaults (defaults arrancan en `ajustes-view.js:229`, merge en `:242`). |
 | Falsos positivos del MutationObserver | Observación por identidad de nodo (no por clase), `childList` sin `subtree`, observer perezoso. Ver §5.2. |
 | Accesibilidad / focus | Focus trap en el popover; Escape = Saltar; `aria-modal` y `role="dialog"` en el overlay. |
 | Rendimiento en WebView Android | Overlay ligero (un `<svg>` + un `<div>` popover); observer sólo activo durante paso de captura; recálculo de posición throttle on resize/scroll. |
@@ -357,15 +387,16 @@ async _runLaunchStep(step) {
 
 | Archivo | Cambio |
 |---|---|
-| `js/guide-manager.js` | **NUEVO** — motor |
-| `js/guide-registry.js` | **NUEVO** — registro |
-| `js/guides/*.js` | **NUEVOS** — 16 guías declarativas + loaders |
-| `js/app.js` | Patch `:663` (emit `view:tabChanged`) + hook `:1188` (`maybeStart`) + loader de guías en `_ensureRouteScripts` |
-| `js/views/ajustes-view.js` | Toggle "Guías interactivas" + botón "Reiniciar todas" |
-| `js/views/ganaderia-view.js`, `explotacion-view.js`, `comercializacion-view.js` | Atributos `data-guide` mínimos + FAB "Guía" |
-| Sub-vistas (`animales-view.js`, `rebanos-view.js`, etc.) | Atributos `data-guide` en elementos clave |
+| `js/guide-manager.js` | **NUEVO** — motor (overlay, máscara, popover, observer, waitFor, re-anclaje, chip) |
+| `js/guide-registry.js` | **NUEVO** — registro + lookup por `(route, tab)` + filtrado por `applies(flags)` |
+| `js/guides/*.js` | **NUEVOS** — **21 guías** declarativas (18 por tab + 3 panorámicas) + loaders por grupo de ruta |
+| `js/app.js` | Helper `_cambiarSubmoduloConGuia(viewName,key)` (awaitea render + `emit view:tabChanged`), helper `_viewForMethod(method)` (mapa método→vista), patch `:663` (usa el helper en vez del inline), hook `:1188` (`maybeStart` con `tab` desde `window[viewName]._activeSubModule`), loader de guías en `_ensureRouteScripts` |
+| `js/icons.js` | **NUEVO método** `ayuda()` (SVG interrogación/ayuda, `currentColor`) — no existe hoy (B-6) |
+| `js/views/ajustes-view.js` | Toggle "Guías interactivas" + botón "Reiniciar todas" (persistido en `appConfig.guides`) |
+| `js/views/ganaderia-view.js`, `explotacion-view.js`, `comercializacion-view.js` | `_cambiarSubModulo` → `return this.render()` (**una línea por vista**, B-5) + atributos `data-guide` mínimos + FAB "Guía" |
+| Sub-vistas (`animales-view.js`, `rebanos-view.js`, `silos-view.js`, `gastos-view.js`, `compradores-view.js`, etc.) | Atributos `data-guide` en elementos clave según cada guía |
 | `css/styles.css` | Estilos del overlay guide + popover + spotlight + chip reanudar (bloque nuevo) |
 | `sw.js` | Bump `CACHE_NAME` |
 | `index.html` | `?v=` en scripts cargados |
 
-**No se tocan**: `wizard-manager.js` (coordinación por observer), `modal-manager.js`, `event-bus.js`, `module-colors.js` (consumidos, no modificados).
+**No se tocan**: `wizard-manager.js` (coordinación por observer, no por events inyectados), `modal-manager.js`, `event-bus.js` (consumido via `emit/on`), `module-colors.js` (consumido via `getModuleColor`), `db.js` (consumido via stores). Las 3 vistas principales sí se tocan — mínimamente (`return this.render()` + `data-guide` + FAB), ver §6.2.
