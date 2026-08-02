@@ -274,5 +274,64 @@
     return { passed: _passed, failed: _failed, total: _passed + _failed, results: _results };
   }
 
-  window.GuiaQA = { runAll };
+  /**
+   * Valida los `target` de las guías registradas CONTRA EL DOM REAL, recorriendo
+   * cada sub-módulo. Un selector puede ser CSS válido y aun así no encontrar nada:
+   * `runAll` no lo detecta porque no navega. Ejecutar desde la vista del pilar:
+   *
+   *   await GuiaQA.validarTargets('GanaderiaView')
+   *
+   * Devuelve, por guía, los pasos cuyo target no resuelve. Un paso puede fallar
+   * legítimamente si su elemento solo existe tras abrir un formulario o si no hay
+   * datos; revisar caso por caso antes de dar la guía por buena.
+   */
+  async function validarTargets(viewName) {
+    const view = window[viewName];
+    if (!view || typeof view._cambiarSubModulo !== 'function') {
+      console.error('[GuiaQA] Vista no encontrada o sin _cambiarSubModulo:', viewName);
+      return null;
+    }
+    const guias = window.GuideRegistry ? GuideRegistry.getAll() : [];
+    const informe = {};
+
+    for (const g of guias) {
+      if (g.tab) {
+        await App._cambiarSubmoduloConGuia(viewName, g.tab);
+        await new Promise(r => setTimeout(r, 1500)); // render + carga de datos
+      }
+      const fila = { tab: g.tab || '(panorámica)', conTarget: 0, resuelven: 0, invalidos: [], noEncuentran: [] };
+      g.steps.forEach((step, i) => {
+        if (!step.target) return;
+        fila.conTarget++;
+        try {
+          document.querySelector(step.target) ? fila.resuelven++ : fila.noEncuentran.push({ paso: i, selector: step.target });
+        } catch (e) {
+          fila.invalidos.push({ paso: i, selector: step.target });
+        }
+      });
+      informe[g.id] = fila;
+    }
+
+    const totales = Object.values(informe).reduce((a, f) => ({
+      conTarget: a.conTarget + f.conTarget,
+      resuelven: a.resuelven + f.resuelven,
+      invalidos: a.invalidos + f.invalidos.length,
+      noEncuentran: a.noEncuentran + f.noEncuentran.length
+    }), { conTarget: 0, resuelven: 0, invalidos: 0, noEncuentran: 0 });
+
+    console.log(`[GuiaQA] targets: ${totales.resuelven}/${totales.conTarget} resuelven · ` +
+                `${totales.invalidos} selectores inválidos · ${totales.noEncuentran} sin coincidencia`);
+    console.table(Object.entries(informe).map(([id, f]) => ({
+      Guia: id, Tab: f.tab, OK: `${f.resuelven}/${f.conTarget}`,
+      Invalidos: f.invalidos.length, SinCoincidencia: f.noEncuentran.length
+    })));
+    Object.entries(informe).forEach(([id, f]) => {
+      [...f.invalidos, ...f.noEncuentran].forEach(x =>
+        console.warn(`  ${id} paso ${x.paso}: ${x.selector}`));
+    });
+
+    return { informe, totales };
+  }
+
+  window.GuiaQA = { runAll, validarTargets };
 })();
