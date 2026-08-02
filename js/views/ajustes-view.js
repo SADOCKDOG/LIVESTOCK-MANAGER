@@ -213,7 +213,7 @@ const AjustesView = {
         </div>
         <div class="grid gap-10 mt-15">
           <button class="btn btn-secondary w-full" onclick="AjustesView._reiniciarGuias()">
-            ${Icons.actualizar()} Reiniciar todas las guías
+            ${Icons.rotacion()} Reiniciar todas las guías
           </button>
         </div>
       </div>
