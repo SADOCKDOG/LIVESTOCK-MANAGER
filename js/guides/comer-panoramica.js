@@ -21,7 +21,7 @@
       {
         title: 'Carrusel de pestañas',
         body: 'El carrusel circular superior muestra **solo las pestañas permitidas** según tu modo de explotación (Ajustes → Explotación): Leche (azul) si flags.leche=ON; Carne (verde lima) si flags.carne=ON; Compradores, Contratos y Transportistas (púrpura/rosa) siempre. Click para cambiar sin recargar la vista completa.',
-        target: '.carrusel-pestanas button, .carrusel-pestanas .carrusel-dot',
+        target: '.carrusel-pestanas .carrusel-dot, .carrusel-pestanas .carrusel-marco',
         waitFor: 1000,
         position: 'below'
       },
