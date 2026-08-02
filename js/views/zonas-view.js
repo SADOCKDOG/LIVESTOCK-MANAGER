@@ -259,6 +259,10 @@ const ZonasView = {
         <div class="grid gap-12">${fichasHtml}</div>`;
     }
     main.innerHTML = html;
+    // FAB Guía interactiva
+    if (window.App && typeof App.renderGuideFab === 'function') {
+      App.renderGuideFab('/ganaderia', 'zonas');
+    }
   },
 
   async renderDetalle(params) {

@@ -1,0 +1,782 @@
+/**
+ * Livestock Manager - GuideManager v1.0.0
+ * Motor de guías interactivas: overlay z-3500, spotlight SVG, popover narrativo,
+ * navegación, MutationObserver perezoso para wizards, waitFor, re-anclaje, chip reanudar.
+ */
+(function () {
+  'use strict';
+
+  // ==================== ESTADO ====================
+  const _state = {
+    enabled: true,              // toggle global
+    seen: [],                   // guías completadas (auto-arranque no repite)
+    dismissed: [],              // "No mostrar de nuevo" por guía (FAB aún relanza)
+    currentGuide: null,         // { guide, stepIndex, overlay, popover, spotlight, observer }
+    _hydrated: false            // hidratado desde App._config
+  };
+
+  // ==================== HELPERS ====================
+
+  /** Lee config caliente desde App._config (cache en memoria, respeta AjustesView._saveConfig) */
+  function _readConfig() {
+    const cfg = (window.App && App._config) || {};
+    const guides = cfg.guides || {};
+    return {
+      enabled: guides.enabled ?? true,
+      seen: Array.isArray(guides.seen) ? guides.seen : [],
+      dismissed: Array.isArray(guides.dismissed) ? guides.dismissed : []
+    };
+  }
+
+  /** Escribe config y actualiza App._config cache */
+  function _writeConfig(patch) {
+    const cfg = _readConfig();
+    Object.assign(cfg, patch);
+    if (window.AjustesView && typeof AjustesView._saveConfig === 'function') {
+      AjustesView._saveConfig({ guides: cfg });
+    }
+    // Actualiza estado local inmediatamente
+    Object.assign(_state, cfg);
+  }
+
+  /** Hidrata estado desde App._config al inicio (una sola vez) */
+  function _hydrate() {
+    if (_state._hydrated) return Promise.resolve();
+    _state._hydrated = true;
+    const cfg = _readConfig();
+    Object.assign(_state, cfg);
+    return Promise.resolve();
+  }
+
+  /** Comprueba si las guías están globalmente habilitadas.
+   *  Lectura CALIENTE (spec §3.3): siempre desde App._config, nunca desde _state,
+   *  porque AjustesView._saveConfig escribe la config sin pasar por _writeConfig. */
+  function isEnabled() {
+    return _readConfig().enabled;
+  }
+
+  /** Genera ID único para elementos del overlay */
+  function _uid(prefix) {
+    return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  /** Obtiene color neón del pilar (usa module-colors.js si existe) */
+  function _getPillarColor(pillar) {
+    // Fuente de verdad: el color que cada vista pasa a App.updateHeaderColor
+    // (ganaderia-view.js:44, explotacion-view.js:209, comercializacion-view.js:192).
+    // NO se usa getModuleColor: module-colors.js:24 mapea /ganaderia a #FF4444 (rojo),
+    // que no es el lima con el que GeGan pinta realmente su header.
+    const porPilar = { gegan: 'var(--c-success)', expro: 'var(--c-info)', comer: 'var(--c-warning)' };
+    return porPilar[pillar] || 'var(--c-success)';
+  }
+
+  /** Escape HTML simple para títulos/cuerpos (markdown ligero: **negrita**) */
+  function _renderBody(body) {
+    if (!body) return '';
+    // **texto** -> <strong>texto</strong>
+    return body.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  // ==================== OVERLAY + SPOTLIGHT (SVG MÁSCARA) ====================
+
+  /**
+   * Crea el overlay con máscara SVG (4 rectángulos sombreados + 1 hueco recortado).
+   * @param {HTMLElement} target - Elemento a destacar
+   * @param {string} color - Color neón del pilar
+   * @returns {HTMLElement} overlay
+   */
+  function _createOverlay(target, color) {
+    const overlay = document.createElement('div');
+    overlay.className = 'guide-overlay';
+    overlay.style.cssText = `
+      position:fixed; inset:0; z-index:3500; pointer-events:none;
+      background:rgba(0,0,0,0.82); backdrop-filter:blur(2px);
+    `;
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.style.position = 'absolute';
+    svg.style.inset = '0';
+
+    const defs = document.createElementNS(svgNS, 'defs');
+    const mask = document.createElementNS(svgNS, 'mask');
+    mask.id = _uid('guide-mask');
+
+    // Rectángulo base (todo el viewport)
+    const fullRect = document.createElementNS(svgNS, 'rect');
+    fullRect.setAttribute('x', '0');
+    fullRect.setAttribute('y', '0');
+    fullRect.setAttribute('width', '100%');
+    fullRect.setAttribute('height', '100%');
+    fullRect.setAttribute('fill', 'white');
+    mask.appendChild(fullRect);
+
+    // Hueco recortado (target) — se actualiza en _updateSpotlight
+    const holeRect = document.createElementNS(svgNS, 'rect');
+    holeRect.id = _uid('guide-hole');
+    holeRect.setAttribute('fill', 'black'); // negro = transparente en mask
+    mask.appendChild(holeRect);
+
+    defs.appendChild(mask);
+    svg.appendChild(defs);
+
+    // Rectángulo visible que usa la máscara
+    const maskedRect = document.createElementNS(svgNS, 'rect');
+    maskedRect.setAttribute('x', '0');
+    maskedRect.setAttribute('y', '0');
+    maskedRect.setAttribute('width', '100%');
+    maskedRect.setAttribute('height', '100%');
+    maskedRect.setAttribute('fill', 'rgba(0,0,0,0.82)');
+    maskedRect.setAttribute('mask', `url(#${mask.id})`);
+    svg.appendChild(maskedRect);
+
+    // Anillo spotlight (neón del pilar) — se actualiza en _updateSpotlight
+    const ring = document.createElementNS(svgNS, 'rect');
+    ring.id = _uid('guide-ring');
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', color);
+    ring.setAttribute('stroke-width', '3');
+    ring.setAttribute('filter', 'drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor)');
+    ring.setAttribute('rx', '12');
+    ring.setAttribute('ry', '12');
+    svg.appendChild(ring);
+
+    overlay.appendChild(svg);
+    document.body.appendChild(overlay);
+
+    // Guardar referencias para actualización
+    overlay._svg = svg;
+    overlay._hole = holeRect;
+    overlay._ring = ring;
+    overlay._target = target;
+    overlay._color = color;
+
+    return overlay;
+  }
+
+  /**
+   * Actualiza posición/tamaño del spotlight (hueco + anillo) según target.getBoundingClientRect().
+   * @param {HTMLElement} overlay
+   * @param {HTMLElement} target
+   */
+  function _updateSpotlight(overlay, target) {
+    if (!overlay || !target) return;
+    const rect = target.getBoundingClientRect();
+    const padding = 8;
+    const x = rect.left - padding;
+    const y = rect.top - padding;
+    const w = rect.width + padding * 2;
+    const h = rect.height + padding * 2;
+    const r = 12;
+
+    // Hueco en máscara (coordenadas absolutas viewport)
+    overlay._hole.setAttribute('x', x);
+    overlay._hole.setAttribute('y', y);
+    overlay._hole.setAttribute('width', w);
+    overlay._hole.setAttribute('height', h);
+    overlay._hole.setAttribute('rx', r);
+    overlay._hole.setAttribute('ry', r);
+
+    // Anillo neón
+    overlay._ring.setAttribute('x', x);
+    overlay._ring.setAttribute('y', y);
+    overlay._ring.setAttribute('width', w);
+    overlay._ring.setAttribute('height', h);
+    overlay._ring.setAttribute('rx', r);
+    overlay._ring.setAttribute('ry', r);
+  }
+
+  // ==================== POPOVER NARRATIVO ====================
+
+  /**
+   * Crea el popover anclado al target (arriba si hay espacio, abajo si no).
+   * @param {Object} step - Paso actual
+   * @param {HTMLElement} target - Elemento ancla
+   * @param {number} stepIndex - Índice 0-based
+   * @param {number} totalSteps - Total de pasos
+   * @param {string} color - Color neón del pilar
+   * @returns {HTMLElement} popover
+   */
+  function _createPopover(step, target, stepIndex, totalSteps, color) {
+    const popover = document.createElement('div');
+    popover.className = 'guide-popover';
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-modal', 'true');
+    popover.style.cssText = `
+      position:fixed; z-index:3501; pointer-events:auto;
+      max-width:320px; min-width:260px;
+      background:var(--surface, #1a1a1a); border-radius:var(--r-xl, 16px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      font-family:inherit; font-size:0.8rem; line-height:1.4;
+      color:var(--text, #fff); padding:16px;
+    `;
+    // Sin borde superior iluminado (regla estricta de cards)
+
+    // Dots de progreso
+    const dots = document.createElement('div');
+    dots.className = 'guide-dots';
+    dots.style.cssText = 'display:flex; gap:6px; justify-content:center; margin-bottom:12px;';
+    for (let i = 0; i < totalSteps; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'tour-dot' + (i === stepIndex ? ' active' : '');
+      dot.style.cssText = `
+        width:8px; height:8px; border-radius:50%; background:var(--c-555, #555);
+        transition:background 0.2s, transform 0.2s;
+        ${i === stepIndex ? 'background:' + color + '; transform:scale(1.2);' : ''}
+      `;
+      dots.appendChild(dot);
+    }
+
+    // Título
+    const title = document.createElement('h4');
+    title.textContent = step.title;
+    title.style.cssText = 'margin:0 0 8px; font-size:0.85rem; font-weight:900; color:' + color + ';';
+
+    // Cuerpo (markdown ligero)
+    const body = document.createElement('div');
+    body.innerHTML = _renderBody(step.body);
+    body.style.cssText = 'margin-bottom:14px; font-size:0.75rem; line-height:1.5; color:var(--c-ccc, #ccc);';
+
+    // Botones
+    const btnBar = document.createElement('div');
+    btnBar.style.cssText = 'display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;';
+
+    const btnPrev = document.createElement('button');
+    btnPrev.type = 'button';
+    btnPrev.textContent = 'Anterior';
+    btnPrev.style.cssText = _btnStyle('secondary');
+    btnPrev.addEventListener('click', () => GuideManager.prev());
+
+    const btnNext = document.createElement('button');
+    btnNext.type = 'button';
+    btnNext.textContent = stepIndex === totalSteps - 1 ? 'Finalizar' : 'Siguiente';
+    btnNext.style.cssText = _btnStyle('primary', color);
+    btnNext.addEventListener('click', () => GuideManager.next());
+
+    const btnSkip = document.createElement('button');
+    btnSkip.type = 'button';
+    btnSkip.textContent = 'Saltar';
+    btnSkip.style.cssText = _btnStyle('ghost');
+    btnSkip.addEventListener('click', () => GuideManager.skip());
+
+    const btnDismiss = document.createElement('button');
+    btnDismiss.type = 'button';
+    btnDismiss.textContent = 'No mostrar de nuevo';
+    btnDismiss.style.cssText = _btnStyle('ghost');
+    btnDismiss.addEventListener('click', () => GuideManager.dismiss());
+
+    // Focus trap: primero = btnPrev (o btnNext si no hay prev), último = btnDismiss
+    btnPrev.setAttribute('data-guide-focus', 'first');
+    btnDismiss.setAttribute('data-guide-focus', 'last');
+
+    if (stepIndex > 0) btnBar.appendChild(btnPrev);
+    btnBar.appendChild(btnNext);
+    btnBar.appendChild(btnSkip);
+    btnBar.appendChild(btnDismiss);
+
+    popover.appendChild(dots);
+    popover.appendChild(title);
+    popover.appendChild(body);
+    popover.appendChild(btnBar);
+    document.body.appendChild(popover);
+
+    // Posicionar
+    _positionPopover(popover, target);
+
+    return popover;
+  }
+
+  function _btnStyle(variant, color) {
+    const base = 'padding:10px 16px; border-radius:8px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; min-height:44px; min-width:44px; cursor:pointer; border:none; transition:transform 0.05s, opacity 0.1s;';
+    const active = 'transform:scale(0.95);';
+    switch (variant) {
+      case 'primary': return base + 'background:' + color + '; color:#000;' + active;
+      case 'secondary': return base + 'background:var(--c-333, #333); color:var(--c-fff, #fff); border:1px solid var(--c-555, #555);' + active;
+      case 'ghost': return base + 'background:transparent; color:var(--c-aaa, #aaa);' + active;
+      default: return base;
+    }
+  }
+
+  /**
+   * Posiciona popover arriba del target si cabe, sino abajo. Centrado horizontalmente.
+   */
+  function _positionPopover(popover, target) {
+    const rect = target.getBoundingClientRect();
+    const popoverRect = popover.getBoundingClientRect();
+    const gap = 12;
+    const viewportH = window.innerHeight;
+
+    // Intentar arriba
+    let top = rect.top - popoverRect.height - gap;
+    let left = rect.left + rect.width / 2 - popoverRect.width / 2;
+
+    // Clamp horizontal
+    left = Math.max(12, Math.min(left, viewportH - popoverRect.width - 12));
+
+    // Si no cabe arriba, poner abajo
+    if (top < 12) {
+      top = rect.bottom + gap;
+      // Si tampoco cabe abajo, centrar en viewport
+      if (top + popoverRect.height > viewportH - 12) {
+        top = (viewportH - popoverRect.height) / 2;
+      }
+    }
+
+    popover.style.top = top + 'px';
+    popover.style.left = left + 'px';
+  }
+
+  // ==================== CHIP "REAUDAR GUÍA" ====================
+
+  let _chip = null;
+
+  function _showResumeChip() {
+    if (_chip) return;
+    const chip = document.createElement('button');
+    chip.id = 'guide-resume-chip';
+    chip.className = 'guide-resume-chip';
+    chip.innerHTML = Icons ? Icons.rotacion() : '↻';
+    chip.setAttribute('aria-label', 'Reanudar guía');
+    chip.style.cssText = `
+      position:fixed; bottom:24px; right:24px; z-index:4500;
+      width:56px; height:56px; border-radius:50%;
+      background:var(--c-success, #00cc00); color:#000;
+      border:none; box-shadow:0 4px 20px rgba(0,204,0,0.4);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; cursor:pointer;
+      animation:guide-chip-pulse 1.5s ease-in-out infinite;
+      touch-action:manipulation;
+    `;
+    chip.addEventListener('click', () => GuideManager._resumeAfterWizard());
+    document.body.appendChild(chip);
+    _chip = chip;
+
+    // Auto-ocultar si hay tour bienvenida o asistente activo
+    _checkChipVisibility();
+  }
+
+  function _hideResumeChip() {
+    if (_chip) {
+      _chip.remove();
+      _chip = null;
+    }
+  }
+
+  function _checkChipVisibility() {
+    if (!_chip) return;
+    const hidden = document.getElementById('tour-flotante-overlay') ||
+                   document.querySelector('.asistente-loading-overlay');
+    _chip.style.display = hidden ? 'none' : 'flex';
+  }
+
+  // Observer para auto-ocultar chip cuando aparece/desaparece bienvenida/asistente
+  let _chipObserver = null;
+  function _startChipObserver() {
+    if (_chipObserver) return;
+    _chipObserver = new MutationObserver(_checkChipVisibility);
+    _chipObserver.observe(document.body, { childList: true, subtree: true });
+  }
+  function _stopChipObserver() {
+    if (_chipObserver) {
+      _chipObserver.disconnect();
+      _chipObserver = null;
+    }
+  }
+
+  // ==================== MUTATION OBSERVER PARA WIZARDS ====================
+
+  /**
+   * Ejecuta un paso con launch: abre wizard real y pausa guía hasta que cierra.
+   * Usa MutationObserver perezoso (childList sin subtree, por identidad de nodo).
+   * Cubre 3 salidas: Finalizar, Cancelar confirmado, Android-back wizard.remove().
+   */
+  async function _runLaunchStep(step) {
+    const state = _state.currentGuide;
+    if (!state) return;
+
+    state._nodoPausa = null; // aún no existe el wizard
+
+    state._observer = new MutationObserver(muts => {
+      for (const m of muts) {
+        // Capturar nodo wizard cuando aparece (caso a: launch propio, caso b: usuario abre fuera del guion)
+        if (!state._nodoPausa) {
+          const nuevo = [...m.addedNodes].find(n =>
+            n.nodeType === Node.ELEMENT_NODE && n.classList?.contains('wizard-full-screen')
+          );
+          if (nuevo) {
+            state._nodoPausa = nuevo;
+            _hidePopover();
+            _showResumeChip();
+            _startChipObserver();
+            continue;
+          }
+        }
+        // Cierre: el nodo capturado se elimina (3 salidas convergen aquí)
+        if (state._nodoPausa && [...m.removedNodes].includes(state._nodoPausa)) {
+          _teardownObserver();
+          _resumeAfterWizard();
+          return;
+        }
+      }
+    });
+    state._observer.observe(document.body, { childList: true }); // sin subtree
+
+    // Ejecutar launch — abre el wizard real
+    if (typeof step.launch === 'function') {
+      try {
+        step.launch();
+      } catch (e) {
+        console.error('[GuideManager] Error en launch:', e);
+        _teardownObserver();
+        _resumeAfterWizard();
+      }
+    }
+  }
+
+  function _teardownObserver() {
+    const state = _state.currentGuide;
+    if (state && state._observer) {
+      state._observer.disconnect();
+      state._observer = null;
+      state._nodoPausa = null;
+    }
+    _hideResumeChip();
+    _stopChipObserver();
+  }
+
+  function _resumeAfterWizard() {
+    const state = _state.currentGuide;
+    if (!state) return;
+    // Recalcular spotlight/popover por si el DOM cambió
+    setTimeout(() => {
+      if (state.overlay && state.step.target) {
+        const target = document.querySelector(state.step.target);
+        if (target) {
+          _updateSpotlight(state.overlay, target);
+          _positionPopover(state.popover, target);
+        }
+      }
+      _showPopover();
+    }, 0); // next tick
+  }
+
+  function _showPopover() {
+    const state = _state.currentGuide;
+    if (state && state.popover) state.popover.style.display = '';
+  }
+
+  function _hidePopover() {
+    const state = _state.currentGuide;
+    if (state && state.popover) state.popover.style.display = 'none';
+  }
+
+  // ==================== NAVEGACIÓN ====================
+
+  function _goToStep(index) {
+    const state = _state.currentGuide;
+    if (!state || !state.guide) return;
+    const steps = state.guide.steps;
+    if (index < 0 || index >= steps.length) return;
+
+    const prevStep = state.step;
+    state.stepIndex = index;
+    state.step = steps[index];
+
+    // Si hay target, reanclar overlay + popover
+    if (state.step.target) {
+      const target = document.querySelector(state.step.target);
+      if (target) {
+        _updateSpotlight(state.overlay, target);
+        _positionPopover(state.popover, target);
+        // Actualizar dots
+        state.popover.querySelectorAll('.tour-dot').forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+          dot.style.background = i === index ? state.guide.pillarColor : 'var(--c-555, #555)';
+          dot.style.transform = i === index ? 'scale(1.2)' : 'scale(1)';
+        });
+        // Actualizar botón "Siguiente" -> "Finalizar" si es último
+        const btnNext = state.popover.querySelector('button[data-guide-action="next"]') ||
+                        state.popover.querySelector('button[type="button"]:not([data-guide-focus="first"]):not([data-guide-focus="last"])');
+        if (btnNext && btnNext.textContent !== 'Anterior' && btnNext.textContent !== 'Saltar' && btnNext.textContent !== 'No mostrar de nuevo') {
+          btnNext.textContent = index === steps.length - 1 ? 'Finalizar' : 'Siguiente';
+        }
+        return;
+      }
+    }
+
+    // Paso narrativo (target: null) — centrar popover en viewport
+    state.overlay._hole.setAttribute('x', '-9999');
+    state.overlay._hole.setAttribute('y', '-9999');
+    state.overlay._hole.setAttribute('width', '0');
+    state.overlay._hole.setAttribute('height', '0');
+    state.overlay._ring.setAttribute('x', '-9999');
+    state.popover.style.top = '50%';
+    state.popover.style.left = '50%';
+    state.popover.style.transform = 'translate(-50%, -50%)';
+  }
+
+  // ==================== API PÚBLICA ====================
+
+  const GuideManager = {
+    // Hidratación
+    _hydrate,
+
+    // Estado
+    isEnabled,
+
+    // Auto-arranque: evalúa precondiciones y arranca si procede
+    async maybeStart(route, tab) {
+      await _hydrate();
+
+      const cfg = _readConfig();
+      if (!cfg.enabled) return;
+      if (!window.Fincas || !(await Fincas.getActiveId())) return; // sin finca activa
+      if (document.getElementById('tour-flotante-overlay')) return; // bienvenida activa
+      if (document.querySelector('.asistente-loading-overlay')) return; // asistente activo
+
+      const flags = window.ModoContextoHelper ? ModoContextoHelper.getFlags() : { leche: true, carne: false };
+
+      // Los ids son `<pillar>.<tab>` (gegan.animales), no `<route>.<tab>`: no se pueden
+      // derivar de la ruta. Se resuelve la guía primero y se filtra por su id real.
+      const visto = (g) => !g || cfg.seen.includes(g.id) || cfg.dismissed.includes(g.id);
+
+      // Prioridad (spec §6.1): la panorámica del pilar manda mientras no se haya visto;
+      // una vez vista (o descartada), se ofrece la guía del tab actual.
+      const panoramica = GuideRegistry.getPanoramica(route, flags);
+      if (!visto(panoramica)) return await this.start(panoramica.id);
+
+      const guiaTab = tab ? GuideRegistry.getByRouteTab(route, tab, flags) : null;
+      if (visto(guiaTab)) return;
+
+      await this.start(guiaTab.id);
+    },
+
+    // Arranque manual (FAB, test, etc.) — ignora seen/dismissed
+    async start(guideId) {
+      await _hydrate();
+      if (!isEnabled()) return;
+
+      const guide = GuideRegistry.getAll().find(g => g.id === guideId);
+      if (!guide) {
+        console.warn('[GuideManager] Guía no encontrada:', guideId);
+        return;
+      }
+
+      // `seen` se marca al COMPLETAR el último paso (_finish), nunca al arrancar:
+      // de lo contrario Saltar equivaldría a "no volver a mostrar" (spec §6.1 y §6.3).
+
+      const color = _getPillarColor(guide.pillar);
+      const firstStep = guide.steps[0];
+
+      // Esperar target si waitFor
+      let target = null;
+      if (firstStep.target) {
+        target = await _waitForSelector(firstStep.target, firstStep.waitFor);
+        if (!target) {
+          console.warn('[GuideManager] Target no encontrado tras waitFor:', firstStep.target);
+          // Seguir sin target (paso narrativo centrado)
+        }
+      }
+
+      // Crear overlay
+      const overlay = target ? _createOverlay(target, color) : _createOverlay(
+        { getBoundingClientRect: () => ({ left: -9999, top: -9999, width: 0, height: 0 }) }, color
+      );
+
+      // Crear popover
+      const popover = _createPopover(firstStep, target || document.body, 0, guide.steps.length, color);
+
+      // Estado actual
+      _state.currentGuide = {
+        guide,
+        stepIndex: 0,
+        step: firstStep,
+        overlay,
+        popover,
+        pillarColor: color,
+        _resizeHandler: () => {
+          if (target) _updateSpotlight(overlay, target);
+          _positionPopover(popover, target || document.body);
+        },
+        _scrollHandler: () => {
+          if (target) _positionPopover(popover, target);
+        }
+      };
+
+      // Listeners recálculo
+      window.addEventListener('resize', _state.currentGuide._resizeHandler, { passive: true });
+      window.addEventListener('scroll', _state.currentGuide._scrollHandler, { passive: true });
+      window.addEventListener('orientationchange', _state.currentGuide._resizeHandler, { passive: true });
+
+      // Focus trap en popover
+      _setupFocusTrap(popover);
+
+      // Escape = Saltar
+      _state.currentGuide._keydownHandler = (e) => {
+        if (e.key === 'Escape') GuideManager.skip();
+      };
+      document.addEventListener('keydown', _state.currentGuide._keydownHandler);
+
+      // Si el primer paso tiene launch, ejecutarlo
+      if (firstStep.launch) {
+        await _runLaunchStep(firstStep);
+      }
+    },
+
+    // Re-lanzar (FAB) — ignora seen/dismissed
+    async relaunch(guideId) {
+      await this.start(guideId);
+    },
+
+    next() {
+      const state = _state.currentGuide;
+      if (!state) return;
+      if (state.stepIndex < state.guide.steps.length - 1) {
+        _goToStep(state.stepIndex + 1);
+      } else {
+        this._finish();
+      }
+    },
+
+    prev() {
+      const state = _state.currentGuide;
+      if (!state) return;
+      if (state.stepIndex > 0) {
+        _goToStep(state.stepIndex - 1);
+      }
+    },
+
+    skip() {
+      this._cleanup(false); // no marca seen ni dismissed
+    },
+
+    dismiss() {
+      const state = _state.currentGuide;
+      if (!state) return;
+      const id = state.guide.id;
+      const { dismissed } = _readConfig();
+      if (!dismissed.includes(id)) _writeConfig({ dismissed: [...dismissed, id] });
+      this._cleanup(true);
+    },
+
+    _finish() {
+      const state = _state.currentGuide;
+      if (!state) return;
+      const id = state.guide.id;
+      // Marcar completada
+      const { seen } = _readConfig();
+      if (!seen.includes(id)) {
+        _writeConfig({ seen: [...seen, id] });
+      }
+      this._cleanup(true);
+    },
+
+    _cleanup(markSeen) {
+      const state = _state.currentGuide;
+      if (!state) return;
+
+      // Limpiar listeners
+      window.removeEventListener('resize', state._resizeHandler);
+      window.removeEventListener('scroll', state._scrollHandler);
+      window.removeEventListener('orientationchange', state._resizeHandler);
+      document.removeEventListener('keydown', state._keydownHandler);
+
+      // Limpiar observer si activo
+      _teardownObserver();
+
+      // Eliminar DOM
+      state.overlay?.remove();
+      state.popover?.remove();
+
+      _state.currentGuide = null;
+    },
+
+    // Re-anclaje tras cambio de tab (llamado desde EventBus 'view:tabChanged')
+    reanchor() {
+      const state = _state.currentGuide;
+      if (!state || !state.step) return;
+      if (!state.step.target) return; // paso narrativo, no hay target
+
+      const target = document.querySelector(state.step.target);
+      if (target) {
+        _updateSpotlight(state.overlay, target);
+        _positionPopover(state.popover, target);
+      }
+    }
+  };
+
+  // ==================== WAITFOR SELECTOR ====================
+
+  /**
+   * Espera a que exista un selector en el DOM (hasta 2s, polling 50ms).
+   * @param {string} selector
+   * @param {boolean} waitFor - si false, devuelve inmediato
+   * @returns {Promise<HTMLElement|null>}
+   */
+  function _waitForSelector(selector, waitFor) {
+    if (!waitFor) return Promise.resolve(document.querySelector(selector));
+    return new Promise(resolve => {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        const el = document.querySelector(selector);
+        if (el || Date.now() - start > 2000) {
+          clearInterval(interval);
+          resolve(el || null);
+        }
+      }, 50);
+    });
+  }
+
+  // ==================== FOCUS TRAP ====================
+
+  function _setupFocusTrap(popover) {
+    const focusable = popover.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    popover.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    // Focus inicial
+    setTimeout(() => first?.focus(), 0);
+  }
+
+  // ==================== ICONOS FALLBACK ====================
+
+  // Icons.ayuda() se añade en js/icons.js; este fallback es por si no existe
+  const Icons = window.Icons || {
+    rotacion: () => '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>',
+    ayuda: () => '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>'
+  };
+
+  // Exponer global
+  window.GuideManager = GuideManager;
+
+  // Estilos dinámicos para chip (animación pulse)
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes guide-chip-pulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(0,204,0,0.4); transform: scale(1); }
+      50% { box-shadow: 0 4px 30px rgba(0,204,0,0.7); transform: scale(1.05); }
+    }
+    .guide-resume-chip:active { transform: scale(0.95) !important; }
+  `;
+  document.head.appendChild(style);
+
+})();
