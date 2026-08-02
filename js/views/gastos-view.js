@@ -65,7 +65,7 @@ const GastosView = {
     });
 
     main.innerHTML = `
-      <div class="card mb-14 p-12 card-resumen" style="background:rgba(168,85,247,0.015); width:100%;">
+      <div class="card mb-14 p-12 card-resumen" data-guide="grafico-evolucion" style="background:rgba(168,85,247,0.015); width:100%;">
         <div class="flex justify-between items-center mb-6">
           <span class="text-xs text-gray font-bold uppercase"><span style="color: var(--c-purple); margin-right:4px;">|</span> EVOLUCIÓN MENSUAL (ÚLTIMOS 6 MESES)</span>
           <span class="text-xs text-gray">${UI.formatCurrency(totalGeneral)} total</span>

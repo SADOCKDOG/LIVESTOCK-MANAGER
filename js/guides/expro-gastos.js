@@ -22,16 +22,20 @@
       {
         title: 'Evolución Mensual (últimos 6 meses)',
         body: 'Gráfico de barras: gasto total por mes. Verde = bajo, ámbar = medio, rojo = alto. Total general en cabecera. Indicador visual de estacionalidad de costes.',
-        target: '.gasto-bar-wrap, [style*="gasto-bar"]',
+        // La tarjeta completa del gráfico: .gasto-bar-wrap casaba con UNA barra suelta
+        // (a menudo la de un mes sin gasto), no con el gráfico que describe el texto.
+        target: '[data-guide="grafico-evolucion"]',
         waitFor: 1500,
         position: 'below'
       },
       {
         title: 'Balance Global de Gastos (colapsable)',
         body: 'Panel colapsable con total por cada una de las 6 categorías (icono + color propio) + **Total General Gastos** (rojo). Click en chevron para colapsar/expandir. Refleja solo gastos de la finca activa.',
-        target: '.card-resumen.card-total-3d:has-text("BALANCE GLOBAL DE GASTOS"), .card-total-3d',
+        target: '.card-resumen.card-total-3d',
         waitFor: 1000,
-        position: 'below'
+        position: 'below',
+        optional: true,
+        optionalReason: 'Solo visible tras renderizar la pestaña Gastos (contenido dinámico)'
       },
       {
         title: 'Tabs por Categoría Contable',
@@ -43,14 +47,14 @@
       {
         title: 'Listado de gastos (filtrado por tab)',
         body: 'Grid con tarjetas: concepto/categoría, fecha, categoría, badge importe (€). Click abre detalle (editar/borrar). Orden: más reciente primero. Límite 15 por tab. Vacío = sin gastos en esa categoría.',
-        target: '#expro-tab-content .card-registro, .grid.gap-10 .card-registro',
+        target: '#gasto-content .card-registro',
         waitFor: 1500,
         position: 'above'
       },
       {
         title: 'FAB Nuevo Gasto',
         body: 'FAB flotante «Nuevo Gasto» (púrpura) abre wizard: categoría (selector 6 opciones), concepto, fecha, importe (€), proveedor (opcional, enlace a Proveedores), zona, notas. Valida importe >0. Genera gasto_ganaderia + evento registro_eventos.',
-        target: '.fab-container:has([onclick*="App._abrirFormularioGasto"])',
+        target: '.fab-container[onclick*="App._abrirFormularioGasto"]',
         waitFor: 1500,
         position: 'above'
       },
