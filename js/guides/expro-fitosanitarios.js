@@ -22,13 +22,13 @@
       {
         title: 'KPIs: Inversión / Aplicaciones / Zonas',
         body: '3 tarjetas superiores: **Inversión Total** (€, verde neón), **Aplicaciones** (número registros), **Zonas Tratadas** (parcelas únicas). Resumen económico y de cobertura fitosanitaria.',
-        target: '.grid.grid-cols-3 .card, .card:has-text("INVERSIÓN TOTAL")',
+        target: '.grid .card',
         waitFor: 1000,
         position: 'below'
       },
       {
         title: 'Exportar Libro Fitosanitario Oficial (PDF)',
-        body: 'Botán principal verde neón: **«Exportar Libro Fitosanitario Oficial (PDF)»**. Genera documento oficial compatible con requisitos CCAA (Andalucía/Extremadura/etc.) para inspecciones. Incluye: finca, parcela, cultivo, producto, dosis, fecha, operador, plazo seguridad, LMR.',
+        body: 'Botón principal verde neón: **«Exportar Libro Fitosanitario Oficial (PDF)»**. Genera documento oficial compatible con requisitos CCAA (Andalucía/Extremadura/etc.) para inspecciones. Incluye: finca, parcela, cultivo, producto, dosis, fecha, operador, plazo seguridad, LMR.',
         target: '[onclick*="FitosanitariosView._exportarPDF"]',
         waitFor: true,
         position: 'below'
@@ -36,14 +36,16 @@
       {
         title: 'Historial de Tratamientos y Compras',
         body: 'Listado cronológico (más reciente primero) de cada registro: fecha, zona/parcela, producto, dosis, ha, plazo seguridad (días), operador, coste. Cada tarjeta clicable abre opciones: editar / eliminar / ver PDF individual. Vacío = sin registros fitosanitarios en esta finca.',
-        target: '.card:has-text("TRATAMIENTOS Y COMPRAS"), .card-registro:has(.empty-state-icon)',
+        // .card.p-16 es único en la vista y es el bloque "TRATAMIENTOS Y COMPRAS
+        // REGISTRADAS" (verificado en dispositivo). El :has-text() anterior no era CSS.
+        target: '.card.p-16',
         waitFor: 1500,
         position: 'above'
       },
       {
         title: 'FAB Nuevo Registro',
         body: 'FAB flotante «Nuevo Registro» (abajo derecha, verde neón) abre formulario: producto, dosis, hectáreas, zona, plazo seguridad, operador, fecha, notas, coste. Valida campos obligatorios. Guarda en gastos_ganaderia con categoría "Fitosanitarios".',
-        target: '.fab-container:has([onclick*="FitosanitariosView._nuevoTratamiento"])',
+        target: '.fab-container[onclick*="FitosanitariosView._nuevoTratamiento"]',
         waitFor: 1500,
         position: 'above'
       },

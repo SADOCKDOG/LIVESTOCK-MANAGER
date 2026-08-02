@@ -22,14 +22,14 @@
       {
         title: 'Resumen de Producción (KPIs)',
         body: 'Tarjeta superior con 2 KPIs: **Producción (L)** = total litros ordeñados; **Margen Carne** = margen económico cárnico. Color verde lima = carne, azul = leche. Se actualizan en tiempo real tras cada registro.',
-        target: '.card:has([style*="rgba(34,197,94"]), .leche-kpi-item',
+        target: '.leche-kpi-item',
         waitFor: 1000,
         position: 'below'
       },
       {
         title: 'Guía Sanitaria 365 Días (Andalucía)',
         body: 'Si la finca está en Andalucía y calificada **Indemne/Calificada** (T3/M3/B4), aparece banner **Guía 365**. Verde = activa (auto-autoriza guías anuales 365 días sin confirmación previa por lote). Amarillo = inactiva (requiere saneamiento). Botón «Ajustes» abre WizardFinca.',
-        target: '.card:has([style*="border-left: 4px solid var(--c-success)"]), .card:has([style*="border-left: 4px solid var(--c-warning)"])',
+        target: '.card[style*="border-left: 4px solid var(--c-success)"], .card[style*="border-left: 4px solid var(--c-warning)"]',
         waitFor: 1500,
         position: 'below',
         optional: true,
@@ -38,7 +38,7 @@
       {
         title: 'Alerta Telemetría: Stock Silos <15%',
         body: 'Si algún silo tiene stock <15% de capacidad, aparece tarjeta de alerta roja listando silos críticos con kg actual/capacidad y %. Click en silo abre ficha para recargar. Requiere módulo Silos configurado.',
-        target: '.card-resumen:has([style*="rgba(255, 68, 68"], .card:has-text("STOCK BAJO")',
+        target: '.card-resumen[style*="border-left: 4px solid var(--c-danger)"]',
         waitFor: 1500,
         position: 'below',
         optional: true,
