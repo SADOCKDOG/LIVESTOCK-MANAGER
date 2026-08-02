@@ -55,6 +55,18 @@
     return _readConfig().enabled;
   }
 
+  /** querySelector tolerante: un selector mal formado en una guía degrada ese paso a
+   *  narrativo (sin spotlight) en vez de lanzar y dejar el tour congelado. */
+  function _qs(selector) {
+    if (!selector) return null;
+    try {
+      return document.querySelector(selector);
+    } catch (e) {
+      console.warn('[GuideManager] Selector inválido, el paso se muestra sin spotlight:', selector);
+      return null;
+    }
+  }
+
   /** Genera ID único para elementos del overlay */
   function _uid(prefix) {
     return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -231,11 +243,13 @@
 
     // Título
     const title = document.createElement('h4');
+    title.className = 'guide-popover-title';
     title.textContent = step.title;
     title.style.cssText = 'margin:0 0 8px; font-size:0.85rem; font-weight:900; color:' + color + ';';
 
     // Cuerpo (markdown ligero)
     const body = document.createElement('div');
+    body.className = 'guide-popover-body';
     body.innerHTML = _renderBody(step.body);
     body.style.cssText = 'margin-bottom:14px; font-size:0.75rem; line-height:1.5; color:var(--c-ccc, #ccc);';
 
@@ -251,6 +265,7 @@
 
     const btnNext = document.createElement('button');
     btnNext.type = 'button';
+    btnNext.setAttribute('data-guide-action', 'next');
     btnNext.textContent = stepIndex === totalSteps - 1 ? 'Finalizar' : 'Siguiente';
     btnNext.style.cssText = _btnStyle('primary', color);
     btnNext.addEventListener('click', () => GuideManager.next());
@@ -285,6 +300,7 @@
     // Posicionar
     _positionPopover(popover, target);
 
+    popover._color = color;
     return popover;
   }
 
@@ -452,7 +468,7 @@
     // Recalcular spotlight/popover por si el DOM cambió
     setTimeout(() => {
       if (state.overlay && state.step.target) {
-        const target = document.querySelector(state.step.target);
+        const target = _qs(state.step.target);
         if (target) {
           _updateSpotlight(state.overlay, target);
           _positionPopover(state.popover, target);
@@ -480,41 +496,50 @@
     const steps = state.guide.steps;
     if (index < 0 || index >= steps.length) return;
 
-    const prevStep = state.step;
     state.stepIndex = index;
     state.step = steps[index];
 
-    // Si hay target, reanclar overlay + popover
-    if (state.step.target) {
-      const target = document.querySelector(state.step.target);
-      if (target) {
-        _updateSpotlight(state.overlay, target);
-        _positionPopover(state.popover, target);
-        // Actualizar dots
-        state.popover.querySelectorAll('.tour-dot').forEach((dot, i) => {
-          dot.classList.toggle('active', i === index);
-          dot.style.background = i === index ? state.guide.pillarColor : 'var(--c-555, #555)';
-          dot.style.transform = i === index ? 'scale(1.2)' : 'scale(1)';
-        });
-        // Actualizar botón "Siguiente" -> "Finalizar" si es último
-        const btnNext = state.popover.querySelector('button[data-guide-action="next"]') ||
-                        state.popover.querySelector('button[type="button"]:not([data-guide-focus="first"]):not([data-guide-focus="last"])');
-        if (btnNext && btnNext.textContent !== 'Anterior' && btnNext.textContent !== 'Saltar' && btnNext.textContent !== 'No mostrar de nuevo') {
-          btnNext.textContent = index === steps.length - 1 ? 'Finalizar' : 'Siguiente';
-        }
-        return;
-      }
+    const pop = state.popover;
+    const color = pop?._color || _getPillarColor(state.guide.pillar);
+
+    // Repintar el CONTENIDO del paso. Sin esto el popover conserva el texto del paso 0
+    // durante toda la guía: solo se movía el spotlight.
+    if (pop) {
+      const title = pop.querySelector('.guide-popover-title');
+      const body = pop.querySelector('.guide-popover-body');
+      if (title) title.textContent = state.step.title || '';
+      if (body) body.innerHTML = _renderBody(state.step.body);
+
+      pop.querySelectorAll('.tour-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+        dot.style.background = i === index ? color : 'var(--c-555, #555)';
+        dot.style.transform = i === index ? 'scale(1.2)' : 'scale(1)';
+      });
+
+      const btnNext = pop.querySelector('button[data-guide-action="next"]');
+      if (btnNext) btnNext.textContent = index === steps.length - 1 ? 'Finalizar' : 'Siguiente';
     }
 
-    // Paso narrativo (target: null) — centrar popover en viewport
-    state.overlay._hole.setAttribute('x', '-9999');
-    state.overlay._hole.setAttribute('y', '-9999');
-    state.overlay._hole.setAttribute('width', '0');
-    state.overlay._hole.setAttribute('height', '0');
-    state.overlay._ring.setAttribute('x', '-9999');
-    state.popover.style.top = '50%';
-    state.popover.style.left = '50%';
-    state.popover.style.transform = 'translate(-50%, -50%)';
+    // Si hay target visible, anclar overlay + popover sobre él
+    const target = state.step.target ? _qs(state.step.target) : null;
+    if (target) {
+      _updateSpotlight(state.overlay, target);
+      _positionPopover(state.popover, target);
+    } else {
+      // Paso narrativo (target: null o target ausente) — centrar popover en viewport
+      state.overlay._hole.setAttribute('x', '-9999');
+      state.overlay._hole.setAttribute('y', '-9999');
+      state.overlay._hole.setAttribute('width', '0');
+      state.overlay._hole.setAttribute('height', '0');
+      state.overlay._ring.setAttribute('x', '-9999');
+      state.popover.style.top = '50%';
+      state.popover.style.left = '50%';
+      state.popover.style.transform = 'translate(-50%, -50%)';
+    }
+
+    // Paso de captura: abrir el wizard real. Antes solo se hacía si el launch estaba en
+    // el PRIMER paso (start), así que los launch intermedios no se ejecutaban nunca.
+    if (typeof state.step.launch === 'function') _runLaunchStep(state.step);
   }
 
   // ==================== API PÚBLICA ====================
@@ -563,6 +588,12 @@
         console.warn('[GuideManager] Guía no encontrada:', guideId);
         return;
       }
+
+      // Cerrar el tour en curso antes de montar otro: sin esto _state.currentGuide se
+      // pisa y su overlay queda huérfano en el DOM (se apilaban varios a z-3500,
+      // oscureciendo la pantalla sin forma de cerrarlos).
+      if (_state.currentGuide) this._cleanup(false);
+      document.querySelectorAll('.guide-overlay, .guide-popover').forEach(n => n.remove());
 
       // `seen` se marca al COMPLETAR el último paso (_finish), nunca al arrancar:
       // de lo contrario Saltar equivaldría a "no volver a mostrar" (spec §6.1 y §6.3).
@@ -686,9 +717,10 @@
       // Limpiar observer si activo
       _teardownObserver();
 
-      // Eliminar DOM
+      // Eliminar DOM (incluye cualquier resto huérfano de un tour anterior)
       state.overlay?.remove();
       state.popover?.remove();
+      document.querySelectorAll('.guide-overlay, .guide-popover').forEach(n => n.remove());
 
       _state.currentGuide = null;
     },
@@ -699,7 +731,7 @@
       if (!state || !state.step) return;
       if (!state.step.target) return; // paso narrativo, no hay target
 
-      const target = document.querySelector(state.step.target);
+      const target = _qs(state.step.target);
       if (target) {
         _updateSpotlight(state.overlay, target);
         _positionPopover(state.popover, target);
@@ -716,12 +748,14 @@
    * @returns {Promise<HTMLElement|null>}
    */
   function _waitForSelector(selector, waitFor) {
-    if (!waitFor) return Promise.resolve(document.querySelector(selector));
+    if (!waitFor) return Promise.resolve(_qs(selector));
+    // waitFor admite `true` (2s por defecto) o un número de milisegundos.
+    const limite = typeof waitFor === 'number' ? waitFor : 2000;
     return new Promise(resolve => {
       const start = Date.now();
       const interval = setInterval(() => {
-        const el = document.querySelector(selector);
-        if (el || Date.now() - start > 2000) {
+        const el = _qs(selector);
+        if (el || Date.now() - start > limite) {
           clearInterval(interval);
           resolve(el || null);
         }
