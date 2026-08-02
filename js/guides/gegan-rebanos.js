@@ -29,7 +29,7 @@
       {
         title: 'Balance de Rebaños (colapsable)',
         body: 'Panel colapsable con conteos por categoría: **Todos, Carne, Leche, Activos** (filtrados por modo de explotación activo). El total final refleja solo los rebaños visibles según tus flags Leche/Carne.',
-        target: '.card-resumen, .card-total-3d:has(.fa-rebanos), .card-resumen:has-text("BALANCE DE REBAÑOS")',
+        target: '.card-resumen.card-total-3d',
         waitFor: 1000,
         position: 'below'
       },
@@ -58,14 +58,14 @@
       {
         title: 'Consumo de pienso (desde Silos)',
         body: 'En la ficha, botón **«Consumo Pienso»** descuenta stock del silo elegido, imputa kilos al rebaño y genera gasto analítico. Si hay varios silos, pide elegir. Requiere módulo ExPro → Silos configurado.',
-        target: '#rebanos-content [onclick*="_abrirConsumoPienso"], .widget-link-label:has-text("Consumo Pienso")',
+        target: '[onclick*="_abrirConsumoPienso"]',
         waitFor: 2000,
         position: 'above'
       },
       {
         title: 'Mover lote (rotación)',
         body: 'Botón **«Mover Lote»** abre selector para trasladar animales a otro rebaño/zona. Útil para rotaciones de pastillo o cambios de fase productiva.',
-        target: '#rebanos-content [onclick*="_abrirSelectorAnimales"], .widget-link-label:has-text("Mover Lote")',
+        target: '[onclick*="_abrirSelectorAnimales"]',
         waitFor: 2000,
         position: 'above'
       },
