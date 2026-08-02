@@ -2,8 +2,8 @@
 
 **Fecha:** 2026-08-02  
 **Espec:** `docs/superpowers/specs/2026-08-02-guias-interactivas-design.md`  
-**Estado:** Listo para ejecución  
-**Branch objetivo:** `feature/guias-interactivas` (master protegida → PR)
+**Estado:** Listo para ejecución (auditado contra código real)  
+**Branch actual:** `feature/guias-interactivas` (master protegida → PR)
 
 ---
 
@@ -20,7 +20,90 @@
 
 ---
 
-## Fases y desglose TDD
+## AUDITORÍA DE SUB-VISTAS — Acciones "ALTA" reales (verificadas file:line)
+
+| Sub-vista | Acción "Alta" real | API / Código | Tipo |
+|-----------|-------------------|--------------|------|
+| **animales-view.js** | `location.hash='/animal'` (32, 66) | Hash route → vista detalle animal | **NO wizard** |
+| **rebanos-view.js** | `RebanosView._crearRebano()` (594) | WizardManager inline (722-770) | **NO wizard externo** |
+| **zonas-view.js** | `ZonasView._crearZona()` (379) | WizardManager inline (438-470) | **NO wizard externo** |
+| **patrimonio-view.js** | `App._abrirAsistenteProduccion('carne')` (52) | ProduccionUI.iniciarAsistente | Asistente |
+| **sanidad-view.js** | **Tratamiento**: `WizardTratamiento.registrar(null)` (197) | ✓ Wizard real | `launch: () => WizardTratamiento.registrar(null)` |
+|  | **Vacunación**: `WizardVacunacion.registrar(null, ...)` (200) | ✓ Wizard real | `launch: () => WizardVacunacion.registrar(null)` |
+|  | **Crotales**: `App._abrirWizardCrotales()` (201) | Wrapper → `WizardCrotales.abrir()` | `launch: () => App._abrirWizardCrotales()` |
+|  | **Guía Mov.**: `App._abrirWizardGuiaMovimiento()` (202) | Wrapper → `WizardGuiaMovimiento.abrir()` | `launch: () => App._abrirWizardGuiaMovimiento()` |
+| **explotacion-view.js** (tab 'explotacion') | `App._abrirSubmenuRegistros()` / `_abrirAsistenteProduccion()` (220-222) | ProduccionUI.iniciarAsistente | Asistente |
+| **explotacion-view.js** (tab 'lacteo'→tanques) | `TanqueWizard.open(tanque)` (expl-lactea-view:102,111) | ✓ Wizard real | `launch: () => TanqueWizard.open()` |
+| **explotacion-view.js** (tab 'lacteo'→control) | `OrdeñoWizard.open()` (expl-lactea-view:54) | ✓ Wizard real | `launch: () => OrdeñoWizard.open()` |
+| **silos-view.js** | `SilosView._abrirFormularioSilo()` (365) | WizardManager inline (687-732) | **NO wizard externo** |
+| **fitosanitarios-view.js** | `GastoWizard.open({categoria:'Fitosanitarios'})` (282-285) | ✓ Wizard real | `launch: () => GastoWizard.open({categoria:'Fitosanitarios'})` |
+| **gastos-view.js** | `App._abrirFormularioGasto()` (150) → `GastoWizard.open()` | ✓ Wizard real | `launch: () => GastoWizard.open()` |
+| **proveedores-view.js** | `ProveedoresView.renderFormulario()` (529) | **Modal propio** (277-396) | **NO wizard** |
+| **tramites** (expro sub-tabs) | **guias**: `App._abrirWizardGuiaMovimiento()` (700) | Wrapper → `WizardGuiaMovimiento.abrir()` | `launch: () => App._abrirWizardGuiaMovimiento()` |
+|  | **censo**: `App._abrirWizardCenso()` (721) | Wrapper → `WizardCenso.abrir()` | `launch: () => App._abrirWizardCenso()` |
+|  | **crotales**: `App._abrirWizardCrotales()` (746) | Wrapper → `WizardCrotales.abrir()` | `launch: () => App._abrirWizardCrotales()` |
+|  | **traslado**: `App._abrirWizardTraslado()` (766) | Wrapper → `WizardTraslado.abrir()` | `launch: () => App._abrirWizardTraslado()` |
+| **compradores-view.js** | `CompradoresView.renderFormulario()` (647) | **Modal propio** (661-774) | **NO wizard** |
+| **contratos-view.js** | `ContratosView._crearContrato()` → modal (277) | **Modal propio** (277-362) | **NO wizard** |
+| **transportistas-view.js** | `TransportistasView._abrirFormulario()` (320) | **Modal propio** (264-432) | **NO wizard** |
+
+---
+
+## WIZARDS REALES DISPONIBLES (15 + 1)
+
+| Wizard | API pública | Usado en |
+|--------|-------------|----------|
+| `WizardFinca` | `.editar()`, `.showForm(options)` | Ajustes |
+| `WizardTraslado` | `.abrir()`, `.abrirSelectorRebano()`, `.abrirSelectorAnimales()` | Tramites, ExPro |
+| `WizardCenso` | `.abrir()` | Tramites |
+| `WizardCrotales` | `.abrir(borrador)`, `.abrirPedido(borrador)` | Tramites, Sanidad |
+| `WizardGuiaMovimiento` | `.abrir(borrador)` | Tramites, Sanidad, CoMer.leche |
+| `WizardTratamiento` | `.abrir(options)`, `.registrar(rebanoId, options)` | Sanidad |
+| `WizardVacunacion` | `.registrar(rebanoId, options)` | Sanidad |
+| `GastoWizard` | `.open(options)` | Gastos, Fitosanitarios |
+| `OrdeñoWizard` | `.open()` | ExPro.lacteo.control |
+| `TanqueWizard` | `.open(tanque)` | ExPro.lacteo.tanques |
+| `AlbaranLecheWizard` | `.open(borrador)`, `.abrir()` | Albaranes |
+| `VentaMasivaWizard` | `.open(borrador)` | CoMer.carne |
+| `WizardTarea` | `.open(options)` | — (sin consumir) |
+| `MovimientoBalanceWizard` | `.open()` | — (sin consumir) |
+| `AnaliticaLecheWizard` | `.open()` | — (sin consumir) |
+
+> **Notas de inventario (corrección 4 errores menores sin impacto en guías):**
+> - `AnaliticaLecheWizard` (no `WizardAnaliticaLeche`) — patrón invertido
+> - `AlbaranLecheWizard` solo tiene `.open(borrador)`, no `.abrir()`
+> - `WizardFinca` expone también `.showForm(options)`
+> - `MovimientoBalanceWizard.open()` y `WizardTarea.open(options)` existen y están sin consumir
+
+---
+
+## CORRECCIÓN AL PLAN — `launch` por guía (PATRÓN ÚNICO)
+
+**Regla:** Si hay wizard real → `launch: () => WizardReal.api(...)`. Si NO hay wizard (formulario inline, modal propio, hash route, asistente) → **NO usar `launch`**. El paso usa `target: '[data-guide="..."]'` apuntando al botón/elemento real de la vista.
+
+| Guía | `launch` CORREGIDO | Notas |
+|------|-------------------|-------|
+| `gegan.animales` | **NO launch** → `target: '[data-guide="btn-nuevo-animal"]'` | Hash route |
+| `gegan.rebanos` | **NO launch** → `target: '[data-guide="btn-nuevo-rebano"]'` | WizardManager inline |
+| `gegan.zonas` | **NO launch** → `target: '[data-guide="btn-nueva-zona"]'` | WizardManager inline |
+| `gegan.patrimonio` | `() => App._abrirAsistenteProduccion('carne', {origen:'patrimonio'})` | Asistente producción |
+| `gegan.sanidad` | **Tratamiento:** `() => WizardTratamiento.registrar(null)` <br> **Vacunación:** `() => WizardVacunacion.registrar(null)` | 2 pasos con launch ✓ |
+| `expro.explotacion` | **NO launch** → `target: '[data-guide="btn-produccion"]'` | Submenu/Asistente |
+| `expro.lacteo` | **Tanques:** `() => TanqueWizard.open()` <br> **Ordeño:** `() => OrdeñoWizard.open()` | 2 pasos con launch ✓ <br> **Riesgo:** `OrdeñoWizard` lleva ñ en global — verificar en build `:free` + WebView |
+| `expro.silos` | **NO launch** → `target: '[data-guide="btn-nuevo-silo"]'` | WizardManager inline |
+| `expro.fitosanitarios` | `() => GastoWizard.open({categoria:'Fitosanitarios'})` | ✓ GastoWizard |
+| `expro.gastos` | `() => GastoWizard.open()` | ✓ GastoWizard |
+| `expro.proveedores` | **NO launch** → `target: '[data-guide="btn-nuevo-proveedor"]'` | Modal propio |
+| `expro.tramites` (panorámica cubre sub-tabs) | **guias:** `() => App._abrirWizardGuiaMovimiento()` <br> **censo:** `() => App._abrirWizardCenso()` <br> **crotales:** `() => App._abrirWizardCrotales()` <br> **traslado:** `() => App._abrirWizardTraslado()` | 4 pasos con launch ✓ |
+| `comer.leche` | `() => WizardGuiaMovimiento.abrir(null)` | ✓ Wizard real |
+| `comer.carne` | `() => VentaMasivaWizard.open(null)` | ✓ Wizard real |
+| `comer.compradores` | **NO launch** → `target: '[data-guide="btn-nuevo-comprador"]'` | Modal propio |
+| `comer.contratos` | **NO launch** → `target: '[data-guide="btn-nuevo-contrato"]'` | Modal propio |
+| `comer.transportistas` | **NO launch** → `target: '[data-guide="btn-nuevo-transportista"]'` | Modal propio |
+
+---
+
+## Fases y desglose TDD (ACTUALIZADO)
 
 ### FASE 0 — Motor + Infraestructura (~1 sesión)
 
@@ -38,7 +121,7 @@
 | 0.8 | Loader guías por grupo de ruta en `_ensureRouteScripts` — carga `js/guides/<pillar>/*` bajo demanda | `js/app.js` | Scripts guías cargados solo al entrar a su ruta; no bloquean carga inicial |
 | 0.9 | FAB "Guía" por subvista + icono `Icons.ayuda()` nuevo en `js/icons.js` | `js/icons.js`, 3 vistas + sub-vistas | FAB visible si `enabled`; relanza guía tab actual ignore `seen`/`dismissed` |
 | 0.10 | Estilos CSS overlay guide + popover + spotlight + chip reanudar (z-4500, responsive, Marco Galáctico, sin borde sup iluminado) | `css/styles.css` | z-index sanado (§3.2 spec); chip debajo toast (6000) y btn-pesaje-close (5001) |
-| 0.11 | Tests unitarios motor (Jest/jsdom o equivalente ligero del proyecto) | `__tests__/guide-manager.test.js` | Cobertura §9 Testing spec |
+| 0.11 | Suite QA motor en `js/qa-guias.js` con `GuiaQA.runAll()` (patrón repo: `qa-margen-animal.js:11`) | `js/qa-guias.js` | Verifica: motor precondiciones, waitFor, nav, MutationObserver 3 salidas, chip auto-oculto, persistencia `seen`/`dismissed`/`enabled`, toggle Ajustes on/off, FAB relanza, `launch` abre wizard correcto |
 
 ---
 
@@ -49,18 +132,18 @@
 | # | Guía | Archivo | Pasos clave (launch real) |
 |---|------|---------|---------------------------|
 | 1.1 | `gegan.panoramica` | `js/guides/gegan-panoramica.js` | 4 pasos narrativos recorren carrusel (sin `launch`) |
-| 1.2 | `gegan.animales` | `js/guides/gegan-animales.js` | Alta animal → `WizardAnimal.showForm({})`; crotal/sexo/raza/f.nac obligatorios |
-| 1.3 | `gegan.rebanos` | `js/guides/gegan-rebanos.js` | Crear lote → `WizardRebano.showForm({})`; nombre/capacidad/ubicacion |
-| 1.4 | `gegan.patrimonio` | `js/guides/gegan-patrimonio.js` | (condicional `flags.carne`) Censo → `WizardCenso.abrir()`; lotes/conversión |
-| 1.5 | `gegan.zonas` | `js/guides/gegan-zonas.js` | Parcela → `WizardZona.showForm({})`; UGM/carga/PAC |
-| 1.6 | `gegan.sanidad` | `js/guides/gegan-sanidad.js` | Tratamiento → `WizardTratamiento.abrir(opts)`; vacuna/supresión **siempre visibles** |
+| 1.2 | `gegan.animales` | `js/guides/gegan-animales.js` | **NO launch** → `target: '[data-guide="btn-nuevo-animal"]'` + campos crotal/sexo/raza/f.nac |
+| 1.3 | `gegan.rebanos` | `js/guides/gegan-rebanos.js` | **NO launch** → `target: '[data-guide="btn-nuevo-rebano"]'` + nombre/capacidad/ubicacion |
+| 1.4 | `gegan.patrimonio` | `js/guides/gegan-patrimonio.js` | (condicional `flags.carne`) `launch: () => App._abrirAsistenteProduccion('carne', {origen:'patrimonio'})` |
+| 1.5 | `gegan.zonas` | `js/guides/gegan-zonas.js` | **NO launch** → `target: '[data-guide="btn-nueva-zona"]'` + UGM/carga/PAC |
+| 1.6 | `gegan.sanidad` | `js/guides/gegan-sanidad.js` | **Tratamiento:** `launch: () => WizardTratamiento.registrar(null)` <br> **Vacunación:** `launch: () => WizardVacunacion.registrar(null)` <br> **Crotales:** `launch: () => App._abrirWizardCrotales()` <br> **Guía Mov.:** `launch: () => App._abrirWizardGuiaMovimiento()` — supresión siempre visible |
 
 **Atributos `data-guide` mínimos** (añadir en cada sub-vista):
-- `animales-view.js`: `btn-add-animal`, `crotal-input`, `sexo-select`, `raza-select`, `fnac-input`
-- `rebanos-view.js`: `btn-add-rebano`, `nombre-input`, `capacidad-input`, `ubicacion-select`
-- `patrimonio-view.js`: `btn-censo`, `lote-select`, `conversion-input`
-- `zonas-view.js`: `btn-add-zona`, `nombre-input`, `ugm-input`, `carga-input`, `pac-checkbox`
-- `sanidad-view.js`: `btn-add-tratamiento`, `animal-select`, `tipo-select`, `producto-input`, `supresion-input`
+- `animales-view.js`: `btn-nuevo-animal` (line 66), `crotal-input`, `sexo-select`, `raza-select`, `fnac-input`
+- `rebanos-view.js`: `btn-nuevo-rebano` (line 75), `nombre-input`, `capacidad-input`, `ubicacion-select`
+- `patrimonio-view.js`: `btn-produccion` (line 52 — ya existe), `lote-select`, `conversion-input`
+- `zonas-view.js`: `btn-nueva-zona` (line 232), `nombre-input`, `ugm-input`, `carga-input`, `pac-checkbox`
+- `sanidad-view.js`: `btn-add-tratamiento` (line 197), `btn-add-vacunacion` (line 200), `btn-add-crotales` (line 201), `btn-add-guia` (line 202), `supresion-input`
 
 **Verificación:** cada guía en web (PWA) + emulador WebView Android (safe-areas, edge-to-edge, rotación).
 
@@ -72,16 +155,16 @@
 
 | # | Guía | Archivo | Pasos clave (launch real) |
 |---|------|---------|---------------------------|
-| 2.1 | `expro.panoramica` | `js/guides/expro-panoramica.js` | 4 pasos recorren carrusel ExPro |
-| 2.2 | `expro.explotacion` | `js/guides/expro-explotacion.js` | Modo explotación (balance leche/carne) — FAB adaptativo; sin wizard |
-| 2.3 | `expro.lacteo` | `js/guides/expro-lacteo.js` | Partida leche → `WizardPartidaLeche.showForm({})`; fecha/volumen/grasa/proteina |
-| 2.4 | `expro.silos` | `js/guides/expro-silos.js` | Silo → `WizardSilo.showForm({})`; tipo/capacidad/stock |
-| 2.5 | `expro.fitosanitarios` | `js/guides/expro-fitosanitarios.js` | Aplicación → `WizardFitosanitario.showForm({})`; parcela/producto/dosis |
-| 2.6 | `expro.gastos` | `js/guides/expro-gastos.js` | Gasto → `GastoWizard.open(opts)`; concepto/importe/fecha/proveedor |
-| 2.7 | `expro.proveedores` | `js/guides/expro-proveedores.js` | Proveedor → `WizardProveedor.showForm({})`; nombre/CIF/contacto |
-| 2.8 | `expro.tramites` | `js/guides/expro-tramites.js` | Trámite → `WizardTramite.showForm({})`; tipo/organismo/fecha/doc |
+| 2.1 | `expro.panoramica` | `js/guides/expro-panoramica.js` | 4 pasos recorren carrusel ExPro (sin `launch`) |
+| 2.2 | `expro.explotacion` | `js/guides/expro-explotacion.js` | **NO launch** → `target: '[data-guide="btn-produccion"]'` (line 243) — submenu/asistente |
+| 2.3 | `expro.lacteo` | `js/guides/expro-lacteo.js` | **Tanques:** `launch: () => TanqueWizard.open()` <br> **Ordeño:** `launch: () => OrdeñoWizard.open()` — **verificar build `:free` + WebView por ñ en global** |
+| 2.4 | `expro.silos` | `js/guides/expro-silos.js` | **NO launch** → `target: '[data-guide="btn-nuevo-silo"]'` (line 145) — WizardManager inline |
+| 2.5 | `expro.fitosanitarios` | `js/guides/expro-fitosanitarios.js` | `launch: () => GastoWizard.open({categoria:'Fitosanitarios'})` |
+| 2.6 | `expro.gastos` | `js/guides/expro-gastos.js` | `launch: () => GastoWizard.open()` |
+| 2.7 | `expro.proveedores` | `js/guides/expro-proveedores.js` | **NO launch** → `target: '[data-guide="btn-nuevo-proveedor"]'` (line 42) — modal propio |
+| 2.8 | `expro.tramites` | `js/guides/expro-tramites.js` | **guias:** `launch: () => App._abrirWizardGuiaMovimiento()` <br> **censo:** `launch: () => App._abrirWizardCenso()` <br> **crotales:** `launch: () => App._abrirWizardCrotales()` <br> **traslado:** `launch: () => App._abrirWizardTraslado()` |
 
-**Atributos `data-guide`** en sub-vistas correspondientes (`lacteo-view.js`, `silos-view.js`, etc.) — 5-6 por vista.
+**Atributos `data-guide`** en sub-vistas correspondientes — 5-6 por vista.
 
 **Verificación:** mismo criterio Fase 1.
 
@@ -93,12 +176,12 @@
 
 | # | Guía | Archivo | Pasos clave (launch real) |
 |---|------|---------|---------------------------|
-| 3.1 | `comer.panoramica` | `js/guides/comer-panoramica.js` | 4 pasos recorren carrusel CoMer |
-| 3.2 | `comer.leche` | `js/guides/comer-leche.js` | (condicional `flags.leche`) Guía movimiento → `WizardGuiaMovimiento.abrir(borrador)`; comprador/volumen/fecha |
-| 3.3 | `comer.carne` | `js/guides/comer-carne.js` | (condicional `flags.carne`) Venta → `VentaMasivaWizard.open(borrador)`; comprador/cabezas/peso/precio |
-| 3.4 | `comer.compradores` | `js/guides/comer-compradores.js` | Comprador → `WizardComprador.showForm({})`; nombre/CIF/direccion/contacto |
-| 3.5 | `comer.contratos` | `js/guides/comer-contratos.js` | Contrato → `WizardContrato.showForm({})`; comprador/tipo/duracion/condiciones |
-| 3.6 | `comer.transportistas` | `js/guides/comer-transportistas.js` | Transportista → `WizardTransportista.showForm({})`; nombre/matricula/autorizacion |
+| 3.1 | `comer.panoramica` | `js/guides/comer-panoramica.js` | 4 pasos recorren carrusel CoMer (sin `launch`) |
+| 3.2 | `comer.leche` | `js/guides/comer-leche.js` | (condicional `flags.leche`) `launch: () => WizardGuiaMovimiento.abrir(null)` |
+| 3.3 | `comer.carne` | `js/guides/comer-carne.js` | (condicional `flags.carne`) `launch: () => VentaMasivaWizard.open(null)` |
+| 3.4 | `comer.compradores` | `js/guides/comer-compradores.js` | **NO launch** → `target: '[data-guide="btn-nuevo-comprador"]'` (line 75) — modal propio |
+| 3.5 | `comer.contratos` | `js/guides/comer-contratos.js` | **NO launch** → `target: '[data-guide="btn-nuevo-contrato"]'` (line 80) — modal propio |
+| 3.6 | `comer.transportistas` | `js/guides/comer-transportistas.js` | **NO launch** → `target: '[data-guide="btn-nuevo-transportista"]'` (line 114) — modal propio |
 
 **Atributos `data-guide`** en sub-vistas CoMer.
 
@@ -113,7 +196,7 @@
 | 4.1 | QA regresión web PWA MSIX + WebView Android | Spotlight, popover, safe-areas, rotación, z-index |
 | 4.2 | Extender `PremiumQA.runAll()` | Verifica persistencia `guides.{enabled,seen,dismissed}` y toggle desactiva auto-arranque |
 | 4.3 | Bump `CACHE_NAME` en `sw.js` + `?v=` en `<script>`/`<link>` editados | SW cache-first obligatorio |
-| 4.4 | Build `:free` + `cap sync android` | Flujo estándar repo |
+| 4.4 | Build `:free` + `cap sync android` | Flujo estándar repo — **verificar `OrdeñoWizard` en WebView** |
 | 4.5 | Commit + PR a `master` (rama protegida) | Usuario revisa antes de fusionar |
 
 ---
@@ -177,14 +260,14 @@ GuideManager._hydrate(): Promise<void>;  // startup si !App._config
 
 ---
 
-## Criterios de aceptación por fase
+## Criterios de aceptación por fase (ACTUALIZADOS)
 
 | Fase | Done cuando |
 |------|-------------|
-| 0 | Motor arranca guía test en `/ganaderia` tab `animales`; MutationObserver reanuda tras cerrar `WizardAnimal`; toggle Ajustes off/on funciona; FAB relanza; chip reanudar aparece/oculta correctamente; tests unitarios pasan |
-| 1 | 6 guías GeGan completan sin error en navegador + emulador; `patrimonio` solo aparece con `flags.carne`; supresión sanidad visible en paso correspondiente |
-| 2 | 8 guías ExPro completan; `explotacion` (tab por defecto) auto-arranca primero |
-| 3 | 6 guías CoMer completan; `leche`/`carne` condicionales a flags |
+| 0 | Motor arranca guía test en `/ganaderia` tab `animales`; MutationObserver reanuda tras cerrar wizard real; toggle Ajustes off/on funciona; FAB relanza; chip reanudar aparece/oculta correctamente; `GuiaQA.runAll()` verde |
+| 1 | 6 guías GeGan completan sin error en navegador + emulador; `patrimonio` solo aparece con `flags.carne`; supresión sanidad visible en paso correspondiente; guías sin launch usan `target` y avanzan al tocar botón real |
+| 2 | 8 guías ExPro completan; `explotacion` (tab por defecto) auto-arranca primero; `expro.lacteo` verificado en build `:free` + WebView (ñ en `OrdeñoWizard`) |
+| 3 | 6 guías CoMer completan; `leche`/`carne` condicionales a flags; guías sin launch usan `target` y avanzan al tocar botón real |
 | 4 | `PremiumQA` verde; build `:free` + `cap sync` ok; PR creado |
 
 ---
@@ -197,31 +280,32 @@ GuideManager._hydrate(): Promise<void>;  // startup si !App._config
 - `waitFor` resuelve targets lazy/modales
 - Re-anclaje `requestAnimationFrame` ×2 tras `view:tabChanged`
 - Merge defaults config sobrevive migraciones
+- **NUEVO:** `OrdeñoWizard` con ñ en global — verificado en build `:free` + WebView (Fase 2.3, 4.4)
 
 ---
 
 ## Comandos de verificación rápida
 
 ```bash
-# Tests unitarios motor
-npm test -- __tests__/guide-manager.test.js
+# Suite QA motor (DevTools console)
+# > GuiaQA.runAll()
 
 # Build free + sync android
 npm run build:free && npx cap sync android
-
-# Lint / typecheck si aplica
-npm run lint
 ```
 
 ---
 
-## Notas para el ejecutor (subagent-driven-development)
+## Notas para el ejecutor (FASE 0 inline, resto subagent-driven-development)
 
+- **FASE 0 inline** en esta sesión (alto acoplamiento: app.js, 3 vistas, ajustes-view.js, icons.js, styles.css). Un subagente fresco no tiene el contexto de las 11 correcciones verificadas.
+- **Fases 1-3 con subagentes** (`subagent-driven-development`), una vez el motor existe y el contrato (Guide/GuideStep + data-guide) está congelado.
 - **Una tarea = un subagente** (según skill). Cada fila de la tabla TDD es una tarea atómica.
 - **No `git add .` nunca** — añadir archivos individuales (`git add <archivo>`).
 - **Commit + push tras cada fase** (PR a master, usuario revisa).
 - **Verificación en navegador real** obligatoria por guía (no solo tests).
 - **Icono `Icons.ayuda()`** — añadir en `js/icons.js` siguiendo patrón `info()` (`js/icons.js:445`).
 - **Selectores `data-guide`** — añadir en vistas/sub-vistas según tabla Fases 1-3; son el contrato estable entre guía y vista.
-- **`launch` usa APIs reales** — no hay interfaz uniforme; cada guía declara su llamada concreta (ver `launch` en catálogo spec §4).
+- **`launch` usa APIs reales** — no hay interfaz uniforme; cada guía declara su llamada concreta (tabla corregida arriba).
 - **SW cache-first** — bump `CACHE_NAME` + `?v=` en `index.html` tras tocar CSS/JS (memoria `deploy-cache-build`).
+- **Tests** — patrón repo: `js/qa-*.js` con `XxxQA.runAll()` ejecutado en DevTools console. No Jest/jsdom/npm test.
