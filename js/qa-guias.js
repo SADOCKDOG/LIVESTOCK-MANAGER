@@ -291,7 +291,15 @@
       console.error('[GuiaQA] Vista no encontrada o sin _cambiarSubModulo:', viewName);
       return null;
     }
-    const guias = window.GuideRegistry ? GuideRegistry.getAll() : [];
+    // Solo las guías del pilar que se está validando: el registro puede tener cargadas
+    // guías de otras rutas, y medirlas aquí produciría 0/N falsos.
+    const rutaActual = (location.hash.slice(1) || '/').split('?')[0];
+    const todas = window.GuideRegistry ? GuideRegistry.getAll() : [];
+    const guias = todas.filter(g => g.route === rutaActual);
+    if (!guias.length) {
+      console.warn(`[GuiaQA] Ninguna guía registrada para la ruta ${rutaActual}. ¿Estás en la vista correcta?`);
+      return { informe: {}, totales: { conTarget: 0, resuelven: 0, invalidos: 0, noEncuentran: 0 } };
+    }
     const informe = {};
 
     for (const g of guias) {
