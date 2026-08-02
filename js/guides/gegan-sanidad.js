@@ -38,8 +38,11 @@
       {
         title: 'Alertas de supresión',
         body: 'Aquí aparecen **automáticamente** los tratamientos en período de supresión (carne/leche). Rojo = supresión activa; verde = libre. Nunca se ocultan: son obligatorias por normativa.',
-        target: '.alertas-supresion, [data-alertas-supresion]',
+        target: '[data-guide="alertas-supresion"]',
         waitFor: 1500,
+        // El bloque solo se renderiza si hay supresiones activas (sanidad-view.js:65
+        // devuelve '' cuando no las hay), por eso el paso es opcional.
+        optional: true,
         position: 'below'
       },
       {
@@ -52,14 +55,14 @@
       {
         title: 'Vacunaciones recientes',
         body: 'Lista de vacunaciones (más reciente primero). Cada tarjeta muestra tipo(s), animales vacunados, veterinario y estado (cerrada/abierta). Click para opciones.',
-        target: '#sanidad-filtro-buscar ~ .inf-section-title + .grid.gap-10',
+        target: '[data-guide="seccion-vacunaciones"]',
         waitFor: 1000,
         position: 'above'
       },
       {
         title: 'Historial clínico',
         body: 'Registro completo de tratamientos aplicados. Cada tarjeta muestra medicamento, dosis, animal, fecha, veterinario y **badges de supresión** (carne/leche) con cuenta regresiva en días.',
-        target: '#sanidad-filtro-buscar ~ .inf-section-title ~ .inf-section-title + .grid.gap-10',
+        target: '[data-guide="seccion-historial"]',
         waitFor: 1000,
         position: 'above'
       },
