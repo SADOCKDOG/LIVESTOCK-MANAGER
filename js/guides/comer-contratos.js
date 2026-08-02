@@ -50,7 +50,7 @@
       {
         title: 'FAB Nuevo Contrato (libre)',
         body: 'FAB «Nuevo Contrato» abre **wizard modal**: comprador (selector obligatorio), nº contrato, tipo (leche/carne), fechas inicio/fin, condiciones, precios (array: producto, precio_unitario, unidad), activo. Guarda en `config_contratos`. También se puede crear desde ficha comprador («Nuevo Contrato» pre-rellena el comprador).',
-        target: '.fab-container[onclick*="CompradoresView._nuevoContratoLibre"]',
+        target: '.fab-container',
         waitFor: 1500,
         position: 'above'
       },

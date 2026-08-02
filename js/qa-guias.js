@@ -295,7 +295,13 @@
     // guías de otras rutas, y medirlas aquí produciría 0/N falsos.
     const rutaActual = (location.hash.slice(1) || '/').split('?')[0];
     const todas = window.GuideRegistry ? GuideRegistry.getAll() : [];
-    const guias = todas.filter(g => g.route === rutaActual);
+    // Además de la ruta, se respeta applies(flags): una guía que no se muestra con los
+    // flags activos (p. ej. comer.carne con Carne OFF) no debe contarse como fallo — sus
+    // targets pertenecen a una pestaña que ni siquiera existe en ese modo.
+    const flags = window.ModoContextoHelper
+      ? (ModoContextoHelper.getFlags() || { leche: true, carne: false })
+      : { leche: true, carne: false };
+    const guias = todas.filter(g => g.route === rutaActual && (!g.applies || g.applies(flags)));
     if (!guias.length) {
       console.warn(`[GuiaQA] Ninguna guía registrada para la ruta ${rutaActual}. ¿Estás en la vista correcta?`);
       return { informe: {}, totales: { conTarget: 0, resuelven: 0, invalidos: 0, noEncuentran: 0 } };
