@@ -37,7 +37,7 @@
       {
         title: 'Animales — Censo individual',
         body: 'Pestaña **Animales**: control de crotales (nº REGA), altas (nacimiento/compra), bajas y ficha completa con genealógica, Libro de Registro SIGGAN y margen económico por animal. Botón «Nuevo Animal» abre el wizard de alta.',
-        target: '.carrusel-item[data-tab="animales"]',
+        target: '.carrusel-dot[data-tab="animales"]',
         waitFor: 1000,
         position: 'below',
         launch: () => { if (window.GanaderiaView && GanaderiaView._cambiarSubModulo) GanaderiaView._cambiarSubModulo('animales'); }
@@ -45,7 +45,7 @@
       {
         title: 'Rebaños — Lotes productivos',
         body: 'Pestaña **Rebaños**: agrupamiento de ganado por especie/tipo, capacidad (aforo), zona asignada, tipo REGA obligatorio (RD 787/2023). Incluye balance mensual,Wizard de «Nuevo Rebaño» y ficha con sanidad, gastos y animales.',
-        target: '.carrusel-item[data-tab="rebanos"]',
+        target: '.carrusel-dot[data-tab="rebanos"]',
         waitFor: 1000,
         position: 'below',
         launch: () => { if (window.GanaderiaView && GanaderiaView._cambiarSubModulo) GanaderiaView._cambiarSubModulo('rebanos'); }
@@ -53,7 +53,7 @@
       {
         title: 'Patrimonio — ICA de cebo (solo Carne)',
         body: 'Pestaña **Patrimonio** (solo si Carne=ON): visión consolidada de toda la finca. Calcula **Índice de Conversión Alimenticia (ICA)** por **Tanda de Cebo** (animales de un mismo movimiento de entrada SIGGAN). Nivel 1 = cierre lote (entrada→matadero), Nivel 2 = control mensual (alertas de desviación).',
-        target: '.carrusel-item[data-tab="patrimonio"]',
+        target: '.carrusel-dot[data-tab="patrimonio"]',
         waitFor: 1000,
         position: 'below',
         launch: () => { if (window.GanaderiaView && GanaderiaView._cambiarSubModulo) GanaderiaView._cambiarSubModulo('patrimonio'); }
@@ -61,7 +61,7 @@
       {
         title: 'Zonas — Parcelas, PAC, UGM, rotación',
         body: 'Pestaña **Zonas**: define parcelas con superficie (ha), aforo, código PAC, distancia a agua. Calcula **UGM/ha** (carga ganadera) y alerta **sobrepastoreo** (>1.0 UGM/ha). Incluye **cuarentena fitosanitaria** en tiempo real y botón «Rotar Lote» con chequeo de bloqueos.',
-        target: '.carrusel-item[data-tab="zonas"]',
+        target: '.carrusel-dot[data-tab="zonas"]',
         waitFor: 1000,
         position: 'below',
         launch: () => { if (window.GanaderiaView && GanaderiaView._cambiarSubModulo) GanaderiaView._cambiarSubModulo('zonas'); }
@@ -69,7 +69,7 @@
       {
         title: 'Sanidad — Libro tratamientos y vacunas',
         body: 'Pestaña **Sanidad**: libro de tratamientos (supresión carne/leche automática), vacunaciones (Libro ADSG), buscador global y alertas de supresión **siempre visibles** (rojo=activa, verde=libre). Tiene su propia guía detallada (FAB «Guía» en la pestaña).',
-        target: '.carrusel-item[data-tab="sanidad"]',
+        target: '.carrusel-dot[data-tab="sanidad"]',
         waitFor: 1000,
         position: 'below',
         launch: () => { if (window.GanaderiaView && GanaderiaView._cambiarSubModulo) GanaderiaView._cambiarSubModulo('sanidad'); }
