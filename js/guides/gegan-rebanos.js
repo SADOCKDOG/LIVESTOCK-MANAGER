@@ -1,7 +1,7 @@
 /**
  * Livestock Manager - Guía Rebaños (GeGan)
  * Tour guiado para la pestaña Rebaños: lotes, balance, ficha, sanidad, gastos, rotación.
- * Lanza wizard real: RebanosView._crearRebano() y consumo de pienso.
+ * Lanza wizard real: RebanosView._crearRebano()
  */
 (function () {
   'use strict';
@@ -50,23 +50,9 @@
       },
       {
         title: 'Ficha de rebaño (click en tarjeta)',
-        body: 'Click en una tarjeta abre **ficha full-screen** con: KPIs (total, activos, vendidos, kg carne, litros leche, eventos), categorías, edición de datos (nombre, especie, tipo, capacidad, lote, fecha, zona, REGA, notas), **sanidad** (botón «Añadir Trat.» → WizardTratamiento), **gastos/consumos** (consumo pienso desde Silos + otros gastos), **animales** del lote con botón «Mover Lote».',
+        body: 'Click en una tarjeta abre **ficha full-screen** con: KPIs, categorías, edición de datos, **sanidad** (botón «Añadir Trat.»), **gastos/consumos**, **animales** del lote. Cada ficha tiene su propia guía contextual.',
         target: '#rebanos-content .card-registro',
         waitFor: 1500,
-        position: 'above'
-      },
-      {
-        title: 'Consumo de pienso (desde Silos)',
-        body: 'En la ficha, botón **«Consumo Pienso»** descuenta stock del silo elegido, imputa kilos al rebaño y genera gasto analítico. Si hay varios silos, pide elegir. Requiere módulo ExPro → Silos configurado.',
-        target: '[onclick*="_abrirConsumoPienso"]',
-        waitFor: 2000,
-        position: 'above'
-      },
-      {
-        title: 'Mover lote (rotación)',
-        body: 'Botón **«Mover Lote»** abre selector para trasladar animales a otro rebaño/zona. Útil para rotaciones de pastillo o cambios de fase productiva.',
-        target: '[onclick*="_abrirSelectorAnimales"]',
-        waitFor: 2000,
         position: 'above'
       },
       {

@@ -490,11 +490,28 @@
 
   // ==================== NAVEGACIÓN ====================
 
-  function _goToStep(index) {
+  /**
+   * @param {number} index - paso destino
+   * @param {number} [dir=1] - dirección del avance (1 adelante, -1 atrás), usada para
+   *        saltar pasos `optional` cuyo target no está en el DOM sin quedarse atascado.
+   */
+  function _goToStep(index, dir = 1) {
     const state = _state.currentGuide;
     if (!state || !state.guide) return;
     const steps = state.guide.steps;
     if (index < 0 || index >= steps.length) return;
+
+    // Paso opcional (spec §4): si su elemento no está presente —porque depende de datos
+    // o de un formulario abierto— se omite en lugar de mostrar un paso sin contexto.
+    const candidato = steps[index];
+    if (candidato.optional && candidato.target && !_qs(candidato.target)) {
+      const siguiente = index + dir;
+      if (siguiente < 0 || siguiente >= steps.length) {
+        if (dir > 0) return GuideManager._finish();
+        return; // hacia atrás no hay nada más: se queda donde está
+      }
+      return _goToStep(siguiente, dir);
+    }
 
     state.stepIndex = index;
     state.step = steps[index];
@@ -665,7 +682,7 @@
       const state = _state.currentGuide;
       if (!state) return;
       if (state.stepIndex < state.guide.steps.length - 1) {
-        _goToStep(state.stepIndex + 1);
+        _goToStep(state.stepIndex + 1, 1);
       } else {
         this._finish();
       }
@@ -675,7 +692,7 @@
       const state = _state.currentGuide;
       if (!state) return;
       if (state.stepIndex > 0) {
-        _goToStep(state.stepIndex - 1);
+        _goToStep(state.stepIndex - 1, -1);
       }
     },
 
