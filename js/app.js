@@ -675,11 +675,11 @@ const App = {
         </button>`;
     const dots = single ? '' : `
       <div class="carrusel-dots" role="tablist" aria-label="Todas las secciones">
-        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" onclick="${navegarConGuia(t.key)}" title="${t.label}"></span>`).join('')}
+        ${tabs.map(t => `<span class="carrusel-dot ${t.key === activeKey ? 'active' : ''}" data-tab="${t.key}" onclick="${navegarConGuia(t.key)}" title="${t.label}"></span>`).join('')}
       </div>`;
     const menu = single ? '' : `
       <div class="carrusel-menu" id="${menuId}" role="listbox" aria-label="Todos los submódulos">
-        ${tabs.map(t => `<button type="button" class="carrusel-menu-item ${t.key === activeKey ? 'active' : ''}" role="option" aria-selected="${t.key === activeKey}" onclick="${navegarConGuia(t.key)}"><span class="carrusel-menu-item-icon" style="color:${t.color};">${t.icon}</span><span>${t.label}</span></button>`).join('')}
+        ${tabs.map(t => `<button type="button" class="carrusel-menu-item ${t.key === activeKey ? 'active' : ''}" data-tab="${t.key}" role="option" aria-selected="${t.key === activeKey}" onclick="${navegarConGuia(t.key)}"><span class="carrusel-menu-item-icon" style="color:${t.color};">${t.icon}</span><span>${t.label}</span></button>`).join('')}
       </div>`;
 
     return `
@@ -688,7 +688,7 @@ const App = {
         <div class="carrusel-pestanas-wrapper">
           <div class="carrusel-pestanas">
             ${flechaIzq}
-            <button type="button" class="carrusel-marco" id="${menuId}-trigger" onclick="App.toggleCarruselMenu('${menuId}')" aria-haspopup="listbox" aria-expanded="false" ${single ? 'disabled' : ''}>
+            <button type="button" class="carrusel-marco" id="${menuId}-trigger" data-tab="${activeKey}" onclick="App.toggleCarruselMenu('${menuId}')" aria-haspopup="listbox" aria-expanded="false" ${single ? 'disabled' : ''}>
               <span class="carrusel-marco-icon" style="color:${active.color};">${active.icon}</span>
               <span class="carrusel-marco-label">${active.label}</span>
               ${single ? '' : `<span class="carrusel-marco-chevron">${Icons.chevronAbajo()}</span>`}
@@ -1906,7 +1906,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js'], // + js/guides/gegan-*.js al crearlos en Fase 1
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js', 'js/guides/gegan-sanidad.js', 'js/guides/gegan-panoramica.js', 'js/guides/gegan-animales.js', 'js/guides/gegan-rebanos.js', 'js/guides/gegan-patrimonio.js', 'js/guides/gegan-zonas.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js'], // + js/guides/expro-*.js al crearlos en Fase 2
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js'], // + js/guides/comer-*.js al crearlos en Fase 3
     informes: ['js/views/informes-analytics.js', 'js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1944,7 +1944,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.29.12';
+        s.src = src + '?v=6.57.0';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;

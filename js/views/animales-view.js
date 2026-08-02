@@ -63,7 +63,7 @@ const AnimalesView = {
           </div>
         </div>
         <div class="module-header-primary-action">
-          <button class="btn btn-create btn-lg w-full" onclick="location.hash='/animal'">${Icons.agregar()} Nuevo Animal</button>
+          <button class="btn btn-create btn-lg w-full" data-guide="btn-nuevo-animal" onclick="location.hash='/animal'">${Icons.agregar()} Nuevo Animal</button>
         </div>
       </div>
 
