@@ -318,26 +318,71 @@
   /**
    * Posiciona popover arriba del target si cabe, sino abajo. Centrado horizontalmente.
    */
+  /** Alto en px de una custom property de safe-area (env(safe-area-inset-*) vía CSS). */
+  function _safeInset(nombre) {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(nombre);
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  /**
+   * Lleva el target a la banda visible si está fuera. Sin esto el spotlight se dibuja
+   * sobre una zona que el usuario no ve (en el móvil aparecía el anillo pegado al borde
+   * o directamente fuera de pantalla) y el popover se ancla contra coordenadas inútiles.
+   * Scroll instantáneo: hay que medir inmediatamente después.
+   */
+  function _ensureVisible(target) {
+    const r = target.getBoundingClientRect();
+    const sup = 62 + _safeInset('--safe-top');
+    const inf = window.innerHeight - (65 + _safeInset('--safe-bottom'));
+    if (r.top < sup || r.bottom > inf) {
+      try {
+        target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+      } catch (e) { /* navegadores sin opciones: se ignora */ }
+    }
+  }
+
   function _positionPopover(popover, target) {
     const rect = target.getBoundingClientRect();
+    // El popover se centra antes de medir para que la altura sea la real del contenido
+    // del paso actual (el texto cambia de un paso a otro).
+    popover.style.transform = 'none';
     const popoverRect = popover.getBoundingClientRect();
     const gap = 12;
+    const margen = 12;
+
+    const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
 
-    // Intentar arriba
-    let top = rect.top - popoverRect.height - gap;
+    // Banda utilizable: por debajo del header fijo y por encima de la bottom-nav,
+    // respetando las safe-areas del dispositivo (edge-to-edge en Android).
+    const limiteSup = 62 + _safeInset('--safe-top') + margen;
+    const limiteInf = viewportH - (65 + _safeInset('--safe-bottom')) - margen;
+
+    // Horizontal: centrado sobre el target y acotado al ANCHO (antes se acotaba con la
+    // altura del viewport, que en móvil vertical es mucho mayor y no acotaba nada).
     let left = rect.left + rect.width / 2 - popoverRect.width / 2;
+    left = Math.max(margen, Math.min(left, viewportW - popoverRect.width - margen));
 
-    // Clamp horizontal
-    left = Math.max(12, Math.min(left, viewportH - popoverRect.width - 12));
+    // Vertical: arriba del target si cabe, abajo si no.
+    let top = rect.top - popoverRect.height - gap;
+    if (top < limiteSup) {
+      const abajo = rect.bottom + gap;
+      top = (abajo + popoverRect.height <= limiteInf) ? abajo : limiteSup;
+    }
 
-    // Si no cabe arriba, poner abajo
-    if (top < 12) {
-      top = rect.bottom + gap;
-      // Si tampoco cabe abajo, centrar en viewport
-      if (top + popoverRect.height > viewportH - 12) {
-        top = (viewportH - popoverRect.height) / 2;
-      }
+    // Garantía final: el popover nunca sobresale de la banda utilizable, de modo que sus
+    // botones (Siguiente / Saltar) queden siempre alcanzables. Si es más alto que la
+    // banda, se ancla arriba y hace scroll interno en vez de desbordar fuera de pantalla.
+    const alturaDisponible = limiteInf - limiteSup;
+    if (popoverRect.height > alturaDisponible) {
+      top = limiteSup;
+      popover.style.maxHeight = alturaDisponible + 'px';
+      popover.style.overflowY = 'auto';
+    } else {
+      popover.style.maxHeight = '';
+      popover.style.overflowY = '';
+      top = Math.max(limiteSup, Math.min(top, limiteInf - popoverRect.height));
     }
 
     popover.style.top = top + 'px';
@@ -540,6 +585,7 @@
     // Si hay target visible, anclar overlay + popover sobre él
     const target = state.step.target ? _qs(state.step.target) : null;
     if (target) {
+      _ensureVisible(target);
       _updateSpotlight(state.overlay, target);
       _positionPopover(state.popover, target);
     } else {
@@ -552,6 +598,10 @@
       state.popover.style.top = '50%';
       state.popover.style.left = '50%';
       state.popover.style.transform = 'translate(-50%, -50%)';
+      // Limpiar el scroll interno que pudiera haber dejado un paso anclado más alto
+      // que la banda utilizable.
+      state.popover.style.maxHeight = '';
+      state.popover.style.overflowY = '';
     }
 
     // Paso de captura: abrir el wizard real. Antes solo se hacía si el launch estaba en
@@ -571,6 +621,12 @@
     // Auto-arranque: evalúa precondiciones y arranca si procede
     async maybeStart(route, tab) {
       await _hydrate();
+
+      // Con un tour en curso no se auto-arranca nada. Las guías panorámicas cambian de
+      // tab y de ruta por diseño (_cambiarSubModulo, App.route), y cada navegación vuelve
+      // a pasar por el hook de route(): sin esta guarda, start() cerraba el tour vivo y lo
+      // relanzaba en el paso 0 una y otra vez (bucle observado en Android).
+      if (_state.currentGuide) return;
 
       const cfg = _readConfig();
       if (!cfg.enabled) return;
