@@ -810,7 +810,14 @@
 
     _cleanup(markSeen) {
       const state = _state.currentGuide;
-      if (!state) return;
+      if (!state) {
+        // Sin guía activa puede quedar overlay huérfano en el DOM (el motor se recargó,
+        // o algo destruyó el estado sin desmontar). Se retira igualmente: de lo contrario
+        // la pantalla queda oscurecida y Saltar no tiene ningún efecto.
+        document.querySelectorAll('.guide-overlay, .guide-popover, .guide-resume-chip')
+          .forEach(n => n.remove());
+        return;
+      }
 
       // Limpiar listeners
       window.removeEventListener('resize', state._resizeHandler);
