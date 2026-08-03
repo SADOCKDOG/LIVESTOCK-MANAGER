@@ -32,10 +32,19 @@
   function _writeConfig(patch) {
     const cfg = _readConfig();
     Object.assign(cfg, patch);
+
+    // La cache en memoria se actualiza AQUÍ, de forma síncrona. _saveConfig es async y
+    // sólo escribe App._config al resolverse: si el usuario pulsa "No mostrar de nuevo"
+    // y la app navega en el mismo instante, maybeStart leía el `dismissed` anterior y
+    // volvía a arrancar la guía recién descartada.
+    if (window.App) {
+      App._config = App._config || {};
+      App._config.guides = { ...(App._config.guides || {}), ...cfg };
+    }
+
     if (window.AjustesView && typeof AjustesView._saveConfig === 'function') {
       AjustesView._saveConfig({ guides: cfg });
     }
-    // Actualiza estado local inmediatamente
     Object.assign(_state, cfg);
   }
 
@@ -896,6 +905,28 @@
 
   // Exponer global
   window.GuideManager = GuideManager;
+
+  // El evento view:tabChanged se emitía desde App._cambiarSubmoduloConGuia pero nadie lo
+  // escuchaba, así que reanchor() no llegaba a ejecutarse nunca: al cambiar de pestaña el
+  // fondo cambiaba y el popover seguía siendo el de la pestaña anterior (por ejemplo,
+  // "Bienvenido a Zonas y Parcelas" sobre el censo de Animales).
+  if (window.EventBus && typeof EventBus.on === 'function') {
+    EventBus.on('view:tabChanged', ({ tabKey } = {}) => {
+      const state = _state.currentGuide;
+      if (!state) return;
+
+      // Una guía de pestaña deja de tener sentido en otra pestaña: sus targets ya no
+      // existen. Se cierra sin marcarla vista, igual que Saltar. Las panorámicas
+      // (tab: null) recorren pestañas por diseño y sobreviven al cambio.
+      const tabGuia = state.guide?.tab;
+      if (tabGuia && tabKey && tabGuia !== tabKey) {
+        GuideManager.skip();
+        return;
+      }
+      // Mismo tab o panorámica: el DOM se ha vuelto a montar, hay que reanclar.
+      requestAnimationFrame(() => requestAnimationFrame(() => GuideManager.reanchor()));
+    });
+  }
 
   // Estilos dinámicos para chip (animación pulse)
   const style = document.createElement('style');

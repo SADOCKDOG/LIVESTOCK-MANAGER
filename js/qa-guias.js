@@ -308,6 +308,11 @@
     }
     const informe = {};
 
+    // Espera inicial: las guías panorámicas (tab: null) no cambian de pestaña, así que
+    // se medirían de inmediato. Si se llama justo tras navegar a la vista, el render aún
+    // no ha terminado y todos sus targets salen como "sin coincidencia" (falso negativo).
+    await new Promise(r => setTimeout(r, 1500));
+
     for (const g of guias) {
       if (g.tab) {
         await App._cambiarSubmoduloConGuia(viewName, g.tab);
