@@ -49,7 +49,7 @@ const PatrimonioView = {
           </div>
         </div>
         <div class="module-header-primary-action">
-          <button class="btn btn-create btn-lg w-full" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'patrimonio' })">${Icons.peso()} Registrar Pesaje</button>
+          <button class="btn btn-create btn-lg w-full" data-guide="btn-registrar-pesaje" onclick="App._abrirAsistenteProduccion('carne', { origen_modulo: 'patrimonio' })">${Icons.peso()} Registrar Pesaje</button>
         </div>
       </div>
 
