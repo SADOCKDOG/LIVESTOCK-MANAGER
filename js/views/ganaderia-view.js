@@ -105,7 +105,7 @@ const GanaderiaView = {
       return;
     }
     this._activeSubModule = subModulo;
-    this.render();
+    return this.render();
   },
 
 };

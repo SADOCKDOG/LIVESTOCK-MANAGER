@@ -72,7 +72,7 @@ const RebanosView = {
           </div>
         </div>
         <div class="module-header-primary-action">
-          <button class="btn btn-create btn-lg w-full" onclick="RebanosView._crearRebano()">${Icons.agregar()} Nuevo Rebaño</button>
+          <button class="btn btn-create btn-lg w-full" data-guide="btn-nuevo-rebano" onclick="RebanosView._crearRebano()">${Icons.agregar()} Nuevo Rebaño</button>
         </div>
       </div>
 
@@ -132,6 +132,10 @@ const RebanosView = {
     // Actualizar datos filtrados para la lista
     this._cachedData = { rebanos: filteredRebanos, eventos };
     this._renderLista();
+    // FAB Guía interactiva
+    if (window.App && typeof App.renderGuideFab === 'function') {
+      App.renderGuideFab('/ganaderia', 'rebanos');
+    }
   },
 
   _CATEGORIAS: [

@@ -14,7 +14,7 @@ const ExplotacionView = {
 
   _cambiarSubModulo(subModulo) {
     this._activeSubModule = subModulo;
-    this.render();
+    return this.render();
   },
 
   _cambiarLacteoSubTab(subTab) {
@@ -82,6 +82,10 @@ const ExplotacionView = {
       await ExplotacionLacteaView.renderGraficos(subContainer);
     } else {
       await ExplotacionLacteaView.render(subContainer);
+    }
+    // FAB Guía interactiva para sub-tabs de láctea
+    if (window.App && typeof App.renderGuideFab === 'function') {
+      App.renderGuideFab('/explotacion', 'lacteo');
     }
   },
 
@@ -315,6 +319,11 @@ const ExplotacionView = {
           this._cambiarSubModulo('explotacion');
         }
         break;
+    }
+
+    // FAB Guía interactiva para ExPro
+    if (window.App && typeof App.renderGuideFab === 'function') {
+      App.renderGuideFab('/explotacion', this._activeSubModule);
     }
   },
 

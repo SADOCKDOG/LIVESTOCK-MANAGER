@@ -4314,3 +4314,123 @@ body.glow-tarjetas-off .status-badge {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================
+   GUÍAS INTERACTIVAS (GuideManager)
+   ============================================ */
+
+/* Overlay principal (z-3500, por encima de header 2000, debajo de wizard 4000) */
+.guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3500;
+  pointer-events: none;
+}
+
+/* Popover narrativo (z-3501, sobre overlay) */
+.guide-popover {
+  position: fixed;
+  z-index: 3501;
+  pointer-events: auto;
+  max-width: 320px;
+  min-width: 260px;
+  background: var(--surface, #1a1a1a);
+  border-radius: var(--r-xl, 16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  font-family: inherit;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text, #fff);
+  padding: 16px;
+  /* Sin borde superior iluminado — regla estricta de cards */
+}
+
+.guide-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.tour-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-555, #555);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.tour-dot.active {
+  background: var(--c-success);
+  transform: scale(1.2);
+}
+
+/* Botones del popover */
+.guide-popover button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.05s, opacity 0.1s;
+}
+
+.guide-popover button:active {
+  transform: scale(0.95);
+}
+
+.guide-popover button[style*="primary"] {
+  background: var(--c-success);
+  color: #000;
+}
+
+.guide-popover button[style*="secondary"] {
+  background: var(--c-333, #333);
+  color: var(--c-fff, #fff);
+  border: 1px solid var(--c-555, #555);
+}
+
+.guide-popover button[style*="ghost"] {
+  background: transparent;
+  color: var(--c-aaa, #aaa);
+}
+
+/* Chip "Reanudar guía" (z-4500, entre wizard 4000 y toast 6000, debajo btn-pesaje-close 5001) */
+.guide-resume-chip {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 4500;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--c-success, #00cc00);
+  color: #000;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,204,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  animation: guide-chip-pulse 1.5s ease-in-out infinite;
+  touch-action: manipulation;
+}
+
+.guide-resume-chip:active {
+  transform: scale(0.95) !important;
+}
+
+@keyframes guide-chip-pulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(0,204,0,0.4); transform: scale(1); }
+  50% { box-shadow: 0 4px 30px rgba(0,204,0,0.7); transform: scale(1.05); }
+}
+
+/* Asegurar que el chip quede debajo de toasts (6000) y btn-pesaje-close (5001) */
+#toast-container { z-index: 6000; }
+.btn-pesaje-close { z-index: 5001; }
