@@ -695,10 +695,10 @@
       // PRIMERO: Guía transversal "onboarding.primeros-pasos" en finca vacía
       // ============================================
       // Esta guía tiene prioridad absoluta sobre las de pilar/tab cuando la finca está vacía.
-      // Solo arranca si: (a) no se ha visto/descartado, (b) disponible()=true (finca vacía),
-      // (c) estamos en la ruta/tab donde empieza (ganaderia/zonas).
+      // Solo arranca si: (a) no se ha visto/descartado, (b) disponible()=true (finca vacía).
+      // Se lanza en CUALQUIER punto de entrada; sus launch functions navegan al paso adecuado.
       const onboarding = GuideRegistry.getAll().find(g => g.id === 'onboarding.primeros-pasos');
-      if (onboarding && !visto(onboarding) && route === onboarding.route && tab === onboarding.tab && await _checkDisponible(onboarding)) {
+      if (onboarding && !visto(onboarding) && await _checkDisponible(onboarding)) {
         return await this.start(onboarding.id);
       }
 
