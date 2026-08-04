@@ -16,7 +16,8 @@
       if (!window.db) return true;
       try {
         const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
-        const ordeños = await window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId || -1).catch(() => []);
+        if (!fincaId) return false;
+        const ordeños = await window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []);
         return ordeños.some(e => e.tipo === 'ordeño');
       } catch (e) {
         console.warn('[expro.lacteo] disponible error:', e);

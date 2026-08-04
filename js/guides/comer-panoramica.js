@@ -14,15 +14,16 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const [fincaId, leche, carne, compradores, contratos, transportistas] = await Promise.all([
-          window.Fincas ? Fincas.getActiveId() : Promise.resolve(null),
-          window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId || -1).catch(() => []),
-          window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId || -1).catch(() => []),
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        const [leche, carne, compradores, contratos, transportistas] = await Promise.all([
+          window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []),
+          window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []),
           window.db.getAll('compradores').catch(() => []),
           window.db.getAll('contratos_compra').catch(() => []),
           window.db.getAll('transportistas').catch(() => [])
         ]);
-        // Disponible si HAY datos en ALGUNO de estos stores
+        // Disponible si HAY datos en ALGUNO de estos stores (compradores/contratos/transportistas son globales)
         return leche.length > 0 || carne.length > 0 || compradores.length > 0 || contratos.length > 0 || transportistas.length > 0;
       } catch (e) {
         console.warn('[comer.panoramica] disponible error:', e);
