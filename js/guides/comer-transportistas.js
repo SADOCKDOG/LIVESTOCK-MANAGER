@@ -15,6 +15,9 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        // transportistas es store global (sin fincaId), pero solo tiene sentido con finca activa
         const transportistas = await window.db.getAll('transportistas').catch(() => []);
         return transportistas.length > 0;
       } catch (e) {

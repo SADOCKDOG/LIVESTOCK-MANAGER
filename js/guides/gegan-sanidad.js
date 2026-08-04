@@ -15,8 +15,17 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const sanitarios = await window.db.getAll('sanitarios_ganado').catch(() => []);
-        return sanitarios.length > 0;
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        // sanitarios_ganado tiene índice rebanoId, debe consultarse vía rebanos de esta finca
+        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
+        const rebanoIds = new Set(rebanos.map(r => r.id));
+        if (rebanoIds.size === 0) return false;
+        for (const rid of rebanoIds) {
+          const s = await window.db.getAllFromIndex('sanitarios_ganado', 'rebanoId', rid).catch(() => []);
+          if (s.length > 0) return true;
+        }
+        return false;
       } catch (e) {
         console.warn('[gegan.sanidad] disponible error:', e);
         return true;

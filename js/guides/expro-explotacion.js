@@ -15,10 +15,11 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const [fincaId, ordeños, pesajes] = await Promise.all([
-          window.Fincas ? Fincas.getActiveId() : Promise.resolve(null),
-          window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId || -1).catch(() => []),
-          window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId || -1).catch(() => [])
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        const [ordeños, pesajes] = await Promise.all([
+          window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => []),
+          window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId).catch(() => [])
         ]);
         const tieneOrdeños = ordeños.some(e => e.tipo === 'ordeño');
         const tienePesajes = pesajes.some(e => e.tipo === 'pesaje');

@@ -16,7 +16,8 @@
       if (!window.db) return true;
       try {
         const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
-        const leche = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId || -1).catch(() => []);
+        if (!fincaId) return false;
+        const leche = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId).catch(() => []);
         return leche.length > 0;
       } catch (e) {
         console.warn('[comer.leche] disponible error:', e);

@@ -15,6 +15,8 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
         const compradores = await window.db.getAll('compradores').catch(() => []);
         return compradores.length > 0;
       } catch (e) {
