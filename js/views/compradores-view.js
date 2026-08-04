@@ -331,7 +331,7 @@ const CompradoresView = {
         <div class="empty-state">
           <div class="empty-state-icon">${Icons.edificio()}</div>
           <p class="empty-state-text">${this._cachedCompradores?.length === 0 ? 'Aún no hay compradores registrados.' : 'No hay compradores con ese filtro.'}</p>
-          <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()">${Icons.agregar()} Registrar primer comprador</button>
+          <button class="btn btn-create btn-sm" onclick="CompradoresView.renderFormulario()" data-guide="btn-vacio-compradores">${Icons.agregar()} Registrar primer comprador</button>
         </div>`;
       return;
     }
@@ -401,7 +401,7 @@ const CompradoresView = {
         <div class="empty-state">
           <div class="empty-state-icon">${Icons.contratos()}</div>
           <p class="empty-state-text">Aún no hay contratos registrados.</p>
-          <button class="btn btn-create btn-sm" style="background:var(--c-success);" onclick="CompradoresView._nuevoContratoLibre()">${Icons.agregar()} Crear primer contrato</button>
+          <button class="btn btn-create btn-sm" style="background:var(--c-success);" onclick="CompradoresView._nuevoContratoLibre()" data-guide="btn-vacio-contratos">${Icons.agregar()} Crear primer contrato</button>
         </div>`;
       return;
     }

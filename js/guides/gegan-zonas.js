@@ -12,6 +12,17 @@
     route: '/ganaderia',
     tab: 'zonas',
     applies: (flags) => true, // Siempre disponible
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const finca = window.Fincas ? await Fincas.getActive() : null;
+        const zonas = (finca?.zonas || []).filter(z => !z.anulada);
+        return zonas.length > 0;
+      } catch (e) {
+        console.warn('[gegan.zonas] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Zonas y Parcelas',

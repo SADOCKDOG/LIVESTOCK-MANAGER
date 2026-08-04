@@ -12,6 +12,16 @@
     route: '/ganaderia',
     tab: 'sanidad',
     applies: (flags) => true, // Sanidad siempre disponible
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const sanitarios = await window.db.getAll('sanitarios_ganado').catch(() => []);
+        return sanitarios.length > 0;
+      } catch (e) {
+        console.warn('[gegan.sanidad] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Sanidad',

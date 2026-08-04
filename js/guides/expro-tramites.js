@@ -14,6 +14,18 @@
     route: '/explotacion',
     tab: 'tramites',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        const guiaMovimientos = await window.db.getAll('guias_movimiento').catch(() => []);
+        const censos = await window.db.getAll('censos').catch(() => []);
+        return guiaMovimientos.length > 0 || censos.length > 0;
+      } catch (e) {
+        console.warn('[expro.tramites] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Trámites SIGGAN',

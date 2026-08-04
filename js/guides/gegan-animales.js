@@ -12,6 +12,16 @@
     route: '/ganaderia',
     tab: 'animales',
     applies: (flags) => true, // Siempre disponible
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const animales = await window.db.getAll('animales').catch(() => []);
+        return animales.length > 0;
+      } catch (e) {
+        console.warn('[gegan.animales] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido al Censo de Animales',

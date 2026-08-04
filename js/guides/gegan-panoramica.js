@@ -12,6 +12,22 @@
     route: '/ganaderia',
     tab: 'panoramica',
     applies: (flags) => true, // Siempre disponible
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const [animales, rebanos, finca] = await Promise.all([
+          window.db.getAll('animales').catch(() => []),
+          window.db.getAll('rebanos').catch(() => []),
+          window.Fincas ? Fincas.getActive() : Promise.resolve(null)
+        ]);
+        const zonas = (finca?.zonas || []).filter(z => !z.anulada);
+        // Disponible si HAY datos (para que no arranque en finca vacía)
+        return animales.length > 0 || rebanos.length > 0 || zonas.length > 0;
+      } catch (e) {
+        console.warn('[gegan.panoramica] disponible error:', e);
+        return true; // fallback seguro
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Ganadería (GeGan)',

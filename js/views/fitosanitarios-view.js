@@ -84,6 +84,7 @@ const FitosanitariosView = {
                 <div class="empty-state py-40 text-center">
                     <div class="empty-state-icon mb-10" style="color:#C5FA50;">${Icons.fitosanitario()}</div>
                     <p class="empty-state-text text-gray-500 font-bold uppercase text-xs">No hay registros fitosanitarios cargados en esta finca.</p>
+                    <div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="FitosanitariosView._nuevoTratamiento()" data-guide="btn-vacio-fitosanitarios">${Icons.agregar()} Nuevo Registro</button></div>
                 </div>
                 ` : `
                 <div class="flex flex-col gap-10">
