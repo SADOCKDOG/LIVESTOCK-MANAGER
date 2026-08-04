@@ -15,14 +15,19 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const [animales, rebanos, finca] = await Promise.all([
-          window.db.getAll('animales').catch(() => []),
-          window.db.getAll('rebanos').catch(() => []),
-          window.Fincas ? Fincas.getActive() : Promise.resolve(null)
-        ]);
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        const finca = await window.Fincas.getActive().catch(() => null);
         const zonas = (finca?.zonas || []).filter(z => !z.anulada);
-        // Disponible si HAY datos (para que no arranque en finca vacía)
-        return animales.length > 0 || rebanos.length > 0 || zonas.length > 0;
+        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
+        if (rebanos.length > 0 || zonas.length > 0) return true;
+        // Verificar animales en rebanos de esta finca
+        const rebanoIds = new Set(rebanos.map(r => r.id));
+        for (const rid of rebanoIds) {
+          const a = await window.db.getAllFromIndex('animales', 'rebanoId', rid).catch(() => []);
+          if (a.length > 0) return true;
+        }
+        return false;
       } catch (e) {
         console.warn('[gegan.panoramica] disponible error:', e);
         return true; // fallback seguro

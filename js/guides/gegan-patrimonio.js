@@ -15,12 +15,22 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const [animales, rebanos] = await Promise.all([
-          window.db.getAll('animales').catch(() => []),
-          window.db.getAll('rebanos').catch(() => [])
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        // Patrimonio necesita animales/rebaños de ESTA finca para mostrar ICA
+        const [rebanos, zonas] = await Promise.all([
+          window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []),
+          window.Fincas ? Fincas.getActive() : Promise.resolve(null)
         ]);
-        // Patrimonio necesita animales/rebaños para mostrar ICA
-        return animales.length > 0 || rebanos.length > 0;
+        const zonasFinca = (zonas?.zonas || []).filter(z => !z.anulada);
+        if (rebanos.length > 0 || zonasFinca.length > 0) return true;
+        // Verificar si hay animales en los rebanos de esta finca
+        const rebanoIds = new Set(rebanos.map(r => r.id));
+        for (const rid of rebanoIds) {
+          const a = await window.db.getAllFromIndex('animales', 'rebanoId', rid).catch(() => []);
+          if (a.length > 0) return true;
+        }
+        return false;
       } catch (e) {
         console.warn('[gegan.patrimonio] disponible error:', e);
         return true;

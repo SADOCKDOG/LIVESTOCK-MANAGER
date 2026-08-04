@@ -15,6 +15,9 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        // contratos_compra es store global (sin fincaId), pero solo tiene sentido con finca activa
         const contratos = await window.db.getAll('contratos_compra').catch(() => []);
         return contratos.length > 0;
       } catch (e) {

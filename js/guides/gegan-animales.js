@@ -15,8 +15,17 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const animales = await window.db.getAll('animales').catch(() => []);
-        return animales.length > 0;
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        // Animales se consultan vía rebanos de esta finca (animales tiene índice rebanoId, no fincaId directo)
+        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
+        const rebanoIds = new Set(rebanos.map(r => r.id));
+        if (rebanoIds.size === 0) return false;
+        for (const rid of rebanoIds) {
+          const a = await window.db.getAllFromIndex('animales', 'rebanoId', rid).catch(() => []);
+          if (a.length > 0) return true;
+        }
+        return false;
       } catch (e) {
         console.warn('[gegan.animales] disponible error:', e);
         return true;

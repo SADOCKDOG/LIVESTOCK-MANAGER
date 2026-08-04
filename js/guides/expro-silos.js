@@ -15,7 +15,9 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const silos = await window.db.getAll('config_silos').catch(() => []);
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        const silos = await window.db.getAllFromIndex('config_silos', 'fincaId', fincaId).catch(() => []);
         return silos.length > 0;
       } catch (e) {
         console.warn('[expro.silos] disponible error:', e);

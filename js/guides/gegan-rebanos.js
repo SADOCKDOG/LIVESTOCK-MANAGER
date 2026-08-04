@@ -15,7 +15,9 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const rebanos = await window.db.getAll('rebanos').catch(() => []);
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        const rebanos = await window.db.getAllFromIndex('rebanos', 'fincaId', fincaId).catch(() => []);
         return rebanos.length > 0;
       } catch (e) {
         console.warn('[gegan.rebanos] disponible error:', e);
