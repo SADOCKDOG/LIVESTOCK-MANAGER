@@ -1310,6 +1310,10 @@ const App = {
     if (!window.GuideManager || !GuideManager.isEnabled || !GuideManager.isEnabled()) return;
     if (!window.GuideRegistry) return;
 
+    // Guarda: sin finca activa no hay guías disponibles
+    const activeFincaId = localStorage.getItem('activeFincaIdLivestock');
+    if (!activeFincaId) return;
+
     const flags = window.ModoContextoHelper ? ModoContextoHelper.getFlags() : { leche: true, carne: false };
     // Buscar guía para este tab; si no hay, buscar panorámica
     const guide = GuideRegistry.getByRouteTab(route, tab, flags) || GuideRegistry.getPanoramica(route, flags);
