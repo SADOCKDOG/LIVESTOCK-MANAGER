@@ -16,15 +16,17 @@
     disponible: async () => {
       if (!window.db) return true;
       try {
-        const [silos, proveedores, gastos, fincaId] = await Promise.all([
-          window.db.getAll('config_silos').catch(() => []),
-          window.db.getAll('proveedores').catch(() => []),
-          window.db.getAll('gastos_ganaderia').catch(() => []),
-          window.Fincas ? Fincas.getActiveId() : Promise.resolve(null)
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        if (!fincaId) return false;
+        const [silos, proveedores, gastos, fitos] = await Promise.all([
+          window.db.getAllFromIndex('config_silos', 'fincaId', fincaId).catch(() => []),
+          window.db.getAll('proveedores').catch(() => []), // global, no filtro finca
+          window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => []),
+          window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => [])
         ]);
-        const fitos = fincaId ? (await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId).catch(() => [])).filter(g => (g.categoria || '').toLowerCase() === 'fitosanitarios') : [];
-        // Disponible si HAY datos en ALGUNO de estos stores
-        return silos.length > 0 || proveedores.length > 0 || gastos.length > 0 || fitos.length > 0;
+        const fitosFiltrados = fitos.filter(g => (g.categoria || '').toLowerCase() === 'fitosanitarios');
+        // Disponible si HAY datos en ALGUNO de estos stores de ESTA finca (o proveedores globales)
+        return silos.length > 0 || proveedores.length > 0 || gastos.length > 0 || fitosFiltrados.length > 0;
       } catch (e) {
         console.warn('[expro.panoramica] disponible error:', e);
         return true; // fallback seguro

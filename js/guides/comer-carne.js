@@ -16,7 +16,8 @@
       if (!window.db) return true;
       try {
         const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
-        const carne = await window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId || -1).catch(() => []);
+        if (!fincaId) return false;
+        const carne = await window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId).catch(() => []);
         return carne.length > 0;
       } catch (e) {
         console.warn('[comer.carne] disponible error:', e);

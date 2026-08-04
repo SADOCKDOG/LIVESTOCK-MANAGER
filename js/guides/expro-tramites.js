@@ -18,9 +18,19 @@
       if (!window.db) return true;
       try {
         const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
-        const guiaMovimientos = await window.db.getAll('guias_movimiento').catch(() => []);
-        const censos = await window.db.getAll('censos').catch(() => []);
-        return guiaMovimientos.length > 0 || censos.length > 0;
+        if (!fincaId) return false;
+        // comprobar documentos_legales (guías y censos) y movimientos_ganado (traslados) de ESTA finca
+        const [docs, movimientos] = await Promise.all([
+          window.db.getAll('documentos_legales').catch(() => []),
+          window.db.getAllFromIndex('movimientos_ganado', 'fincaId', fincaId).catch(() => [])
+        ]);
+        const guiasFinca = (docs || []).filter(g =>
+          (g.tipo === 'guia_movimiento' || g.tipo_documento === 'guia_movimiento') &&
+          (g.fincaId === undefined || Number(g.fincaId) === Number(fincaId)) && !g.anulado
+        );
+        const censosFinca = (docs || []).filter(d => (d.tipo === 'DECLARACION_CENSAL' || d.tipo === 'censo_anual') && !d.anulado);
+        const trasladosFinca = (movimientos || []).filter(m => m.tipo === 'traslado' && !m.anulado);
+        return guiasFinca.length > 0 || censosFinca.length > 0 || trasladosFinca.length > 0;
       } catch (e) {
         console.warn('[expro.tramites] disponible error:', e);
         return true;
