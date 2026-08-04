@@ -12,6 +12,17 @@
     route: '/comercializacion',
     tab: 'leche',
     applies: (flags) => flags.leche === true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        const leche = await window.db.getAllFromIndex('comercializacion_leche', 'fincaId', fincaId || -1).catch(() => []);
+        return leche.length > 0;
+      } catch (e) {
+        console.warn('[comer.leche] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Contratos y Entregas Lácteas',

@@ -12,6 +12,16 @@
     route: '/explotacion',
     tab: 'proveedores',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const proveedores = await window.db.getAll('proveedores').catch(() => []);
+        return proveedores.length > 0;
+      } catch (e) {
+        console.warn('[expro.proveedores] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Proveedores',

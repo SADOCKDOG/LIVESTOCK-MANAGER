@@ -12,6 +12,17 @@
     route: '/explotacion',
     tab: 'lacteo',
     applies: (flags) => flags.leche === true, // SOLO si Leche=ON
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        const ordeños = await window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId || -1).catch(() => []);
+        return ordeños.some(e => e.tipo === 'ordeño');
+      } catch (e) {
+        console.warn('[expro.lacteo] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Gestión Láctea',

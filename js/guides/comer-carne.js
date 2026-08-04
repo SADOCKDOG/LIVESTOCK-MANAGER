@@ -12,6 +12,17 @@
     route: '/comercializacion',
     tab: 'carne',
     applies: (flags) => flags.carne === true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        const carne = await window.db.getAllFromIndex('comercializacion_carne', 'fincaId', fincaId || -1).catch(() => []);
+        return carne.length > 0;
+      } catch (e) {
+        console.warn('[comer.carne] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Comercialización Cárnica',

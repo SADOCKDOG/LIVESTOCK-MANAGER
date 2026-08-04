@@ -12,6 +12,22 @@
     route: '/explotacion',
     tab: 'explotacion',
     applies: (flags) => true, // Siempre disponible (tab por defecto)
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const [fincaId, ordeños, pesajes] = await Promise.all([
+          window.Fincas ? Fincas.getActiveId() : Promise.resolve(null),
+          window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId || -1).catch(() => []),
+          window.db.getAllFromIndex('registro_eventos', 'fincaId', fincaId || -1).catch(() => [])
+        ]);
+        const tieneOrdeños = ordeños.some(e => e.tipo === 'ordeño');
+        const tienePesajes = pesajes.some(e => e.tipo === 'pesaje');
+        return tieneOrdeños || tienePesajes;
+      } catch (e) {
+        console.warn('[expro.explotacion] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Control de Producción',

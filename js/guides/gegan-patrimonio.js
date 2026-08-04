@@ -12,6 +12,20 @@
     route: '/ganaderia',
     tab: 'patrimonio',
     applies: (flags) => flags && flags.carne === true, // Solo si Carne está activo
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const [animales, rebanos] = await Promise.all([
+          window.db.getAll('animales').catch(() => []),
+          window.db.getAll('rebanos').catch(() => [])
+        ]);
+        // Patrimonio necesita animales/rebaños para mostrar ICA
+        return animales.length > 0 || rebanos.length > 0;
+      } catch (e) {
+        console.warn('[gegan.patrimonio] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Patrimonio y Ganadería',

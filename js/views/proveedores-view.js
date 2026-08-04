@@ -106,7 +106,7 @@ const ProveedoresView = {
               <div class="empty-state border border-222">
                 <div class="empty-state-icon" style="color:#555;">${Icons.proveedores()}</div>
                 <p class="empty-state-text uppercase font-900 text-xs">${this._cachedData?.length === 0 ? 'Aún no hay proveedores registrados.' : 'No hay proveedores con ese filtro.'}</p>
-                <button onclick="ProveedoresView.renderFormulario()"
+                <button onclick="ProveedoresView.renderFormulario()" data-guide="btn-vacio-proveedores"
                   class="widget-link-btn widget-link-btn--neon neon-success px-16 mt-10">
                   ${Icons.agregar()} <span class="widget-link-label">REGISTRAR PRIMERO</span>
                 </button>

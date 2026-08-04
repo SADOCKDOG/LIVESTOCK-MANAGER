@@ -12,6 +12,16 @@
     route: '/explotacion',
     tab: 'silos',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const silos = await window.db.getAll('config_silos').catch(() => []);
+        return silos.length > 0;
+      } catch (e) {
+        console.warn('[expro.silos] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Control de Silos',

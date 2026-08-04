@@ -12,6 +12,16 @@
     route: '/ganaderia',
     tab: 'rebanos',
     applies: (flags) => true, // Siempre disponible
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const rebanos = await window.db.getAll('rebanos').catch(() => []);
+        return rebanos.length > 0;
+      } catch (e) {
+        console.warn('[gegan.rebanos] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Lotes y Rebaños',

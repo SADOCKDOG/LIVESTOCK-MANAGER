@@ -51,7 +51,7 @@ const ZonasView = {
           .filter(({ zona }) => !zona?.anulada);
     let html = '';
     if (zonasConIndice.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()">${Icons.agregar()} Crear primera zona</button></div></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()" data-guide="btn-vacio-zonas">${Icons.agregar()} Crear primera zona</button></div></div>`;
     else {
       let totalAforo = 0, totalOcupacion = 0;
       let fichasHtml = '';
@@ -447,6 +447,8 @@ const ZonasView = {
       onComplete: async (finalData) => {
         try {
           const finca = await Fincas.getActive();
+          // Initialize zonas array if it doesn't exist
+          if (!Array.isArray(finca.zonas)) finca.zonas = [];
           // Generate unique ID for the new zona
           const maxId = finca.zonas.reduce((max, zona) => Math.max(max, zona.id || 0), 0);
           const newId = maxId + 1;

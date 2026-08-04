@@ -95,6 +95,25 @@
     return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
   }
 
+  /**
+   * Evalúa el predicado `disponible()` de una guía (si existe).
+   * Permite que cada guía decida si debe auto-arrancarse según datos de la finca.
+   * @param {Object} guide - Guía a evaluar
+   * @returns {Promise<boolean>} true si la guía está disponible (o no tiene el predicado)
+   */
+  async function _checkDisponible(guide) {
+    if (!guide) return false;
+    if (typeof guide.disponible === 'function') {
+      try {
+        return await guide.disponible();
+      } catch (e) {
+        console.warn('[GuideManager] Error evaluando disponible():', e);
+        return false;
+      }
+    }
+    return true; // sin predicado → siempre disponible
+  }
+
   /** Obtiene color neón del pilar (usa module-colors.js si existe) */
   function _getPillarColor(pillar) {
     // Fuente de verdad: el color que cada vista pasa a App.updateHeaderColor
@@ -530,6 +549,12 @@
     }
     _hideResumeChip();
     _stopChipObserver();
+
+    // Si no hay guía activa (p. ej. terminó mientras el wizard estaba abierto),
+    // asegurar que no queden overlay/popover huérfanos en el DOM
+    if (!_state.currentGuide) {
+      document.querySelectorAll('.guide-overlay, .guide-popover').forEach(n => n.remove());
+    }
   }
 
   function _resumeAfterWizard() {
@@ -666,15 +691,25 @@
       // derivar de la ruta. Se resuelve la guía primero y se filtra por su id real.
       const visto = (g) => !g || cfg.seen.includes(g.id) || cfg.dismissed.includes(g.id);
 
+      // ============================================
+      // PRIMERO: Guía transversal "onboarding.primeros-pasos" en finca vacía
+      // ============================================
+      // Esta guía tiene prioridad absoluta sobre las de pilar/tab cuando la finca está vacía.
+      // Solo arranca si: (a) no se ha visto/descartado, (b) disponible()=true (finca vacía),
+      // (c) estamos en la ruta/tab donde empieza (ganaderia/zonas).
+      const onboarding = GuideRegistry.getAll().find(g => g.id === 'onboarding.primeros-pasos');
+      if (onboarding && !visto(onboarding) && route === onboarding.route && tab === onboarding.tab && await _checkDisponible(onboarding)) {
+        return await this.start(onboarding.id);
+      }
+
       // Prioridad (spec §6.1): la panorámica del pilar manda mientras no se haya visto;
       // una vez vista (o descartada), se ofrece la guía del tab actual.
       const panoramica = GuideRegistry.getPanoramica(route, flags);
-      if (!visto(panoramica)) return await this.start(panoramica.id);
+      if (!visto(panoramica) && await _checkDisponible(panoramica)) return await this.start(panoramica.id);
 
       const guiaTab = tab ? GuideRegistry.getByRouteTab(route, tab, flags) : null;
       if (visto(guiaTab)) return;
-
-      await this.start(guiaTab.id);
+      if (guiaTab && await _checkDisponible(guiaTab)) return await this.start(guiaTab.id);
     },
 
     // Arranque manual (FAB, test, etc.) — ignora seen/dismissed
@@ -819,21 +854,24 @@
         return;
       }
 
-      // Limpiar listeners
-      window.removeEventListener('resize', state._resizeHandler);
-      window.removeEventListener('scroll', state._scrollHandler);
-      window.removeEventListener('orientationchange', state._resizeHandler);
-      document.removeEventListener('keydown', state._keydownHandler);
+      try {
+        // Limpiar listeners
+        window.removeEventListener('resize', state._resizeHandler);
+        window.removeEventListener('scroll', state._scrollHandler);
+        window.removeEventListener('orientationchange', state._resizeHandler);
+        document.removeEventListener('keydown', state._keydownHandler);
 
-      // Limpiar observer si activo
-      _teardownObserver();
+        // Limpiar observer si activo
+        _teardownObserver();
 
-      // Eliminar DOM (incluye cualquier resto huérfano de un tour anterior)
-      state.overlay?.remove();
-      state.popover?.remove();
-      document.querySelectorAll('.guide-overlay, .guide-popover').forEach(n => n.remove());
-
-      _state.currentGuide = null;
+        // Eliminar DOM (incluye cualquier resto huérfano de un tour anterior)
+        state.overlay?.remove();
+        state.popover?.remove();
+        document.querySelectorAll('.guide-overlay, .guide-popover').forEach(n => n.remove());
+      } finally {
+        // Garantizar que el estado se limpia aunque falle cualquier remove()
+        _state.currentGuide = null;
+      }
     },
 
     // Re-anclaje tras cambio de tab (llamado desde EventBus 'view:tabChanged')
