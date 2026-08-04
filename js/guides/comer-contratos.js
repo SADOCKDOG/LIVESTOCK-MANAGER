@@ -12,6 +12,16 @@
     route: '/comercializacion',
     tab: 'contratos',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const contratos = await window.db.getAll('contratos_compra').catch(() => []);
+        return contratos.length > 0;
+      } catch (e) {
+        console.warn('[comer.contratos] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Contratos',

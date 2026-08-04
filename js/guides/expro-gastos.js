@@ -12,6 +12,17 @@
     route: '/explotacion',
     tab: 'gastos',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId || -1).catch(() => []);
+        return gastos.length > 0;
+      } catch (e) {
+        console.warn('[expro.gastos] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Finanzas / Gastos',

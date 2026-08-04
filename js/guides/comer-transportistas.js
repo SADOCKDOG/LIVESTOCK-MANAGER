@@ -12,6 +12,16 @@
     route: '/comercializacion',
     tab: 'transportistas',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const transportistas = await window.db.getAll('transportistas').catch(() => []);
+        return transportistas.length > 0;
+      } catch (e) {
+        console.warn('[comer.transportistas] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Transportistas',

@@ -215,7 +215,7 @@ const TransportistasView = {
     const transportistas = this._cachedData ? this._cachedData.transportistas : [];
 
     if (transportistas.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.transportistas()}</div><p class="empty-state-text">${this._cachedDataRaw ? this._cachedDataRaw.transportistas.length === 0 ? 'No hay transportistas registrados.' : 'No hay transportistas con ese filtro.' : 'Cargando...'}</p></div>`;
+      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${Icons.transportistas()}</div><p class="empty-state-text">${this._cachedDataRaw ? this._cachedDataRaw.transportistas.length === 0 ? 'No hay transportistas registrados.' : 'No hay transportistas con ese filtro.' : 'Cargando...'}</p><button class="btn btn-create btn-sm" onclick="TransportistasView._abrirFormulario()" data-guide="btn-vacio-transportistas">${Icons.agregar()} Nuevo Transportista</button></div>`;
       return;
     }
 

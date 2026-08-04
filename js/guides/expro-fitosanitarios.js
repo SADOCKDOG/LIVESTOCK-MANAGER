@@ -12,6 +12,17 @@
     route: '/explotacion',
     tab: 'fitosanitarios',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const fincaId = window.Fincas ? await Fincas.getActiveId() : null;
+        const gastos = await window.db.getAllFromIndex('gastos_ganaderia', 'fincaId', fincaId || -1).catch(() => []);
+        return gastos.some(g => (g.categoria || '').toLowerCase() === 'fitosanitarios');
+      } catch (e) {
+        console.warn('[expro.fitosanitarios] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido al Libro Fitosanitario',

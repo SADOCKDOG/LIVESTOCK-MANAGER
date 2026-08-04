@@ -12,6 +12,16 @@
     route: '/comercializacion',
     tab: 'compradores',
     applies: (flags) => true,
+    disponible: async () => {
+      if (!window.db) return true;
+      try {
+        const compradores = await window.db.getAll('compradores').catch(() => []);
+        return compradores.length > 0;
+      } catch (e) {
+        console.warn('[comer.compradores] disponible error:', e);
+        return true;
+      }
+    },
     steps: [
       {
         title: 'Bienvenido a Compradores',
