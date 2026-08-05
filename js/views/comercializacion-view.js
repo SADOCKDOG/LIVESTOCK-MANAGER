@@ -349,7 +349,7 @@ const ComercializacionView = {
       </div>`;
 
     const kpisHtml = this._renderKPIsSubTab('leche', d.kpis.leche, 'var(--c-info)', Icons.leche());
-    
+
     container.innerHTML = `
       <div class="px-4">
         ${resumenLecheHtml}
@@ -359,7 +359,7 @@ const ComercializacionView = {
         <div id="comer-sub-content"></div>
       </div>`;
 
-    const subContent = document.getElementById('comer-sub-content');
+    const subContent = container.querySelector('#comer-sub-content');
     this._renderSeccion(subContent, {
       icon: Icons.leche(),
       title: 'Entregas Leche',
@@ -427,7 +427,7 @@ const ComercializacionView = {
       </div>`;
 
     const kpisHtml = this._renderKPIsSubTab('carne', d.kpis.carne, 'var(--c-success)', Icons.carne());
-    
+
     container.innerHTML = `
       <div class="px-4">
         ${resumenCarneHtml}
@@ -437,7 +437,7 @@ const ComercializacionView = {
         <div id="comer-sub-content"></div>
       </div>`;
 
-    const subContent = document.getElementById('comer-sub-content');
+    const subContent = container.querySelector('#comer-sub-content');
     this._renderSeccion(subContent, {
       icon: Icons.carne(),
       title: 'Ventas Carne',
