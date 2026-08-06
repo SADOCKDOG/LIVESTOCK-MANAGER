@@ -16,7 +16,9 @@ body {
     margin: 0;
     padding: 0;
     line-height: 1.5;
-    overflow-x: hidden;
+    /* Ver nota en main#app-content: `clip` no crea contenedor de scroll y deja
+       funcionar `position: sticky` en los descendientes. */
+    overflow-x: clip;
     min-height: 100vh;
 }
 
@@ -307,7 +309,11 @@ main#app-content {
     padding: 12px 12px calc(100px + var(--safe-bottom));
     max-width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
+    /* `clip` en vez de `hidden`: recorta igual el desbordamiento lateral, pero
+       NO convierte el elemento en contenedor de scroll. Con `hidden`, el
+       carrusel sticky se anclaba a este main en vez de al viewport y no
+       llegaba a fijarse nunca. */
+    overflow-x: clip;
     min-height: 100vh;
 }
 
@@ -3463,6 +3469,26 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .carrusel-modulo {
   width: 100%;
   box-sizing: border-box;
+  /* Anclado bajo el header: el submódulo activo es la referencia de "dónde
+     estoy" y debe seguir visible al recorrer la vista, igual que las tabs de
+     sección bajo la app bar. Se ancla algo más arriba de la altura real del
+     header a propósito, para que no quede una franja intermedia por la que se
+     vería pasar el contenido; el header tapa el sobrante, que es solo padding.
+     z-index POR DEBAJO del header (#main-header va en 1000 aquí), o el
+     carrusel lo pintaría encima al solaparse. Los márgenes negativos compensan
+     el padding lateral de main#app-content para que el fondo llegue a los
+     bordes. Medido en dispositivo: --safe-top 35px, header hasta 97, carrusel
+     anclado en 89. */
+  position: sticky;
+  top: calc(54px + var(--safe-top));
+  z-index: 900;
+  background: rgba(12, 12, 12, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin-left: -12px;
+  margin-right: -12px;
+  margin-bottom: 14px; /* heredado del wrapper .mb-14 que envolvía al carrusel */
+  padding: 14px 12px 4px; /* holgura superior: absorbe el solape bajo el header */
 }
 .carrusel-pestanas-wrapper {
   position: relative;
