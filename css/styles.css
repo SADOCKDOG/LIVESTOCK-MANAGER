@@ -487,6 +487,50 @@ nav.bottom-nav {
     cursor: not-allowed;
 }
 
+/* ── VARIANTES DE BOTÓN ──
+   `.btn` nace a ancho completo, que es lo correcto para la acción principal de una
+   pantalla. Pero esa base la heredan también los botones que van agrupados (las
+   parejas CANCELAR/CONFIRMAR de los modales, las tríadas de acción de las listas):
+   dentro de un contenedor flex los tres pelean por el 100% del ancho y quedan
+   desproporcionados. `--inline` es la variante para esos casos: se dimensiona por su
+   contenido y deja que el contenedor los reparta.
+   Aditivo a propósito: no se toca `.btn`, así que ningún botón existente cambia hasta
+   que se le añada la clase. */
+.btn--inline {
+    /* `inline-flex` y no `flex`: `.btn` es un flex de nivel bloque, así que `width:auto`
+       por sí solo seguiría ocupando toda la línea en un contenedor normal. Dentro de un
+       contenedor flex da igual (el item se dimensiona por su contenido), pero para los
+       botones sueltos en un div block es la diferencia entre ceñirse al texto y seguir
+       siendo una barra. De paso, hereda el text-align del padre: en un `.text-center`
+       queda centrado sin más. */
+    display: inline-flex;
+    width: auto;
+    height: 48px;
+    /* 16px y no 20: con tres controles en fila (icono + Cancelar + Guardar) los 20px
+       hacían que el último se saliera 7px del contenedor en un móvil de 392px. */
+    padding: 0 16px;
+    border-radius: var(--r-lg, 14px);
+    font-size: 0.9rem;
+}
+
+/* Explícito para la acción principal. Es lo que `.btn` ya hace, pero nombrarlo permite
+   distinguir "ancho completo porque lo quiero" de "ancho completo por herencia". */
+.btn--block {
+    width: 100%;
+}
+
+/* Solo icono, sin etiqueta. Para la acción destructiva cuando comparte fila con otras
+   dos: tres botones con texto no caben en un móvil de 392px (suman ~429px sobre ~353
+   útiles) y el más corto acababa recortado a media palabra. Lleva siempre aria-label,
+   que sin texto visible es el único nombre accesible del control. */
+.btn--icon {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    flex: 0 0 auto;
+    border-radius: var(--r-lg, 14px);
+}
+
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

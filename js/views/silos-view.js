@@ -412,9 +412,9 @@ const SilosView = {
                 </div>
             </div>
 
-            <div class="flex gap-10 justify-end">
-                <button class="btn btn-dark" onclick="ModalManager.close('load-silo-modal')">CANCELAR</button>
-                <button class="btn btn-primary" onclick="SilosView._guardarCargaSilo(${id})">REGISTRAR</button>
+            <div class="flex gap-10 justify-between">
+                <button class="btn btn--inline btn-dark" onclick="ModalManager.close('load-silo-modal')">CANCELAR</button>
+                <button class="btn btn--inline btn-primary" onclick="SilosView._guardarCargaSilo(${id})">REGISTRAR</button>
             </div>
         </div>
         `;
@@ -558,9 +558,9 @@ const SilosView = {
                 </div>
             </div>
 
-            <div class="flex gap-10 justify-end">
-                <button class="btn btn-dark" onclick="ModalManager.close('consume-silo-modal')">CANCELAR</button>
-                <button class="btn btn-primary" onclick="SilosView._guardarConsumoSilo(${id})" style="background-color:var(--c-danger); border-color:var(--c-danger);">REGISTRAR CONSUMO</button>
+            <div class="flex gap-10 justify-between">
+                <button class="btn btn--inline btn-dark" onclick="ModalManager.close('consume-silo-modal')">CANCELAR</button>
+                <button class="btn btn--inline btn-primary" onclick="SilosView._guardarConsumoSilo(${id})" style="background-color:var(--c-danger); border-color:var(--c-danger);">REGISTRAR CONSUMO</button>
             </div>
         </div>
         `;
