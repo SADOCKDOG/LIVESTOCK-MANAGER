@@ -1187,7 +1187,15 @@ const App = {
     // limpian solos al cambiar de vista: en rutas sin guía (Ajustes, Informes…) el FAB
     // de la vista anterior seguía flotando. Cada vista con guía vuelve a pintarlo.
     document.getElementById('guide-fab')?.remove();
-    if (window.GuideManager && typeof GuideManager.skip === 'function') GuideManager.skip();
+    // Cerrar el tour SOLO si no hay uno en curso. Las guías panorámicas navegan entre
+    // submódulos por diseño para enseñar cada paso, y esa navegación vuelve a pasar por
+    // aquí: al llamar a skip() incondicionalmente se mataba el tour vivo (cleanup deja
+    // currentGuide a null) y, doce líneas más abajo, maybeStart() ya no veía tour activo
+    // y relanzaba la panorámica desde el paso 0 — el usuario pulsaba Siguiente y volvía
+    // al principio una y otra vez. El tour se cierra desde sus propios controles:
+    // Saltar, No mostrar de nuevo, o al completar el último paso.
+    const tourEnCurso = !!(window.GuideManager && typeof GuideManager.isRunning === 'function' && GuideManager.isRunning());
+    if (!tourEnCurso && window.GuideManager && typeof GuideManager.skip === 'function') GuideManager.skip();
     try {
       await App._ensureRouteScripts(path);
       const methodName = App.routes[path];
@@ -1206,11 +1214,15 @@ const App = {
           console.warn('[GuideManager] Error en auto-start:', e);
         }
 
-        // Restablecer el scroll al inicio de la página en cada navegación
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-        if (main) main.scrollTop = 0;
+        // Restablecer el scroll al inicio de la página en cada navegación, salvo con un
+        // tour en curso: la guía ya ha desplazado la vista hasta el elemento del paso
+        // (_ensureVisible) y devolverla arriba deja el spotlight descolocado.
+        if (!tourEnCurso) {
+          window.scrollTo(0, 0);
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          if (main) main.scrollTop = 0;
+        }
 
         // Animación de entrada entre rutas
         main.classList.add('route-enter');
@@ -1954,7 +1966,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.62.0';
+        s.src = src + '?v=6.63.0';
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;
