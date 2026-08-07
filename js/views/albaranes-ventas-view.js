@@ -29,7 +29,7 @@ const AlbaranesVentasView = {
         titulo: `Venta de Animales`,
         comprador: v.razonSocial || 'Comprador Desconocido',
         fecha: v.fecha || v.fechaSacrificio || v.creadoEn,
-        cantidad: v.num_animales || (v.animalId ? v.animalId.length : 1),
+        cantidad: v.num_animales || (Array.isArray(v.animalId) ? v.animalId.length : 1),
         unidad: 'cabezas',
         importe: v.importe_total || (v.precio_total || 0),
         estado: v.estado_tramite || 'presentado',
