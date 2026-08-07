@@ -645,7 +645,7 @@ const InformesView = {
       if (porMes.length > 1) {
         const ctx = document.getElementById('chart-gastos-mes');
         if (ctx) {
-          new Chart(ctx.getContext('2d'), {
+          this._nuevoChart(ctx, {
             type: 'bar',
             data: {
               labels: porMes.map(m => m.mes),
@@ -701,7 +701,7 @@ const InformesView = {
     setTimeout(() => {
       const ctx = document.getElementById('chart-margenes');
       if (ctx && (margenCarne !== 0 || mofaLeche !== 0)) {
-        new Chart(ctx.getContext('2d'), {
+        this._nuevoChart(ctx, {
           type: 'doughnut',
           data: {
             labels: ['Margen Carne', 'MOFA Leche'],
@@ -980,7 +980,7 @@ const InformesView = {
       if (timeline.length > 1) {
         const ctx = document.getElementById('chart-prod-timeline');
         if (ctx) {
-          new Chart(ctx.getContext('2d'), {
+          this._nuevoChart(ctx, {
             type: 'line',
             data: {
               labels: timeline.map(t => t.fecha),
@@ -1240,7 +1240,7 @@ const InformesView = {
     setTimeout(() => {
       const ctxR = document.getElementById("chart-repro-kpis");
       if (ctxR && kpisRepro.tasaFertilidadPct !== undefined) {
-        new Chart(ctxR.getContext("2d"), {
+        this._nuevoChart(ctxR, {
           type: 'doughnut',
           data: { labels: ['Éxito', 'Fallo'], datasets: [{ data: [kpisRepro.tasaFertilidadPct, 100 - kpisRepro.tasaFertilidadPct], backgroundColor: ['#4FADF5', '#3730a3'], borderColor: '#111', borderWidth: 4 }] },
           options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
@@ -1315,7 +1315,7 @@ const InformesView = {
     setTimeout(() => {
       const ctxS = document.getElementById("chart-sanidad-kpis");
       if (ctxS && estadisticasSanidad.porCategoria?.length > 0) {
-        new Chart(ctxS.getContext("2d"), {
+        this._nuevoChart(ctxS, {
           type: 'pie',
           data: {
             labels: estadisticasSanidad.porCategoria.map(c => c.categoria),
@@ -1622,7 +1622,7 @@ const InformesView = {
       if (evolucionData.length > 1) {
         const ctxE = document.getElementById('chart-ventas-evolucion');
         if (ctxE) {
-          new Chart(ctxE.getContext('2d'), {
+          this._nuevoChart(ctxE, {
             type: 'line',
             data: {
               labels: evolucionData.map(e => e.mes),
@@ -1742,7 +1742,7 @@ const InformesView = {
           card.appendChild(canvasWrap);
           const c = document.getElementById('chart-compradores');
           if (c) {
-            new Chart(c.getContext("2d"), {
+            this._nuevoChart(c, {
               type: 'bar',
               data: {
                 labels: data.slice(0, 8).map(c => c.nombre.length > 15 ? c.nombre.substring(0,15)+'…' : c.nombre),
@@ -1856,7 +1856,7 @@ const InformesView = {
             const cats = {};
             data.forEach(p => { Object.entries(p.categorias).forEach(([c, t]) => { cats[c] = (cats[c] || 0) + t; }); });
             const entries = Object.entries(cats).sort((a, b) => b[1] - a[1]);
-            new Chart(ctx.getContext("2d"), {
+            this._nuevoChart(ctx, {
               type: 'doughnut',
               data: {
                 labels: entries.map(e => e[0]),
@@ -3253,6 +3253,20 @@ const InformesView = {
 
   // ===================== GRÁFICOS =====================
 
+  /**
+   * Crea un Chart sobre un canvas ya existente. Chart.js asocia cada canvas a un
+   * único Chart: si el render se re-ejecuta (p. ej. al volver a la pestaña general
+   * de Informes) y se intenta `new Chart()` sobre el mismo canvas, lanza
+   * "Canvas is already in use... must be destroyed before the canvas can be reused",
+   * que el onerror global muestra como banner rojo. Se destruye el chart previo
+   * con Chart.getChart(canvas) antes de crear el nuevo.
+   */
+  _nuevoChart(canvas, config) {
+    const previo = Chart.getChart(canvas);
+    if (previo) previo.destroy();
+    return new Chart(canvas.getContext('2d'), config);
+  },
+
   _renderGraficosGeneral(d) {
     const { margenA, lecheStats, kpisRepro, estadisticasSanidad } = d;
     setTimeout(() => {
@@ -3264,7 +3278,7 @@ const InformesView = {
   _renderScatter(canvasId, data, color) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
-    new Chart(ctx.getContext("2d"), {
+    this._nuevoChart(ctx, {
       type: "scatter",
       data: { datasets: [{ label: "Animales", data, backgroundColor: color, pointRadius: 5 }] },
       options: {
@@ -3278,7 +3292,7 @@ const InformesView = {
   _renderBarrasZonas(canvasId, rentZ) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
-    new Chart(ctx.getContext("2d"), {
+    this._nuevoChart(ctx, {
       type: "bar",
       data: {
         labels: rentZ.map(z => z.zona), datasets: [
@@ -3293,7 +3307,7 @@ const InformesView = {
   _renderLecheTimeline(canvasId, timeline) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
-    new Chart(ctx.getContext("2d"), {
+    this._nuevoChart(ctx, {
       type: 'line',
       data: {
         labels: timeline.map(r => { const d = r.fecha.split('-'); return d[1] + '/' + d[2]; }),
