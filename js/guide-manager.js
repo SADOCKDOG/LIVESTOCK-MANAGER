@@ -85,7 +85,13 @@
   function _esResaltable(el) {
     if (!el) return false;
     const r = el.getBoundingClientRect();
-    if (r.width < 8 || r.height < 8) return false;
+    // Minimo 4px y no 8: el umbral existe para descartar elementos colapsados o
+    // invisibles, pero los .carrusel-dot miden 16x6 y quedaban fuera. Al no ser
+    // "resaltables" sus pasos se trataban como narrativos: el texto se leia centrado
+    // y el spotlight se aparcaba fuera de pantalla, asi que no se veia QUE estaba
+    // señalando la guia. El agujero añade 8px de margen por lado, de modo que un dot
+    // de 6px de alto produce un resalte de ~22px, sobradamente visible.
+    if (r.width < 4 || r.height < 4) return false;
     const cs = getComputedStyle(el);
     return cs.visibility !== 'hidden' && cs.display !== 'none' && parseFloat(cs.opacity || '1') > 0.05;
   }
