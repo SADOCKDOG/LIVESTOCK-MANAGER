@@ -58,6 +58,17 @@
     letter-spacing: 0.5px;
 }
 
+/* Mientras la app arranca, el chrome (header y nav inferior) ya está pintado y es
+   pulsable, pero sus onclick llaman a `App.*` y App no existe hasta que terminan de
+   cargar los ~89 scripts. Tocar cualquier control en ese hueco lanzaba
+   "App is not defined" y el window.onerror lo mostraba como error grave.
+   La clase la pone el script de arranque de index.html y la retira en cuanto App
+   existe. Se bloquea el puntero, no la visibilidad: el chrome se sigue viendo. */
+html.app-cargando nav.bottom-nav,
+html.app-cargando header {
+    pointer-events: none;
+}
+
 #startup-rescue {
     display: none;
     text-align: center;
