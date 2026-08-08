@@ -27,7 +27,7 @@
 La aplicación no es un CRM genérico adaptado al sector: su modelo de datos y sus flujos de trabajo están construidos directamente sobre la normativa española y autonómica de identificación y movimiento de ganado (RD 787/2023, RD 479/2004, Reg. UE 1069/2009), con los sistemas oficiales de gestión ganadera de **Andalucía (SIGGAN)** y **Extremadura (BADIGEX)** como referencia de diseño.
 
 <p align="center">
-  <img src="manual/img/dashboard-bento-grid.png" alt="Pantalla principal" width="300">
+  <img src="manual/img/dashboard-bento-grid.png" alt="Pantalla principal - Dashboard Bento Grid" width="300">
 </p>
 
 ---
@@ -55,7 +55,7 @@ La aplicación se organiza en pilares interconectados que cubren todas las área
 Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritarias. Filtra automáticamente según el tipo de explotación activa (leche/carne).
 
 <p align="center">
-  <img src="manual/img/dashboard-kpis.png" alt="Dashboard" width="300">
+  <img src="manual/img/dashboard-kpis.png" alt="Dashboard KPIs en tiempo real" width="300">
 </p>
 
 ### Ganadería y Animales (GeGAn)
@@ -65,7 +65,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Gestión de rebaños y lotes
 
 <p align="center">
-  <img src="manual/img/ganaderia-carrusel.png" alt="Ganadería y Animales (GeGAn)" width="300">
+  <img src="manual/img/ganaderia-carrusel.png" alt="Ganadería y Animales - Carrusel submodulos" width="300">
 </p>
 
 ### Producción Lechera — ExPro: Leche (módulo condicional)
@@ -75,7 +75,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Alertas de periodos de espera post-tratamiento
 
 <p align="center">
-  <img src="manual/img/lacteo-dashboard.png" alt="Producción Lechera (ExPro: Leche)" width="300">
+  <img src="manual/img/lacteo-dashboard.png" alt="Producción Lechera - Dashboard Lácteo ExPro" width="300">
 </p>
 
 ### Producción Cárnica — ExPro: Carne (módulo condicional)
@@ -85,7 +85,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Gestión de lotes de cebo y fechas de salida previstas
 
 <p align="center">
-  <img src="manual/img/comercializacion-carne-kpis.png" alt="Producción Cárnica (ExPro: Carne)" width="300">
+  <img src="manual/img/comercializacion-carne-kpis.png" alt="Producción Cárnica - KPIs Carne CoMer" width="300">
 </p>
 
 ### Sanidad y Tratamientos
@@ -95,7 +95,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Historial sanitario completo por animal y lote
 
 <p align="center">
-  <img src="manual/img/sanidad-tabs-internos.png" alt="Sanidad y Tratamientos" width="300">
+  <img src="manual/img/sanidad-tabs-internos.png" alt="Sanidad y Tratamientos - Tabs internos" width="300">
 </p>
 
 ### Finanzas y Gastos
@@ -115,7 +115,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Generación automática de documentación de transporte
 
 <p align="center">
-  <img src="manual/img/comercializacion-carrusel.png" alt="Comercialización (CoMer)" width="300">
+  <img src="manual/img/comercializacion-carrusel.png" alt="Comercialización - Carrusel CoMer" width="300">
 </p>
 
 ### Documentación Oficial
@@ -126,7 +126,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Exportación a formatos oficiales SIGGAN/BADIGEX
 
 <p align="center">
-  <img src="manual/img/informes-libros-export-csv.png" alt="Documentación Oficial" width="300">
+  <img src="manual/img/informes-libros-export-csv.png" alt="Documentación Oficial - Exportación libros CSV" width="300">
 </p>
 
 ### Informes y Analítica
@@ -137,7 +137,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Exportación a PDF/CSV para presentación oficial
 
 <p align="center">
-  <img src="manual/img/informes-sidebar-categoria.png" alt="Informes y Analítica" width="300">
+  <img src="manual/img/informes-sidebar-categoria.png" alt="Informes y Analítica - Sidebar categorías" width="300">
 </p>
 
 ### Herramientas y Asistentes
@@ -151,7 +151,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Manuales de usuario integrados y actualizables
 
 <p align="center">
-  <img src="manual/img/animales-ficha-wizard.png" alt="Herramientas y Asistentes" width="300">
+  <img src="manual/img/animales-ficha-wizard.png" alt="Herramientas y Asistentes - Wizard ficha animal" width="300">
 </p>
 
 ### Ajustes y Configuración
@@ -162,7 +162,7 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 - Gestión de actualizaciones y mantenimiento
 
 <p align="center">
-  <img src="manual/img/ajustes-general.png" alt="Ajustes y Configuración" width="300">
+  <img src="manual/img/ajustes-general.png" alt="Ajustes y Configuración - Panel general" width="300">
 </p>
 
 ---
