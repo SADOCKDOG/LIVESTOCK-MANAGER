@@ -664,11 +664,12 @@ img { max-width: 100%; height: auto; display: block; }
 .copyright { font-size: 0.7rem !important; color: var(--manual-text-muted) !important; }
 
 /* SCREENSHOT PLACEHOLDER */
+/* Capturas en móvil vertical 390x844 → aspect-ratio 390/844 ≈ 195/422 */
 
 .screenshot-placeholder {
   width: 100%;
   max-width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 195 / 422;
   background: linear-gradient(135deg, var(--manual-surface-hover) 0%, var(--manual-surface) 100%);
   border: 2px dashed var(--manual-border);
   border-radius: var(--radius-md);
@@ -696,6 +697,15 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .screenshot-placeholder span { position: relative; z-index: 1; }
 .screenshot-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Tablet/Mobile: en pantallas anchas, limitar ancho máximo para no estirar */
+@media (min-width: 768px) {
+  .screenshot-placeholder {
+    max-width: 390px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 
 /* TABLET / MOBILE */
 
