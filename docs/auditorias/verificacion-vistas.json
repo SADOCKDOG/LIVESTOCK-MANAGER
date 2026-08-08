@@ -130,12 +130,9 @@
   {
     "ruta": "#/comercializacion",
     "nombre": "CoMer · carrusel",
-    "chars": 11,
-    "muestra": "Cargando...",
-    "problemas": [
-      "VISTA VACIA",
-      "ATASCADA EN CARGANDO"
-    ]
+    "chars": 916,
+    "muestra": "LECHE LECHE CARNE COMPRADORES CONTRATOS TRANSPORTISTAS Registrar Retir",
+    "problemas": []
   },
   {
     "ruta": "#/comercializacion?tab=leche",
