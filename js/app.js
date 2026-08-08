@@ -1197,7 +1197,20 @@ const App = {
     const tourEnCurso = !!(window.GuideManager && typeof GuideManager.isRunning === 'function' && GuideManager.isRunning());
     if (!tourEnCurso && window.GuideManager && typeof GuideManager.skip === 'function') GuideManager.skip();
     try {
-      await App._ensureRouteScripts(path);
+      // Si el grupo de scripts de la vista no carga, hay que DECIRLO. Antes se ignoraba
+      // el resultado y se caia al `else` de mas abajo sin tocar el contenedor, dejando
+      // el "Cargando..." en pantalla de forma indefinida: sin error, sin banner y sin
+      // forma de que el usuario supiera que algo habia fallado ni de reintentarlo.
+      const gruposOk = await App._ensureRouteScripts(path);
+      if (!gruposOk) {
+        main.innerHTML = `
+          <div class="card error-card">
+            <h2>No se pudo cargar esta sección</h2>
+            <p>Fallo al descargar los componentes de la vista. Comprueba la conexión y vuelve a intentarlo.</p>
+            <button class="btn btn--inline btn-primary" onclick="App.route('${path}')">Reintentar</button>
+          </div>`;
+        return;
+      }
       const methodName = App.routes[path];
       if (methodName && typeof App[methodName] === "function") {
         await App[methodName](params);
@@ -1928,7 +1941,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js', 'js/guides/gegan-sanidad.js', 'js/guides/gegan-panoramica.js', 'js/guides/gegan-animales.js', 'js/guides/gegan-rebanos.js', 'js/guides/gegan-patrimonio.js', 'js/guides/gegan-zonas.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js', 'js/views/margen-animal-view.js', 'js/guides/gegan-sanidad.js', 'js/guides/gegan-panoramica.js', 'js/guides/gegan-animales.js', 'js/guides/gegan-rebanos.js', 'js/guides/gegan-patrimonio.js', 'js/guides/gegan-zonas.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js', 'js/guides/expro-panoramica.js', 'js/guides/expro-explotacion.js', 'js/guides/expro-lacteo.js', 'js/guides/expro-silos.js', 'js/guides/expro-fitosanitarios.js', 'js/guides/expro-gastos.js', 'js/guides/expro-proveedores.js', 'js/guides/expro-tramites.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js', 'js/guides/comer-panoramica.js', 'js/guides/comer-leche.js', 'js/guides/comer-carne.js', 'js/guides/comer-compradores.js', 'js/guides/comer-contratos.js', 'js/guides/comer-transportistas.js'],
     informes: ['js/views/informes-analytics.js', 'js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1975,6 +1988,10 @@ const App = {
     }
     try { await App._viewGroupLoadPromises[groupName]; return true; } catch (e) {
       console.error('[LazyView] Error cargando grupo ' + groupName, e);
+      // La promesa fallida NO se queda en cache: si se conserva, el grupo queda
+      // envenenado para el resto de la sesion y la vista no vuelve a intentarse
+      // nunca, por mucho que el usuario navegue a ella.
+      delete App._viewGroupLoadPromises[groupName];
       return false;
     }
   },
@@ -1982,7 +1999,11 @@ const App = {
   /** Punto único de entrada desde route(): asegura el grupo de la ruta actual antes de despachar. */
   async _ensureRouteScripts(path) {
     const group = App._routeGroups[path];
-    if (group) await App._ensureViewGroup(group);
+    if (!group) return true;
+    // Se DEVUELVE el resultado: antes se ignoraba, route() seguia como si el grupo
+    // hubiera cargado, el metodo de la vista no existia y el loader "Cargando..."
+    // se quedaba en pantalla para siempre, sin error ni aviso.
+    return await App._ensureViewGroup(group);
   },
 
   async _escanearCrotal(inputId) {
@@ -2778,7 +2799,11 @@ const App = {
   },
 
   async renderMargenAnimal(params) {
-    if (window.MargenAnimalView) { await MargenAnimalView.render(); }
+    if (window.MargenAnimalView) {
+      await MargenAnimalView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando margen por animal...</div>';
+    }
   },
 
   async renderImportadorRFID(params) {
