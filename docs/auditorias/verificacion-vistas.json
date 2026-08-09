@@ -100,11 +100,9 @@
   {
     "ruta": "#/explotacion?tab=fitosanitarios",
     "nombre": "ExPro · Fitosanitarios",
-    "chars": 642,
+    "chars": 609,
     "muestra": "FITOSANITARIOS EXPRO LÁCTEA SILOS FITOSANITARIOS FINANZAS PROVEEDORES ",
-    "problemas": [
-      "3 elementos con texto recortado"
-    ]
+    "problemas": []
   },
   {
     "ruta": "#/explotacion?tab=finanzas",
@@ -208,7 +206,7 @@
     "ruta": "#/saneamientos",
     "nombre": "Saneamientos",
     "chars": 270,
-    "muestra": "| SANEAMIENTOS 2 CAMPAÑAS BRUCELOSIS BOVINA (B. ABORTUS) CALIFICADA 24",
+    "muestra": "| SANEAMIENTOS 2 CAMPAÑAS BRUCELOSIS BOVINA (B. ABORTUS) CALIFICADA 25",
     "problemas": []
   },
   {
@@ -271,7 +269,7 @@
     "ruta": "#/margen-animal",
     "nombre": "Margen por animal",
     "chars": 561,
-    "muestra": "| MARGEN ECONÓMICO POR ANIMAL Ordenar: Peor primero ES123456789012 Cos",
+    "muestra": "| MARGEN ECONÓMICO POR ANIMAL Ordenar: Peor primero ES123456789013 Cos",
     "problemas": []
   },
   {
@@ -300,9 +298,7 @@
     "nombre": "Sistema",
     "chars": 579,
     "muestra": "← Volver a Ajustes | SISTEMA Y SEGURIDAD Gestión integral de la plataf",
-    "problemas": [
-      "6 boton(es) sin nombre accesible"
-    ]
+    "problemas": []
   },
   {
     "ruta": "#/alertas",
