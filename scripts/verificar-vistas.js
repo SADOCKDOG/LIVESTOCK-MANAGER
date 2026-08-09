@@ -181,15 +181,31 @@ function servir() {
           .filter(i => i.complete && i.naturalWidth === 0).map(i => i.getAttribute('src')).slice(0, 3);
         const botonesSinNombre = Array.from(main?.querySelectorAll('button') || [])
           .filter(b => !(b.textContent || '').trim() && !b.getAttribute('aria-label') && !b.querySelector('svg')).length;
+        // Texto cortado SIN indicacion visual. `truncate` (text-overflow:
+        // ellipsis) recorta a proposito y muestra los puntos suspensivos, asi
+        // que no es un fallo: marcarlo solo generaba ruido.
         const desbordan = Array.from(main?.querySelectorAll('*') || [])
-          .filter(e => e.scrollWidth > e.clientWidth + 4 && getComputedStyle(e).overflowX === 'hidden').length;
+          .filter(e => {
+            const cs = getComputedStyle(e);
+            return e.scrollWidth > e.clientWidth + 4
+              && cs.overflowX === 'hidden'
+              && cs.textOverflow !== 'ellipsis';
+          }).length;
+        // Elemento con contenido real pero ancho 0: no se ve nada en pantalla.
+        // Es lo que le pasaba al titulo de las tarjetas de Fitosanitarios, y el
+        // detector de arriba no lo distinguia de un recorte intencionado.
+        const invisibles = Array.from(main?.querySelectorAll('*') || [])
+          .filter(e => e.scrollWidth > 20
+            && e.getBoundingClientRect().width < 1
+            && (e.textContent || '').trim().length > 3)
+          .map(e => (e.className || e.tagName).toString().slice(0, 40)).slice(0, 3);
         return {
           vacia: texto.length < 25,
           cargando: /Cargando|Iniciando/i.test(texto.slice(0, 60)),
           banner: !!(diag && getComputedStyle(diag).display !== 'none' && (diag.innerText || '').trim()),
           bannerTexto: (diag?.innerText || '').slice(0, 90),
           chars: texto.length,
-          imgsRotas, botonesSinNombre, desbordan,
+          imgsRotas, botonesSinNombre, desbordan, invisibles,
           muestra: texto.replace(/\s+/g, ' ').slice(0, 70)
         };
       });
@@ -200,7 +216,8 @@ function servir() {
       if (d.cargando) problemas.push('ATASCADA EN CARGANDO');
       if (d.imgsRotas.length) problemas.push('IMG ROTA: ' + d.imgsRotas.join(', '));
       if (d.botonesSinNombre) problemas.push(`${d.botonesSinNombre} boton(es) sin nombre accesible`);
-      if (d.desbordan > 2) problemas.push(`${d.desbordan} elementos con texto recortado`);
+      if (d.desbordan > 2) problemas.push(`${d.desbordan} elementos con texto cortado sin indicacion`);
+      if (d.invisibles?.length) problemas.push(`TEXTO INVISIBLE (ancho 0): ${d.invisibles.join(', ')}`);
       erroresVista.slice(0, 2).forEach(e => problemas.push(e));
 
       informe.push({ ...v, chars: d.chars, muestra: d.muestra, problemas });
