@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 27;
+const DB_VERSION = 28;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -1039,6 +1039,17 @@ async function initDB() {
                     if (!store.indexNames.contains('fincaId_motivo_fecha')) {
                         store.createIndex('fincaId_motivo_fecha', ['fincaId', 'motivo_tarea', 'fecha']);
                     }
+                }
+            }
+
+            // v28: Store para croquis de parcelas importadas desde PDF Catastro (SIGPAC)
+            // Ver docs/superpowers/specs/2026-08-03-importador-sigpac-zonas.md §3.2
+            if (oldVersion < 28) {
+                if (!db.objectStoreNames.contains('croquis_parcelas')) {
+                    const store = db.createObjectStore('croquis_parcelas', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('fincaId', 'fincaId');
+                    store.createIndex('zonaId', 'zonaId');
+                    store.createIndex('creadoEn', 'creadoEn');
                 }
             }
         },
