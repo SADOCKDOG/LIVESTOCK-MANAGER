@@ -53,7 +53,7 @@ const ZonasView = {
           .filter(({ zona }) => !zona?.anulada);
     let html = '';
     if (zonasConIndice.length === 0)
-      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()" data-guide="btn-vacio-zonas">${Icons.agregar()} Crear primera zona</button></div></div>`;
+      html += `<div class="empty-state"><div class="empty-state-icon">${Icons.zonas()}</div><p class="empty-state-text">Sin zonas definidas.</p><div class="text-center mt-20 space-y-10"><button class="btn btn-create btn-lg" onclick="ZonasView._crearZona()" data-guide="btn-vacio-zonas">${Icons.agregar()} Crear primera zona</button><button class="btn btn-secondary btn-lg" onclick="ZonasView._importarDesdePDF()" data-guide="btn-importar-pdf">${Icons.documento()} Importar desde PDF del Catastro</button></div></div>`;
     else {
       let totalAforo = 0, totalOcupacion = 0;
       let fichasHtml = '';
@@ -232,6 +232,7 @@ const ZonasView = {
           </div>
           <div class="module-header-primary-action">
             <button class="btn btn-create btn-lg w-full" data-guide="btn-nueva-zona" onclick="ZonasView._crearZona()">${Icons.agregar()} Nueva Zona</button>
+            <button class="btn btn-secondary btn-lg w-full mt-10" data-guide="btn-importar-pdf" onclick="ZonasView._importarDesdePDF()">${Icons.documento()} Importar desde PDF del Catastro</button>
           </div>
         </div>
 
@@ -677,6 +678,10 @@ const ZonasView = {
       }
     }
     return { bloqueado: false };
+  },
+
+  async _importarDesdePDF() {
+    location.hash = '#/importar-zonas';
   }
 };
 

@@ -37,7 +37,7 @@
   {
     "ruta": "#/ganaderia?tab=zonas",
     "nombre": "GeGan · Zonas",
-    "chars": 1297,
+    "chars": 1329,
     "muestra": "ZONAS ANIMALES REBANOS PATRIMONIO ZONAS SANIDAD | ZONAS Y PARCELAS UBI",
     "problemas": []
   },
@@ -65,7 +65,7 @@
   {
     "ruta": "#/zonas",
     "nombre": "Zonas",
-    "chars": 1297,
+    "chars": 1329,
     "muestra": "ZONAS ANIMALES REBANOS PATRIMONIO ZONAS SANIDAD | ZONAS Y PARCELAS UBI",
     "problemas": []
   },
@@ -170,7 +170,7 @@
   {
     "ruta": "#/informes",
     "nombre": "Informes",
-    "chars": 684,
+    "chars": 685,
     "muestra": "GENERAL GEGAN EXPRO COMER LIBROS GENERAL POR FINCA ALERTAS EFICIENCIA ",
     "problemas": []
   },
@@ -206,7 +206,7 @@
     "ruta": "#/saneamientos",
     "nombre": "Saneamientos",
     "chars": 270,
-    "muestra": "| SANEAMIENTOS 2 CAMPAÑAS BRUCELOSIS BOVINA (B. ABORTUS) CALIFICADA 25",
+    "muestra": "| SANEAMIENTOS 2 CAMPAÑAS BRUCELOSIS BOVINA (B. ABORTUS) CALIFICADA 27",
     "problemas": []
   },
   {
@@ -269,7 +269,7 @@
     "ruta": "#/margen-animal",
     "nombre": "Margen por animal",
     "chars": 561,
-    "muestra": "| MARGEN ECONÓMICO POR ANIMAL Ordenar: Peor primero ES123456789013 Cos",
+    "muestra": "| MARGEN ECONÓMICO POR ANIMAL Ordenar: Peor primero ES123456789014 Cos",
     "problemas": []
   },
   {
