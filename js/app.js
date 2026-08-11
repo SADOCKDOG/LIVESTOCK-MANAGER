@@ -98,6 +98,7 @@ const App = {
     "/fitosanitario": "renderFitosanitarios",
     "/margen-animal": "renderMargenAnimal",
     "/importar-rfid": "renderImportadorRFID",
+    "/importar-zonas": "renderImportarZonas",
     "/agenda": "renderAgenda",
   },
 
@@ -1932,6 +1933,26 @@ const App = {
     return typeof Chart !== 'undefined';
   },
 
+  /** Carga pdf.js bajo demanda (~2MB vía CDN) solo cuando se importa PDF del Catastro (SIGPAC). */
+  async _ensurePdfJs() {
+    if (typeof pdfjsLib !== 'undefined') return true;
+    if (!App._pdfJsLoadPromise) {
+      App._pdfJsLoadPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+      });
+    }
+    try { await App._pdfJsLoadPromise; } catch (_) {}
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
+      return true;
+    }
+    return false;
+  },
+
   // ==========================================
   // LAZY LOADING DE VISTAS POR GRUPO (P0-4)
   // ==========================================
@@ -1941,7 +1962,7 @@ const App = {
   // servicios) siguen cargando siempre, porque el Dashboard los usa todos
   // desde sus accesos directos.
   _viewGroups: {
-    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js', 'js/views/margen-animal-view.js', 'js/guides/gegan-sanidad.js', 'js/guides/gegan-panoramica.js', 'js/guides/gegan-animales.js', 'js/guides/gegan-rebanos.js', 'js/guides/gegan-patrimonio.js', 'js/guides/gegan-zonas.js'],
+    gegan: ['js/views/sanidad-view.js', 'js/views/patrimonio-view.js', 'js/views/ganaderia-view.js', 'js/views/animales-view.js', 'js/views/rebanos-view.js', 'js/views/zonas-view.js', 'js/views/importar-zonas-view.js', 'js/views/instalaciones-view.js', 'js/views/saneamientos-view.js', 'js/views/subexplotaciones-view.js', 'js/views/botiquin-view.js', 'js/views/bitacora-animal-view.js', 'js/views/margen-animal-view.js', 'js/guides/gegan-sanidad.js', 'js/guides/gegan-panoramica.js', 'js/guides/gegan-animales.js', 'js/guides/gegan-rebanos.js', 'js/guides/gegan-patrimonio.js', 'js/guides/gegan-zonas.js'],
     expro: ['js/views/explotacion-view.js', 'js/views/silos-view.js', 'js/views/fitosanitarios-view.js', 'js/views/gastos-view.js', 'js/views/proveedores-view.js', 'js/views/wizards/wizard-traslado.js', 'js/views/wizards/wizard-censo.js', 'js/views/wizards/wizard-crotales.js', 'js/views/wizards/wizard-guia-movimiento.js', 'js/guides/expro-panoramica.js', 'js/guides/expro-explotacion.js', 'js/guides/expro-lacteo.js', 'js/guides/expro-silos.js', 'js/guides/expro-fitosanitarios.js', 'js/guides/expro-gastos.js', 'js/guides/expro-proveedores.js', 'js/guides/expro-tramites.js'],
     comer: ['js/views/comercializacion-view.js', 'js/views/compradores-view.js', 'js/views/contratos-view.js', 'js/views/transportistas-view.js', 'js/guides/comer-panoramica.js', 'js/guides/comer-leche.js', 'js/guides/comer-carne.js', 'js/guides/comer-compradores.js', 'js/guides/comer-contratos.js', 'js/guides/comer-transportistas.js'],
     informes: ['js/views/informes-analytics.js', 'js/views/informes-view.js', 'js/views/informes-data.js', 'js/views/informes-export.js'],
@@ -1955,7 +1976,7 @@ const App = {
 
   // Ruta (ya normalizada por redirectMap) -> grupo que debe estar cargado antes de despachar.
   _routeGroups: {
-    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan', '/animal-bitacora': 'gegan', '/margen-animal': 'gegan',
+    '/ganaderia': 'gegan', '/rebanos': 'gegan', '/animales': 'gegan', '/rebano': 'gegan', '/animal': 'gegan', '/zonas': 'gegan', '/zona': 'gegan', '/importar-zonas': 'gegan', '/instalaciones': 'gegan', '/instalacion': 'gegan', '/saneamientos': 'gegan', '/saneamiento': 'gegan', '/subexplotaciones': 'gegan', '/subexplotacion': 'gegan', '/botiquin': 'gegan', '/botiquin-producto': 'gegan', '/animal-bitacora': 'gegan', '/margen-animal': 'gegan',
     '/explotacion': 'expro', '/silos': 'expro', '/fitosanitario': 'expro', '/gastos': 'expro', '/proveedores': 'expro', '/proveedor': 'expro',
     '/comercializacion': 'comer', '/compradores': 'comer', '/contratos': 'comer', '/transportistas': 'comer', '/comprador': 'comer', '/contrato': 'comer',
     '/informes': 'informes', '/alertas': 'informes',
@@ -2808,6 +2829,14 @@ const App = {
 
   async renderImportadorRFID(params) {
     if (window.ImportadorRFIDView) { await ImportadorRFIDView.render(); }
+  },
+
+  async renderImportarZonas(params) {
+    if (window.ImportarZonasView) {
+      await ImportarZonasView.render();
+    } else {
+      document.getElementById("app-content").innerHTML = '<div class="loader">Cargando importador de zonas...</div>';
+    }
   },
 
   async renderAlbaranesVentas(params) {
