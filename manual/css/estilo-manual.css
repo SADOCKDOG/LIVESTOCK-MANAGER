@@ -737,6 +737,13 @@ img { max-width: 100%; height: auto; display: block; }
 @media (max-width: 480px) {
   .hero-stats { grid-template-columns: 1fr 1fr; }
   .stat-num { font-size: 1.5rem; }
+  /* El logo (wordmark ancho) ocupaba ~226px de los ~358px disponibles y dejaba
+     al title-block una columna de ~116px: el h1 en 1.5rem/800 no cabía y
+     desbordaba, sobre todo con el tamaño de letra del sistema aumentado.
+     Apilar en vertical le da al título el ancho completo. */
+  .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .logo { max-height: 40px; }
+  .title-block { width: 100%; }
 }
 
 /* REDUCED MOTION */
