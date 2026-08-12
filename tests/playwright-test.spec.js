@@ -174,14 +174,14 @@ test.describe('Importar Zonas - Parser Catastro E2E', () => {
     console.log('✅ Review screen data verified');
 
     // 12. Click save (guardar) - wait for navigation
-        const [response] = await Promise.all([
-          page.waitForNavigation({ timeout: 30000, url: '**/#/zonas*' }),
+        await Promise.all([
+          page.waitForNavigation({ timeout: 30000, url: '**/#/ganaderia*tab=zonas*' }),
           page.click('.wizard-footer-fixed .btn-create')
         ]);
-        console.log('Save clicked, navigated to /zonas');
+        console.log('Save clicked, navigated to /ganaderia?tab=zonas');
 
         // 13. Wait for /zonas view to load
-        await page.waitForFunction(() => location.hash.includes('/zonas'), { timeout: 10000 });
+        await page.waitForFunction(() => location.hash.includes('tab=zonas'), { timeout: 10000 });
         console.log('Zonas view loaded');
 
         // 14. Verify zone was saved
@@ -202,9 +202,8 @@ test.describe('Importar Zonas - Parser Catastro E2E', () => {
   });
 
   test('Multiple PDFs with duplicate detection', async () => {
-      // Navigate to importar-zonas
-      await page.goto(`${BASE_URL}/index.html#/importar-zonas`, { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction('!!window.App', { timeout: 30000 });
+      // Navigate to importar-zonas via hash change (app already initialized)
+      await page.evaluate(() => { location.hash = '#/importar-zonas'; });
       await page.waitForSelector('#pdf-files', { timeout: 15000 });
       console.log('Selector view rendered');
     
