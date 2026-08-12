@@ -1,16 +1,13 @@
-// Test E2E script for pdf-catastro.js using pdf.js in Node.js
-// Since pdf.js is loaded from CDN in browser, we'll use pdfjs-dist in Node
+// Test E2E batch - procesa los 11 PDFs SIGPAC disponibles
+// Uso: node test-e2e-batch.mjs
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+// Use CommonJS require for legacy build
+const { getDocument, GlobalWorkerOptions } = require('pdfjs-dist/legacy/build/pdf.js');
 
-// Use pdfjs-dist for Node.js testing (CommonJS - older version 3.11.174)
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
+GlobalWorkerOptions.workerSrc = '';
 
-// Set worker source - in Node we don't need a worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-
-// Copy pure functions from pdf-catastro.js
 function parsearSuperficie(str) {
     if (!str) return null;
     const limpio = String(str).replace(/\./g, '').replace(',', '.');
@@ -31,7 +28,6 @@ async function extraerLineas(pdf) {
         const grupos = {};
         for (const item of contenido.items) {
             if (!item.str || !item.str.trim()) continue;
-            // Se redondea la Y a múltiplos de 2 para tolerar diferencias de baseline
             const y = Math.round(item.transform[5] / 2) * 2;
             const x = item.transform[4];
             (grupos[y] = grupos[y] || []).push({ x, str: item.str });
@@ -64,7 +60,6 @@ function parsearCatastro(lineas) {
 
     const texto = lineas.join('\n');
 
-    // Referencia catastral: rústica (5 díg + letra + 12 díg + 2 letras) o urbana.
     const ref = texto.match(/[0-9]{5}[A-Z][0-9]{12}[A-Z]{2}/i) ||
                 texto.match(/[0-9]{7}[A-Z]{2}[0-9]{4}[A-Z][0-9]{4}[A-Z]{2}/i);
     if (ref) d.refCatastral = ref[0].toUpperCase();
@@ -75,8 +70,6 @@ function parsearCatastro(lineas) {
         d.parcela = parseInt(pol[2], 10);
     }
 
-    // Localización, paraje, municipio y provincia: se buscan en las líneas
-    // siguientes a la de "Polígono X Parcela Y".
     for (let i = 0; i < lineas.length; i++) {
         if (!/Pol[íi]gono\s+\d+\s+Parcela\s+\d+/i.test(lineas[i])) continue;
 
@@ -102,9 +95,6 @@ function parsearCatastro(lineas) {
     const clase = texto.match(/Clase\s+(R[úu]stico|Urbano|BICE|Agrario|Industrial)/i);
     if (clase) d.clase = clase[1];
 
-    // Espacio literal en la clase, NO \s: con \s la captura se comía el salto de
-    // línea y arrastraba el encabezado siguiente ("Agrario\nPARC" en 9 de los 11
-    // PDFs de prueba). Este defecto venía del parser original de Cork.
     const uso = texto.match(/Uso\s+principal\s+([A-ZÁÉÍÓÚÑa-zñáéíóú ]{3,20})/i);
     if (uso) d.usoPrincipal = uso[1].trim();
 
@@ -117,7 +107,6 @@ function parsearCatastro(lineas) {
     const ano = texto.match(/A[ñn]o\s+construcci[óo]n\s+(\d{4})/i);
     if (ano) d.anoConstruccion = parseInt(ano[1], 10);
 
-    // CULTIVOS SIGPAC: "a FE Encinar 02 55.460"
     const iCultivo = lineas.findIndex(l => /^CULTIVO/i.test(l.trim()));
     if (iCultivo >= 0) {
         for (let i = iCultivo + 1; i < lineas.length; i++) {
@@ -136,7 +125,6 @@ function parsearCatastro(lineas) {
         }
     }
 
-    // CONSTRUCCIONES: "USO ESCALERA PLANTA PUERTA SUPERFICIE"
     const iConst = lineas.findIndex(l => /^CONSTRUCCI[ÓO]N/i.test(l.trim()));
     if (iConst >= 0) {
         for (let i = iConst + 1; i < lineas.length; i++) {
@@ -159,76 +147,114 @@ function parsearCatastro(lineas) {
     return d;
 }
 
-async function testWithRealPDF() {
-    const pdfPath = path.join(__dirname, 'test-catastro-real.pdf');
+const carpetaOrigen = "C:\\Users\\yo\\repo\\pesadas-corcho\\_PRIVATE_\\ZONAS";
+
+async function procesarPDF(archivo) {
+    const pdfPath = path.join(carpetaOrigen, archivo);
+    const nombreBase = path.basename(archivo, '.pdf');
     
-    if (!fs.existsSync(pdfPath)) {
-        console.error('PDF not found at:', pdfPath);
-        return;
-    }
-
-    console.log('Loading PDF:', pdfPath);
-    const data = fs.readFileSync(pdfPath);
-    
-    console.log('Loading pdf.js document...');
-    const pdf = await pdfjsLib.getDocument({ data: data.buffer }).promise;
-    console.log('Pages:', pdf.numPages);
-
-    console.log('\n=== EXTRAYENDO LÍNEAS ===');
-    const lineas = await extraerLineas(pdf);
-    console.log(`Total líneas extraídas: ${lineas.length}`);
-    console.log('\n--- Primeras 30 líneas ---');
-    lineas.slice(0, 30).forEach((l, i) => console.log(`${i}: ${l}`));
-
-    console.log('\n--- Líneas con "Polígono", "Parcela", "Referencia", "CULTIVO", "Superficie" ---');
-    lineas.forEach((l, i) => {
-        if (/pol[ií]gono|parcela|referencia|cultivo|superficie|clase|uso|paraje|municipio|provincia|construcci/i.test(l)) {
-            console.log(`${i}: ${l}`);
-        }
-    });
-
-    console.log('\n=== PARSEANDO CATASTRO ===');
-    const resultado = parsearCatastro(lineas);
-    console.log(JSON.stringify(resultado, null, 2));
-
-    console.log('\n=== VERIFICACIÓN ===');
-    console.log('refCatastral:', resultado.refCatastral);
-    console.log('poligono:', resultado.poligono);
-    console.log('parcela:', resultado.parcela);
-    console.log('superficieGrafica (m2):', resultado.superficieGrafica);
-    console.log('superficie (ha):', m2AHectareas(resultado.superficieGrafica));
-    console.log('usoPrincipal:', resultado.usoPrincipal);
-    console.log('cultivos:', resultado.cultivos.length);
-    if (resultado.cultivos.length > 0) {
-        console.log('  Detalle cultivos:', JSON.stringify(resultado.cultivos, null, 2));
-    }
-    console.log('paraje:', resultado.paraje);
-    console.log('municipio:', resultado.municipio);
-    console.log('provincia:', resultado.provincia);
-    console.log('clase:', resultado.clase);
-    
-    // Check what ImportarZonasView expects
-    console.log('\n=== CAMPOS QUE ESPERA IMPORTARZONASVIEW ===');
-    const camposEsperados = [
-        'refCatastral', 'poligono', 'parcela', 'paraje', 'municipio', 'provincia',
-        'localizacion', 'clase', 'usoPrincipal', 'superficieGrafica', 
-        'superficie', 'superficieConstruida', 'anoConstruccion', 'cultivos', 'construcciones'
-    ];
-    camposEsperados.forEach(c => {
-        const valor = c === 'superficie' ? m2AHectareas(resultado.superficieGrafica) : resultado[c];
-        console.log(`  ${c}: ${valor !== null && valor !== undefined ? JSON.stringify(valor) : 'null/undefined'}`);
-    });
-    
-    // Ahora probar renderizarCroquis (simulado)
-    console.log('\n=== RENDERIZANDO CROQUIS (página 1) ===');
     try {
-        const pagina = await pdf.getPage(1);
-        const viewport = pagina.getViewport({ scale: 1.5 });
-        console.log(`Viewport: ${viewport.width}x${viewport.height}`);
-        console.log('Croquis renderizado OK (en browser sería canvas.toBlob)');
+        const data = fs.readFileSync(pdfPath);
+        const pdf = await getDocument({ data: data.buffer }).promise;
+        const lineas = await extraerLineas(pdf);
+        const resultado = parsearCatastro(lineas);
+        
+        // Verificar croquis
+        let croquisOK = false;
+        try {
+            const pagina = await pdf.getPage(1);
+            const viewport = pagina.getViewport({ scale: 1.5 });
+            croquisOK = viewport.width > 0 && viewport.height > 0;
+        } catch {}
+        
+        return {
+            archivo,
+            nombreBase,
+            ok: true,
+            refCatastral: resultado.refCatastral,
+            poligono: resultado.poligono,
+            parcela: resultado.parcela,
+            superficieM2: resultado.superficieGrafica,
+            superficieHa: m2AHectareas(resultado.superficieGrafica),
+            usoPrincipal: resultado.usoPrincipal,
+            clase: resultado.clase,
+            paraje: resultado.paraje,
+            municipio: resultado.municipio,
+            provincia: resultado.provincia,
+            numCultivos: resultado.cultivos.length,
+            numConstrucciones: resultado.construcciones.length,
+            cultivos: resultado.cultivos,
+            construcciones: resultado.construcciones,
+            croquisOK
+        };
     } catch (e) {
-        console.error('Error renderizando croquis:', e.message);
+        return { archivo, nombreBase, ok: false, error: e.message };
     }
 }
 
-testWithRealPDF().catch(console.error);
+async function main() {
+    console.log('🚀 Iniciando test batch de 11 PDFs SIGPAC...\n');
+    
+    const archivos = fs.readdirSync(carpetaOrigen)
+        .filter(f => f.toLowerCase().endsWith('.pdf'))
+        .sort();
+    
+    console.log(`Encontrados ${archivos.length} PDFs:\n`);
+    
+    const resultados = [];
+    for (const archivo of archivos) {
+        console.log(`📄 Procesando: ${archivo}...`);
+        const r = await procesarPDF(archivo);
+        resultados.push(r);
+        
+        if (r.ok) {
+            console.log(`   ✅ Ref: ${r.refCatastral} | Pol: ${r.poligono} Par: ${r.parcela} | ${r.superficieHa} ha | ${r.usoPrincipal} | ${r.numCultivos} cultivos | ${r.numConstrucciones} constr. | Croquis: ${r.croquisOK ? 'OK' : 'Failed'}`);
+        } else {
+            console.log(`   ❌ Error: ${r.error}`);
+        }
+        console.log('');
+    }
+    
+    // Resumen
+    const ok = resultados.filter(r => r.ok).length;
+    const fail = resultados.filter(r => !r.ok).length;
+    const totalCultivos = resultados.reduce((s, r) => s + (r.numCultivos || 0), 0);
+    const totalConstrucciones = resultados.reduce((s, r) => s + (r.numConstrucciones || 0), 0);
+    
+    console.log('═'.repeat(80));
+    console.log(`📊 RESUMEN FINAL: ${ok}/${resultados.length} OK, ${fail} fallos`);
+    console.log(`   Total cultivos detectados: ${totalCultivos}`);
+    console.log(`   Total construcciones detectadas: ${totalConstrucciones}`);
+    console.log(`   Croquis renderizados OK: ${resultados.filter(r => r.croquisOK).length}/${resultados.length}`);
+    console.log('═'.repeat(80));
+    
+    // Mostrar detalles por PDF
+    console.log('\n📋 DETALLE POR PDF:');
+    for (const r of resultados) {
+        if (!r.ok) continue;
+        console.log(`\n${r.archivo}:`);
+        console.log(`  Ref. Catastral: ${r.refCatastral}`);
+        console.log(`  Polígono/Parcela: ${r.poligono}/${r.parcela}`);
+        console.log(`  Superficie: ${r.superficieM2} m² (${r.superficieHa} ha)`);
+        console.log(`  Clase: ${r.clase} | Uso: ${r.usoPrincipal}`);
+        console.log(`  Paraje: ${r.paraje} | ${r.municipio} (${r.provincia})`);
+        if (r.numCultivos > 0) {
+            console.log(`  Cultivos (${r.numCultivos}):`);
+            r.cultivos.forEach(c => console.log(`    ${c.letra}: ${c.cultivo} (Int: ${c.intensidad}, ${c.superficie} m²)`));
+        }
+        if (r.numConstrucciones > 0) {
+            console.log(`  Construcciones (${r.numConstrucciones}):`);
+            r.construcciones.forEach(c => console.log(`    ${c.uso} - Esc${c.escalera} Pl${c.planta} Pt${c.puerta} ${c.superficie} m²`));
+        }
+    }
+    
+    // Guardar resultados en JSON para análisis posterior
+    const resultadosJSON = resultados.map(r => {
+        const { cultivos, construcciones, ...resto } = r;
+        return resto;
+    });
+    fs.writeFileSync('test-batch-resultados.json', JSON.stringify(resultadosJSON, null, 2));
+    console.log('\n💾 Resultados guardados en test-batch-resultados.json');
+}
+
+main().catch(console.error);
