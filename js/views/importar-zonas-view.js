@@ -123,6 +123,11 @@ const ImportarZonasView = {
           this._resultadosParseo.push({
             archivo: file.name,
             datos: resultado.datos,
+            // `importar()` devuelve el croquis como hermano de `datos`, no dentro.
+            // Sin recogerlo aqui, el guardado buscaba `d.croquisBlob` (siendo
+            // `d = r.datos`), siempre undefined: el PNG del croquis se generaba y
+            // se tiraba, y el store croquis_parcelas de la v28 quedaba vacio.
+            croquisBlob: resultado.croquisBlob || null,
             nombreEditado: nombreDefecto,
             incluir: true,
             error: null
@@ -379,11 +384,11 @@ const ImportarZonasView = {
 
       // 1. Guardar croquis en store aparte
       let croquisId = null;
-      if (d.croquisBlob) {
+      if (r.croquisBlob) {
         const croquisRecord = {
           fincaId: finca.id,
           // zonaId se asignará después
-          blob: d.croquisBlob,
+          blob: r.croquisBlob,
           creadoEn: new Date().toISOString()
         };
         croquisId = await db.add('croquis_parcelas', croquisRecord);
