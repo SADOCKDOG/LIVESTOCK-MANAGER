@@ -206,7 +206,7 @@
     "ruta": "#/saneamientos",
     "nombre": "Saneamientos",
     "chars": 270,
-    "muestra": "| SANEAMIENTOS 2 CAMPAÑAS BRUCELOSIS BOVINA (B. ABORTUS) CALIFICADA 27",
+    "muestra": "| SANEAMIENTOS 2 CAMPAÑAS BRUCELOSIS BOVINA (B. ABORTUS) CALIFICADA 28",
     "problemas": []
   },
   {
@@ -269,7 +269,7 @@
     "ruta": "#/margen-animal",
     "nombre": "Margen por animal",
     "chars": 561,
-    "muestra": "| MARGEN ECONÓMICO POR ANIMAL Ordenar: Peor primero ES123456789014 Cos",
+    "muestra": "| MARGEN ECONÓMICO POR ANIMAL Ordenar: Peor primero ES123456789013 Cos",
     "problemas": []
   },
   {
