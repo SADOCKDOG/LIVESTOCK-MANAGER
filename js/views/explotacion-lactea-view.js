@@ -3,6 +3,59 @@
  * Módulo Lácteo Integral (v24)
  */
 window.ExplotacionLacteaView = {
+
+  // ── Acciones sobre los registros de Láctea ────────────────────────────────
+  // Las analíticas y los movimientos de balance se pintaban en modo consulta:
+  // no había forma de abrirlos ni corregirlos desde la interfaz.
+
+  /** Abre una analítica existente en el asistente, en modo edición. */
+  async _editarAnalitica(id) {
+    try {
+      const analitica = await window.AnaliticasLeche.getById(Number(id));
+      if (!analitica) return App.toastError('La analítica ya no existe');
+      await window.AnaliticaLecheWizard.open(analitica);
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
+
+  /** Elimina una analítica, previa confirmación. */
+  async _eliminarAnalitica(id) {
+    const ok = await Confirm.confirm('Eliminar analítica', '¿Eliminar esta analítica del control lechero? La acción no se puede deshacer.', true);
+    if (!ok) return;
+    try {
+      await window.db.delete('analiticas_leche', Number(id));
+      App.toast('Analítica eliminada', 'success');
+      App.route();
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
+
+  /** Abre un movimiento de balance existente en el asistente, en modo edición. */
+  async _editarMovimiento(id) {
+    try {
+      const mov = await window.BalanceLacteo.getById(Number(id));
+      if (!mov) return App.toastError('El movimiento ya no existe');
+      await window.MovimientoBalanceWizard.open(mov);
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
+
+  /** Elimina un movimiento de balance. El stock del tanque se recalcula solo,
+   *  porque se deriva de la suma de movimientos (ver BalanceLacteo.getStockTanque). */
+  async _eliminarMovimiento(id) {
+    const ok = await Confirm.confirm('Eliminar movimiento', '¿Eliminar este movimiento de balance? El stock del tanque se recalculará automáticamente.', true);
+    if (!ok) return;
+    try {
+      await window.BalanceLacteo.eliminar(Number(id));
+      App.toast('Movimiento eliminado', 'success');
+      App.route();
+    } catch (e) {
+      App.toastError(e.message);
+    }
+  },
   async render(container) {
     const App = window.App;
     const fincaId = await window.Fincas.getActiveId();
@@ -217,6 +270,10 @@ window.ExplotacionLacteaView = {
               <div class="text-xs font-800">${a.laboratorio_nombre || '—'}</div>
             </div>
           </div>
+        <div class="flex gap-6 mt-10 justify-end">
+          <button onclick="ExplotacionLacteaView._editarAnalitica(${a.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-222); color:var(--c-aaa);">Editar</button>
+          <button onclick="ExplotacionLacteaView._eliminarAnalitica(${a.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-danger)20; color:var(--c-danger);">Eliminar</button>
+        </div>
         </div>
       `;
     }).join('');
@@ -292,6 +349,10 @@ window.ExplotacionLacteaView = {
               <div class="text-sm font-900">${m.cantidad_litros.toLocaleString('es-ES')} L</div>
               <div class="text-xs text-aaa">${UI.formatDate(m.fecha)} ${m.turno ? '(' + m.turno + ')' : ''}</div>
             </div>
+          </div>
+          <div class="flex gap-6 mt-8 justify-end">
+            <button onclick="ExplotacionLacteaView._editarMovimiento(${m.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-222); color:var(--c-aaa);">Editar</button>
+            <button onclick="ExplotacionLacteaView._eliminarMovimiento(${m.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-danger)20; color:var(--c-danger);">Eliminar</button>
           </div>
         </div>
       `;
