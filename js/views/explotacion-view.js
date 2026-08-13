@@ -526,7 +526,7 @@ const ExplotacionView = {
         </div>
       </div>
       <div class="fab-container" style="--fab-neon-color: var(--c-purple);" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
-        <span class="fab-label">Nuevo Gasto</span>
+        <span class="fab-label">Registrar Gasto</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;
   },
