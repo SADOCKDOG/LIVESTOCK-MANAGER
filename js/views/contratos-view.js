@@ -234,7 +234,7 @@ const ContratosView = {
     const fabContainer = document.createElement('div');
     fabContainer.className = 'fab-container';
     fabContainer.innerHTML = `
-      <span class="fab-label">NUEVO CONTRATO</span>
+      <span class="fab-label">Nuevo Contrato</span>
       <button class="fab-btn">${Icons.fabPlus()}</button>
     `;
     fabContainer.onclick = () => {

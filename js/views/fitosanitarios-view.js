@@ -95,7 +95,7 @@ const FitosanitariosView = {
 
             <!-- FAB (Botón de Acción Flotante) Premium -->
             <div class="fab-container" style="--fab-neon-color: var(--c-purple);" onclick="FitosanitariosView._nuevoTratamiento()">
-                <span class="fab-label">Nuevo Registro</span>
+                <span class="fab-label">Registrar Tratamiento</span>
                 <button class="fab-btn">${Icons.fabPlus()}</button>
             </div>
         </div>
