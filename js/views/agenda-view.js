@@ -76,7 +76,7 @@ const AgendaView = {
             </div>
 
             <div class="fab-container" onclick="window.WizardTarea.open({ onComplete: () => AgendaView.render() })">
-                <span class="fab-label">Programar</span>
+                <span class="fab-label">Nueva Tarea</span>
                 <button class="fab-btn">${Icons.fabPlus()}</button>
             </div>
         `;
