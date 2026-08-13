@@ -57,6 +57,14 @@
     <link rel="stylesheet" href="css/design-tokens.css?v=6.74" />
     <link rel="stylesheet" href="css/styles.css?v=6.74" />
     <link rel="stylesheet" href="css/layout.css?v=6.74" />
+
+    <!-- Piel ERP de escritorio. Cargan SOLO en >=1024px vía el atributo media,
+         asi que en movil el navegador ni las aplica y Android conserva su
+         paleta neon y su chrome (header + bottom-nav) intactos. -->
+    <link rel="stylesheet" href="css/erp-tokens.css?v=6.74" media="(min-width: 1024px)" />
+    <link rel="stylesheet" href="css/erp-sidebar.css?v=6.74" media="(min-width: 1024px)" />
+    <link rel="stylesheet" href="css/erp-data-table.css?v=6.74" media="(min-width: 1024px)" />
+    <link rel="stylesheet" href="css/erp-overrides.css?v=6.74" media="(min-width: 1024px)" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/Logo aplicación.png" />
 
@@ -276,6 +284,11 @@
     <script src="js/db.js?v=6.74"></script>
     <script src="js/error-handler.js?v=6.74"></script>
     <script src="js/icons.js?v=6.74"></script>
+    <!-- Capa ERP: ambos son inertes al cargar (icons-desktop solo anade iconos
+         con guardas; erp-data-table solo declara window.ErpDataTable), asi que
+         no alteran el movil aunque se carguen siempre. -->
+    <script src="js/icons-desktop.js?v=6.74"></script>
+    <script src="js/erp-data-table.js?v=6.74"></script>
     <script src="js/crypto.js?v=6.74"></script>
     <script src="js/catalogo-sanitario.js?v=6.74"></script>
 
