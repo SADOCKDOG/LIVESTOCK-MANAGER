@@ -186,7 +186,7 @@ const ProduccionView = {
 
       <!-- Botón Flotante de Acción con viñeta -->
       <div class="fab-container" onclick="${registrarHandler}">
-        <span class="fab-label">Nuevo Registro ${registrarLabel}</span>
+        <span class="fab-label">Registrar ${registrarLabel}</span>
         <button class="fab-btn" style="--fab-color: ${color};">${Icons.fabPlus()}</button>
       </div>`;
   },
