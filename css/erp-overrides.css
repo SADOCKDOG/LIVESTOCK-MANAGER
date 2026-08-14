@@ -773,3 +773,19 @@ main#app-content.manual-open {
     box-shadow: 0 0 6px rgba(239,68,68,0.6);
   }
 }
+
+/* ===========================================================================
+   Navegación exclusiva de móvil
+   ---------------------------------------------------------------------------
+   Los FAB y las franjas de sub-pestañas son la ÚNICA navegación en móvil (no
+   hay sidebar), así que no se eliminan: se marcan con .erp-solo-movil y se
+   ocultan aquí, donde el sidebar ya cumple esa función.
+
+   Sin @media propio a propósito: esta hoja se enlaza con
+   media="(min-width: 1024px)", así que todo lo que contiene ya es de
+   escritorio. Sin regla base, el elemento conserva en móvil el display que
+   tuviera (flex, block…), sin tener que acertar con cuál es en cada caso.
+   =========================================================================== */
+.erp-solo-movil {
+  display: none !important;
+}

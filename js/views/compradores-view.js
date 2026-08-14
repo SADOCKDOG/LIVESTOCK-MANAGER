@@ -383,7 +383,7 @@ const CompradoresView = {
 
     // Botón Flotante de Acción con viñeta (se agrega después de la lista)
     const fabContainer = document.createElement('div');
-    fabContainer.className = 'fab-container';
+    fabContainer.className = 'fab-container erp-solo-movil';
     fabContainer.innerHTML = `
       <span class="fab-label">Nuevo Comprador</span>
       <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
@@ -462,7 +462,7 @@ const CompradoresView = {
 
     // Botón Flotante de Acción con viñeta (se agrega después de la lista)
     const fabContainer = document.createElement('div');
-    fabContainer.className = 'fab-container';
+    fabContainer.className = 'fab-container erp-solo-movil';
     fabContainer.innerHTML = `
       <span class="fab-label">Nuevo Contrato</span>
       <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>

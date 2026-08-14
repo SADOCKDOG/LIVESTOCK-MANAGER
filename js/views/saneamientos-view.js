@@ -59,7 +59,7 @@ const SaneamientosView = {
     }
 
     main.innerHTML = html + `
-      <div class="fab-container" onclick="SaneamientosView._crearSaneamiento()">
+      <div class="fab-container erp-solo-movil" onclick="SaneamientosView._crearSaneamiento()">
         <span class="fab-label">Nuevo Saneamiento</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

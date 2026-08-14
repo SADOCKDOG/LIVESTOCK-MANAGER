@@ -58,7 +58,7 @@ const InstalacionesView = {
     }
 
     main.innerHTML = html + `
-      <div class="fab-container" onclick="InstalacionesView._crearInstalacion()">
+      <div class="fab-container erp-solo-movil" onclick="InstalacionesView._crearInstalacion()">
         <span class="fab-label">Nueva Instalación</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

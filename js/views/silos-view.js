@@ -142,7 +142,7 @@ const SilosView = {
             </div>
 
             <!-- FAB (Botón de Acción Flotante) Premium -->
-            <div class="fab-container" style="--fab-neon-color: var(--c-success);" onclick="SilosView._abrirFormularioSilo()">
+            <div class="fab-container erp-solo-movil" style="--fab-neon-color: var(--c-success);" onclick="SilosView._abrirFormularioSilo()">
                 <span class="fab-label">Nuevo Silo</span>
                 <button class="fab-btn">${Icons.fabPlus()}</button>
             </div>

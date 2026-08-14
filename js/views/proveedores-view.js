@@ -39,7 +39,7 @@ const ProveedoresView = {
           <div id="prov-lista"><div class="loader">Cargando proveedores...</div></div>
 
           <!-- Botón Flotante de Acción con viñeta -->
-          <div class="fab-container" onclick="ProveedoresView.renderFormulario()">
+          <div class="fab-container erp-solo-movil" onclick="ProveedoresView.renderFormulario()">
             <span class="fab-label">Nuevo Proveedor</span>
             <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
           </div>

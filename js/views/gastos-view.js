@@ -97,7 +97,7 @@ const GastosView = {
 
       <div class="mb-14">
         <div class="tabs-scroll-wrapper">
-          <div class="tabs-scroll gasto-tabs scroll-shadow-container"
+          <div class="tabs-scroll gasto-tabs scroll-shadow-container erp-solo-movil"
                onscroll="const b=this.parentNode.querySelector('.scroll-indicator-badge'); if(b) b.classList.add('hidden');">
             ${this._CATEGORIAS.map(c => `
               <button class="gasto-tab ${this._currentTab === c.key ? 'active' : ''}" 
@@ -204,7 +204,7 @@ const GastosView = {
         ${recordsHtml}
       </div>
       <!-- Botón Flotante de Acción con viñeta -->
-      <div class="fab-container" onclick="${registrarHandler}">
+      <div class="fab-container erp-solo-movil" onclick="${registrarHandler}">
         <span class="fab-label">Registrar ${registrarLabel}</span>
         <button class="fab-btn" aria-label="Añadir"><span aria-hidden="true">${Icons.fabPlus()}</span></button>
       </div>`;
