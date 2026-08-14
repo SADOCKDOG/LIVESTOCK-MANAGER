@@ -66,7 +66,7 @@ const SubexplotacionesView = {
     }
 
     main.innerHTML = html + `
-      <div class="fab-container" onclick="SubexplotacionesView._crearSubexplotacion()">
+      <div class="fab-container erp-solo-movil" onclick="SubexplotacionesView._crearSubexplotacion()">
         <span class="fab-label">Nueva Subexplotación</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

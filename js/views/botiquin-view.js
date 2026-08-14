@@ -103,7 +103,7 @@ const BotiquinView = {
     }
 
     main.innerHTML = html + `
-      <div class="fab-container" onclick="BotiquinView._crearProducto()">
+      <div class="fab-container erp-solo-movil" onclick="BotiquinView._crearProducto()">
         <span class="fab-label">Nuevo Producto</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

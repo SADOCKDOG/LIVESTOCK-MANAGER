@@ -63,7 +63,7 @@ const ExplotacionView = {
     container.innerHTML = `
       <div class="px-4 pt-12">
         ${resumenLacteoHtml}
-        <div class="tabs-scroll leche-sub-tabs scroll-shadow-container mb-14">
+        <div class="tabs-scroll leche-sub-tabs scroll-shadow-container mb-14 erp-solo-movil">
           ${subTabs.map(t => `
             <button class="text-[0.6rem] font-900 uppercase px-12 py-6 rounded-sm" style="background:${this._lacteoSubTab === t.key ? 'var(--c-info)' : 'var(--c-222)'}; color:${this._lacteoSubTab === t.key ? '#000' : 'var(--c-aaa)'};" onclick="ExplotacionView._cambiarLacteoSubTab('${t.key}')">${t.label}</button>
           `).join('')}
@@ -525,7 +525,7 @@ const ExplotacionView = {
           })).join('')}
         </div>
       </div>
-      <div class="fab-container" style="--fab-neon-color: var(--c-purple);" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
+      <div class="fab-container erp-solo-movil" style="--fab-neon-color: var(--c-purple);" onclick="App._abrirFormularioGasto({ origenModulo: 'explotacion' })">
         <span class="fab-label">Registrar Gasto</span>
         <button class="fab-btn">${Icons.fabPlus()}</button>
       </div>`;

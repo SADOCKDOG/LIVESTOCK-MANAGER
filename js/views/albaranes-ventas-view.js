@@ -221,7 +221,7 @@ const AlbaranesVentasView = {
       <!-- Tabs de comercialización estandarizados -->
       <div class="mb-14">
         <div class="scroll-shadow-container scroll-tabs-row mb-10">
-          <div class="comer-tabs">
+          <div class="comer-tabs erp-solo-movil">
             <button class="comer-tab ${this._currentTab === 'todos' ? 'active' : ''}" data-tab="todos" onclick="AlbaranesVentasView._cambiarTab('todos')">${Icons.comercial()} Todo</button>
             <button class="comer-tab ${this._currentTab === 'leche' ? 'active' : ''}" data-tab="leche" onclick="AlbaranesVentasView._cambiarTab('leche')">${Icons.leche()} Leche</button>
             <button class="comer-tab ${this._currentTab === 'carne' ? 'active' : ''}" data-tab="carne" onclick="AlbaranesVentasView._cambiarTab('carne')">${Icons.carne()} Carne</button>
