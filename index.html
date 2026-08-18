@@ -403,7 +403,29 @@
     <!-- 5dº Motor de guías interactivas (registro antes que motor; ambos antes que app.js,
          que llama a GuideManager.maybeStart desde route()) -->
     <script src="js/guide-registry.js?v=6.74"></script>
+    <!-- Catálogos: sin estas <script> GuideRegistry.register() no se ejecuta y las guías
+         de pilar/tab no abren (solo quedaba registrada onboarding). Ver también desktop. -->
     <script src="js/guides/onboarding-primeros-pasos.js?v=6.74"></script>
+    <script src="js/guides/comer-carne.js?v=6.74"></script>
+    <script src="js/guides/comer-compradores.js?v=6.74"></script>
+    <script src="js/guides/comer-contratos.js?v=6.74"></script>
+    <script src="js/guides/comer-leche.js?v=6.74"></script>
+    <script src="js/guides/comer-panoramica.js?v=6.74"></script>
+    <script src="js/guides/comer-transportistas.js?v=6.74"></script>
+    <script src="js/guides/expro-explotacion.js?v=6.74"></script>
+    <script src="js/guides/expro-fitosanitarios.js?v=6.74"></script>
+    <script src="js/guides/expro-gastos.js?v=6.74"></script>
+    <script src="js/guides/expro-lacteo.js?v=6.74"></script>
+    <script src="js/guides/expro-panoramica.js?v=6.74"></script>
+    <script src="js/guides/expro-proveedores.js?v=6.74"></script>
+    <script src="js/guides/expro-silos.js?v=6.74"></script>
+    <script src="js/guides/expro-tramites.js?v=6.74"></script>
+    <script src="js/guides/gegan-animales.js?v=6.74"></script>
+    <script src="js/guides/gegan-panoramica.js?v=6.74"></script>
+    <script src="js/guides/gegan-patrimonio.js?v=6.74"></script>
+    <script src="js/guides/gegan-rebanos.js?v=6.74"></script>
+    <script src="js/guides/gegan-sanidad.js?v=6.74"></script>
+    <script src="js/guides/gegan-zonas.js?v=6.74"></script>
     <script src="js/guide-manager.js?v=6.74"></script>
 
     <!-- 6º Arrancar el Controlador de la Aplicación (Orquestador Central) -->
