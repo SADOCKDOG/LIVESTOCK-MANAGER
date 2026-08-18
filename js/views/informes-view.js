@@ -155,7 +155,7 @@ const InformesView = {
 
     // 1. Nivel 1: Categorías
     let catsHtml = `
-      <div class="scroll-shadow-container scroll-tabs-row mb-6">
+      <div class="scroll-shadow-container scroll-tabs-row mb-6 erp-solo-movil">
         <div class="informes-categories py-4" id="inf-cat-row">
     `;
     for (const [catKey, cat] of Object.entries(this._categories)) {
@@ -178,7 +178,7 @@ const InformesView = {
     // 2. Nivel 2: Sub-tabs de la categoría activa
     const activeCat = this._categories[activeCatKey];
     let subTabsHtml = `
-      <div class="scroll-shadow-container scroll-tabs-row mb-12">
+      <div class="scroll-shadow-container scroll-tabs-row mb-12 erp-solo-movil">
         <div class="informes-tabs py-2" id="inf-tab-row">
     `;
     for (const [tabKey, tabLabel] of Object.entries(activeCat.tabs)) {
@@ -437,23 +437,23 @@ const InformesView = {
 
   // ===================== RENDER POR TABS =====================
 
-  /** Genera barra de acciones PDF+Excel compacta e inline */
+  /** Genera barra de acciones PDF+Excel (chrome ERP: fieldset erp-action-group, centrado). */
   _sectionActionsHTML(seccion, label) {
     return `
-      <div class="inf-export-bar mb-14">
-        <span class="inf-export-label">${label}</span>
-        <div class="inf-export-btns">
-          <button class="inf-export-btn inf-export-btn--pdf" onclick="InformesView._exportPDFSeccion('${seccion}')" title="Exportar ${label} a PDF">
-            ${Icons.documento()} PDF
+      <fieldset class="erp-action-group erp-action-group--centro">
+        <legend>Exportar ${label}</legend>
+        <div class="erp-action-group-body">
+          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="InformesView._exportPDFSeccion('${seccion}')" title="Exportar ${label} a PDF">
+            ${Icons.documento()}<span class="widget-link-label">PDF</span>
           </button>
-          <button class="inf-export-btn inf-export-btn--excel" onclick="InformesView._exportExcel()" title="Exportar a Excel">
-            ${Icons.exportar()} Excel
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="InformesView._exportExcel()" title="Exportar a Excel">
+            ${Icons.exportar()}<span class="widget-link-label">Excel</span>
           </button>
-          <button class="inf-export-btn inf-export-btn--full" onclick="InformesView._exportPDF()" title="Exportar informe completo">
-            ${Icons.documento()} Completo
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="InformesView._exportPDF()" title="Exportar informe completo">
+            ${Icons.documento()}<span class="widget-link-label">Completo</span>
           </button>
         </div>
-      </div>
+      </fieldset>
     `;
   },
 
