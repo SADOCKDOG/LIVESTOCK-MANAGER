@@ -8,7 +8,7 @@ Sistema de soporte técnico integrado en la app, disponible para usuarios regist
 
 - Ofrecer soporte profesional sin que el usuario perciba la infraestructura técnica subyacente.
 - Reducir la fricción de reportar problemas (la IA convierte texto libre en un reporte estructurado).
-- Mantener control humano sobre cualquier cambio de código: la IA propone, el mantenedor aprueba.
+- El sistema nunca genera código ni PR: el soporte son solo issues de GitHub. La IA estructura y crea el issue; el mantenedor no aprueba nada, solo lee, prioriza y responde.
 - Monetizar el soporte mediante una licencia mínima, reutilizando la infraestructura de billing ya existente.
 
 ## 3. Flujo de usuario (end-to-end)
@@ -24,7 +24,7 @@ Sistema de soporte técnico integrado en la app, disponible para usuarios regist
 9. El ticket aparece en "Mis incidencias" dentro de la app, con estado inicial "Enviada".
 10. Cambios en GitHub (comentarios, etiquetas, cierre) disparan un webhook que actualiza el estado en el backend.
 11. La app consulta periódicamente (o recibe push) las actualizaciones y refleja el nuevo estado.
-12. Si la IA sugirió un fix de código, queda como comentario o draft PR — pendiente de revisión y aprobación manual del mantenedor. Nunca se aplica ni mergea automáticamente.
+12. El sistema no sugiere ni crea fixes de código: la incidencia es un issue de GitHub. Si la IA apunta a una posible causa, queda como comentario en el issue. El mantenedor no tiene ningún paso de aprobación; solo lee y responde.
 
 ## 4. Arquitectura de componentes
 
@@ -159,8 +159,8 @@ Sistema de soporte técnico integrado en la app, disponible para usuarios regist
 - Sanitización del contenido generado por IA antes de publicarlo (evitar inyección de markdown/HTML peligroso).
 - Verificación server-side de la compra — nunca confiar en el estado enviado por el cliente.
 - Branch protection en `main` del repo principal: nada de push directo, todo vía PR revisado.
-- El usuario valida el **contenido de su propio reporte**, nunca aprueba cambios de código.
-- Cualquier propuesta de fix de la IA queda como comentario/draft PR, pendiente de revisión y aprobación humana — nunca se aplica ni mergea automáticamente.
+- El usuario valida su **propio reporte** (human-in-the-loop a su nivel). El sistema nunca genera código ni PR; el mantenedor no aprueba nada, solo lee, prioriza y responde.
+- El sistema no genera código ni PR. Si la IA sugiere una solución, queda como comentario en el issue; el mantenedor no tiene ningún paso de aprobación.
 - Webhook de GitHub verificado por firma HMAC, rechazando cualquier payload no firmado correctamente.
 
 ## 7. Organización de repositorios y ramas
