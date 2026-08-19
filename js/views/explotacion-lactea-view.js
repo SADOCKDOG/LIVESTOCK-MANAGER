@@ -5,8 +5,8 @@
 window.ExplotacionLacteaView = {
 
   // ── Acciones sobre los registros de Láctea ────────────────────────────────
-  // Las analíticas y los movimientos de balance se pintaban en modo consulta:
-  // no había forma de abrirlos ni corregirlos desde la interfaz.
+  // Hasta ahora las analíticas y los movimientos de balance se pintaban en
+  // modo consulta: no había forma de abrirlos ni corregirlos desde la interfaz.
 
   /** Abre una analítica existente en el asistente, en modo edición. */
   async _editarAnalitica(id) {
@@ -44,7 +44,7 @@ window.ExplotacionLacteaView = {
   },
 
   /** Elimina un movimiento de balance. El stock del tanque se recalcula solo,
-   *  porque se deriva de la suma de movimientos (ver BalanceLacteo.getStockTanque). */
+   *  porque se deriva de la suma de movimientos. */
   async _eliminarMovimiento(id) {
     const ok = await Confirm.confirm('Eliminar movimiento', '¿Eliminar este movimiento de balance? El stock del tanque se recalculará automáticamente.', true);
     if (!ok) return;
@@ -152,7 +152,7 @@ window.ExplotacionLacteaView = {
           </div>
         </div>
         <div class="flex gap-6 mt-8">
-          <button onclick="window.TanqueWizard.open(${JSON.stringify(t).replace(/"/g, '&quot;')})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-222); color:var(--c-aaa);">Editar</button>
+          <button onclick="window.TanqueWizard.open(${JSON.stringify(t).replace(/"/g, '&quot;')})" class="btn-erp-secondary btn-sm">Editar</button>
         </div>
       </div>`;
     }
@@ -161,7 +161,7 @@ window.ExplotacionLacteaView = {
       html += `
       <div class="card p-20 text-center">
         <div class="text-aaa text-xs mb-8">No hay tanques registrados</div>
-        <button onclick="window.TanqueWizard.open()" class="btn-primary text-xs px-16 py-8 font-900" style="background:var(--c-info);">Registrar primer tanque</button>
+        <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="location.hash='/explotacion?tab=lacteo&sub=tanques'">${Icons.agregar()}<span class="widget-link-label">Nuevo primer Tanque</span></button>
       </div>`;
     }
 
@@ -239,7 +239,7 @@ window.ExplotacionLacteaView = {
     const analiticasHtml = analiticas.slice(0, 20).map(a => {
       const estadoColor = a.estado === 'validado' ? 'var(--c-success)' : (a.estado === 'alerta' ? 'var(--c-warning)' : 'var(--c-danger)');
       return `
-        <div class="card p-12 mb-10" style="border-left: 3px solid var(--c-accent);">
+        <div class="card p-12 mb-10" data-tipo="${a.tipo_muestreo || 'autocontrol'}" style="border-left: 3px solid var(--c-accent);">
           <div class="flex items-center justify-between mb-6">
             <div class="text-sm font-900 uppercase">${a.tipo_muestreo || 'Autocontrol'} — ${UI.formatDate(a.fecha_muestreo)}</div>
             <span class="badge badge-sm" style="background: ${estadoColor}15; color: ${estadoColor}; border: 1px solid ${estadoColor}40; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; padding: 2px 8px; border-radius: 6px;">${a.estado}</span>
@@ -270,16 +270,16 @@ window.ExplotacionLacteaView = {
               <div class="text-xs font-800">${a.laboratorio_nombre || '—'}</div>
             </div>
           </div>
-        <div class="flex gap-6 mt-10 justify-end">
-          <button onclick="ExplotacionLacteaView._editarAnalitica(${a.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-222); color:var(--c-aaa);">Editar</button>
-          <button onclick="ExplotacionLacteaView._eliminarAnalitica(${a.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-danger)20; color:var(--c-danger);">Eliminar</button>
-        </div>
+          <div class="flex gap-6 mt-10 justify-end">
+            <button class="btn-erp-secondary btn-sm" onclick="ExplotacionLacteaView._editarAnalitica(${a.id})">Editar</button>
+            <button class="btn-erp-secondary btn-sm" onclick="ExplotacionLacteaView._eliminarAnalitica(${a.id})">Eliminar</button>
+          </div>
         </div>
       `;
     }).join('');
 
     const controlLecheroHtml = controlLechero.slice(0, 10).map(c => `
-      <div class="card p-12 mb-10" style="border-left: 3px solid var(--c-purple);">
+      <div class="card p-12 mb-10" data-tipo="${c.organismo_control || 'DHI'}" style="border-left: 3px solid var(--c-purple);">
         <div class="flex items-center justify-between mb-6">
           <div class="text-sm font-900 uppercase">Control Lechero — ${UI.formatDate(c.fecha_control)}</div>
           <span class="badge badge-sm badge-purple" style="font-size: 0.6rem; font-weight: 900; text-transform: uppercase; padding: 2px 8px; border-radius: 6px;">${c.organismo_control || 'DHI'}</span>
@@ -313,18 +313,36 @@ window.ExplotacionLacteaView = {
               <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Analíticas y controles oficiales</div>
             </div>
           </div>
-          <button onclick="window.AnaliticaLecheWizard.open()" class="text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-accent); color:#000; border:none; border-radius:6px;">+ Analítica</button>
         </div>
+
+        <fieldset class="erp-action-group">
+          <legend>Registro de Analíticas</legend>
+          <div class="erp-action-group-body">
+            <button class="widget-link-btn widget-link-btn--neon neon-accent" onclick="window.AnaliticaLecheWizard.open()">${Icons.analitica()}<span class="widget-link-label">Nueva Analítica</span></button>
+          </div>
+        </fieldset>
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px; margin-top: 15px;">
           ${Icons.analitica()} Analíticas de Leche
         </div>
+        <div class="erp-filtros" data-filtros-para="lacteo-analiticas-lista">
+          <input type="search" class="form-input search-input" placeholder="Buscar analítica por fecha, laboratorio o estado...">
+          <select class="form-select" data-etiqueta-todos="Todo muestreo"></select>
+        </div>
+        <div id="lacteo-analiticas-lista" data-ver-mas="10">
         ${analiticasHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin analíticas registradas</span></div>'}
+        </div>
 
         <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px; margin-top: 15px;">
           ${Icons.documento()} Controles Oficiales (DHI)
         </div>
+        <div class="erp-filtros" data-filtros-para="lacteo-controles-lista">
+          <input type="search" class="form-input search-input" placeholder="Buscar control por fecha u organismo...">
+          <select class="form-select" data-etiqueta-todos="Todo organismo"></select>
+        </div>
+        <div id="lacteo-controles-lista" data-ver-mas="10">
         ${controlLecheroHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin controles lecheros registrados</span></div>'}
+        </div>
       </div>
     `;
   },
@@ -339,7 +357,7 @@ window.ExplotacionLacteaView = {
       const icon = m.tipo_movimiento === 'entrada' ? '↓' : (m.tipo_movimiento === 'salida' ? '↑' : '•');
       const color = m.tipo_movimiento === 'entrada' ? 'var(--c-success)' : 'var(--c-danger)';
       return `
-        <div class="card p-10 mb-8" style="border-left: 3px solid ${color};">
+        <div class="card p-10 mb-8" data-tipo="${m.tipo_movimiento || 'otro'}" style="border-left: 3px solid ${color};">
           <div class="flex items-center justify-between">
             <div>
               <div class="text-sm font-900" style="color: ${color};">${icon} ${m.tipo_movimiento.toUpperCase()}</div>
@@ -351,8 +369,8 @@ window.ExplotacionLacteaView = {
             </div>
           </div>
           <div class="flex gap-6 mt-8 justify-end">
-            <button onclick="ExplotacionLacteaView._editarMovimiento(${m.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-222); color:var(--c-aaa);">Editar</button>
-            <button onclick="ExplotacionLacteaView._eliminarMovimiento(${m.id})" class="text-[0.55rem] font-800 px-8 py-4 rounded-sm" style="background:var(--c-danger)20; color:var(--c-danger);">Eliminar</button>
+            <button class="btn-erp-secondary btn-sm" onclick="ExplotacionLacteaView._editarMovimiento(${m.id})">Editar</button>
+            <button class="btn-erp-secondary btn-sm" onclick="ExplotacionLacteaView._eliminarMovimiento(${m.id})">Eliminar</button>
           </div>
         </div>
       `;
@@ -370,10 +388,22 @@ window.ExplotacionLacteaView = {
               <div class="text-gray" style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Movimientos de tanque (más reciente primero)</div>
             </div>
           </div>
-          <button onclick="window.MovimientoBalanceWizard.open()" class="text-xs px-12 py-6 font-900 uppercase" style="background:var(--c-info); color:#000; border:none; border-radius:6px;">+ Movimiento</button>
         </div>
 
+        <fieldset class="erp-action-group">
+          <legend>Registro de Movimientos</legend>
+          <div class="erp-action-group-body">
+            <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="window.MovimientoBalanceWizard.open()">${Icons.agregar()}<span class="widget-link-label">Registrar Movimiento</span></button>
+          </div>
+        </fieldset>
+
+        <div class="erp-filtros" data-filtros-para="lacteo-movimientos-lista">
+          <input type="search" class="form-input search-input" placeholder="Buscar movimiento por fecha, litros o referencia...">
+          <select class="form-select" data-etiqueta-todos="Todo movimiento"></select>
+        </div>
+        <div id="lacteo-movimientos-lista" data-ver-mas="10">
         ${movimientosHtml || '<div class="p-14 text-center bg-dark rounded-sm border border-222"><span class="text-555 text-xs uppercase font-900 tracking-widest">Sin movimientos registrados</span></div>'}
+        </div>
       </div>
     `;
   },
