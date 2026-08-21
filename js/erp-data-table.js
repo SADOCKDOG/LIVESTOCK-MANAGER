@@ -78,8 +78,18 @@ class ErpDataTable {
         if (valA === null || valA === undefined) valA = '';
         if (valB === null || valB === undefined) valB = '';
 
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          return this.sortAsc ? valA - valB : valB - valA;
+        const dateA = this._toDate(valA);
+        const dateB = this._toDate(valB);
+        if (dateA && dateB) {
+          const tA = dateA.getTime();
+          const tB = dateB.getTime();
+          return this.sortAsc ? tA - tB : tB - tA;
+        }
+
+        const numA = this._toNumber(valA);
+        const numB = this._toNumber(valB);
+        if (numA !== null && numB !== null) {
+          return this.sortAsc ? numA - numB : numB - numA;
         }
 
         const strA = String(valA).toLowerCase();
@@ -90,6 +100,53 @@ class ErpDataTable {
 
     this.filteredData = result;
     this.render();
+  }
+
+  // Convierte un valor a número si es realmente numérico:
+  // nativo, string sin unidades, o moneda/cantidad formateada con toLocaleString.
+  _toNumber(v) {
+    if (v === null || v === undefined || v === '') return null;
+    if (typeof v === 'number') return isFinite(v) ? v : null;
+    const s = String(v).trim();
+    if (!s) return null;
+    // Sin ningun digito no hay nada que ordenar como numero.
+    if (!/\d/.test(s)) return null;
+    // Las fechas las resuelve _toDate, no este metodo.
+    if (/\//.test(s)) return null;
+    // Quitar primero unidades y simbolos, de mas larga a mas corta para que
+    // «litros» no deje una «L» suelta. Este paso va ANTES de descartar por
+    // letras: si no, «1.500 kg» o «12,5 L» nunca llegarian a parsearse.
+    const sinUnidades = s
+      .replace(/\s+/g, '')
+      .replace(/litros|meses|días|dias|unid|kg|KG|ud|€|%|L/g, '');
+    // Lo que sobreviva con letras no es un numero: texto libre, crotales (ES2100…).
+    if (/[a-záéíóúñ]/i.test(sinUnidades)) return null;
+    const cleaned = sinUnidades
+      .replace(/\.(?=\d{3}\b|\.)/g, '')
+      .replace(',', '.');
+    // Exigir que TODO el resto sea el numero, no solo su prefijo.
+    if (!/^-?\d+(\.\d+)?$/.test(cleaned)) return null;
+    const n = parseFloat(cleaned);
+    return isFinite(n) ? n : null;
+  }
+
+  // Convierte un valor a Date si es una fecha reconocible (ISO, DD/MM/AAAA, DD/MM/AA).
+  _toDate(v) {
+    if (v === null || v === undefined) return null;
+    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+    const s = String(v).trim();
+    if (!s) return null;
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (m) {
+      const y = m[3].length === 2 ? 2000 + Number(m[3]) : Number(m[3]);
+      const d = new Date(y, Number(m[2]) - 1, Number(m[1]));
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
   }
 
   exportCSV() {
@@ -105,14 +162,25 @@ class ErpDataTable {
       }).join(';');
     });
 
-    const csvContent = 'data:text/csv;charset=utf-8,﻿' + [headers, ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    // Blob y no data: URI. encodeURI no escapa la almohadilla, asi que un valor
+    // con «#» (referencias tipo «Fra. #123», lotes) truncaba el fichero por ahi
+    // sin avisar. El Blob ademas no tiene el limite de tamano del data: URI.
+    const csvContent = '﻿' + [headers, ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${this.title.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`);
+    link.setAttribute('href', url);
+    // El CSV exporta lo que se ve (filteredData), no toda la tabla. Cuando hay
+    // busqueda activa eso significa menos filas de las que existen, asi que se
+    // marca en el nombre: sin el sufijo, un fichero incompleto es
+    // indistinguible de uno completo al abrirlo semanas despues.
+    const sufijo = this.searchTerm ? '_filtrado' : '';
+    const nombre = `${this.title.toLowerCase().replace(/\s+/g, '_')}${sufijo}_${new Date().toISOString().slice(0,10)}.csv`;
+    link.setAttribute('download', nombre);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
   render() {
