@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Use pdfjs-dist for Node.js testing (ES modules) - named exports
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/build/pdf.mjs';
 
 // Set worker source - in Node we don't need a worker
 GlobalWorkerOptions.workerSrc = '';
