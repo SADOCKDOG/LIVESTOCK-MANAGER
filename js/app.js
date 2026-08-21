@@ -1891,7 +1891,7 @@ const App = {
     if (!App._xlsxLoadPromise) {
       App._xlsxLoadPromise = new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        s.src = 'js/vendor/xlsx.full.min.js';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
@@ -1907,7 +1907,7 @@ const App = {
     if (!App._html2pdfLoadPromise) {
       App._html2pdfLoadPromise = new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.src = 'js/vendor/html2pdf.bundle.min.js';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
@@ -1923,7 +1923,7 @@ const App = {
     if (!App._chartJsLoadPromise) {
       App._chartJsLoadPromise = new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        s.src = 'js/vendor/chart.umd.min.js';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
@@ -1933,21 +1933,24 @@ const App = {
     return typeof Chart !== 'undefined';
   },
 
-  /** Carga pdf.js bajo demanda (~2MB vía CDN) solo cuando se importa PDF del Catastro (SIGPAC). */
+  /** Carga pdf.js bajo demanda (~2MB) solo cuando se importa PDF del Catastro (SIGPAC). */
   async _ensurePdfJs() {
     if (typeof pdfjsLib !== 'undefined') return true;
     if (!App._pdfJsLoadPromise) {
-      App._pdfJsLoadPromise = new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js';
-        s.onload = resolve;
-        s.onerror = reject;
-        document.body.appendChild(s);
-      });
+      // pdf.js 4.x se distribuye solo como modulo ES: no define window.pdfjsLib
+      // por si mismo, hay que importarlo y publicarlo. Servido en local para no
+      // depender de la red (la app es offline-first) y porque la 3.11.174 que
+      // se cargaba del CDN arrastra GHSA-wgrm-67xf-hhpq.
+      App._pdfJsLoadPromise = import('/js/vendor/pdf.min.mjs')
+        .then((mod) => { window.pdfjsLib = mod; return mod; });
     }
-    try { await App._pdfJsLoadPromise; } catch (_) {}
+    try { await App._pdfJsLoadPromise; } catch (e) {
+      // Sin resetear, una promesa rechazada deja pdf.js inservible hasta recargar.
+      App._pdfJsLoadPromise = null;
+      console.warn('[PDF] no se pudo cargar pdf.js:', e && e.message);
+    }
     if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/js/vendor/pdf.worker.min.mjs';
       return true;
     }
     return false;
