@@ -100,6 +100,8 @@ const App = {
     "/importar-rfid": "renderImportadorRFID",
     "/importar-zonas": "renderImportarZonas",
     "/agenda": "renderAgenda",
+    "/soporte": "renderSoporte",
+    "/mis-incidencias": "renderMisIncidencias",
   },
 
   async init() {
@@ -348,6 +350,8 @@ const App = {
     '/informes': 'Informes',
     '/alertas': 'Alertas',
     '/ajustes': 'Ajustes',
+    '/soporte': 'Soporte',
+    '/mis-incidencias': 'Mis incidencias',
     '/compradores': 'Compradores',
     '/comprador': 'Ficha Comprador',
     '/proveedores': 'Proveedores',
@@ -2859,6 +2863,18 @@ const App = {
   },
   async renderAgenda(params) {
     if (window.AgendaView) { await AgendaView.render(params); }
+  },
+
+  // Soporte: modulo de pago, requiere internet. La app sigue siendo gratuita
+  // y offline-first; esto es lo unico que necesita conexion y licencia.
+  async renderSoporte(params) {
+    if (window.SoporteView) { await SoporteView.render(params); }
+    else document.getElementById("app-content").innerHTML = '<div class="loader">Cargando soporte...</div>';
+  },
+
+  async renderMisIncidencias(params) {
+    if (window.MisIncidenciasView) { await MisIncidenciasView.render(params); }
+    else document.getElementById("app-content").innerHTML = '<div class="loader">Cargando incidencias...</div>';
   },
 
   async renderSilos() {
