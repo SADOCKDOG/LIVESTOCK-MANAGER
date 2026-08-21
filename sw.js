@@ -110,8 +110,8 @@ const ASSETS = [
   'https://cdn.jsdelivr.net/npm/idb@8/build/umd.js',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js',
-  'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js'
+  'js/vendor/pdf.min.mjs',
+  'js/vendor/pdf.worker.min.mjs'
 ];
 
 self.addEventListener('install', event => {

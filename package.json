@@ -34,7 +34,9 @@
     "patch-package": "^8.0.1",
     "postinstall-postinstall": "^2.1.0",
     "puppeteer": "^25.5.0",
-    "typescript": "~5.9.0"
+    "typescript": "~5.9.0",
+    "pdfjs-dist": "^4",
+    "pdf-lib": "^1.17.1"
   },
   "dependencies": {
     "@capacitor-mlkit/barcode-scanning": "^7.5.0",
@@ -43,15 +45,14 @@
     "@capacitor/local-notifications": "^7.0.7",
     "@capacitor/share": "^7.0.4",
     "@capawesome/capacitor-file-picker": "^7.2.0",
-    "cordova-plugin-purchase": "^13.18.0",
-    "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^3.11.174"
+    "cordova-plugin-purchase": "^13.18.0"
   },
   "overrides": {
     "minimatch": "3.1.4",
     "uuid": "11.1.1",
     "protobufjs": "7.6.3",
-    "brace-expansion": "1.1.16"
+    "brace-expansion": "1.1.18",
+    "tar": "7.5.22"
   },
   "main": "sw.js",
   "directories": {
