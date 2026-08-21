@@ -3,6 +3,9 @@
 
   var STORAGE_KEY = 'livestock_premium_purchased';
   var PRODUCT_ID = 'premium_unlock';
+  // Licencia del modulo de soporte con IA. Es un producto DISTINTO de
+  // premium_unlock: la app es gratuita, lo que se cobra es el soporte.
+  var SUPPORT_PRODUCT_ID = 'support_unlock';
   // InAppOfferToken del complemento en Partner Center. Es independiente del id
   // de Google Play: si al crear el add-on se usa otro token, hay que cambiarlo
   // aqui, porque la Digital Goods API no permite listar los ids disponibles.
@@ -10,7 +13,25 @@
   var MS_STORE_BILLING = 'https://store.microsoft.com/billing';
 
   if (window.FREE_MODE === false) {
-    window.PurchaseManager = { isPurchased: function () { return true; }, isReady: function () { return true; }, purchase: function () {}, restorePurchases: function () {} };
+    // Build Premium: la app va desbloqueada sin pasar por la tienda. Pero el
+    // SOPORTE es un producto distinto y de pago aunque la app sea Premium, asi
+    // que sus metodos siguen siendo los reales y no se conceden por defecto.
+    window.PurchaseManager = {
+      isPurchased: function () { return true; },
+      isReady: function () { return true; },
+      purchase: function () {},
+      restorePurchases: function () {},
+      comprarSoporte: function () {
+        if (window.App) App.toastError('La licencia de soporte se compra desde la versión de la tienda.');
+        return Promise.resolve(false);
+      },
+      restaurarSoporte: function () {
+        // Sin CdvPurchase no hay recibo local que revalidar; la sesion de
+        // soporte tiene que abrirse con una compra real.
+        if (window.App) App.toast('No se encontró ninguna licencia de soporte.', 'info');
+        return Promise.resolve(false);
+      }
+    };
     return;
   }
 
@@ -186,6 +207,13 @@
         id: PRODUCT_ID,
         type: CdvPurchase.ProductType.NON_CONSUMABLE,
         platform: CdvPurchase.Platform.GOOGLE_PLAY
+      }, {
+        // Licencia del modulo de soporte. Si se decide cobrarlo por suscripcion
+        // (ver seccion 11 del doc de diseno), aqui pasa a PAID_SUBSCRIPTION y en
+        // el Worker hay que poner SOPORTE_ES_SUSCRIPCION = true.
+        id: SUPPORT_PRODUCT_ID,
+        type: CdvPurchase.ProductType.NON_CONSUMABLE,
+        platform: CdvPurchase.Platform.GOOGLE_PLAY
       }]);
 
       store.when()
@@ -267,6 +295,80 @@
       if (!yaEstaba && window.App && typeof App.route === 'function') {
         try { App.route(); } catch (e) {}
       }
+    },
+
+    // --- Licencia de soporte -------------------------------------------
+    // El estado real lo decide el backend verificando la compra contra Google
+    // Play. Aqui solo se lanza el flujo de compra y se pasa el token.
+
+    comprarSoporte: function () {
+      var self = this;
+      if (!self._store) {
+        App.toastError('El sistema de pago no está disponible ahora mismo.');
+        return Promise.resolve(false);
+      }
+      try {
+        var oferta = self._store.get(SUPPORT_PRODUCT_ID);
+        if (!oferta) {
+          App.toastError('La licencia de soporte no está disponible todavía.');
+          return Promise.resolve(false);
+        }
+        return self._store.order(oferta).then(function () {
+          return self._sincronizarSoporte();
+        });
+      } catch (e) {
+        console.warn('[PurchaseManager] comprarSoporte fallo:', e);
+        App.toastError('No se pudo iniciar la compra.');
+        return Promise.resolve(false);
+      }
+    },
+
+    restaurarSoporte: function () {
+      return this._sincronizarSoporte();
+    },
+
+    /**
+     * Manda el token de compra al backend, que lo valida contra Google Play y
+     * devuelve la sesion. Nunca se concede la licencia desde el cliente.
+     */
+    _sincronizarSoporte: function () {
+      var self = this;
+      if (!window.SupportAPI) return Promise.resolve(false);
+
+      var token = self._tokenDeSoporte();
+      if (!token) {
+        App.toast('No se encontró ninguna licencia de soporte en esta cuenta.', 'info');
+        return Promise.resolve(false);
+      }
+
+      return window.SupportAPI.iniciarSesion(token, 'android')
+        .then(function () {
+          App.toast('Soporte activado.', 'success');
+          return true;
+        })
+        .catch(function (e) {
+          App.toastError((e && e.message) || 'No se pudo activar el soporte.');
+          return false;
+        });
+    },
+
+    /** Busca el purchase token de support_unlock entre los recibos locales. */
+    _tokenDeSoporte: function () {
+      try {
+        var recibos = (this._store && this._store.localReceipts) || [];
+        for (var i = 0; i < recibos.length; i++) {
+          var txs = recibos[i].transactions || [];
+          for (var t = 0; t < txs.length; t++) {
+            var tx = txs[t];
+            if (tx.products && tx.products.indexOf(SUPPORT_PRODUCT_ID) !== -1) {
+              return tx.purchaseToken || tx.transactionId || null;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[PurchaseManager] no se pudo leer el recibo de soporte:', e);
+      }
+      return null;
     },
 
     _checkLocal: function () {
