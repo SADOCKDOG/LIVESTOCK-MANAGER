@@ -262,21 +262,6 @@ const DocumentosView = {
         </div>
       </div>
 
-      <div class="card p-12 mb-14 border-222 card-dark-gradient card-resumen pb-24" style="background: rgba(168,85,247,0.015); width:100%;">
-        <div class="section-header-theme" style="--theme-color: var(--c-info); font-weight:900;"><span style="color: var(--c-info); margin-right:4px;">|</span> ACCESOS Y ACCIONES</div>
-        <div class="grid grid-cols-2 gap-10 max-w-320 mx-auto mt-10">
-          <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="DocumentosView._abrirAsistenteConsulta()">
-            ${Icons.buscar()}
-            <span class="widget-link-label">Consultar / Imprimir</span>
-          </button>
-          <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="DocumentosView._exportDocs()">
-            ${Icons.exportar()}
-            <span class="widget-link-label">Exportar Todo</span>
-          </button>
-        </div>
-        <div class="mt-4"><span class="text-xs text-aaa leading-relaxed">${Icons.documento()} Consulta y reimpresión de documentos oficiales por tipo y explotación</span></div>
-      </div>
-
       <div class="card p-16" style="border: 1px solid #27272a; background: #1E1E1E; width:100%;">
         <div class="text-xs text-white font-black uppercase tracking-wider mb-12 flex items-center gap-6" style="justify-content: space-between;">
           <span class="flex items-center gap-6"><span style="color: var(--c-info); margin-right: 4px;">|</span> ${Icons.documento()} REGISTRO DOCUMENTAL</span>
@@ -285,6 +270,19 @@ const DocumentosView = {
             <button class="btn-erp-secondary btn-sm" id="btn-docs-vista-tabla" onclick="DocumentosView._setVistaModo('tabla')">Tabla ERP</button>
           </div>
         </div>
+        <fieldset class="erp-action-group">
+          <legend>Acciones de Registro</legend>
+          <div class="erp-action-group-body">
+            <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="DocumentosView._abrirAsistenteConsulta()">
+              ${Icons.buscar()}
+              <span class="widget-link-label">Consultar / Imprimir</span>
+            </button>
+            <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="DocumentosView._exportDocs()">
+              ${Icons.exportar()}
+              <span class="widget-link-label">Exportar Todo</span>
+            </button>
+          </div>
+        </fieldset>
         <div class="erp-filtros" data-filtros-para="docs-lista">
           <input type="search" class="form-input search-input" placeholder="Buscar documento por tipo, número o fecha...">
           <select class="form-select" data-etiqueta-todos="Todos los tipos"></select>
