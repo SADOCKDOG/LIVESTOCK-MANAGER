@@ -106,10 +106,9 @@ const ASSETS = [
   './icons/app-icon.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap',
   'https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;900&family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800;900&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
-  'https://cdn.jsdelivr.net/npm/idb@8/build/umd.js',
-  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
-  'https://cdn.jsdelivr.net/npm/chart.js',
+  'js/vendor/html2pdf.bundle.min.js',
+  'js/vendor/xlsx.full.min.js',
+  'js/vendor/chart.umd.min.js',
   'js/vendor/pdf.min.mjs',
   'js/vendor/pdf.worker.min.mjs'
 ];
