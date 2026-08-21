@@ -206,6 +206,14 @@ const AlbaranesVentasView = {
       <div class="text-xs text-white uppercase font-black tracking-wider mb-10 flex items-center gap-4">
         <span style="color: ${moduleColor};">|</span> ${Icons.documento()} HISTORIAL DE ALBARANES Y VENTAS
       </div>
+      <fieldset class="erp-action-group">
+        <legend>Acciones de Registro</legend>
+        <div class="erp-action-group-body">
+          <button class="btn-fab-primary" onclick="AlbaranesVentasView._abrirMenuNuevo()">
+            ${Icons.agregar()}<span class="widget-link-label" style="margin-left:6px;">Nuevo Albarán / Venta</span>
+          </button>
+        </div>
+      </fieldset>
       <div class="erp-filtros" data-filtros-de="albaranes-lista">
         <input type="search" id="albaran-search" placeholder="Buscar por comprador, número de albarán, concepto..."
                oninput="AlbaranesVentasView._setFiltro('texto', this.value)"
@@ -224,13 +232,6 @@ const AlbaranesVentasView = {
       </div>
       <div id="albaranes-lista"><div class="loader">Cargando albaranes y ventas...</div></div>
       <div id="alb-erp-table-container" class="mt-12" style="display:none;"></div>;
-
-      <!-- FAB -->
-      <div class="fixed bottom-20 right-20 z-50">
-        <button class="btn-fab-primary" onclick="AlbaranesVentasView._abrirMenuNuevo()">
-          ${Icons.agregar()}
-        </button>
-      </div>
     `;
   },
 
