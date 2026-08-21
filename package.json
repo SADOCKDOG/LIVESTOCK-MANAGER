@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "livestock-manager-premium",
   "version": "4.10.1",
   "private": true,
@@ -9,16 +9,20 @@
   },
   "scripts": {
     "build": "powershell -NoProfile -Command \"if (-not (Test-Path www)) { New-Item -ItemType Directory -Path www | Out-Null }; Copy-Item -Path index.html, manifest.webmanifest, sw.js -Destination www -Force; foreach ($d in 'css','js','icons','manual','tests') { Copy-Item -Path $d -Destination www -Recurse -Force } \"",
-    "prebuild:free": "powershell -NoProfile -Command \"Copy-Item -Path js/mode-config.free.js -Destination js/mode-config.js -Force\"",
-    "prebuild:premium": "powershell -NoProfile -Command \"Copy-Item -Path js/mode-config.premium.js -Destination js/mode-config.js -Force\"",
-    "build:free": "npm run prebuild:free && npm run build",
-    "build:premium": "npm run prebuild:premium && npm run build",
     "cap:add": "npx cap add android",
-    "cap:sync": "npm run build:premium && npx cap sync android",
-    "cap:sync:free": "set FREE_MODE=true&& npm run build:free && npx cap sync android",
-    "cap:sync:premium": "set FREE_MODE=false&& npm run build:premium && npx cap sync android",
     "cap:open": "npx cap open android",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "prebuild:pago": "powershell -NoProfile -Command \"Copy-Item -Path js/mode-config-con-pago.js -Destination js/mode-config.js -Force\"",
+    "prebuild:demo": "powershell -NoProfile -Command \"Copy-Item -Path js/mode-config-sin-pago.js -Destination js/mode-config.js -Force\"",
+    "build:pago": "npm run prebuild:pago && npm run build",
+    "build:demo": "npm run prebuild:demo && npm run build",
+    "cap:sync:pago": "set FREE_MODE=true&& npm run build:pago && npx cap sync android",
+    "cap:sync:demo": "set FREE_MODE=false&& npm run build:demo && npx cap sync android",
+    "build:free": "npm run build:pago",
+    "build:premium": "npm run build:demo",
+    "cap:sync:free": "npm run cap:sync:pago",
+    "cap:sync:premium": "npm run cap:sync:demo",
+    "cap:sync": "npm run cap:sync:demo"
   },
   "devDependencies": {
     "@capacitor/android": "^7.6.8",
