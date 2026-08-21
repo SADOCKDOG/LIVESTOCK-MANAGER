@@ -208,11 +208,13 @@
         type: CdvPurchase.ProductType.NON_CONSUMABLE,
         platform: CdvPurchase.Platform.GOOGLE_PLAY
       }, {
-        // Licencia del modulo de soporte. Si se decide cobrarlo por suscripcion
-        // (ver seccion 11 del doc de diseno), aqui pasa a PAID_SUBSCRIPTION y en
-        // el Worker hay que poner SOPORTE_ES_SUSCRIPCION = true.
+        // Licencia del modulo de soporte: suscripcion, no compra unica. El
+        // soporte cuesta dinero cada mes (cada ticket gasta IA), asi que el
+        // ingreso tiene que ser recurrente. En el Worker, el flag equivalente
+        // es SOPORTE_ES_SUSCRIPCION, que decide si se consulta el endpoint de
+        // suscripciones o el de productos de Google Play.
         id: SUPPORT_PRODUCT_ID,
-        type: CdvPurchase.ProductType.NON_CONSUMABLE,
+        type: CdvPurchase.ProductType.PAID_SUBSCRIPTION,
         platform: CdvPurchase.Platform.GOOGLE_PLAY
       }]);
 
