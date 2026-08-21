@@ -1891,7 +1891,7 @@ const App = {
     if (!App._xlsxLoadPromise) {
       App._xlsxLoadPromise = new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        s.src = 'js/vendor/xlsx.full.min.js';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
@@ -1907,7 +1907,7 @@ const App = {
     if (!App._html2pdfLoadPromise) {
       App._html2pdfLoadPromise = new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.src = 'js/vendor/html2pdf.bundle.min.js';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
@@ -1923,7 +1923,7 @@ const App = {
     if (!App._chartJsLoadPromise) {
       App._chartJsLoadPromise = new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        s.src = 'js/vendor/chart.umd.min.js';
         s.onload = resolve;
         s.onerror = reject;
         document.body.appendChild(s);
