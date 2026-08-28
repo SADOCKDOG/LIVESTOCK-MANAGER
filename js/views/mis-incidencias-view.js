@@ -74,16 +74,85 @@ const MisIncidenciasView = {
   _fila(incidencia) {
     const estado = window.SupportAPI.textoEstado(incidencia.estado);
     const clase = this._claseEstado(incidencia.estado);
+    const id = this._escapar(incidencia.ticket_id);
     return `
-      <div class="card-registro mb-10" data-ticket="${this._escapar(incidencia.ticket_id)}">
-        <div class="flex items-center justify-between gap-10">
+      <div class="card-registro mb-10" data-ticket="${id}">
+        <div class="flex items-center justify-between gap-10"
+             style="cursor:pointer"
+             onclick="MisIncidenciasView.alternarDetalle('${id}')">
           <div>
             <div class="font-bold">${this._escapar(incidencia.titulo)}</div>
             <div class="text-gray text-sm">${this._fecha(incidencia.created_at)}</div>
           </div>
           <span class="badge ${clase}">${estado}</span>
         </div>
+        <div class="mt-10" id="detalle-${id}" hidden></div>
       </div>`;
+  },
+
+  /**
+   * Abre o cierra el detalle de una incidencia. El backend solo guarda
+   * metadatos (la descripcion vive en el issue de GitHub), asi que aqui se
+   * muestra lo que hay: identificador, severidad y ultima actualizacion.
+   */
+  async alternarDetalle(ticketId) {
+    const caja = document.getElementById('detalle-' + ticketId);
+    if (!caja) return;
+
+    if (!caja.hidden) {
+      caja.hidden = true;
+      return;
+    }
+
+    caja.hidden = false;
+    // Solo se pide una vez: los metadatos no cambian mientras la vista vive.
+    if (caja.dataset.cargado === '1') return;
+    caja.innerHTML = '<p class="text-gray text-sm">Cargando…</p>';
+
+    try {
+      const d = await window.SupportAPI.detalleIncidencia(ticketId);
+      caja.innerHTML = this._detalle(d);
+      caja.dataset.cargado = '1';
+    } catch (e) {
+      caja.innerHTML = `<p class="text-gray text-sm">${this._escapar(
+        (e && e.message) || 'No se pudo cargar la incidencia',
+      )}</p>`;
+    }
+  },
+
+  _detalle(d) {
+    if (!d) return '<p class="text-gray text-sm">Sin datos.</p>';
+    const filas = [
+      ['Referencia', d.ticket_id],
+      ['Estado', window.SupportAPI.textoEstado(d.estado)],
+      ['Severidad', this._textoSeveridad(d.severidad)],
+      ['Reportada', this._fecha(d.created_at)],
+      ['Actualizada', this._fecha(d.updated_at)],
+    ];
+    return `
+      <div class="detalle-incidencia"
+           style="border-top:1px solid rgba(255,255,255,0.10); padding-top:10px">
+        ${filas
+          .filter(([, v]) => v)
+          .map(
+            ([k, v]) => `
+          <div class="flex justify-between gap-10 text-sm mb-5">
+            <span class="text-gray">${k}</span>
+            <span>${this._escapar(v)}</span>
+          </div>`,
+          )
+          .join('')}
+        <p class="text-gray text-sm mt-10">
+          Cuando el equipo responda, el estado cambiará aquí.
+        </p>
+      </div>`;
+  },
+
+  _textoSeveridad(sev) {
+    if (sev === 'alta') return 'Alta';
+    if (sev === 'media') return 'Media';
+    if (sev === 'baja') return 'Baja';
+    return sev || '';
   },
 
   _claseEstado(estado) {
