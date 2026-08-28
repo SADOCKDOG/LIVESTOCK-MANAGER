@@ -99,3 +99,10 @@ app/src/main/assets/public
 app/src/main/assets/capacitor.config.json
 app/src/main/assets/capacitor.plugins.json
 app/src/main/res/xml/config.xml
+
+# Residuo de un "npm install" lanzado por error dentro de android/.
+# Gradle resuelve los plugins desde ../node_modules (la raiz del proyecto),
+# nunca desde aqui: si reaparecen, es contaminacion y hay que borrarlos.
+node_modules/
+package.json
+package-lock.json
