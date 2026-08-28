@@ -12,8 +12,9 @@
 (function () {
   'use strict';
 
-  // PENDIENTE: sustituir por el dominio real al desplegar el Worker.
-  var BASE = 'https://livestock-manager-support-api.workers.dev';
+  // Worker en produccion. window.SUPPORT_API_BASE permite apuntar a otro
+  // entorno (pruebas) sin tocar este fichero.
+  var BASE = ('SUPPORT_API_BASE' in window ? window.SUPPORT_API_BASE : 'https://livestock-manager-support-api-production.livestock-desktop.workers.dev');
 
   var CLAVE_SESION = 'livestock_support_session';
 
