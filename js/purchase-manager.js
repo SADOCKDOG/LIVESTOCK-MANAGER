@@ -292,7 +292,11 @@
         // Se detecta SOLO por el texto. Antes tambien se daba por bueno el codigo
         // 6777003, que en realidad es ErrorCode.PURCHASE ("la compra fallo"): un
         // fallo cualquiera desbloqueaba Premium y anunciaba "Compra restaurada".
-        if (/already owned|ya (lo )?has comprado|ya tienes una suscripci/i.test(msg)) {
+        //
+        // El plugin entrega la constante de Billing con guiones bajos
+        // (ITEM_ALREADY_OWNED), no la frase que ve el usuario en el dialogo, asi
+        // que hace falta aceptar los dos separadores o no casa nunca.
+        if (/already[ _]owned|ya (lo )?has comprado|ya tienes una suscripci/i.test(msg)) {
           if (producto === SUPPORT_PRODUCT_ID) {
             self._sincronizarSoporte();
           } else {
@@ -378,6 +382,23 @@
 
     restaurarSoporte: function () {
       return this._sincronizarSoporte();
+    },
+
+    /**
+     * Revalidacion silenciosa contra Google, para cuando el backend contesta
+     * que la licencia ha caducado. La suscripcion puede haberse renovado ya:
+     * el token local sigue siendo el bueno y basta con volver a canjearlo.
+     *
+     * No muestra ningun aviso a proposito. Quien la llama decide que contar,
+     * porque esto ocurre en mitad de otra operacion del usuario.
+     */
+    revalidarSoporte: function () {
+      if (!window.SupportAPI) return Promise.resolve(false);
+      var token = this._tokenDeSoporte();
+      if (!token) return Promise.resolve(false);
+      return window.SupportAPI.iniciarSesion(token, 'android')
+        .then(function () { return true; })
+        .catch(function () { return false; });
     },
 
     /**
