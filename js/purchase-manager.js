@@ -259,12 +259,31 @@
         });
 
       store.error(function (err) {
-        console.error('[PurchaseManager] error:', err && err.code, err && err.message);
-        // Autocuración: si Google responde "ya comprado", marcar Premium localmente
+        var code = err && err.code;
         var msg = (err && err.message) || '';
-        if ((err && err.code === 6777003) || /already owned|ya has comprado/i.test(msg)) {
-          self._markPurchased();
-          App.toast('Compra Premium restaurada.', 'success');
+        var producto = (err && err.productId) || '';
+        console.error('[PurchaseManager] error:', code, producto, msg);
+
+        // El usuario cerro el dialogo de Google: no hay nada que contarle.
+        if (code === CdvPurchase.ErrorCode.PAYMENT_CANCELLED) return;
+
+        // "Ya lo tienes": Google rechaza la compra porque la licencia sigue viva.
+        // Se detecta SOLO por el texto. Antes tambien se daba por bueno el codigo
+        // 6777003, que en realidad es ErrorCode.PURCHASE ("la compra fallo"): un
+        // fallo cualquiera desbloqueaba Premium y anunciaba "Compra restaurada".
+        if (/already owned|ya (lo )?has comprado/i.test(msg)) {
+          if (producto === SUPPORT_PRODUCT_ID) {
+            self._sincronizarSoporte();
+          } else {
+            self._markPurchased();
+            App.toast('Compra Premium restaurada.', 'success');
+          }
+          return;
+        }
+
+        // Un fallo real en la compra del soporte tiene que verse como fallo.
+        if (producto === SUPPORT_PRODUCT_ID || code === CdvPurchase.ErrorCode.PURCHASE) {
+          App.toastError('No se pudo completar la compra. Intentalo de nuevo.');
         }
       });
 
