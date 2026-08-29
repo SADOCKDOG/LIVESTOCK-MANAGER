@@ -277,12 +277,13 @@ window.WizardCrotales = {
   },
 
   async _mostrarPDF(html, baseName, titulo) {
-  await window.generateAndShowPDF({
-    title: titulo,
-    html,
-    filename: baseName,
-    shareTitle: titulo
-  });
+    DocumentViewer.show({
+      id: 'doc-viewer-crotales',
+      title: titulo,
+      html,
+      filename: baseName,
+      shareTitle: titulo
+    });
   },
 
   async generarDocumento(finca, mov) {
@@ -384,10 +385,11 @@ window.WizardCrotales = {
       </div>
     </div>`;
 
-    await window.generateAndShowPDF({
+    DocumentViewer.show({
+      id: 'doc-viewer-guia-movimiento',
       title: 'Guía de Movimiento',
       html,
-      filename: `Guia_Movimiento_${mov.numero_guia}`,
+      filename: 'Guia_Movimiento_' + mov.numero_guia,
       shareTitle: 'Guía de Movimiento'
     });
   },
