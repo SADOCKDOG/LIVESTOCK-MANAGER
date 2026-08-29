@@ -74,7 +74,7 @@ window.WizardCrotales = {
           return `
             <div class="card card-accent card-accent-blue p-16 mt-10">
               <div class="section-header-theme mb-12" style="--theme-color: var(--c-info)">${Icons.edificio()} DESTINO Y ADSG</div>
-
+              
               ${adsgs.length > 0 ? `
               <div class="wizard-input-group mb-14">
                 <label class="wizard-label">SELECCIONAR ADSG REGISTRADA</label>
@@ -135,7 +135,7 @@ window.WizardCrotales = {
       title: 'PEDIDO OFICIAL CROTALES',
       initialData: {
         id: borrador ? borrador.id : undefined,
-        tipo: borrador ? borrador.tipo : (especiesPedido[0] || "Ovino"),
+        tipo: borrador ? borrador.tipo : "Bandera + Botón (EID)",
         especie: borrador ? borrador.especie : (especiesPedido[0] || "Ovino"),
         cantidad: borrador ? borrador.cantidad : 50,
         adsg_nombre: borrador ? borrador.adsg_nombre : (finca.adsg_nombre || ""),
@@ -154,8 +154,8 @@ window.WizardCrotales = {
           }
 
           if (!window.db.objectStoreNames.contains('pedidos_crotales')) {
-            await Confirm.alert("Actualización Requerida", "El sistema de pedidos requiere una actualización de base de datos (v12). Por favor, cierra y abre la aplicación.");
-            return;
+             await Confirm.alert("Actualización Requerida", "El sistema de pedidos requiere una actualización de base de datos (v12). Por favor, cierra y abre la aplicación.");
+             return;
           }
 
           // Leer valores directamente del DOM como fallback
@@ -183,12 +183,7 @@ window.WizardCrotales = {
 
           const pdfData = { ...data, especie, tipo, cantidad, adsg_nombre, adsg_codigo, adsg_veterinario, adsg_vet_colegiado, adsg_vet_nif };
           App.toast(`Pedido guardado (nº ${pedidoId})`, 'success');
-          await window.generateAndShowPDF({
-            title: 'Solicitud Crotales',
-            html: this._buildPDFHtml(finca, data, pedidoId),
-            filename: `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}`,
-            shareTitle: 'Solicitud Crotales'
-          });
+          await WizardCrotales.generarPDF(finca, pdfData, pedidoId);
           if (document.getElementById('docs-lista')) {
             try { await DocumentosView.render(); } catch (_) { /* noop */ }
           }
@@ -196,12 +191,7 @@ window.WizardCrotales = {
           console.error('[wizard-crotales] Error:', e);
           await Confirm.alert("Error", "Error al procesar el pedido: " + e.message);
           const fbData = { ...data, especie: data.especie || document.getElementById('w-pd-especie')?.value, tipo: data.tipo || document.getElementById('w-pd-tipo')?.value, cantidad: data.cantidad || parseInt(document.getElementById('w-pd-cant')?.value) || 0 };
-          await window.generateAndShowPDF({
-            title: 'Solicitud Crotales',
-            html: this._buildPDFHtml(finca, fbData, "TEMP-" + Date.now()),
-            filename: "TEMP",
-            shareTitle: 'Solicitud Crotales'
-          });
+          await WizardCrotales.generarPDF(finca, fbData, "TEMP-" + Date.now());
         }
       }
     });
@@ -210,12 +200,7 @@ window.WizardCrotales = {
   async generarPDF(finca, data, pedidoId = null) {
     App.toast("Generando documento oficial...");
     const html = this._buildPDFHtml(finca, data, pedidoId);
-    await window.generateAndShowPDF({
-      title: 'Solicitud Crotales',
-      html,
-      filename: `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}`,
-      shareTitle: 'Solicitud Crotales'
-    });
+    await this._mostrarPDF(html, `Solicitud_Crotales_${finca.codigo_REGA || finca.rega}`, 'Solicitud Crotales');
   },
 
   _buildPDFHtml(finca, data, pedidoId) {
@@ -226,7 +211,7 @@ window.WizardCrotales = {
       <div style="padding:40px;font-family:serif;max-width:800px;margin:0 auto;color:#000;background:#fff;">
         <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:20px;margin-bottom:30px;">
           <h1 style="margin:0;font-size:1.5rem;text-transform:uppercase;">SOLICITUD DE MATERIAL DE IDENTIFICACIÓN ANIMAL</h1>
-          <h3 style="margin:5px 0 0;color:#555;">Documento de delegación para ADSG / Autoridad Competente</h3>
+          <h3 style="margin:5px 0 0 0;color:#555;font-weight:normal;">Documento de delegación para ADSG / Autoridad Competente</h3>
         </div>
         <div style="display:flex;gap:40px;margin-bottom:20px;font-size:0.9rem;">
           <div style="flex:1;">
@@ -241,7 +226,7 @@ window.WizardCrotales = {
             <h4 style="border-bottom:1px solid #ddd;padding-bottom:5px;margin-top:0;">DATOS DE LA EXPLOTACIÓN</h4>
             <p><strong>Nombre Finca:</strong> ${finca.nombre}<br>
             <strong>Código REGA:</strong> <span class="text-gold" style="color:var(--p-gold); font-weight:bold;">${finca.codigo_REGA || finca.rega || 'No especificado'}</span><br>
-            <strong>Destinatario (ADSG/OCA):</strong> ${data.adsg_nombre}</p>
+            <strong>Dirigido a (ADSG/OCA):</strong> ${data.adsg_nombre}</p>
           </div>
         </div>
         ${data.adsg_codigo || data.adsg_veterinario ? `
@@ -286,129 +271,41 @@ window.WizardCrotales = {
     });
   },
 
-  async generarDocumento(finca, mov) {
-    const CS = window.ComunidadService;
-    const conf = CS && finca.comunidad_autonoma ? CS.getConfiguracionCCAA(finca.comunidad_autonoma) : null;
-    const plataforma = conf ? conf.sistema_movimiento : 'SIA';
-
-    const crotalesLista = mov.crotales || [];
-    const crotalesHtml = crotalesLista.length
-      ? `<div style="margin-top:10px;">
-          <strong>Crotales Identificados:</strong>
-          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;">
-            ${crotalesLista.map(c => `<span style="font-family:'IBM Plex Mono', monospace; font-size:0.8rem; font-weight:900; background:#FFFDF0; border:1px solid #C5A059; color:#8F6B2B; padding:3px 8px; border-radius:4px; display:inline-block;">${c}</span>`).join('')}
-          </div>
-         </div>`
-      : '';
-
-    const hashInput = JSON.stringify({ numero: mov.numero_guia, fecha: mov.fecha, crotales: crotalesLista, origen: mov.rega_origen, destino: mov.rega_destino });
-    const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(hashInput));
-    const hashSeguridad = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-    const regaOrigenDestacado = `<span style="font-family:monospace; font-weight:950; color:#8F6B2B; background:#FFFDF0; padding:1px 4px; border-radius:3px; border:1px solid rgba(197, 160, 89, 0.3);">${mov.rega_origen || '—'}</span>`;
-    const regaDestinoDestacado = `<span style="font-family:monospace; font-weight:950; color:#8F6B2B; background:#FFFDF0; padding:1px 4px; border-radius:3px; border:1px solid rgba(197, 160, 89, 0.3);">${mov.rega_destino || '—'}</span>`;
-
-    const html = `<div style="padding:40px;font-family:sans-serif;max-width:800px;margin:0 auto;color:#000;background:#fff; line-height:1.4;">
-      <!-- Cabecera Oficial -->
-      <div style="display:flex; justify-content:between; align-items:center; border-bottom:3px solid #000; padding-bottom:16px; margin-bottom:24px;">
-        <div style="flex:1;">
-          <h1 style="margin:0;font-size:1.3rem;text-transform:uppercase;font-weight:900;letter-spacing:0.5px;color:#111;">Guía de Origen y Sanidad Pecuaria</h1>
-          <h3 style="margin:4px 0 0;color:#666;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;">Documento de Movimiento Oficial (DIMOE) · Plataforma ${plataforma}</h3>
-        </div>
-        <div style="text-align:right;">
-          <div style="border:2px solid #C5A059; padding:5px 10px; border-radius:6px; background:#FFFDF0; display:inline-block;">
-            <span style="font-size:0.55rem; font-weight:bold; color:#8F6B2B; display:block; text-transform:uppercase; letter-spacing:0.5px;">CÓDIGO DE TRAZABILIDAD</span>
-            <span style="font-family:'IBM Plex Mono', monospace; font-size:0.75rem; font-weight:900; color:#000;">DMO-${mov.numero_guia || 'PENDIENTE'}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Datos de Origen y Destino -->
-      <div style="display:flex;gap:30px;font-size:0.85rem;margin-bottom:24px;">
-        <div style="flex:1; border:1px solid #ddd; padding:12px; border-radius:6px; background:#fafafa;">
-          <h4 style="border-bottom:1px solid #C5A059;padding-bottom:5px;margin-top:0;font-weight:900;color:#8F6B2B;letter-spacing:0.3px;">EXPLOTACIÓN ORIGEN</h4>
-          <p style="margin:6px 0 0 0;"><strong>REGA:</strong> ${regaOrigenDestacado}<br>
-          ${mov.tipo === 'salida' ? '<strong>Titular:</strong> ' + (finca.propietario || finca.nombre) : '<strong>Explotación:</strong> ' + (mov.explotacion_contraparte || '—')}</p>
-        </div>
-        <div style="flex:1; border:1px solid #ddd; padding:12px; border-radius:6px; background:#fafafa;">
-          <h4 style="border-bottom:1px solid #C5A059;padding-bottom:5px;margin-top:0;font-weight:900;color:#8F6B2B;letter-spacing:0.3px;">EXPLOTACIÓN DESTINO</h4>
-          <p style="margin:6px 0 0 0;"><strong>REGA:</strong> ${regaDestinoDestacado}<br>
-          ${mov.tipo === 'entrada' ? '<strong>Titular:</strong> ' + (finca.propietario || finca.nombre) : '<strong>Explotación:</strong> ' + (mov.explotacion_contraparte || '—')}</p>
-        </div>
-      </div>
-
-      <!-- Datos del Movimiento -->
-      <div style="margin-bottom:24px;font-size:0.85rem; border:1px solid #ddd; padding:12px; border-radius:6px; background:#fff;">
-        <h4 style="border-bottom:1px solid #111;padding-bottom:5px;margin-top:0;font-weight:900;color:#111;letter-spacing:0.3px;">DATOS DEL TRASLADO GANADERO</h4>
-        <p style="margin:6px 0 0 0; line-height:1.5;">
-          <strong>Nº Guía Oficial:</strong> <span style="font-weight:bold;color:#000;">${mov.numero_guia}</span> · Fecha Expedición: ${mov.fecha} · Motivo de Traslado: ${(mov.motivo || '—').toUpperCase()}<br>
-          <strong>Especie Ganadera:</strong> <span style="font-weight:700;">${(mov.especie || '—').toUpperCase()}</span> · Censo de Cabezas: <span style="font-weight:900;color:#10b981;font-size:0.9rem;">${mov.num_animales} UDS</span>
-          ${mov.autoguia ? '<br><strong>Tipo:</strong> <span style="font-weight:900;color:#b8860b;">AUTOGUÍA (MISMO TITULAR — SIN TASA NI FIRMA DIGITAL)</span>' : ''}
-        </p>
-        ${crotalesHtml}
-      </div>
-
-      <!-- Transporte y Bioseguridad -->
-      <div style="margin-bottom:24px;font-size:0.85rem; border:1px solid #ddd; padding:12px; border-radius:6px; background:#fafafa;">
-        <h4 style="border-bottom:1px solid #111;padding-bottom:5px;margin-top:0;font-weight:900;color:#111;letter-spacing:0.3px;">TRANSPORTE Y PROTOCOLO BIOLÓGICO</h4>
-        <p style="margin:6px 0 0 0; line-height:1.5;">
-          <strong>Operador / Transportista:</strong> ${mov.transportista_nombre || '—'} · Matrícula Vehículo: <span style="font-family:monospace;font-weight:bold;color:#333;">${mov.matricula || '—'}</span><br>
-          <strong>Desinsectación Certificada:</strong> <span style="color:${mov.desinsectacion_certificada ? '#10b981' : '#f59e0b'}; font-weight:bold;">${mov.desinsectacion_certificada ? 'SÍ (Protocolo Ejecutado)' : 'No'}</span><br>
-          ${mov.desinfeccion_numero_talon ? `<strong>Nº Talón de Desinfección:</strong> <span style="font-family:monospace;">${mov.desinfeccion_numero_talon}</span> · Fecha Aplicación: ${mov.desinfeccion_fecha || '—'}<br>` : ''}
-          ${mov.veterinario_autorizante ? `<strong>Veterinario Oficial Inspector:</strong> <span style="font-weight:700;color:#111;">${mov.veterinario_autorizante}</span>' : ''}
-        </p>
-      </div>
-
-      <!-- Firma Telemétrica de Autenticidad (Sello PAC/SIGGAN) -->
-      <div style="display:flex; gap:20px; align-items:center; padding:14px; border:1px dashed #C5A059; background:#FFFDF0; border-radius:6px; margin-bottom:30px; font-size:0.78rem;">
-        <div style="font-size:1.8rem; color:#8F6B2B; padding:0 8px;">🛡️</div>
-        <div style="flex:1; line-height:1.4; color:#555;">
-          <strong>REFERENCIA DE TRAZABILIDAD DIGITAL</strong><br/>
-          Documento generado electrónicamente en la plataforma <strong>${plataforma}</strong>. Saneamiento pecuario y trazabilidad de conformidad con la normativa de sanidad animal vigente. <br/>
-          <span style="font-family:'IBM Plex Mono', monospace; font-size:0.65rem; color:#888;">Código integridad SHA-256: ${hashSeguridad}</span>
-        </div>
-      </div>
-
-      <!-- Secciones de Firmas en el PDF -->
-      <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:0.8rem;">
-        <div style="text-align:center; border-top:1px solid #999; width:220px; padding-top:6px; color:#555;">
-          <strong>Titular / Propietario</strong><br/>
-          <span style="font-size:0.75rem;color:#777;">${finca.propietario || finca.nombre}</span>
-        </div>
-        <div style="text-align:center; border-top:1px solid #999; width:220px; padding-top:6px; color:#555;">
-          <strong>Operador Logístico</strong><br/>
-          <span style="font-size:0.75rem;color:#777;">Firma del Transportista</span>
-        </div>
-        <div style="text-align:right; font-size:0.75rem; color:#777; align-self:flex-end;">
-          Fecha de Emisión: <strong>${new Date().toLocaleDateString('es-ES')}</strong><br/>
-          Livestock Manager Premium v4.8
-        </div>
-      </div>
-    </div>`;
-
+  /** Fallback genérico cuando html2pdf no llegó a cargarse: muestra el documento igualmente. */
+  _fallbackPDF(element, filename) {
+    if (!element) { App.toastError('Documento no disponible'); return; }
     DocumentViewer.show({
-      id: 'doc-viewer-guia-movimiento',
-      title: 'Guía de Movimiento',
-      html,
-      filename: 'Guia_Movimiento_' + mov.numero_guia,
-      shareTitle: 'Guía de Movimiento'
+      id: 'doc-viewer-fallback',
+      title: filename,
+      html: element.innerHTML,
+      filename: filename.replace(/\.pdf$/i, '')
     });
   },
 
-  async _onSelectADSG(transportistaId) {
-    console.log("[WizardGuiaMovimiento] _onSelectADSG seleccionado:", transportistaId);
-    let transportistas = [];
-    try { transportistas = await Transportistas.list({ activo: true }); } catch (e) { transportistas = []; }
-    const t = transportistas.find(x => Number(x.id) === Number(transportistaId));
+  async _onSelectADSG(adsgId) {
+    console.log("[WizardCrotales] _onSelectADSG seleccionado:", adsgId);
+    const adsgs = await window.ADSGs.list().catch(() => []);
+    const adsg = adsgs.find(a => Number(a.id) === Number(adsgId));
+    
+    const inputNombre = document.getElementById('w-pd-adsg');
+    const inputCodigo = document.getElementById('w-pd-adsg-cod');
+    const inputVet = document.getElementById('w-pd-vet');
+    const inputCol = document.getElementById('w-pd-vet-col');
+    const inputNif = document.getElementById('w-pd-vet-nif');
 
-    const inputNombre = document.getElementById('w-mv-transp-nom');
-    const inputMatricula = document.getElementById('w-mv-matricula');
-
-    if (t) {
-      if (inputNombre) inputNombre.value = t.nombre || '';
-      if (inputMatricula) inputMatricula.value = t.matricula || '';
+    if (adsg) {
+      if (inputNombre) inputNombre.value = adsg.nombre || '';
+      if (inputCodigo) inputCodigo.value = adsg.codigo || '';
+      if (inputVet) inputVet.value = adsg.veterinario || '';
+      if (inputCol) inputCol.value = adsg.colegiado || '';
+      if (inputNif) inputNif.value = adsg.vet_nif || '';
     } else {
       if (inputNombre) inputNombre.value = '';
-      if (inputMatricula) inputMatricula.value = '';
+      if (inputCodigo) inputCodigo.value = '';
+      if (inputVet) inputVet.value = '';
+      if (inputCol) inputCol.value = '';
+      if (inputNif) inputNif.value = '';
     }
   }
 };
+
