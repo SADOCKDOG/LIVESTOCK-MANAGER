@@ -1,5 +1,5 @@
 /**
- * Livestock Manager - MisIncidenciasView v1.1.0
+ * Livestock Manager - MisIncidenciasView v1.2.0
  *
  * Listado de las incidencias propias, con su estado y con las respuestas del
  * equipo. El usuario nunca ve GitHub: aqui solo hay incidencias con estado en
@@ -7,10 +7,10 @@
  *
  * No exige licencia activa: quien la deja caducar sigue viendo lo que reporto
  * y lo que le han contestado, aunque no pueda abrir nada nuevo.
+ *
+ * El estado de «leido» y los textos de estado viven en SupportAPI, no aqui:
+ * los comparte con el aviso de arranque.
  */
-
-/** Ultima respuesta ya vista de cada incidencia, para marcar las nuevas. */
-const CLAVE_LEIDAS = 'livestock_incidencias_leidas';
 
 const MisIncidenciasView = {
   _cargando: false,
@@ -20,8 +20,8 @@ const MisIncidenciasView = {
 
     if (!window.SupportAPI || !window.SupportAPI.tieneSesion()) {
       main.innerHTML = `
+        ${this._cabecera()}
         <div class="card p-20 mt-10">
-          <h2 class="section-title">Mis incidencias</h2>
           <p class="text-gray mt-10">Entra en Soporte para ver tus incidencias.</p>
           <div class="erp-action-group mt-20">
             <button class="btn btn-primary" onclick="location.hash='#/soporte'">Ir a Soporte</button>
@@ -31,18 +31,89 @@ const MisIncidenciasView = {
     }
 
     main.innerHTML = `
+      ${this._cabecera()}
       <div class="card p-20 mt-10">
-        <h2 class="section-title">Mis incidencias</h2>
-        <div id="incidencias-lista" class="mt-20">
+        <div id="incidencias-lista" class="mt-10">
           <p class="text-gray">Cargando…</p>
         </div>
         <div class="erp-action-group mt-20">
           <button class="btn btn-primary" onclick="location.hash='#/soporte'">
             Contar una incidencia
           </button>
+          <button class="btn btn-secondary" onclick="MisIncidenciasView.recargar()">
+            Actualizar
+          </button>
         </div>
-      </div>`;
+      </div>
+      ${this._ayuda()}`;
 
+    await this._cargar();
+  },
+
+  /**
+   * Volver a Ajustes, que es de donde se llega. Es un destino fijo y no
+   * history.back() a proposito: tras confirmar una incidencia se aterriza aqui
+   * desde Soporte, y retroceder devolveria al formulario recien enviado.
+   */
+  _cabecera() {
+    return `
+      <div class="mb-20">
+        <a href="#/ajustes" class="link-back">← Volver a Ajustes</a>
+        <h2 class="mt-10 font-900 uppercase tracking-wider">
+          <span style="color: var(--neon);">|</span> MIS INCIDENCIAS
+        </h2>
+      </div>`;
+  },
+
+  /**
+   * Que significa cada estado y que se espera del usuario. Va al pie y
+   * plegado: estorba a quien ya lo sabe, pero sin ello la primera vez no hay
+   * forma de saber si «Enviada» durante dos dias es normal o es un fallo.
+   */
+  _ayuda() {
+    const estados = window.SupportAPI.ESTADOS;
+    const expl = window.SupportAPI.EXPLICACION_ESTADOS;
+    const filas = Object.keys(estados)
+      .map(
+        (clave) => `
+        <div class="flex gap-10 items-start mb-10">
+          <span class="badge ${this._claseEstado(clave)}" style="flex:0 0 auto">${estados[clave]}</span>
+          <span class="text-sm text-gray">${expl[clave] || ''}</span>
+        </div>`,
+      )
+      .join('');
+
+    return `
+      <details class="card p-20 mt-10">
+        <summary class="font-bold" style="cursor:pointer">Cómo funciona el soporte</summary>
+        <div class="mt-15">
+          ${filas}
+          <div class="text-sm text-gray mt-15" style="border-top:1px solid rgba(255,255,255,0.10); padding-top:10px">
+            <p class="mb-5">
+              · Toca una incidencia para ver los detalles y las respuestas del equipo.
+            </p>
+            <p class="mb-5">
+              · Cuando haya respuesta verás el aviso <b>Respuesta nueva</b> en la fila.
+            </p>
+            <p class="mb-5">
+              · Si te piden más datos, cuéntalos abriendo una incidencia nueva y menciona
+              la referencia de esta; así no se pierde el hilo.
+            </p>
+            <p class="mb-5">
+              · Las respuestas llegan a este listado, no por correo. Consulta cada pocos días.
+            </p>
+            <p>
+              · Lo enviado incluye la versión de la app y el modelo del móvil. Nunca se
+              envían tus datos de animales ni de la explotación.
+            </p>
+          </div>
+        </div>
+      </details>`;
+  },
+
+  async recargar() {
+    const contenedor = document.getElementById('incidencias-lista');
+    if (contenedor) contenedor.innerHTML = '<p class="text-gray">Cargando…</p>';
     await this._cargar();
   },
 
@@ -79,7 +150,7 @@ const MisIncidenciasView = {
     const estado = window.SupportAPI.textoEstado(incidencia.estado);
     const clase = this._claseEstado(incidencia.estado);
     const id = this._escapar(incidencia.ticket_id);
-    const nuevas = this._tieneRespuestaNueva(incidencia);
+    const nuevas = window.SupportAPI.tieneRespuestaNueva(incidencia);
     const cuantas = incidencia.respuestas || 0;
 
     // El aviso va en la fila, no dentro del detalle: si hubiera que desplegar
@@ -106,37 +177,6 @@ const MisIncidenciasView = {
         </div>
         <div class="mt-10" id="detalle-${id}" hidden></div>
       </div>`;
-  },
-
-  // --- Respuestas leidas ----------------------------------------------------
-  //
-  // Se guarda en el dispositivo, no en el servidor: es una comodidad visual y
-  // no merece ni una llamada mas ni un campo por usuario en KV. El precio es
-  // que al cambiar de movil todo vuelve a verse como nuevo, que es el lado
-  // seguro del fallo.
-
-  _leidas() {
-    try {
-      return JSON.parse(localStorage.getItem(CLAVE_LEIDAS) || '{}') || {};
-    } catch (e) {
-      return {};
-    }
-  },
-
-  _marcarLeida(ticketId, fechaUltima) {
-    if (!fechaUltima) return;
-    try {
-      const mapa = this._leidas();
-      mapa[ticketId] = fechaUltima;
-      localStorage.setItem(CLAVE_LEIDAS, JSON.stringify(mapa));
-    } catch (e) {}
-  },
-
-  _tieneRespuestaNueva(incidencia) {
-    if (!incidencia.ultima_respuesta_at) return false;
-    const vista = this._leidas()[incidencia.ticket_id];
-    if (!vista) return true;
-    return Date.parse(incidencia.ultima_respuesta_at) > Date.parse(vista);
   },
 
   /**
@@ -166,10 +206,10 @@ const MisIncidenciasView = {
       caja.innerHTML = this._detalle(d);
 
       // Abrir el detalle es leerlo: se marca la ultima respuesta como vista y
-      // se repinta la lista para que desaparezca el aviso.
+      // se quita el aviso de la fila.
       const respuestas = (d && d.respuestas) || [];
       if (respuestas.length) {
-        this._marcarLeida(ticketId, respuestas[respuestas.length - 1].fecha);
+        window.SupportAPI.marcarLeida(ticketId, respuestas[respuestas.length - 1].fecha);
         const fila = document.querySelector(`[data-ticket="${ticketId}"] .badge-success`);
         if (fila && fila.textContent === 'Respuesta nueva') fila.remove();
       }
@@ -191,6 +231,8 @@ const MisIncidenciasView = {
     ];
     if (d.cerrada_at) filas.push(['Resuelta', this._fecha(d.cerrada_at)]);
 
+    const explicacion = window.SupportAPI.EXPLICACION_ESTADOS[d.estado];
+
     return `
       <div class="detalle-incidencia"
            style="border-top:1px solid rgba(255,255,255,0.10); padding-top:10px">
@@ -204,6 +246,7 @@ const MisIncidenciasView = {
           </div>`,
           )
           .join('')}
+        ${explicacion ? `<p class="text-gray text-sm mt-10">${explicacion}</p>` : ''}
         ${this._hilo(d)}
       </div>`;
   },
