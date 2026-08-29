@@ -333,12 +333,24 @@
         return Promise.resolve(false);
       }
       try {
-        var oferta = self._store.get(SUPPORT_PRODUCT_ID);
-        if (!oferta) {
+        var producto = self._store.get(SUPPORT_PRODUCT_ID);
+        if (!producto) {
           App.toastError('La licencia de soporte no está disponible todavía.');
           return Promise.resolve(false);
         }
-        return self._store.order(oferta).then(function () {
+        // order() espera una Offer, NO un Product. Pasarle el producto hacia que
+        // el plugin mandase productId=null a Google ("Product not registered:
+        // null", codigo 6777003), asi que la compra no llegaba a abrirse nunca.
+        var oferta = producto.getOffer();
+        if (!oferta) {
+          App.toastError('El plan de soporte no está disponible todavía.');
+          return Promise.resolve(false);
+        }
+        return self._store.order(oferta).then(function (err) {
+          if (err) {
+            console.warn('[PurchaseManager] order devolvio error:', err.code, err.message);
+            return false;
+          }
           return self._sincronizarSoporte();
         });
       } catch (e) {
