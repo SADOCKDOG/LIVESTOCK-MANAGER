@@ -18,6 +18,12 @@
 
   var CLAVE_SESION = 'livestock_support_session';
 
+  // Fecha de la ultima respuesta ya vista de cada incidencia. Vive en el
+  // dispositivo y no en el servidor: es una comodidad visual y no merece una
+  // llamada mas ni un campo por usuario en KV. Al cambiar de movil todo vuelve
+  // a verse como nuevo, que es el lado seguro del fallo.
+  var CLAVE_LEIDAS = 'livestock_incidencias_leidas';
+
   var SupportAPI = {
     _sesion: (function () {
       try {
@@ -133,9 +139,24 @@
       return datos;
     },
 
-    /** Estado de la licencia segun el servidor (no segun el cliente). */
+    /**
+     * Estado de la licencia segun el servidor (no segun el cliente).
+     *
+     * Refresca de paso la copia guardada en la sesion: si el usuario cancelo
+     * la suscripcion desde Google Play, la app no se entera de otra forma.
+     */
     async estadoLicencia() {
-      return this._peticion('/auth/me');
+      var datos = await this._peticion('/auth/me');
+      if (datos && datos.licencia && this._sesion) {
+        this._sesion.licencia = datos.licencia;
+        this._guardarSesion(this._sesion);
+      }
+      return datos;
+    },
+
+    /** Lo ultimo que se sabe de la licencia, sin llamar al servidor. */
+    licenciaGuardada: function () {
+      return (this._sesion && this._sesion.licencia) || null;
     },
 
     /**
@@ -175,6 +196,38 @@
       return this._peticion('/tickets/' + encodeURIComponent(ticketId));
     },
 
+    // --- Respuestas leidas ---------------------------------------------------
+    //
+    // Viven aqui y no en la vista porque hay dos consumidores: la lista de
+    // incidencias, que marca las filas, y el aviso de arranque, que cuenta las
+    // pendientes. Con una copia en cada sitio, abrir una respuesta la marcaba
+    // leida en un sitio y seguia avisando desde el otro.
+
+    _leidas: function () {
+      try {
+        return JSON.parse(localStorage.getItem(CLAVE_LEIDAS) || '{}') || {};
+      } catch (e) {
+        return {};
+      }
+    },
+
+    marcarLeida: function (ticketId, fechaUltima) {
+      if (!fechaUltima) return;
+      try {
+        var mapa = this._leidas();
+        mapa[ticketId] = fechaUltima;
+        localStorage.setItem(CLAVE_LEIDAS, JSON.stringify(mapa));
+      } catch (e) {}
+    },
+
+    /** true si la incidencia tiene una respuesta posterior a la ultima vista. */
+    tieneRespuestaNueva: function (incidencia) {
+      if (!incidencia || !incidencia.ultima_respuesta_at) return false;
+      var vista = this._leidas()[incidencia.ticket_id];
+      if (!vista) return true;
+      return Date.parse(incidencia.ultima_respuesta_at) > Date.parse(vista);
+    },
+
     /** Contexto tecnico que acompana al reporte. */
     contextoActual: function () {
       var cap = window.Capacitor;
@@ -197,6 +250,58 @@
 
   SupportAPI.textoEstado = function (estado) {
     return SupportAPI.ESTADOS[estado] || 'Enviada';
+  };
+
+  /** Que significa cada estado, en la pantalla de incidencias. */
+  SupportAPI.EXPLICACION_ESTADOS = {
+    enviada: 'Registrada. Nadie la ha mirado todavía.',
+    revision: 'El equipo la está mirando y puede que te pregunte algo.',
+    curso: 'Confirmada como fallo. Se está trabajando en ella.',
+    resuelta: 'Cerrada. Suele llegar en la siguiente actualización de la app.',
+  };
+
+  /**
+   * Frase de la licencia para Ajustes.
+   *
+   * Tres casos distintos que la misma fecha no distingue: renovacion prevista,
+   * suscripcion cancelada que aun funciona, y compra unica sin caducidad. Sin
+   * el dato de renovacion (licencias verificadas antes de que existiera el
+   * campo) se dice solo hasta cuando vale, sin prometer nada.
+   */
+  SupportAPI.textoLicencia = function (lic) {
+    if (!lic || !lic.activa) {
+      return { activa: false, titulo: 'Sin licencia de soporte', detalle: 'Actívala para poder abrir incidencias.' };
+    }
+
+    if (!lic.expira) {
+      return { activa: true, titulo: 'Licencia activa', detalle: 'Compra única, sin caducidad.' };
+    }
+
+    var fecha = SupportAPI.fechaLarga(lic.expira);
+    var quedan = Math.ceil((Date.parse(lic.expira) - Date.now()) / 86400000);
+    var aviso = quedan >= 0 && quedan <= 7;
+
+    if (lic.renovacion_automatica === true) {
+      return { activa: true, titulo: 'Licencia activa', detalle: 'Se renueva el ' + fecha + '.' };
+    }
+    if (lic.renovacion_automatica === false) {
+      return {
+        activa: true,
+        aviso: true,
+        titulo: 'Licencia activa (renovación cancelada)',
+        detalle: 'Funcionará hasta el ' + fecha + '. Después no podrás abrir incidencias nuevas.',
+      };
+    }
+    return { activa: true, aviso: aviso, titulo: 'Licencia activa', detalle: 'Válida hasta el ' + fecha + '.' };
+  };
+
+  SupportAPI.fechaLarga = function (iso) {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+    } catch (e) {
+      return '';
+    }
   };
 
   window.SupportAPI = SupportAPI;

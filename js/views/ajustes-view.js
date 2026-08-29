@@ -223,6 +223,9 @@ const AjustesView = {
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
           <span style="color: var(--c-purple);">|</span> ${Icons.libro()} AYUDA Y SOPORTE
         </h3>
+        <!-- Se rellena en _pintarLicencia(): depende del servidor y no debe
+             retrasar el pintado del resto de Ajustes. -->
+        <div id="soporte-licencia" class="mt-15"></div>
         <div class="grid grid-cols-1 gap-10 mt-15">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._abrirManual()">
             ${Icons.libro()} <span class="widget-link-label">Manual de Usuario</span>
@@ -244,6 +247,61 @@ const AjustesView = {
           © 2026 Livestock Manager Premium · v${window.APP_INFO.version}<br>
           Todos los derechos reservados.
         </div>
+      </div>`;
+
+    this._pintarLicencia();
+  },
+
+  // ===================== LICENCIA DE SOPORTE =====================
+
+  /**
+   * Estado de la licencia y fecha de la proxima renovacion.
+   *
+   * Se pinta primero con lo que hay guardado y luego se refresca contra el
+   * servidor: sin conexion se ensena la ultima verdad conocida en vez de un
+   * hueco, y con conexion se corrige si el usuario cancelo la suscripcion
+   * desde Google Play, cosa de la que la app no se entera de ninguna otra
+   * forma.
+   */
+  async _pintarLicencia() {
+    const caja = document.getElementById('soporte-licencia');
+    if (!caja || !window.SupportAPI) return;
+
+    if (!window.SupportAPI.tieneSesion()) {
+      caja.innerHTML = this._tarjetaLicencia({
+        activa: false,
+        titulo: 'Soporte no activado',
+        detalle: 'Entra en Soporte técnico para activar tu licencia.',
+      });
+      return;
+    }
+
+    caja.innerHTML = this._tarjetaLicencia(
+      window.SupportAPI.textoLicencia(window.SupportAPI.licenciaGuardada()),
+    );
+
+    try {
+      const datos = await window.SupportAPI.estadoLicencia();
+      const actual = document.getElementById('soporte-licencia');
+      // Puede haberse cambiado de pantalla mientras respondia el servidor.
+      if (actual) actual.innerHTML = this._tarjetaLicencia(window.SupportAPI.textoLicencia(datos.licencia));
+    } catch (e) {
+      console.warn('[Ajustes] No se pudo refrescar la licencia:', e);
+    }
+  },
+
+  _tarjetaLicencia(info) {
+    const color = !info.activa
+      ? 'var(--color-danger, #e04545)'
+      : info.aviso
+        ? 'var(--color-warning, #e0a020)'
+        : 'var(--color-success, #7cc00b)';
+
+    return `
+      <div class="p-10" style="background:rgba(255,255,255,0.04); border-radius:8px;
+                               border-left:3px solid ${color}">
+        <div class="font-bold text-sm">${info.titulo}</div>
+        <div class="text-gray text-sm mt-5">${info.detalle}</div>
       </div>`;
   },
 
