@@ -15,12 +15,13 @@ const PdfService = {
    * @returns {HTMLElement} overlay
    */
   mostrarPDF({ title = 'Documento', filename = 'documento.pdf', contentHtml, onClose } = {}) {
-    await window.generateAndShowPDF({
+    return DocumentViewer.show({
+      id: 'doc-viewer-pdfservice',
       title,
       html: `<div style="padding:30px; box-sizing:border-box; font-family:serif; color:black;">${contentHtml}</div>`,
       filename: filename.replace(/\.pdf$/i, ''),
       shareTitle: title,
-      onClose: onClose
+      onClose
     });
   },
 
