@@ -6,5 +6,5 @@
  */
 window.APP_INFO = Object.freeze({
   version: '4.10.4',
-  versionCode: 526
+  versionCode: 525
 });
