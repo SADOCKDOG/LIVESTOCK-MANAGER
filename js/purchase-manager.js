@@ -12,33 +12,20 @@
   var MS_STORE_PRODUCT_ID = 'premium_unlock';
   var MS_STORE_BILLING = 'https://store.microsoft.com/billing';
 
-  if (window.FREE_MODE === false) {
-    // Build Premium: la app va desbloqueada sin pasar por la tienda. Pero el
-    // SOPORTE es un producto distinto y de pago aunque la app sea Premium, asi
-    // que sus metodos siguen siendo los reales y no se conceden por defecto.
-    window.PurchaseManager = {
-      isPurchased: function () { return true; },
-      isReady: function () { return true; },
-      purchase: function () {},
-      restorePurchases: function () {},
-      comprarSoporte: function () {
-        if (window.App) App.toastError('La licencia de soporte se compra desde la versión de la tienda.');
-        return Promise.resolve(false);
-      },
-      restaurarSoporte: function () {
-        // Sin CdvPurchase no hay recibo local que revalidar; la sesion de
-        // soporte tiene que abrirse con una compra real.
-        if (window.App) App.toast('No se encontró ninguna licencia de soporte.', 'info');
-        return Promise.resolve(false);
-      }
-    };
-    return;
-  }
+  // FREE_MODE === false es el build "Premium": la app va desbloqueada sin pasar
+  // por la tienda. Pero el SOPORTE es un producto DISTINTO y de pago, asi que su
+  // flujo de compra tiene que ser el real tambien aqui.
+  // Antes esta rama devolvia stubs que solo mostraban "se compra desde la version
+  // de la tienda", asi que el soporte era inaccesible justo en el unico build que
+  // se publica. Ahora se conserva el desbloqueo Premium y se mantiene vivo el
+  // motor de compras, registrando unicamente el producto de soporte.
+  var BUILD_PREMIUM = window.FREE_MODE === false;
 
   var PurchaseManager = {
     _initialized: false,
     // Lectura síncrona: las vistas del primer render ya conocen el estado Premium
     _purchased: (function () {
+      if (BUILD_PREMIUM) return true;
       try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch (e) { return false; }
     })(),
     _store: null,
@@ -203,11 +190,7 @@
       self._store = store;
       store.verbosus = true;
 
-      store.register([{
-        id: PRODUCT_ID,
-        type: CdvPurchase.ProductType.NON_CONSUMABLE,
-        platform: CdvPurchase.Platform.GOOGLE_PLAY
-      }, {
+      var catalogo = [{
         // Licencia del modulo de soporte: suscripcion, no compra unica. El
         // soporte cuesta dinero cada mes (cada ticket gasta IA), asi que el
         // ingreso tiene que ser recurrente. En el Worker, el flag equivalente
@@ -216,7 +199,17 @@
         id: SUPPORT_PRODUCT_ID,
         type: CdvPurchase.ProductType.PAID_SUBSCRIPTION,
         platform: CdvPurchase.Platform.GOOGLE_PLAY
-      }]);
+      }];
+      // En el build Premium la app ya va desbloqueada, asi que registrar
+      // premium_unlock solo generaria ruido de "producto no encontrado".
+      if (!BUILD_PREMIUM) {
+        catalogo.unshift({
+          id: PRODUCT_ID,
+          type: CdvPurchase.ProductType.NON_CONSUMABLE,
+          platform: CdvPurchase.Platform.GOOGLE_PLAY
+        });
+      }
+      store.register(catalogo);
 
       store.when()
         .productUpdated(function (product) {
@@ -228,6 +221,17 @@
         })
         .verified(function (receipt) {
           console.log('[PurchaseManager] verified:', receipt);
+          // Filtrar por producto: son dos compras distintas. Sin esto, comprar
+          // la licencia de SOPORTE desbloqueaba Premium de regalo.
+          if (receiptHasProduct(receipt, SUPPORT_PRODUCT_ID)) {
+            receipt.finish();
+            self._sincronizarSoporte();
+            return;
+          }
+          if (!receiptHasProduct(receipt, PRODUCT_ID)) {
+            receipt.finish();
+            return;
+          }
           self._markPurchased();
           receipt.finish();
           if (window.PremiumManager && window.PremiumManager.cleanDemoData) {
@@ -374,6 +378,9 @@
     },
 
     _checkLocal: function () {
+      // En el build Premium la app va desbloqueada por definicion: leer el
+      // localStorage aqui la degradaria a Free en cuanto fallase el store.
+      if (BUILD_PREMIUM) { this._initialized = true; return; }
       try {
         this._purchased = localStorage.getItem(STORAGE_KEY) === 'true';
       } catch (e) {}
