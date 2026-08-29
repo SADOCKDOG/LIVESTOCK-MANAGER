@@ -33,8 +33,16 @@
       return !this._sesion.expira || Date.parse(this._sesion.expira) > Date.now();
     },
 
+    /**
+     * La licencia tiene su propia caducidad, distinta de la de la sesion: la
+     * sesion dura 24 h y la suscripcion se renueva por su cuenta. Comprobar
+     * solo el flag `activa` daba por buena una licencia vencida hace rato, asi
+     * que el usuario escribia la incidencia entera y solo fallaba al enviarla.
+     */
     licenciaActiva: function () {
-      return !!(this._sesion && this._sesion.licencia && this._sesion.licencia.activa);
+      var lic = this._sesion && this._sesion.licencia;
+      if (!lic || !lic.activa) return false;
+      return !lic.expira || Date.parse(lic.expira) > Date.now();
     },
 
     _guardarSesion: function (sesion) {
@@ -79,6 +87,25 @@
         this.cerrarSesion();
         throw new Error('Tu sesión ha caducado. Vuelve a entrar en Soporte.');
       }
+
+      // La licencia ha vencido mientras la sesion seguia viva. La suscripcion
+      // puede haberse renovado ya en Google, asi que se revalida el token de
+      // compra y se reintenta una sola vez. Sin esto el usuario se quedaba
+      // bloqueado hasta que se le ocurriera pulsar «Ya lo tengo» a ciegas.
+      var caducada =
+        respuesta.status === 403 &&
+        datos &&
+        (datos.codigo === 'LICENCIA_CADUCADA' || datos.codigo === 'LICENCIA_INACTIVA');
+
+      if (caducada && !opciones._reintento && window.PurchaseManager &&
+          window.PurchaseManager.revalidarSoporte) {
+        var renovada = await window.PurchaseManager.revalidarSoporte();
+        if (renovada) {
+          opciones._reintento = true;
+          return this._peticion(ruta, opciones);
+        }
+      }
+
       if (!respuesta.ok) {
         var error = new Error((datos && datos.error) || 'No se pudo completar la operación');
         error.codigo = datos && datos.codigo;
@@ -94,6 +121,8 @@
     async iniciarSesion(purchaseToken, plataforma, email) {
       var datos = await this._peticion('/auth/verify-purchase', {
         method: 'POST',
+        // Esta es la llamada que revalida: no puede reintentarse a si misma.
+        _reintento: true,
         body: {
           purchase_token: purchaseToken,
           plataforma: plataforma || 'android',
