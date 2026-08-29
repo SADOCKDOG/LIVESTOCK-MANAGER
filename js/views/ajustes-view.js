@@ -281,7 +281,25 @@ const AjustesView = {
     );
 
     try {
-      const datos = await window.SupportAPI.estadoLicencia();
+      let datos = await window.SupportAPI.estadoLicencia();
+
+      // `/auth/me` solo lee lo guardado: no pregunta a Google. Una suscripcion
+      // renovada mientras la app no miraba sigue figurando como inactiva hasta
+      // que alguien revalida la compra, y quien entraba en Ajustes veia «Sin
+      // licencia de soporte» aun teniendola al dia. Revalidar aqui evita tener
+      // que pasar por Soporte para que aparezca la fecha.
+      if (datos && datos.licencia && !datos.licencia.activa &&
+          window.PurchaseManager && window.PurchaseManager.revalidarSoporte) {
+        try {
+          if (await window.PurchaseManager.revalidarSoporte()) {
+            datos = await window.SupportAPI.estadoLicencia();
+          }
+        } catch (e) {
+          // Sin compra que revalidar se queda el estado que dijo el servidor.
+          console.warn('[Ajustes] No se pudo revalidar la licencia:', e);
+        }
+      }
+
       const actual = document.getElementById('soporte-licencia');
       // Puede haberse cambiado de pantalla mientras respondia el servidor.
       if (actual) actual.innerHTML = this._tarjetaLicencia(window.SupportAPI.textoLicencia(datos.licencia));
