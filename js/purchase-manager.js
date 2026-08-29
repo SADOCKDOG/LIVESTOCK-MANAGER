@@ -21,6 +21,27 @@
   // motor de compras, registrando unicamente el producto de soporte.
   var BUILD_PREMIUM = window.FREE_MODE === false;
 
+  // Transaction.products NO es un array de ids: es {id, offerId}[]. Buscarlo con
+  // indexOf(productId) devolvia siempre -1, asi que ningun recibo se reconocia
+  // nunca y la licencia comprada resultaba invisible para la app.
+  function txTieneProducto(tx, productId) {
+    var lista = (tx && tx.products) || [];
+    for (var i = 0; i < lista.length; i++) {
+      var p = lista[i];
+      if (p === productId) return true;              // por si la forma cambia
+      if (p && p.id === productId) return true;
+    }
+    return false;
+  }
+
+  function reciboTieneProducto(recibo, productId) {
+    var txs = (recibo && recibo.transactions) || [];
+    for (var t = 0; t < txs.length; t++) {
+      if (txTieneProducto(txs[t], productId)) return true;
+    }
+    return false;
+  }
+
   var PurchaseManager = {
     _initialized: false,
     // Lectura síncrona: las vistas del primer render ya conocen el estado Premium
@@ -271,7 +292,7 @@
         // Se detecta SOLO por el texto. Antes tambien se daba por bueno el codigo
         // 6777003, que en realidad es ErrorCode.PURCHASE ("la compra fallo"): un
         // fallo cualquiera desbloqueaba Premium y anunciaba "Compra restaurada".
-        if (/already owned|ya (lo )?has comprado/i.test(msg)) {
+        if (/already owned|ya (lo )?has comprado|ya tienes una suscripci/i.test(msg)) {
           if (producto === SUPPORT_PRODUCT_ID) {
             self._sincronizarSoporte();
           } else {
@@ -301,12 +322,7 @@
         });
 
       function receiptHasProduct(receipt, productId) {
-        if (!receipt || !receipt.transactions) return false;
-        for (var t = 0; t < receipt.transactions.length; t++) {
-          var tx = receipt.transactions[t];
-          if (tx.products && tx.products.indexOf(productId) !== -1) return true;
-        }
-        return false;
+        return reciboTieneProducto(receipt, productId);
       }
     },
 
@@ -397,11 +413,14 @@
           var txs = recibos[i].transactions || [];
           for (var t = 0; t < txs.length; t++) {
             var tx = txs[t];
-            if (tx.products && tx.products.indexOf(SUPPORT_PRODUCT_ID) !== -1) {
-              return tx.purchaseToken || tx.transactionId || null;
-            }
+            if (!txTieneProducto(tx, SUPPORT_PRODUCT_ID)) continue;
+            var token = tx.purchaseToken ||
+                        (tx.nativePurchase && tx.nativePurchase.purchaseToken) ||
+                        tx.transactionId || null;
+            if (token) return token;
           }
         }
+        console.warn('[PurchaseManager] sin token de soporte en', recibos.length, 'recibos');
       } catch (e) {
         console.warn('[PurchaseManager] no se pudo leer el recibo de soporte:', e);
       }
