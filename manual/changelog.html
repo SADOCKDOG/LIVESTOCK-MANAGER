@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changelog — LIVESTOCK MANAGER v4.10.3</title>
+  <title>Changelog — LIVESTOCK MANAGER v4.10.4</title>
   <link rel="stylesheet" href="css/estilo-manual.css">
   <link rel="stylesheet" href="../css/design-tokens.css">
 </head>
@@ -13,7 +13,7 @@
       <a href="index.html" class="back-link" aria-label="Volver al indice">&larr;</a>
       <div class="title-block">
         <h1>Changelog — Historial de Versiones</h1>
-        <p class="version">LIVESTOCK MANAGER v4.10.3 — Cronologico inverso (mas reciente primero)</p>
+        <p class="version">LIVESTOCK MANAGER v4.10.4 — Cronologico inverso (mas reciente primero)</p>
       </div>
     </div>
   </header>
@@ -25,11 +25,12 @@
         <h2>v4.10.x — Agosto 2026 (Actual)</h2>
       </div>
 
-      <h3>v4.10.3 — 2026-08-29</h3>
+      <h3>v4.10.4 — 2026-08-29</h3>
       <ul class="feature-list">
         <li><strong>Compra del soporte inaccesible:</strong> En el build Premium (FREE_MODE=false) comprarSoporte() era un stub que solo mostraba "se compra desde la version de la tienda", asi que el soporte no se podia contratar justo en el unico build que se publica.</li>
         <li><strong>Motor de compras activo en build Premium:</strong> Se conserva la app desbloqueada y se registra el producto de soporte contra Google Play.</li>
         <li><strong>Compra de soporte regalaba Premium:</strong> El callback verified() no distinguia producto; ahora filtra por id y sincroniza la licencia de soporte.</li>
+        <li><strong>Fallo de compra anunciado como exito:</strong> store.error() trataba el codigo 6777003 (ErrorCode.PURCHASE, "la compra fallo") como "ya comprado": cualquier fallo desbloqueaba Premium y mostraba "Compra Premium restaurada". Ahora solo se detecta por el texto del error, se distingue el producto y un fallo real se muestra como fallo.</li>
       </ul>
 
       <h3>v4.10.2 — 2026-08-29</h3>
@@ -233,7 +234,7 @@
 
       <h3>Version Code Android (Play Store)</h3>
       <ul class="feature-list">
-        <li>v4.10.3 -> versionCode <strong>525</strong>.</li>
+        <li>v4.10.4 -> versionCode <strong>525</strong>.</li>
         <li>v4.10.2 -> versionCode <strong>524</strong>.</li>
         <li>v4.10.1 -> versionCode <strong>523</strong> (publicada en Prueba cerrada - Alpha).</li>
         <li>Incremental por build: Private/build-and-upload.ps1 auto-incrementa.</li>
@@ -250,7 +251,7 @@
   </main>
 
   <footer class="manual-footer">
-    <p>LIVESTOCK MANAGER v4.10.3 — Changelog</p>
+    <p>LIVESTOCK MANAGER v4.10.4 — Changelog</p>
     <p class="copyright">Generado 2026-08-07</p>
   </footer>
 </body>
