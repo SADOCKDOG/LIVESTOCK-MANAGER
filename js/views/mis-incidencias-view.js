@@ -1,12 +1,16 @@
 /**
- * Livestock Manager - MisIncidenciasView v1.0.0
+ * Livestock Manager - MisIncidenciasView v1.1.0
  *
- * Listado de las incidencias propias con su estado. El usuario nunca ve GitHub:
- * aqui solo hay incidencias con estado en espanol.
+ * Listado de las incidencias propias, con su estado y con las respuestas del
+ * equipo. El usuario nunca ve GitHub: aqui solo hay incidencias con estado en
+ * espanol y mensajes, no issues ni comentarios.
  *
- * No exige licencia activa: quien la deja caducar sigue viendo lo que reporto,
- * aunque no pueda abrir nada nuevo.
+ * No exige licencia activa: quien la deja caducar sigue viendo lo que reporto
+ * y lo que le han contestado, aunque no pueda abrir nada nuevo.
  */
+
+/** Ultima respuesta ya vista de cada incidencia, para marcar las nuevas. */
+const CLAVE_LEIDAS = 'livestock_incidencias_leidas';
 
 const MisIncidenciasView = {
   _cargando: false,
@@ -75,6 +79,17 @@ const MisIncidenciasView = {
     const estado = window.SupportAPI.textoEstado(incidencia.estado);
     const clase = this._claseEstado(incidencia.estado);
     const id = this._escapar(incidencia.ticket_id);
+    const nuevas = this._tieneRespuestaNueva(incidencia);
+    const cuantas = incidencia.respuestas || 0;
+
+    // El aviso va en la fila, no dentro del detalle: si hubiera que desplegar
+    // para enterarse de que hay respuesta, no serviria de aviso.
+    const marca = nuevas
+      ? '<span class="badge badge-success">Respuesta nueva</span>'
+      : cuantas
+        ? `<span class="text-gray text-sm">${cuantas} ${cuantas === 1 ? 'respuesta' : 'respuestas'}</span>`
+        : '';
+
     return `
       <div class="card-registro mb-10" data-ticket="${id}">
         <div class="flex items-center justify-between gap-10"
@@ -84,16 +99,55 @@ const MisIncidenciasView = {
             <div class="font-bold">${this._escapar(incidencia.titulo)}</div>
             <div class="text-gray text-sm">${this._fecha(incidencia.created_at)}</div>
           </div>
-          <span class="badge ${clase}">${estado}</span>
+          <div class="flex items-center gap-10">
+            ${marca}
+            <span class="badge ${clase}">${estado}</span>
+          </div>
         </div>
         <div class="mt-10" id="detalle-${id}" hidden></div>
       </div>`;
   },
 
+  // --- Respuestas leidas ----------------------------------------------------
+  //
+  // Se guarda en el dispositivo, no en el servidor: es una comodidad visual y
+  // no merece ni una llamada mas ni un campo por usuario en KV. El precio es
+  // que al cambiar de movil todo vuelve a verse como nuevo, que es el lado
+  // seguro del fallo.
+
+  _leidas() {
+    try {
+      return JSON.parse(localStorage.getItem(CLAVE_LEIDAS) || '{}') || {};
+    } catch (e) {
+      return {};
+    }
+  },
+
+  _marcarLeida(ticketId, fechaUltima) {
+    if (!fechaUltima) return;
+    try {
+      const mapa = this._leidas();
+      mapa[ticketId] = fechaUltima;
+      localStorage.setItem(CLAVE_LEIDAS, JSON.stringify(mapa));
+    } catch (e) {}
+  },
+
+  _tieneRespuestaNueva(incidencia) {
+    if (!incidencia.ultima_respuesta_at) return false;
+    const vista = this._leidas()[incidencia.ticket_id];
+    if (!vista) return true;
+    return Date.parse(incidencia.ultima_respuesta_at) > Date.parse(vista);
+  },
+
   /**
-   * Abre o cierra el detalle de una incidencia. El backend solo guarda
-   * metadatos (la descripcion vive en el issue de GitHub), asi que aqui se
-   * muestra lo que hay: identificador, severidad y ultima actualizacion.
+   * Abre o cierra el detalle. Muestra los metadatos y el hilo de respuestas
+   * del equipo; la descripcion original no se guarda en el backend, vive en el
+   * issue, y el usuario ya sabe lo que escribio.
+   *
+   * Se pide al servidor cada vez que se abre: antes se cacheaba porque los
+   * metadatos no cambiaban, pero ahora puede haber llegado una respuesta y
+   * ensenar una copia vieja seria justo el fallo que esta pantalla existe para
+   * evitar.
    */
   async alternarDetalle(ticketId) {
     const caja = document.getElementById('detalle-' + ticketId);
@@ -105,14 +159,20 @@ const MisIncidenciasView = {
     }
 
     caja.hidden = false;
-    // Solo se pide una vez: los metadatos no cambian mientras la vista vive.
-    if (caja.dataset.cargado === '1') return;
     caja.innerHTML = '<p class="text-gray text-sm">Cargando…</p>';
 
     try {
       const d = await window.SupportAPI.detalleIncidencia(ticketId);
       caja.innerHTML = this._detalle(d);
-      caja.dataset.cargado = '1';
+
+      // Abrir el detalle es leerlo: se marca la ultima respuesta como vista y
+      // se repinta la lista para que desaparezca el aviso.
+      const respuestas = (d && d.respuestas) || [];
+      if (respuestas.length) {
+        this._marcarLeida(ticketId, respuestas[respuestas.length - 1].fecha);
+        const fila = document.querySelector(`[data-ticket="${ticketId}"] .badge-success`);
+        if (fila && fila.textContent === 'Respuesta nueva') fila.remove();
+      }
     } catch (e) {
       caja.innerHTML = `<p class="text-gray text-sm">${this._escapar(
         (e && e.message) || 'No se pudo cargar la incidencia',
@@ -129,6 +189,8 @@ const MisIncidenciasView = {
       ['Reportada', this._fecha(d.created_at)],
       ['Actualizada', this._fecha(d.updated_at)],
     ];
+    if (d.cerrada_at) filas.push(['Resuelta', this._fecha(d.cerrada_at)]);
+
     return `
       <div class="detalle-incidencia"
            style="border-top:1px solid rgba(255,255,255,0.10); padding-top:10px">
@@ -142,10 +204,60 @@ const MisIncidenciasView = {
           </div>`,
           )
           .join('')}
-        <p class="text-gray text-sm mt-10">
-          Cuando el equipo responda, el estado cambiará aquí.
-        </p>
+        ${this._hilo(d)}
       </div>`;
+  },
+
+  /** Respuestas del equipo, de la mas antigua a la mas reciente. */
+  _hilo(d) {
+    const respuestas = (d && d.respuestas) || [];
+
+    if (!respuestas.length) {
+      return `
+        <p class="text-gray text-sm mt-10">
+          ${
+            d.estado === 'resuelta'
+              ? 'Esta incidencia se ha dado por resuelta.'
+              : 'Cuando el equipo responda, lo verás aquí.'
+          }
+        </p>`;
+    }
+
+    return `
+      <div class="mt-15">
+        <div class="text-gray text-sm mb-10">Respuestas del equipo</div>
+        ${respuestas.map((r) => this._mensaje(r)).join('')}
+      </div>`;
+  },
+
+  _mensaje(r) {
+    // El texto llega de GitHub en Markdown. No se interpreta: se escapa y se
+    // respetan los saltos de linea. Renderizar Markdown aqui significaria
+    // meter HTML de terceros en la pantalla del usuario a cambio de casi nada.
+    const texto = this._escapar(r.texto).replace(/\n/g, '<br>');
+    return `
+      <div class="mb-10 p-10"
+           style="background:rgba(255,255,255,0.04); border-radius:8px;
+                  border-left:3px solid ${r.cierre ? 'var(--color-success, #7cc00b)' : 'rgba(255,255,255,0.15)'}">
+        <div class="text-gray text-sm mb-5">
+          ${r.cierre ? 'Cierre · ' : ''}${this._fechaHora(r.fecha)}
+        </div>
+        <div class="text-sm">${texto}</div>
+      </div>`;
+  },
+
+  _fechaHora(iso) {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (e) {
+      return '';
+    }
   },
 
   _textoSeveridad(sev) {

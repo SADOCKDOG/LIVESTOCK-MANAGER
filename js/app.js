@@ -116,6 +116,12 @@ const App = {
       if (window.NotificacionesService) {
         window.NotificacionesService.init().catch(e => console.warn('[App] Error init notificaciones:', e));
       }
+      // Avisa de las respuestas del soporte. No bloquea el arranque: si no hay
+      // red o no hay licencia, se calla y lo reintenta al volver al primer plano.
+      if (window.AvisosSoporteService) {
+        try { window.AvisosSoporteService.init(); }
+        catch (e) { console.warn('[App] Error init avisos de soporte:', e); }
+      }
 
       this._setupOfflineIndicator();
 
