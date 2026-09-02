@@ -214,3 +214,68 @@ body[data-modo="claro"] .btn-erp-pagi {
 .erp-data-table td.erp-cell-aviso    { color: var(--c-warning, #B45309); font-weight: 800; }
 .erp-data-table td.erp-cell-info     { color: var(--c-info, #1F5FA8); font-weight: 800; }
 .erp-data-table td.erp-cell-tenue    { color: var(--text-d, #777); }
+
+/* ---------------------------------------------------------------------------
+   Conmutador Tarjetas / Tabla ERP: estado activo
+   ---------------------------------------------------------------------------
+   _setVistaModo pintaba el estado activo con `style.background` inline. El boton
+   NO activo se quedaba en `transparent`, asi que su unica presencia visible eran
+   el borde y el color de texto de .btn-erp-secondary. `.btn-sm` (css/styles.css)
+   declara `border: none`, de ahi la especificidad reforzada.
+   --------------------------------------------------------------------------- */
+.btn-erp-secondary.btn-sm {
+  border: 1px solid var(--border, #27272A);
+  color: var(--text-p, #FFF);
+}
+
+.btn-erp-secondary.is-activa,
+.btn-erp-secondary.btn-sm.is-activa {
+  background: var(--brand, #1F5FA8);
+  border-color: var(--brand, #1F5FA8);
+  color: #FFFFFF;
+}
+
+body[data-modo="claro"] .btn-erp-secondary.is-activa {
+  color: #FFFFFF;
+}
+
+/* ---------------------------------------------------------------------------
+   Movil vertical (<1024px)
+   ---------------------------------------------------------------------------
+   ErpDataTable se pinta tambien en telefono. Aqui se compacta la densidad y se
+   garantiza que el desbordamiento lateral haga scroll DENTRO de la tabla: body
+   y main#app-content usan `overflow-x: clip` (css/styles.css:21 y :316), que
+   recorta pero NO crea carril de scroll; sin esto las columnas de la derecha
+   quedaban cortadas e inalcanzables.
+   --------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .erp-table-wrapper {
+    margin-bottom: 14px;
+    border-radius: var(--r-sm, 8px);
+  }
+
+  .erp-table-responsive {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .erp-table-toolbar { padding: 8px 10px; gap: 8px; }
+  .erp-table-search  { width: 100%; }
+
+  .erp-data-table    { font-size: 0.78rem; }
+  .erp-data-table th { padding: 6px 8px; }
+  .erp-data-table td { padding: 6px 8px; }
+
+  /* .btn-sm impone min-height:48px; dentro de una celda hincha cada fila. */
+  .erp-data-table .btn-sm,
+  .erp-table-toolbar .btn-sm,
+  .erp-vista-toggle .btn-sm {
+    min-height: 32px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .erp-table-pagination { padding: 8px 10px; }
+}

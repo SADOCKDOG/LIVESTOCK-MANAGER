@@ -196,7 +196,7 @@ const DocumentosView = {
       this._setupFilters();
 
       // Restaurar modo de vista (por defecto "tabla" en escritorio ≥ 1024px)
-      const modoGuardado = localStorage.getItem('documentos_view_mode') || 'tabla';
+      const modoGuardado = localStorage.getItem('documentos_view_mode') || (window.innerWidth >= 1024 ? 'tabla' : 'cards');
       this._setVistaModo(modoGuardado, false);
     } catch (e) {
       console.error('[Documentos] Error:', e);
@@ -515,8 +515,8 @@ const DocumentosView = {
     const notaMas = document.getElementById('docs-mas-nota');
 
     if (btnCards && btnTabla) {
-      btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-      btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+      btnCards.classList.toggle('is-activa', modo === 'cards');
+      btnTabla.classList.toggle('is-activa', modo === 'tabla');
     }
 
     if (modo === 'tabla') {

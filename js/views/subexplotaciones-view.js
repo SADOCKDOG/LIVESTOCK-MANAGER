@@ -102,7 +102,7 @@ const SubexplotacionesView = {
     main.innerHTML = html;
 
     if (this._cache.length > 0) {
-      const modoGuardado = localStorage.getItem('subexplotaciones_view_mode') || 'tabla';
+      const modoGuardado = localStorage.getItem('subexplotaciones_view_mode') || (window.innerWidth >= 1024 ? 'tabla' : 'cards');
       this._setVistaModo(modoGuardado, false);
     }
   },
@@ -120,8 +120,8 @@ const SubexplotacionesView = {
     const contenedorTabla = document.getElementById('subexp-erp-table-container');
 
     if (btnCards && btnTabla) {
-      btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-      btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+      btnCards.classList.toggle('is-activa', modo === 'cards');
+      btnTabla.classList.toggle('is-activa', modo === 'tabla');
     }
 
     if (modo === 'tabla') {

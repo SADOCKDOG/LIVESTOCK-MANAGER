@@ -251,7 +251,7 @@ const SanidadView = {
         ${this.renderHistorial(this.enriquecer(tratamientosFiltrados))}
         <div id="sanidad-erp-table-container" class="mt-12" style="display:none;"></div>
         </div>`;
-    const modoGuardado = localStorage.getItem('sanidad_view_mode') || 'tabla';
+    const modoGuardado = localStorage.getItem('sanidad_view_mode') || (window.innerWidth >= 1024 ? 'tabla' : 'cards');
     this._setVistaModo(modoGuardado, false);
 
     // FAB Guía interactiva
@@ -282,8 +282,8 @@ const SanidadView = {
     const contenedorTabla = document.getElementById('sanidad-erp-table-container');
 
     if (btnCards && btnTabla) {
-      btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-      btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+      btnCards.classList.toggle('is-activa', modo === 'cards');
+      btnTabla.classList.toggle('is-activa', modo === 'tabla');
     }
 
     if (modo === 'tabla') {

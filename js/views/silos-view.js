@@ -174,8 +174,8 @@ const SilosView = {
         const btnTabla = document.getElementById('btn-silos-vista-tabla');
         const lista = document.getElementById('silos-lista');
         const tablaC = document.getElementById('silos-erp-table-container');
-        if (btnCards) btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-        if (btnTabla) btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+        if (btnCards) btnCards.classList.toggle('is-activa', modo === 'cards');
+        if (btnTabla) btnTabla.classList.toggle('is-activa', modo === 'tabla');
         if (lista) lista.style.display = modo === 'cards' ? '' : 'none';
         if (tablaC) {
             if (modo === 'tabla') {

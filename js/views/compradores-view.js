@@ -165,7 +165,7 @@ const CompradoresView = {
       this._renderListaCompradores(this._cachedData.compradores);
 
       // Restaurar modo de vista (por defecto "tabla" en escritorio ≥ 1024px)
-      const modoGuardado = localStorage.getItem('compradores_view_mode') || 'tabla';
+      const modoGuardado = localStorage.getItem('compradores_view_mode') || (window.innerWidth >= 1024 ? 'tabla' : 'cards');
       this._setVistaModo(modoGuardado, false);
     } else {
       this._cachedData = { contratos: this._filtrarContratos(this._cachedContratos || []) };
@@ -413,8 +413,8 @@ const CompradoresView = {
     const contenedorTabla = document.getElementById('compradores-erp-table-container');
 
     if (btnCards && btnTabla) {
-      btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-      btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+      btnCards.classList.toggle('is-activa', modo === 'cards');
+      btnTabla.classList.toggle('is-activa', modo === 'tabla');
     }
 
     if (modo === 'tabla') {
