@@ -166,16 +166,25 @@ class ErpDataTable {
     // con «#» (referencias tipo «Fra. #123», lotes) truncaba el fichero por ahi
     // sin avisar. El Blob ademas no tiene el limite de tamano del data: URI.
     const csvContent = '﻿' + [headers, ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
     // El CSV exporta lo que se ve (filteredData), no toda la tabla. Cuando hay
     // busqueda activa eso significa menos filas de las que existen, asi que se
     // marca en el nombre: sin el sufijo, un fichero incompleto es
     // indistinguible de uno completo al abrirlo semanas despues.
     const sufijo = this.searchTerm ? '_filtrado' : '';
     const nombre = `${this.title.toLowerCase().replace(/\s+/g, '_')}${sufijo}_${new Date().toISOString().slice(0,10)}.csv`;
+
+    // En Android el WebView de Capacitor ignora <a download>: el fichero nunca
+    // llegaba a guardarse y el boton parecia no hacer nada. ExportService ya
+    // resuelve el caso nativo (Filesystem + Share) y cae al blob en navegador.
+    if (window.ExportService && typeof window.ExportService.descargar === 'function') {
+      window.ExportService.descargar(csvContent, nombre, 'text/csv;charset=utf-8;');
+      return;
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
     link.setAttribute('download', nombre);
     document.body.appendChild(link);
     link.click();
@@ -209,7 +218,7 @@ class ErpDataTable {
               Mostrando <strong>${total ? startIdx + 1 : 0}–${endIdx}</strong> de <strong>${total}</strong>
             </span>
             ${this.exportable ? `
-              <button class="btn-erp-secondary btn-sm" onclick="window['dt_${this.containerId}'].exportCSV()" title="Exportar vista a CSV">
+              <button class="btn-erp-secondary btn-sm erp-btn-csv" onclick="window['dt_${this.containerId}'].exportCSV()" title="Exportar vista a CSV">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 CSV
               </button>
