@@ -57,9 +57,9 @@ const MisIncidenciasView = {
    */
   _cabecera() {
     return `
-      <div class="mb-20">
+      <div class="p-16 mb-20">
         <a href="#/ajustes" class="link-back">← Volver a Ajustes</a>
-        <h2 class="mt-10 font-900 uppercase tracking-wider">
+        <h2 class="mt-10 font-900 uppercase tracking-wider text-white">
           <span style="color: var(--neon);">|</span> MIS INCIDENCIAS
         </h2>
       </div>`;
