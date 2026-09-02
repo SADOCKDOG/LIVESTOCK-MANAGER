@@ -32,6 +32,38 @@ class ErpDataTable {
     this.searchTerm = '';
 
     this.filteredData = [...this.rawData];
+
+    this._heredarEstado();
+  }
+
+  /**
+   * Las vistas repintan la tabla creando una instancia nueva en cada refresco
+   * (new window.ErpDataTable({...}).render()): al guardar un registro, al
+   * teclear en el buscador propio de la vista, al cambiar de submodulo... Sin
+   * esto, cada repintado devolvia la tabla a la pagina 1, sin orden y sin el
+   * texto que el usuario habia escrito en el buscador de la tabla, en silencio.
+   * render() ya registra la instancia en window['dt_<containerId>'], asi que
+   * basta con recoger de ahi el estado de la anterior. Solo se hereda si las
+   * columnas siguen siendo las mismas: si cambian, el orden y la busqueda
+   * anteriores ya no son aplicables.
+   */
+  _heredarEstado() {
+    const previa = typeof window !== 'undefined' && window['dt_' + this.containerId];
+    if (!previa || previa === this || !Array.isArray(previa.columns)) return;
+
+    const mismasColumnas = previa.columns.length === this.columns.length
+      && previa.columns.every((c, i) => c && this.columns[i] && c.key === this.columns[i].key);
+    if (!mismasColumnas) return;
+
+    this.searchTerm = previa.searchTerm || '';
+    this.sortKey = previa.sortKey || null;
+    this.sortAsc = previa.sortAsc !== false;
+
+    if (this.searchTerm || this.sortKey) this.applyFiltersAndSort();
+
+    // La pagina solo se conserva si sigue existiendo tras el nuevo filtrado.
+    const paginas = Math.max(1, Math.ceil(this.filteredData.length / this.pageSize));
+    this.currentPage = Math.min(Math.max(1, previa.currentPage || 1), paginas);
   }
 
   updateData(newData) {
@@ -293,6 +325,39 @@ class ErpDataTable {
 
     container.innerHTML = html;
     window[`dt_${this.containerId}`] = this;
+    this._ocultarBuscadorDeVista(container);
+  }
+
+  /**
+   * Las vistas nacieron en movil con tarjetas y su propio buscador. La tabla
+   * ERP llego despues como componente autonomo, con buscador propio, y nadie
+   * retiro el de la vista: en modo tabla se veian dos cajas de busqueda con
+   * estados independientes, y la de la vista, ademas, repintaba la tabla desde
+   * cero. Aqui se esconde la de la vista mientras la tabla esta en pantalla,
+   * porque la de la tabla busca en todas las columnas y mantiene coherentes el
+   * orden, la paginacion y la exportacion a CSV.
+   *
+   * Se oculta solo el buscador emparejado con esta tabla (el mas cercano
+   * subiendo por los ancestros), no todos los de la pagina: hay vistas con
+   * varias secciones y solo una de ellas lleva tabla.
+   */
+  _ocultarBuscadorDeVista(container) {
+    let ancestro = container.parentElement;
+    for (let i = 0; ancestro && i < 6; i++, ancestro = ancestro.parentElement) {
+      const propio = Array.from(ancestro.querySelectorAll('input.search-input'))
+        .find(el => !container.contains(el));
+      if (!propio) continue;
+
+      // Si el input va solo en su envoltorio, se oculta el envoltorio entero
+      // para no dejar un hueco con los margenes del contenedor vacio.
+      const padre = propio.parentElement;
+      const soloEl = padre && padre !== ancestro
+        && padre.children.length === 1 && !padre.textContent.trim();
+      const objetivo = soloEl ? padre : propio;
+      objetivo.style.display = 'none';
+      objetivo.setAttribute('data-buscador-vista-oculto', 'tabla-erp');
+      return;
+    }
   }
 
   goToPage(page) {
