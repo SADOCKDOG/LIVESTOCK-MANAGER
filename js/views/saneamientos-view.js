@@ -73,10 +73,6 @@ const SaneamientosView = {
               ${registros.length} ${registros.length === 1 ? 'campaña' : 'campañas'}
             </div>
           </div>
-          <div class="ml-auto flex gap-6">
-            <button class="btn-erp-secondary btn-sm" id="btn-sane-vista-cards" onclick="SaneamientosView._setVistaModo('cards')">Tarjetas</button>
-            <button class="btn-erp-secondary btn-sm" id="btn-sane-vista-tabla" onclick="SaneamientosView._setVistaModo('tabla')">Tabla ERP</button>
-          </div>
         </div>
         <fieldset class="erp-action-group">
           <legend>Registro de Saneamientos</legend>
@@ -96,7 +92,7 @@ const SaneamientosView = {
 
     // Restaurar modo de vista (por defecto "tabla" en escritorio >= 1024px)
     if (this._cache.length > 0) {
-      const modoGuardado = localStorage.getItem('saneamientos_view_mode') || (window.innerWidth >= 1024 ? 'tabla' : 'cards');
+      const modoGuardado = VistaRegistros.get();
       this._setVistaModo(modoGuardado, false);
     }
   },
@@ -104,19 +100,10 @@ const SaneamientosView = {
   /** Alterna entre el listado de tarjetas (móvil) y la tabla densa ERP (escritorio). */
   _setVistaModo(modo, guardar = true) {
     this._vistaModo = modo;
-    if (guardar) {
-      try { localStorage.setItem('saneamientos_view_mode', modo); } catch (_) {}
-    }
 
-    const btnCards = document.getElementById('btn-sane-vista-cards');
-    const btnTabla = document.getElementById('btn-sane-vista-tabla');
     const contenedorCards = document.getElementById('san-lista');
     const contenedorTabla = document.getElementById('san-erp-table-container');
 
-    if (btnCards && btnTabla) {
-      btnCards.classList.toggle('is-activa', modo === 'cards');
-      btnTabla.classList.toggle('is-activa', modo === 'tabla');
-    }
 
     if (modo === 'tabla') {
       if (contenedorCards) contenedorCards.style.display = 'none';

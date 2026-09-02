@@ -23,9 +23,12 @@ const MisIncidenciasView = {
         ${this._cabecera()}
         <div class="card p-20 mt-10">
           <p class="text-gray mt-10">Entra en Soporte para ver tus incidencias.</p>
-          <div class="erp-action-group mt-20">
-            <button class="btn btn-primary" onclick="location.hash='#/soporte'">Ir a Soporte</button>
-          </div>
+          <fieldset class="erp-action-group erp-action-group--centro mt-20">
+            <legend>Soporte</legend>
+            <div class="erp-action-group-body">
+              <button class="btn btn-primary" onclick="location.hash='#/soporte'">Ir a Soporte</button>
+            </div>
+          </fieldset>
         </div>`;
       return;
     }
@@ -36,14 +39,17 @@ const MisIncidenciasView = {
         <div id="incidencias-lista" class="mt-10">
           <p class="text-gray">Cargando…</p>
         </div>
-        <div class="erp-action-group mt-20">
-          <button class="btn btn-primary" onclick="location.hash='#/soporte'">
-            Contar una incidencia
-          </button>
-          <button class="btn btn-secondary" onclick="MisIncidenciasView.recargar()">
-            Actualizar
-          </button>
-        </div>
+        <fieldset class="erp-action-group erp-action-group--centro mt-20">
+          <legend>Acciones</legend>
+          <div class="erp-action-group-body">
+            <button class="btn btn-primary" onclick="location.hash='#/soporte'">
+              Contar una incidencia
+            </button>
+            <button class="btn btn-secondary" onclick="MisIncidenciasView.recargar()">
+              Actualizar
+            </button>
+          </div>
+        </fieldset>
       </div>
       ${this._ayuda()}`;
 
