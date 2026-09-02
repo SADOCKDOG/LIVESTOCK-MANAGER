@@ -58,12 +58,15 @@
     <link rel="stylesheet" href="css/styles.css?v=6.78" />
     <link rel="stylesheet" href="css/layout.css?v=6.78" />
 
-    <!-- Piel ERP de escritorio. Cargan SOLO en >=1024px vía el atributo media,
-         asi que en movil el navegador ni las aplica y Android conserva su
-         paleta neon y su chrome (header + bottom-nav) intactos. -->
+    <!-- Piel ERP. erp-tokens/erp-sidebar/erp-overrides cargan SOLO en >=1024px
+         via el atributo media, asi que en movil Android conserva su paleta neon
+         y su chrome (header + bottom-nav) intactos.
+         erp-data-table.css SI carga siempre: el componente ErpDataTable se pinta
+         tambien en movil, y sin su CSS la tabla salia sin estilos y con los
+         botones del conmutador invisibles. Su bloque <1024px va al final del fichero. -->
     <link rel="stylesheet" href="css/erp-tokens.css?v=6.78" media="(min-width: 1024px)" />
     <link rel="stylesheet" href="css/erp-sidebar.css?v=6.78" media="(min-width: 1024px)" />
-    <link rel="stylesheet" href="css/erp-data-table.css?v=6.78" media="(min-width: 1024px)" />
+    <link rel="stylesheet" href="css/erp-data-table.css?v=6.78" />
     <link rel="stylesheet" href="css/erp-overrides.css?v=6.78" media="(min-width: 1024px)" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/Logo aplicación.png" />

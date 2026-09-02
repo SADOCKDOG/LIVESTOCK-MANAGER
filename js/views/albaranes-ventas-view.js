@@ -248,8 +248,8 @@ const AlbaranesVentasView = {
     const contenedorTabla = document.getElementById('alb-erp-table-container');
 
     if (btnCards && btnTabla) {
-      btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-      btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+      btnCards.classList.toggle('is-activa', modo === 'cards');
+      btnTabla.classList.toggle('is-activa', modo === 'tabla');
     }
 
     if (modo === 'tabla') {
@@ -325,7 +325,7 @@ const AlbaranesVentasView = {
 
     this._cacheTabla = filtrados;
     // El modo lo manda la preferencia guardada; por defecto, tabla.
-    const modoGuardado = localStorage.getItem('albaranes_view_mode') || 'tabla';
+    const modoGuardado = localStorage.getItem('albaranes_view_mode') || (window.innerWidth >= 1024 ? 'tabla' : 'cards');
     setTimeout(() => this._setVistaModo(modoGuardado, false), 0);
 
     if (!filtrados.length) {

@@ -279,8 +279,8 @@ const RebanosView = {
     const contenedorTabla = document.getElementById('rebanos-erp-table-container');
 
     if (btnCards && btnTabla) {
-      btnCards.style.background = modo === 'cards' ? 'var(--brand, #1F5FA8)' : 'transparent';
-      btnTabla.style.background = modo === 'tabla' ? 'var(--brand, #1F5FA8)' : 'transparent';
+      btnCards.classList.toggle('is-activa', modo === 'cards');
+      btnTabla.classList.toggle('is-activa', modo === 'tabla');
     }
 
     if (modo === 'tabla') {
