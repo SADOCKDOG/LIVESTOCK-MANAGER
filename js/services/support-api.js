@@ -196,6 +196,18 @@
       return this._peticion('/tickets/' + encodeURIComponent(ticketId));
     },
 
+    /**
+     * Escribe un mensaje en una incidencia ya abierta. Devuelve la respuesta
+     * tal y como queda guardada, para pintarla sin recargar el hilo entero.
+     */
+    async responderIncidencia(ticketId, texto) {
+      var datos = await this._peticion(
+        '/tickets/' + encodeURIComponent(ticketId) + '/responder',
+        { method: 'POST', body: { texto: texto } },
+      );
+      return (datos && datos.respuesta) || null;
+    },
+
     // --- Respuestas leidas ---------------------------------------------------
     //
     // Viven aqui y no en la vista porque hay dos consumidores: la lista de
