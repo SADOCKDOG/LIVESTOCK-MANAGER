@@ -208,6 +208,22 @@
       return (datos && datos.respuesta) || null;
     },
 
+    /**
+     * Confirma que la solucion propuesta funciona.
+     *
+     * «Resuelta» la decide el equipo, que no puede saber si al usuario le ha
+     * servido; hasta esta confirmacion es una propuesta. El «no» no se manda
+     * por aqui: es un mensaje normal, y el servidor reabre la incidencia al
+     * recibirlo.
+     */
+    async confirmarResolucion(ticketId) {
+      var datos = await this._peticion(
+        '/tickets/' + encodeURIComponent(ticketId) + '/confirmar',
+        { method: 'POST', body: {} },
+      );
+      return (datos && datos.confirmada_at) || null;
+    },
+
     // --- Respuestas leidas ---------------------------------------------------
     //
     // Viven aqui y no en la vista porque hay dos consumidores: la lista de
@@ -274,7 +290,9 @@
     analizada: 'El asistente la ha analizado y te ha respondido. El equipo la revisará después.',
     revision: 'El equipo la está mirando y puede que te pregunte algo.',
     curso: 'Confirmada como fallo. Se está trabajando en ella.',
-    resuelta: 'Cerrada. Suele llegar en la siguiente actualización de la app.',
+    // 'resuelta' la marca el equipo, no el usuario: mientras no la confirme es
+    // una propuesta, y el texto no debe darla por cerrada a su espalda.
+    resuelta: 'El equipo la da por resuelta. Suele llegar en la siguiente actualización de la app.',
   };
 
   /**
