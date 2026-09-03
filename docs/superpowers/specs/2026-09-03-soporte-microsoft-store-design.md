@@ -60,7 +60,8 @@ Microsoft, no se dio por supuesto:
 4. **Tauri no genera MSIX de serie.** Su ruta oficial a la Store es una ficha que enlaza a un
    instalador externo: sin identidad de paquete, sin `StoreContext`, sin complementos. Se usa
    el empaquetador comunitario `@choochmeque/tauri-windows-bundle`.
-5. **La Digital Goods API sí existe** en Edge desde `134.0.3124.51`, en todos los canales. El
+5. **La Digital Goods API sí existe** en Edge desde `134.0.3124.51`, en todos los canales,
+   **pero no dentro de Tauri** (ver «Corrección del 3 sep 2026» al final). El
    README de `livestock-pwa-msix` dice lo contrario y está obsoleto: su propio
    `js/purchase-manager.js` ya la usa.
 6. **`livestock-pwa-msix/js/purchase-manager.js` ya tiene escrita la compra completa**:
@@ -123,9 +124,11 @@ través de `IInitializeWithWindow` —sin eso, WinRT lanza en una aplicación de
 `GetCustomerCollectionsIdAsync(ticket, publisher_user_id)`. Devuelve la Store ID key. El
 frontend lo llama con `window.__TAURI__.core.invoke('obtener_store_id_key', ...)`.
 
-Esa es toda la superficie nativa. Ni el pago, ni la identidad, ni la verificación viven en
-Rust: el pago lo hace la Digital Goods API dentro del WebView2, y la verificación el Worker.
-Tauri es el puente hacia WinRT porque el WebView2 no puede llegar solo, y punto.
+La superficie nativa son **dos** comandos, no uno: `obtener_store_id_key` y
+`comprar_complemento` (`StoreContext::RequestPurchaseAsync`, también con `IInitializeWithWindow`).
+La identidad y la verificación siguen fuera de Rust: de eso se encarga el Worker. Ver
+«Corrección del 3 sep 2026» al final: el pago tuvo que bajar a Rust porque la Digital Goods API
+no funciona dentro del WebView2 de Tauri.
 
 **Lo que le cambia: cómo se empaqueta.** Aquí está el único conflicto real con Tauri. Sus
 objetivos de `bundle` son MSI y NSIS —instaladores—, y la ruta oficial de Tauri a la Microsoft
@@ -149,8 +152,8 @@ que garantiza que el frontend empaquetado sea el sincronizado desde `LIVESTOCK-M
 
 ## 4. Compra y verificación
 
-La compra usa el código ya escrito (Digital Goods API + Payment Request API). La verificación
-son tres saltos:
+La compra la abre WinRT (`comprar_complemento`), no la Digital Goods API — ver «Corrección del
+3 sep 2026». La verificación son tres saltos:
 
 1. **La app pide un ticket.** `POST /auth/ms/ticket`. El Worker obtiene de Entra ID un token
    con audiencia `https://onestore.microsoft.com` usando su secreto de cliente, que **nunca
@@ -229,7 +232,8 @@ reconciliarse con la ficha de la Store.
 
 | Fallo | Comportamiento |
 |---|---|
-| No hay Digital Goods (ejecución fuera de la Store) | El soporte simplemente no se ofrece; la app funciona igual |
+| No hay puente nativo (ejecución fuera de la app instalada) | El soporte simplemente no se ofrece; la app funciona igual |
+| El usuario cierra el diálogo de compra | `RequestPurchaseAsync` devuelve `NotPurchased`; se trata como cancelación, no como error |
 | Entra ID caído | 502; la sesión anterior sigue válida hasta caducar |
 | `GetCustomerCollectionsIdAsync` lanza | Mensaje claro; no se concede nada |
 | API de colecciones caída | `comprobarLicencia` lanza → `comprobacion-fallida` → **el enlace de instalación se queda intacto** |
@@ -264,3 +268,36 @@ Los pasos 1 y 2 ya dejan algo demostrable.
 
 **Coste:** Entra ID es gratuito, el KV ya existe, la app sigue siendo gratuita. Microsoft se
 lleva el 15 % del complemento.
+
+---
+
+## Corrección del 3 sep 2026 — la compra va por WinRT, no por Digital Goods
+
+Al probar el vuelo 4.11.0.0 instalado desde la Store, la pantalla de soporte falló con
+«unsupported context». `window.getDigitalGoodsService` **existe** en el WebView2 de Tauri, pero
+rechaza: Chromium solo habilita esa API (y el método de pago `microsoft.com/…` de
+`PaymentRequest`) en aplicaciones instaladas *desde* la Store —PWA o TWA—, y un WebView2
+embebido en un host Win32 no lo es.
+
+La restricción queda invertida respecto a lo que asumía esta spec, escrita para la PWA MSIX:
+
+| | PWA empaquetada (MSIX) | App de escritorio (Tauri) |
+|---|---|---|
+| WinRT / `StoreContext` | No | **Sí** |
+| Digital Goods + Payment Request | Sí | **No** |
+
+**Consecuencias, ya implementadas** en `livestock-desktop`:
+
+- `comprar_complemento(hwnd, store_id)` en `src-tauri/src/store_winrt.rs`, expuesto como comando
+  Tauri en `main.rs`, llama a `StoreContext::RequestPurchaseAsync`.
+- **`RequestPurchaseAsync` quiere el Store ID del complemento (`9P4577W3B0D2`), no el Product ID.**
+  El Product ID (`support_unlock`) sigue siendo lo que devuelve la API de colecciones en
+  `inAppOfferToken` y lo que filtra el Worker; son identificadores distintos y no intercambiables.
+- `StorePurchaseStatus::AlreadyPurchased` cuenta como éxito y `NotPurchased` como cancelación.
+  Pagar no concede licencia por sí solo: quien la acredita sigue siendo el servidor, tras
+  `revalidar()`.
+- `frontend/js/services/soporte-store.js` ya no contiene `getDigitalGoodsService` ni
+  `PaymentRequest`. El bloque de Digital Goods que queda en `purchase-manager.js` pertenece al
+  camino de la PWA y no se ejecuta en el build de escritorio (`FREE_MODE = false`).
+
+El hallazgo 6 sigue siendo cierto para `livestock-pwa-msix`; deja de serlo para el escritorio.
