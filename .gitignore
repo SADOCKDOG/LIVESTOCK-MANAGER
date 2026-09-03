@@ -33,6 +33,7 @@ android/.proxyai/
 # Logs de sesión y herramientas ad-hoc de asistentes IA (ver repo-cleanup-2026-07)
 session-*.md
 tools/
+.agents/
 .claude/
 .codebuddy/
 .codex/
@@ -63,3 +64,8 @@ android/app/*.jks
 android/app/service-account.json
 android/keystore.properties
 android/app/src/main/assets/public/js/
+
+# Copias de seguridad de ficheros fuente: acababan dentro del AAB.
+*.backup
+*.bak
+*.orig

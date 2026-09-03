@@ -71,9 +71,6 @@ const RebanosView = {
             <div class="text-[0.6rem] text-gray uppercase font-900">Activos: <strong class="text-success">${rebanosActivos}</strong></div>
           </div>
         </div>
-        <div class="module-header-primary-action">
-          <button class="btn btn-create btn-lg w-full" data-guide="btn-nuevo-rebano" onclick="RebanosView._crearRebano()">${Icons.agregar()} Nuevo Rebaño</button>
-        </div>
       </div>
 
       ${window.ModoContextoHelper.bannerOcultosPorModo(ocultosPorModo, 'rebaño', 'rebaños')}
@@ -115,9 +112,16 @@ const RebanosView = {
       </div>
 
       <div class="mb-14">
-        <!-- Filtro de búsqueda integrado (controla el listado) -->
-        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; gap: 4px;">
-          ${Icons.rebanos()} LISTA DE REBAÑOS
+        <!-- Filtro de búsqueda e interruptor de vista (Tarjetas / Tabla ERP) -->
+        <fieldset class="erp-action-group">
+          <legend>Registro de Rebaños</legend>
+          <div class="erp-action-group-body">
+            <button class="widget-link-btn widget-link-btn--neon neon-success" data-guide="btn-nuevo-rebano" onclick="RebanosView._crearRebano()">${Icons.agregar()}<span class="widget-link-label">Nuevo Rebaño</span></button>
+          </div>
+        </fieldset>
+
+        <div class="text-xs text-gray uppercase font-extrabold tracking-wider border-bottom-222 mb-10 pb-5" style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+          <span style="display: flex; align-items: center; gap: 4px;">${Icons.rebanos()} LISTA DE REBAÑOS</span>
         </div>
         <div class="flex gap-8 items-center mb-12">
           <div class="relative flex-1 min-w-0">
@@ -127,11 +131,17 @@ const RebanosView = {
           </div>
         </div>
       </div>
-      <div id="rebanos-content"><div class="loader">Cargando rebaños...</div></div>`;
+      <div id="rebanos-content"><div class="loader">Cargando rebaños...</div></div>
+      <div id="rebanos-erp-table-container" class="mt-12" style="display:none;"></div>`;
 
     // Actualizar datos filtrados para la lista
     this._cachedData = { rebanos: filteredRebanos, eventos };
     this._renderLista();
+
+    // Inicializar o restaurar modo de vista (por defecto "cards" en móvil, respeta preferencia)
+    const modoGuardado = VistaRegistros.get();
+    RebanosView._setVistaModo(modoGuardado, false);
+
     // FAB Guía interactiva
     if (window.App && typeof App.renderGuideFab === 'function') {
       App.renderGuideFab('/ganaderia', 'rebanos');
@@ -246,6 +256,70 @@ const RebanosView = {
 
     // Volver a renderizar la lista
     this._renderLista();
+
+    // Si el modo activo es la tabla ERP, repintarla también con el filtro aplicado
+    const modoGuardado = VistaRegistros.get();
+    if (modoGuardado === 'tabla') {
+      this._renderErpTable();
+    }
+  },
+
+  _setVistaModo(modo, guardar = true) {
+
+    const contenedorCards = document.getElementById('rebanos-content');
+    const contenedorTabla = document.getElementById('rebanos-erp-table-container');
+
+
+    if (modo === 'tabla') {
+      if (contenedorCards) contenedorCards.style.display = 'none';
+      if (contenedorTabla) {
+        contenedorTabla.style.display = 'block';
+        this._renderErpTable();
+      }
+    } else {
+      if (contenedorTabla) contenedorTabla.style.display = 'none';
+      if (contenedorCards) contenedorCards.style.display = 'block';
+    }
+  },
+
+  _renderErpTable() {
+    const d = this._cachedData;
+    if (!d || !d.rebanos || !window.ErpDataTable) return;
+
+    const tableData = d.rebanos.map(r => ({
+      id: r.id,
+      nombre: r.nombre || 'Sin nombre',
+      tipo: r.tipo || '—',
+      especie: r.especie || '—',
+      codigo_lote: r.codigo_lote || '—',
+      estado: r.estado || 'activo'
+    }));
+
+    new window.ErpDataTable({
+      containerId: 'rebanos-erp-table-container',
+      title: 'Rebaños',
+      pageSize: 15,
+      columns: [
+        { key: 'nombre', label: 'Nombre / Lote', sortable: true, cellClass: 'erp-cell-id' },
+        { key: 'especie', label: 'Especie', sortable: true },
+        { key: 'tipo', label: 'Tipo Producción', sortable: true },
+        { key: 'codigo_lote', label: 'Código Lote', sortable: true },
+        {
+          key: 'estado',
+          label: 'Estado',
+          sortable: true,
+          render: (val) => `<span class="badge ${val === 'inactivo' ? 'badge-gray' : 'badge-success'}">${val}</span>`
+        },
+        {
+          key: 'id',
+          label: 'Ficha',
+          sortable: false,
+          align: 'center',
+          render: (id) => `<button class="btn-erp-secondary btn-sm" onclick="location.hash='/rebano?id=${id}'">Ver Ficha</button>`
+        }
+      ],
+      data: tableData
+    }).render();
   },
 
   _setFiltro(type, value) {
