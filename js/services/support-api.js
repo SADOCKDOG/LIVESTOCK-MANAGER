@@ -121,10 +121,48 @@
     },
 
     /**
+     * Identificador de esta instalacion, guardado en el almacen `meta` de la
+     * base de datos de la app.
+     *
+     * Va ahi y no en localStorage por dos motivos: `meta` entra en la copia de
+     * seguridad (exportBackup vuelca todos los almacenes), y no se pierde al
+     * borrar los datos del navegador interno.
+     *
+     * Para que sirve: la identidad de soporte se deriva del token de compra de
+     * Google, que cambia cuando la suscripcion caduca y se vuelve a comprar. Sin
+     * este id, esa recompra dejaria al ganadero con el historial de incidencias
+     * vacio y el anterior inaccesible.
+     */
+    async _idDeInstalacion() {
+      if (!window.db || typeof window.db.get !== 'function') return '';
+      try {
+        var fila = await window.db.get('meta', 'instalacion_soporte');
+        if (fila && fila.valor) return fila.valor;
+
+        var id =
+          (window.crypto && window.crypto.randomUUID)
+            ? window.crypto.randomUUID()
+            : 'inst-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+
+        await window.db.put('meta', {
+          key: 'instalacion_soporte',
+          valor: id,
+          creadoEn: new Date().toISOString(),
+        });
+        return id;
+      } catch (e) {
+        // Sin id se sigue trabajando: es una red de seguridad, no un requisito.
+        console.warn('[SupportAPI] no se pudo leer el id de instalacion:', e);
+        return '';
+      }
+    },
+
+    /**
      * Valida la compra contra el backend y abre sesion. Se llama al entrar en
      * Soporte y tras comprar la licencia.
      */
-    async iniciarSesion(purchaseToken, plataforma, email) {
+    async iniciarSesion(purchaseToken, plataforma, email, actualizarEmail) {
+      var instalacion = await this._idDeInstalacion();
       var datos = await this._peticion('/auth/verify-purchase', {
         method: 'POST',
         // Esta es la llamada que revalida: no puede reintentarse a si misma.
@@ -133,10 +171,23 @@
           purchase_token: purchaseToken,
           plataforma: plataforma || 'android',
           email: email || '',
+          // Solo cuando el usuario ha editado el campo a proposito. En los
+          // arranques normales el correo va vacio y sin esta marca borraria el
+          // que tuviera guardado.
+          actualizar_email: actualizarEmail === true,
+          instalacion: instalacion,
         },
       });
+      if (datos && email !== undefined && actualizarEmail === true) {
+        datos.email = email || '';
+      }
       this._guardarSesion(datos);
       return datos;
+    },
+
+    /** Correo de contacto tal y como quedo en la ultima sesion. */
+    correoGuardado: function () {
+      return (this._sesion && this._sesion.email) || '';
     },
 
     /**

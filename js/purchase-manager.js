@@ -402,6 +402,20 @@
     },
 
     /**
+     * Guarda (o borra, con cadena vacia) el correo de contacto de soporte.
+     *
+     * Reaprovecha la revalidacion de la compra en vez de estrenar un endpoint:
+     * la sesion se reemite con el correo nuevo y de paso se comprueba que la
+     * licencia sigue viva.
+     */
+    registrarCorreoSoporte: function (correo) {
+      if (!window.SupportAPI) return Promise.reject(new Error('Soporte no disponible.'));
+      var token = this._tokenDeSoporte();
+      if (!token) return Promise.reject(new Error('No hay licencia de soporte activa.'));
+      return window.SupportAPI.iniciarSesion(token, 'android', correo || '', true);
+    },
+
+    /**
      * Manda el token de compra al backend, que lo valida contra Google Play y
      * devuelve la sesion. Nunca se concede la licencia desde el cliente.
      */
