@@ -144,8 +144,34 @@ con este:
    funciona. Si dice que no, la incidencia se reabre y vuelve a `revision`.
 
 El cliente vive en [`js/services/support-api.js`](js/services/support-api.js) y
+
 [`js/views/mis-incidencias-view.js`](js/views/mis-incidencias-view.js). El
+
 usuario nunca ve GitHub.
+
+
+### Cómo se reconoce al usuario
+
+No hay cuentas ni contraseñas. La identidad de soporte se deriva del
+`purchase_token` de la suscripción `support_unlock`, así que sobrevive a un
+borrado de datos o a un móvil nuevo: Google Play restaura el token y el Worker
+vuelve a calcular el mismo `user_id`.
+
+Ese token, sin embargo, **cambia en una recompra** (la suscripción caduca y se
+vuelve a contratar, o se cambia de plan), y con él cambiaría el `user_id`,
+dejando huérfano el historial de incidencias. Para evitarlo se guarda un **id de
+instalación** en el almacén `meta` de IndexedDB, que la app manda en cada
+`/auth/verify-purchase`. Como `exportBackup()` vuelca todos los almacenes, el id
+viaja dentro de la copia de seguridad sin cambiar el formato del fichero.
+
+Antes de adoptar la identidad anterior, el Worker vuelve a consultar a Google el
+token viejo: si sigue activo, hay dos licencias vivas a la vez y no son la misma
+persona (alguien ha restaurado una copia ajena), así que rechaza la adopción.
+
+En **Ajustes → Licencia** se puede añadir un **correo de contacto opcional**,
+como último recurso manual si se pierden las dos anclas anteriores. Es el correo
+de **quien usa la app**, que puede ser un empleado; nunca se prerrellena con el
+de la ficha de finca, que es el del titular de la explotación.
 
 ## Integración SIGGAN / BADIGEX
 

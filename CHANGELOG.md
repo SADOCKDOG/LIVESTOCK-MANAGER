@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v4.10.8] - 2026-09-03
+### Added
+- **Conversación en Mis incidencias:** campo para responder al equipo, respuestas del agente de IA distinguidas de las del equipo humano y estado `analizada` en la leyenda.
+- **Confirmación de resolución:** `resuelta` es una propuesta; la app pregunta al usuario si le funciona y reabre la incidencia si dice que no.
+- **Id de instalación** en el almacén `meta` de IndexedDB, enviado en `/auth/verify-purchase`: mantiene el historial de soporte cuando una recompra cambia el `purchase_token`. Viaja en la copia de seguridad.
+- **Correo de contacto opcional** en Ajustes → Licencia, de quien usa la app (nunca el de la ficha de finca, que es del titular).
+
+### Fixed
+- La cabecera de Mis incidencias no se veía en móvil.
+- La Tabla ERP aparecía sin estilos y con el conmutador invisible en Android; exportación CSV reparada.
+- El buscador de la Tabla ERP se duplicaba y perdía el estado al repintar.
+- El Worker ya no pisa el índice de correos cuando el usuario no tiene ninguno.
+
+### Changed
+- Vista de registros unificada en Ajustes y marco de acciones usable en móvil.
+- Caché del Service Worker a `corcho-v6.81`; versión 4.10.8 (529).
+
 ## [v4.9.0] - 2026-07-17
 ### Added
 - **Interfaz Industrial Premium:** Rediseño completo optimizado para alta visibilidad en exteriores y pantallas OLED.
