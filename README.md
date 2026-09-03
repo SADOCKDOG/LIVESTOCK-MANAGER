@@ -119,6 +119,34 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 
 ---
 
+## Infraestructura de Soporte
+
+La app no es el único repositorio del producto. El soporte al usuario y la
+documentación pública viven en repos propios, sin historial ni build compartido
+con este:
+
+| Repositorio | Qué es | Documentación |
+|---|---|---|
+| [livestock-manager-support-api](https://github.com/SADOCKDOG/livestock-manager-support-api) | Backend de soporte con IA (Cloudflare Worker + KV + Workers AI) | [README](https://github.com/SADOCKDOG/livestock-manager-support-api#readme) — estados, agente, marcadores y confirmación de resolución |
+| [livestock-manager-support-tickets](https://github.com/SADOCKDOG/livestock-manager-support-tickets) | Repo privado donde aterrizan las incidencias como issues | Las etiquetas `estado:*` son el tablero del equipo |
+| [livestock-manager-docs](https://github.com/SADOCKDOG/livestock-manager-docs) | Guías de usuario y política de privacidad publicadas | Sitio estático servido desde `docs/` |
+| [livestock-pwa-msix](https://github.com/SADOCKDOG/livestock-pwa-msix) | Empaquetado de escritorio (MSIX) | `AUDITORIA-DESKTOP-UI-UX.md` |
+
+### Cómo viaja una incidencia
+
+1. El usuario la escribe en la app (**Más → Soporte**). El Worker la estructura
+   con IA y le devuelve un borrador que debe confirmar.
+2. Al confirmar se crea un issue en el repo de tickets y el agente responde:
+   una hipótesis técnica para el equipo y una respuesta para el usuario.
+3. El equipo trabaja con etiquetas `estado:*`. Cada cambio vuelve a la app por
+   webhook: `enviada → analizada → revision → curso → resuelta`.
+4. `resuelta` es una **propuesta**: la app le pregunta al usuario si le
+   funciona. Si dice que no, la incidencia se reabre y vuelve a `revision`.
+
+El cliente vive en [`js/services/support-api.js`](js/services/support-api.js) y
+[`js/views/mis-incidencias-view.js`](js/views/mis-incidencias-view.js). El
+usuario nunca ve GitHub.
+
 ## Integración SIGGAN / BADIGEX
 
 Livestock Manager está diseñado desde cero para cumplir con los requisitos normativos de los sistemas oficiales de gestión ganadera:
@@ -444,6 +472,7 @@ zipalign -c -P 16 -v 4 app/build/outputs/apk/release/app-release.apk
 | [STATUS_BADGE_STANDARD.md](docs/STATUS_BADGE_STANDARD.md) | Estándar de badges retroiluminados |
 | [WIDGET_BUTTON_STANDARD.md](docs/WIDGET_BUTTON_STANDARD.md) | Estándar de botones widget |
 | [PREMIUM-LIMIT-PATTERN.md](memory/premium-limit-pattern.md) | Patrón de límites Free/Premium en capa de datos |
+| [support-api/README](https://github.com/SADOCKDOG/livestock-manager-support-api#readme) | Backend de soporte: estados, agente de IA y confirmación de resolución |
 
 ---
 
