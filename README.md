@@ -119,6 +119,60 @@ Panel de control con KPIs en tiempo real, accesos rápidos y alertas prioritaria
 
 ---
 
+## Infraestructura de Soporte
+
+La app no es el único repositorio del producto. El soporte al usuario y la
+documentación pública viven en repos propios, sin historial ni build compartido
+con este:
+
+| Repositorio | Qué es | Documentación |
+|---|---|---|
+| [livestock-manager-support-api](https://github.com/SADOCKDOG/livestock-manager-support-api) | Backend de soporte con IA (Cloudflare Worker + KV + Workers AI) | [README](https://github.com/SADOCKDOG/livestock-manager-support-api#readme) — estados, agente, marcadores y confirmación de resolución |
+| [livestock-manager-support-tickets](https://github.com/SADOCKDOG/livestock-manager-support-tickets) | Repo privado donde aterrizan las incidencias como issues | Las etiquetas `estado:*` son el tablero del equipo |
+| [livestock-manager-docs](https://github.com/SADOCKDOG/livestock-manager-docs) | Guías de usuario y política de privacidad publicadas | Sitio estático servido desde `docs/` |
+| [livestock-pwa-msix](https://github.com/SADOCKDOG/livestock-pwa-msix) | Empaquetado de escritorio (MSIX) | `AUDITORIA-DESKTOP-UI-UX.md` |
+
+### Cómo viaja una incidencia
+
+1. El usuario la escribe en la app (**Más → Soporte**). El Worker la estructura
+   con IA y le devuelve un borrador que debe confirmar.
+2. Al confirmar se crea un issue en el repo de tickets y el agente responde:
+   una hipótesis técnica para el equipo y una respuesta para el usuario.
+3. El equipo trabaja con etiquetas `estado:*`. Cada cambio vuelve a la app por
+   webhook: `enviada → analizada → revision → curso → resuelta`.
+4. `resuelta` es una **propuesta**: la app le pregunta al usuario si le
+   funciona. Si dice que no, la incidencia se reabre y vuelve a `revision`.
+
+El cliente vive en [`js/services/support-api.js`](js/services/support-api.js) y
+
+[`js/views/mis-incidencias-view.js`](js/views/mis-incidencias-view.js). El
+
+usuario nunca ve GitHub.
+
+
+### Cómo se reconoce al usuario
+
+No hay cuentas ni contraseñas. La identidad de soporte se deriva del
+`purchase_token` de la suscripción `support_unlock`, así que sobrevive a un
+borrado de datos o a un móvil nuevo: Google Play restaura el token y el Worker
+vuelve a calcular el mismo `user_id`.
+
+Ese token, sin embargo, **cambia en una recompra** (la suscripción caduca y se
+vuelve a contratar, o se cambia de plan), y con él cambiaría el `user_id`,
+dejando huérfano el historial de incidencias. Para evitarlo se guarda un **id de
+instalación** en el almacén `meta` de IndexedDB, que la app manda en cada
+`/auth/verify-purchase`. Como `exportBackup()` vuelca todos los almacenes, el id
+viaja dentro de la copia de seguridad sin cambiar el formato del fichero.
+
+Antes de adoptar la identidad anterior, el Worker vuelve a consultar a Google el
+token viejo: si sigue activo, hay dos licencias vivas a la vez y no son la misma
+persona (alguien ha restaurado una copia ajena), así que rechaza la adopción.
+
+En **Ajustes → Licencia** se puede añadir un **correo de contacto opcional**,
+como último recurso manual si se pierden las dos anclas anteriores. Es el correo
+de **quien usa la app**, que puede ser un empleado; nunca se prerrellena con el
+de la ficha de finca, que es el del titular de la explotación.
+
 ## Integración SIGGAN / BADIGEX
 
 Livestock Manager está diseñado desde cero para cumplir con los requisitos normativos de los sistemas oficiales de gestión ganadera:
@@ -444,6 +498,7 @@ zipalign -c -P 16 -v 4 app/build/outputs/apk/release/app-release.apk
 | [STATUS_BADGE_STANDARD.md](docs/STATUS_BADGE_STANDARD.md) | Estándar de badges retroiluminados |
 | [WIDGET_BUTTON_STANDARD.md](docs/WIDGET_BUTTON_STANDARD.md) | Estándar de botones widget |
 | [PREMIUM-LIMIT-PATTERN.md](memory/premium-limit-pattern.md) | Patrón de límites Free/Premium en capa de datos |
+| [support-api/README](https://github.com/SADOCKDOG/livestock-manager-support-api#readme) | Backend de soporte: estados, agente de IA y confirmación de resolución |
 
 ---
 
