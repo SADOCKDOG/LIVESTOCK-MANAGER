@@ -143,7 +143,7 @@ const AjustesView = {
             <div>${f.id !== activeId ? `<button onclick="AjustesView._cambiarFincaActiva(${f.id})" class="btn btn-secondary btn-sm">Activar</button>` : `<span style="font-size: 1.1rem; font-weight: 800; border: 1px solid var(--c-success); color: var(--c-success); background: rgba(204,255,0,0.1); padding: 6px 12px; border-radius: 8px; display: inline-block;">ACTIVA</span>`}</div>
           </div>`).join("")}
         </div>
-        ${!isFree ? `<button class="btn btn-create btn-full mt-15" onclick="App._showFincaForm()">${Icons.agregar()} Nueva Finca</button>` : ''}
+        ${!isFree ? `<button class="widget-link-btn widget-link-btn--neon neon-success" onclick="App._showFincaForm()">${Icons.agregar()}<span class="widget-link-label">Nueva Finca</span></button>` : ''}
       </div>
 
       <!-- ===================== ADSG Y SANIDAD ===================== -->
@@ -158,7 +158,7 @@ const AjustesView = {
               <button class="btn btn-secondary btn-sm" onclick="AjustesView._editarADSG(${a.id})">${Icons.editar()}</button>
             </div>`).join('')}
         </div>
-        <button class="btn btn-create btn-full mt-15" onclick="AjustesView._nuevoADSG()">${Icons.agregar()} Nueva ADSG</button>
+        <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="AjustesView._nuevoADSG()">${Icons.agregar()}<span class="widget-link-label">Nueva ADSG</span></button>
       </div>
 
       <!-- ===================== OBJETIVOS DE EXPLOTACIÓN ===================== -->
@@ -180,7 +180,7 @@ const AjustesView = {
           <span style="color: var(--c-orange);">|</span> ${Icons.reproduccion()} ESPECIES Y RAZAS
         </h3>
         <div id="especies-container" class="mt-15">${this._renderEspecies(config)}</div>
-        <button class="btn btn-create btn-full mt-15" onclick="AjustesView._agregarEspecie()">${Icons.agregar()} Añadir Especie</button>
+        <button class="widget-link-btn widget-link-btn--neon neon-success" onclick="AjustesView._agregarEspecie()">${Icons.agregar()}<span class="widget-link-label">Añadir Especie</span></button>
       </div>
 
       <!-- ===================== GESTIÓN DE ALERTAS ===================== -->
@@ -223,9 +223,18 @@ const AjustesView = {
         <h3 class="flex items-center gap-10 mt-0 text-white font-900 uppercase text-lg tracking-wider">
           <span style="color: var(--c-purple);">|</span> ${Icons.libro()} AYUDA Y SOPORTE
         </h3>
+        <!-- Se rellena en _pintarLicencia(): depende del servidor y no debe
+             retrasar el pintado del resto de Ajustes. -->
+        <div id="soporte-licencia" class="mt-15"></div>
         <div class="grid grid-cols-1 gap-10 mt-15">
           <button class="widget-link-btn widget-link-btn--neon neon-warning" onclick="AjustesView._abrirManual()">
             ${Icons.libro()} <span class="widget-link-label">Manual de Usuario</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-purple" onclick="location.hash='#/soporte'">
+            ${Icons.ayuda()} <span class="widget-link-label">Soporte técnico</span>
+          </button>
+          <button class="widget-link-btn widget-link-btn--neon neon-info" onclick="location.hash='#/mis-incidencias'">
+            ${Icons.alerta()} <span class="widget-link-label">Mis incidencias</span>
           </button>
         </div>
       </div>
@@ -239,6 +248,148 @@ const AjustesView = {
           Todos los derechos reservados.
         </div>
       </div>`;
+
+    this._pintarLicencia();
+  },
+
+  // ===================== LICENCIA DE SOPORTE =====================
+
+  /**
+   * Estado de la licencia y fecha de la proxima renovacion.
+   *
+   * Se pinta primero con lo que hay guardado y luego se refresca contra el
+   * servidor: sin conexion se ensena la ultima verdad conocida en vez de un
+   * hueco, y con conexion se corrige si el usuario cancelo la suscripcion
+   * desde Google Play, cosa de la que la app no se entera de ninguna otra
+   * forma.
+   */
+  async _pintarLicencia() {
+    const caja = document.getElementById('soporte-licencia');
+    if (!caja || !window.SupportAPI) return;
+
+    if (!window.SupportAPI.tieneSesion()) {
+      caja.innerHTML = this._tarjetaLicencia({
+        activa: false,
+        titulo: 'Soporte no activado',
+        detalle: 'Entra en Soporte técnico para activar tu licencia.',
+      });
+      return;
+    }
+
+    caja.innerHTML = this._tarjetaLicencia(
+      window.SupportAPI.textoLicencia(window.SupportAPI.licenciaGuardada()),
+      window.SupportAPI.correoGuardado(),
+    );
+
+    try {
+      let datos = await window.SupportAPI.estadoLicencia();
+
+      // `/auth/me` solo lee lo guardado: no pregunta a Google. Una suscripcion
+      // renovada mientras la app no miraba sigue figurando como inactiva hasta
+      // que alguien revalida la compra, y quien entraba en Ajustes veia «Sin
+      // licencia de soporte» aun teniendola al dia. Revalidar aqui evita tener
+      // que pasar por Soporte para que aparezca la fecha.
+      if (datos && datos.licencia && !datos.licencia.activa &&
+          window.PurchaseManager && window.PurchaseManager.revalidarSoporte) {
+        try {
+          if (await window.PurchaseManager.revalidarSoporte()) {
+            datos = await window.SupportAPI.estadoLicencia();
+          }
+        } catch (e) {
+          // Sin compra que revalidar se queda el estado que dijo el servidor.
+          console.warn('[Ajustes] No se pudo revalidar la licencia:', e);
+        }
+      }
+
+      const actual = document.getElementById('soporte-licencia');
+      // Puede haberse cambiado de pantalla mientras respondia el servidor.
+      if (actual) {
+        actual.innerHTML = this._tarjetaLicencia(
+          window.SupportAPI.textoLicencia(datos.licencia),
+          datos.email || '',
+        );
+      }
+    } catch (e) {
+      console.warn('[Ajustes] No se pudo refrescar la licencia:', e);
+    }
+  },
+
+  _tarjetaLicencia(info, correo) {
+    const color = !info.activa
+      ? 'var(--color-danger, #e04545)'
+      : info.aviso
+        ? 'var(--color-warning, #e0a020)'
+        : 'var(--color-success, #7cc00b)';
+
+    // El correo solo se ofrece con la licencia activa: sin soporte contratado
+    // no hay a quien escribir y seria pedir un dato personal para nada.
+    const filaCorreo = info.activa
+      ? `
+        <div class="text-gray text-sm mt-10" style="display:flex; gap:8px; align-items:center;
+                                                    flex-wrap:wrap">
+          <span>Correo para soporte:</span>
+          <span>${correo ? this._escaparHtml(correo) : 'sin indicar'}</span>
+          <button class="btn-link text-sm" onclick="AjustesView.editarCorreoSoporte()"
+                  style="background:none; border:0; color:var(--color-primary, #d4af37);
+                         cursor:pointer; padding:0; text-decoration:underline">
+            ${correo ? 'Cambiar' : 'Añadir'}
+          </button>
+        </div>`
+      : '';
+
+    return `
+      <div class="p-10" style="background:rgba(255,255,255,0.04); border-radius:8px;
+                               border-left:3px solid ${color}">
+        <div class="font-bold text-sm">${info.titulo}</div>
+        <div class="text-gray text-sm mt-5">${info.detalle}</div>
+        ${filaCorreo}
+      </div>`;
+  },
+
+  _escaparHtml(texto) {
+    return String(texto).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[c]);
+  },
+
+  /**
+   * Correo de quien usa la app, no el de la ficha de la finca.
+   *
+   * Son cosas distintas y confundirlas tiene consecuencias: el de la finca es
+   * del titular de la explotacion, mientras que quien abre las incidencias
+   * puede ser un empleado. Prerrellenarlo con el de la finca atribuiria al
+   * propietario incidencias que no ha escrito y le mandaria correo sin haberlo
+   * pedido, asi que este campo empieza vacio y se teclea a mano.
+   *
+   * Es opcional: sirve para responder fuera de la app y para recuperar el
+   * historial si algun dia falla la identidad derivada de la compra.
+   */
+  async editarCorreoSoporte() {
+    // `prompt` lo expone Confirm, no ModalManager.
+    if (!window.Confirm || !window.Confirm.prompt || !window.SupportAPI) return;
+
+    const correo = await window.Confirm.prompt(
+      'Correo para soporte',
+      'Correo de quien usa la app. Lo usamos solo para responderte si no puedes ' +
+      'abrir la aplicación. Puedes dejarlo en blanco.',
+      '',
+      'nombre@correo.com',
+    );
+    if (correo === null) return;
+
+    const limpio = correo.trim().toLowerCase();
+    if (limpio && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(limpio)) {
+      App.toastError('Ese correo no parece válido.');
+      return;
+    }
+
+    try {
+      await window.PurchaseManager.registrarCorreoSoporte(limpio);
+      App.toast(limpio ? 'Correo guardado.' : 'Correo borrado.', 'success');
+      await this._pintarLicencia();
+    } catch (e) {
+      App.toastError((e && e.message) || 'No se pudo guardar el correo.');
+    }
   },
 
   // ===================== HELPER: CONFIG =====================
@@ -443,17 +594,14 @@ const AjustesView = {
   async _abrirWizardRetroiluminacion() {
     const config = await this._loadConfig();
     const colors = [
-      { name: 'Neon Lime', hex: '#C5FA50' },
-      { name: 'Neon Red', hex: '#E8555F' },
-      { name: 'Neon Blue', hex: '#4FADF5' },
-      { name: 'Neon Gold', hex: '#FFFC55' },
-      
-      
-      
-      { name: 'Neon Green', hex: '#10b981' },
-      { name: 'Neon Indigo', hex: '#8b5cf6' },
-      { name: 'Steel Grey', hex: '#B1B1B1' },
-      { name: 'White Backlit', hex: '#FFFFFF' }
+      { name: 'Lima Éxito', hex: '#CCFF00' },
+      { name: 'Rojo Peligro', hex: '#FF4444' },
+      { name: 'Azul Info', hex: '#3b82f6' },
+      { name: 'Oro Premium', hex: '#FFB300' },
+      { name: 'Verde Esmeralda', hex: '#10b981' },
+      { name: 'Violeta', hex: '#A855F7' },
+      { name: 'Gris Acero', hex: '#B1B1B1' },
+      { name: 'Blanco', hex: '#FFFFFF' }
     ];
 
     const steps = [
