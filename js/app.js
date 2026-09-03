@@ -116,6 +116,12 @@ const App = {
       if (window.NotificacionesService) {
         window.NotificacionesService.init().catch(e => console.warn('[App] Error init notificaciones:', e));
       }
+      // Avisa de las respuestas del soporte. No bloquea el arranque: si no hay
+      // red o no hay licencia, se calla y lo reintenta al volver al primer plano.
+      if (window.AvisosSoporteService) {
+        try { window.AvisosSoporteService.init(); }
+        catch (e) { console.warn('[App] Error init avisos de soporte:', e); }
+      }
 
       this._setupOfflineIndicator();
 
@@ -1235,12 +1241,7 @@ const App = {
         // Restablecer el scroll al inicio de la página en cada navegación, salvo con un
         // tour en curso: la guía ya ha desplazado la vista hasta el elemento del paso
         // (_ensureVisible) y devolverla arriba deja el spotlight descolocado.
-        if (!tourEnCurso) {
-          window.scrollTo(0, 0);
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
-          if (main) main.scrollTop = 0;
-        }
+        if (!tourEnCurso) App.scrollAlInicio();
 
         // Animación de entrada entre rutas
         main.classList.add('route-enter');
@@ -1256,6 +1257,20 @@ const App = {
       main.classList.add('route-enter');
       main.addEventListener('animationend', () => main.classList.remove('route-enter'), { once: true });
     }
+  },
+
+  /**
+   * Devuelve la pagina al principio. Vive aparte porque no solo hace falta al
+   * cambiar de ruta: los submodulos (animales -> rebanos) se repintan llamando
+   * a render() sin pasar por route(), y sin esto el usuario aterrizaba en la
+   * pestana nueva a la altura de scroll de la anterior, a media pantalla.
+   */
+  scrollAlInicio() {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const main = document.getElementById('app-content');
+    if (main) main.scrollTop = 0;
   },
 
   /**

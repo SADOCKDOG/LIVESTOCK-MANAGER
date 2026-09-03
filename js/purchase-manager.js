@@ -12,33 +12,41 @@
   var MS_STORE_PRODUCT_ID = 'premium_unlock';
   var MS_STORE_BILLING = 'https://store.microsoft.com/billing';
 
-  if (window.FREE_MODE === false) {
-    // Build Premium: la app va desbloqueada sin pasar por la tienda. Pero el
-    // SOPORTE es un producto distinto y de pago aunque la app sea Premium, asi
-    // que sus metodos siguen siendo los reales y no se conceden por defecto.
-    window.PurchaseManager = {
-      isPurchased: function () { return true; },
-      isReady: function () { return true; },
-      purchase: function () {},
-      restorePurchases: function () {},
-      comprarSoporte: function () {
-        if (window.App) App.toastError('La licencia de soporte se compra desde la versión de la tienda.');
-        return Promise.resolve(false);
-      },
-      restaurarSoporte: function () {
-        // Sin CdvPurchase no hay recibo local que revalidar; la sesion de
-        // soporte tiene que abrirse con una compra real.
-        if (window.App) App.toast('No se encontró ninguna licencia de soporte.', 'info');
-        return Promise.resolve(false);
-      }
-    };
-    return;
+  // FREE_MODE === false es el build "Premium": la app va desbloqueada sin pasar
+  // por la tienda. Pero el SOPORTE es un producto DISTINTO y de pago, asi que su
+  // flujo de compra tiene que ser el real tambien aqui.
+  // Antes esta rama devolvia stubs que solo mostraban "se compra desde la version
+  // de la tienda", asi que el soporte era inaccesible justo en el unico build que
+  // se publica. Ahora se conserva el desbloqueo Premium y se mantiene vivo el
+  // motor de compras, registrando unicamente el producto de soporte.
+  var BUILD_PREMIUM = window.FREE_MODE === false;
+
+  // Transaction.products NO es un array de ids: es {id, offerId}[]. Buscarlo con
+  // indexOf(productId) devolvia siempre -1, asi que ningun recibo se reconocia
+  // nunca y la licencia comprada resultaba invisible para la app.
+  function txTieneProducto(tx, productId) {
+    var lista = (tx && tx.products) || [];
+    for (var i = 0; i < lista.length; i++) {
+      var p = lista[i];
+      if (p === productId) return true;              // por si la forma cambia
+      if (p && p.id === productId) return true;
+    }
+    return false;
+  }
+
+  function reciboTieneProducto(recibo, productId) {
+    var txs = (recibo && recibo.transactions) || [];
+    for (var t = 0; t < txs.length; t++) {
+      if (txTieneProducto(txs[t], productId)) return true;
+    }
+    return false;
   }
 
   var PurchaseManager = {
     _initialized: false,
     // Lectura síncrona: las vistas del primer render ya conocen el estado Premium
     _purchased: (function () {
+      if (BUILD_PREMIUM) return true;
       try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch (e) { return false; }
     })(),
     _store: null,
@@ -203,11 +211,7 @@
       self._store = store;
       store.verbosus = true;
 
-      store.register([{
-        id: PRODUCT_ID,
-        type: CdvPurchase.ProductType.NON_CONSUMABLE,
-        platform: CdvPurchase.Platform.GOOGLE_PLAY
-      }, {
+      var catalogo = [{
         // Licencia del modulo de soporte: suscripcion, no compra unica. El
         // soporte cuesta dinero cada mes (cada ticket gasta IA), asi que el
         // ingreso tiene que ser recurrente. En el Worker, el flag equivalente
@@ -216,7 +220,17 @@
         id: SUPPORT_PRODUCT_ID,
         type: CdvPurchase.ProductType.PAID_SUBSCRIPTION,
         platform: CdvPurchase.Platform.GOOGLE_PLAY
-      }]);
+      }];
+      // En el build Premium la app ya va desbloqueada, asi que registrar
+      // premium_unlock solo generaria ruido de "producto no encontrado".
+      if (!BUILD_PREMIUM) {
+        catalogo.unshift({
+          id: PRODUCT_ID,
+          type: CdvPurchase.ProductType.NON_CONSUMABLE,
+          platform: CdvPurchase.Platform.GOOGLE_PLAY
+        });
+      }
+      store.register(catalogo);
 
       store.when()
         .productUpdated(function (product) {
@@ -228,6 +242,17 @@
         })
         .verified(function (receipt) {
           console.log('[PurchaseManager] verified:', receipt);
+          // Filtrar por producto: son dos compras distintas. Sin esto, comprar
+          // la licencia de SOPORTE desbloqueaba Premium de regalo.
+          if (receiptHasProduct(receipt, SUPPORT_PRODUCT_ID)) {
+            receipt.finish();
+            self._sincronizarSoporte();
+            return;
+          }
+          if (!receiptHasProduct(receipt, PRODUCT_ID)) {
+            receipt.finish();
+            return;
+          }
           self._markPurchased();
           receipt.finish();
           if (window.PremiumManager && window.PremiumManager.cleanDemoData) {
@@ -255,12 +280,35 @@
         });
 
       store.error(function (err) {
-        console.error('[PurchaseManager] error:', err && err.code, err && err.message);
-        // Autocuración: si Google responde "ya comprado", marcar Premium localmente
+        var code = err && err.code;
         var msg = (err && err.message) || '';
-        if ((err && err.code === 6777003) || /already owned|ya has comprado/i.test(msg)) {
-          self._markPurchased();
-          App.toast('Compra Premium restaurada.', 'success');
+        var producto = (err && err.productId) || '';
+        console.error('[PurchaseManager] error:', code, producto, msg);
+
+        // El usuario cerro el dialogo de Google: no hay nada que contarle.
+        if (code === CdvPurchase.ErrorCode.PAYMENT_CANCELLED) return;
+
+        // "Ya lo tienes": Google rechaza la compra porque la licencia sigue viva.
+        // Se detecta SOLO por el texto. Antes tambien se daba por bueno el codigo
+        // 6777003, que en realidad es ErrorCode.PURCHASE ("la compra fallo"): un
+        // fallo cualquiera desbloqueaba Premium y anunciaba "Compra restaurada".
+        //
+        // El plugin entrega la constante de Billing con guiones bajos
+        // (ITEM_ALREADY_OWNED), no la frase que ve el usuario en el dialogo, asi
+        // que hace falta aceptar los dos separadores o no casa nunca.
+        if (/already[ _]owned|ya (lo )?has comprado|ya tienes una suscripci/i.test(msg)) {
+          if (producto === SUPPORT_PRODUCT_ID) {
+            self._sincronizarSoporte();
+          } else {
+            self._markPurchased();
+            App.toast('Compra Premium restaurada.', 'success');
+          }
+          return;
+        }
+
+        // Un fallo real en la compra del soporte tiene que verse como fallo.
+        if (producto === SUPPORT_PRODUCT_ID || code === CdvPurchase.ErrorCode.PURCHASE) {
+          App.toastError('No se pudo completar la compra. Intentalo de nuevo.');
         }
       });
 
@@ -278,12 +326,7 @@
         });
 
       function receiptHasProduct(receipt, productId) {
-        if (!receipt || !receipt.transactions) return false;
-        for (var t = 0; t < receipt.transactions.length; t++) {
-          var tx = receipt.transactions[t];
-          if (tx.products && tx.products.indexOf(productId) !== -1) return true;
-        }
-        return false;
+        return reciboTieneProducto(receipt, productId);
       }
     },
 
@@ -310,12 +353,24 @@
         return Promise.resolve(false);
       }
       try {
-        var oferta = self._store.get(SUPPORT_PRODUCT_ID);
-        if (!oferta) {
+        var producto = self._store.get(SUPPORT_PRODUCT_ID);
+        if (!producto) {
           App.toastError('La licencia de soporte no está disponible todavía.');
           return Promise.resolve(false);
         }
-        return self._store.order(oferta).then(function () {
+        // order() espera una Offer, NO un Product. Pasarle el producto hacia que
+        // el plugin mandase productId=null a Google ("Product not registered:
+        // null", codigo 6777003), asi que la compra no llegaba a abrirse nunca.
+        var oferta = producto.getOffer();
+        if (!oferta) {
+          App.toastError('El plan de soporte no está disponible todavía.');
+          return Promise.resolve(false);
+        }
+        return self._store.order(oferta).then(function (err) {
+          if (err) {
+            console.warn('[PurchaseManager] order devolvio error:', err.code, err.message);
+            return false;
+          }
           return self._sincronizarSoporte();
         });
       } catch (e) {
@@ -327,6 +382,37 @@
 
     restaurarSoporte: function () {
       return this._sincronizarSoporte();
+    },
+
+    /**
+     * Revalidacion silenciosa contra Google, para cuando el backend contesta
+     * que la licencia ha caducado. La suscripcion puede haberse renovado ya:
+     * el token local sigue siendo el bueno y basta con volver a canjearlo.
+     *
+     * No muestra ningun aviso a proposito. Quien la llama decide que contar,
+     * porque esto ocurre en mitad de otra operacion del usuario.
+     */
+    revalidarSoporte: function () {
+      if (!window.SupportAPI) return Promise.resolve(false);
+      var token = this._tokenDeSoporte();
+      if (!token) return Promise.resolve(false);
+      return window.SupportAPI.iniciarSesion(token, 'android')
+        .then(function () { return true; })
+        .catch(function () { return false; });
+    },
+
+    /**
+     * Guarda (o borra, con cadena vacia) el correo de contacto de soporte.
+     *
+     * Reaprovecha la revalidacion de la compra en vez de estrenar un endpoint:
+     * la sesion se reemite con el correo nuevo y de paso se comprueba que la
+     * licencia sigue viva.
+     */
+    registrarCorreoSoporte: function (correo) {
+      if (!window.SupportAPI) return Promise.reject(new Error('Soporte no disponible.'));
+      var token = this._tokenDeSoporte();
+      if (!token) return Promise.reject(new Error('No hay licencia de soporte activa.'));
+      return window.SupportAPI.iniciarSesion(token, 'android', correo || '', true);
     },
 
     /**
@@ -362,11 +448,14 @@
           var txs = recibos[i].transactions || [];
           for (var t = 0; t < txs.length; t++) {
             var tx = txs[t];
-            if (tx.products && tx.products.indexOf(SUPPORT_PRODUCT_ID) !== -1) {
-              return tx.purchaseToken || tx.transactionId || null;
-            }
+            if (!txTieneProducto(tx, SUPPORT_PRODUCT_ID)) continue;
+            var token = tx.purchaseToken ||
+                        (tx.nativePurchase && tx.nativePurchase.purchaseToken) ||
+                        tx.transactionId || null;
+            if (token) return token;
           }
         }
+        console.warn('[PurchaseManager] sin token de soporte en', recibos.length, 'recibos');
       } catch (e) {
         console.warn('[PurchaseManager] no se pudo leer el recibo de soporte:', e);
       }
@@ -374,6 +463,9 @@
     },
 
     _checkLocal: function () {
+      // En el build Premium la app va desbloqueada por definicion: leer el
+      // localStorage aqui la degradaria a Free en cuanto fallase el store.
+      if (BUILD_PREMIUM) { this._initialized = true; return; }
       try {
         this._purchased = localStorage.getItem(STORAGE_KEY) === 'true';
       } catch (e) {}
