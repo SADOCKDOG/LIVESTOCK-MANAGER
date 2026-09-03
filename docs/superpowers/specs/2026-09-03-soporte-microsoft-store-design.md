@@ -214,7 +214,8 @@ En este orden:
 MSIX con `@choochmeque/tauri-windows-bundle`, firmado, subido a Partner Center; si ese
 empaquetador falla, MSIX a mano con `MakeAppx.exe` (ver 3.1).
 `support_unlock` ya está descrito en `livestock-pwa-msix/partner_center_addon.json` como
-`MONTHLY`, y así se queda: el soporte se cobra mensual y es opcional. La app va a **Gratis**
+`MONTHLY`, y así se queda: el soporte se cobra mensual y es opcional, a **6,99 EUR de
+precio base** (Partner Center convierte a las demás divisas). La app va a **Gratis**
 en Partner Center; lo único de pago es este complemento. No se replica el periodo anual de
 Play. Consecuencia técnica: con `validityType: 'All'` una suscripción mensual acumula un
 elemento por renovación en la colección, que es exactamente el caso que obliga a paginar en
