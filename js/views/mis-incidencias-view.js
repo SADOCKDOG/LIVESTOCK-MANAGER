@@ -285,6 +285,7 @@ const MisIncidenciasView = {
       ['Actualizada', this._fecha(d.updated_at)],
     ];
     if (d.cerrada_at) filas.push(['Resuelta', this._fecha(d.cerrada_at)]);
+    if (d.confirmada_at) filas.push(['Confirmada por ti', this._fecha(d.confirmada_at)]);
 
     const explicacion = window.SupportAPI.EXPLICACION_ESTADOS[d.estado];
 
@@ -315,7 +316,7 @@ const MisIncidenciasView = {
         <p class="text-gray text-sm mt-10">
           ${
             d.estado === 'resuelta'
-              ? 'Esta incidencia se ha dado por resuelta.'
+              ? 'El equipo ha dado esta incidencia por resuelta.'
               : 'Cuando el equipo responda, lo verás aquí.'
           }
         </p>
@@ -340,15 +341,75 @@ const MisIncidenciasView = {
    */
   _formulario(d) {
     const id = this._escapar(d.ticket_id);
+
+    // Una incidencia que el equipo ha marcado como resuelta pero que el
+    // usuario todavía no ha dado por buena es una propuesta, no un cierre:
+    // aquí se le pregunta. El «sí» cierra la incidencia de verdad; el «no» es
+    // un mensaje normal, y el servidor la devuelve a «en revisión» al
+    // recibirlo. Sin esta pregunta, decir que algo está arreglado cuando no lo
+    // está no le costaba nada a nadie y el usuario se quedaba sin salida.
+    const pendienteDeConfirmar = d.estado === 'resuelta' && !d.confirmada_at;
+
+    const pregunta = pendienteDeConfirmar
+      ? `
+        <div class="mt-15">
+          <div class="text-sm mb-5">¿Se ha resuelto tu problema?</div>
+          <button class="btn btn-primary" data-confirmar="${id}"
+                  onclick="MisIncidenciasView.confirmarResolucion('${id}')">Sí, ya funciona</button>
+          <div class="text-gray text-sm mt-10">
+            Si sigue fallando, cuéntanoslo aquí abajo y la volveremos a mirar.
+          </div>
+        </div>`
+      : '';
+
     return `
+      ${pregunta}
       <div class="mt-15" data-responder="${id}">
         <textarea id="mensaje-${id}" rows="3" maxlength="2000"
                   class="form-input" style="resize:vertical"
-                  placeholder="Escribe aquí si quieres añadir algo…"></textarea>
+                  placeholder="${
+                    pendienteDeConfirmar
+                      ? 'Cuéntanos qué sigue fallando…'
+                      : 'Escribe aquí si quieres añadir algo…'
+                  }"></textarea>
         <div class="text-gray text-sm mt-5" id="aviso-${id}"></div>
         <button class="btn btn-secondary mt-5"
-                onclick="MisIncidenciasView.enviarMensaje('${id}')">Enviar</button>
+                onclick="MisIncidenciasView.enviarMensaje('${id}')">${
+                  pendienteDeConfirmar ? 'No, sigue fallando' : 'Enviar'
+                }</button>
       </div>`;
+  },
+
+  /**
+   * El usuario da por buena la solución.
+   *
+   * Recarga el detalle en vez de repintar a mano porque la confirmación cierra
+   * la incidencia en el servidor y conviene enseñar exactamente lo que ha
+   * quedado guardado.
+   */
+  async confirmarResolucion(ticketId) {
+    const boton = document.querySelector('[data-confirmar="' + ticketId + '"]');
+    const aviso = document.getElementById('aviso-' + ticketId);
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Confirmando…';
+    }
+    if (aviso) aviso.textContent = '';
+
+    try {
+      await window.SupportAPI.confirmarResolucion(ticketId);
+      const d = await window.SupportAPI.detalleIncidencia(ticketId);
+      const caja = document.getElementById('detalle-' + ticketId);
+      if (caja) caja.innerHTML = this._detalle(d);
+    } catch (e) {
+      if (aviso) {
+        aviso.textContent = (e && e.message) || 'No se pudo confirmar.';
+      }
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = 'Sí, ya funciona';
+      }
+    }
   },
 
   _mensaje(r) {
