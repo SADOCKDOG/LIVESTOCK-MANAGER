@@ -365,9 +365,10 @@ const AjustesView = {
    * historial si algun dia falla la identidad derivada de la compra.
    */
   async editarCorreoSoporte() {
-    if (!window.ModalManager || !window.SupportAPI) return;
+    // `prompt` lo expone Confirm, no ModalManager.
+    if (!window.Confirm || !window.Confirm.prompt || !window.SupportAPI) return;
 
-    const correo = await window.ModalManager.prompt(
+    const correo = await window.Confirm.prompt(
       'Correo para soporte',
       'Correo de quien usa la app. Lo usamos solo para responderte si no puedes ' +
       'abrir la aplicación. Puedes dejarlo en blanco.',
