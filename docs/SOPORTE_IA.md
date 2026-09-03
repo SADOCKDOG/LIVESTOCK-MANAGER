@@ -1,5 +1,11 @@
 # Soporte con IA — Livestock Manager
 
+> **Estado: documento de diseño (agosto de 2026).** El sistema ya está
+> implementado y en producción desde la 4.10.8 (529). Algunas decisiones se
+> resolvieron de forma distinta a lo que se planteaba aquí — sobre todo la
+> identidad del usuario, ver 5.2. Para el comportamiento real, la referencia es
+> el README de `livestock-manager-support-api`.
+
 ## 1. Resumen
 
 Sistema de soporte técnico integrado en la app, disponible para usuarios registrados con licencia de soporte activa. El usuario reporta una incidencia desde la propia app; un agente de IA la estructura y crea un issue en GitHub de forma transparente (el usuario nunca ve GitHub, solo una pantalla de "Mis incidencias" dentro de la app).
@@ -85,6 +91,19 @@ Sistema de soporte técnico integrado en la app, disponible para usuarios regist
 - Autenticación mínima: email + código de un solo uso (OTP), o Google Sign-In (más simple de integrar con Play Billing).
 - Al autenticarse, el backend emite un JWT de corta duración que la app adjunta en cada llamada.
 - Tabla de usuarios mínima: `user_id`, `email`, `play_purchase_token`, `licencia_activa_hasta`.
+
+> **Lo implementado no es esto.** No hay cuentas, ni OTP, ni Google Sign-In: al
+> ganadero no se le pide nada. El `user_id` se deriva del `purchase_token`
+> (`SHA-256`), y como Google emite otro token al recomprar, la app manda además
+> un id de instalación que vive en su IndexedDB y viaja en la copia de
+> seguridad. El servidor decide con él si adopta la identidad anterior, con una
+> regla que no es obvia y que ya costó una pérdida de historial en producción.
+> El JWT de corta duración sí se conserva tal cual.
+>
+> El detalle está en la sección **Identidad del usuario** del README de
+> `livestock-manager-support-api` y en `src/services/identidad.ts`. Google
+> Sign-In sigue en el plan, pero para la fase 2 (copia en Drive), no para
+> identificar al usuario de soporte.
 
 ### 5.3 Verificación de licencia de soporte
 
