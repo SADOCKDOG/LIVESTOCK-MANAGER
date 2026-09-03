@@ -278,6 +278,7 @@ const AjustesView = {
 
     caja.innerHTML = this._tarjetaLicencia(
       window.SupportAPI.textoLicencia(window.SupportAPI.licenciaGuardada()),
+      window.SupportAPI.correoGuardado(),
     );
 
     try {
@@ -302,25 +303,92 @@ const AjustesView = {
 
       const actual = document.getElementById('soporte-licencia');
       // Puede haberse cambiado de pantalla mientras respondia el servidor.
-      if (actual) actual.innerHTML = this._tarjetaLicencia(window.SupportAPI.textoLicencia(datos.licencia));
+      if (actual) {
+        actual.innerHTML = this._tarjetaLicencia(
+          window.SupportAPI.textoLicencia(datos.licencia),
+          datos.email || '',
+        );
+      }
     } catch (e) {
       console.warn('[Ajustes] No se pudo refrescar la licencia:', e);
     }
   },
 
-  _tarjetaLicencia(info) {
+  _tarjetaLicencia(info, correo) {
     const color = !info.activa
       ? 'var(--color-danger, #e04545)'
       : info.aviso
         ? 'var(--color-warning, #e0a020)'
         : 'var(--color-success, #7cc00b)';
 
+    // El correo solo se ofrece con la licencia activa: sin soporte contratado
+    // no hay a quien escribir y seria pedir un dato personal para nada.
+    const filaCorreo = info.activa
+      ? `
+        <div class="text-gray text-sm mt-10" style="display:flex; gap:8px; align-items:center;
+                                                    flex-wrap:wrap">
+          <span>Correo para soporte:</span>
+          <span>${correo ? this._escaparHtml(correo) : 'sin indicar'}</span>
+          <button class="btn-link text-sm" onclick="AjustesView.editarCorreoSoporte()"
+                  style="background:none; border:0; color:var(--color-primary, #d4af37);
+                         cursor:pointer; padding:0; text-decoration:underline">
+            ${correo ? 'Cambiar' : 'Añadir'}
+          </button>
+        </div>`
+      : '';
+
     return `
       <div class="p-10" style="background:rgba(255,255,255,0.04); border-radius:8px;
                                border-left:3px solid ${color}">
         <div class="font-bold text-sm">${info.titulo}</div>
         <div class="text-gray text-sm mt-5">${info.detalle}</div>
+        ${filaCorreo}
       </div>`;
+  },
+
+  _escaparHtml(texto) {
+    return String(texto).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[c]);
+  },
+
+  /**
+   * Correo de quien usa la app, no el de la ficha de la finca.
+   *
+   * Son cosas distintas y confundirlas tiene consecuencias: el de la finca es
+   * del titular de la explotacion, mientras que quien abre las incidencias
+   * puede ser un empleado. Prerrellenarlo con el de la finca atribuiria al
+   * propietario incidencias que no ha escrito y le mandaria correo sin haberlo
+   * pedido, asi que este campo empieza vacio y se teclea a mano.
+   *
+   * Es opcional: sirve para responder fuera de la app y para recuperar el
+   * historial si algun dia falla la identidad derivada de la compra.
+   */
+  async editarCorreoSoporte() {
+    if (!window.ModalManager || !window.SupportAPI) return;
+
+    const correo = await window.ModalManager.prompt(
+      'Correo para soporte',
+      'Correo de quien usa la app. Lo usamos solo para responderte si no puedes ' +
+      'abrir la aplicación. Puedes dejarlo en blanco.',
+      '',
+      'nombre@correo.com',
+    );
+    if (correo === null) return;
+
+    const limpio = correo.trim().toLowerCase();
+    if (limpio && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(limpio)) {
+      App.toastError('Ese correo no parece válido.');
+      return;
+    }
+
+    try {
+      await window.PurchaseManager.registrarCorreoSoporte(limpio);
+      App.toast(limpio ? 'Correo guardado.' : 'Correo borrado.', 'success');
+      await this._pintarLicencia();
+    } catch (e) {
+      App.toastError((e && e.message) || 'No se pudo guardar el correo.');
+    }
   },
 
   // ===================== HELPER: CONFIG =====================
