@@ -257,7 +257,7 @@ const MisIncidenciasView = {
       </div>`;
   },
 
-  /** Respuestas del equipo, de la mas antigua a la mas reciente. */
+  /** Respuestas a la incidencia, de la mas antigua a la mas reciente. */
   _hilo(d) {
     const respuestas = (d && d.respuestas) || [];
 
@@ -274,7 +274,7 @@ const MisIncidenciasView = {
 
     return `
       <div class="mt-15">
-        <div class="text-gray text-sm mb-10">Respuestas del equipo</div>
+        <div class="text-gray text-sm mb-10">Respuestas</div>
         ${respuestas.map((r) => this._mensaje(r)).join('')}
       </div>`;
   },

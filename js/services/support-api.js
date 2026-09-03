@@ -243,6 +243,7 @@
   /** Estados internos -> texto para el usuario. */
   SupportAPI.ESTADOS = {
     enviada: 'Enviada',
+    analizada: 'Analizada',
     revision: 'En revisión',
     curso: 'En curso',
     resuelta: 'Resuelta',
@@ -255,6 +256,10 @@
   /** Que significa cada estado, en la pantalla de incidencias. */
   SupportAPI.EXPLICACION_ESTADOS = {
     enviada: 'Registrada. Nadie la ha mirado todavía.',
+    // 'analizada' la pone el asistente automático al responder, no una persona:
+    // por eso no dice «el equipo la está mirando», que sería falso. Ese texto se
+    // reserva para 'revision', que solo llega cuando comenta alguien de verdad.
+    analizada: 'El asistente la ha analizado y te ha respondido. El equipo la revisará después.',
     revision: 'El equipo la está mirando y puede que te pregunte algo.',
     curso: 'Confirmada como fallo. Se está trabajando en ella.',
     resuelta: 'Cerrada. Suele llegar en la siguiente actualización de la app.',
