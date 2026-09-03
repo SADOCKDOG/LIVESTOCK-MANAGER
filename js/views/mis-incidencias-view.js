@@ -284,12 +284,25 @@ const MisIncidenciasView = {
     // respetan los saltos de linea. Renderizar Markdown aqui significaria
     // meter HTML de terceros en la pantalla del usuario a cambio de casi nada.
     const texto = this._escapar(r.texto).replace(/\n/g, '<br>');
+
+    // Quien responde se dice siempre. Un primer analisis automatico y la
+    // respuesta de una persona no valen lo mismo, y confundirlos deja al
+    // usuario esperando a alguien que todavia no ha entrado. Las respuestas
+    // anteriores al asistente no traen `autor`: eran todas del equipo.
+    const deIA = r.autor === 'ia';
+    const quien = deIA ? 'Asistente automático' : 'Equipo';
+    const borde = r.cierre
+      ? 'var(--color-success, #7cc00b)'
+      : deIA
+        ? 'rgba(255,255,255,0.10)'
+        : 'rgba(255,255,255,0.15)';
+
     return `
       <div class="mb-10 p-10"
            style="background:rgba(255,255,255,0.04); border-radius:8px;
-                  border-left:3px solid ${r.cierre ? 'var(--color-success, #7cc00b)' : 'rgba(255,255,255,0.15)'}">
+                  border-left:3px solid ${borde}">
         <div class="text-gray text-sm mb-5">
-          ${r.cierre ? 'Cierre · ' : ''}${this._fechaHora(r.fecha)}
+          ${r.cierre ? 'Cierre · ' : ''}${quien} · ${this._fechaHora(r.fecha)}
         </div>
         <div class="text-sm">${texto}</div>
       </div>`;
