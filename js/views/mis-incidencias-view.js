@@ -226,6 +226,55 @@ const MisIncidenciasView = {
     }
   },
 
+  /**
+   * Envia un mensaje del usuario a la incidencia.
+   *
+   * Al terminar se recarga el detalle en vez de pintar el mensaje a mano: el
+   * servidor puede haber recortado el texto al limpiarlo, y ensenar aqui algo
+   * distinto de lo que ha quedado guardado confundiria mas que ayudar.
+   */
+  async enviarMensaje(ticketId) {
+    const campo = document.getElementById('mensaje-' + ticketId);
+    const aviso = document.getElementById('aviso-' + ticketId);
+    const boton = document.querySelector(
+      '[data-responder="' + ticketId + '"] button'
+    );
+    if (!campo) return;
+
+    const texto = (campo.value || '').trim();
+    if (!texto) {
+      if (aviso) aviso.textContent = 'Escribe algo antes de enviar.';
+      return;
+    }
+
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+    }
+    if (aviso) aviso.textContent = '';
+
+    try {
+      await window.SupportAPI.responderIncidencia(ticketId, texto);
+      const d = await window.SupportAPI.detalleIncidencia(ticketId);
+      const caja = document.getElementById('detalle-' + ticketId);
+      if (caja) caja.innerHTML = this._detalle(d);
+      const respuestas = (d && d.respuestas) || [];
+      if (respuestas.length) {
+        window.SupportAPI.marcarLeida(ticketId, respuestas[respuestas.length - 1].fecha);
+      }
+    } catch (e) {
+      // El texto se deja en el campo: si el envio ha fallado, lo ultimo que
+      // debe pasar es que el usuario pierda lo que habia escrito.
+      if (aviso) {
+        aviso.textContent = (e && e.message) || 'No se pudo enviar el mensaje.';
+      }
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = 'Enviar';
+      }
+    }
+  },
+
   _detalle(d) {
     if (!d) return '<p class="text-gray text-sm">Sin datos.</p>';
     const filas = [
@@ -269,13 +318,36 @@ const MisIncidenciasView = {
               ? 'Esta incidencia se ha dado por resuelta.'
               : 'Cuando el equipo responda, lo verás aquí.'
           }
-        </p>`;
+        </p>
+        ${this._formulario(d)}`;
     }
 
     return `
       <div class="mt-15">
         <div class="text-gray text-sm mb-10">Respuestas</div>
         ${respuestas.map((r) => this._mensaje(r)).join('')}
+      </div>
+      ${this._formulario(d)}`;
+  },
+
+  /**
+   * Campo para escribir en la incidencia.
+   *
+   * Existe porque el asistente automático pide datos («cuéntanos también…») y
+   * hasta ahora no había forma de dárselos: el usuario leía una pregunta que
+   * no podía contestar. Se ofrece también en las resueltas: si el arreglo no
+   * funcionó, decirlo en la misma incidencia es mejor que abrir otra.
+   */
+  _formulario(d) {
+    const id = this._escapar(d.ticket_id);
+    return `
+      <div class="mt-15" data-responder="${id}">
+        <textarea id="mensaje-${id}" rows="3" maxlength="2000"
+                  class="form-input" style="resize:vertical"
+                  placeholder="Escribe aquí si quieres añadir algo…"></textarea>
+        <div class="text-gray text-sm mt-5" id="aviso-${id}"></div>
+        <button class="btn btn-secondary mt-5"
+                onclick="MisIncidenciasView.enviarMensaje('${id}')">Enviar</button>
       </div>`;
   },
 
@@ -290,12 +362,15 @@ const MisIncidenciasView = {
     // usuario esperando a alguien que todavia no ha entrado. Las respuestas
     // anteriores al asistente no traen `autor`: eran todas del equipo.
     const deIA = r.autor === 'ia';
-    const quien = deIA ? 'Asistente automático' : 'Equipo';
+    const mio = r.autor === 'usuario';
+    const quien = mio ? 'Tú' : deIA ? 'Asistente automático' : 'Equipo';
     const borde = r.cierre
       ? 'var(--color-success, #7cc00b)'
-      : deIA
-        ? 'rgba(255,255,255,0.10)'
-        : 'rgba(255,255,255,0.15)';
+      : mio
+        ? 'var(--color-primary, #a3e635)'
+        : deIA
+          ? 'rgba(255,255,255,0.10)'
+          : 'rgba(255,255,255,0.15)';
 
     return `
       <div class="mb-10 p-10"
