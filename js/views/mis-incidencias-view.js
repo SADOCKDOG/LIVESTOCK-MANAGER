@@ -342,6 +342,19 @@ const MisIncidenciasView = {
   _formulario(d) {
     const id = this._escapar(d.ticket_id);
 
+    // Una incidencia que el usuario ya ha dado por buena está cerrada por
+    // acuerdo de las dos partes, así que no se ofrece seguir escribiendo:
+    // dejar el campo ahí invita a reabrir una conversación terminada. Si el
+    // fallo reaparece, lo suyo es una incidencia nueva, que llega al equipo
+    // con su propio análisis en vez de colgando de un hilo ya resuelto.
+    if (d.confirmada_at) {
+      return `
+        <p class="text-gray text-sm mt-15">
+          Confirmaste que quedó resuelta. Si vuelve a pasarte, cuéntanoslo en
+          una incidencia nueva.
+        </p>`;
+    }
+
     // Una incidencia que el equipo ha marcado como resuelta pero que el
     // usuario todavía no ha dado por buena es una propuesta, no un cierre:
     // aquí se le pregunta. El «sí» cierra la incidencia de verdad; el «no» es
