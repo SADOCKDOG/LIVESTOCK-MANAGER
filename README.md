@@ -491,13 +491,11 @@ zipalign -c -P 16 -v 4 app/build/outputs/apk/release/app-release.apk
 
 | Documento | Descripción |
 |-----------|-------------|
-| [CUMPLIMIENTO_SIGGAN.md](docs/CUMPLIMIENTO_SIGGAN.md) | Matriz de cumplimiento con SIGGAN/BADIGEX |
-| [CUMPLIMIENTO_BADIGEX.md](docs/CUMPLIMIENTO_BADIGEX.md) | Adaptación específica a Extremadura |
+| [CUMPLIMIENTO_SIGGAN.md](docs/CUMPLIMIENTO_SIGGAN.md) | Matriz de cumplimiento con SIGGAN/BADIGEX, incluida la adaptación a Extremadura |
 | [INTERACTION_PATTERNS.md](docs/INTERACTION_PATTERNS.md) | Patrón de interacción y componentes UI |
 | [DESIGN_TOKENS.md](docs/DESIGN_TOKENS.md) | Tokens de diseño y sistema de estilo Coral |
 | [STATUS_BADGE_STANDARD.md](docs/STATUS_BADGE_STANDARD.md) | Estándar de badges retroiluminados |
 | [WIDGET_BUTTON_STANDARD.md](docs/WIDGET_BUTTON_STANDARD.md) | Estándar de botones widget |
-| [PREMIUM-LIMIT-PATTERN.md](memory/premium-limit-pattern.md) | Patrón de límites Free/Premium en capa de datos |
 | [support-api/README](https://github.com/SADOCKDOG/livestock-manager-support-api#readme) | Backend de soporte: estados, agente de IA y confirmación de resolución |
 
 ---
