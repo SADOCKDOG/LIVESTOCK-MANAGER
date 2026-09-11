@@ -69,3 +69,16 @@ android/app/src/main/assets/public/js/
 *.backup
 *.bak
 *.orig
+
+# Material de referencia y artefactos de prueba: se movieron a private/limpieza-2026-09
+# (318 MB de PDFs oficiales, bases FoxPro heredadas, instaladores y ZIPs de datos).
+private/
+PRIVATE/
+docs/AUDITAR/
+docs/Legistacion/
+.playwright-mcp/
+test-results/
+test_*.png
+test-*.png
+test-*.pdf
+pwa-header-verify-*.png
