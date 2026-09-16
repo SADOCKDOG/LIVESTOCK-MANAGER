@@ -11,6 +11,7 @@
   // aqui, porque la Digital Goods API no permite listar los ids disponibles.
   var MS_STORE_PRODUCT_ID = 'premium_unlock';
   var MS_STORE_BILLING = 'https://store.microsoft.com/billing';
+    var TAURI_STORE_ID = '9P104KJR294Z'; // Store ID del complemento de soporte en Partner Center
 
   // FREE_MODE === false es el build "Premium": la app va desbloqueada sin pasar
   // por la tienda. Pero el SOPORTE es un producto DISTINTO y de pago, asi que su
@@ -191,7 +192,118 @@
       });
     },
 
-    init: function () {
+          // ── Tauri (Escritorio Windows) ───────────────────────────────────────
+          // No se puede usar la Digital Goods API porque el WebView2 de Tauri no es
+          // considerado una app instalada desde la Store. Se usa WinRT via comandos
+          // Tauri para obtener la clave de la Store y comprar el complemento.
+          _tauri: null,
+
+          /** ¿Estamos dentro de la app de escritorio Tauri? */
+          _tieneTauri: function () {
+            return !!(window.__TAURI__ && window.__TAURI__.core);
+          },
+
+          /** Inicializa la comprobacion de licencia de Tauri. */
+          _initTauri: function () {
+            var self = this;
+            self._initialized = true;
+            console.log('[PurchaseManager] Tauri detectado');
+            // En Tauri, la Store es la fuente de verdad al igual que en Microsoft Store
+            return self._sincronizarConTauri();
+          },
+
+          /** Pregunta a la Store que posee el usuario y ajusta el estado Premium. */
+          _sincronizarConTauri: function () {
+            var self = this;
+            if (!self._tieneTauri()) return Promise.resolve(false);
+      
+            // En Tauri, usamos el mismo flujo que en Microsoft Store para validar licencia
+            // pero mediante comandos Tauri en lugar de Digital Goods API
+            return self._revalidarLicenciaTauri();
+          },
+
+          /** Compra el complemento premium mediante WinRT (comando comprar_complemento). */
+          _comprarEnTauri: function () {
+            var self = this;
+            if (!self._tieneTauri()) {
+              App.toastError('La compra solo está disponible en la app de escritorio.');
+              return;
+            }
+
+            // Compra el complemento premium de la Microsoft Store mediante WinRT
+            window.__TAURI__.core.invoke('comprar_complemento', {
+              storeId: TAURI_STORE_ID
+            }).then(function (estado) {
+              if (estado === 'cancelado') {
+                var abortado = new Error('Compra cancelada.');
+                abortado.name = 'AbortError';
+                throw abortado;
+              }
+              if (estado !== 'comprado' && estado !== 'ya_comprado') {
+                App.toastError('No se pudo completar la compra.');
+                return false;
+              }
+              return self._sincronizarConTauri();
+            }).then(function (exito) {
+              if (exito) {
+                App.toast('Premium activado. Gracias por tu compra.', 'success');
+                self._markPurchased();
+              }
+            }).catch(function (error) {
+              console.error('[PurchaseManager] Error en compra Tauri:', error);
+              var msg = error && error.message;
+              if (/cancel/i.test(msg) || error.name === 'AbortError') {
+                // Cancelado por el usuario, no mostrar error
+                return;
+              }
+              App.toastError('No se pudo completar la compra.');
+            });
+          },
+
+          /** Valida la licencia mediante el ticket de Entra ID y la Store ID key. */
+          _revalidarLicenciaTauri: function () {
+            var self = this;
+            if (!self._tieneTauri()) return Promise.resolve(false);
+
+            return window.SupportAPI._idDeInstalacion()
+              .then(function (instalacion) {
+                if (!instalacion) {
+                  console.warn('[PurchaseManager] sin id de instalacion para validacion Tauri');
+                }
+          
+                // Paso 1: Obtener ticket de Entra ID desde el Worker
+                return fetch(BASE + '/auth/ms/ticket', { method: 'POST' })
+                  .then(function (respuesta) {
+                    if (!respuesta.ok) {
+                      if (respuesta.status === 501) {
+                        throw new Error('La compra en Microsoft Store todavía no está activada.');
+                      }
+                      throw new Error('No se pudo contactar con el servidor de soporte.');
+                    }
+                    return respuesta.json();
+                  })
+                  .then(function (datos) {
+                    // Paso 2: Intercambiar ticket por Store ID key mediante WinRT
+                    return window.__TAURI__.core.invoke('obtener_store_id_key', {
+                      ticket: datos.ticket,
+                      publisherUserId: instalacion || ''
+                    });
+                  })
+                  .then(function (clave) {
+                    // Paso 3: Validar licencia con el Worker
+                    return window.SupportAPI.iniciarSesion(clave, 'windows')
+                      .then(function () {
+                        return true;
+                      });
+                  });
+              })
+              .catch(function (error) {
+                console.error('[PurchaseManager] Error en validacion Tauri:', error);
+                return false;
+              });
+          },
+
+          init: function () {
       var self = this;
 
       // En la PWA de Microsoft Store manda la Digital Goods API; CdvPurchase
@@ -201,7 +313,13 @@
         return;
       }
 
-      if (typeof CdvPurchase === 'undefined' || !CdvPurchase.store) {
+                // En escritorio con Tauri, usamos WinRT via comandos Tauri
+                if (self._tieneTauri()) {
+                  self._initTauri();
+                  return;
+                }
+
+                if (typeof CdvPurchase === 'undefined' || !CdvPurchase.store) {
         console.warn('[PurchaseManager] CdvPurchase no disponible');
         self._checkLocal();
         return;
