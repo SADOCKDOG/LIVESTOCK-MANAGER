@@ -313,13 +313,13 @@
         return;
       }
 
-                // En escritorio con Tauri, usamos WinRT via comandos Tauri
-                if (self._tieneTauri()) {
-                  self._initTauri();
-                  return;
-                }
+            // En escritorio con Tauri, usamos WinRT via comandos Tauri
+            if (self._tieneTauri()) {
+              self._initTauri();
+              return;
+            }
 
-                if (typeof CdvPurchase === 'undefined' || !CdvPurchase.store) {
+            if (typeof CdvPurchase === 'undefined' || !CdvPurchase.store) {
         console.warn('[PurchaseManager] CdvPurchase no disponible');
         self._checkLocal();
         return;
