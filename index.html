@@ -443,6 +443,9 @@
     <script src="js/app.js?v=6.81"></script>
     <!-- Capa de escritorio: se instala sobre App, por eso va despues de app.js -->
     <script src="js/erp-shell.js?v=6.81"></script>
+    <!-- Panel de soporte (pie del sidebar + cajón minimizable). Va tras erp-shell
+         para poder montar su bloque en el pie del sidebar cuando ya existe. -->
+    <script src="js/soporte-panel.js?v=6.81"></script>
 
     <!-- Herramientas de QA/E2E (solo en desarrollo): se cargan bajo demanda,
          no en cada arranque en producción. Activar una vez con
