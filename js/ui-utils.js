@@ -106,8 +106,17 @@ const UI = {
             this.scrollListener = null;
             this.resizeListener = null;
             
+            // Heights measured per rendered item (real heights allow variable-height cards)
+            this._measuredHeights = new Map();
+
             // Create the scrolling structure
             this._createStructure();
+
+            // Allow the scroll area to have a fixed height (required when the
+            // contentContainer is absolutely positioned and the page already scrolls)
+            if (this.options.height) {
+                this.scrollContainer.style.height = this.options.height;
+            }
             
             // Bind event listeners
             this._bindEvents();
@@ -189,44 +198,78 @@ const UI = {
             return { startIndex, endIndex, viewportHeight, scrollTop };
         }
         
+        _getOffsetTop(index) {
+            let top = 0;
+            const limit = Math.min(index, this.items.length);
+            for (let i = 0; i < limit; i++) {
+                top += this._measuredHeights.get(i) != null ? this._measuredHeights.get(i) : this.itemHeight;
+            }
+            return top;
+        }
+
+        _getTotalHeight() {
+            let total = 0;
+            for (let i = 0; i < this.items.length; i++) {
+                total += this._measuredHeights.get(i) != null ? this._measuredHeights.get(i) : this.itemHeight;
+            }
+            return total;
+        }
+
         _updateVisibleItems() {
             if (this.items.length === 0) {
                 this.placeholder.style.display = 'block';
                 return;
             }
-            
+
             const { startIndex, endIndex } = this._getViewportInfo();
-            
+
             // Only update if the visible range has changed significantly
             if (startIndex === this.visibleStart && endIndex === this.visibleEnd) {
                 return;
             }
-            
+
             this.visibleStart = startIndex;
             this.visibleEnd = endIndex;
-            
+
             // Render visible items
             const fragment = document.createDocumentFragment();
-            
+            const rendered = [];
+
             for (let i = startIndex; i < endIndex; i++) {
                 const itemElement = this.options.renderItem(this.items[i], i);
                 if (itemElement) {
-                    // Position the item absolutely
+                    // Position the item at its measured offset (supports variable heights)
                     itemElement.style.position = 'absolute';
-                    itemElement.style.top = `${i * this.itemHeight}px`;
+                    itemElement.style.top = `${this._getOffsetTop(i)}px`;
+                    itemElement.style.left = '0';
                     itemElement.style.width = '100%';
                     itemElement.style.boxSizing = 'border-box';
+                    rendered.push({ index: i, el: itemElement });
                     fragment.appendChild(itemElement);
                 }
             }
-            
-            // Update content container height
-            this.contentContainer.style.height = `${this.items.length * this.itemHeight}px`;
-            
+
+            // Update content container height (sum of measured/estimated heights)
+            this.contentContainer.style.height = `${this._getTotalHeight()}px`;
+
             // Clear and append new items
             this.contentContainer.innerHTML = '';
             this.contentContainer.appendChild(fragment);
-            
+
+            // Measure real heights after insertion so subsequent scroll positions are
+            // accurate, even with variable-height cards.
+            for (const { index, el } of rendered) {
+                const h = el.offsetHeight;
+                if (h > 0) this._measuredHeights.set(index, h);
+            }
+
+            // Reposition rendered items using the freshly measured heights so that the
+            // first paint (done with estimated offsets) does not leave cards overlapping.
+            for (const { index, el } of rendered) {
+                el.style.top = `${this._getOffsetTop(index)}px`;
+            }
+            this.contentContainer.style.height = `${this._getTotalHeight()}px`;
+
             // Hide placeholder if we have items
             this.placeholder.style.display = this.items.length === 0 ? 'block' : 'none';
         }

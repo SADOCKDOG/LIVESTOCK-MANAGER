@@ -81,4 +81,6 @@ test-results/
 test_*.png
 test-*.png
 test-*.pdf
+# Fixture del test E2E de importación de PDFs de catastro (se versiona a pesar de test-*.pdf)
+!test-catastro.pdf
 pwa-header-verify-*.png
