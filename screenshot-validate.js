@@ -5,7 +5,9 @@ const fs = require('fs');
 const PROJECT_ROOT = 'C:/Users/yo/repo/LIVESTOCK-MANAGER/www';
 const PORT = 8095;
 const BASE = `http://localhost:${PORT}`;
-const OUT = 'C:/Users/yo/repo/LIVESTOCK-MANAGER/test-results/screenshots';
+// Playwright limpia test-results/ en cada corrida, así que la evidencia vive
+// fuera de esa carpeta para no perderse al ejecutar la suite.
+const OUT = 'C:/Users/yo/repo/LIVESTOCK-MANAGER/evidencias';
 
 function startServer() {
   const http = require('http');
@@ -86,9 +88,40 @@ async function seedDemo(page) {
     await page.evaluate(() => {
       try {
         if (window.GuideManager && typeof GuideManager.dismiss === 'function') GuideManager.dismiss();
+        if (window.GuideManager && typeof GuideManager._hideResumeChip === 'function') GuideManager._hideResumeChip();
       } catch (e) {}
+      // Ocultar permanentemente el chip de reanudar y cualquier overlay residual.
+      // El chip se crea dinamicamente al navegar, asi que tambien se elimina bajo demanda
+      // con un MutationObserver que lo quita en cuanto aparezca.
+      if (!window.__guideResidueHooked) {
+        window.__guideResidueHooked = true;
+        const st = document.createElement('style');
+        st.textContent = '.guide-resume-chip,.guide-overlay,.guide-popover,.guide-spotlight{display:none!important;}';
+        document.head.appendChild(st);
+        new MutationObserver(() => {
+          const chip = document.getElementById('guide-resume-chip');
+          if (chip) chip.remove();
+          document.querySelectorAll('body *').forEach(n => {
+            const cs = getComputedStyle(n);
+            if ((cs.position === 'fixed' || cs.position === 'absolute') &&
+                (parseInt(cs.zIndex, 10) || 0) >= 4000) {
+              n.remove();
+            }
+          });
+        }).observe(document.body, { childList: true, subtree: true });
+      }
+      document.getElementById('guide-resume-chip')?.remove();
       document.querySelectorAll('.guide-overlay, .guide-popover, .guide-resume-chip, .guide-spotlight')
         .forEach(n => n.remove());
+      // El chip de reanudar lleva z-index alto (4500): barrer cualquier flotante
+      // con z-index >= 4000 elimina el residuo del tour sin depender de ids.
+      document.querySelectorAll('body *').forEach(n => {
+        const cs = getComputedStyle(n);
+        if ((cs.position === 'fixed' || cs.position === 'absolute') &&
+            (parseInt(cs.zIndex, 10) || 0) >= 4000) {
+          n.remove();
+        }
+      });
     });
     await page.waitForTimeout(250);
   };
