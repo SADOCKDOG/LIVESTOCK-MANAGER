@@ -2391,13 +2391,11 @@ const App = {
         tipo_evento: tipo,
         fecha,
         hora,
+        lote: lote,
         notas,
         resultado: notas,
         fincaId
       };
-      if (tipo === 'Inseminación Artificial' || tipo === 'Monta Natural') {
-        payload.lote = lote;
-      }
       if (tipo === 'Monta Natural') {
         payload.numero_macho = numeroMacho;
       }
