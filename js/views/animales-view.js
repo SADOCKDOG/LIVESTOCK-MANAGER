@@ -103,6 +103,7 @@ const AnimalesView = {
                oninput="AnimalesView._filtrar(this.value)"
                class="form-input search-input">
         <select id="animales-filtro-especie" class="form-select"
+                aria-label="Filtrar por especie"
                 onchange="AnimalesView._setFiltro('especie', this.value)">
           <option value="" ${this._filtroActivo.especie === '' ? 'selected' : ''}>Todas</option>
           <option value="Vacas" ${this._filtroActivo.especie === 'Vacas' ? 'selected' : ''}>Vacas</option>

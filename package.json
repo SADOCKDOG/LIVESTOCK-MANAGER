@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "livestock-manager-premium",
   "version": "4.10.8",
   "private": true,
@@ -29,14 +29,15 @@
     "@capacitor/cli": "^7.6.8",
     "@capacitor/core": "^7.6.8",
     "@playwright/test": "^1.62.1",
+    "axe-core": "^4.13.0",
     "chrome-remote-interface": "^0.34.0",
     "markdown-it": "^14.3.0",
     "patch-package": "^8.0.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4",
     "postinstall-postinstall": "^2.1.0",
     "puppeteer": "^25.5.0",
-    "typescript": "~5.9.0",
-    "pdfjs-dist": "^4",
-    "pdf-lib": "^1.17.1"
+    "typescript": "~5.9.0"
   },
   "dependencies": {
     "@capacitor-mlkit/barcode-scanning": "^7.5.0",
