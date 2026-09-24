@@ -1191,7 +1191,15 @@ const App = {
     if (!fincaId && path !== "/ajustes")
       return await AsistenteConfiguracion.mostrarAsistente();
 
-    main.innerHTML = '<div class="loader">Cargando...</div>';
+    // Show detailed progress indicator instead of simple loader
+    main.innerHTML = '<div id="progress-container"></div>';
+    const progressContainer = document.getElementById('progress-container');
+    App._currentProgress = new UI.Progress(progressContainer, {
+      showPercentage: true,
+      showTime: true,
+      showETA: true
+    });
+    App._currentProgress.start('Cargando aplicación...', 'Preparando la interfaz de usuario');
     App.clearExitGuard(); // La vista que se va a renderizar registrará su propia guarda si la necesita
 
     // El FAB "Guía" y el tour cuelgan de <body>, no de #app-content, así que no se
@@ -1214,6 +1222,16 @@ const App = {
       // forma de que el usuario supiera que algo habia fallado ni de reintentarlo.
       const gruposOk = await App._ensureRouteScripts(path);
       if (!gruposOk) {
+        // Complete progress indicator with error state
+        if (App._currentProgress) {
+          App._currentProgress.complete('Error al cargar');
+          setTimeout(() => {
+            if (App._currentProgress) {
+              App._currentProgress.destroy();
+              App._currentProgress = null;
+            }
+          }, 800);
+        }
         main.innerHTML = `
           <div class="card error-card">
             <h2>No se pudo cargar esta sección</h2>
@@ -1225,6 +1243,17 @@ const App = {
       const methodName = App.routes[path];
       if (methodName && typeof App[methodName] === "function") {
         await App[methodName](params);
+
+        // Complete progress indicator
+        if (App._currentProgress) {
+          App._currentProgress.complete('Carga completada');
+          setTimeout(() => {
+            if (App._currentProgress) {
+              App._currentProgress.destroy();
+              App._currentProgress = null;
+            }
+          }, 800);
+        }
 
         // Auto-start guide for this view/tab (if enabled and first visit)
         try {
@@ -1253,6 +1282,16 @@ const App = {
       }
     } catch (error) {
       console.error(error);
+      // Complete progress indicator with error state
+      if (App._currentProgress) {
+        App._currentProgress.complete('Error en la carga');
+        setTimeout(() => {
+          if (App._currentProgress) {
+            App._currentProgress.destroy();
+            App._currentProgress = null;
+          }
+        }, 800);
+      }
       main.innerHTML = `<div class="card error-card"><h2>Error</h2><p>${error.message}</p></div>`;
       main.classList.add('route-enter');
       main.addEventListener('animationend', () => main.classList.remove('route-enter'), { once: true });
@@ -2391,13 +2430,11 @@ const App = {
         tipo_evento: tipo,
         fecha,
         hora,
+        lote: lote,
         notas,
         resultado: notas,
         fincaId
       };
-      if (tipo === 'Inseminación Artificial' || tipo === 'Monta Natural') {
-        payload.lote = lote;
-      }
       if (tipo === 'Monta Natural') {
         payload.numero_macho = numeroMacho;
       }

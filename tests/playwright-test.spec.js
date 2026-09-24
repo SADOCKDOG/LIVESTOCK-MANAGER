@@ -23,6 +23,7 @@ function startServer() {
     '.svg': 'image/svg+xml',
     '.webmanifest': 'application/manifest+json',
     '.pdf': 'application/pdf',
+    '.mjs': 'text/javascript',
     '.map': 'application/json',
     '.woff2': 'font/woff2',
     '.woff': 'font/woff',
@@ -173,12 +174,11 @@ test.describe('Importar Zonas - Parser Catastro E2E', () => {
     
     console.log('✅ Review screen data verified');
 
-    // 12. Click save (guardar) - wait for navigation
-        await Promise.all([
-          page.waitForNavigation({ timeout: 30000, url: '**/#/ganaderia*tab=zonas*' }),
-          page.click('.wizard-footer-fixed .btn-create')
-        ]);
-        console.log('Save clicked, navigated to /ganaderia?tab=zonas');
+    // 12. Click save (guardar) - navegación por hash (same-document), no dispara
+    //     event de navegación, así que se espera con waitForFunction.
+    await page.click('.wizard-footer-fixed .btn-create');
+    await page.waitForFunction(() => location.hash.includes('tab=zonas'), { timeout: 30000 });
+    console.log('Save clicked, navigated to /ganaderia?tab=zonas');
 
         // 13. Wait for /zonas view to load
         await page.waitForFunction(() => location.hash.includes('tab=zonas'), { timeout: 10000 });
@@ -202,7 +202,13 @@ test.describe('Importar Zonas - Parser Catastro E2E', () => {
   });
 
   test('Multiple PDFs with duplicate detection', async () => {
-      // Navigate to importar-zonas via hash change (app already initialized)
+      // Recargar en estado limpio (el test anterior deja la app en tab=zonas)
+      await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction('!!window.App', { timeout: 90000 });
+      await page.waitForTimeout(1000);
+      console.log('App re-initialized');
+
+      // Navigate to importar-zonas via hash change
       await page.evaluate(() => { location.hash = '#/importar-zonas'; });
       await page.waitForSelector('#pdf-files', { timeout: 15000 });
       console.log('Selector view rendered');
