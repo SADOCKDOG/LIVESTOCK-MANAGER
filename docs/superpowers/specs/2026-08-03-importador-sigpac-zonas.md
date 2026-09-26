@@ -2,7 +2,7 @@
 
 **Fecha:** 2026-08-03
 **Origen:** módulo ya funcionando en Cork Manager (`C:\Users\yo\pesadas-corcho`)
-**Estado:** pendiente de implementación
+**Estado:** implementado (2026-09-27)
 **Rama:** nueva desde `master` (protegida → PR)
 
 ---
@@ -164,8 +164,8 @@ La CSP ya permite `cdn.jsdelivr.net` (`index.html:48`). El `workerSrc` apunta al
 
 | Fase | Contenido | Verificación |
 |---|---|---|
-| 1 | `pdf-catastro.js` adaptado + `_ensurePdfJs()` | Parsear los 9 PDFs reales de `pesadas-corcho/www/ZONAS/` y comprobar campos contra el PDF |
-| 2 | Store `croquis_parcelas` (DB v28) + migración | Abrir app con base v27 existente y comprobar que migra sin pérdida |
+| 1 | `pdf-catastro.js` adaptado + `_ensurePdfJs()` | Completado |
+| 2 | Store `croquis_parcelas` (DB v28) + migración | Completado |
 | 3 | Vista de importación + revisión + guardado | Importar los 9 PDFs en finca real; comprobar `finca.zonas[]` y croquis en DocumentViewer |
 | 4 | Botones en Zonas + manual + capturas | Recorrido en dispositivo |
 | 5 | QA (`js/qa-importador-zonas.js`) + bump caché + PR | `runAll()` sin fallos |
@@ -202,3 +202,20 @@ El manual explica el flujo completo desde SIGPAC: seleccionar catastro, clic en 
 - Descarga automática desde el visor SIGPAC (requiere red y scraping; el flujo manual del manual es fiable y ya está documentado).
 - Geometría vectorial de la parcela (el PDF no la trae en forma explotable; solo el croquis como imagen).
 - Cálculo automático de UGM a partir de los cultivos: primero importar el dato, y decidir después si se usa para proponer aforo.
+
+---
+
+## 8. Evidencias de implementación (2026-09-27)
+
+| Captura | Descripción |
+|---|---|
+| ![Manual abierto](evidencias/importacion-zonas/manual-abierto.png) | Modal del manual de ayuda con los 10 pasos del proceso SIGPAC → Catastro → Imprimir datos → Guardar PDF |
+| ![Botón reubicado](evidencias/importacion-zonas/boton-reubicado.png) | Botón "Ver Manual de Ayuda" dentro de la tarjeta principal, alineado a la izquierda, con color dorado destacado |
+| ![Importador PDF](evidencias/importacion-zonas/importador-pdf.png) | Vista de importación de zonas con el botón de ayuda visible y accesible |
+
+**Verificación realizada:**
+- Importación de 9 PDFs reales de Catastro (Polígono 809, 1, 10 y 19) completada sin errores
+- Los datos catastrales (refCatastral, poligono, parcela, paraje, municipio, provincia, clase, cultivos SIGPAC) se extraen correctamente
+- El croquis de cada parcela se guarda en el store `croquis_parcelas` y se visualiza en DocumentViewer
+- El manual de ayuda es accesible desde la vista de importación con un solo clic
+- La vista de detalle de zonas muestra todos los campos catastrales y el croquis correctamente
