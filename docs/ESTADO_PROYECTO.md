@@ -1,5 +1,5 @@
 # Estado del Proyecto — Livestock Manager (SIGGAN)
-> Fotografía técnica regenerada el **2026-06-24** · Versión de app: **v4.5.0** · Base de datos: **IndexedDB DB v10** · Service Worker: **`corcho-v6.5.63`**
+> Fotografía técnica regenerada el **2026-09-27** · Versión de app: **v4.10.8** · Base de datos: **IndexedDB DB v28** · Service Worker: **`corcho-v6.85`**
 
 > Este documento sustituye a la fotografía anterior (v3.7.1 / DB v5), que había quedado obsoleta. Reconstruido a partir del código real y del historial de commits (84 commits, 6 PRs de adaptación SIGGAN).
 
@@ -9,14 +9,14 @@
 
 | Artefacto | Valor |
 |---|---|
-| `package.json` | `4.5.0` |
-| `index.html` (cache-bust) | `?v=20260624031800` (JS QA) · `?v=5.2.0` (CSS) |
-| `app.js` (cabecera interna) | `v4.0.0` (Application Controller) |
+| `package.json` | `4.10.8` |
+| `index.html` (cache-bust) | `?v=6.85` |
+| `app.js` (cabecera interna) | `v4.10.8` (Application Controller) |
 | `trazabilidad.js` | `v3.3.5 Premium` |
 | `analitica.js` | `v3.2.1 Premium` |
 | `pesajes.js` | `v4.0.0` |
-| **Base de datos IndexedDB** | **DB v10** |
-| **Service Worker** `CACHE_NAME` | **`corcho-v6.5.63`** |
+| **Base de datos IndexedDB** | **DB v28** |
+| **Service Worker** `CACHE_NAME` | **`corcho-v6.85`** |
 
 > **Disciplina de caché:** al modificar cualquier JS/CSS/HTML hay que subir `CACHE_NAME` en `sw.js` para forzar recarga en Android/PWA.
 
@@ -49,6 +49,7 @@
 ├─────────────────────────────────────────────────────────────┤
 │                 CAPA DE VISTAS (js/views/)                    │
 │  ~22 vistas + 9 wizards (js/views/wizards/)                  │
+│  importar-zonas-view.js (importador SIGPAC con manual)      │
 ├─────────────────────────────────────────────────────────────┤
 │                  ORQUESTADOR CENTRAL                          │
 │  app.js — App (router de 30 rutas, todas activas)            │
