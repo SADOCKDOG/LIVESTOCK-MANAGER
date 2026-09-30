@@ -153,6 +153,39 @@ test.describe('ZonasView: protección de identidad y datos vinculados', () => {
     expect(fincaConId.zonas[0].id).toBe(4);
   });
 
+  test('Fincas.save no reasigna una zona sobre un zonaId de rebaño ya referenciado', async () => {
+    // El rebaño referencia el zonaId 5, pero ninguna zona existente lo usa: es un
+    // huérfano que indica que una zona legacy perdió su ID. Una zona nueva sin ID
+    // no debe recibir 5, porque eso reenlazaría silenciosamente el rebaño a otra zona.
+    const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'fincas.js'), 'utf8');
+    const context = {
+      window: {
+        db: {
+          async getAllFromIndex(store, index, value) {
+            return store === 'rebanos'
+              ? [{ id: 1, fincaId: value, zonaId: 5, zonaActual: 'Sin zona' }]
+              : [];
+          },
+          async put(store, data) { return data.id; }
+        }
+      },
+      localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+      CustomEvent: function CustomEvent() {},
+      Date,
+      Number,
+      Set,
+      Error
+    };
+    vm.createContext(context);
+    vm.runInContext(source, context);
+    context.window.PremiumManager = { isFree: () => false };
+    const finca = { id: 8, nombre: 'Finca', zonas: [{ id: 4, nombre: 'Con ID' }, { nombre: 'Sin zona' }] };
+    await context.window.Fincas.save(finca);
+    const zonaNueva = finca.zonas[1];
+    expect(Number(zonaNueva.id)).not.toBe(5);
+    expect(Number(zonaNueva.id)).toBeGreaterThan(5);
+  });
+
   test('migra rebaños legacy solo por nombre inequívoco y conserva IDs huérfanos referenciados', async () => {
     const { view, context } = loadZonasView();
     const rebanos = [
