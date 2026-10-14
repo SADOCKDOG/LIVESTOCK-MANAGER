@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">Livestock Manager Premium</h1>
-<h3 align="center">Sistema Integral de Gestión Ganadera · v4.10.1</h3>
+<h3 align="center">Sistema Integral de Gestión Ganadera · v4.10.8</h3>
 
 <p align="center">
   PWA híbrida (Android · Capacitor 7) 100% <strong>offline-first</strong> para la gestión profesional de explotaciones ganaderas, con cumplimiento normativo nativo del sistema <strong>SIGGAN</strong> (Andalucía) y <strong>BADIGEX</strong> (Extremadura).
@@ -17,6 +17,19 @@
   <a href="#instalación-y-desarrollo">Instalación</a> ·
   <a href="#free--premium">Free / Premium</a>
 </p>
+
+---
+
+## Estado y disponibilidad
+
+| Plataforma | Versión | Estado | Coste |
+|---|---|---|---|
+| Windows (Microsoft Store) | 4.10.526 | Publicada | Gratuita, sin límites de fincas ni animales |
+| Windows nativa (Tauri) | 4.11.15 | Distribuida con el paquete «Activación Licencia de Soporte» de Partner Center; incluye el soporte con IA | Gratuita, sin límites; el soporte es opcional |
+| Android (Google Play) | 4.10.8 (529) | Prueba cerrada con testers; aún no disponible para usuario final | Versión Free gratuita, con límites (1 finca, 15 animales); Premium por compra única dentro de la app |
+| Soporte técnico con IA | — | Integrado en la app ([`livestock-manager-support-api`](https://github.com/SADOCKDOG/livestock-manager-support-api)) | Complemento opcional con suscripción mensual renovable; límites diarios de incidencias y mensajes por usuario |
+
+> El nombre «Premium» de la ficha de Microsoft Store designa la edición completa, sin límites; no implica coste. Los límites de la sección [Free / Premium](#free--premium) corresponden a la versión de Android.
 
 ---
 
@@ -297,6 +310,8 @@ LIVESTOCK-MANAGER/
 
 ## Free / Premium
 
+> Esta sección describe el modelo de la versión de Android, actualmente en prueba cerrada (aún no disponible para usuario final). La versión de Windows es gratuita y no aplica estos límites.
+
 | Característica | **FREE** | **PREMIUM** |
 |----------------|----------|-------------|
 | **Fincas** | 1 finca | Ilimitadas |
@@ -473,6 +488,9 @@ cd android
 ```
 
 ### Generar AAB (Release - Play Store)
+
+> La publicación en Google Play está en prueba cerrada (solo testers); aún no está disponible para usuario final.
+
 ```bash
 cd android
 ./gradlew :app:bundleRelease
@@ -521,7 +539,7 @@ zipalign -c -P 16 -v 4 app/build/outputs/apk/release/app-release.apk
 ## Licencia y Créditos
 
 © 2026 **David Asuar Arteaga** · Livestock Manager Premium.  
-Todos los derechos reservados. Uso exclusivo interno.
+Todos los derechos reservados. El código fuente no se distribuye bajo licencia de código abierto. La versión de Windows puede descargarse y usarse gratuitamente desde Microsoft Store.
 
 ---
 
