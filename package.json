@@ -25,7 +25,7 @@
     "cap:sync": "npm run cap:sync:demo"
   },
   "devDependencies": {
-    "@capacitor/android": "^7.6.8",
+    "@capacitor/android": "^7.6.9",
     "@capacitor/cli": "^7.6.8",
     "@capacitor/core": "^7.6.8",
     "@playwright/test": "^1.62.1",
