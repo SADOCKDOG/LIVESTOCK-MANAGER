@@ -2061,7 +2061,7 @@ const App = {
     if (!App._viewGroupLoadPromises[groupName]) {
       App._viewGroupLoadPromises[groupName] = Promise.all(files.map(src => new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = src + '?v=6.74.0';
+        s.src = src + '?v=6.85';  // mismo token que index.html, si no el navegador sirve la copia cacheada
         s.async = false;
         s.onload = resolve;
         s.onerror = reject;
