@@ -18,7 +18,7 @@ const { test, expect } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
 
-const PROJECT_ROOT = 'C:/Users/yo/repo/LIVESTOCK-MANAGER/www';
+const PROJECT_ROOT = path.resolve(__dirname, '..', 'www');
 const PORT = 8876;
 const BASE_URL = `http://localhost:${PORT}`;
 
@@ -125,7 +125,7 @@ test.describe('Soporte panel minimizable + pie sidebar (Tarea #19)', () => {
     expect(diag.existe).toBe(true);
     expect(diag.visible).toBe(true);
     expect(diag.titulo.toLowerCase()).toContain('soporte');
-    expect(diag.tabs).toBe(2); // «Nueva incidencia» + «Mis incidencias»
+    expect(diag.tabs).toBe(3); // «Nueva incidencia» + «Mis incidencias» + «Licencia»
   });
 
   test('El botón Minimizar oculta el cajón y muestra la barra flotante #sp-min', async () => {
@@ -183,5 +183,25 @@ test.describe('Soporte panel minimizable + pie sidebar (Tarea #19)', () => {
       /TypeError|ReferenceError|SyntaxError|is not a function|is not defined/.test(e)
     );
     expect(fatal).toEqual([]);
+  });
+
+  test('Muestra el aviso cuando la licencia está próxima a caducar', async () => {
+    await page.evaluate(() => {
+      window.SupportAPI.tieneSesion = () => false;
+      window.SupportAPI.licenciaGuardada = () => ({ activa: true, expira: '2099-01-01' });
+      window.SupportAPI.textoLicencia = () => ({
+        activa: true,
+        aviso: true,
+        titulo: 'Licencia activa',
+        detalle: 'Válida hasta el 1 de enero de 2099.'
+      });
+      window.SupportAPI.correoGuardado = () => '';
+    });
+
+    await clickDom(page, '#sidebarStatus .sp-pie');
+    await clickDom(page, '#sp-tab-licencia');
+
+    const avisos = await page.locator('#sp-cuerpo p.text-sm.mt-10').allTextContents();
+    expect(avisos.join(' ')).toContain('Válida hasta el 1 de enero de 2099.');
   });
 });
