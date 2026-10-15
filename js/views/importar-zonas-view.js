@@ -261,7 +261,12 @@ const ImportarZonasView = {
       if (r.incluir === undefined) r.incluir = true;
     }
 
-    const validos = this._resultadosParseo.filter((r) => r.incluir && r.datos && this._esPDFElegidoDelGrupo(r)).length;
+    // Un PDF marcado para omitir no se guarda: _guardarParcelas lo salta con
+    // `continue`. Contarlo aqui hacia que el boton anunciara mas parcelas de las
+    // que se acaban escribiendo.
+    const validos = this._resultadosParseo.filter((r) =>
+      r.incluir && r.datos && this._esPDFElegidoDelGrupo(r) && r.duplicadoAccion !== 'omitir'
+    ).length;
     const conError = this._resultadosParseo.filter(r => r.error).length;
     const duplicados = new Set([
       ...this._resultadosParseo.map((r, i) => r.grupoDuplicadoLote || r.coincidenciasZona?.length ? i : -1).filter((i) => i >= 0)
@@ -495,7 +500,12 @@ const ImportarZonasView = {
   },
 
   _actualizarBotonGuardar() {
-    const validos = this._resultadosParseo.filter((r) => r.incluir && r.datos && this._esPDFElegidoDelGrupo(r)).length;
+    // Un PDF marcado para omitir no se guarda: _guardarParcelas lo salta con
+    // `continue`. Contarlo aqui hacia que el boton anunciara mas parcelas de las
+    // que se acaban escribiendo.
+    const validos = this._resultadosParseo.filter((r) =>
+      r.incluir && r.datos && this._esPDFElegidoDelGrupo(r) && r.duplicadoAccion !== 'omitir'
+    ).length;
     const gruposLote = new Set(this._resultadosParseo.map((r) => r.grupoDuplicadoLote).filter(Boolean));
     const faltaDecisionLote = [...gruposLote].some((grupo) => {
       const decision = this._resultadosParseo.find((r) => r.grupoDuplicadoLote === grupo);
@@ -511,7 +521,9 @@ const ImportarZonasView = {
     const btn = document.querySelector('.wizard-footer-fixed .btn-create');
     if (btn) {
       btn.disabled = validos === 0 || faltaDecision || this._bloqueoGuardado;
-      btn.textContent = `${Icons.guardar()} Guardar ${validos} parcela${validos !== 1 ? 's' : ''}`;
+      // innerHTML, no textContent: el icono es un <svg> y textContent lo escapa
+      // como texto, dejando el codigo SVG visible dentro del boton.
+      btn.innerHTML = `${Icons.guardar()} Guardar ${validos} parcela${validos !== 1 ? 's' : ''}`;
     }
   },
 
