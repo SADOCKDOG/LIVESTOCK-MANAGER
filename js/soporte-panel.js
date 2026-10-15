@@ -501,7 +501,7 @@
             '<button class="btn btn-secondary btn--inline" type="button" ' +
             'onclick="SoportePanel.restaurar()">Ya la tengo</button>') +
         '</div>' +
-        (info.avisa
+        (info.aviso
           ? '<p class="text-sm mt-10" style="color:var(--c-warning,#E8A33D)">' +
             escapar(info.detalle) + '</p>'
           : ''));
