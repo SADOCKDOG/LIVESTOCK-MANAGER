@@ -20,7 +20,10 @@ const ImportarZonasView = {
     return `
       <div class="wizard-full-screen">
         <div class="wizard-header-fixed border-top-5-gold">
-          <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.importar()} IMPORTAR ZONAS DESDE PDF</h1>
+          <div class="flex items-center justify-between px-4 py-4">
+            <h1 class="wizard-header-title uppercase font-950 tracking-widest text-lg"><span style="color: var(--p-gold); margin-right: 6px;">|</span> ${Icons.importar()} IMPORTAR ZONAS DESDE PDF</h1>
+            <button class="btn btn-secondary btn-sm" onclick="ImportarZonasView._toggleAyuda()" style="padding: 6px 12px; font-size: 0.85rem; border-left: 3px solid #c9851f;">${Icons.libro()} Ayuda SIGPAC</button>
+          </div>
         </div>
         <div class="wizard-content-scrollable p-20">
           <div class="card-registro" style="--registro-color: var(--c-success);">
@@ -32,6 +35,25 @@ const ImportarZonasView = {
                   Selecciona uno o varios PDFs oficiales de <strong>"Consulta descriptiva y gráfica de datos catastrales"</strong> (sede.catastro.gob.es).
                   El flujo habitual: SIGPAC → Catastro → Imprimir datos → Guardar como PDF.
                 </p>
+              </div>
+
+              <div id="ayuda-sigpac" class="hidden mt-8 p-6 rounded-xs" style="background:rgba(201,133,31,0.06);border:1px solid #c9851f;border-left:4px solid #c9851f;">
+                <h4 class="text-warning font-800 text-sm mb-3 flex items-center gap-2">${Icons.libro()} Guía rápida: Exportar PDF desde SIGPAC</h4>
+                <ol class="list-decimal list-inside text-xs text-gray space-y-2 mb-4">
+                  <li><strong>Ve al SIGPAC</strong> (sede.catastro.gob.es) y selecciona Catastro.</li>
+                  <li><strong>Haz clic en la parcela</strong> para ver su ficha descriptiva.</li>
+                  <li><strong>Selecciona "Imprimir Datos"</strong> para generar el PDF oficial.</li>
+                  <li><strong>Copia el nombre del Polígono y Parcela</strong> del documento.</li>
+                  <li><strong>Guarda el PDF</strong> asegurándote de que incluye el croquis y tabla de cultivos.</li>
+                  <li><strong>Guarda el PDF con el nombre correcto</strong> para que la app extraiga la Ref. Catastral.</li>
+                  <li><strong>Abre la app y ve a Zonas</strong> desde el menú inferior.</li>
+                  <li><strong>Haz clic en "Importar PDF"</strong> y selecciona uno o varios archivos.</li>
+                  <li><strong>Selecciona el PDF y acepta</strong> para procesar superficie y localización.</li>
+                  <li><strong>Confirma y guarda la zona</strong> con un nombre familiar.</li>
+                </ol>
+                <div class="mt-3 text-xs text-gray border-t border-gray/20 pt-3">
+                  <strong>[INFO]</strong> La app lee automáticamente la Referencia Catastral del PDF para evitar errores de entrada manual.
+                </div>
               </div>
 
               <div class="wizard-input-group">
@@ -745,6 +767,10 @@ const ImportarZonasView = {
 
   _cancelar() {
     location.hash = '#/zonas';
+  },
+
+  _toggleAyuda() {
+    document.getElementById('ayuda-sigpac').classList.toggle('hidden');
   },
 
   _renderBotonesNavegacion(paso) {
