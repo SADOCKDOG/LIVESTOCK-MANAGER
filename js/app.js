@@ -2948,12 +2948,25 @@ const App = {
   // ==========================================
   async renderInformes(params) {
     try {
-      // Soporte de deep-link: #/informes?tab=alertas (o cualquier sub-tab válido)
-      const tab = params?.get ? params.get('tab') : null;
-      if (tab && window.InformesView) {
-        const esValido = Object.values(InformesView._categories || {})
-          .some(cat => Object.prototype.hasOwnProperty.call(cat.tabs || {}, tab));
-        if (esValido) InformesView._currentTab = tab;
+      // Deep-link: #/informes?cat=general&tab=alertas (cualquier categoría/sub-tab válido).
+      if (params?.get && window.InformesView) {
+        const cats = InformesView._categories || {};
+        const cat = params.get('cat');
+        const tab = params.get('tab');
+        if (cat && Object.prototype.hasOwnProperty.call(cats, cat)) {
+          InformesView._currentCategory = cat;
+        }
+        const catActual = InformesView._currentCategory;
+        const tabsCat = (cats[catActual] || {}).tabs || {};
+        const tabValido = (t) => Object.prototype.hasOwnProperty.call(tabsCat, t);
+        if (tab && tabValido(tab)) {
+          InformesView._currentTab = tab;
+        } else if (!tabValido(InformesView._currentTab)) {
+          // El tab activo no pertenece a la categoría (p.ej. cambio de cat sin tab):
+          // caer al primer sub-tab válido de la categoría actual.
+          const primero = Object.keys(tabsCat).find(t => InformesView._esTabPermitida(t));
+          if (primero) InformesView._currentTab = primero;
+        }
       }
       await InformesView.render();
     } catch (e) {
