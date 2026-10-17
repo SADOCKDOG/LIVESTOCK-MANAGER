@@ -102,6 +102,14 @@ const ManualesView = {
       color: '#c9851f',
     },
     {
+      id: 'zonas-sigpac',
+      titulo: 'Importación de Zonas del SIGPAC',
+      descripcion: 'Exporta el PDF oficial desde el Catastro (SIGPAC) e importa parcelas a la app: referencia catastral automática, superficie y localización.',
+      icono: 'zonas',
+      archivo: 'manual/manual-zonas.html',
+      color: '#c9851f',
+    },
+    {
       id: 'contratos',
       titulo: 'Contratos — Acuerdos Comerciales',
       descripcion: 'Registro de contratos con compradores: tipos (carne/leche/mixto), vigencia, IVA, tabla de precios pactados y su integración en liquidaciones.',
