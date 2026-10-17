@@ -185,10 +185,15 @@ const ManualesView = {
       </div>`;
   },
 
+  /** Escapa un valor para interpolarlo entre comillas simples dentro de un atributo onclick. */
+  _escAttr(valor) {
+    return String(valor).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  },
+
   _renderLista() {
     return this._MANUALES.map(m => `
       <div class="card-registro manual-card" style="--registro-color: ${m.color}; padding:16px; cursor:pointer;"
-           onclick="ManualesView._abrirManual('${m.archivo}', '${m.titulo.replace(/'/g, "\\'")}')">
+           onclick="ManualesView._abrirManual('${m.archivo}', '${this._escAttr(m.titulo)}')">
         <div class="flex items-center gap-14">
           <span class="flex-shrink-0" style="width:32px; height:32px; color:${m.color}; display:flex; align-items:center; justify-content:center;">
             ${Icons[m.icono] ? Icons[m.icono]({ style: 'width:32px; height:32px;' }) : ''}
