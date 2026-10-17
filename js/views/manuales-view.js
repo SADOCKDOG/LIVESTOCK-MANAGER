@@ -203,7 +203,7 @@ const ManualesView = {
             <div style="font-size:0.78rem; color:#999; line-height:1.3;">${m.descripcion}</div>
           </div>
           <button class="btn btn-sm" style="flex-shrink:0; background:${m.color}; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:0.7rem; font-weight:700;"
-                  onclick="event.stopPropagation(); ManualesView._exportarPDF('${m.archivo}', '${m.titulo}')">
+                  onclick="event.stopPropagation(); ManualesView._exportarPDF('${m.archivo}', '${this._escAttr(m.titulo)}')">
             ${Icons.exportar()} PDF
           </button>
         </div>
