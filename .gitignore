@@ -50,6 +50,15 @@ tools/
 # Modo de publicación (generado por build:free / build:premium)
 js/mode-config.js
 
+# Vercel y bun: restos de una sesion con Trae (proyecto "trae_k4xlkz88") que nunca
+# se conectaron al pipeline real. El proyecto usa npm + PowerShell y se despliega
+# con cap sync / Google Play, no con Vercel. La copia se conserva en
+# private/limpieza-2026-10/vercel-bun/.
+.vercel/
+.vercelignore
+vercel.json
+bun.lock
+
 # Sistema
 .DS_Store
 Thumbs.db
