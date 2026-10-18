@@ -382,17 +382,28 @@ npm run cap:open
 
 ### Variables de Entorno / Signing (Android)
 
-El proyecto usa `keystore.properties` (no commiteado) para signing de release:
+El proyecto usa `keystore.properties` (**no commiteado**, ignorado por `.gitignore`)
+para el signing de release:
 
 ```properties
 # android/keystore.properties
 storeFile=upload.jks
-storePassword=livestock2026
+storePassword=<tu contraseña, NO la subas al repo>
 keyAlias=upload
-keyPassword=livestock2026
+keyPassword=<tu contraseña, NO la subas al repo>
 ```
 
-> **Nota:** El `upload.jks` incluido es solo para desarrollo. Para producción, genere su propio keystore y actualice `keystore.properties` (o use variables de entorno `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEYSTORE_KEY_ALIAS`, `KEYSTORE_KEY_PASSWORD`).
+> **Nunca pongas la contraseña real en este README.** Este fichero es público y
+> todo lo que se escribe aquí queda en el historial de git aunque luego se borre.
+> Para compartir la plantilla, deja los valores vacíos o con marcadores.
+
+Para producción se recomienda, además de lo anterior:
+
+- usar variables de entorno (`KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEYSTORE_KEY_ALIAS`,
+  `KEYSTORE_KEY_PASSWORD`) en vez del fichero, para que las credenciales no dependan
+  del disco;
+- proteger el `upload.jks` de release y su contraseña como secretos de la
+  organización, no como fichero en una máquina.
 
 ### Configuración Capacitor (`capacitor.config.ts`)
 
