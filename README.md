@@ -25,7 +25,7 @@
 | Plataforma | Versión | Estado | Coste |
 |---|---|---|---|
 | Windows (Microsoft Store) | 4.10.526 | Publicada | Gratuita, sin límites de fincas ni animales |
-| Windows nativa (Tauri) | 4.11.15 | Distribuida con el paquete «Activación Licencia de Soporte» de Partner Center; incluye el soporte con IA | Gratuita, sin límites; el soporte es opcional |
+| Windows nativa (Tauri) | 4.11.21.0 | Distribuida con el paquete «Activación Licencia de Soporte» de Partner Center (canal de vuelo, subido el 18 oct 2026, en certificación); incluye el soporte con IA | Gratuita, sin límites; el soporte es opcional |
 | Android (Google Play) | 4.10.8 (529) | Prueba cerrada con testers; aún no disponible para usuario final | Versión Free gratuita, con límites (1 finca, 15 animales); Premium por compra única dentro de la app |
 | Soporte técnico con IA | — | Integrado en la app ([`livestock-manager-support-api`](https://github.com/SADOCKDOG/livestock-manager-support-api)) | Complemento opcional con suscripción mensual renovable; límites diarios de incidencias y mensajes por usuario |
 
