@@ -405,15 +405,30 @@ const ManualesView = {
         return;
       }
     } catch (e) { console.warn('[Manual Share] falló:', e?.message || e); }
-    // 2) navigator.share con File (web/PWA)
+    // 2) File System Access API (escritorio) — selector de carpeta local
     try {
-      if (navigator.share) {
+      if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [{ description: 'Archivo', accept: { 'application/pdf': ['.pdf'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        App.toast('PDF guardado', 'success');
+        return;
+      }
+    } catch (e) { if (e.name === 'AbortError') return; console.warn('[showSaveFilePicker]', e?.message || e); }
+
+    // 3) navigator.share (Web/PWA móvil) — OMITIR en escritorio/Tauri
+    try {
+      if (navigator.share && !esEscritorio()) {
         const file = new File([blob], fileName, { type: 'application/pdf' });
         await navigator.share({ title: titulo, files: [file] });
         return;
       }
     } catch (e) { if (e.name === 'AbortError') return; }
-    // 3) Fallback: descarga directa (navegador de escritorio)
+    // 4) Fallback: descarga directa (navegador de escritorio)
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = fileName; a.style.display = 'none';
     document.body.appendChild(a); a.click();
@@ -421,5 +436,10 @@ const ManualesView = {
     App.toast('PDF descargado', 'success');
   },
 };
+
+/** Detecta entorno de escritorio (Tauri) para evitar navigator.share */
+function esEscritorio() {
+  return !!(window.__TAURI__ || window.__TAURI_IPC__);
+}
 
 window.ManualesView = ManualesView;
