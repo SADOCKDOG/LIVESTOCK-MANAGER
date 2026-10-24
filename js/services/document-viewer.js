@@ -192,7 +192,7 @@ const DocumentViewer = {
         App.toast('Documento guardado', 'success');
         return;
       }
-    } catch (e) { if (e.name !== 'AbortError') console.warn('[showSaveFilePicker]', e?.message || e); }
+    } catch (e) { if (e.name === 'AbortError') return; console.warn('[showSaveFilePicker]', e?.message || e); }
 
     // navigator.share (Web/PWA móvil) — OMITIR en escritorio/Tauri
     if (navigator.share && !esEscritorio()) {

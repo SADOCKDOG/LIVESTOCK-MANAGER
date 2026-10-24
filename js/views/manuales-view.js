@@ -418,7 +418,7 @@ const ManualesView = {
         App.toast('PDF guardado', 'success');
         return;
       }
-    } catch (e) { if (e.name !== 'AbortError') console.warn('[showSaveFilePicker]', e?.message || e); }
+    } catch (e) { if (e.name === 'AbortError') return; console.warn('[showSaveFilePicker]', e?.message || e); }
 
     // 3) navigator.share (Web/PWA móvil) — OMITIR en escritorio/Tauri
     try {

@@ -565,7 +565,8 @@ const CuadernoDigitalView = {
         return true;
       }
     } catch (e) {
-      if (e.name !== 'AbortError') console.warn(`[showSaveFilePicker ${titulo}] falló:`, e?.message || e);
+      if (e.name === 'AbortError') return true; // usuario canceló el guardado
+      console.warn(`[showSaveFilePicker ${titulo}] falló:`, e?.message || e);
     }
 
     // 3️⃣ navigator.share (Web/PWA móvil) — OMITIR en escritorio/Tauri
@@ -967,7 +968,8 @@ const CuadernoDigitalView = {
           return;
         }
       } catch (e) {
-        if (e.name !== 'AbortError') console.warn('[showSaveFilePicker CSV]', e?.message || e);
+        if (e.name === 'AbortError') return; // usuario canceló el guardado
+        console.warn('[showSaveFilePicker CSV]', e?.message || e);
       }
 
       // Fallback: descarga directa

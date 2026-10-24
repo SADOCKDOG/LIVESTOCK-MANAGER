@@ -455,7 +455,7 @@ const TrazabilidadView = {
             App.toast('PDF guardado', 'success');
             return;
           }
-        } catch (e) { if (e.name !== 'AbortError') console.warn('[showSaveFilePicker]', e?.message || e); }
+        } catch (e) { if (e.name === 'AbortError') return; console.warn('[showSaveFilePicker]', e?.message || e); }
 
         // Fallback: descarga directa
         const url = URL.createObjectURL(pdfBlob);

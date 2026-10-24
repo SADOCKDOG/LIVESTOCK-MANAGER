@@ -1019,7 +1019,8 @@ Object.assign(window.InformesView, {
         return true;
       }
     } catch (e) {
-      if (e.name !== 'AbortError') console.warn(`[showSaveFilePicker ${titulo}]`, e?.message || e);
+      if (e.name === 'AbortError') return true; // usuario canceló el guardado
+      console.warn(`[showSaveFilePicker ${titulo}]`, e?.message || e);
     }
 
     // 3️⃣ navigator.share (Web/PWA móvil) — OMITIR en escritorio/Tauri
