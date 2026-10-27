@@ -262,26 +262,44 @@ const ConfigSistemaView = {
         </div>
       ` : '';
 
+      const _esc = (typeof AuditService !== 'undefined' && typeof AuditService.escapeHtml === 'function')
+        ? (s) => AuditService.escapeHtml(s)
+        : (s) => {
+            if (s == null) return '';
+            return String(s)
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;');
+          };
+
       let logsHtml = logs.length > 0 ? logs.map(l => {
-        const isAnulado = l.anulado || l.motivo_tarea?.includes('anulacion') || l.action === 'DELETE_LOGICAL';
-        const isRectificado = l.rectificado || l.resultado === 'WARNING';
+        const isAnulado = l.anulado || l.motivo_tarea?.includes('anulacion') || l.motivo_tarea?.includes('baja') || l.action === 'DELETE_LOGICAL';
+        const isRectificado = l.rectificado || l.resultado === 'WARNING' || l.motivo_tarea?.includes('rectificacion');
         const color = isAnulado ? 'var(--c-danger)' : (isRectificado ? 'var(--c-warning)' : 'var(--c-info)');
-        const actorTag = l.actor_id ? `<span class="text-[0.55rem] text-gray-500 font-bold ml-6">| Actor: ${l.actor_id}</span>` : '';
+        const actorTag = l.actor_id ? `<span class="text-[0.55rem] text-gray-500 font-bold ml-6">| Actor: ${_esc(l.actor_id)}</span>` : '';
         const fieldsTag = Array.isArray(l.fields_modified) && l.fields_modified.length > 0
-          ? `<div class="text-[0.6rem] text-gray-400 mt-2">Campos alterados: ${l.fields_modified.join(', ')}</div>`
+          ? `<div class="text-[0.6rem] text-gray-400 mt-2">Campos alterados: ${_esc(l.fields_modified.join(', '))}</div>`
+          : '';
+        const motivo = _esc((l.motivo_tarea || 'Evento de Sistema').replace(/_/g, ' '));
+        const fechaStr = _esc(new Date(l.creadoEn || l.fecha).toLocaleString());
+        const desc = _esc(l.descripcion || l.observaciones || 'Registro modificado');
+        const detalleMotivo = (l.rectificadoMotivo || l.anuladoMotivo)
+          ? `<div class="text-[0.6rem] text-aaa italic mt-2">Motivo: ${_esc(l.rectificadoMotivo || l.anuladoMotivo)}</div>`
           : '';
 
         return `
           <div class="p-10 mb-8 rounded bg-black border border-222 border-left-3px" style="border-left-color:${color};">
             <div class="flex justify-between items-start">
               <span class="text-[0.65rem] font-950 uppercase" style="color:${color};">
-                ${l.motivo_tarea?.replace(/_/g, ' ') || 'Evento de Sistema'} ${actorTag}
+                ${motivo} ${actorTag}
               </span>
-              <span class="text-[0.55rem] text-gray-600 font-900">${new Date(l.creadoEn || l.fecha).toLocaleString()}</span>
+              <span class="text-[0.55rem] text-gray-600 font-900">${fechaStr}</span>
             </div>
-            <div class="text-white text-xs mt-4 font-700">${l.descripcion || l.observaciones || 'Registro modificado'}</div>
+            <div class="text-white text-xs mt-4 font-700">${desc}</div>
             ${fieldsTag}
-            ${l.rectificadoMotivo || l.anuladoMotivo ? `<div class="text-[0.6rem] text-aaa italic mt-2">Motivo: ${l.rectificadoMotivo || l.anuladoMotivo}</div>` : ''}
+            ${detalleMotivo}
           </div>
         `;
       }).join('') : '<div class="text-center p-20 text-gray-600 font-900 text-xs uppercase">Sin registros de auditoría recientes</div>';

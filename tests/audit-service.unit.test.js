@@ -6,6 +6,8 @@
 
 const assert = require('assert');
 const path = require('path');
+const vm = require('vm');
+const fs = require('fs');
 
 const AuditService = require(path.join(__dirname, '..', 'js', 'services', 'audit-service.js'));
 
@@ -14,10 +16,24 @@ function createMockDB() {
   const store = [];
   let nextId = 1;
   let throwOnAdd = false;
+  let throwOnGetAll = false;
 
   return {
     _store: store,
     setThrowOnAdd: (val) => { throwOnAdd = val; },
+    setThrowOnGetAll: (val) => { throwOnGetAll = val; },
+    objectStoreNames: {
+      _names: ['registro_eventos', 'animales', 'gastos_ganaderia', 'ventas_ganado'],
+      contains(s) { return this._names.includes(s); },
+      [Symbol.iterator]() { return this._names[Symbol.iterator](); }
+    },
+    getAll: async (storeName) => {
+      if (throwOnGetAll) {
+        throw new Error('DatabaseError: Error al recuperar datos de ' + storeName);
+      }
+      if (storeName === 'registro_eventos') return store;
+      return [{ id: 101, crotal: 'ES01' }];
+    },
     add: async (storeName, item) => {
       if (throwOnAdd) {
         const err = new Error('QuotaExceededError: Mock storage limit exceeded');
@@ -37,6 +53,64 @@ function createMockDB() {
       });
     }
   };
+}
+
+function loadRealAppInstance(customMocks = {}) {
+  const appPath = path.join(__dirname, '..', 'js', 'app.js');
+  const appCode = fs.readFileSync(appPath, 'utf8');
+
+  class MockFileReader {
+    constructor() { this.onload = null; }
+    readAsText(file) {
+      setTimeout(() => {
+        if (this.onload) {
+          this.onload({ target: { result: file._content || '' } });
+        }
+      }, 5);
+    }
+  }
+
+  const sandbox = {
+    window: {},
+    document: {
+      readyState: 'loading',
+      addEventListener: () => {},
+      createElement: (tag) => ({ tag, href: '', download: '', click() {}, style: {} }),
+      body: { appendChild: () => {}, removeChild: () => {} }
+    },
+    Blob: global.Blob,
+    URL: { createObjectURL: () => 'blob:mock-url', revokeObjectURL: () => {} },
+    FileReader: MockFileReader,
+    setTimeout: (fn) => setTimeout(fn, 1),
+    console: { log: () => {}, warn: () => {}, error: () => {} },
+    DB_VERSION: 1,
+    ...customMocks
+  };
+
+  sandbox.window = sandbox;
+  sandbox.window.db = customMocks.db || global.db;
+  sandbox.window.APP_INFO = { version: '2.5.0' };
+  sandbox.window.AuditService = AuditService;
+  sandbox.AuditService = AuditService;
+  sandbox.window.location = { reload: () => {} };
+  sandbox.window.Confirm = { alert: async () => {} };
+  sandbox.window.Fincas = { setActiveId: async () => {} };
+  sandbox.window.Trazabilidad = customMocks.Trazabilidad || {
+    importarBackupData: async () => ({ fincas: [{ id: 1 }], multiplesFincas: false })
+  };
+
+  vm.createContext(sandbox);
+  vm.runInContext(appCode + '\n; sandbox_export_App = App;', sandbox);
+
+  const realApp = sandbox.sandbox_export_App;
+  realApp.toast = (msg, type) => {
+    if (customMocks.onToast) customMocks.onToast(msg, type);
+  };
+  realApp.toastError = (msg) => {
+    if (customMocks.onToastError) customMocks.onToastError(msg);
+  };
+
+  return { App: realApp, sandbox };
 }
 
 async function runTests() {
@@ -406,6 +480,297 @@ async function runTests() {
 
     assert.strictEqual(res.success, false);
     assert.strictEqual(res.reason, 'AUDIT_WRITE_FAILED');
+  });
+
+  // Grupo 7: Mitigación de Inyección HTML (XSS) y Seguridad DOM
+  console.log('\n--- 7. Mitigación de Inyección HTML (XSS) y Seguridad DOM ---');
+
+  await test('AuditService.escapeHtml sanea caracteres especiales y entidades maliciosas', async () => {
+    assert.strictEqual(AuditService.escapeHtml(null), '');
+    assert.strictEqual(AuditService.escapeHtml(undefined), '');
+    assert.strictEqual(AuditService.escapeHtml('Texto plano'), 'Texto plano');
+
+    const dangerous = '<script>alert("xss")</script>';
+    const escaped = AuditService.escapeHtml(dangerous);
+    assert.strictEqual(escaped, '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+
+    const attrs = '" onmouseover="alert(\'xss\')"';
+    const escapedAttrs = AuditService.escapeHtml(attrs);
+    assert.strictEqual(escapedAttrs, '&quot; onmouseover=&quot;alert(&#39;xss&#39;)&quot;');
+  });
+
+  await test('Renderizado de vista de auditoría neutraliza vectores maliciosos en campos almacenados', async () => {
+    const maliciousLogs = [
+      {
+        id: 1,
+        fincaId: 1,
+        tipo: 'auditoria',
+        motivo_tarea: '<script>evil()</script>',
+        actor_id: '<img src=x onerror=steal()>',
+        descripcion: '"><svg onload=alert(document.cookie)>',
+        fields_modified: ['<b onmouseover=evil()>', 'campo_normal'],
+        rectificadoMotivo: '"><iframe src=evil.com></iframe>',
+        creadoEn: '2026-10-27T12:00:00Z'
+      }
+    ];
+
+    const _esc = AuditService.escapeHtml;
+    // Simular el renderizado idéntico al de ConfigSistemaView._renderAuditoria
+    const renderedHtml = maliciousLogs.map(l => {
+      const isAnulado = l.anulado || l.motivo_tarea?.includes('anulacion') || l.motivo_tarea?.includes('baja') || l.action === 'DELETE_LOGICAL';
+      const isRectificado = l.rectificado || l.resultado === 'WARNING' || l.motivo_tarea?.includes('rectificacion');
+      const color = isAnulado ? 'var(--c-danger)' : (isRectificado ? 'var(--c-warning)' : 'var(--c-info)');
+      const actorTag = l.actor_id ? `<span class="actor">| Actor: ${_esc(l.actor_id)}</span>` : '';
+      const fieldsTag = Array.isArray(l.fields_modified) && l.fields_modified.length > 0
+        ? `<div class="fields">Campos alterados: ${_esc(l.fields_modified.join(', '))}</div>`
+        : '';
+      const motivo = _esc((l.motivo_tarea || 'Evento de Sistema').replace(/_/g, ' '));
+      const fechaStr = _esc(new Date(l.creadoEn || l.fecha).toLocaleString());
+      const desc = _esc(l.descripcion || l.observaciones || 'Registro modificado');
+      const detalleMotivo = (l.rectificadoMotivo || l.anuladoMotivo)
+        ? `<div class="motivo">Motivo: ${_esc(l.rectificadoMotivo || l.anuladoMotivo)}</div>`
+        : '';
+
+      return `
+        <div class="card" style="border-left-color:${color};">
+          <div class="header">
+            <span>${motivo} ${actorTag}</span>
+            <span>${fechaStr}</span>
+          </div>
+          <div class="desc">${desc}</div>
+          ${fieldsTag}
+          ${detalleMotivo}
+        </div>
+      `;
+    }).join('');
+
+    // Comprobaciones estrictas de seguridad
+    assert.ok(!renderedHtml.includes('<script>'), 'No debe contener tags de script activos');
+    assert.ok(!renderedHtml.includes('<img src=x'), 'No debe contener tags de imagen maliciosos');
+    assert.ok(!renderedHtml.includes('<svg onload='), 'No debe contener vectores SVG maliciosos');
+    assert.ok(!renderedHtml.includes('<iframe'), 'No debe contener iframes maliciosos');
+    assert.ok(renderedHtml.includes('&lt;script&gt;evil()&lt;/script&gt;'));
+    assert.ok(renderedHtml.includes('&lt;img src=x onerror=steal()&gt;'));
+    assert.ok(renderedHtml.includes('&quot;&gt;&lt;svg onload=alert(document.cookie)&gt;'));
+  });
+
+  // Grupo 8: Reconciliación de Cobertura de Eventos y No Duplicación
+  console.log('\n--- 8. Reconciliación de Cobertura de Eventos y No Duplicación ---');
+
+  await test('EventBus registra altas y bajas de compradores, proveedores, contratos y saneamientos', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const handlers = {};
+    global.EventBus = {
+      on: (ev, fn) => { handlers[ev] = fn; },
+      emit: async (ev, data) => { if (handlers[ev]) await handlers[ev](data); }
+    };
+    AuditService._listenersInitialized = false;
+    AuditService.initEventBusListeners();
+
+    // 1. Alta y baja de comprador
+    await global.EventBus.emit('comprador:created', { comprador: { id: 10, fincaId: 1, nombre: 'Matadero Central' } });
+    await global.EventBus.emit('comprador:deleted', { id: 10 });
+
+    // 2. Alta y baja de proveedor
+    await global.EventBus.emit('proveedor:created', { proveedor: { id: 20, fincaId: 1, nombre: 'Piensos del Norte' } });
+    await global.EventBus.emit('proveedor:deleted', { id: 20 });
+
+    // 3. Alta de contrato
+    await global.EventBus.emit('contrato:created', { contrato: { id: 30, fincaId: 1 } });
+
+    // 4. Anulación de saneamiento y de vacunación
+    await global.EventBus.emit('saneamiento:anulado', { id: 40 });
+    await global.EventBus.emit('vacunacion:anulada', { id: 50 });
+
+    assert.strictEqual(mockDB._store.length, 7);
+    assert.strictEqual(mockDB._store[0].tipo_entidad, 'comprador');
+    assert.strictEqual(mockDB._store[0].action, 'CREATE');
+    assert.strictEqual(mockDB._store[1].tipo_entidad, 'comprador');
+    assert.strictEqual(mockDB._store[1].action, 'DELETE_LOGICAL');
+    assert.strictEqual(mockDB._store[2].tipo_entidad, 'proveedor');
+    assert.strictEqual(mockDB._store[3].tipo_entidad, 'proveedor');
+    assert.strictEqual(mockDB._store[4].tipo_entidad, 'contrato');
+    assert.strictEqual(mockDB._store[5].tipo_entidad, 'saneamiento');
+    assert.strictEqual(mockDB._store[6].tipo_entidad, 'vacunacion');
+  });
+
+  await test('EventBus NO duplica anulación de animal si ya fue registrada de forma nativa', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const handlers = {};
+    global.EventBus = {
+      on: (ev, fn) => { handlers[ev] = fn; },
+      emit: async (ev, data) => { if (handlers[ev]) await handlers[ev](data); }
+    };
+    AuditService._listenersInitialized = false;
+    AuditService.initEventBusListeners();
+
+    // Simular que animales.js registra la anulación directamente
+    await mockDB.add('registro_eventos', {
+      fincaId: 1,
+      entidad_id: 99,
+      tipo_entidad: 'animal',
+      tipo: 'auditoria',
+      motivo_tarea: 'anulacion_registro',
+      descripcion: 'Anulación de ficha animal ES99'
+    });
+    assert.strictEqual(mockDB._store.length, 1);
+
+    // Emitir el evento con la bandera { anulacion: true } generada por animales.js
+    await global.EventBus.emit('animal:deleted', { id: 99, anulacion: true });
+
+    // Verificar que AuditService no añadió un segundo evento duplicado
+    assert.strictEqual(mockDB._store.length, 1, 'No debe duplicar anulación ya registrada en db');
+  });
+
+  await test('list() recupera registros de auditoría y mutaciones directas de censo (altas y bajas)', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+
+    // Insertar operaciones directas e indirectas
+    mockDB._store.push({ id: 1, fincaId: 1, tipo: 'alta', motivo_tarea: 'alta_nacimiento', descripcion: 'Alta animal ES01', creadoEn: '2026-10-27T08:00:00Z' });
+    mockDB._store.push({ id: 2, fincaId: 1, tipo: 'baja', motivo_tarea: 'baja_muerte', descripcion: 'Baja animal ES02', creadoEn: '2026-10-27T08:30:00Z' });
+    mockDB._store.push({ id: 3, fincaId: 1, tipo: 'auditoria', motivo_tarea: 'anulacion_registro', descripcion: 'Anulación animal ES03', creadoEn: '2026-10-27T09:00:00Z' });
+    mockDB._store.push({ id: 4, fincaId: 1, tipo: 'telemetria', motivo_tarea: 'ping_sensor', descripcion: 'Ping sensor', creadoEn: '2026-10-27T09:15:00Z' });
+
+    const logs = await AuditService.list({ fincaId: 1, limit: 10 });
+    assert.strictEqual(logs.length, 3, 'Debe mostrar 3 operaciones de negocio y omitir telemetría irrelevante');
+    assert.strictEqual(logs[0].id, 3); // más reciente primero
+    assert.strictEqual(logs[1].id, 2);
+    assert.strictEqual(logs[2].id, 1);
+  });
+
+  // Grupo 9: Pruebas de Ejecución de Flujos Reales de App (Exportación e Importación)
+  console.log('\n--- 9. Pruebas de Ejecución de Flujos Reales de App (Exportación e Importación) ---');
+
+  await test('Flujo real App.exportBackup() exitoso registra auditoría con metadatos', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    let toastSuccess = null;
+    const { App } = loadRealAppInstance({
+      db: mockDB,
+      onToast: (msg, type) => {
+        if (type === 'success') toastSuccess = msg;
+      }
+    });
+
+    await App.exportBackup();
+
+    assert.ok(toastSuccess && toastSuccess.includes('Backup descargado'));
+    assert.strictEqual(mockDB._store.length, 1);
+    const auditRec = mockDB._store[0];
+    assert.strictEqual(auditRec.tipo_entidad, 'backup');
+    assert.strictEqual(auditRec.action, 'EXPORT');
+    assert.strictEqual(auditRec.resultado, 'SUCCESS');
+    assert.strictEqual(auditRec.motivo_tarea, 'exportacion_backup');
+    assert.strictEqual(auditRec.fincaId, 'global');
+    assert.ok(auditRec.descripcion.includes('Copia de seguridad exportada y descargada'));
+    assert.strictEqual(auditRec.hash_integridad, AuditService.computeIntegrityHash(auditRec));
+  });
+
+  await test('Flujo real App.exportBackup() con fallo registra auditoría tolerante de error', async () => {
+    const mockDB = createMockDB();
+    mockDB.setThrowOnGetAll(true);
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    let toastErrorMsg = null;
+    const { App } = loadRealAppInstance({
+      db: mockDB,
+      onToastError: (msg) => { toastErrorMsg = msg; }
+    });
+
+    await App.exportBackup();
+
+    assert.ok(toastErrorMsg && toastErrorMsg.includes('Error al exportar'));
+    assert.strictEqual(mockDB._store.length, 1);
+    const auditRec = mockDB._store[0];
+    assert.strictEqual(auditRec.tipo_entidad, 'backup');
+    assert.strictEqual(auditRec.action, 'EXPORT');
+    assert.strictEqual(auditRec.resultado, 'FAILED');
+    assert.strictEqual(auditRec.motivo_tarea, 'fallo_exportacion_backup');
+  });
+
+  await test('Flujo real App.importBackup() exitoso restaura datos y preserva registro de auditoría POST-restauración', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    // Base de datos previa con un registro histórico
+    mockDB._store.push({ id: 1, fincaId: 1, tipo: 'alta', motivo_tarea: 'alta_historica' });
+
+    let toastSuccess = null;
+    const { App } = loadRealAppInstance({
+      db: mockDB,
+      Trazabilidad: {
+        importarBackupData: async (db, jsonStr) => {
+          // Simula la sustitución física de datos efectuada por la restauración
+          mockDB._store.length = 0;
+          mockDB._store.push({ id: 200, fincaId: 1, tipo: 'alta', motivo_tarea: 'alta_restaurada_de_fichero' });
+          return { fincas: [{ id: 1 }], multiplesFincas: false };
+        }
+      },
+      onToast: (msg, type) => {
+        if (type === 'success') toastSuccess = msg;
+      }
+    });
+
+    const mockFile = { name: 'backup_explotacion.json', _content: JSON.stringify({ datos: 'demo' }) };
+    const event = { target: { files: [mockFile] } };
+
+    await App.importBackup(event);
+    // Esperar resolución de FileReader simulado
+    await new Promise(r => setTimeout(r, 50));
+
+    assert.ok(toastSuccess && toastSuccess.includes('Backup restaurado'));
+    // Debe haber 2 registros: el importado del fichero + el registro de auditoría añadido POST-restauración
+    assert.strictEqual(mockDB._store.length, 2);
+    const auditImport = mockDB._store.find(r => r.action === 'IMPORT');
+    assert.ok(auditImport, 'El registro de auditoría de importación debe existir');
+    assert.strictEqual(auditImport.resultado, 'SUCCESS');
+    assert.strictEqual(auditImport.motivo_tarea, 'importacion_backup');
+    assert.strictEqual(auditImport.fincaId, 'global');
+
+    // Comprobar que list() lo muestra como el evento más reciente
+    const listado = await AuditService.list({ fincaId: 1, limit: 10 });
+    assert.strictEqual(listado[0].motivo_tarea, 'importacion_backup');
+  });
+
+  await test('Flujo real App.importBackup() con fallo registra evento FAILED de auditoría', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    let toastErrorMsg = null;
+    const { App } = loadRealAppInstance({
+      db: mockDB,
+      Trazabilidad: {
+        importarBackupData: async () => {
+          throw new Error('Estructura de JSON inválida o corrupta');
+        }
+      },
+      onToastError: (msg) => { toastErrorMsg = msg; }
+    });
+
+    const mockFile = { name: 'backup_corrupto.json', _content: 'no-json' };
+    const event = { target: { files: [mockFile] } };
+
+    await App.importBackup(event);
+    await new Promise(r => setTimeout(r, 50));
+
+    assert.ok(toastErrorMsg && toastErrorMsg.includes('Estructura de JSON inválida'), 'Debe notificar el error de restauración');
+    assert.strictEqual(mockDB._store.length, 1);
+    const auditFallo = mockDB._store[0];
+    assert.strictEqual(auditFallo.action, 'IMPORT');
+    assert.strictEqual(auditFallo.resultado, 'FAILED');
+    assert.strictEqual(auditFallo.motivo_tarea, 'fallo_importacion_backup');
   });
 
   console.log(`\n========================================`);

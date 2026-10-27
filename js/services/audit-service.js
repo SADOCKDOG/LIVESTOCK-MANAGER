@@ -21,6 +21,12 @@
     'venta',
     'gasto',
     'finca',
+    'comprador',
+    'proveedor',
+    'contrato',
+    'saneamiento',
+    'vacunacion',
+    'movimiento',
     'general'
   ]);
 
@@ -43,6 +49,19 @@
     _recentFailures: [],
     _recentOperations: new Map(), // Clave de idempotencia -> { timestamp, id }
     _listenersInitialized: false,
+
+    /**
+     * Escapa caracteres especiales HTML para prevenir ataques XSS al renderizar en la vista.
+     */
+    escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    },
 
     /**
      * Calcula un hash de integridad determinista sobre campos invariantes.
@@ -262,9 +281,19 @@
           }
         }
 
-        // Filtrar exclusivamente eventos de auditoría y rectificaciones
+        // Filtrar exclusivamente eventos de auditoría y mutaciones críticas de negocio
         const logs = unicos.filter(e =>
-          e.tipo === 'auditoria' || e.rectificado || e.anulado || (e.motivo_tarea && e.motivo_tarea.includes('anulacion'))
+          e.tipo === 'auditoria' ||
+          e.tipo === 'alta' ||
+          e.tipo === 'baja' ||
+          e.rectificado ||
+          e.anulado ||
+          (e.motivo_tarea && (
+            e.motivo_tarea.includes('anulacion') ||
+            e.motivo_tarea.includes('rectificacion') ||
+            e.motivo_tarea.includes('alta') ||
+            e.motivo_tarea.includes('baja')
+          ))
         );
 
         // Ordenar cronológicamente descendente
@@ -359,6 +388,120 @@
           action: 'UPDATE',
           motivo_tarea: 'cambio_finca_activa',
           descripcion: `Contexto cambiado a explotación #${id}`
+        });
+      });
+
+      // Anulación de animal: evitar duplicar si animales.js ya registró directamente en registro_eventos
+      bus.on('animal:deleted', async (data) => {
+        if (!data || data.anulacion) {
+          // Ya registrado directamente por animales.js con motivo_tarea 'anulacion_registro'
+          return;
+        }
+        await this.record({
+          tipo_entidad: 'animal',
+          entidad_id: data.id || 'animal',
+          actor_type: 'user',
+          action: 'DELETE_LOGICAL',
+          motivo_tarea: 'anulacion_animal',
+          descripcion: `Baja/anulación de animal #${data.id || ''}`
+        });
+      });
+
+      // Compradores comerciales
+      bus.on('comprador:created', async (data) => {
+        const c = data && (data.comprador || data);
+        if (!c) return;
+        await this.record({
+          fincaId: c.fincaId || null,
+          tipo_entidad: 'comprador',
+          entidad_id: c.id || c.nombre || 'comprador',
+          actor_type: 'user',
+          action: 'CREATE',
+          motivo_tarea: 'alta_comprador',
+          descripcion: `Comprador comercial registrado: ${c.nombre || '#' + (c.id || '')}`
+        });
+      });
+
+      bus.on('comprador:deleted', async (data) => {
+        const id = data && (data.id || data);
+        if (!id) return;
+        await this.record({
+          tipo_entidad: 'comprador',
+          entidad_id: id,
+          actor_type: 'user',
+          action: 'DELETE_LOGICAL',
+          motivo_tarea: 'baja_comprador',
+          descripcion: `Baja de comprador comercial #${id}`
+        });
+      });
+
+      // Proveedores
+      bus.on('proveedor:created', async (data) => {
+        const p = data && (data.proveedor || data);
+        if (!p) return;
+        await this.record({
+          fincaId: p.fincaId || null,
+          tipo_entidad: 'proveedor',
+          entidad_id: p.id || p.nombre || 'proveedor',
+          actor_type: 'user',
+          action: 'CREATE',
+          motivo_tarea: 'alta_proveedor',
+          descripcion: `Proveedor registrado: ${p.nombre || '#' + (p.id || '')}`
+        });
+      });
+
+      bus.on('proveedor:deleted', async (data) => {
+        const id = data && (data.id || data);
+        if (!id) return;
+        await this.record({
+          tipo_entidad: 'proveedor',
+          entidad_id: id,
+          actor_type: 'user',
+          action: 'DELETE_LOGICAL',
+          motivo_tarea: 'baja_proveedor',
+          descripcion: `Baja de proveedor #${id}`
+        });
+      });
+
+      // Contratos
+      bus.on('contrato:created', async (data) => {
+        const ct = data && (data.contrato || data);
+        if (!ct) return;
+        await this.record({
+          fincaId: ct.fincaId || null,
+          tipo_entidad: 'contrato',
+          entidad_id: ct.id || 'contrato',
+          actor_type: 'user',
+          action: 'CREATE',
+          motivo_tarea: 'alta_contrato',
+          descripcion: `Contrato mercantil registrado #${ct.id || ''}`
+        });
+      });
+
+      // Anulaciones sanitarias y vacunaciones
+      bus.on('saneamiento:anulado', async (data) => {
+        const id = data && (data.id || data);
+        if (!id) return;
+        await this.record({
+          tipo_entidad: 'saneamiento',
+          entidad_id: id,
+          actor_type: 'user',
+          action: 'DELETE_LOGICAL',
+          motivo_tarea: 'anulacion_saneamiento',
+          descripcion: `Anulación de campaña de saneamiento #${id}`
+        });
+      });
+
+      bus.on('vacunacion:anulada', async (data) => {
+        const id = data && (data.id || data);
+        if (!id) return;
+        await this.record({
+          tipo_entidad: 'vacunacion',
+          entidad_id: id,
+          actor_type: 'user',
+          action: 'DELETE_LOGICAL',
+          motivo_tarea: 'anulacion_vacunacion',
+          descripcion: `Anulación de orden de vacunación #${id}`
         });
       });
     }
