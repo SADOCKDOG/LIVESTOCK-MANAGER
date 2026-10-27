@@ -30,7 +30,7 @@ Notas:
 
 ## Especificación oficial y exacta: fichero de incorporación de datos a SIGGAN (pequeño rumiante)
 
-**Fuente**: `docs/AUDITAR/SIGGAN_Manual_Fichero_Incorporacion.pdf` — "Identificación individual de Pequeños Rumiantes: definición del fichero de incorporación de datos a SIGGAN", AGAPA/Junta de Andalucía, v0400, 10/07/2012. Este documento es la especificación técnica formal (8 páginas) del formato que hasta ahora solo habíamos deducido por un ejemplo en el manual de ADSG WEB — **corrige y precisa** varios detalles.
+**Fuente**: `Private/limpieza-2026-09/docs/AUDITAR/SIGGAN_Manual_Fichero_Incorporacion.pdf` — "Identificación individual de Pequeños Rumiantes: definición del fichero de incorporación de datos a SIGGAN", AGAPA/Junta de Andalucía, v0400, 10/07/2012. Este documento es la especificación técnica formal (8 páginas) del formato que hasta ahora solo habíamos deducido por un ejemplo en el manual de ADSG WEB — **corrige y precisa** varios detalles. *(archivado 2026-10-27)*
 
 - Fichero de texto plano, extensión `.txt`. Nombre: `AAAAMMDD_DESCRIPCION` (máx. 23 caracteres, sin espacios), ej. `20060801_ES140080009876`.
 - Primera fila: cabecera con los nombres de campo. Filas siguientes: una por animal.
@@ -99,7 +99,7 @@ GET https://www11.fega.es/bdcsixwsp/catalogos/{idCatalogo}?Extension=CSV|XLSX|PD
 GET https://www11.fega.es/bdcsixwsp/catalogos/zip   (todos los catálogos)
 ```
 Swagger: `https://www11.fega.es/bdcsixwsp/swagger-ui/index.html`
-Fuente: `docs/AUDITAR/GUIA_AD-SIEX-DSI-PortalPublico.pdf` (BDCSIXWSP, Guía de Servicios Públicos de SIEX, FEGA, v4.5.0).
+Fuente: `Private/limpieza-2026-09/docs/AUDITAR/GUIA_AD-SIEX-DSI-PortalPublico.pdf` (BDCSIXWSP, Guía de Servicios Públicos de SIEX, FEGA, v4.5.0). *(archivado 2026-10-27)*
 
 Catálogos relevantes (grupo GANADERAS, sección 5.1.3 de la guía):
 
@@ -118,7 +118,7 @@ Catálogos relevantes (grupo GANADERAS, sección 5.1.3 de la guía):
 
 ### Catálogos ya descargados localmente
 
-Ya están en `docs/AUDITAR/Catalogos_csv/` (descarga completa vía `/catalogos/zip`). Contenido relevante:
+Ya están en `Private/limpieza-2026-09/docs/AUDITAR/Catalogos_csv/` (descarga completa vía `/catalogos/zip`). Contenido relevante: *(archivado 2026-10-27)*
 
 **`Especies animales.csv`** (`ESPECIE_ANIMAL`) — catálogo con ~190 entradas (incluye acuicultura, apicultura, especies cinegéticas, experimentación, etc., fuera del alcance actual de la app). Las especies de abasto/ganadería relevantes para Livestock Manager:
 
@@ -188,13 +188,13 @@ También descargados y disponibles para uso futuro: `Catálogo oficial de razas 
 2. ~~Diseñar el modelo de datos unificado~~ — **hecho e implementado** (commit `20055ad`: tablas `especies`/`tipos_identificador`/`especie_tipo_identificador`, `ErrorHandler.validateCrotal()`).
 3. **Tabla de correspondencia con la codificación interna de SIGGAN** (`Espe`/`Espe_ID`/`Tipo_Iden` del fichero de incorporación, distinta de los códigos FEGA) — sigue sin implementar, es requisito bloqueante para cualquier exportador SIGGAN real. Ver plan.
 4. **Catálogo de razas** (189 razas) — nuevo gap detectado en la auditoría 2026-07-21, ver sección dedicada arriba. No estaba en el alcance original de este documento.
-5. Decidir el mecanismo de sincronización con la API del FEGA (build-time vs. acción manual vs. runtime con CORS) — de momento se puede semillar directamente desde los CSV ya descargados en `docs/AUDITAR/Catalogos_csv/`. Sigue pendiente, sin decidir.
+5. Decidir el mecanismo de sincronización con la API del FEGA (build-time vs. acción manual vs. runtime con CORS) — de momento se puede semillar directamente desde los CSV ya descargados en `Private/limpieza-2026-09/docs/AUDITAR/Catalogos_csv/`. Sigue pendiente, sin decidir. *(archivado 2026-10-27)*
 6. Plan de migración de datos existentes (animales ya dados de alta con los catálogos actuales desincronizados, `Vacas`/`Ovejas`/`Cabras`/`Cerdos` → códigos SIEX 01/03/04/02). Sigue pendiente.
 7. Si se aborda la generación/lectura de guías de movimiento compatibles con SIGGAN: la máquina de estados real de GTA (12 estados, pago de tasa, firma digital) ya está documentada en detalle en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md) — la recomendación de la auditoría 2026-07-21 es NO replicarla completa (complejidad de integración real que la app no tiene), solo evaluar el flag "autoguía" si aporta valor.
 
 ## ⚠️ Advertencia importante: los códigos de especie/raza son POR REGIÓN, no nacionales
 
-**Fuente**: `docs/AUDITAR/LECTOR/ID Andalucia.zip` e `ID Extremadura.zip` — no son informes ni RDF semántico, son ficheros de configuración de menú de un **lector físico de crotales** (dispositivo de campo usado por técnicos/ADSG), uno por Comunidad Autónoma. Formato de texto plano con pares etiqueta+código.
+**Fuente**: `Private/limpieza-2026-09/docs/AUDITAR/LECTOR/ID Andalucia.zip` e `ID Extremadura.zip` — no son informes ni RDF semántico, son ficheros de configuración de menú de un **lector físico de crotales** (dispositivo de campo usado por técnicos/ADSG), uno por Comunidad Autónoma. Formato de texto plano con pares etiqueta+código. *(archivados 2026-10-27)*
 
 **Hallazgo**: comparando ambos ficheros, la codificación de especie **no coincide** entre Andalucía y Extremadura:
 
@@ -215,9 +215,9 @@ El catálogo `TIPO ID` de Extremadura sí coincide en significado con el RIIA de
 
 La implementación actual (`js/db.js`, tablas `especies`/`tipos_identificador`/`especie_tipo_identificador`) usa **una sola codificación nacional** (la del catálogo `ESPECIE_ANIMAL` del FEGA, códigos SIEX 01-05), que es correcta como *identificador interno* de la app y para el **formato del crotal en sí** (que sí es nacional, normativa RD 787/2023). Lo que este hallazgo afecta es **si en algún momento se genera/lee un fichero de intercambio directo con el sistema autonómico** (SIGGAN o BADIGEX) — en ese caso hará falta una **tabla de correspondencia por región** (especie SIEX → código regional) en vez de asumir un único mapeo, ya que Andalucía y Extremadura no comparten numeración. No se ha tocado código por esto todavía — es una decisión a tomar cuando se aborde la integración real de ficheros de intercambio (fuera del alcance de esta sesión).
 
-### Resto de `docs/AUDITAR/LECTOR/` — identificado el dispositivo y el flujo completo
+### Resto de `Private/limpieza-2026-09/docs/AUDITAR/LECTOR/` — identificado el dispositivo y el flujo completo *(archivado 2026-10-27)*
 
-**Fuente añadida**: `docs/AUDITAR/LECTOR/UniTransfer_1.37.zip` (instalador del software de PC) + fichas técnicas `EI2061.pdf`, `Guia Instalación.pdf`, `GUIA RAPIDA MANEJO LECTOR UNIVERSAL.pdf`, `Posibles_Errores.pdf`.
+**Fuente añadida**: `Private/limpieza-2026-09/docs/AUDITAR/LECTOR/UniTransfer_1.37.zip` (instalador del software de PC) + fichas técnicas `EI2061.pdf`, `Guia Instalación.pdf`, `GUIA RAPIDA MANEJO LECTOR UNIVERSAL.pdf`, `Posibles_Errores.pdf`. *(archivado 2026-10-27)*
 
 **Dispositivo identificado**: **Lector Universal II**, de **Felixcan Animal ID** (Albacete, España; código de fabricante ICAR 941; www.felixcan.com). Es un lector RFID de mano específico para ganadería:
 
@@ -242,7 +242,7 @@ La implementación actual (`js/db.js`, tablas `especies`/`tipos_identificador`/`
 
 ### Segundo fabricante confirmado: Datamars (GES3S / Rumisoft) — mismo ecosistema, más piezas
 
-**Fuente**: `docs/AUDITAR/LECTOR/GES3S - Configuración de Equivalencias v.1.0.pdf` + página oficial de descargas `https://www.livestock.datamars.es/descargas` (aportada por el usuario).
+**Fuente**: `Private/limpieza-2026-09/docs/AUDITAR/LECTOR/GES3S - Configuración de Equivalencias v.1.0.pdf` + página oficial de descargas `https://www.livestock.datamars.es/descargas` (aportada por el usuario). *(archivado 2026-10-27)*
 
 Hay **dos fabricantes/ecosistemas distintos** detrás de los ficheros `.rdf` de este proyecto, ambos con el mismo tipo de flujo:
 

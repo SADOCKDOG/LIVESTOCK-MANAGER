@@ -1,6 +1,6 @@
 # ADSG WEB (SIGGAN, Junta de Andalucía) — Flujos y estructura
 
-**Fuente**: `docs/AUDITAR/ADS005E_MUS_Manual_Usuario_0100.pdf` — "ADSG WEB, Manual de Usuario", Consejería de Agricultura, Pesca y Desarrollo Rural, v0100, 02/03/2015, 345 páginas.
+**Fuente**: `Private/limpieza-2026-09/docs/AUDITAR/ADS005E_MUS_Manual_Usuario_0100.pdf` — "ADSG WEB, Manual de Usuario", Consejería de Agricultura, Pesca y Desarrollo Rural, v0100, 02/03/2015, 345 páginas. *(archivado 2026-10-27)*
 **Relacionado**: [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md), [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md).
 
 ## Qué es

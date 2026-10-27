@@ -24575,7 +24575,7 @@ Contiene:
 
 **Índice actualizado:** Se ha creado/modificado `MEMORY.md` en el mismo directorio con la referencia:
 ```
-- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos
+- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](memory/livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos
 ```
 
 ## ✅ Tareas de Fase 1 Creadas (6/6)
@@ -24650,7 +24650,7 @@ metadata:
 ```
 
 Luego en MEMORY.md del proyecto, añadir una línea:
-`- [Title](file.md) — one-line hook`
+`- [Title](file.md) — one-line hook` (Roadmap: `livestock-manager-audit-roadmap.md` — en `memory/`, fuera del repo)
 
 Para este caso, como es un proyecto-specific roadmap de auditoría y plan de mejoras, usaré:
 - name: livestock-manager-audit-roadmap
@@ -24767,7 +24767,7 @@ Let me create the MEMORY.md file with a reference to the livestock-manager-audit
 ```json
 {
   "file_path": "C:\\Users\\yo\\.qoder\\projects\\C--Users-yo-repo-LIVESTOCK-MANAGER\\memory/MEMORY.md",
-  "content": "- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos"
+  "content": "- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](memory/livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos"
 }
 ```
 
@@ -24882,7 +24882,7 @@ No matches found
 ```json
 {
   "file_path": "C:\\Users\\yo\\.qoder\\projects\\C--Users-yo-repo-LIVESTOCK-MANAGER\\memory/MEMORY.md",
-  "content": "- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos"
+  "content": "- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](memory/livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos"
 }
 ```
 
@@ -24907,7 +24907,7 @@ Este archivo contiene:
 
 **Índice actualizado:** Se ha creado `MEMORY.md` en el mismo directorio con la referencia:
 ```
-- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos
+- [Roadmap de Auditoría y Mejoras para LIVESTOCK-MANAGER](memory/livestock-manager-audit-roadmap.md) — Plan de mejoras basado en análisis exhaustivo de 6 bloques críticos
 ```
 
 ## ✅ Tareas de Fase 1 Creadas (6/6)

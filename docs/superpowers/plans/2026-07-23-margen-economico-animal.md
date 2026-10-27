@@ -890,4 +890,4 @@ git commit -m "feat: añadir vista de ranking de margen económico por animal (/
 ## Post-implementación
 
 - [ ] Revisar que `js/qa-margen-animal.js` se pueda ejecutar limpio dos veces seguidas sin fallos por datos duplicados (usa `Date.now()` en identificadores de test para evitar colisiones — ya incorporado en el plan).
-- [ ] Actualizar `docs/AUDITAR/AUDITORIA-BASEDEDATOS-LEGACY.md` o memoria del proyecto si aplica, indicando que "productividad por animal" quedó cerrada.
+- [ ] Actualizar `Private/limpieza-2026-09/docs/AUDITAR/AUDITORIA-BASEDEDATOS-LEGACY.md` o memoria del proyecto si aplica, indicando que "productividad por animal" quedó cerrada. *(archivado 2026-10-27)*
