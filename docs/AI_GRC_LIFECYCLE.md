@@ -45,7 +45,8 @@ Ningun agente de IA dispone de permisos ilimitados sobre el codigo base. Las tar
 ## 5. Consola de Gestion Integral de Escritorio para Windows
 
 Los operadores, desarrolladores y responsables tecnicos disponen de una aplicacion grafica nativa en Windows para supervisar este ciclo de vida en tiempo real:
-- **Lanzador:** Archivo ejecutable por lotes `run_console.bat` en la infraestructura de desarrollo.
+- **Repositorio Dedicado:** [Console-AI-Dev-Infrastructure](https://github.com/SADOCKDOG/Console-AI-Dev-Infrastructure)
+- **Lanzador:** Archivo ejecutable por lotes `run_console.bat` en la infraestructura de desarrollo y en la consola.
 - **Capacidades Operativas:**
   - Monitorizacion en tiempo real de FCC Server (8082), Backend FastAPI (8000), base de datos SQLite y Microsoft Foundry (`sadogfarm.onmicrosoft.com`).
   - Gestion del tablero Kanban: visualizacion de expedientes tecnicos, creacion de tareas asistidas y firma de aprobaciones humanas para transicion a `DONE`.
