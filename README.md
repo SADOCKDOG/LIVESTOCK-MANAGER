@@ -6,6 +6,10 @@
 <h3 align="center">Sistema Integral de Gestión Ganadera · v4.10.8</h3>
 
 <p align="center">
+  <em>v4.10.8 corresponde a Android / Google Play. La versión nativa de Windows (Tauri) usa su propio esquema de versión 4.11.x.</em>
+</p>
+
+<p align="center">
   PWA híbrida (Android · Capacitor 7) 100% <strong>offline-first</strong> para la gestión profesional de explotaciones ganaderas, con cumplimiento normativo nativo del sistema <strong>SIGGAN</strong> (Andalucía) y <strong>BADIGEX</strong> (Extremadura).
 </p>
 
@@ -25,7 +29,7 @@
 | Plataforma | Versión | Estado | Coste |
 |---|---|---|---|
 | Windows (Microsoft Store) | 4.10.526 | Publicada | Gratuita, sin límites de fincas ni animales |
-| Windows nativa (Tauri) | 4.11.22.0 | Distribuida con el paquete «Activación Licencia de Soporte» de Partner Center (canal de vuelo, subido el 18 oct 2026, certificación pasada y publicada el 23 oct 2026; el vuelo 4.11.22.0 con fixes del maestro PR #183 subido el 23 oct 2026 y publicado el 24 oct 2026); incluye el soporte con IA | Gratuita, sin límites; el soporte es opcional |
+| Windows nativa (Tauri) | 4.11.24.0 | Distribuida con el paquete «Activación Licencia de Soporte» de Partner Center (canal de vuelo, subido y publicado el 26 oct 2026; trae los fixes de exportaciones del maestro PR #188); incluye el soporte con IA | Gratuita, sin límites; el soporte es opcional |
 | Android (Google Play) | 4.10.8 (529) | Prueba cerrada con testers; aún no disponible para usuario final | Versión Free gratuita, con límites (1 finca, 15 animales); Premium por compra única dentro de la app |
 | Soporte técnico con IA | — | Integrado en la app ([`livestock-manager-support-api`](https://github.com/SADOCKDOG/livestock-manager-support-api)) | Complemento opcional con suscripción mensual renovable; límites diarios de incidencias y mensajes por usuario |
 
