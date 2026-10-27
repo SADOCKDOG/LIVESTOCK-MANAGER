@@ -84,8 +84,12 @@ El asistente se adapta dinámicamente según la llamada:
 
 ---
 
-## 5. Próximos Pasos de Implementación
+## 5. Próximos Pasos de Implementación — Actualizado 2026-10-27
 
-1.  **Refactorizar `js/db.js`**: Crear el ObjectStore `registro_eventos` y migrar datos antiguos.
-2.  **Desarrollar `js/pesajes.js`**: Crear el motor lógico de cálculo de pesos y tara.
-3.  **Implementar UI en `js/app.js`**: Sustituir los asistentes antiguos por la llamada al nuevo `Pesajes.abrirWizard()`.
+**Estado:** Los items 1-3 a continuación ya están implementados según la auditoría del 2026-10-27. Este sección mantiene registro histórico.
+
+1.  ✅ **Refactorizar `js/db.js`**: Crear el ObjectStore `registro_eventos` y migrar datos antiguos. — *Implementado: ObjectStore `registro_eventos` creado y migración de datos completada.*
+2.  ✅ **Desarrollar `js/pesajes.js`**: Crear el motor lógico de cálculo de pesos y tara. — *Implementado: Motor de cálculo de pesos y tara desarrollado en `js/pesajes.js`.*
+3.  ✅ **Implementar UI en `js/app.js`**: Sustituir los asistentes antiguos por la llamada al nuevo `Pesajes.abrirWizard()`. — *Implementado: UI en `js/app.js` actualizada para usar `Pesajes.abrirWizard()`.*
+
+**Nota:** Estos items formaban parte de la planificación inicial pero han sido completados en iteraciones anteriores. El documento los mantiene como referencia histórica.

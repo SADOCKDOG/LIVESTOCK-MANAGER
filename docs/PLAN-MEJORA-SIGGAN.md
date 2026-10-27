@@ -1,10 +1,10 @@
 # Plan de mejora e implementación — integración SIGGAN
 
-**Origen**: auditoría completa de `docs/AUDITAR/` (~150 documentos: PDFs normativos BOE/BOJA/Junta de Andalucía/FEGA, ~120 catálogos CSV oficiales, ZIPs de configuración de lectores RFID de campo), realizada el 2026-07-21 con 6 subagentes especializados en paralelo, más una auditoría dedicada previa que ya cerró el modelo de datos maestro Especie/Crotal (commit `20055ad`).
+**Origen**: auditoría completa de `docs/AUDITAR/` (~150 documentos: PDFs normativos BOE/BOJA/Junta de Andalucía/FEGA, ~120 catálogos CSV oficiales, ZIPs de configuración de lectores RFID de campo), realizada el 2026-07-21 con 6 subagentes especializados en paralelo, más una auditoría dedicada previa que ya cerró el modelo de datos maestro Especie/Crotal (commit `20055ad`). **Nota (2026-10-27):** el directorio `docs/AUDITAR/` fue archivado tras la auditoría; los ficheros originales no están en el árbol actual. Las fuentes citadas abajo se identifican por su nombre de fichero original.
 
 **Cómo leer este documento**: es el plan maestro. Cada sección enlaza al documento de detalle normativo correspondiente (`docs/NORMATIVA-CROTAL-ESPECIE.md`, `docs/ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md`) donde está la cita exacta de fuente y el razonamiento completo — aquí solo está lo accionable: qué falta, dónde, y en qué orden abordarlo.
 
-**Relacionado**: [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md), [AUDITAR/INVENTARIO-AUDITORIA.md](AUDITAR/INVENTARIO-AUDITORIA.md) (qué documento/fichero de `docs/AUDITAR/` está auditado, cuál no aplica, y cuál queda pendiente).
+**Relacionado**: [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md), [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md), [CUMPLIMIENTO_SIGGAN.md](CUMPLIMIENTO_SIGGAN.md), [el-sistema-de-identificacion-crotal.md](el-sistema-de-identificacion-crotal.md) — el inventario de auditoría original (`docs/AUDITAR/INVENTARIO-AUDITORIA.md`, artefacto temporal de la auditoría 2026-07-21) fue archivado; los hallazgos se integraron en este plan y en los documentos normativos enlazados.
 
 ---
 
@@ -44,7 +44,7 @@ La adaptación SIGGAN de Livestock Manager estaba ya en buen estado en los flujo
 
 DB_VERSION 15→16, migración aditiva. Tabla `razas` (keyPath `id`, índice `especieId`) semillada con 163 de las 189 razas del catálogo oficial (filtradas a las 5 especies ya modeladas: 47 bovino, 16 porcino, 51 ovino, 22 caprino, 27 équido). `js/views/animales-view.js`: el campo RAZA es ahora un `<select>` filtrado por especie con opción "OTRA (ESPECIFICAR)" para razas fuera de catálogo. Comparación case-insensitive, sin migración forzosa del campo `raza` (string) de animales existentes — igual que se planteó, se mantiene intacto en paralelo. Detalle completo en [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md#catálogo-de-razas--implementado-commit-8675c08-2026-07-22).
 
-**✅ Cierre de flecos (2026-07-22)**: `clasificacion`/`grado_amenaza` ahora se muestran como badge en la ficha de animal (`js/views/animales-view.js`), junto al selector de raza. `Asociación de razas.csv` auditado y **descartado explícitamente** — es un directorio de contacto de asociaciones de criadores (NIF/email/teléfono), no un catálogo de razas ni un dato relevante para la gestión de una explotación individual. Ver `docs/AUDITAR/INVENTARIO-AUDITORIA.md`.
+**✅ Cierre de flecos (2026-07-22)**: `clasificacion`/`grado_amenaza` ahora se muestran como badge en la ficha de animal (`js/views/animales-view.js`), junto al selector de raza. `Asociación de razas.csv` auditado y **descartado explícitamente** — es un directorio de contacto de asociaciones de criadores (NIF/email/teléfono), no un catálogo de razas ni un dato relevante para la gestión de una explotación individual. (Documento original: `docs/AUDITAR/INVENTARIO-AUDITORIA.md`, archivado tras la auditoría 2026-07-21; ver auditorías en `docs/auditorias/`.)
 
 ---
 
@@ -86,7 +86,7 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 ## 5. Sub-modelo Instalaciones + geolocalización + restricciones en finca — ✅ IMPLEMENTADO PARCIALMENTE (commit `57202a5`, 2026-07-22)
 
-**Fuente**: mapa de navegación 1.4 de ADSG WEB (`docs/AUDITAR/ADS005E_MUS_Manual_Usuario_0100.pdf`) — ver árbol completo en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md#árbol-completo-del-punto-14-mapa-del-sistema-auditoría-dedicada-2026-07-21).
+**Fuente**: mapa de navegación 1.4 de ADSG WEB (fichero original `docs/AUDITAR/ADS005E_MUS_Manual_Usuario_0100.pdf`, archivado 2026-10-27) — ver árbol completo en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md#árbol-completo-del-punto-14-mapa-del-sistema-auditoría-dedicada-2026-07-21).
 
 | Campo/módulo | Estado |
 |---|---|
@@ -107,7 +107,7 @@ Verificado en navegador: microchip válido/inválido, DIE con formato heredado v
 
 ## 6. Campos de captura de campo — lectores RFID — ✅ IMPLEMENTADO PARCIALMENTE (commit `800e913`, 2026-07-22)
 
-**Fuente**: comparación de los `.rdf` de programas de lector físico (Felixcan/Datamars, carpeta `docs/AUDITAR/LECTOR/`) contra los formularios actuales de la app.
+**Fuente**: comparación de los `.rdf` de programas de lector físico (Felixcan/Datamars, carpeta `docs/AUDITAR/LECTOR/`, archivada 2026-10-27) contra los formularios actuales de la app.
 
 | Campo que captura el lector | Estado |
 |---|---|
@@ -125,7 +125,7 @@ Verificado en navegador: hora/lote/nº macho persistidos correctamente vía UI r
 
 ## 7. Concepto "Subexplotación" (prioridad baja, gap estructural — añadido 2026-07-22)
 
-**Fuente**: `docs/AUDITAR/2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` (documento técnico SIEX más reciente, 2025) y el XLSX Anexo I de Variables Ganaderas (bloque "Subexplotación", 21 campos).
+**Fuente**: fichero original `docs/AUDITAR/2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf` (documento técnico SIEX más reciente, 2025, archivado 2026-10-27) y el XLSX Anexo I de Variables Ganaderas (bloque "Subexplotación", 21 campos).
 
 **Qué falta**: el concepto **"Subexplotación" no existe en absoluto en el código** de Livestock Manager (confirmado por búsqueda exhaustiva en todo `js/`, cero coincidencias). Es la unidad real que usa SIEX/REGA por debajo de la explotación: **una subexplotación = un código REGA + una especie + su clasificación zootécnica**. Es decir, SIEX no relaciona animales directamente con la explotación (finca), sino con una subdivisión de esa explotación por especie.
 
@@ -159,7 +159,7 @@ Detalle completo de los 12 estados en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADS
 
 ---
 
-## Documentos auditados en las últimas pasadas (2026-07-22) — la auditoría de docs/AUDITAR/ está completa
+## Documentos auditados en las últimas pasadas (2026-07-22) — la auditoría original de docs/AUDITAR/ está completa (directorio archivado 2026-10-27)
 
 **Único punto realmente sin cerrar**: detalle operativo paso a paso (más allá del mapa 1.4) de Avícola, Porcino y Cunícola en ADSG WEB — no se considera prioritario porque el mapa de navegación (1.4) ya está completo y esas 3 secciones no revelaron nada estructuralmente distinto al comparar con Bovino/Pequeño Rumiante (sí auditados a fondo).
 
@@ -174,10 +174,10 @@ Los 2 ficheros `.odt`/`.ods` se abrieron sin `odfpy` (un `.odt`/`.ods` es un ZIP
 
 ### Auditoría de pendientes prioritarios cerrada (2026-07-22)
 
-Los 3 documentos marcados como prioritarios en `docs/AUDITAR/INVENTARIO-AUDITORIA.md` ya están auditados:
+Los 3 documentos marcados como prioritarios en el inventario de auditoría (archivado tras la auditoría 2026-07-21) ya están auditados:
 
 - **`2025.09.18-Documento_Tecnico_ganadero_SIEX_3.6_CORRECCION_ERRORES.pdf`** (el más importante) — **confirmado sin cambios** respecto al catálogo `ESPECIE_ANIMAL` ya implementado en `js/db.js` (pese al nombre "corrección de errores", es el documento técnico SIEX v3.6.0 completo, no un changelog puntual). Cero riesgo para el modelo de datos ya cerrado. Aportó 2 hallazgos: catálogo de 23 "Tipos de explotación ganadera" (complementa el ya inventariado) y confirmación del gap "Subexplotación" (ver punto 7 arriba).
-- **`GUIA_AD-SIEX-DSI-PortalPublico.pdf`** — API REST del FEGA confirmada "sin autenticación"; CORS sigue sin documentarse explícitamente (pendiente de validar empíricamente). Endpoint nuevo útil no usado hoy: `GET /catalogos/{idTabla}/fecha` (para sincronización incremental de catálogos, solo descargar si cambió). 2 catálogos del grupo GANADERAS reclasificados desde "agrícola" a "ganadero": `Sistemas de sostenibilidad y control.csv`, `Datos de la integradora comercial.csv` (ver `INVENTARIO-AUDITORIA.md`).
+- **`GUIA_AD-SIEX-DSI-PortalPublico.pdf`** — API REST del FEGA confirmada "sin autenticación"; CORS sigue sin documentarse explícitamente (pendiente de validar empíricamente). Endpoint nuevo útil no usado hoy: `GET /catalogos/{idTabla}/fecha` (para sincronización incremental de catálogos, solo descargar si cambió). 2 catálogos del grupo GANADERAS reclasificados desde "agrícola" a "ganadero": `Sistemas de sostenibilidad y control.csv`, `Datos de la integradora comercial.csv` (ver `INVENTARIO-AUDITORIA.md` — artefacto archivado de la auditoría 2026-07-21).
 - **XLSX Anexo I de Variables Ganaderas** — auditado completo (los 11 bloques restantes, más allá de "Datos individuales de los animales" ya cubierto). Aportó el detalle de campos del gap "Instalaciones" (punto 5, actualizado arriba) y confirmó el gap nuevo "Subexplotación" (punto 7). Los bloques "Gerente de explotación", "Rendimiento económico", "Asociaciones/socios" y "Actividad secundaria" son gaps completos de prioridad baja, no incorporados a este plan por no chocar con nada ya implementado ni aportar valor claro al alcance operativo actual de la app — mencionados aquí solo para constancia de que fueron revisados.
 
 ---

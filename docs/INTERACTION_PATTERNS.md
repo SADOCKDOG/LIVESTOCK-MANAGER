@@ -1,4 +1,5 @@
 # Patrones de Interacción Estándar
+> v1.1 · Última actualización: 2026-10-27
 
 Este documento establece los patrones de interacción consistentes que deben seguirse en toda la aplicación Livestock Manager para garantizar una experiencia de usuario uniforme e intuitiva.
 
@@ -125,7 +126,7 @@ tarjetaElemento.addEventListener('click', () => {
 
 ### 3.2 Características Esenciales
 - **Cursor**: `cursor: pointer` en todas las tarjetas clickeables
-- **Feedback Visual**: Sutil cambio de escala o color al presionar (`transform: scale(0.98)`)
+- **Feedback Visual**: Sutil cambio de escala o color al presionar (`transform: scale(0.95)`)
 - **Estado de Carga**: Mostrar indicador cuando se navega a detalle
 - **Retroceso Navegacional**: Soportar correctamente el botón "atrás" del navegador
 - **URL Limpia**: Usar hash params limpios: `#/animal?id=123` no `#/animal/123`
@@ -149,7 +150,7 @@ function mostrarToast(mensaje, tipo = 'info', duracion = 3000) {
     
     // Estilos basados en tipo
     const estilos = {
-        success: { background: 'var(--c-success)20', color: 'var(--c-success)' },
+        success: { background: 'var(--c-success)15', color: 'var(--c-success)' },
         error: { background: 'var(--c-danger)20', color: 'var(--c-danger)' },
         warning: { background: 'var(--c-warning)20', color: 'var(--c-warning)' },
         info: { background: 'var(--c-info)20', color: 'var(--c-info)' }

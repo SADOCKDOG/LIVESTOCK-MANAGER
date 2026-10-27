@@ -1,4 +1,5 @@
 # Estándar de Botones de Acción Hub
+> v1.0 · Última actualización: 2026-10-27 · Referencia: [DESIGN_TOKENS.md](DESIGN_TOKENS.md) para colores y escala
 
 Este documento detalla el estándar de implementación para los botones de acción hub en el sistema Livestock Manager, siguiendo el patrón de "Neon Branding".
 

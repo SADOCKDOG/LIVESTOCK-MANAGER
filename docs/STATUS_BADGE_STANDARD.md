@@ -1,4 +1,5 @@
 # Estándar de Status Badge (Viñeta Iluminada)
+> v1.0 · Última actualización: 2026-10-27 · Referencia: [DESIGN_TOKENS.md](DESIGN_TOKENS.md) para colores semánticos
 
 Este documento detalla el estándar de implementación para las "etiquetas de estado" o "badges" en el sistema Livestock Manager, siguiendo el patrón de "Neon Branding" y "Aglutinadora".
 
@@ -124,7 +125,7 @@ Según el estándar de posicionamiento (ver card-registro-positioning-standard.m
 ## 5. Accesibilidad
 
 - **Contraste**: La relación de contraste entre texto y fondo debe cumplir con WCAG AA (4.5:1 para texto normal)
-- **Tamaño objetivo táctil**: Mínimo 44x44dp cuando se usa en pantallas táctiles
+- **Tamaño objetivo táctil**: Mínimo 48x48dp cuando se usa en pantallas táctiles
 - **Lectura por pantalla**: El texto debe ser legible por lectores de pantalla (no usar solo colores para transmitir información)
 
 ## 6. Ejemplos de Implementación
