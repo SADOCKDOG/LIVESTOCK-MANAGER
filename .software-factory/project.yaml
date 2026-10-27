@@ -1,0 +1,60 @@
+# Manifiesto de Proyecto para la Software Factory Autonoma
+# Vinculado con Autonomous-AI-Dev-Infrastructure y Microsoft Foundry en sadogfarm.onmicrosoft.com
+
+project:
+  name: "Livestock Manager"
+  slug: "livestock-manager"
+  version: "4.10.8"
+  repository: "https://github.com/SADOCKDOG/LIVESTOCK-MANAGER"
+  organization: "Sdog Farm Software Factory"
+  tenant_id: "sadogfarm.onmicrosoft.com"
+
+stack:
+  type: "hybrid_offline_first_pwa"
+  frontend:
+    framework: "Vanilla JS / TypeScript / HTML5 PWA"
+    mobile_bridge: "Capacitor 7 (Android)"
+    desktop_bridge: "Tauri v2 (Rust / Windows)"
+    persistence: "IndexedDB (Dexie.js)"
+  backend_support:
+    type: "Cloudflare Worker Serverless"
+    repo: "https://github.com/SADOCKDOG/livestock-manager-support-api"
+
+sandbox_commands:
+  allowed_test_commands:
+    - "npm test"
+    - "npx playwright test"
+    - "cargo test"
+  allowed_build_commands:
+    - "npm run build"
+    - "npx cap sync"
+    - "cargo check"
+
+data_boundaries:
+  strictly_local_only:
+    - "Private/"
+    - "*.db"
+    - "*.sqlite"
+    - "*.pfx"
+    - "*.keystore"
+    - "*.jks"
+    - "credentials.json"
+    - "jwt-private-key.pem"
+  governed_ai_processing:
+    - "js/"
+    - "css/"
+    - "www/"
+    - "tests/"
+    - "docs/"
+
+governance:
+  framework: "AI-GRC"
+  compliance_regulations:
+    - "Real Decreto 787/2023 (Trazabilidad y registro animal)"
+    - "Real Decreto 479/2004 (REGA)"
+    - "Reglamento UE 1069/2009 (SANDACH)"
+    - "SIGGAN (Junta de Andalucia)"
+    - "BADIGEX (Junta de Extremadura)"
+  mandatory_human_approval_roles:
+    - "director_tecnico_veterinario"
+    - "responsable_cumplimiento_legal"
