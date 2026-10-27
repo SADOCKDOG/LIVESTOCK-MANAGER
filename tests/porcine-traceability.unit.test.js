@@ -175,6 +175,31 @@ describeFn("PorcineTraceabilityService: Evaluacion de Movimiento y Emision de Ce
   });
 });
 
+describeFn("PorcineTraceabilityService: Calculo de FCR (Feed Conversion Ratio)", () => {
+  testFn("Rechaza entradas no numéricas para feedKg/gainKg", () => {
+    assert.throws(() => PorcineTraceabilityService.calculateFCR("100", 25), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(100, "25"), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(null, 25), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(100, undefined), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR({}, []), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(NaN, 25), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(100, NaN), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(Infinity, 25), Error);
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(100, -Infinity), Error);
+  });
+
+  testFn("Lanza error ante division por cero (gainKg === 0)", () => {
+    assert.throws(() => PorcineTraceabilityService.calculateFCR(250, 0), Error);
+  });
+
+  testFn("Calcula correctamente feedKg / gainKg para valores numéricos válidos con gainKg > 0", () => {
+    assert.strictEqual(PorcineTraceabilityService.calculateFCR(250, 50), 5);
+    assert.strictEqual(PorcineTraceabilityService.calculateFCR(300, 75), 4);
+    assert.strictEqual(PorcineTraceabilityService.calculateFCR(275.5, 55.1), 275.5 / 55.1);
+    assert.strictEqual(PorcineTraceabilityService.calculateFCR(150, 30), 5);
+  });
+});
+
 describeFn("MotorTrazabilidad: Integracion en el Ecosistema y Evaluacion Porcina", () => {
   const MotorTrazabilidad = require(path.join(__dirname, "..", "js", "trazabilidad.js"));
 
