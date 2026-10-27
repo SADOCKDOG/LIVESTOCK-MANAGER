@@ -39,3 +39,15 @@ Ningun agente de IA dispone de permisos ilimitados sobre el codigo base. Las tar
 5. **Pruebas en Sandbox Seguro:** El Agente Tester ejecuta `npm test`, `npx playwright test` o `cargo test` dentro del entorno restringido.
 6. **Auditoria de Seguridad:** El Agente Revisor escanea el diff con `SecretScanner` para asegurar cero credenciales expuestas.
 7. **Aprobacion Humana y Promocion:** Solo el Director Tecnico Ganadero o el Responsable de Seguridad pueden emitir la decision formal de transicion a `DONE` y autorizar la creacion de la Pull Request hacia la rama protegida `master`.
+
+---
+
+## 5. Consola de Gestion Integral de Escritorio para Windows
+
+Los operadores, desarrolladores y responsables tecnicos disponen de una aplicacion grafica nativa en Windows para supervisar este ciclo de vida en tiempo real:
+- **Lanzador:** Archivo ejecutable por lotes `run_console.bat` en la infraestructura de desarrollo.
+- **Capacidades Operativas:**
+  - Monitorizacion en tiempo real de FCC Server (8082), Backend FastAPI (8000), base de datos SQLite y Microsoft Foundry (`sadogfarm.onmicrosoft.com`).
+  - Gestion del tablero Kanban: visualizacion de expedientes tecnicos, creacion de tareas asistidas y firma de aprobaciones humanas para transicion a `DONE`.
+  - Gestor de incidencias AI-GRC: diagnostico y resolucion auditada de bloqueos normativos o alertas de seguridad.
+  - Exportacion de informes forenses de auditoria de cumplimiento en formato Markdown.
