@@ -52,3 +52,42 @@ Los operadores, desarrolladores y responsables tecnicos disponen de una aplicaci
   - Gestion del tablero Kanban: visualizacion de expedientes tecnicos, creacion de tareas asistidas y firma de aprobaciones humanas para transicion a `DONE`.
   - Gestor de incidencias AI-GRC: diagnostico y resolucion auditada de bloqueos normativos o alertas de seguridad.
   - Exportacion de informes forenses de auditoria de cumplimiento en formato Markdown.
+
+---
+
+## 6. Expediente de Validacion: Modulo de Trazabilidad y Evaluacion Zoosanitaria Porcina (RD 787/2023)
+
+### A. Datos del Expediente
+- **Identificador de Tarea:** `TASK-LM-PORCINE-COMPLIANCE-02`
+- **Rama de Trabajo Aislada:** `test/software-factory-porcine-traceability`
+- **Marco de Gobernanza:** Repositorio privado [Autonomous-Doc-Compliance](https://github.com/SADOCKDOG/Autonomous-Doc-Compliance) (Procedimiento `SOP-SF-001`, ISO/IEC 42001, NIST AI RMF).
+- **Directivas Inyectadas con Hash SHA-256:**
+  - `policy_analyst.md`: `79de69b60a6a1f9f5b6e9d40dff98a2b08fdf73992c8b39e8bd997e1845ee0ed`
+  - `policy_architect.md`: `3487c4eba15dd4aab6620a1567767e13a8017157c296612fc8c3b4815ec0693f`
+  - `policy_developer.md`: `07ff9594ee457c9f8945858f184a40c73a494624c0c6540a58439cc9440cc1ae`
+  - `policy_uiux.md`: `548fe387bdabee51e7eda602ca470e620aaccea0b59b1a75dcf273456aef19ed`
+  - `policy_tester.md`: `c5066957c6c5b2b5bab08788ce08833f99a34af004f3c47152e6f7861f84eeea`
+  - `policy_reviewer.md`: `87d6a917a815b22b0ad360f1681327e0d06f9b461e731aa2746e376783a7a75e`
+
+### B. Arquitectura e Integracion en el Ecosistema
+1. **Extension del Motor Central (`MotorTrazabilidad` en `js/trazabilidad.js`):**
+   - Incorporacion de `evaluarMovimientoPorcino(db, options)` en el nucleo de negocio.
+   - Consulta transaccional a `animales` y `sanitarios_ganado`, aplicando `checkSupresion` para el bloqueo automatico de partidas con periodos de retirada de medicamentos veterinarios activos.
+2. **Anclaje en el Shell ERP (`js/erp-shell.js`):**
+   - Integracion en el menu lateral oficial de escritorio dentro de `NAV_GROUPS` (`gegan -> trazabilidad-porcina` y `tramites -> tram-porcino`).
+   - Ruta activa: `#/trazabilidad?modulo=porcino`.
+3. **Conformidad con el Sistema de Diseno (`js/views/trazabilidad-porcina-view.js`):**
+   - Uso exclusivo de tokens W3C de `css/design-tokens.css` (`--surface-card`, `--surface-input`, `--p-gold`, `--c-success`, `--c-danger`).
+   - Consumo dinamico del codigo REGA de la finca activa (`ES210050001234`) a traves de `Fincas.getActive()`.
+   - Dimensiones tactiles ergonomicas $\ge 48\text{ px}$.
+
+### C. Resultados de Aseguramiento de Calidad (QA)
+- **Pruebas Unitarias Node.js:** 16/16 aserciones superadas con exito (100% PASS, 0 fallos) en `tests/porcine-traceability.unit.test.js`.
+- **Validacion Visual Playwright:** Capturas nominales y de bloqueo generadas en `docs/screenshots/`.
+- **Validacion en Vivo y Coexistencia de Base de Datos:** Certificada por el Director Tecnico mediante captura de pantalla de la aplicacion en ejecucion local (`localhost:8080/index.html#/trazabilidad?modulo=porcino`), constatando ubicacion en sidebar, armonia de tokens y lectura del REGA real.
+- **Evidencia Visual Archivada:** `docs/screenshots/evidencia_usuario_integracion_real.png`.
+- **Revision de Seguridad SecOps:** 0 secretos detectados en diff.
+- **Firma Humana Criptografica (AI-GRC):**
+  - Actor: `director_tecnico_veterinario`
+  - Firma SHA-256: `9490814df9d0a9c55e5716fc575af6b5f59c57d50c54b81f90b361379fbe4dda`
+  - Estado: `DONE` (Registrado en `factory.db`).
