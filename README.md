@@ -48,6 +48,11 @@ La custodia técnica, validación de políticas y automatización del ciclo de v
   *Especifica las cuotas de tokens, tiempos de respuesta, allowlist de comandos seguros en sandbox (`node`, `npm`, `npx`, `pytest`, `cargo`) y políticas de aislamiento de red.*
 - **Evidencias de Auditoría y Simulación:** [REPORTE_SIMULACION_Y_EVIDENCIAS.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/piloto_livestock_manager/REPORTE_SIMULACION_Y_EVIDENCIAS.md)  
   *Recoge las pruebas de bloqueo automático ante fugas de datos restringidos y la derivación determinista de criterios de aceptación normativos sin intervención de modelos no autorizados.*
+- **Orquestación y Supervisión Multiagente:** [ORQUESTACION_Y_SUPERVISION_MULTIAGENTE.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/ORQUESTACION_Y_SUPERVISION_MULTIAGENTE.md)  
+  *Especificación maestra de la máquina de estados de LangGraph, coordinación entre los 9 roles especializados y barrera de firma humana auditada.*
+- **Integración con Microsoft Foundry (Sdog Farm):** [INTEGRACION_MICROSOFT_FOUNDRY_SDOGFARM.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/INTEGRACION_MICROSOFT_FOUNDRY_SDOGFARM.md)  
+  *Conexión corporativa gobernada con Microsoft Azure AI Foundry bajo el tenant sadogfarm.onmicrosoft.com y EU Data Boundary.*
+- **Normativa y Manifiesto Local:** [.software-factory/project.yaml](.software-factory/project.yaml) y [docs/AI_GRC_LIFECYCLE.md](docs/AI_GRC_LIFECYCLE.md).
 
 ---
 
