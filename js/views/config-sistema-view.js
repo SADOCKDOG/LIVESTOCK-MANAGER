@@ -277,14 +277,34 @@ const ConfigSistemaView = {
       let logsHtml = logs.length > 0 ? logs.map(l => {
         const isAnulado = l.anulado || l.motivo_tarea?.includes('anulacion') || l.motivo_tarea?.includes('baja') || l.action === 'DELETE_LOGICAL';
         const isRectificado = l.rectificado || l.resultado === 'WARNING' || l.motivo_tarea?.includes('rectificacion');
-        const color = isAnulado ? 'var(--c-danger)' : (isRectificado ? 'var(--c-warning)' : 'var(--c-info)');
+        const isAlta = l.tipo === 'alta' || l.motivo_tarea?.includes('alta') || l.action === 'CREATE';
+        const isMovimiento = l.tipo === 'movimiento' || l.motivo_tarea === 'entrada' || l.motivo_tarea === 'salida' || l.motivo_tarea === 'cambio_rebano';
+        const color = isAnulado
+          ? 'var(--c-danger)'
+          : (isRectificado
+            ? 'var(--c-warning)'
+            : (isAlta ? 'var(--c-success)' : (isMovimiento ? 'var(--c-purple)' : 'var(--c-info)')));
+
         const actorTag = l.actor_id ? `<span class="text-[0.55rem] text-gray-500 font-bold ml-6">| Actor: ${_esc(l.actor_id)}</span>` : '';
         const fieldsTag = Array.isArray(l.fields_modified) && l.fields_modified.length > 0
           ? `<div class="text-[0.6rem] text-gray-400 mt-2">Campos alterados: ${_esc(l.fields_modified.join(', '))}</div>`
           : '';
-        const motivo = _esc((l.motivo_tarea || 'Evento de Sistema').replace(/_/g, ' '));
+
+        const motivoRaw = (l.motivo_tarea === 'control' && l.valor_neto != null)
+          ? 'pesaje control'
+          : (l.motivo_tarea || 'Evento de Sistema');
+        const motivo = _esc(motivoRaw.replace(/_/g, ' '));
         const fechaStr = _esc(new Date(l.creadoEn || l.fecha).toLocaleString());
-        const desc = _esc(l.descripcion || l.observaciones || 'Registro modificado');
+
+        let descRaw = l.descripcion;
+        if (!descRaw && l.valor_neto != null) {
+          descRaw = `Pesaje registrado: ${l.valor_neto} ${l.unidad || 'kg'} (animal #${l.entidad_id})`;
+        }
+        if (!descRaw) {
+          descRaw = l.observaciones || l.notas || 'Registro modificado';
+        }
+        const desc = _esc(descRaw);
+
         const detalleMotivo = (l.rectificadoMotivo || l.anuladoMotivo)
           ? `<div class="text-[0.6rem] text-aaa italic mt-2">Motivo: ${_esc(l.rectificadoMotivo || l.anuladoMotivo)}</div>`
           : '';

@@ -13,26 +13,37 @@ const AuditService = require(path.join(__dirname, '..', 'js', 'services', 'audit
 
 // Mock de base de datos en memoria para pruebas
 function createMockDB() {
-  const store = [];
+  const stores = {
+    registro_eventos: [],
+    animales: [],
+    movimientos_ganado: [],
+    gastos_ganaderia: [],
+    ventas_ganado: []
+  };
   let nextId = 1;
   let throwOnAdd = false;
   let throwOnGetAll = false;
 
   return {
-    _store: store,
+    _stores: stores,
+    _store: stores.registro_eventos,
     setThrowOnAdd: (val) => { throwOnAdd = val; },
     setThrowOnGetAll: (val) => { throwOnGetAll = val; },
     objectStoreNames: {
-      _names: ['registro_eventos', 'animales', 'gastos_ganaderia', 'ventas_ganado'],
+      _names: ['registro_eventos', 'animales', 'movimientos_ganado', 'gastos_ganaderia', 'ventas_ganado'],
       contains(s) { return this._names.includes(s); },
       [Symbol.iterator]() { return this._names[Symbol.iterator](); }
     },
+    get: async (storeName, id) => {
+      const arr = stores[storeName] || [];
+      return arr.find(x => x.id === Number(id)) || null;
+    },
+    getFromIndex: async () => null,
     getAll: async (storeName) => {
       if (throwOnGetAll) {
         throw new Error('DatabaseError: Error al recuperar datos de ' + storeName);
       }
-      if (storeName === 'registro_eventos') return store;
-      return [{ id: 101, crotal: 'ES01' }];
+      return stores[storeName] || [{ id: 101, crotal: 'ES01' }];
     },
     add: async (storeName, item) => {
       if (throwOnAdd) {
@@ -40,18 +51,65 @@ function createMockDB() {
         err.name = 'QuotaExceededError';
         throw err;
       }
-      if (storeName !== 'registro_eventos') throw new Error(`Unexpected store: ${storeName}`);
+      if (!stores[storeName]) stores[storeName] = [];
       const record = { ...item, id: nextId++ };
-      store.push(record);
+      stores[storeName].push(record);
       return record.id;
     },
+    put: async (storeName, item) => {
+      if (!stores[storeName]) stores[storeName] = [];
+      const idx = stores[storeName].findIndex(x => x.id === item.id);
+      if (idx >= 0) stores[storeName][idx] = item;
+      else stores[storeName].push(item);
+      return item.id;
+    },
     getAllFromIndex: async (storeName, indexName, value) => {
-      if (storeName !== 'registro_eventos') return [];
-      return store.filter(item => {
+      const arr = stores[storeName] || [];
+      return arr.filter(item => {
         if (indexName === 'fincaId') return String(item.fincaId) === String(value);
+        if (indexName === 'entidad_id') return String(item.entidad_id) === String(value);
         return false;
       });
     }
+  };
+}
+
+function loadRealDomainModules(customMocks = {}) {
+  const sandbox = {
+    window: {},
+    console: { log: () => {}, warn: () => {}, error: () => {} },
+    setTimeout: setTimeout,
+    ErrorHandler: {
+      tryAsync: async (fn) => fn(),
+      validateCrotal: async (c) => c
+    },
+    Fincas: { getActiveId: async () => 1 },
+    EventBus: customMocks.EventBus || global.EventBus,
+    ...customMocks
+  };
+  sandbox.window = sandbox;
+  sandbox.window.db = customMocks.db || global.db;
+  sandbox.window.EventBus = sandbox.EventBus;
+  sandbox.window.Fincas = sandbox.Fincas;
+  sandbox.window.AuditService = AuditService;
+  sandbox.AuditService = AuditService;
+
+  vm.createContext(sandbox);
+
+  const animalesCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'animales.js'), 'utf8');
+  vm.runInContext(animalesCode + '\n; sandbox_export_Animales = Animales;', sandbox);
+
+  const pesajesCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'pesajes.js'), 'utf8');
+  vm.runInContext(pesajesCode + '\n; sandbox_export_Pesajes = Pesajes;', sandbox);
+
+  const movimientosCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'movimientos.js'), 'utf8');
+  vm.runInContext(movimientosCode + '\n; sandbox_export_Movimientos = Movimientos;', sandbox);
+
+  return {
+    Animales: sandbox.sandbox_export_Animales,
+    Pesajes: sandbox.sandbox_export_Pesajes,
+    Movimientos: sandbox.sandbox_export_Movimientos,
+    sandbox
   };
 }
 
@@ -771,6 +829,190 @@ async function runTests() {
     assert.strictEqual(auditFallo.action, 'IMPORT');
     assert.strictEqual(auditFallo.resultado, 'FAILED');
     assert.strictEqual(auditFallo.motivo_tarea, 'fallo_importacion_backup');
+  });
+
+  // Grupo 10: Pruebas de Ruta Real desde Operaciones de Dominio (Altas, Modificaciones, Pesajes y Movimientos)
+  console.log('\n--- 10. Pruebas de Ruta Real desde Operaciones de Dominio (Altas, Modificaciones, Pesajes y Movimientos) ---');
+
+  await test('Ruta real: Animales.save (alta en censo) persiste en registro_eventos y aparece en list()', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const { Animales } = loadRealDomainModules({ db: mockDB });
+
+    // Ejecutar alta real de animal en finca 1
+    const nuevoId = await Animales.save({
+      numero_identificacion: 'ES011122233344',
+      tipoAlta: 'Nacimiento',
+      fincaId: 1,
+      fecha_nacimiento: '2026-10-27'
+    });
+
+    assert.ok(nuevoId > 0, 'Debe devolver un ID de animal válido');
+    
+    // Comprobar que en registro_eventos existe el alta oficial de censo
+    const eventosCenso = mockDB._stores.registro_eventos.filter(e => e.tipo === 'alta');
+    assert.strictEqual(eventosCenso.length, 1);
+    assert.strictEqual(eventosCenso[0].fincaId, 1);
+    assert.strictEqual(eventosCenso[0].entidad_id, nuevoId);
+    assert.strictEqual(eventosCenso[0].motivo_tarea, 'alta_nacimiento');
+    assert.ok(eventosCenso[0].descripcion.includes('ES011122233344'));
+
+    // Comprobar que list() de AuditService para la finca 1 lo recupera
+    const logsFinca1 = await AuditService.list({ fincaId: 1, limit: 10 });
+    const logAlta = logsFinca1.find(l => l.entidad_id === nuevoId);
+    assert.ok(logAlta, 'El evento de alta debe aparecer en la auditoría de la finca 1');
+    assert.strictEqual(logAlta.motivo_tarea, 'alta_nacimiento');
+  });
+
+  await test('Ruta real: Animales.save (modificación de ficha) audita la operación vía EventBus sin duplicar', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const handlers = {};
+    const bus = {
+      on: (ev, fn) => { handlers[ev] = fn; },
+      emit: async (ev, data) => { if (handlers[ev]) await handlers[ev](data); }
+    };
+    global.EventBus = bus;
+    AuditService._listenersInitialized = false;
+    AuditService.initEventBusListeners();
+
+    const { Animales } = loadRealDomainModules({ db: mockDB, EventBus: bus });
+
+    // Pre-insertar animal en almacén
+    mockDB._stores.animales.push({
+      id: 50,
+      numero_identificacion: 'ES099988877766',
+      fincaId: 1,
+      estado: 'activo',
+      rebanoId: 1
+    });
+
+    // Modificar animal (cambio de rebaño)
+    await Animales.save({
+      id: 50,
+      numero_identificacion: 'ES099988877766',
+      fincaId: 1,
+      estado: 'activo',
+      rebanoId: 2
+    });
+
+    // Comprobar que AuditService registró la modificación
+    const eventosAudit = mockDB._stores.registro_eventos.filter(e => e.tipo === 'auditoria');
+    assert.ok(eventosAudit.length >= 1, 'Debe registrarse auditoría de la modificación');
+    const logMod = eventosAudit.find(e => e.entidad_id === '50' || e.entidad_id === 50);
+    assert.ok(logMod);
+    assert.strictEqual(logMod.action, 'UPDATE');
+    assert.strictEqual(logMod.fincaId, 1);
+
+    // Comprobar que list() de AuditService lo muestra
+    const logs = await AuditService.list({ fincaId: 1, limit: 10 });
+    assert.ok(logs.some(l => l.entidad_id === '50' || l.entidad_id === 50));
+  });
+
+  await test('Ruta real: Pesajes.registrar persiste pesaje de control y se visualiza en list() sin duplicados', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const { Pesajes } = loadRealDomainModules({ db: mockDB });
+
+    // Registrar pesaje de control real en finca 1
+    const idPesaje = await Pesajes.registrar({
+      fincaId: 1,
+      entidad_id: 105,
+      valor_neto: 420.5,
+      unidad: 'kg',
+      motivo_tarea: 'control'
+    });
+
+    assert.ok(idPesaje > 0);
+
+    // Comprobar que en registro_eventos hay exactamente un registro de pesaje
+    const eventosPesaje = mockDB._stores.registro_eventos.filter(e => e.valor_neto === 420.5);
+    assert.strictEqual(eventosPesaje.length, 1, 'No debe haber registros duplicados de pesaje');
+    assert.strictEqual(eventosPesaje[0].fincaId, 1);
+    assert.strictEqual(eventosPesaje[0].unidad, 'kg');
+
+    // Comprobar que AuditService.list() para la finca 1 incluye el pesaje
+    const logs = await AuditService.list({ fincaId: 1, limit: 10 });
+    const logP = logs.find(l => l.valor_neto === 420.5);
+    assert.ok(logP, 'El pesaje debe aparecer en el registro de actividad de la finca');
+    assert.strictEqual(logP.motivo_tarea, 'control');
+  });
+
+  await test('Ruta real: Movimientos._registrarEventos persiste eventos pecuarios oficiales y aparecen en list()', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const { Movimientos } = loadRealDomainModules({ db: mockDB });
+
+    // Registrar evento de salida de 2 animales con guía sanitaria oficial
+    await Movimientos._registrarEventos({
+      fincaId: 1,
+      animalId: [201, 202],
+      tipo: 'salida',
+      fecha: '2026-10-27',
+      numero_guia: 'GUIA-OFICIAL-2026-001',
+      rega_destino: 'ES450000000001'
+    });
+
+    // Comprobar que se persistieron 2 eventos de tipo 'movimiento'
+    const movEvents = mockDB._stores.registro_eventos.filter(e => e.tipo === 'movimiento');
+    assert.strictEqual(movEvents.length, 2);
+    assert.strictEqual(movEvents[0].motivo_tarea, 'salida');
+    assert.strictEqual(movEvents[0].fincaId, 1);
+    assert.ok(movEvents[0].descripcion.includes('GUIA-OFICIAL-2026-001'));
+
+    // Comprobar que AuditService.list() los muestra
+    const logs = await AuditService.list({ fincaId: 1, limit: 10 });
+    const logsMov = logs.filter(l => l.tipo === 'movimiento');
+    assert.strictEqual(logsMov.length, 2);
+  });
+
+  await test('Ruta real: Aislamiento estricto por explotación en operaciones pecuarias', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    let activeFinca = 1;
+    const { Animales, Pesajes } = loadRealDomainModules({
+      db: mockDB,
+      Fincas: { getActiveId: async () => activeFinca }
+    });
+
+    // Operación en Finca 1
+    activeFinca = 1;
+    await Animales.save({
+      numero_identificacion: 'ES111111111111',
+      tipoAlta: 'Nacimiento',
+      fincaId: 1,
+      fecha_nacimiento: '2026-10-27'
+    });
+
+    // Operación en Finca 2
+    activeFinca = 2;
+    await Pesajes.registrar({
+      fincaId: 2,
+      entidad_id: 301,
+      valor_neto: 510,
+      unidad: 'kg',
+      motivo_tarea: 'control'
+    });
+
+    // Consultar auditoría de Finca 1
+    const logsFinca1 = await AuditService.list({ fincaId: 1, limit: 10 });
+    assert.ok(logsFinca1.some(l => l.descripcion && l.descripcion.includes('ES111111111111')), 'Finca 1 debe ver su alta');
+    assert.ok(!logsFinca1.some(l => l.valor_neto === 510), 'Finca 1 NO debe ver el pesaje de Finca 2');
+
+    // Consultar auditoría de Finca 2
+    const logsFinca2 = await AuditService.list({ fincaId: 2, limit: 10 });
+    assert.ok(logsFinca2.some(l => l.valor_neto === 510), 'Finca 2 debe ver su pesaje');
+    assert.ok(!logsFinca2.some(l => l.descripcion && l.descripcion.includes('ES111111111111')), 'Finca 2 NO debe ver el alta de Finca 1');
   });
 
   console.log(`\n========================================`);

@@ -281,18 +281,27 @@
           }
         }
 
-        // Filtrar exclusivamente eventos de auditoría y mutaciones críticas de negocio
+        // Filtrar exclusivamente eventos de auditoría y mutaciones críticas de negocio (altas, modificaciones, pesajes, movimientos)
         const logs = unicos.filter(e =>
           e.tipo === 'auditoria' ||
           e.tipo === 'alta' ||
           e.tipo === 'baja' ||
+          e.tipo === 'movimiento' ||
+          e.tipo === 'pesaje' ||
           e.rectificado ||
           e.anulado ||
+          (e.valor_neto != null && e.tipo_entidad === 'animal') ||
           (e.motivo_tarea && (
             e.motivo_tarea.includes('anulacion') ||
             e.motivo_tarea.includes('rectificacion') ||
             e.motivo_tarea.includes('alta') ||
-            e.motivo_tarea.includes('baja')
+            e.motivo_tarea.includes('baja') ||
+            e.motivo_tarea.includes('entrada') ||
+            e.motivo_tarea.includes('salida') ||
+            e.motivo_tarea.includes('control') ||
+            e.motivo_tarea.includes('movimiento') ||
+            e.motivo_tarea.includes('modificacion') ||
+            e.motivo_tarea.includes('rebano')
           ))
         );
 
@@ -404,6 +413,35 @@
           action: 'DELETE_LOGICAL',
           motivo_tarea: 'anulacion_animal',
           descripcion: `Baja/anulación de animal #${data.id || ''}`
+        });
+      });
+
+      // Modificaciones y traslados de animales
+      bus.on('animal:updated', async (data) => {
+        const a = data && (data.animal || data);
+        if (!a || a.estado === 'baja') return;
+        await this.record({
+          fincaId: a.fincaId || null,
+          tipo_entidad: 'animal',
+          entidad_id: a.id || a.numero_identificacion || 'animal',
+          actor_type: 'user',
+          action: 'UPDATE',
+          motivo_tarea: 'modificacion_animal',
+          descripcion: `Ficha de animal actualizada · crotal ${a.numero_identificacion || '#' + a.id}`
+        });
+      });
+
+      bus.on('animal:moved', async (data) => {
+        const a = data && (data.animal || data);
+        if (!a) return;
+        await this.record({
+          fincaId: a.fincaId || null,
+          tipo_entidad: 'animal',
+          entidad_id: a.id || a.numero_identificacion || 'animal',
+          actor_type: 'user',
+          action: 'UPDATE',
+          motivo_tarea: 'cambio_rebano',
+          descripcion: `Traslado de rebaño para animal ${a.numero_identificacion || '#' + a.id} (de #${data.rebanoOrigen} a #${data.rebanoDestino})`
         });
       });
 
