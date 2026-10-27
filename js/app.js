@@ -434,6 +434,7 @@ const App = {
       { path: '/gastos', label: 'Gastos', icon: Icons.dinero() },
       { path: '/informes', label: 'Informes', icon: Icons.libroVentas() },
       { path: '/alertas', label: 'Alertas', icon: Icons.campana() },
+      { path: '/mis-incidencias', label: 'Mis incidencias', icon: Icons.ayuda() },
       { path: '/cuaderno', label: 'Cuaderno', icon: Icons.libro() },
       { path: '/manuales', label: 'Manuales', icon: Icons.libro() },
       { path: '/importar-rfid', label: 'Importar RFID', icon: Icons.importar() },
@@ -1752,6 +1753,15 @@ const App = {
                 <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Salida comercial o carga para matadero</p>
               </div>
             </div>
+          </div>
+
+          <!-- Mis Incidencias de Soporte -->
+          <div class="card p-12 hover:border-gray transition-all" style="background:#141414; border:1px solid #222; cursor:pointer; border-left:3px solid var(--c-danger); grid-column: span 2;" onclick="App._cerrarSubmenuRegistros(); location.hash = '#/mis-incidencias';">
+            <div class="flex items-center justify-center rounded-sm mb-10" style="width:36px; height:36px; background:#1A1A1A; color:var(--c-danger); border:1px solid #222;">
+              ${Icons.ayuda()}
+            </div>
+            <h4 class="text-xs font-black text-white uppercase tracking-wider mb-2">MIS INCIDENCIAS</h4>
+            <p class="text-[0.55rem] text-gray uppercase tracking-tight m-0">Soporte técnico y respuestas</p>
           </div>
 
         </div>
