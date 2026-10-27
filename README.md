@@ -529,6 +529,8 @@ zipalign -c -P 16 -v 4 app/build/outputs/apk/release/app-release.apk
 | [DESIGN_TOKENS.md](docs/DESIGN_TOKENS.md) | Tokens de diseño y sistema de estilo Coral |
 | [STATUS_BADGE_STANDARD.md](docs/STATUS_BADGE_STANDARD.md) | Estándar de badges retroiluminados |
 | [WIDGET_BUTTON_STANDARD.md](docs/WIDGET_BUTTON_STANDARD.md) | Estándar de botones widget |
+| [PLANTILLA-CARD-REGISTRO.md](docs/PLANTILLA-CARD-REGISTRO.md) | Plantilla de card de registro (estructura HTML/CSS base) |
+| [card-registro-positioning-standard.md](docs/card-registro-positioning-standard.md) | Posicionamiento de badge en card de registro |
 | [support-api/README](https://github.com/SADOCKDOG/livestock-manager-support-api#readme) | Backend de soporte: estados, agente de IA y confirmación de resolución |
 
 ---
