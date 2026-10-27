@@ -291,6 +291,123 @@ async function runTests() {
     assert.strictEqual(logs.length, 50);
   });
 
+  // Grupo 6: Auditoría de Copias de Seguridad (Exportación e Importación)
+  console.log('\n--- 6. Auditoría de Copias de Seguridad ---');
+
+  await test('Registra auditoría de exportación satisfactoria de backup', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+
+    const res = await AuditService.record({
+      fincaId: 'global',
+      actor_type: 'user',
+      action: 'EXPORT',
+      resultado: 'SUCCESS',
+      tipo_entidad: 'backup',
+      entidad_id: 'backup_json',
+      motivo_tarea: 'exportacion_backup',
+      descripcion: 'Copia de seguridad exportada y descargada (142 registros)'
+    });
+
+    assert.strictEqual(res.success, true);
+    const saved = mockDB._store[0];
+    assert.strictEqual(saved.tipo_entidad, 'backup');
+    assert.strictEqual(saved.action, 'EXPORT');
+    assert.strictEqual(saved.resultado, 'SUCCESS');
+    assert.strictEqual(saved.motivo_tarea, 'exportacion_backup');
+    assert.strictEqual(saved.fincaId, 'global');
+  });
+
+  await test('Registra auditoría de importación POST-restauración y preserva el evento', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+
+    // Simular que la base de datos tenía registros previos
+    await mockDB.add('registro_eventos', { id: 1, fincaId: 1, tipo: 'auditoria', motivo_tarea: 'evento_antiguo' });
+
+    // 1. Simulación del proceso de restauración de Trazabilidad.importarBackupData:
+    //    Se limpian o reemplazan los datos con los del archivo de backup
+    mockDB._store.length = 0; // Se vacía como parte de la carga del archivo
+    mockDB._store.push({ id: 10, fincaId: 1, tipo: 'auditoria', motivo_tarea: 'evento_restaurado_del_fichero', creadoEn: '2026-10-25T10:00:00Z' });
+
+    // 2. Ejecutar la auditoría post-restauración de App.importBackup:
+    const res = await AuditService.record({
+      fincaId: 'global',
+      actor_type: 'user',
+      action: 'IMPORT',
+      resultado: 'SUCCESS',
+      tipo_entidad: 'backup',
+      entidad_id: 'backup_json',
+      motivo_tarea: 'importacion_backup',
+      descripcion: 'Copia de seguridad restaurada (2 fincas)'
+    });
+
+    assert.strictEqual(res.success, true);
+
+    // Verificar que el evento de importación NO desapareció durante la restauración
+    assert.strictEqual(mockDB._store.length, 2);
+    const ultimoRegistro = mockDB._store[mockDB._store.length - 1];
+    assert.strictEqual(ultimoRegistro.motivo_tarea, 'importacion_backup');
+    assert.strictEqual(ultimoRegistro.tipo_entidad, 'backup');
+    assert.strictEqual(ultimoRegistro.action, 'IMPORT');
+    assert.strictEqual(ultimoRegistro.fincaId, 'global');
+
+    // Comprobar que list() lo muestra como el más reciente
+    const logs = await AuditService.list({ fincaId: 1, limit: 10 });
+    assert.strictEqual(logs[0].motivo_tarea, 'importacion_backup');
+  });
+
+  await test('Registra eventos de fallo ante errores de exportación o importación', async () => {
+    const mockDB = createMockDB();
+    global.db = mockDB;
+
+    const resFalloExport = await AuditService.record({
+      fincaId: 'global',
+      action: 'EXPORT',
+      resultado: 'FAILED',
+      tipo_entidad: 'backup',
+      entidad_id: 'backup_json',
+      motivo_tarea: 'fallo_exportacion_backup',
+      descripcion: 'Fallo al generar copia de seguridad'
+    });
+    assert.strictEqual(resFalloExport.success, true);
+    assert.strictEqual(mockDB._store[0].resultado, 'FAILED');
+    assert.strictEqual(mockDB._store[0].motivo_tarea, 'fallo_exportacion_backup');
+
+    const resFalloImport = await AuditService.record({
+      fincaId: 'global',
+      action: 'IMPORT',
+      resultado: 'FAILED',
+      tipo_entidad: 'backup',
+      entidad_id: 'backup_json',
+      motivo_tarea: 'fallo_importacion_backup',
+      descripcion: 'Fallo al restaurar copia de seguridad'
+    });
+    assert.strictEqual(resFalloImport.success, true);
+    assert.strictEqual(mockDB._store[1].resultado, 'FAILED');
+    assert.strictEqual(mockDB._store[1].motivo_tarea, 'fallo_importacion_backup');
+  });
+
+  await test('Fallo de escritura de auditoría en backup no lanza excepción (modo tolerante)', async () => {
+    const mockDB = createMockDB();
+    mockDB.setThrowOnAdd(true);
+    global.db = mockDB;
+    AuditService._recentOperations.clear();
+
+    const res = await AuditService.record({
+      fincaId: 'global',
+      action: 'EXPORT',
+      resultado: 'SUCCESS',
+      tipo_entidad: 'backup',
+      entidad_id: 'backup_json',
+      motivo_tarea: 'exportacion_backup',
+      descripcion: 'Copia de seguridad exportada'
+    });
+
+    assert.strictEqual(res.success, false);
+    assert.strictEqual(res.reason, 'AUDIT_WRITE_FAILED');
+  });
+
   console.log(`\n========================================`);
   console.log(`RESULTADO FINAL: ${passed}/${total} PRUEBAS SUPERADAS`);
   console.log(`========================================\n`);
