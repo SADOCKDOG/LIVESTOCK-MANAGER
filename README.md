@@ -24,6 +24,33 @@
 
 ---
 
+## Arquitectura Híbrida, Custodia y Gobernanza AI-GRC
+
+### Caso de Estudio de Desarrollo Autónomo con IA
+Livestock Manager es una plataforma de software crítico para el sector agropecuario cuyo desarrollo y mantenimiento se ha coordinado mediante una factoría multiagente de inteligencia artificial. En lugar de utilizar modelos genéricos sin supervisión, la ingeniería del proyecto se estructuró emulando una organización profesional completa con agentes especializados en roles clave:
+- **Dirección y Gestión:** Project Manager y Oficial de Cumplimiento Normativo (Auditor Legal).
+- **Ingeniería de Software:** Desarrolladores Full-Stack (Web/Capacitor), Android nativo, Windows Desktop (Tauri/Rust) y Backend Serverless (Cloudflare Workers).
+- **Calidad y Operaciones:** Ingeniero de QA y DevOps (automatización de compilaciones y pruebas en sandbox).
+- **Seguridad y Soporte:** Especialista en Ciberseguridad (escaneo estático de secretos) y Agente de Soporte Técnico al Usuario.
+
+### Custodia Tecnológica e Infraestructura de Soporte (AI-GRC)
+Dado que el sistema procesa datos regulados por la normativa ganadera de la Unión Europea y el Estado español (RD 787/2023, RD 479/2004, SIGGAN en Andalucía y BADIGEX en Extremadura), la evolución del código está sujeta a un marco estricto de **Gobierno, Riesgos y Cumplimiento de IA (AI-GRC)**.
+
+La custodia técnica, validación de políticas y automatización del ciclo de vida se ejecutan sobre la infraestructura local de desarrollo autónomo documentada en el repositorio:
+- **Infraestructura de Referencia:** [Autonomous-AI-Dev-Infrastructure](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure)
+
+#### Documentación Técnica del Piloto de Gobierno en la Infraestructura
+- **Marco de Gobernanza y Taxonomía (AI-GRC):** [AI_GOVERNANCE_RISK_COMPLIANCE.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/piloto_livestock_manager/AI_GOVERNANCE_RISK_COMPLIANCE.md)  
+  *Delimita los 5 niveles de autonomía (L1-L5), la matriz de clasificación de datos confidenciales (aislamiento estricto de códigos REGA, coordenadas GPS y certificados de explotación) y el protocolo de gestión de incidentes.*
+- **Blueprint Operativo del Piloto:** [PILOT_BLUEPRINT_LIVESTOCK_MANAGER.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/piloto_livestock_manager/PILOT_BLUEPRINT_LIVESTOCK_MANAGER.md)  
+  *Define el flujo Kanban end-to-end (desde BACKLOG hasta DONE) para épicas críticas como el bloqueo preventivo de venta de leche bajo tratamiento farmacológico, con barrera de aprobación humana obligatoria.*
+- **Configuración Declarativa del Entorno:** [CONFIG_LIVESTOCK_MANAGER.yaml](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/piloto_livestock_manager/CONFIG_LIVESTOCK_MANAGER.yaml)  
+  *Especifica las cuotas de tokens, tiempos de respuesta, allowlist de comandos seguros en sandbox (`node`, `npm`, `npx`, `pytest`, `cargo`) y políticas de aislamiento de red.*
+- **Evidencias de Auditoría y Simulación:** [REPORTE_SIMULACION_Y_EVIDENCIAS.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/piloto_livestock_manager/REPORTE_SIMULACION_Y_EVIDENCIAS.md)  
+  *Recoge las pruebas de bloqueo automático ante fugas de datos restringidos y la derivación determinista de criterios de aceptación normativos sin intervención de modelos no autorizados.*
+
+---
+
 ## Estado y disponibilidad
 
 | Plataforma | Versión | Estado | Coste |
