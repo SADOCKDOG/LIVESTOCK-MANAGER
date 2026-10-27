@@ -6,6 +6,10 @@
 <h3 align="center">Sistema Integral de Gestión Ganadera · v4.10.8</h3>
 
 <p align="center">
+  <em>v4.10.8 corresponde a Android / Google Play. La versión nativa de Windows (Tauri) usa su propio esquema de versión 4.11.x.</em>
+</p>
+
+<p align="center">
   PWA híbrida (Android · Capacitor 7) 100% <strong>offline-first</strong> para la gestión profesional de explotaciones ganaderas, con cumplimiento normativo nativo del sistema <strong>SIGGAN</strong> (Andalucía) y <strong>BADIGEX</strong> (Extremadura).
 </p>
 
