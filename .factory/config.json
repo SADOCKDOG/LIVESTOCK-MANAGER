@@ -1,0 +1,17 @@
+{
+  "project_name": "LIVESTOCK-MANAGER",
+  "archetype": "mobile_pwa",
+  "base_branch": "master",
+  "test_command": ["node", "tests/porcine-traceability.unit.test.js"],
+  "build_command": ["npm", "run", "build"],
+  "uiux_mode": "advisory",
+  "design_tokens_path": "css/theme.css",
+  "protected_paths": [
+    "src-tauri/**",
+    ".github/workflows/**"
+  ],
+  "metadata": {
+    "role": "upstream_canonic_mobile_android_core_pwa",
+    "target_platform": "Android (Capacitor) + Web PWA"
+  }
+}
