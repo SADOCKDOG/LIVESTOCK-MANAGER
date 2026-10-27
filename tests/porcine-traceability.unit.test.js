@@ -175,4 +175,33 @@ describeFn("PorcineTraceabilityService: Evaluacion de Movimiento y Emision de Ce
   });
 });
 
+describeFn("MotorTrazabilidad: Integracion en el Ecosistema y Evaluacion Porcina", () => {
+  const MotorTrazabilidad = require(path.join(__dirname, "..", "js", "trazabilidad.js"));
+
+  testFn("MotorTrazabilidad expone el metodo evaluarMovimientoPorcino en el core", () => {
+    assert.strictEqual(typeof MotorTrazabilidad.evaluarMovimientoPorcino, "function");
+  });
+
+  testFn("MotorTrazabilidad bloquea movimiento si REGA es invalido", async () => {
+    const res = await MotorTrazabilidad.evaluarMovimientoPorcino(null, {
+      origenREGA: "INVALID_REGA",
+      destinoREGA: "ES410000000002",
+      batch: { batchId: "LOTE-PORC-01", categoria: "cebo", numAnimales: 50 },
+    });
+    assert.strictEqual(res.isApto, false);
+    assert.strictEqual(res.estado, "BLOQUEO_ZOOSANITARIO");
+  });
+
+  testFn("MotorTrazabilidad autoriza movimiento pecuario conforme a RD 787/2023", async () => {
+    const res = await MotorTrazabilidad.evaluarMovimientoPorcino(null, {
+      origenREGA: "ES110000000001",
+      destinoREGA: "ES410000000002",
+      batch: { batchId: "LOTE-PORC-01", categoria: "cebo", numAnimales: 50, fechaIngreso: "2026-05-01" },
+      tratamientos: []
+    });
+    assert.strictEqual(res.isApto, true);
+    assert.strictEqual(res.estado, "MOVIMIENTO_AUTORIZADO");
+  });
+});
+
 console.log("\nTODAS LAS PRUEBAS DE TRAZABILIDAD PORCINA SUPERADAS SATISFACTORIAMENTE.\n");
