@@ -125,6 +125,11 @@ const App = {
 
       this._setupOfflineIndicator();
 
+      if (window.AuditService && typeof AuditService.initEventBusListeners === 'function') {
+        try { window.AuditService.initEventBusListeners(); }
+        catch (e) { console.warn('[App] Error init audit service:', e); }
+      }
+
       if (window.EventBus) {
         const eventosRefresh = [
           'tratamiento:added', 'tratamiento:deleted',
