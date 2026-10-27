@@ -1,5 +1,5 @@
 # Estado del Proyecto — Livestock Manager (SIGGAN)
-> Fotografía técnica regenerada el **2026-09-27** · Versión de app: **v4.10.8** · Base de datos: **IndexedDB DB v28** · Service Worker: **`corcho-v6.85`**
+> Fotografía técnica regenerada el **2026-10-27** · Versión de app Android/PWA: **v4.10.8** · Versión nativa Windows (Tauri): **v4.11.24.0** · Base de datos: **IndexedDB DB v28** · Service Worker: **`corcho-v6.86`**
 
 > Este documento sustituye a la fotografía anterior (v3.7.1 / DB v5), que había quedado obsoleta. Reconstruido a partir del código real y del historial de commits (84 commits, 6 PRs de adaptación SIGGAN).
 
@@ -16,7 +16,7 @@
 | `analitica.js` | `v3.2.1 Premium` |
 | `pesajes.js` | `v4.0.0` |
 | **Base de datos IndexedDB** | **DB v28** |
-| **Service Worker** `CACHE_NAME` | **`corcho-v6.85`** |
+| **Service Worker** `CACHE_NAME` | **`corcho-v6.86`** |
 
 > **Disciplina de caché:** al modificar cualquier JS/CSS/HTML hay que subir `CACHE_NAME` en `sw.js` para forzar recarga en Android/PWA.
 
@@ -30,7 +30,7 @@
 │  Header · Nav · #app-content · Toast · ~80 <script> cargados │
 ├─────────────────────────────────────────────────────────────┤
 │                    CAPA DE ARRANQUE                           │
-│  idb-local.js (wrapper idb)  →  db.js (DB v10 + migraciones)  │
+│  idb-local.js (wrapper idb)  →  db.js (DB v28 + migraciones)  │
 │  error-handler.js (validación NIF/CIF/REGA)  ·  crypto.js     │
 ├─────────────────────────────────────────────────────────────┤
 │                    CAPA DE SERVICIOS                          │
@@ -58,7 +58,7 @@
 
 ---
 
-## 3. Base de Datos IndexedDB — DB v10
+## 3. Base de Datos IndexedDB — DB v28
 
 ### Almacenes y versión de introducción
 
@@ -188,10 +188,10 @@
 
 | # | Severidad | Descripción | Estado |
 |---|:---:|---|---|
-| 1 | 🔴 | `GanaderiaView` (≈línea 27) lee `db.getAllFromIndex('zonas', …)` pero **no existe el store `zonas`** (viven en `fincas.zonas`). Envuelto en `.catch(()=>[])` → los KPIs de zonas del hub salen siempre vacíos. | Abierto |
-| 2 | 🟡 | `notificaciones-rega.js` persiste en `localStorage`, no en store versionado / `documentos_legales`. | Abierto |
+| 1 | 🟢 | `GanaderiaView` (≈línea 27) lee `db.getAllFromIndex('zonas', …)` pero **no existe el store `zonas`** (viven en `fincas.zonas`). Envuelto en `.catch(()=>[])` → los KPIs de zonas del hub salen siempre vacíos. | **Resuelto** — ahora lee de `finca.zonas` vía `Fincas.getActive()`; los KPIs de carga ganadera se muestran. |
+| 2 | 🟢 | `notificaciones-rega.js` persiste en `localStorage`, no en store versionado / `documentos_legales`. | **Resuelto** — migrado a store versionado `notificaciones_rega` (DB v11) con auto-migración (ver `CUMPLIMIENTO_SIGGAN.md`, línea 75). |
 | 3 | 🟢 | `js/qa-siggan-test17.js` era un duplicado huérfano (no referenciado) de la suite QA → **eliminado** en esta limpieza. | Resuelto |
-| 4 | 🟡 | **Manuales** (`docs/GUIA_*.html`) no actualizados a SIGGAN (sin Cuaderno Digital ni libros de registro). | Abierto |
+| 4 | 🟢 | **Manuales** (`docs/GUIA_*.html`) no actualizados a SIGGAN (sin Cuaderno Digital ni libros de registro). | **Resuelto** — 4 guías reescritas/ampliadas al Cuaderno Digital SIGGAN (ver `CUMPLIMIENTO_SIGGAN.md`, línea 76). |
 | 5 | 🟡 | **Validación end-to-end en Android** (`cap:sync` + `SigganQA.runAll()` en dispositivo) repetidamente diferida. | Abierto |
 | 6 | 🟢 | Divergencia histórica `notes`/`notas` en rebaños (rebanos-view usa `notas` de forma consistente). | A vigilar |
 
