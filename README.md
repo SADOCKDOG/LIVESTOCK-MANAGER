@@ -52,6 +52,8 @@ La custodia técnica, validación de políticas y automatización del ciclo de v
   *Especificación maestra de la máquina de estados de LangGraph, coordinación entre los 9 roles especializados y barrera de firma humana auditada.*
 - **Integración con Microsoft Foundry (Sdog Farm):** [INTEGRACION_MICROSOFT_FOUNDRY_SDOGFARM.md](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/INTEGRACION_MICROSOFT_FOUNDRY_SDOGFARM.md)  
   *Conexión corporativa gobernada con Microsoft Azure AI Foundry bajo el tenant sadogfarm.onmicrosoft.com y EU Data Boundary.*
+- **Consola de Gestión de Escritorio (Windows):** [Console-AI-Dev-Infrastructure](https://github.com/SADOCKDOG/Console-AI-Dev-Infrastructure)  
+  *Panel de control de escritorio para Windows para supervisión de servicios, ciclo de vida Kanban de Livestock Manager, gestión de incidencias AI-GRC y exportación forense.*
 - **Normativa y Manifiesto Local:** [.software-factory/project.yaml](.software-factory/project.yaml) y [docs/AI_GRC_LIFECYCLE.md](docs/AI_GRC_LIFECYCLE.md).
 
 ---
