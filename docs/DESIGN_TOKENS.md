@@ -1,4 +1,5 @@
 # Tokens de Diseño
+> v2.1 · Última actualización: 2026-10-27
 
 Este documento define los tokens de diseño (CSS Custom Properties) utilizados en todo el sistema Livestock Manager para asegurar consistencia visual y facilitar actualizaciones temáticas.
 
@@ -17,7 +18,10 @@ Los tokens de diseño son variables CSS que almacenan valores de diseño reutili
 --c-info: #3b82f6;      /* Información, datos técnicos */
 --c-accent: #8b5cf6;    /* Acento secundario, sanidad, genética */
 --p-gold: #fbbf24;      /* Oro maestro, identificadores primarios */
---c-orange: #f97316;    /* Variantes de naranja para específicas especies */
+--c-orange: #f97316;    /* Variantes de naranja para especies específicas */
+
+--color-base: #6b7280;    /* Color base neutro, usado para fondos y bordes genéricos */
+--c-purple: var(--c-accent); /* Mismo valor que --c-accent (#8b5cf6) */
 
 /* Texto y neutrales */
 --text-primary: #111827;     /* Texto principal */
@@ -184,7 +188,7 @@ Los tokens de diseño son variables CSS que almacenan valores de diseño reutili
 --radius-input: var(--radius-md);     /* 6px - inputs */
 --radius-card: var(--radius-lg);      /* 8px - tarjetas */
 --radius-modal: var(--radius-lg);     /* 8px - modales */
---radius-badge: var-radius-md;        /* 6px - badges */
+--radius-badge: var(--radius-md);     /* 6px - badges */
 --radius-fab: 50%;                   /* Círculo perfecto para FAB */
 ```
 
@@ -337,7 +341,7 @@ Los tokens de diseño son variables CSS que almacenan valores de diseño reutili
 --card-border-color: var(--border-222);
 --card-bg: var(--surface);
 --card-box-shadow: var(--shadow-md);
---card-shadow-hover: var(--shadow-lg));
+--card-shadow-hover: var(--shadow-lg);
 --card-transition: var(--transition-normal);
 ```
 
@@ -450,7 +454,7 @@ badge.style.borderRadius = 'var(--radius-md)';
 
 ### 10.2 Temas de Alto Contraste
 ```css
-. high-contrast {
+.high-contrast {
     --text-primary: #000000;
     --text-s: #333333;
     --background: #ffffff;
