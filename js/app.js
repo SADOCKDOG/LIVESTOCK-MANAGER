@@ -125,6 +125,11 @@ const App = {
 
       this._setupOfflineIndicator();
 
+      if (window.AuditService && typeof AuditService.initEventBusListeners === 'function') {
+        try { window.AuditService.initEventBusListeners(); }
+        catch (e) { console.warn('[App] Error init audit service:', e); }
+      }
+
       if (window.EventBus) {
         const eventosRefresh = [
           'tratamiento:added', 'tratamiento:deleted',
@@ -3178,6 +3183,18 @@ const App = {
           });
 
           App.toast(`Backup compartido (${totalRegistros} registros)`, 'success');
+          if (window.AuditService && typeof AuditService.record === 'function') {
+            await AuditService.record({
+              fincaId: 'global',
+              actor_type: 'user',
+              action: 'EXPORT',
+              resultado: 'SUCCESS',
+              tipo_entidad: 'backup',
+              entidad_id: 'backup_json',
+              motivo_tarea: 'exportacion_backup',
+              descripcion: `Copia de seguridad exportada y compartida (${totalRegistros} registros)`
+            }).catch(() => {});
+          }
           return;
         }
       } catch (capErr) {
@@ -3195,7 +3212,31 @@ const App = {
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 10000);
       App.toast(`Backup descargado (${totalRegistros} registros)`, 'success');
+      if (window.AuditService && typeof AuditService.record === 'function') {
+        await AuditService.record({
+          fincaId: 'global',
+          actor_type: 'user',
+          action: 'EXPORT',
+          resultado: 'SUCCESS',
+          tipo_entidad: 'backup',
+          entidad_id: 'backup_json',
+          motivo_tarea: 'exportacion_backup',
+          descripcion: `Copia de seguridad exportada y descargada (${totalRegistros} registros)`
+        }).catch(() => {});
+      }
     } catch (error) {
+      if (window.AuditService && typeof AuditService.record === 'function') {
+        AuditService.record({
+          fincaId: 'global',
+          actor_type: 'user',
+          action: 'EXPORT',
+          resultado: 'FAILED',
+          tipo_entidad: 'backup',
+          entidad_id: 'backup_json',
+          motivo_tarea: 'fallo_exportacion_backup',
+          descripcion: 'Fallo al generar copia de seguridad'
+        }).catch(() => {});
+      }
       App.toastError("Error al exportar: " + error.message);
     }
   },
@@ -3216,6 +3257,23 @@ const App = {
           e.target.result
         );
         App.toast(`Backup restaurado (${res.fincas.length} finca${res.fincas.length > 1 ? 's' : ''})`, 'success');
+
+        // AUDITORÍA POST-RESTAURACIÓN: Registrar DESPUÉS de que la base ha sido restaurada.
+        // Esto garantiza que el evento de auditoría de importación se añade al registro_eventos recién restaurado
+        // y NO es sobrescrito ni borrado durante la importación.
+        if (window.AuditService && typeof AuditService.record === 'function') {
+          await AuditService.record({
+            fincaId: 'global',
+            actor_type: 'user',
+            action: 'IMPORT',
+            resultado: 'SUCCESS',
+            tipo_entidad: 'backup',
+            entidad_id: 'backup_json',
+            motivo_tarea: 'importacion_backup',
+            descripcion: `Copia de seguridad restaurada (${res.fincas ? res.fincas.length : 0} fincas)`
+          }).catch(() => {});
+        }
+
         if (res.multiplesFincas) {
           await Confirm.alert("Restauración Completada", "Base de datos restaurada. Detectadas múltiples fincas.");
         } else {
@@ -3223,6 +3281,18 @@ const App = {
         }
         window.location.reload();
       } catch (error) {
+        if (window.AuditService && typeof AuditService.record === 'function') {
+          AuditService.record({
+            fincaId: 'global',
+            actor_type: 'user',
+            action: 'IMPORT',
+            resultado: 'FAILED',
+            tipo_entidad: 'backup',
+            entidad_id: 'backup_json',
+            motivo_tarea: 'fallo_importacion_backup',
+            descripcion: 'Fallo al restaurar copia de seguridad'
+          }).catch(() => {});
+        }
         App.toastError(error.message);
       }
     };
