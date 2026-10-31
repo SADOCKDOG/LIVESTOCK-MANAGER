@@ -17,6 +17,7 @@
     'sesion',
     'sistema',
     'backup',
+    'copia_seguridad',
     'tratamiento',
     'venta',
     'gasto',
@@ -27,6 +28,7 @@
     'saneamiento',
     'vacunacion',
     'movimiento',
+    'censo',
     'general'
   ]);
 
@@ -38,7 +40,8 @@
     'LOGIN',
     'LOGOUT',
     'EXPORT',
-    'IMPORT'
+    'IMPORT',
+    'RESTORE'
   ]);
 
   // Patrón para detectar y redactar posibles secretos (tokens, hashes >32 hex, jwt, passwords)
@@ -64,13 +67,24 @@
     },
 
     /**
-     * Calcula un hash de integridad determinista sobre campos invariantes.
-     * NOTA DE LIMITACIÓN DE SEGURIDAD:
-     * Este hash es una comprobación de integridad a nivel de aplicación (permite detectar
-     * corrupciones o modificaciones locales accidentales en el almacenamiento del cliente).
-     * NO constituye una garantía criptográfica WORM de hardware ni una firma digital PKI de servidor.
+     * Calcula el hash de integridad del algoritmo legado v1 (8 campos canónicos invariantes).
+     * Campos canónicos cubiertos por v1:
+     * - fincaId
+     * - creadoEn
+     * - actor_id
+     * - action
+     * - tipo_entidad
+     * - entidad_id
+     * - motivo_tarea
+     * - resultado
+     *
+     * LIMITACIÓN EXPRESA DE SEGURIDAD Y AUDITORÍA:
+     * El algoritmo v1 NO cubre ni incluye los campos 'descripcion' ni 'fields_modified'.
+     * Por diseño histórico, cualquier alteración en el texto descriptivo o en los campos modificados
+     * de un registro generado bajo v1 no alterará el hash resultante de esta función.
      */
-    computeIntegrityHash(record) {
+    computeIntegrityHashV1(record) {
+      if (!record || typeof record !== 'object') return '';
       const canonicalStr = [
         record.fincaId ?? 'null',
         record.creadoEn ?? '',
@@ -88,6 +102,124 @@
         hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
       }
       return ('00000000' + (hash >>> 0).toString(16)).slice(-8);
+    },
+
+    /**
+     * Calcula el hash de integridad determinista FNV-1a (32 bits, 8 caracteres hexadecimales) v2.
+     * Campos canónicos cubiertos por el hash v2:
+     * - fincaId
+     * - creadoEn
+     * - actor_id
+     * - action
+     * - tipo_entidad
+     * - entidad_id
+     * - motivo_tarea
+     * - resultado
+     * - descripcion
+     * - fields_modified (ordenados canónicamente)
+     *
+     * NOTA DE LIMITACIÓN DE SEGURIDAD:
+     * Este hash implementa el algoritmo no criptográfico FNV-1a (Fowler-Noll-Vo) como una comprobación
+     * de integridad a nivel de aplicación (permite detectar corrupciones o modificaciones locales accidentales
+     * en el almacenamiento del cliente). NO es una función hash criptográfica SHA-256, NO constituye una
+     * garantía inmutable WORM de hardware ni firma digital PKI de servidor, y NO previene alteraciones deliberadas
+     * de un usuario con acceso directo a las herramientas de desarrollo o al almacenamiento IndexedDB.
+     */
+    computeIntegrityHash(record) {
+      if (!record || typeof record !== 'object') return '';
+      const fieldsModStr = Array.isArray(record.fields_modified)
+        ? record.fields_modified.slice().sort().join(',')
+        : '';
+      const canonicalStr = [
+        record.fincaId ?? 'null',
+        record.creadoEn ?? '',
+        record.actor_id ?? '',
+        record.action ?? '',
+        record.tipo_entidad ?? '',
+        record.entidad_id ?? '',
+        record.motivo_tarea ?? '',
+        record.resultado ?? '',
+        record.descripcion ?? '',
+        fieldsModStr
+      ].join('|');
+
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < canonicalStr.length; i++) {
+        hash ^= canonicalStr.charCodeAt(i);
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+      }
+      return ('00000000' + (hash >>> 0).toString(16)).slice(-8);
+    },
+
+    /**
+     * Alias explícito de computeIntegrityHash para algoritmos versión 2.
+     */
+    computeIntegrityHashV2(record) {
+      return this.computeIntegrityHash(record);
+    },
+
+    /**
+     * Verifica la integridad de un registro auditado según su versión de hash (v1 legado o v2 canónico).
+     * Reglas de verificación:
+     * - Si hash_version === 2: verifica exclusivamente mediante el algoritmo v2 (10 campos canónicos).
+     * - Si hash_version no existe (undefined/null): prueba primero v2; si no coincide, recurre al algoritmo legado v1 exacto.
+     * - Si hash_version === 1: verifica mediante el algoritmo v1 legado exacto (8 campos).
+     * - Si hash_version existe con un valor no soportado (ej. 3, 99): NO aplica fallback y retorna UNSUPPORTED_VERSION.
+     * - Si ningún algoritmo aplicable coincide: retorna CORRUPTED.
+     * - Si el hash no existe o es inválido: retorna MISSING_HASH o INVALID_INPUT.
+     * Comprobación tolerante: no lanza excepciones ante entradas nulas o malformadas.
+     *
+     * @param {Object} record Registro a auditar
+     * @returns {{ valid: boolean, status: 'VERIFIED_V2'|'VERIFIED_V1_LEGACY'|'CORRUPTED'|'UNSUPPORTED_VERSION'|'MISSING_HASH'|'INVALID_INPUT', version: number|null }}
+     */
+    verifyRecordIntegrity(record) {
+      if (!record || typeof record !== 'object') {
+        return { valid: false, status: 'INVALID_INPUT', version: null };
+      }
+      if (!record.hash_integridad || typeof record.hash_integridad !== 'string' || record.hash_integridad.trim() === '') {
+        return { valid: false, status: 'MISSING_HASH', version: null };
+      }
+
+      const hashAlmacenado = record.hash_integridad.trim();
+      const version = record.hash_version;
+
+      try {
+        // Caso A: hash_version === 2 -> Verificación exclusiva con algoritmo v2
+        if (version === 2) {
+          const recalculatedV2 = this.computeIntegrityHash(record);
+          if (hashAlmacenado === recalculatedV2) {
+            return { valid: true, status: 'VERIFIED_V2', version: 2 };
+          }
+          return { valid: false, status: 'CORRUPTED', version: 2 };
+        }
+
+        // Caso B: hash_version === 1 -> Verificación con algoritmo v1 legado
+        if (version === 1) {
+          const recalculatedV1 = this.computeIntegrityHashV1(record);
+          if (hashAlmacenado === recalculatedV1) {
+            return { valid: true, status: 'VERIFIED_V1_LEGACY', version: 1 };
+          }
+          return { valid: false, status: 'CORRUPTED', version: 1 };
+        }
+
+        // Caso C: hash_version ausente (undefined o null) -> Probar v2 primero; fallback a v1 si mismatch
+        if (version === undefined || version === null) {
+          const recalculatedV2 = this.computeIntegrityHash(record);
+          if (hashAlmacenado === recalculatedV2) {
+            return { valid: true, status: 'VERIFIED_V2', version: 2 };
+          }
+          const recalculatedV1 = this.computeIntegrityHashV1(record);
+          if (hashAlmacenado === recalculatedV1) {
+            return { valid: true, status: 'VERIFIED_V1_LEGACY', version: 1 };
+          }
+          return { valid: false, status: 'CORRUPTED', version: null };
+        }
+
+        // Caso D: hash_version existe con valor no soportado -> Sin fallback, marcar versión no válida
+        return { valid: false, status: 'UNSUPPORTED_VERSION', version: version };
+      } catch (e) {
+        return { valid: false, status: 'CORRUPTED', version: null };
+      }
     },
 
     /**
@@ -190,14 +322,15 @@
           resultado,
           descripcion,
           fecha: fechaLocal,
-          creadoEn: creadoEnIso
+          creadoEn: creadoEnIso,
+          hash_version: 2
         };
 
         if (fieldsModified) {
           record.fields_modified = fieldsModified;
         }
 
-        // Sellar con hash de integridad local
+        // Sellar con hash de integridad local v2
         record.hash_integridad = this.computeIntegrityHash(record);
 
         // 4. Persistencia en IndexedDB (modo tolerante)
@@ -282,31 +415,50 @@
         }
 
         // Filtrar exclusivamente eventos de auditoría y mutaciones críticas de negocio (altas, modificaciones, pesajes, movimientos)
-        const logs = unicos.filter(e =>
-          e.tipo === 'auditoria' ||
-          e.tipo === 'alta' ||
-          e.tipo === 'baja' ||
-          e.tipo === 'movimiento' ||
-          e.tipo === 'pesaje' ||
-          e.rectificado ||
-          e.anulado ||
-          (e.valor_neto != null && e.tipo_entidad === 'animal') ||
-          (e.motivo_tarea && (
-            e.motivo_tarea.includes('anulacion') ||
-            e.motivo_tarea.includes('rectificacion') ||
-            e.motivo_tarea.includes('alta') ||
-            e.motivo_tarea.includes('baja') ||
-            e.motivo_tarea.includes('entrada') ||
-            e.motivo_tarea.includes('salida') ||
-            e.motivo_tarea.includes('control') ||
-            e.motivo_tarea.includes('movimiento') ||
-            e.motivo_tarea.includes('modificacion') ||
-            e.motivo_tarea.includes('rebano')
-          ))
-        );
+        // Clonar cada objeto para garantizar inmutabilidad estricta respecto a los datos persistidos en IndexedDB
+        const logs = unicos
+          .filter(e =>
+            e.tipo === 'auditoria' ||
+            e.tipo === 'alta' ||
+            e.tipo === 'baja' ||
+            e.tipo === 'movimiento' ||
+            e.tipo === 'pesaje' ||
+            e.rectificado ||
+            e.anulado ||
+            (e.valor_neto != null && e.tipo_entidad === 'animal') ||
+            (e.motivo_tarea && (
+              e.motivo_tarea.includes('anulacion') ||
+              e.motivo_tarea.includes('rectificacion') ||
+              e.motivo_tarea.includes('alta') ||
+              e.motivo_tarea.includes('baja') ||
+              e.motivo_tarea.includes('entrada') ||
+              e.motivo_tarea.includes('salida') ||
+              e.motivo_tarea.includes('control') ||
+              e.motivo_tarea.includes('movimiento') ||
+              e.motivo_tarea.includes('modificacion') ||
+              e.motivo_tarea.includes('rebano')
+            ))
+          )
+          .map(e => ({ ...e }));
 
         // Ordenar cronológicamente descendente
         logs.sort((a, b) => new Date(b.creadoEn || b.fecha || 0) - new Date(a.creadoEn || a.fecha || 0));
+
+        // Verificar integridad de cada registro consultado contra su hash FNV-1a almacenado (v1 legado o v2 canónico)
+        for (const log of logs) {
+          if (log.tipo === 'auditoria') {
+            const check = this.verifyRecordIntegrity(log);
+            log.integrity_verified = check.valid;
+            log.integrity_status = check.status;
+            log.integrity_version = check.version;
+            log.integrity_corrupted = (check.status === 'CORRUPTED');
+          } else {
+            log.integrity_verified = null;
+            log.integrity_status = null;
+            log.integrity_version = null;
+            log.integrity_corrupted = false;
+          }
+        }
 
         // Presentación limitada a los últimos N
         return logs.slice(0, limit);
