@@ -174,6 +174,33 @@ test('hash ausente o entrada inválida: MISSING_HASH / INVALID_INPUT sin excepci
   }
 });
 
+test('AuditService._sanitizeDescription: redacta datos personales previsibles y secretos, limita longitud y conserva texto ordinario', () => {
+  const { svc } = crearEntorno();
+
+  const casos = [
+    ['correo', 'Contactar ana.perez@example.test', /ana\.perez@example\.test/i],
+    ['teléfono nacional', 'Llamar al 600 123 456', /600\s*123\s*456/],
+    ['teléfono internacional', 'Llamar al +1 202-555-0100', /202-555-0100/],
+    ['dirección', 'Visita en Calle Mayor 12, 28013 Madrid', /Calle Mayor 12|28013/i],
+    ['documento identificativo', 'DNI 12345678Z', /12345678Z/i],
+    ['IBAN', 'Cuenta ES9121000418450200051332', /ES9121000418450200051332/i],
+    ['token', 'Bearer abcdefghijklmnopqrstuvwxyz123456', /Bearer|abcdefghijklmnopqrstuvwxyz123456/i],
+    ['secreto', 'password=secretoPrivado123', /secretoPrivado123/i],
+  ];
+
+  for (const [nombre, entrada, datoSensible] of casos) {
+    const saneada = svc._sanitizeDescription(entrada);
+    assert.doesNotMatch(saneada, datoSensible, `No debe conservar ${nombre}`);
+    assert.ok(saneada.includes('[REDACTED]'), `Debe marcar la redacción de ${nombre}`);
+  }
+
+  const textoOrdinario = 'Anulación administrativa por error de identificación';
+  assert.equal(svc._sanitizeDescription(textoOrdinario), textoOrdinario);
+
+  const textoLargo = 'Motivo ordinario '.repeat(20);
+  assert.equal(svc._sanitizeDescription(textoLargo).length, 120);
+});
+
 test('list(): clasifica v1/v2/discrepancia/versión desconocida sin reescribir IndexedDB', async () => {
   const { svc, store, llamadas } = crearEntorno();
   await svc.record({ fincaId: 7, actor_id: 'op', action: 'CREATE', tipo_entidad: 'animal', entidad_id: 'N1', motivo_tarea: 'alta', resultado: 'SUCCESS', descripcion: 'Nuevo' });
@@ -393,7 +420,7 @@ test('Animales.delete(): persiste anulacion_registro (DELETE_LOGICAL) y rectific
   assert.equal(evAnulacion.entidad_id, '42');
   assert.equal(evAnulacion.hash_version, 2);
   assert.ok(evAnulacion.descripcion.includes('ES010203040506'), 'La descripción debe incluir el crotal del animal');
-  assert.ok(evAnulacion.descripcion.includes('error_identificacion_crotal'), 'La descripción debe incluir el motivo de anulación');
+  assert.ok(!evAnulacion.descripcion.includes('error_identificacion_crotal'), 'La descripción de auditoría no debe duplicar el motivo libre');
   assert.deepEqual(evAnulacion.fields_modified, [
     'estado',
     'motivo_baja',
@@ -426,6 +453,31 @@ test('Animales.delete(): persiste anulacion_registro (DELETE_LOGICAL) y rectific
   assert.equal(listHistorico.integrity_status, 'VERIFIED_V2');
   assert.equal(listHistorico.integrity_verified, true);
   assert.equal(listados.some((l) => l.integrity_status === 'MISSING_HASH'), false);
+});
+
+test('Animales.delete(): conserva íntegro el motivo de negocio y no lo copia al contenido auditado', async () => {
+  const { Animales, stores } = crearEntornoAnimales({ activeFincaId: 7 });
+  const motivoOriginal = 'Contactar ana.perez@example.test; teléfono +34 600 123 456; Calle Mayor 12, 28013 Madrid; password=secreto';
+
+  stores.animales.set(43, {
+    id: 43,
+    fincaId: 7,
+    numero_identificacion: 'ES010203040507',
+    especie: 'Bovino',
+    estado: 'activo',
+  });
+
+  const resultado = await Animales.delete(43, motivoOriginal);
+  assert.equal(resultado.anulado, true);
+
+  const animalPersistido = stores.animales.get(43);
+  assert.equal(animalPersistido.motivo_baja, motivoOriginal);
+  assert.equal(animalPersistido.anuladoMotivo, motivoOriginal);
+
+  const eventoAuditoria = stores.registro_eventos.find((evento) => evento.motivo_tarea === 'anulacion_registro');
+  assert.ok(eventoAuditoria);
+  assert.equal(eventoAuditoria.descripcion, 'Anulación de ficha animal ES010203040507');
+  assert.doesNotMatch(eventoAuditoria.descripcion, /ana\.perez@example\.test|600 123 456|Calle Mayor|28013|secreto/i);
 });
 
 test('Animales.delete(): gestiona expresamente fallos de persistencia en auditoría sin destruir la anulación lógica', async () => {
