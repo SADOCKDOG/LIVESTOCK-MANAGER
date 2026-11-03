@@ -56,6 +56,14 @@ La custodia técnica, validación de políticas y automatización del ciclo de v
   *Panel de control de escritorio para Windows para supervisión de servicios, ciclo de vida Kanban de Livestock Manager, gestión de incidencias AI-GRC y exportación forense.*
 - **Normativa y Manifiesto Local:** [.software-factory/project.yaml](.software-factory/project.yaml) y [docs/AI_GRC_LIFECYCLE.md](docs/AI_GRC_LIFECYCLE.md).
 
+#### Autorización de propietario y operaciones de desarrollo
+
+La fuente documental canónica para la autorización de integración de Pull Requests y el diseño del Dev Operations Intermediary (DOI) está en el repositorio Factory: [Owner Authorization](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/OWNER_AUTHORIZATION.md), [Dev Operations Intermediary](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/blob/main/docs/security/DEV_OPERATIONS_INTERMEDIARY.md) y [especificaciones DOI](https://github.com/SADOCKDOG/Autonomous-AI-Dev-Infrastructure/tree/main/docs/specifications/doi/).
+
+Esta referencia documenta el modelo de separación de identidades Owner (FIDO) → App Exec → GitHub merge y las reservas de implementación. No afirma que el DOI, App Dev o App Exec estén operativos ni activa capacidades de autorización o integración para este producto.
+
+**Estado explícito:** diseño documentado; integración del desarrollo pendiente de revisión; validación operativa pendiente. En la base revisada de Console (`c67d62ab12103752071f9fbfa2b317ae3d470062`), la aprobación local puede marcar una tarea `DONE` y la promoción contempla merge y sincronización/limpieza sin estar protegidos por el flujo FIDO/DOI documentado. Esta PR es solo documental: no implementa ni corrige ese gap ni valida la seguridad de Console.
+
 ---
 
 ## Estado y disponibilidad
