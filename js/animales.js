@@ -30,6 +30,94 @@ function identificadorYContextoSinCambios(data, actual) {
   return especieIgual && tipoIgual;
 }
 
+function validarContratoIdentificacionAnimal(data) {
+  const tiposIdentificador = new Set([
+    "codigo_nacional",
+    "marca_explotacion",
+    "transpondedor_iso",
+    "ueln",
+    "otro",
+  ]);
+  const estadosIdentificador = new Set([
+    "vigente",
+    "historico",
+    "legado",
+    "pendiente",
+  ]);
+
+  if (data.identificadores !== undefined) {
+    if (!Array.isArray(data.identificadores)) {
+      throw new Error("identificadores debe ser una lista");
+    }
+
+    for (const [indice, identificador] of data.identificadores.entries()) {
+      if (!identificador || typeof identificador !== "object" || Array.isArray(identificador)) {
+        throw new Error(`identificadores[${indice}] debe ser un objeto`);
+      }
+      if (!tiposIdentificador.has(identificador.tipo)) {
+        throw new Error(`identificadores[${indice}] tiene un tipo de identificador no admitido`);
+      }
+      if (typeof identificador.valor !== "string" || !identificador.valor.trim()) {
+        throw new Error(`identificadores[${indice}].valor debe ser un texto no vacío`);
+      }
+      if (typeof identificador.principal !== "boolean") {
+        throw new Error(`identificadores[${indice}].principal debe ser booleano`);
+      }
+      if (!estadosIdentificador.has(identificador.estado)) {
+        throw new Error(`identificadores[${indice}] tiene un estado no admitido`);
+      }
+      if (
+        identificador.tipoIdentificadorId !== undefined &&
+        (!Number.isInteger(Number(identificador.tipoIdentificadorId)) || Number(identificador.tipoIdentificadorId) <= 0)
+      ) {
+        throw new Error(`identificadores[${indice}].tipoIdentificadorId debe ser un entero positivo`);
+      }
+      for (const campo of ["medio", "valorLeido", "fechaAplicacion", "fechaFin", "asignador"]) {
+        if (identificador[campo] !== undefined && typeof identificador[campo] !== "string") {
+          throw new Error(`identificadores[${indice}].${campo} debe ser texto`);
+        }
+      }
+    }
+
+    if (data.identificadores.length > 0) {
+      const principales = data.identificadores.filter((identificador) => identificador.principal);
+      if (principales.length !== 1) {
+        throw new Error("identificadores debe contener exactamente un identificador principal");
+      }
+      if (
+        typeof data.numero_identificacion !== "string" ||
+        principales[0].valor !== data.numero_identificacion
+      ) {
+        throw new Error("El identificador principal debe coincidir exactamente con numero_identificacion");
+      }
+    }
+  }
+
+  if (data.documentos_identificacion !== undefined) {
+    if (!Array.isArray(data.documentos_identificacion)) {
+      throw new Error("documentos_identificacion debe ser una lista");
+    }
+
+    const tiposDocumento = new Set(["DIE", "PASAPORTE", "OTRO"]);
+    for (const [indice, documento] of data.documentos_identificacion.entries()) {
+      if (!documento || typeof documento !== "object" || Array.isArray(documento)) {
+        throw new Error(`documentos_identificacion[${indice}] debe ser un objeto`);
+      }
+      if (!tiposDocumento.has(documento.tipo)) {
+        throw new Error(`documentos_identificacion[${indice}] tiene un tipo de documento no admitido`);
+      }
+      if (typeof documento.numero !== "string" || !documento.numero.trim()) {
+        throw new Error(`documentos_identificacion[${indice}].numero debe ser un texto no vacío`);
+      }
+      for (const campo of ["emisor", "fechaEmision", "estado", "referenciaAutorizacion"]) {
+        if (documento[campo] !== undefined && typeof documento[campo] !== "string") {
+          throw new Error(`documentos_identificacion[${indice}].${campo} debe ser texto`);
+        }
+      }
+    }
+  }
+}
+
 const Animales = {
   async list(rebanoId = null) {
     if (rebanoId) {
@@ -79,6 +167,7 @@ const Animales = {
               data.tipoIdentificadorId,
               data
             );
+        validarContratoIdentificacionAnimal({ ...data, numero_identificacion: crotal });
         // El rebaño ya no es obligatorio según las nuevas reglas
 
         // Validación opcional de DIB (único)
