@@ -1,3 +1,35 @@
+function identificadorCompartido(data) {
+  // En el porcino ordinario el código identifica la explotación de nacimiento,
+  // por lo que puede aparecer en varios animales de esa explotación.
+  return Number(data?.especieId) === 2 && Number(data?.tipoIdentificadorId) === 16;
+}
+
+function debeComprobarUnicidadIdentificador(data, esEdicion, actual, crotal) {
+  if (identificadorCompartido(data)) return false;
+  if (!esEdicion) return true;
+  if (!actual) return false;
+
+  return actual.numero_identificacion !== crotal ||
+    Number(actual.especieId) !== Number(data?.especieId) ||
+    Number(actual.tipoIdentificadorId) !== Number(data?.tipoIdentificadorId);
+}
+
+function identificadorYContextoSinCambios(data, actual) {
+  if (!actual) return false;
+  const valorNuevo = String(data?.numero_identificacion ?? '').trim().toUpperCase();
+  const valorActual = String(actual.numero_identificacion ?? '').trim().toUpperCase();
+  if (!valorNuevo || valorNuevo !== valorActual) return false;
+
+  const especieIgual = actual.especieId != null && data?.especieId != null
+    ? Number(actual.especieId) === Number(data.especieId)
+    : !data?.especie || !actual.especie || String(data.especie).trim() === String(actual.especie).trim();
+  const tipoIgual = data?.tipoIdentificadorId == null
+    ? actual.tipoIdentificadorId == null
+    : actual.tipoIdentificadorId != null && Number(actual.tipoIdentificadorId) === Number(data.tipoIdentificadorId);
+
+  return especieIgual && tipoIgual;
+}
+
 const Animales = {
   async list(rebanoId = null) {
     if (rebanoId) {
@@ -32,21 +64,28 @@ const Animales = {
   async save(data) {
     return await ErrorHandler.tryAsync(
       async () => {
-        // Validaciones (formato de crotal según especie/tipo de identificador
-        // si están disponibles; si no, cae al formato genérico)
-        const crotal = await ErrorHandler.validateCrotal(
-          data.numero_identificacion,
-          data.especieId,
-          data.tipoIdentificadorId
-        );
-        // El rebaño ya no es obligatorio según las nuevas reglas
-
         const esEdicion =
           data.id !== undefined && data.id !== null && data.id !== "";
+        const actual = esEdicion ? await this.get(data.id) : null;
+        const conservaIdentificador = identificadorYContextoSinCambios(data, actual);
+        // Fichas históricas pueden conservar códigos emitidos con regímenes
+        // anteriores. Solo se omite su revalidación si valor, especie y tipo
+        // siguen iguales; cualquier cambio pasa por la regla vigente.
+        const crotal = conservaIdentificador
+          ? actual.numero_identificacion
+          : await ErrorHandler.validateCrotal(
+              data.numero_identificacion,
+              data.especieId,
+              data.tipoIdentificadorId,
+              data
+            );
+        // El rebaño ya no es obligatorio según las nuevas reglas
 
         // Validación opcional de DIB (único)
-        if (data.dib && data.dib.trim()) {
-          const dibValue = data.dib.trim().toUpperCase();
+        // DIB es opcional. Omitir el campo vacio para que IndexedDB no
+        // indexe "" como una clave real en el indice unico `dib`.
+        const dibValue = String(data.dib ?? "").trim().toUpperCase();
+        if (dibValue) {
           const existenteDib = await window.db.getFromIndex(
             "animales",
             "dib",
@@ -68,32 +107,34 @@ const Animales = {
           }
         }
 
-        // 1. Control de Duplicados (solo si es nuevo o ha cambiado el crotal)
-        if (!esEdicion) {
-          const existente = await window.db.getFromIndex(
+        if (esEdicion) {
+          if (actual && window.PremiumManager && window.PremiumManager.isFree() && actual.demo && !data.demo) {
+            throw new Error('No puedes modificar animales de demostración en la versión gratuita');
+          }
+        }
+
+        // La marca ordinaria porcina identifica la explotación, no al animal.
+        // Para los identificadores individuales se conserva el control duplicado.
+        const debeComprobarDuplicado = debeComprobarUnicidadIdentificador(
+          data,
+          esEdicion,
+          actual,
+          crotal
+        );
+        if (debeComprobarDuplicado) {
+          const existentes = await window.db.getAllFromIndex(
             "animales",
             "caravana",
             crotal
           );
-          if (existente)
-            throw new Error(
-              `Ya existe un animal registrado con el crotal ${crotal}`
-            );
-        } else {
-          const actual = await this.get(data.id);
-          if (actual && window.PremiumManager && window.PremiumManager.isFree() && actual.demo && !data.demo) {
-            throw new Error('No puedes modificar animales de demostración en la versión gratuita');
-          }
-          if (actual && actual.numero_identificacion !== crotal) {
-            const existente = await window.db.getFromIndex(
-              "animales",
-              "caravana",
-              crotal
-            );
-            if (existente)
-              throw new Error(
-                `No se puede cambiar al crotal ${crotal} porque ya está asignado a otro animal`
-              );
+          const otroAnimal = existentes.find((existente) =>
+            !esEdicion || Number(existente.id) !== Number(data.id)
+          );
+          if (otroAnimal) {
+            const mensaje = esEdicion
+              ? `No se puede cambiar al crotal ${crotal} porque ya está asignado a otro animal`
+              : `Ya existe un animal registrado con el crotal ${crotal}`;
+            throw new Error(mensaje);
           }
         }
 
@@ -114,6 +155,12 @@ const Animales = {
           pago_pendiente: data.pago_pendiente !== undefined ? Boolean(data.pago_pendiente) : false,
           actualizadoEn: new Date().toISOString(),
         };
+
+        if (dibValue) {
+          animalData.dib = dibValue;
+        } else {
+          delete animalData.dib;
+        }
 
         // Gap 7: Mapear motivo_baja a categoría SANDACH
         if (data.motivo_baja && window.ComunidadesService) {

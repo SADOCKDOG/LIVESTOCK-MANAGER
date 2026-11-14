@@ -56,3 +56,5 @@ Debe detallar con precisión técnica qué tipo de material está solicitando, y
 Nota: Una vez aprobada la solicitud por la OCA (Oficina Comarcal Agraria), los crotales se imprimen de forma exclusiva y el fabricante se los enviará directamente a su dirección o a la sede de su ADSG en un plazo habitual de entre una y dos semanas.
 
 
+> **Aviso de vigencia (2026-11-13):** este documento conserva instrucciones históricas, incluidas referencias al código visual `ES + región + 10 dígitos`, solicitudes en plataformas concretas y plazos de tramitación. No usar esas indicaciones para validar nuevas identificaciones. Para la regla vigente, consultar [NORMATIVA-CROTAL-ESPECIE.md](NORMATIVA-CROTAL-ESPECIE.md) y el [RD 787/2023 consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-2023-22499&p=20241224&tn=1): para ovinos/caprinos aún sin identificar tras el periodo transitorio, el código visual incluye especie `24`, comunidad autónoma y ocho dígitos individuales. Las excepciones de animales destinados a sacrificio tienen condiciones propias de edad y ruta.
+

@@ -329,6 +329,8 @@ const AnimalesView = {
     // pueda repoblar los selectores de tipo de crotal y raza sin volver a consultar la BD.
     this._tiposIdentificadorPorEspecieIdCache = tiposIdentificadorPorEspecieId;
     this._razasPorEspecieIdCache = razasPorEspecieId;
+    this._especieTipoIdentificadorCache = especieTipoIdentificador;
+    this._casoIdentificacionInicial = a.casoIdentificacion || '';
 
     // Fallback: animales guardados antes de la migración v15 (o creados por seed-data)
     // solo tienen `especie` (string), no `especieId`. El <select> de ESPECIE ya marca
@@ -381,11 +383,11 @@ const AnimalesView = {
             <label class="text-[0.65rem] text-gray uppercase font-900 tracking-widest mb-8 block" for="a-crotal">Nº CROTAL IDENTIFICACIÓN</label>
             <input type="text" id="a-crotal" required
                    value="${a.numero_identificacion}"
-                   placeholder="ES000000000000" maxlength="14"
+                   placeholder="Número según especie y tipo de identificación" maxlength="32"
                    oninput="AnimalesView._validarCrotalUI(this)"
                    class="wizard-crotal-input font-950 text-gold text-center tracking-tighter" style="font-size: 2.2rem; border-bottom: 2px solid var(--c-orange) !important;">
             <div class="text-aaa text-[0.6rem] uppercase font-800 mt-6 tracking-wide">
-              REQUISITO REGA: ES + 12 DÍGITOS · <span class="text-gold" id="crotal-length-counter">0/14</span>
+              <span id="crotal-format-hint">Formato según especie y tipo de identificación</span> · <span class="text-gold" id="crotal-length-counter">0</span>
             </div>
           </div>
 
@@ -410,11 +412,12 @@ const AnimalesView = {
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-tipo-crotal-oficial">TIPO DE CROTAL (NORMATIVA)</label>
-                <select id="a-tipo-crotal-oficial" class="wizard-input font-800">
+                <select id="a-tipo-crotal-oficial" class="wizard-input font-800" onchange="AnimalesView._actualizarAyudaCrotal()">
                   ${tiposIdentificadorPorEspecieId(especieIdInicial).map((t) => `<option value="${t.id}" ${a.tipoIdentificadorId === t.id ? "selected" : ""}>${t.nombre.toUpperCase()}</option>`).join("") || '<option value="">— Elige especie primero —</option>'}
                 </select>
               </div>
             </div>
+            <div id="a-caso-identificacion-wrap" class="wizard-input-group mb-12" style="display:none;"></div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-raza">RAZA (CATÁLOGO OFICIAL)</label>
@@ -447,7 +450,7 @@ const AnimalesView = {
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-fecha">NACIMIENTO</label>
-                <input type="date" id="a-fecha" value="${a.fecha_nacimiento || ""}" class="wizard-input font-800">
+                <input type="date" id="a-fecha" value="${a.fecha_nacimiento || ""}" class="wizard-input font-800" onchange="AnimalesView._actualizarAyudaCrotal()">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-tipoalta">TIPO DE ALTA</label>
@@ -545,6 +548,7 @@ const AnimalesView = {
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-rfid">CHIP (RFID/NFC)</label>
                 <input type="text" id="a-rfid" value="${a.rfid_codigo || ""}" placeholder="OPCIONAL" class="wizard-input font-800">
+                <div id="a-rfid-hint" class="text-[0.6rem] font-800 uppercase tracking-wide mt-6">Opcional salvo que la regla de la especie exija identificación electrónica.</div>
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-fecha-ident">FECHA IDENTIFICACIÓN</label>
@@ -657,6 +661,8 @@ const AnimalesView = {
           </div>
         </div>
       </div>`;
+
+    this._actualizarAyudaCrotal();
 
     if (!esNuevo && window.Reproduccion) {
       App._cargarHistorialReproduccion(id);
@@ -783,6 +789,9 @@ const AnimalesView = {
         tipoIdentificadorId: document.getElementById("a-tipo-crotal-oficial")?.value
           ? Number(document.getElementById("a-tipo-crotal-oficial").value)
           : null,
+        casoIdentificacion: document.getElementById("a-caso-identificacion")
+          ? (document.getElementById("a-caso-identificacion").value || null)
+          : (existing.casoIdentificacion || null),
         sexo: document.getElementById("a-sexo").value,
         raza: document.getElementById("a-raza").value === "__otra__"
           ? document.getElementById("a-raza-otra").value.trim()
@@ -808,10 +817,10 @@ const AnimalesView = {
         motivo_baja: document.getElementById("a-motivo-baja")?.value || "",
         fecha_baja: document.getElementById("a-fecha-baja")?.value || "",
         // Nuevos campos para compra de animal
-        precio_compra: parseFloat(document.getElementById("a-precio-compra").value) || null,
-        proveedor_id: document.getElementById("a-proveedor").value ? Number(document.getElementById("a-proveedor").value) : null,
-        factura_compra: document.getElementById("a-factura-compra").value.trim() || null,
-        pago_pendiente: document.getElementById("a-pago-pendiente").checked,
+        precio_compra: parseFloat(document.getElementById("a-precio-compra")?.value ?? existing.precio_compra ?? "") || null,
+        proveedor_id: document.getElementById("a-proveedor")?.value ? Number(document.getElementById("a-proveedor").value) : existing.proveedor_id || null,
+        factura_compra: (document.getElementById("a-factura-compra")?.value ?? existing.factura_compra ?? "").trim() || null,
+        pago_pendiente: document.getElementById("a-pago-pendiente")?.checked ?? Boolean(existing.pago_pendiente),
         actualizadoEn: new Date().toISOString(),
       };
 
@@ -893,38 +902,185 @@ const AnimalesView = {
   },
 
   _validarCrotalUI(input) {
-    // 1. Convertir a mayúsculas y limpiar caracteres no permitidos
-    let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const { key, formato } = this._getFormatoCrotalActual();
+    const val = String(input.value || '').toUpperCase();
+    let cleanVal = val;
 
-    // 2. Restringir formato: primeras 2 posiciones letras, del resto números
-    let cleanVal = '';
-    for (let i = 0; i < val.length; i++) {
-      const char = val[i];
-      if (i < 2) {
-        if (/[A-Z]/.test(char)) cleanVal += char;
-      } else {
-        if (/[0-9]/.test(char)) cleanVal += char;
+    if (key === 'bovino_fisico') {
+      const conPrefijoHeredado = /^ES/i.test(val);
+      const digitos = val.replace(/\D/g, '').slice(0, 12);
+      cleanVal = (conPrefijoHeredado ? 'ES' : '') + digitos;
+    } else if (key === 'bovino_electronico_2025') {
+      cleanVal = 'ES' + val.replace(/\D/g, '').slice(0, 12);
+    } else if (key === 'ovino_caprino_eid') {
+      const prefijo = (val.match(/^[A-Z]{0,2}/)?.[0] || '').slice(0, 2);
+      cleanVal = prefijo + val.replace(/\D/g, '').slice(0, 12);
+    } else if (key === 'equino_microchip') {
+      cleanVal = val.replace(/\D/g, '').slice(0, 15);
+    } else if (key === 'porcino_marca_explotacion') {
+      cleanVal = val.replace(/[^A-Z0-9]/g, '').slice(0, 14);
+    } else {
+      cleanVal = val.slice(0, 32);
+    }
+
+    input.value = cleanVal;
+    const len = key === 'bovino_fisico' ? cleanVal.replace(/^ES/, '').length : cleanVal.length;
+    const counter = document.getElementById('crotal-length-counter');
+    if (counter) counter.textContent = formato?.contador ? `${len}/${formato.contador}` : String(len);
+
+    if (!cleanVal) {
+      input.style.color = "#888";
+    } else if (!formato?.regex || formato.regex.test(cleanVal)) {
+      input.style.color = formato ? "var(--c-success)" : "var(--c-warning)";
+    } else if (formato.contador && len >= formato.contador) {
+      input.style.color = "var(--c-danger)";
+    } else {
+      input.style.color = "var(--c-warning)";
+    }
+  },
+
+  _getFormatoCrotalActual() {
+    const especieId = Number(document.getElementById('a-especie')?.selectedOptions?.[0]?.dataset?.especieId || 0);
+    const tipoId = Number(document.getElementById('a-tipo-crotal-oficial')?.value || 0);
+    const asociacion = (this._especieTipoIdentificadorCache || []).find(
+      (item) => Number(item.especieId) === especieId && Number(item.tipoIdentificadorId) === tipoId
+    );
+    const casoIdentificacion = document.getElementById('a-caso-identificacion')?.value || '';
+    const requiereCaso = Array.isArray(asociacion?.casos);
+    if (requiereCaso && !casoIdentificacion) {
+      return {
+        key: null,
+        formato: null,
+        caso: null,
+        requiereCaso: true,
+        config: {
+          placeholder: 'Selecciona el caso de identificación',
+          maxLength: 32,
+          contador: null,
+          ayuda: 'Selecciona el caso de identificación para consultar el formato aplicable.',
+        },
+      };
+    }
+
+    let regla = { formatoKey: asociacion?.formato || null, caso: null };
+    if (asociacion && window.ErrorHandler?.resolverReglaCrotal) {
+      try {
+        regla = window.ErrorHandler.resolverReglaCrotal(asociacion, {
+          casoIdentificacion,
+          fecha_nacimiento: document.getElementById('a-fecha')?.value || '',
+        });
+      } catch (error) {
+        return {
+          key: null,
+          formato: null,
+          caso: null,
+          requiereCaso,
+          config: {
+            placeholder: error?.details?.field === 'fecha_nacimiento'
+              ? 'Indica la fecha de nacimiento'
+              : (requiereCaso ? 'Selecciona un caso disponible' : 'Revisa los datos requeridos'),
+            maxLength: 32,
+            contador: null,
+            ayuda: error.message || 'Faltan datos para resolver el formato de identificación.',
+          },
+        };
       }
     }
-    input.value = cleanVal;
 
-    const len = cleanVal.length;
+    const key = regla.formatoKey || null;
+    const original = key ? window.ErrorHandler?.CROTAL_FORMATOS?.[key] : null;
+    const config = original
+      ? {
+          placeholder: regla.caso?.placeholder || original.placeholder || 'Número según formato oficial',
+          maxLength: regla.caso?.maxLength || original.maxLength || 32,
+          contador: regla.caso?.contador ?? original.contador ?? null,
+          ayuda: regla.caso?.ayuda || regla.caso?.descripcion || original.ayuda || original.descripcion,
+        }
+      : {
+          placeholder: regla.caso?.placeholder || 'Número de identificación',
+          maxLength: regla.caso?.maxLength || 32,
+          contador: regla.caso?.contador ?? null,
+          ayuda: regla.caso?.ayuda || regla.caso?.descripcion || 'Formato libre según el identificador seleccionado.',
+        };
+    return {
+      key,
+      formato: original ? { ...original, ...config } : null,
+      config,
+      caso: regla.caso || null,
+      requiereCaso,
+    };
+  },
+
+  _actualizarSelectorCasoIdentificacion() {
+    const wrap = document.getElementById('a-caso-identificacion-wrap');
+    if (!wrap) return;
+
+    const especieId = Number(document.getElementById('a-especie')?.selectedOptions?.[0]?.dataset?.especieId || 0);
+    const tipoId = Number(document.getElementById('a-tipo-crotal-oficial')?.value || 0);
+    const asociacion = (this._especieTipoIdentificadorCache || []).find(
+      (item) => Number(item.especieId) === especieId && Number(item.tipoIdentificadorId) === tipoId
+    );
+    if (!Array.isArray(asociacion?.casos)) {
+      wrap.style.display = 'none';
+      wrap.innerHTML = '';
+      return;
+    }
+
+    const identity = `${especieId}:${tipoId}`;
+    const anterior = document.getElementById('a-caso-identificacion');
+    const mismoVinculo = anterior?.dataset?.associationKey === identity;
+    let seleccionado = mismoVinculo ? anterior.value : (this._casoIdentificacionInicial || '');
+    this._casoIdentificacionInicial = '';
+    const escapar = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[char]);
+    const opciones = asociacion.casos.map((caso) => {
+      const nombre = caso.nombre || caso.etiqueta || caso.descripcion || caso.id;
+      return `<option value="${escapar(caso.id)}" ${String(caso.id) === String(seleccionado) ? 'selected' : ''}>${escapar(nombre).toUpperCase()}</option>`;
+    }).join('');
+    const validez = asociacion.casos.some((caso) => String(caso.id) === String(seleccionado));
+    if (!validez) seleccionado = '';
+    wrap.innerHTML = `
+      <label class="wizard-label" for="a-caso-identificacion">CASO DE IDENTIFICACIÓN</label>
+      <select id="a-caso-identificacion" class="wizard-input font-800" data-association-key="${identity}" onchange="AnimalesView._actualizarAyudaCrotal()">
+        <option value="">— SELECCIONA EL CASO —</option>${opciones}
+      </select>
+      <div id="a-caso-identificacion-hint" class="text-[0.6rem] font-800 uppercase tracking-wide mt-6"></div>`;
+    const select = document.getElementById('a-caso-identificacion');
+    if (select) {
+      select.value = seleccionado;
+      select.dataset.associationKey = identity;
+    }
+    wrap.style.display = 'block';
+  },
+
+  _actualizarAyudaCrotal() {
+    this._actualizarSelectorCasoIdentificacion();
+    const input = document.getElementById('a-crotal');
+    const hint = document.getElementById('crotal-format-hint');
     const counter = document.getElementById('crotal-length-counter');
-    if (counter) counter.textContent = len + '/14';
-
-    // Para animales de origen extranjero (compra intracomunitaria) el identificador
-    // no empieza por "ES"; solo se marca en rojo cuando se espera un crotal español.
-    const paisSel = document.getElementById('a-pais-nac');
-    const pais = paisSel ? paisSel.value : 'ES';
-
-    if (len < 4) {
-      input.style.color = "#888";
-    } else if (len < 14) {
-      input.style.color = "var(--c-warning)"; // dorado mientras se escribe
-    } else if (pais === 'ES' && !cleanVal.startsWith("ES")) {
-      input.style.color = "var(--c-danger)"; // rojo: español debe empezar por ES (SITRAN)
-    } else {
-      input.style.color = "var(--c-success)"; // verde si está completo y correcto
+    if (!input) return;
+    const { key, formato, config, caso, requiereCaso } = this._getFormatoCrotalActual();
+    input.placeholder = config.placeholder;
+    input.maxLength = config.maxLength;
+    if (hint) hint.textContent = config.ayuda;
+    const casoHint = document.getElementById('a-caso-identificacion-hint');
+    if (casoHint) casoHint.textContent = caso?.condiciones || caso?.requisitos || '';
+    const rfid = document.getElementById('a-rfid');
+    const rfidHint = document.getElementById('a-rfid-hint');
+    const requiereRfid = key === 'bovino_electronico_2025';
+    if (rfid) {
+      rfid.required = requiereRfid;
+      rfid.placeholder = requiereRfid ? '23 DÍGITOS ISO 11784' : 'OPCIONAL';
+    }
+    if (rfidHint) {
+      rfidHint.textContent = requiereRfid
+        ? 'OBLIGATORIO: TRANSPONDEDOR ISO 11784 DE 23 DÍGITOS VINCULADO AL CROTAL VISUAL.'
+        : 'OPCIONAL SALVO QUE LA REGLA DE LA ESPECIE EXIJA IDENTIFICACIÓN ELECTRÓNICA.';
+    }
+    if (counter) {
+      const len = key === 'bovino_fisico' ? String(input.value || '').replace(/^ES/i, '').replace(/\D/g, '').length : String(input.value || '').length;
+      counter.textContent = formato?.contador ? `${len}/${formato.contador}` : (requiereCaso ? 'CASO PENDIENTE' : String(len));
     }
   },
 
@@ -960,6 +1116,7 @@ const AnimalesView = {
         ? tipos.map((t) => `<option value="${t.id}">${t.nombre.toUpperCase()}</option>`).join('')
         : '<option value="">— Sin tipos definidos —</option>';
     }
+    this._actualizarAyudaCrotal();
     // Refrescar el catálogo oficial de razas según la nueva especie
     // (ver docs/NORMATIVA-CROTAL-ESPECIE.md sección "Catálogo de razas")
     const razaSel = document.getElementById('a-raza');
