@@ -77,17 +77,23 @@ function validarContratoIdentificacionAnimal(data) {
           throw new Error(`identificadores[${indice}].${campo} debe ser texto`);
         }
       }
+      if (identificador.representacion !== undefined) {
+        const representaciones = new Set(["nacional", "iso_completa"]);
+        if (identificador.tipo !== "transpondedor_iso" || !representaciones.has(identificador.representacion)) {
+          throw new Error(`identificadores[${indice}].representacion no admitida`);
+        }
+      }
     }
 
     if (data.identificadores.length > 0) {
       const principales = data.identificadores.filter((identificador) => identificador.principal);
-      if (principales.length !== 1) {
-        throw new Error("identificadores debe contener exactamente un identificador principal");
+      if (principales.length > 1) {
+        throw new Error("identificadores puede contener como máximo un identificador principal");
       }
-      if (
+      if (principales.length === 1 && (
         typeof data.numero_identificacion !== "string" ||
         principales[0].valor !== data.numero_identificacion
-      ) {
+      )) {
         throw new Error("El identificador principal debe coincidir exactamente con numero_identificacion");
       }
     }

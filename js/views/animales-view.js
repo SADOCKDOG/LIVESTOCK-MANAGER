@@ -359,6 +359,12 @@ const AnimalesView = {
     const tiposAlta = CS && CS.getTiposAlta ? CS.getTiposAlta() : [{ value: 'Nacimiento', label: 'Nacimiento' }, { value: 'Compra', label: 'Compra' }];
     const categoriasAnimal = CS && CS.getCategoriasAnimal ? CS.getCategoriasAnimal(a.especie) : [];
     const mostrarDIB = CS ? CS.especieRequiereDIB(a.especie) : false;
+    const identificadoresEquinos = Array.isArray(a.identificadores) ? a.identificadores : [];
+    const documentosIdentificacion = Array.isArray(a.documentos_identificacion) ? a.documentos_identificacion : [];
+    const valorHtml = (valor) => String(valor || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const uelnExistente = identificadoresEquinos.find((item) => item.tipo === "ueln" && item.estado !== "historico");
+    const transpondedorExistente = identificadoresEquinos.find((item) => item.tipo === "transpondedor_iso" && item.estado !== "historico");
+    const dieExistente = documentosIdentificacion.find((item) => item.tipo === "DIE" && item.estado !== "historico");
     const esCompra = a.tipoAlta === "Compra";
     const esBaja = a.estado === "baja" || a.estado === "Baja";
     const esSalida = esBaja || a.estado === "vendido";
@@ -553,6 +559,35 @@ const AnimalesView = {
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-fecha-ident">FECHA IDENTIFICACIÓN</label>
                 <input type="date" id="a-fecha-ident" value="${a.fecha_identificacion || ""}" class="wizard-input font-800">
+              </div>
+            </div>
+            <div id="a-identificacion-equino" class="card p-12 mb-12" style="display:${Number(especieIdInicial) === 5 ? 'block' : 'none'}; border: 1px solid var(--c-info); background: rgba(255,255,255,0.02);">
+              <div class="section-header-theme mb-12" style="--theme-color: var(--c-info); font-weight: 900; text-transform: uppercase;">Identificadores equinos</div>
+              <p class="text-[0.65rem] text-aaa mb-12">Estos datos son independientes del identificador principal y de los campos heredados. Los valores nuevos quedan pendientes de verificar.</p>
+              <div class="grid grid-cols-2 gap-12 mb-12">
+                <div class="wizard-input-group">
+                  <label class="wizard-label" for="a-ueln">UELN / CÓDIGO ÚNICO</label>
+                  <input type="text" id="a-ueln" value="${valorHtml(uelnExistente?.valor)}" placeholder="INTRODUCIR SI ESTÁ ASIGNADO" class="wizard-input font-800">
+                </div>
+                <div class="wizard-input-group">
+                  <label class="wizard-label" for="a-die-equino">NÚMERO DIE</label>
+                  <input type="text" id="a-die-equino" value="${valorHtml(dieExistente?.numero)}" placeholder="NÚMERO DEL DOCUMENTO" class="wizard-input font-800">
+                </div>
+              </div>
+              <div class="wizard-input-group mb-12">
+                <div class="flex justify-between items-center gap-8">
+                  <label class="wizard-label" for="a-transpondedor-equino">LECTURA BRUTA DEL TRANSPONDEDOR</label>
+                  <button type="button" onclick="App._leerChipNFC('a-transpondedor-equino')" class="wizard-btn-action wizard-btn-secondary">LEER TAG NFC</button>
+                </div>
+                <input type="text" id="a-transpondedor-equino" value="${valorHtml(transpondedorExistente?.valor)}" placeholder="VALOR LEÍDO, SIN NORMALIZAR" class="wizard-input font-800">
+              </div>
+              <div class="wizard-input-group">
+                <label class="wizard-label" for="a-representacion-transpondedor-equino">REPRESENTACIÓN DE LA LECTURA</label>
+                <select id="a-representacion-transpondedor-equino" class="wizard-input font-800">
+                  <option value="" ${!transpondedorExistente?.representacion ? 'selected' : ''}>PENDIENTE DE CLASIFICAR</option>
+                  <option value="nacional" ${transpondedorExistente?.representacion === 'nacional' ? 'selected' : ''}>CÓDIGO NACIONAL</option>
+                  <option value="iso_completa" ${transpondedorExistente?.representacion === 'iso_completa' ? 'selected' : ''}>CÓDIGO ISO COMPLETO</option>
+                </select>
               </div>
             </div>
             <div class="wizard-input-group mb-12">
@@ -824,6 +859,12 @@ const AnimalesView = {
         actualizadoEn: new Date().toISOString(),
       };
 
+      const identificacionEstructurada = this._construirIdentificacionEstructurada(
+        existing,
+        Number(document.getElementById("a-especie").selectedOptions[0]?.dataset.especieId),
+      );
+      Object.assign(data, identificacionEstructurada);
+
       // Validación SIGGAN: REGA de procedencia (si se indica)
       if (data.tipoAlta === "Compra" && data.rega_origen && window.ComunidadesService) {
         const finca = await Fincas.getActive().catch(() => null);
@@ -1084,6 +1125,67 @@ const AnimalesView = {
     }
   },
 
+  _construirIdentificacionEstructurada(existing = {}, especieId) {
+    let identificadores = Array.isArray(existing.identificadores) ? [...existing.identificadores] : [];
+    let documentos = Array.isArray(existing.documentos_identificacion) ? [...existing.documentos_identificacion] : [];
+    if (Number(especieId) !== 5) {
+      const conservados = {};
+      if (Object.hasOwn(existing, "identificadores")) conservados.identificadores = identificadores;
+      if (Object.hasOwn(existing, "documentos_identificacion")) conservados.documentos_identificacion = documentos;
+      return conservados;
+    }
+
+    const archivarIdentificadores = (tipo) => {
+      identificadores = identificadores.map((item) =>
+        item.tipo === tipo && item.estado !== "historico" ? { ...item, estado: "historico" } : item,
+      );
+    };
+    const archivarDocumentos = (tipo) => {
+      documentos = documentos.map((documento) =>
+        documento.tipo === tipo && documento.estado !== "historico" ? { ...documento, estado: "historico" } : documento,
+      );
+    };
+
+    const ueln = String(document.getElementById("a-ueln")?.value || "").trim().toUpperCase();
+    const uelnActivo = identificadores.some((item) => item.tipo === "ueln" && item.estado !== "historico" && item.valor === ueln);
+    if (!ueln) {
+      archivarIdentificadores("ueln");
+    } else if (!uelnActivo) {
+      archivarIdentificadores("ueln");
+      identificadores.push({ tipo: "ueln", valor: ueln, principal: false, estado: "pendiente" });
+    }
+
+    const lectura = String(document.getElementById("a-transpondedor-equino")?.value || "").trim();
+    const representacion = String(document.getElementById("a-representacion-transpondedor-equino")?.value || "");
+    const transpondedorActivo = identificadores.some((item) =>
+      item.tipo === "transpondedor_iso" && item.estado !== "historico" && item.valor === lectura &&
+      (representacion ? item.representacion === representacion : !item.representacion),
+    );
+    if (!lectura) {
+      archivarIdentificadores("transpondedor_iso");
+    } else if (!transpondedorActivo) {
+      if (!["nacional", "iso_completa"].includes(representacion)) {
+        throw new Error("Indica la representación del transpondedor equino.");
+      }
+      archivarIdentificadores("transpondedor_iso");
+      identificadores.push({ tipo: "transpondedor_iso", valor: lectura, representacion, principal: false, estado: "pendiente" });
+    }
+
+    const numeroDie = String(document.getElementById("a-die-equino")?.value || "").trim().toUpperCase();
+    const dieActivo = documentos.some((documento) => documento.tipo === "DIE" && documento.estado !== "historico" && documento.numero === numeroDie);
+    if (!numeroDie) {
+      archivarDocumentos("DIE");
+    } else if (!dieActivo) {
+      archivarDocumentos("DIE");
+      documentos.push({ tipo: "DIE", numero: numeroDie, estado: "pendiente" });
+    }
+
+    const estructurada = {};
+    if (identificadores.length || Object.hasOwn(existing, "identificadores")) estructurada.identificadores = identificadores;
+    if (documentos.length || Object.hasOwn(existing, "documentos_identificacion")) estructurada.documentos_identificacion = documentos;
+    return estructurada;
+  },
+
   _onTipoAltaChange(selectEl) {
     const section = document.getElementById('a-procedencia-section');
     if (section) {
@@ -1097,6 +1199,10 @@ const AnimalesView = {
     if (section) {
       const requiere = CS ? CS.especieRequiereDIB(selectEl.value) : false;
       section.style.display = requiere ? 'block' : 'none';
+    }
+    const identificacionEquino = document.getElementById('a-identificacion-equino');
+    if (identificacionEquino) {
+      identificacionEquino.style.display = Number(selectEl.selectedOptions[0]?.dataset.especieId) === 5 ? 'block' : 'none';
     }
     // Refrescar el catálogo de categorías según la nueva especie
     const catSel = document.getElementById('a-categoria');

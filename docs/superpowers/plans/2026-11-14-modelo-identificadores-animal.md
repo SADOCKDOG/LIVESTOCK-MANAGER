@@ -24,7 +24,7 @@
 
 - Los guardados heredados sin listas estructuradas conservan su comportamiento y no adquieren datos inferidos.
 - Se guardan varios identificadores sin mezclar sus tipos.
-- Una lista no vacía tiene un identificador principal que coincide con `numero_identificacion`.
+- Una lista puede contener solo identificadores secundarios; si marca uno como principal, debe haber solo uno y coincidir con `numero_identificacion`.
 - Los identificadores preservan ceros iniciales.
 - Los números DIE/documentales quedan separados y sin unicidad por animal.
 
@@ -45,7 +45,7 @@
 - [x] Implementar el validador y llamarlo al inicio de `Animales.save()`.
 - [x] Ejecutar las pruebas nuevas y las de compatibilidad de identificadores heredados.
 
-Tipos de `identificadores[].tipo`: `codigo_nacional`, `marca_explotacion`, `transpondedor_iso`, `ueln`, `otro`. Cada elemento requiere `valor` de texto, `principal` booleano y `estado` en `vigente`, `historico`, `legado`, `pendiente`; admite además `tipoIdentificadorId`, `medio`, `valorLeido`, `fechaAplicacion`, `fechaFin` y `asignador`. Si la lista no está vacía, requiere exactamente un principal y su `valor` debe coincidir exactamente con el `numero_identificacion` normalizado que se guardará. Si se necesita conservar una lectura original distinta, se almacena en `valorLeido`.
+Tipos de `identificadores[].tipo`: `codigo_nacional`, `marca_explotacion`, `transpondedor_iso`, `ueln`, `otro`. Cada elemento requiere `valor` de texto, `principal` booleano y `estado` en `vigente`, `historico`, `legado`, `pendiente`; admite además `tipoIdentificadorId`, `medio`, `valorLeido`, `fechaAplicacion`, `fechaFin` y `asignador`. Una lista no vacía puede tener cero o un elemento principal; si existe, su `valor` debe coincidir exactamente con el `numero_identificacion` normalizado que se guardará. Esta forma permite agregar identificadores secundarios a fichas heredadas sin clasificar ni duplicar el valor principal. Si se necesita conservar una lectura original distinta, se almacena en `valorLeido`.
 
 Los documentos requieren `tipo` (`DIE`, `PASAPORTE`, `OTRO`) y `numero` de texto no vacío; `emisor`, `fechaEmision`, `estado` y `referenciaAutorizacion` son opcionales. No se valida unicidad.
 

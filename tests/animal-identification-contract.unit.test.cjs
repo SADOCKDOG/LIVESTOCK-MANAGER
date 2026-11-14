@@ -87,17 +87,34 @@ test('rechaza tipos de identificador fuera del contrato', async () => {
   assert.equal(state.writes, 0);
 });
 
-test('requiere un identificador principal que corresponda a numero_identificacion', async () => {
+test('rechaza mas de un identificador principal', async () => {
   const { model, state } = createAnimalModel();
 
   await assert.rejects(
     model.save({
       ...baseAnimal,
-      identificadores: [{ tipo: 'ueln', valor: 'AAABBB000000001', principal: false, estado: 'vigente' }],
+      identificadores: [
+        { tipo: 'codigo_nacional', valor: baseAnimal.numero_identificacion, principal: true, estado: 'vigente' },
+        { tipo: 'ueln', valor: baseAnimal.numero_identificacion, principal: true, estado: 'vigente' },
+      ],
     }),
-    /exactamente un identificador principal/
+    /como máximo un identificador principal/
   );
   assert.equal(state.writes, 0);
+});
+
+test('permite persistir solo identificadores secundarios sin reclasificar una ficha heredada', async () => {
+  const { model, state } = createAnimalModel();
+  const secondary = [
+    { tipo: 'ueln', valor: 'FRABC12345678901', principal: false, estado: 'pendiente' },
+    { tipo: 'transpondedor_iso', valor: '009724000000000001', principal: false, estado: 'vigente', medio: 'electronico' },
+  ];
+
+  await model.save({ ...baseAnimal, identificadores: secondary });
+
+  assert.deepEqual(JSON.parse(JSON.stringify(state.saved.identificadores)), secondary);
+  assert.equal(state.saved.numero_identificacion, baseAnimal.numero_identificacion);
+  assert.equal(state.writes, 1);
 });
 
 test('rechaza cuando la proyeccion principal difiere de numero_identificacion', async () => {
@@ -140,6 +157,36 @@ test('conserva los identificadores y documentos tipados, incluidos ceros inicial
   assert.equal(state.saved.identificadores[0].valorLeido, 'es 240100000001');
   assert.equal(state.saved.identificadores[1].valor, '009724000000000001');
   assert.equal(state.writes, 1);
+});
+
+
+test('valida la representación declarada de lecturas de transpondedor', async () => {
+  const { model, state } = createAnimalModel();
+  await model.save({
+    ...baseAnimal,
+    identificadores: [{
+      tipo: 'transpondedor_iso',
+      valor: '009724000000000001',
+      representacion: 'iso_completa',
+      principal: false,
+      estado: 'pendiente',
+    }],
+  });
+  assert.equal(state.saved.identificadores[0].representacion, 'iso_completa');
+
+  await assert.rejects(
+    model.save({
+      ...baseAnimal,
+      identificadores: [{
+        tipo: 'transpondedor_iso',
+        valor: '009724000000000001',
+        representacion: 'inventada',
+        principal: false,
+        estado: 'pendiente',
+      }],
+    }),
+    /representacion no admitida/,
+  );
 });
 
 test('mantiene el guardado heredado sin crear arreglos estructurados', async () => {
