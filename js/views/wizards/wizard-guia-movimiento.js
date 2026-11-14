@@ -5,6 +5,42 @@
  * dirigida a la plataforma de la comunidad (SIGGAN / BADIGEX / PIMA).
  */
 window.WizardGuiaMovimiento = {
+  async _guardarDocumentoLegalGuia(mov, fincaId) {
+    const numero = String(mov?.numero_guia || '').trim().toUpperCase();
+    if (!numero) throw new Error('La guía debe tener número antes de registrar su documento legal.');
+
+    const existente = await window.db
+      .getFromIndex('documentos_legales', 'numero', numero)
+      .catch(() => null);
+    if (existente && (existente.tipo !== 'guia_movimiento' || Number(existente.fincaId) !== Number(fincaId))) {
+      throw new Error(`El número de guía ${numero} ya está asociado a otro documento legal.`);
+    }
+    const ahora = new Date().toISOString();
+    const documento = {
+      ...(existente || {}),
+      tipo: 'guia_movimiento',
+      fincaId,
+      numero,
+      fecha_emision: mov.fecha,
+      estado_tramite: mov.estado_tramite || 'borrador',
+      fecha_presentacion: mov.fecha_presentacion || null,
+      numero_registro_oficial: mov.numero_registro_oficial || '',
+      acuse_recibo: mov.acuse_recibo || '',
+      plataforma: mov.plataforma || '',
+      desinfeccion_numero_talon: mov.desinfeccion_numero_talon || '',
+      desinfeccion_fecha: mov.desinfeccion_fecha || '',
+      veterinario_autorizante: mov.veterinario_autorizante || '',
+      ...(existente ? { actualizadoEn: ahora } : { created_at: ahora }),
+    };
+
+    if (existente) {
+      documento.id = existente.id;
+      await window.db.put('documentos_legales', documento);
+      return existente.id;
+    }
+    return window.db.add('documentos_legales', documento);
+  },
+
   async abrir(borrador = null) {
     const finca = await Fincas.getActive();
     if (!finca) { App.toastError("No hay finca activa"); return; }
@@ -395,21 +431,7 @@ window.WizardGuiaMovimiento = {
             notas: data.notas,
           });
           const mov = await Movimientos.get(movId);
-          await window.db.add('documentos_legales', {
-            tipo: 'guia_movimiento',
-            fincaId: await Fincas.getActiveId(),
-            numero: mov.numero_guia,
-            fecha_emision: mov.fecha,
-            estado_tramite: mov.estado_tramite || 'borrador',
-            fecha_presentacion: mov.fecha_presentacion || null,
-            numero_registro_oficial: mov.numero_registro_oficial || '',
-            acuse_recibo: mov.acuse_recibo || '',
-            plataforma: mov.plataforma || '',
-            desinfeccion_numero_talon: mov.desinfeccion_numero_talon || '',
-            desinfeccion_fecha: mov.desinfeccion_fecha || '',
-            veterinario_autorizante: mov.veterinario_autorizante || '',
-            created_at: new Date().toISOString(),
-          }).catch(() => {});
+          await this._guardarDocumentoLegalGuia(mov, await Fincas.getActiveId());
           App.toast("Guía de movimiento registrada", 'success');
           WizardGuiaMovimiento.generarDocumento(finca, mov);
         } catch (e) {
