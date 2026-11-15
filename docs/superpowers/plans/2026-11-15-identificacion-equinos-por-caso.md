@@ -47,6 +47,7 @@ La evidencia confirma el comportamiento de interfaz en el APK instalado. No repr
 - Build web, sincronización Capacitor, compilación Gradle debug e instalación en la tablet completados durante esta integración.
 - Captura del formulario con transpondedor requerido: `17-chip-required.png`.
 - Captura del paso 4 mostrando `PLANIFICADO` y `BORRADOR`: `40-wizard-estado-traslado.png`.
+- Captura del paso administrativo final de la guía equina: `48-wizard-guia-equino-paso-4.png`.
 - Captura de salida sin guardar y retorno al inicio: `42-tablet-sin-guardar.png`.
 - `git diff --check` sin errores.
 
