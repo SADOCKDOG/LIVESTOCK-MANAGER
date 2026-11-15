@@ -18,6 +18,7 @@ function createView({ association, selectedCase = '', fechaNacimiento = '' }) {
     'crotal-length-counter': { textContent: '' },
     'a-caso-identificacion': { value: selectedCase, dataset: {} },
     'a-caso-identificacion-wrap': { style: {}, innerHTML: '' },
+    'a-equino-caso-contexto-wrap': { style: {}, innerHTML: '' },
   };
   const window = {
     __testElements: elements,
@@ -54,6 +55,7 @@ function createView({ association, selectedCase = '', fechaNacimiento = '' }) {
           maxLength: 14,
           contador: 14,
         },
+        equino_visual: { regex: /^ES(?:21\d{10}|\d{12})$/, ayuda: 'Formato visual equino por fecha', placeholder: 'ES21 + CCAA + 8 dígitos', maxLength: 14, contador: 14 },
         ovino_caprino_eid: {
           regex: /^ES24(?:0[1-9]|1[0-9])\d{8}$/,
           descripcion: 'ES + especie 24 + región + 8 dígitos',
@@ -138,4 +140,28 @@ test('la fecha de nacimiento bovina actualiza formato y hace obligatorio el chip
   assert.equal(view._testElements['a-rfid'].required, true);
   assert.equal(view._testElements['a-rfid'].placeholder, '23 DÍGITOS ISO 11784');
   assert.match(view._testElements['a-rfid-hint'].textContent, /OBLIGATORIO/);
+});
+
+test('la ficha resuelve el formato del caso de botón y exige transpondedor ISO', () => {
+  const view = createView({
+    association: { especieId: 5, tipoIdentificadorId: 4, casos: [{ id: 'crotal_boton_carne_directo', nombre: 'Crotal botón a matadero', formato: 'equino_visual' }] },
+    selectedCase: 'crotal_boton_carne_directo',
+    fechaNacimiento: '2026-01-01',
+  });
+  view._testElements['a-caso-identificacion'].dataset.associationKey = '5:4';
+  view._actualizarAyudaCrotal();
+  assert.equal(view._getFormatoCrotalActual().key, 'equino_visual');
+  assert.equal(view._testElements['a-rfid'].required, true);
+  assert.match(view._testElements['a-rfid-hint'].textContent, /23 DÍGITOS/);
+  assert.equal(view._testElements['a-equino-caso-contexto-wrap'].style.display, 'block');
+});
+
+test('la ficha no pide datos de la excepción equina hasta seleccionar el caso', () => {
+  const view = createView({
+    association: { especieId: 5, tipoIdentificadorId: 4, casos: [{ id: 'crotal_boton_carne_directo', nombre: 'Crotal botón a matadero', formato: 'equino_visual' }] },
+  });
+
+  view._actualizarAyudaCrotal();
+
+  assert.equal(view._testElements['a-equino-caso-contexto-wrap'].style.display, 'none');
 });

@@ -331,6 +331,14 @@ const AnimalesView = {
     this._razasPorEspecieIdCache = razasPorEspecieId;
     this._especieTipoIdentificadorCache = especieTipoIdentificador;
     this._casoIdentificacionInicial = a.casoIdentificacion || '';
+    this._animalContextoEquinoInicial = a.origen_identificacion_equino || {};
+    const contextosEquinos = !esNuevo && Number(a.tipoIdentificadorId) === 4
+      ? await window.db.getAllFromIndex('contextos_identificacion', 'animalId', Number(a.id)).catch(() => [])
+      : [];
+    this._animalContextoEquinoInicial = {
+      ...(a.origen_identificacion_equino || {}),
+      ...(contextosEquinos || []).find((item) => item.tipo === 'equino_crotal_boton' && item.estado === 'planificado') || {},
+    };
 
     // Fallback: animales guardados antes de la migración v15 (o creados por seed-data)
     // solo tienen `especie` (string), no `especieId`. El <select> de ESPECIE ya marca
@@ -439,6 +447,7 @@ const AnimalesView = {
               </div>
             </div>
             <div id="a-caso-identificacion-wrap" class="wizard-input-group mb-12" style="display:none;"></div>
+            <div id="a-equino-caso-contexto-wrap" class="card p-12 mb-12" style="display:none;"></div>
             <div class="grid grid-cols-2 gap-12 mb-12">
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-raza">RAZA (CATÁLOGO OFICIAL)</label>
@@ -845,6 +854,9 @@ const AnimalesView = {
         casoIdentificacion: document.getElementById("a-caso-identificacion")
           ? (document.getElementById("a-caso-identificacion").value || null)
           : (existing.casoIdentificacion || null),
+        origen_identificacion_equino: Number(document.getElementById("a-especie").selectedOptions[0]?.dataset.especieId) === 5
+          ? { regaNacimiento: (document.getElementById('a-equino-rega-nacimiento')?.value || '').trim().toUpperCase(), categoriaNacimiento: document.getElementById('a-equino-categoria-nacimiento')?.value || '', fuente: 'declaracion_local', registradoEn: new Date().toISOString() }
+          : (existing.origen_identificacion_equino || null),
         sexo: document.getElementById("a-sexo").value,
         raza: document.getElementById("a-raza").value === "__otra__"
           ? document.getElementById("a-raza-otra").value.trim()
@@ -914,7 +926,15 @@ const AnimalesView = {
         data.motivo_baja = "";
       }
 
-      const nuevoId = await Animales.save(data);
+      if (Number(data.especieId) === 5 && Number(data.tipoIdentificadorId) === 4) {
+        const validacionCaso = window.EquineIdentificationRules.evaluarElegibilidadCrotalBoton(this._leerContextoCrotalEquino(data));
+        if (!validacionCaso.elegible) return App.toastError(validacionCaso.condicionesPendientes.join(' '));
+      }
+
+      const guardarContextoEquino = Number(data.especieId) === 5 && Number(data.tipoIdentificadorId) === 4
+        ? (animalId, _animalData, registrarCompensacion) => this._guardarContextoCrotalEquino(animalId, data, registrarCompensacion)
+        : null;
+      const nuevoId = await Animales.save(data, guardarContextoEquino ? { afterPersist: guardarContextoEquino } : {});
       this._animalGuardado = true;
       App.toast("Animal guardado correctamente", "success");
 
@@ -976,6 +996,8 @@ const AnimalesView = {
       cleanVal = prefijo + val.replace(/\D/g, '').slice(0, 12);
     } else if (key === 'equino_microchip') {
       cleanVal = val.replace(/\D/g, '').slice(0, 15);
+    } else if (key === 'equino_visual') {
+      cleanVal = 'ES' + val.replace(/^ES/i, '').replace(/\D/g, '').slice(0, 12);
     } else if (key === 'porcino_marca_explotacion') {
       cleanVal = val.replace(/[^A-Z0-9]/g, '').slice(0, 14);
     } else {
@@ -1113,8 +1135,96 @@ const AnimalesView = {
     wrap.style.display = 'block';
   },
 
+  _leerContextoCrotalEquino(data = {}) {
+    const origen = data.origen_identificacion_equino || {};
+    return {
+      destinoDeclarado: document.getElementById('a-equino-destino')?.value || '',
+      categoriaNacimiento: document.getElementById('a-equino-categoria-nacimiento')?.value || origen.categoriaNacimiento || '',
+      regaNacimiento: document.getElementById('a-equino-rega-nacimiento')?.value || origen.regaNacimiento || '',
+      regaOrigen: document.getElementById('a-equino-rega-origen')?.value || '',
+      regaDestinoMatadero: document.getElementById('a-equino-rega-matadero')?.value || '',
+      trasladoDirecto: Boolean(document.getElementById('a-equino-traslado-directo')?.checked),
+      fechaNacimiento: document.getElementById('a-fecha')?.value || data.fecha_nacimiento || '',
+      fechaPrevistaLlegada: document.getElementById('a-equino-fecha-llegada')?.value || '',
+      codigoVisual: document.getElementById('a-crotal')?.value || data.numero_identificacion || '',
+      transpondedor: document.getElementById('a-rfid')?.value || data.rfid_codigo || '',
+    };
+  },
+
+  _actualizarContextoCrotalEquino() {
+    const wrap = document.getElementById('a-equino-caso-contexto-wrap');
+    if (!wrap) return;
+    const especieId = Number(document.getElementById('a-especie')?.selectedOptions?.[0]?.dataset?.especieId || 0);
+    const tipoId = Number(document.getElementById('a-tipo-crotal-oficial')?.value || 0);
+    const caso = document.getElementById('a-caso-identificacion')?.value || '';
+    const visible = especieId === 5 && tipoId === 4 && caso === 'crotal_boton_carne_directo';
+    wrap.style.display = visible ? 'block' : 'none';
+    if (!visible) {
+      wrap.innerHTML = '';
+      return;
+    }
+    if (!document.getElementById('a-equino-destino')) {
+      const origen = this._animalContextoEquinoInicial || {};
+      const escapar = (valor) => String(valor || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      wrap.innerHTML =
+        '<div class="font-900 uppercase mb-8">Condiciones declaradas del caso equino</div>' +
+        '<p class="text-[0.6rem] mb-10">Datos declarados para evaluar la excepción. La app no verifica REGA, destino comercial ni autorización.</p>' +
+        '<div class="grid grid-cols-2 gap-10">' +
+        '<div class="wizard-input-group"><label class="wizard-label" for="a-equino-categoria-nacimiento">CATEGORÍA DE EXPLOTACIÓN DE NACIMIENTO</label><select id="a-equino-categoria-nacimiento" class="wizard-input" onchange="AnimalesView._actualizarAyudaCrotal()"><option value="">SELECCIONA</option><option value="produccion_reproduccion" ' + (origen.categoriaNacimiento === 'produccion_reproduccion' ? 'selected' : '') + '>PRODUCCIÓN-REPRODUCCIÓN</option><option value="pastos" ' + (origen.categoriaNacimiento === 'pastos' ? 'selected' : '') + '>PASTOS</option><option value="silvestre_semisilvestre" ' + (origen.categoriaNacimiento === 'silvestre_semisilvestre' ? 'selected' : '') + '>SILVESTRE / SEMISILVESTRE</option></select></div>' +
+        '<div class="wizard-input-group"><label class="wizard-label" for="a-equino-rega-nacimiento">REGA DE NACIMIENTO</label><input id="a-equino-rega-nacimiento" class="wizard-input" maxlength="14" value="' + escapar(origen.regaNacimiento) + '" oninput="this.value=this.value.toUpperCase();AnimalesView._actualizarAyudaCrotal()"></div>' +
+        '<div class="wizard-input-group"><label class="wizard-label" for="a-equino-destino">DESTINO DECLARADO</label><select id="a-equino-destino" class="wizard-input" onchange="AnimalesView._actualizarAyudaCrotal()"><option value="">SELECCIONA</option><option value="produccion_carne" ' + (origen.destinoDeclarado === 'produccion_carne' ? 'selected' : '') + '>PRODUCCIÓN DE CARNE</option><option value="otro" ' + (origen.destinoDeclarado === 'otro' ? 'selected' : '') + '>OTRO DESTINO</option></select></div>' +
+        '<div class="wizard-input-group"><label class="wizard-label" for="a-equino-rega-origen">REGA DE ORIGEN DEL TRASLADO</label><input id="a-equino-rega-origen" class="wizard-input" maxlength="14" value="' + escapar(origen.regaOrigen) + '" oninput="this.value=this.value.toUpperCase();AnimalesView._actualizarAyudaCrotal()"></div>' +
+        '<div class="wizard-input-group"><label class="wizard-label" for="a-equino-rega-matadero">REGA DEL MATADERO</label><input id="a-equino-rega-matadero" class="wizard-input" maxlength="14" value="' + escapar(origen.regaDestinoMatadero) + '" oninput="this.value=this.value.toUpperCase();AnimalesView._actualizarAyudaCrotal()"></div>' +
+        '<div class="wizard-input-group"><label class="wizard-label" for="a-equino-fecha-llegada">LLEGADA PREVISTA AL MATADERO</label><input id="a-equino-fecha-llegada" type="date" class="wizard-input" value="' + escapar(origen.fechaPrevistaLlegada) + '" onchange="AnimalesView._actualizarAyudaCrotal()"></div>' +
+        '<label class="wizard-input-group flex items-center gap-8"><input id="a-equino-traslado-directo" type="checkbox" ' + (origen.trasladoDirecto ? 'checked' : '') + ' onchange="AnimalesView._actualizarAyudaCrotal()"> TRASLADO DIRECTO DESDE NACIMIENTO A MATADERO</label>' +
+        '</div><div id="a-equino-caso-condiciones" class="text-[0.65rem] mt-8"></div>';
+      const categoria = document.getElementById('a-equino-categoria-nacimiento');
+      if (categoria) categoria.value = origen.categoriaNacimiento || '';
+    }
+    const contexto = this._leerContextoCrotalEquino();
+    const resultado = window.EquineIdentificationRules?.evaluarElegibilidadCrotalBoton(contexto);
+    const estado = document.getElementById('a-equino-caso-condiciones');
+    if (estado) {
+      estado.textContent = resultado?.elegible
+        ? 'Condiciones declaradas completas. Confirma los códigos antes de guardar.'
+        : (resultado?.condicionesPendientes || ['No se pudo evaluar el caso.']).join(' ');
+    }
+  },
+
+  async _guardarContextoCrotalEquino(animalId, data, registrarCompensacion) {
+    const contexto = this._leerContextoCrotalEquino(data);
+    const finca = await Fincas.getActive().catch(() => null);
+    const existentes = await window.db.getAllFromIndex('contextos_identificacion', 'animalId', Number(animalId));
+    const previo = (existentes || []).find((item) => item.tipo === 'equino_crotal_boton' && item.estado === 'planificado');
+    const registro = {
+      ...(previo || {}),
+      animalId: Number(animalId),
+      fincaId: finca?.id ? Number(finca.id) : null,
+      tipo: 'equino_crotal_boton',
+      casoIdentificacion: 'crotal_boton_carne_directo',
+      estado: 'planificado',
+      destinoDeclarado: contexto.destinoDeclarado,
+      regaNacimiento: contexto.regaNacimiento.trim().toUpperCase(),
+      categoriaNacimiento: contexto.categoriaNacimiento,
+      regaOrigen: contexto.regaOrigen.trim().toUpperCase(),
+      regaDestinoMatadero: contexto.regaDestinoMatadero.trim().toUpperCase(),
+      trasladoDirecto: contexto.trasladoDirecto,
+      fechaPrevistaLlegada: contexto.fechaPrevistaLlegada,
+      fuente: 'declaracion_local',
+      actualizadoEn: new Date().toISOString(),
+    };
+    if (previo?.id) {
+      registrarCompensacion(() => window.db.put('contextos_identificacion', previo));
+      await window.db.put('contextos_identificacion', registro);
+    } else {
+      const id = await window.db.add('contextos_identificacion', registro);
+      registrarCompensacion(() => window.db.delete('contextos_identificacion', id));
+    }
+  },
+
   _actualizarAyudaCrotal() {
     this._actualizarSelectorCasoIdentificacion();
+    this._actualizarContextoCrotalEquino();
     const input = document.getElementById('a-crotal');
     const hint = document.getElementById('crotal-format-hint');
     const counter = document.getElementById('crotal-length-counter');
@@ -1127,10 +1237,11 @@ const AnimalesView = {
     if (casoHint) casoHint.textContent = caso?.condiciones || caso?.requisitos || '';
     const rfid = document.getElementById('a-rfid');
     const rfidHint = document.getElementById('a-rfid-hint');
-    const requiereRfid = key === 'bovino_electronico_2025';
+    const requiereRfid = key === 'bovino_electronico_2025' || key === 'equino_visual';
     if (rfid) {
       rfid.required = requiereRfid;
       rfid.placeholder = requiereRfid ? '23 DÍGITOS ISO 11784' : 'OPCIONAL';
+      if (key === 'equino_visual') rfid.maxLength = 23;
     }
     if (rfidHint) {
       rfidHint.textContent = requiereRfid

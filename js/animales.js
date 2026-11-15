@@ -155,7 +155,7 @@ const Animales = {
     return window.db.get("animales", Number(id));
   },
 
-  async save(data) {
+  async save(data, options = {}) {
     return await ErrorHandler.tryAsync(
       async () => {
         const esEdicion =
@@ -327,6 +327,31 @@ const Animales = {
 
         // 4. Libro de registro SIGGAN: eventos de alta y baja (trazabilidad)
         await this._registrarEventoCenso(esEdicion, animalData, animalAnterior);
+
+        if (typeof options.afterPersist === 'function') {
+          const compensaciones = [];
+          const registrarCompensacion = (compensar) => {
+            if (typeof compensar !== 'function') throw new TypeError('La compensación debe ser una función');
+            compensaciones.push(compensar);
+          };
+          try {
+            await options.afterPersist(animalId, animalData, registrarCompensacion);
+          } catch (error) {
+            for (const compensar of compensaciones.reverse()) {
+              try {
+                await compensar();
+              } catch (errorCompensacion) {
+                console.error('[Animales] Falló una compensación de persistencia', errorCompensacion);
+              }
+            }
+            if (esEdicion) {
+              await window.db.put('animales', actual);
+            } else {
+              await window.db.delete('animales', animalId);
+            }
+            throw error;
+          }
+        }
 
         return animalId;
       },
