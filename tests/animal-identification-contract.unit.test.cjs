@@ -199,3 +199,22 @@ test('mantiene el guardado heredado sin crear arreglos estructurados', async () 
   assert.equal(Object.hasOwn(state.saved, 'documentos_identificacion'), false);
 });
 
+
+
+test("acepta metadatos locales de verificación en identificadores y documentos", async () => {
+  const { model, state } = createAnimalModel();
+  const data = {
+    identificadores: [{
+      tipo: "ueln", valor: "FRABC12345678901", principal: false, estado: "vigente",
+      verificadoPor: "Veterinaria Ana", fechaVerificacion: "2026-11-14", referenciaVerificacion: "DIE revisado",
+    }],
+    documentos_identificacion: [{
+      tipo: "DIE", numero: "DIE-2026-0042", estado: "vigente",
+      verificadoPor: "Veterinaria Ana", fechaVerificacion: "2026-11-14", referenciaVerificacion: "Copia del DIE",
+    }],
+  };
+
+  await model.save({ ...baseAnimal, ...data });
+  assert.equal(state.saved.identificadores[0].fechaVerificacion, "2026-11-14");
+  assert.equal(state.saved.documentos_identificacion[0].referenciaVerificacion, "Copia del DIE");
+});

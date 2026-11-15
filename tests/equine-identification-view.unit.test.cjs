@@ -112,3 +112,124 @@ test("al cambiar la representación archiva la anterior y mantiene una sola lect
   assert.equal(result.identificadores[1].representacion, "iso_completa");
   assert.equal(result.identificadores[1].estado, "pendiente");
 });
+
+
+test("actualizar el estado a vigente exige responsable, fecha y referencia de verificación", () => {
+  const { view } = createView({
+    "a-ueln": "FRABC12345678901",
+    "a-ueln-estado": "vigente",
+  });
+
+  assert.throws(
+    () => view._construirIdentificacionEstructurada({}, 5),
+    /responsable, fecha y referencia de verificación/,
+  );
+});
+
+test("guarda la evidencia local al verificar un identificador equino", () => {
+  const { view } = createView({
+    "a-ueln": "FRABC12345678901",
+    "a-ueln-estado": "vigente",
+    "a-ueln-verificado-por": "Veterinaria Ana",
+    "a-ueln-fecha-verificacion": "2026-11-14",
+    "a-ueln-referencia-verificacion": "DIE revisado en explotación",
+  });
+
+  const result = view._construirIdentificacionEstructurada({}, 5);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(result.identificadores[0])), {
+    tipo: "ueln",
+    valor: "FRABC12345678901",
+    principal: false,
+    estado: "vigente",
+    verificadoPor: "Veterinaria Ana",
+    fechaVerificacion: "2026-11-14",
+    referenciaVerificacion: "DIE revisado en explotación",
+  });
+});
+
+test("al verificar el mismo valor conserva un único registro y actualiza su metadata", () => {
+  const existing = {
+    identificadores: [{ tipo: "ueln", valor: "FRABC12345678901", principal: false, estado: "pendiente" }],
+  };
+  const { view } = createView({
+    "a-ueln": "FRABC12345678901",
+    "a-ueln-estado": "vigente",
+    "a-ueln-verificado-por": "Veterinaria Ana",
+    "a-ueln-fecha-verificacion": "2026-11-14",
+    "a-ueln-referencia-verificacion": "DIE revisado en explotación",
+  });
+
+  const result = view._construirIdentificacionEstructurada(existing, 5);
+
+  assert.equal(result.identificadores.length, 1);
+  assert.equal(result.identificadores[0].estado, "vigente");
+  assert.equal(result.identificadores[0].verificadoPor, "Veterinaria Ana");
+});
+
+
+test("conserva la evidencia existente al guardar sin modificar una verificación vigente", () => {
+  const existing = {
+    identificadores: [{ tipo: "ueln", valor: "FRABC12345678901", principal: false, estado: "vigente" }],
+  };
+  const { view } = createView({ "a-ueln": "FRABC12345678901" });
+
+  const result = view._construirIdentificacionEstructurada(existing, 5);
+
+  assert.equal(result.identificadores.length, 1);
+  assert.equal(result.identificadores[0].estado, "vigente");
+});
+
+test("un valor UELN sustituido se archiva y el nuevo queda pendiente", () => {
+  const existing = {
+    identificadores: [{ tipo: "ueln", valor: "FRABC12345678901", principal: false, estado: "vigente" }],
+  };
+  const { view } = createView({ "a-ueln": "FRABC12345678902" });
+
+  const result = view._construirIdentificacionEstructurada(existing, 5);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(result.identificadores.map(({ valor, estado }) => ({ valor, estado })))), [
+    { valor: "FRABC12345678901", estado: "historico" },
+    { valor: "FRABC12345678902", estado: "pendiente" },
+  ]);
+});
+
+
+test("mantiene los metadatos de una verificación vigente si los controles se dejan vacíos", () => {
+  const existing = {
+    identificadores: [{
+      tipo: "ueln", valor: "FRABC12345678901", principal: false, estado: "vigente",
+      verificadoPor: "Veterinaria Ana", fechaVerificacion: "2026-11-14", referenciaVerificacion: "DIE revisado",
+    }],
+  };
+  const { view } = createView({
+    "a-ueln": "FRABC12345678901",
+    "a-ueln-verificado-por": "",
+    "a-ueln-fecha-verificacion": "",
+    "a-ueln-referencia-verificacion": "",
+  });
+
+  const result = view._construirIdentificacionEstructurada(existing, 5);
+
+  assert.equal(result.identificadores[0].verificadoPor, "Veterinaria Ana");
+  assert.equal(result.identificadores[0].fechaVerificacion, "2026-11-14");
+  assert.equal(result.identificadores[0].referenciaVerificacion, "DIE revisado");
+});
+
+
+test("editar un dato equino reinicia el estado y la evidencia local", () => {
+  const { view, elements } = createView({
+    "a-ueln": "FRABC12345678901",
+    "a-ueln-estado": "vigente",
+    "a-ueln-verificado-por": "Veterinaria Ana",
+    "a-ueln-fecha-verificacion": "2026-11-14",
+    "a-ueln-referencia-verificacion": "DIE revisado",
+  });
+
+  view._reiniciarVerificacionEquina("a-ueln");
+
+  assert.equal(elements["a-ueln-estado"].value, "pendiente");
+  assert.equal(elements["a-ueln-verificado-por"].value, "");
+  assert.equal(elements["a-ueln-fecha-verificacion"].value, "");
+  assert.equal(elements["a-ueln-referencia-verificacion"].value, "");
+});

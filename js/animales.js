@@ -72,7 +72,7 @@ function validarContratoIdentificacionAnimal(data) {
       ) {
         throw new Error(`identificadores[${indice}].tipoIdentificadorId debe ser un entero positivo`);
       }
-      for (const campo of ["medio", "valorLeido", "fechaAplicacion", "fechaFin", "asignador"]) {
+      for (const campo of ["medio", "valorLeido", "fechaAplicacion", "fechaFin", "asignador", "verificadoPor", "fechaVerificacion", "referenciaVerificacion"]) {
         if (identificador[campo] !== undefined && typeof identificador[campo] !== "string") {
           throw new Error(`identificadores[${indice}].${campo} debe ser texto`);
         }
@@ -115,7 +115,7 @@ function validarContratoIdentificacionAnimal(data) {
       if (typeof documento.numero !== "string" || !documento.numero.trim()) {
         throw new Error(`documentos_identificacion[${indice}].numero debe ser un texto no vacío`);
       }
-      for (const campo of ["emisor", "fechaEmision", "estado", "referenciaAutorizacion"]) {
+      for (const campo of ["emisor", "fechaEmision", "estado", "referenciaAutorizacion", "verificadoPor", "fechaVerificacion", "referenciaVerificacion"]) {
         if (documento[campo] !== undefined && typeof documento[campo] !== "string") {
           throw new Error(`documentos_identificacion[${indice}].${campo} debe ser texto`);
         }

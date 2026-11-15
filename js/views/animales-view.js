@@ -362,6 +362,21 @@ const AnimalesView = {
     const identificadoresEquinos = Array.isArray(a.identificadores) ? a.identificadores : [];
     const documentosIdentificacion = Array.isArray(a.documentos_identificacion) ? a.documentos_identificacion : [];
     const valorHtml = (valor) => String(valor || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const verificacionHTML = (prefijo, registro = {}) => {
+      const estado = registro.estado || "pendiente";
+      return "<div class=\"grid grid-cols-2 gap-8 mt-8 mb-12\">" +
+        "<div class=\"wizard-input-group\"><label class=\"wizard-label\" for=\"" + prefijo + "-estado\">ESTADO DE VERIFICACIÓN</label>" +
+        "<select id=\"" + prefijo + "-estado\" class=\"wizard-input font-800\">" +
+        "<option value=\"pendiente\" " + (estado === "pendiente" ? "selected" : "") + ">PENDIENTE</option>" +
+        "<option value=\"vigente\" " + (estado === "vigente" ? "selected" : "") + ">VERIFICADO LOCALMENTE</option>" +
+        "<option value=\"legado\" " + (estado === "legado" ? "selected" : "") + ">LEGADO</option></select></div>" +
+        "<div class=\"wizard-input-group\"><label class=\"wizard-label\" for=\"" + prefijo + "-verificado-por\">VERIFICADO POR</label>" +
+        "<input type=\"text\" id=\"" + prefijo + "-verificado-por\" value=\"" + valorHtml(registro.verificadoPor) + "\" class=\"wizard-input font-800\"></div>" +
+        "<div class=\"wizard-input-group\"><label class=\"wizard-label\" for=\"" + prefijo + "-fecha-verificacion\">FECHA DE VERIFICACIÓN</label>" +
+        "<input type=\"date\" id=\"" + prefijo + "-fecha-verificacion\" value=\"" + valorHtml(registro.fechaVerificacion) + "\" class=\"wizard-input font-800\"></div>" +
+        "<div class=\"wizard-input-group\"><label class=\"wizard-label\" for=\"" + prefijo + "-referencia-verificacion\">REFERENCIA DOCUMENTAL</label>" +
+        "<input type=\"text\" id=\"" + prefijo + "-referencia-verificacion\" value=\"" + valorHtml(registro.referenciaVerificacion) + "\" class=\"wizard-input font-800\"></div></div>";
+    };
     const uelnExistente = identificadoresEquinos.find((item) => item.tipo === "ueln" && item.estado !== "historico");
     const transpondedorExistente = identificadoresEquinos.find((item) => item.tipo === "transpondedor_iso" && item.estado !== "historico");
     const dieExistente = documentosIdentificacion.find((item) => item.tipo === "DIE" && item.estado !== "historico");
@@ -567,11 +582,13 @@ const AnimalesView = {
               <div class="grid grid-cols-2 gap-12 mb-12">
                 <div class="wizard-input-group">
                   <label class="wizard-label" for="a-ueln">UELN / CÓDIGO ÚNICO</label>
-                  <input type="text" id="a-ueln" value="${valorHtml(uelnExistente?.valor)}" placeholder="INTRODUCIR SI ESTÁ ASIGNADO" class="wizard-input font-800">
+                  <input type="text" id="a-ueln" oninput="AnimalesView._reiniciarVerificacionEquina('a-ueln')" value="${valorHtml(uelnExistente?.valor)}" placeholder="INTRODUCIR SI ESTÁ ASIGNADO" class="wizard-input font-800">
+                  ${verificacionHTML("a-ueln", uelnExistente)}
                 </div>
                 <div class="wizard-input-group">
                   <label class="wizard-label" for="a-die-equino">NÚMERO DIE</label>
-                  <input type="text" id="a-die-equino" value="${valorHtml(dieExistente?.numero)}" placeholder="NÚMERO DEL DOCUMENTO" class="wizard-input font-800">
+                  <input type="text" id="a-die-equino" oninput="AnimalesView._reiniciarVerificacionEquina('a-die-equino')" value="${valorHtml(dieExistente?.numero)}" placeholder="NÚMERO DEL DOCUMENTO" class="wizard-input font-800">
+                  ${verificacionHTML("a-die-equino", dieExistente)}
                 </div>
               </div>
               <div class="wizard-input-group mb-12">
@@ -579,16 +596,17 @@ const AnimalesView = {
                   <label class="wizard-label" for="a-transpondedor-equino">LECTURA BRUTA DEL TRANSPONDEDOR</label>
                   <button type="button" onclick="App._leerChipNFC('a-transpondedor-equino')" class="wizard-btn-action wizard-btn-secondary">LEER TAG NFC</button>
                 </div>
-                <input type="text" id="a-transpondedor-equino" value="${valorHtml(transpondedorExistente?.valor)}" placeholder="VALOR LEÍDO, SIN NORMALIZAR" class="wizard-input font-800">
+                <input type="text" id="a-transpondedor-equino" oninput="AnimalesView._reiniciarVerificacionEquina('a-transpondedor-equino')" value="${valorHtml(transpondedorExistente?.valor)}" placeholder="VALOR LEÍDO, SIN NORMALIZAR" class="wizard-input font-800">
               </div>
               <div class="wizard-input-group">
                 <label class="wizard-label" for="a-representacion-transpondedor-equino">REPRESENTACIÓN DE LA LECTURA</label>
-                <select id="a-representacion-transpondedor-equino" class="wizard-input font-800">
+                <select id="a-representacion-transpondedor-equino" onchange="AnimalesView._reiniciarVerificacionEquina('a-transpondedor-equino')" class="wizard-input font-800">
                   <option value="" ${!transpondedorExistente?.representacion ? 'selected' : ''}>PENDIENTE DE CLASIFICAR</option>
                   <option value="nacional" ${transpondedorExistente?.representacion === 'nacional' ? 'selected' : ''}>CÓDIGO NACIONAL</option>
                   <option value="iso_completa" ${transpondedorExistente?.representacion === 'iso_completa' ? 'selected' : ''}>CÓDIGO ISO COMPLETO</option>
                 </select>
               </div>
+              ${verificacionHTML("a-transpondedor-equino", transpondedorExistente)}
             </div>
             <div class="wizard-input-group mb-12">
               <label class="wizard-label" for="a-tipo-ident">TIPO DE IDENTIFICACIÓN</label>
@@ -1134,56 +1152,79 @@ const AnimalesView = {
       if (Object.hasOwn(existing, "documentos_identificacion")) conservados.documentos_identificacion = documentos;
       return conservados;
     }
-
     const archivarIdentificadores = (tipo) => {
-      identificadores = identificadores.map((item) =>
-        item.tipo === tipo && item.estado !== "historico" ? { ...item, estado: "historico" } : item,
-      );
+      identificadores = identificadores.map((item) => item.tipo === tipo && item.estado !== "historico" ? { ...item, estado: "historico" } : item);
     };
     const archivarDocumentos = (tipo) => {
-      documentos = documentos.map((documento) =>
-        documento.tipo === tipo && documento.estado !== "historico" ? { ...documento, estado: "historico" } : documento,
-      );
+      documentos = documentos.map((item) => item.tipo === tipo && item.estado !== "historico" ? { ...item, estado: "historico" } : item);
     };
-
+    const obtenerVerificacion = (prefijo, registro = {}) => {
+      const leerCampo = (sufijo, propiedad) => {
+        const control = document.getElementById(prefijo + sufijo);
+        if (!control) return String(registro[propiedad] || "");
+        const valor = String(control.value || "").trim();
+        return valor || (registro.estado === "vigente" ? String(registro[propiedad] || "") : "");
+      };
+      const estadoControl = document.getElementById(prefijo + "-estado");
+      const estado = estadoControl ? String(estadoControl.value || "pendiente") : (registro.estado || "pendiente");
+      const metadatos = {
+        verificadoPor: leerCampo("-verificado-por", "verificadoPor"),
+        fechaVerificacion: leerCampo("-fecha-verificacion", "fechaVerificacion"),
+        referenciaVerificacion: leerCampo("-referencia-verificacion", "referenciaVerificacion"),
+      };
+      if (estado === "vigente" && registro.estado !== "vigente" && Object.values(metadatos).some((valor) => !valor)) {
+        throw new Error("Para marcar el identificador como vigente, indica responsable, fecha y referencia de verificación.");
+      }
+      return { estado, ...Object.fromEntries(Object.entries(metadatos).filter(([, valor]) => valor)) };
+    };
     const ueln = String(document.getElementById("a-ueln")?.value || "").trim().toUpperCase();
-    const uelnActivo = identificadores.some((item) => item.tipo === "ueln" && item.estado !== "historico" && item.valor === ueln);
-    if (!ueln) {
-      archivarIdentificadores("ueln");
-    } else if (!uelnActivo) {
-      archivarIdentificadores("ueln");
-      identificadores.push({ tipo: "ueln", valor: ueln, principal: false, estado: "pendiente" });
+    const uelnIndex = identificadores.findIndex((item) => item.tipo === "ueln" && item.estado !== "historico" && item.valor === ueln);
+    if (!ueln) archivarIdentificadores("ueln");
+    else {
+      const verificacion = obtenerVerificacion("a-ueln", uelnIndex >= 0 ? identificadores[uelnIndex] : {});
+      if (uelnIndex >= 0) identificadores[uelnIndex] = { ...identificadores[uelnIndex], ...verificacion };
+      else {
+        archivarIdentificadores("ueln");
+        identificadores.push({ tipo: "ueln", valor: ueln, principal: false, ...verificacion });
+      }
     }
-
     const lectura = String(document.getElementById("a-transpondedor-equino")?.value || "").trim();
     const representacion = String(document.getElementById("a-representacion-transpondedor-equino")?.value || "");
-    const transpondedorActivo = identificadores.some((item) =>
-      item.tipo === "transpondedor_iso" && item.estado !== "historico" && item.valor === lectura &&
-      (representacion ? item.representacion === representacion : !item.representacion),
-    );
-    if (!lectura) {
-      archivarIdentificadores("transpondedor_iso");
-    } else if (!transpondedorActivo) {
-      if (!["nacional", "iso_completa"].includes(representacion)) {
-        throw new Error("Indica la representación del transpondedor equino.");
+    const transpondedorIndex = identificadores.findIndex((item) => item.tipo === "transpondedor_iso" && item.estado !== "historico" && item.valor === lectura && (representacion ? item.representacion === representacion : !item.representacion));
+    if (!lectura) archivarIdentificadores("transpondedor_iso");
+    else {
+      if (!representacion) throw new Error("Indica la representación del transpondedor equino.");
+      const verificacion = obtenerVerificacion("a-transpondedor-equino", transpondedorIndex >= 0 ? identificadores[transpondedorIndex] : {});
+      if (transpondedorIndex >= 0) identificadores[transpondedorIndex] = { ...identificadores[transpondedorIndex], ...verificacion };
+      else {
+        archivarIdentificadores("transpondedor_iso");
+        identificadores.push({ tipo: "transpondedor_iso", valor: lectura, representacion, principal: false, ...verificacion });
       }
-      archivarIdentificadores("transpondedor_iso");
-      identificadores.push({ tipo: "transpondedor_iso", valor: lectura, representacion, principal: false, estado: "pendiente" });
     }
-
     const numeroDie = String(document.getElementById("a-die-equino")?.value || "").trim().toUpperCase();
-    const dieActivo = documentos.some((documento) => documento.tipo === "DIE" && documento.estado !== "historico" && documento.numero === numeroDie);
-    if (!numeroDie) {
-      archivarDocumentos("DIE");
-    } else if (!dieActivo) {
-      archivarDocumentos("DIE");
-      documentos.push({ tipo: "DIE", numero: numeroDie, estado: "pendiente" });
+    const dieIndex = documentos.findIndex((item) => item.tipo === "DIE" && item.estado !== "historico" && item.numero === numeroDie);
+    if (!numeroDie) archivarDocumentos("DIE");
+    else {
+      const verificacion = obtenerVerificacion("a-die-equino", dieIndex >= 0 ? documentos[dieIndex] : {});
+      if (dieIndex >= 0) documentos[dieIndex] = { ...documentos[dieIndex], ...verificacion };
+      else {
+        archivarDocumentos("DIE");
+        documentos.push({ tipo: "DIE", numero: numeroDie, ...verificacion });
+      }
     }
-
     const estructurada = {};
     if (identificadores.length || Object.hasOwn(existing, "identificadores")) estructurada.identificadores = identificadores;
     if (documentos.length || Object.hasOwn(existing, "documentos_identificacion")) estructurada.documentos_identificacion = documentos;
     return estructurada;
+  },
+
+  _reiniciarVerificacionEquina(prefijo) {
+    const estado = document.getElementById(prefijo + "-estado");
+    if (estado) estado.value = "pendiente";
+    for (const sufijo of ["-verificado-por", "-fecha-verificacion", "-referencia-verificacion"]) {
+      const control = document.getElementById(prefijo + sufijo);
+      if (control) control.value = "";
+    }
   },
 
   _onTipoAltaChange(selectEl) {

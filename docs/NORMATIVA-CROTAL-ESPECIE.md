@@ -269,3 +269,14 @@ Hay **dos fabricantes/ecosistemas distintos** detrás de los ficheros `.rdf` de 
 3. La app **importaría ese fichero de intercambio SIGGAN** (formato ya 100% conocido y documentado aquí) en vez de intentar interpretar el export crudo del lector — evita depender de ingeniería inversa del CSV crudo de Rumisoft/UniTransfer.
 
 **Pendiente real (actualizado)**: no se ha descargado todavía ningún fichero de `https://www.livestock.datamars.es/descargas` (instaladores, manuales de Rumisoft, ni los conversores SIGGAN/XML) — se ha consultado solo el listado de la página. Si se quiere avanzar en la Opción A, el artefacto más valioso a por el que ir sería el **manual de Rumisoft** (documenta el conversor SIGGAN) y, si es descargable, una **muestra de fichero SIGGAN generado por el conversor oficial** para contrastar contra la especificación ya documentada del fichero de incorporación.
+
+
+## Revisión equina y flujo de edición — 2026-11-14
+
+La revisión de las fuentes oficiales confirma la matriz para équidos: el medio general es transpondedor inyectable aplicado por veterinario; el crotal electrónico de botón es una excepción limitada a destino de producción de carne, categorías de explotación expresamente enumeradas y traslado directo a matadero. En équidos nacidos en explotaciones silvestres o semisilvestres se añade el límite de traslado antes de los 12 meses. La identificación se aplica en explotación de nacimiento y antes de abandonarla. La sustitución o retirada de medios requiere autorización en los casos del artículo 15.
+
+El Reglamento (UE) 2021/963 trata separadamente código único/UELN, lectura del transpondedor, DIE y métodos alternativos autorizados. El método alternativo exige verificación antes de su registro en el documento permanente y la base de datos. La ficha actual permanece como captura documental auxiliar y no ofrece las excepciones ni declara conformidad regulatoria.
+
+Flujo de mantenimiento acordado: conservar estado y metadatos si el valor no cambia; archivar como histórico el valor activo sustituido o eliminado; crear valores nuevos como pendientes. La interfaz equina permite registrar estado pendiente, vigente o legado, y exige verificador, fecha y referencia documental para marcar el registro como vigente. Cambiar la lectura o representación del transpondedor reinicia la verificación y archiva el valor anterior. Este estado es evidencia local de revisión, no una autorización oficial. La evaluación de lectores físicos LF sigue pendiente.
+
+Fuentes primarias consultadas el 14-11-2026: [RD 787/2023 consolidado, arts. 8, 15 y 16](https://www.boe.es/buscar/act.php?id=BOE-A-2023-22499&p=20241224&tn=1) y [Reglamento de Ejecución (UE) 2021/963](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX%3A32021R0963).
