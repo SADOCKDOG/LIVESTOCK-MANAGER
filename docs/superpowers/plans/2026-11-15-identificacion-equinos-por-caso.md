@@ -31,7 +31,8 @@ Los datos de destino y traslado se guardan como contexto planificado, fuera de l
 8. [x] Ejecutar build Android, instalar la actualización debug y comprobar la ficha en tablet Samsung SM-X230, paquete `com.livestockmanager.app.manual`, versión 4.10.8 / versionCode 530.
 9. [x] Asociar el contexto con la guía coincidente por animal, caso y REGA de origen/destino; resolver el plan según la declaración de traslado ejecutado o la anulación de la guía.
 10. [x] Añadir pruebas de persistencia/rollback para alta y edición, fallo parcial, guías coincidentes/no coincidentes, estados declarados y edición de fichas equinas heredadas.
-11. [x] Repetir en tablet el paso de especie del asistente tras corregir el filtrado. Con équidos seleccionado, la pantalla muestra solo `ES210112345679`; al alternar a vacas el équido se desmarca y oculta. Se cerró el borrador sin registrar una guía.
+11. [x] Repetir en tablet el paso de especie del asistente tras corregir el filtrado. Con équidos seleccionado, la pantalla muestra solo `ES210112345679`; al alternar a vacas el équido se desmarca y oculta.
+12. [x] Recorrer visualmente los cuatro pasos de la guía con el équido temporal y los REGA del contexto coincidentes. Se revisó el paso 4 con traslado `PLANIFICADO` y trámite `BORRADOR`, y se salió sin guardar. El número de movimientos permaneció en 3.
 
 ## Evidencia visual
 
@@ -46,7 +47,7 @@ La evidencia confirma el comportamiento de interfaz en el APK instalado. No repr
 - Comprobaciones `node --check` de los módulos de vista, guardado, reglas equinas, DB y error handler.
 - Build web, sincronización Capacitor, compilación Gradle debug e instalación en la tablet completados durante esta integración.
 - Captura del formulario con transpondedor requerido: `17-chip-required.png`.
-- Captura del paso 4 mostrando `PLANIFICADO` y `BORRADOR`: `40-wizard-estado-traslado.png`.
+- Captura previa del estado del wizard: `40-wizard-estado-traslado.png`.
 - Captura del paso administrativo final de la guía equina: `48-wizard-guia-equino-paso-4.png`.
 - Captura de salida sin guardar y retorno al inicio: `42-tablet-sin-guardar.png`.
 - `git diff --check` sin errores.
@@ -55,7 +56,7 @@ La evidencia confirma el comportamiento de interfaz en el APK instalado. No repr
 
 - Mantener `www/` generado por build. Editar fuentes raíz y reconstruir.
 - No sincronizar a livestock-desktop ni publicar en tiendas desde esta fase.
-- La tablet no contiene un équido activo en el censo. El enlace contextual con una guía equina queda probado por unidad. El recorrido visual del wizard se hizo con una vaca de demo solo en borrador y sin guardar.
+- El recorrido visual verificó el flujo hasta el paso administrativo final con el équido temporal y canceló el borrador. La persistencia del enlace de una guía efectivamente guardada queda cubierta por pruebas unitarias, ya que no se generó un movimiento administrativo de prueba.
 - No se validó un transporte equino real, la documentación oficial ni la ejecución física del traslado.
 
 ## Fuentes oficiales
