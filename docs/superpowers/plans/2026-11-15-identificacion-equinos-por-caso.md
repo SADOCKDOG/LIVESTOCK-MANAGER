@@ -1,8 +1,9 @@
 # Identificación equina por caso y excepción de crotal electrónico
 
 Fecha: 2026-11-15
+Actualizado: 2026-11-16
 Repositorio: SADOCKDOG/LIVESTOCK-MANAGER (Maestro Android)
-Estado: integración implementada y verificada visualmente en Maestro Android. Alta equina y persistencia del contexto confirmadas en tablet. El filtro dinámico de especie quedó corregido, reconstruido, reinstalado y comprobado visualmente.
+Estado: integración implementada y verificada visualmente en Maestro Android. Alta equina, persistencia del contexto y enlace con una guía guardada como borrador confirmados en tablet. El filtro dinámico de especie quedó corregido, reconstruido, reinstalado y comprobado visualmente.
 
 ## Objetivo
 
@@ -32,11 +33,11 @@ Los datos de destino y traslado se guardan como contexto planificado, fuera de l
 9. [x] Asociar el contexto con la guía coincidente por animal, caso y REGA de origen/destino; resolver el plan según la declaración de traslado ejecutado o la anulación de la guía.
 10. [x] Añadir pruebas de persistencia/rollback para alta y edición, fallo parcial, guías coincidentes/no coincidentes, estados declarados y edición de fichas equinas heredadas.
 11. [x] Repetir en tablet el paso de especie del asistente tras corregir el filtrado. Con équidos seleccionado, la pantalla muestra solo `ES210112345679`; al alternar a vacas el équido se desmarca y oculta.
-12. [x] Recorrer visualmente los cuatro pasos de la guía con el équido temporal y los REGA del contexto coincidentes. Se revisó el paso 4 con traslado `PLANIFICADO` y trámite `BORRADOR`, y se salió sin guardar. El número de movimientos permaneció en 3.
+12. [x] Recorrer y guardar visualmente una guía equina desde el asistente con el équido temporal y los REGA coincidentes. Se verificó el paso 4 en `PLANIFICADO` / `BORRADOR`, la ficha documental `G-62287048` y el enlace persistido `contextos_identificacion.guiaMovimientoId = 9903`. El trámite permanece en borrador y no se presentó.
 
 ## Evidencia visual
 
-Capturas reales de la tablet guardadas en `PRIVATE/evidencias/2026-11-15-caso-equino-boton/`. En la ficha se comprobó el selector de tipos, el caso de botón, el formato `ES21 + CCAA + 8 dígitos`, la etiqueta `14/14`, las declaraciones y el chip ISO 11784 obligatorio. Se guardó el animal equino temporal `ES210112345679` en la finca de demo y se confirmó su contexto separado en IndexedDB. En la guía se comprobó que el registro aparece como selección disponible, que solo se ve con équidos seleccionado y que al cambiar a vacas desaparece y se desmarca. El borrador se cerró con “Salir sin guardar”.
+Capturas reales de la tablet guardadas en `PRIVATE/evidencias/2026-11-15-caso-equino-boton/`. En la ficha se comprobó el selector de tipos, el caso de botón, el formato `ES21 + CCAA + 8 dígitos`, la etiqueta `14/14`, las declaraciones y el chip ISO 11784 obligatorio. Se guardó el animal temporal `ES210112345679` y su contexto separado en IndexedDB. El asistente muestra el animal solo con équidos seleccionado, y lo desmarca y oculta al cambiar a vacas. La guía guardada `G-62287048` aparece en Documentos como borrador. El movimiento `9903` enlaza con el contexto `1` mediante `guiaMovimientoId`, que conserva estado `planificado`. El borrador tiene la nota de prueba local y no se presentó. Capturas clave: `49-guia-equino-borrador-sin-certificado.png`, `52-guia-equino-visible-listado.png` y `53-guia-equino-borrador-sin-desinsectacion.png`.
 
 La evidencia confirma el comportamiento de interfaz en el APK instalado. No representa una autorización oficial ni verifica que el animal real reúna las condiciones declaradas.
 
@@ -56,7 +57,8 @@ La evidencia confirma el comportamiento de interfaz en el APK instalado. No repr
 
 - Mantener `www/` generado por build. Editar fuentes raíz y reconstruir.
 - No sincronizar a livestock-desktop ni publicar en tiendas desde esta fase.
-- El recorrido visual verificó el flujo hasta el paso administrativo final con el équido temporal y canceló el borrador. La persistencia del enlace de una guía efectivamente guardada queda cubierta por pruebas unitarias, ya que no se generó un movimiento administrativo de prueba.
+- La persistencia del enlace se comprobó visualmente tras guardar desde el asistente y se corroboró en IndexedDB. La ficha de documentos conserva la guía como borrador.
+- En la finca configurada en Andalucía, el asistente impidió avanzar mientras la casilla de desinsectación estuviese desmarcada incluso con trámite en borrador. Para completar la prueba visual se activó temporalmente y, tras validar el enlace, se restableció a `false` en el registro local y se dejó nota explícita de que no hay certificado. Revisar este requisito del asistente en una tarea separada antes de usarlo para borradores reales.
 - No se validó un transporte equino real, la documentación oficial ni la ejecución física del traslado.
 
 ## Fuentes oficiales
