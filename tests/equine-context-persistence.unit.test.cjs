@@ -21,8 +21,15 @@ function createDB(seed = {}) {
   };
 }
 
-function loadMovimientos(db) {
+function loadMovimientos(db, configuracion = null) {
   const window = { db, EventBus: { emit() {} } };
+  if (configuracion) {
+    window.ComunidadesService = {
+      normalizarREGA: (value) => value,
+      validarFormatoREGA: () => ({ valido: true }),
+      getConfiguracionCCAA: () => configuracion,
+    };
+  }
   const ErrorHandler = { async tryAsync(operation) { return operation(); } };
   vm.runInNewContext(movimientosSource, { window, ErrorHandler, console, Date, Number, String, Array });
   window.Movimientos._registrarEventos = async () => {};
@@ -38,6 +45,26 @@ const guia = (overrides = {}) => ({
   tipo: 'salida', motivo: 'matadero', fincaId: 1, animalId: [9], num_animales: 1,
   rega_origen: 'ES010000000001', rega_destino: 'ES010000000002', crotales: ['EQ-9'],
   fecha: '2026-11-15', estado_tramite: 'borrador', ...overrides,
+});
+
+test('un borrador planificado en comunidad que exige desinsectación se guarda sin certificarla', async () => {
+  const db = createDB({ contextos_identificacion: [contexto()] });
+  const movimientos = loadMovimientos(db, { requiere_desinsectacion_movimiento: true });
+  const id = await movimientos.save(guia({ comunidad_autonoma: 'Andalucía' }));
+  assert.ok(id);
+  assert.equal((await db.get('movimientos_ganado', id)).desinsectacion_certificada, false);
+});
+
+test('una guía planificada presentada mantiene el requisito de certificado', async () => {
+  const db = createDB();
+  const movimientos = loadMovimientos(db, { requiere_desinsectacion_movimiento: true });
+  await assert.rejects(movimientos.save(guia({ comunidad_autonoma: 'Andalucía', estado_tramite: 'presentado', fecha_presentacion: '2026-11-17' })), /certificar la desinsectación/);
+});
+
+test('una guía declarada como ejecutada exige certificado en la comunidad configurada', async () => {
+  const db = createDB();
+  const movimientos = loadMovimientos(db, { requiere_desinsectacion_movimiento: true });
+  await assert.rejects(movimientos.save(guia({ comunidad_autonoma: 'Andalucía', estado_traslado: 'ejecutado' })), /certificar la desinsectación/);
 });
 
 test('la guía coincidente enlaza el plan equino y mantiene el estado planificado', async () => {

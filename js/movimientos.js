@@ -65,11 +65,7 @@ const Movimientos = {
         }
       }
 
-      // Requisito de desinsectación según comunidad
       const conf = CS && ccaa ? CS.getConfiguracionCCAA(ccaa) : null;
-      if (conf && conf.requiere_desinsectacion_movimiento && !data.desinsectacion_certificada) {
-        throw new Error('Esta comunidad exige certificar la desinsectación previa al movimiento.');
-      }
 
       let animalIds = Array.isArray(data.animalId)
         ? data.animalId.map(Number).filter(n => !Number.isNaN(n))
@@ -109,6 +105,10 @@ const Movimientos = {
       const fechaPresentacion = (data.fecha_presentacion || '').toString().trim();
       const numeroRegistroOficial = (data.numero_registro_oficial || '').toString().trim();
       const acuseRecibo = (data.acuse_recibo || '').toString().trim();
+      const esBorradorPlanificado = estadoTraslado === 'planificado' && estadoTramite === 'borrador';
+      if (conf && conf.requiere_desinsectacion_movimiento && !esBorradorPlanificado && !data.desinsectacion_certificada) {
+        throw new Error('Esta comunidad exige certificar la desinsectación para presentar la guía o declarar ejecutado el movimiento.');
+      }
       if (estadoTramite !== 'borrador' && !fechaPresentacion) {
         throw new Error('La fecha de presentación es obligatoria cuando el trámite no está en borrador.');
       }

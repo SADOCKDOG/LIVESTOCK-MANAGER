@@ -296,7 +296,7 @@ window.WizardGuiaMovimiento = {
             </div>` : ''}
             ${conf && conf.requiere_desinsectacion_movimiento ? `
             <div class="p-10 bg-red-900 border border-red-500 rounded-sm mb-12">
-              <div class="text-[0.55rem] text-white uppercase font-950 tracking-widest">${Icons.alerta()} ${conf.label} EXIGE CERTIFICADO DE DESINSECTACIÓN</div>
+              <div class="text-[0.55rem] text-white uppercase font-950 tracking-widest">${Icons.alerta()} ${conf.label}: CERTIFICADO REQUERIDO PARA PRESENTAR LA GUÍA O DECLARAR EL TRASLADO EJECUTADO</div>
             </div>` : ''}
             <div class="wizard-input-group">
               <label class="wizard-label">OBSERVACIONES</label>
@@ -315,10 +315,6 @@ window.WizardGuiaMovimiento = {
           data.notas = document.getElementById('w-mv-notas')?.value.trim() || '';
         },
         validate: async (data) => {
-          if (conf && conf.requiere_desinsectacion_movimiento && !data.desinsectacion_certificada) {
-            App.toastError("Debes certificar la desinsectación para esta comunidad");
-            return false;
-          }
           if (conf && conf.requiere_nif_veterinario_cebadero && data.tipo_operador_destino === 'cebadero' && !data.vet_nif) {
             App.toastError("Debes proporcionar el NIF del veterinario autorizante para operaciones con cebadero en esta comunidad");
             return false;
@@ -387,6 +383,11 @@ window.WizardGuiaMovimiento = {
           data.acuse_recibo = document.getElementById('w-mv-acuse')?.value.trim() || '';
         },
         validate: async (data) => {
+          const esBorradorPlanificado = data.estado_traslado === 'planificado' && data.estado_tramite === 'borrador';
+          if (conf && conf.requiere_desinsectacion_movimiento && !esBorradorPlanificado && !data.desinsectacion_certificada) {
+            App.toastError("Debes certificar la desinsectación para presentar la guía o declarar ejecutado el traslado.");
+            return false;
+          }
           if (data.estado_tramite !== 'borrador' && !data.fecha_presentacion) {
             App.toastError("La fecha de presentación es obligatoria.");
             return false;

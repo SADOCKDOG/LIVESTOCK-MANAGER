@@ -58,7 +58,7 @@ La evidencia confirma el comportamiento de interfaz en el APK instalado. No repr
 - Mantener `www/` generado por build. Editar fuentes raíz y reconstruir.
 - No sincronizar a livestock-desktop ni publicar en tiendas desde esta fase.
 - La persistencia del enlace se comprobó visualmente tras guardar desde el asistente y se corroboró en IndexedDB. La ficha de documentos conserva la guía como borrador.
-- En la finca configurada en Andalucía, el asistente impidió avanzar mientras la casilla de desinsectación estuviese desmarcada incluso con trámite en borrador. Para completar la prueba visual se activó temporalmente y, tras validar el enlace, se restableció a `false` en el registro local y se dejó nota explícita de que no hay certificado. Revisar este requisito del asistente en una tarea separada antes de usarlo para borradores reales.
+- La prueba visual inicial detectó que la finca configurada en Andalucía no permitía guardar una guía planificada como borrador sin certificar la desinsectación. Se corrigió la validación del asistente y de Movimientos.save(): solo esa combinación queda exenta. Las guías presentadas y los traslados declarados como ejecutados conservan el requisito. Las pruebas de regresión en tests/equine-context-persistence.unit.test.cjs pasan y la prueba visual en la tablet SM-X230, con el APK reconstruido, avanzó hasta el paso 4 y guardó la guía sin certificado. Evidencia local en PRIVATE/evidencias/2026-11-17-guia-borrador-desinsectacion/, incluida la pantalla de aviso y el documento guardado.
 - No se validó un transporte equino real, la documentación oficial ni la ejecución física del traslado.
 
 ## Fuentes oficiales
