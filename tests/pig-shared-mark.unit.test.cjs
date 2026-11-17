@@ -30,7 +30,7 @@ function evaluateFunction(source, signature, context) {
 test('la migración v29 convierte el índice caravana en no único sin tocar los registros', () => {
   const helper = dbSource.match(/function migrarIndiceCaravanaCompartida\(database, transaction\)\s*\{[\s\S]*?\n\}/);
   assert.ok(helper, 'db.js debe declarar la migración del índice caravana');
-  assert.match(dbSource, /const DB_VERSION = 29;/);
+  assert.match(dbSource, /const DB_VERSION = 31;/);
 
   const operations = [];
   const indexNames = {
@@ -82,4 +82,32 @@ test('al editar se revalida unicidad si el animal deja de usar la marca comparti
   assert.equal(context.debeComprobarUnicidadIdentificador(
     { especieId: 1, tipoIdentificadorId: 16 }, false, null, 'ES219999999999'
   ), true);
+});
+
+
+test('la migración v30 crea el almacén contextual equino con índices trazables', () => {
+  const helper = dbSource.match(/function crearStoreContextosIdentificacion\(database\)\s*\{[\s\S]*?\n\}/);
+  assert.ok(helper, 'db.js debe declarar la creación del almacén contextual');
+
+  const operations = [];
+  const database = {
+    objectStoreNames: { contains: () => false },
+    createObjectStore: (name, options) => {
+      operations.push(['createObjectStore', name, options]);
+      return { createIndex: (...args) => operations.push(['createIndex', ...args]) };
+    },
+  };
+  const context = {};
+  evaluateFunction(dbSource, 'function crearStoreContextosIdentificacion(database)', context);
+  context.crearStoreContextosIdentificacion(database);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(operations)), [
+    ['createObjectStore', 'contextos_identificacion', { keyPath: 'id', autoIncrement: true }],
+    ['createIndex', 'animalId', 'animalId'],
+    ['createIndex', 'fincaId', 'fincaId'],
+    ['createIndex', 'tipo', 'tipo'],
+    ['createIndex', 'estado', 'estado'],
+  ]);
+  assert.match(dbSource, /contextos_identificacion/);
+  assert.match(dbSource, /const DB_VERSION = 31;/);
 });

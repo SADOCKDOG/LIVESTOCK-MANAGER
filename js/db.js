@@ -1,6 +1,6 @@
 console.log("[DB] Cargando script db.js");
 const DB_NAME = 'LivestockDB';
-const DB_VERSION = 29;
+const DB_VERSION = 31;
 
 // Datos maestros oficiales de Especie / Tipo de Identificador — ver
 // docs/NORMATIVA-CROTAL-ESPECIE.md para la fuente normativa de cada valor.
@@ -246,6 +246,7 @@ const ESPECIE_TIPO_IDENTIFICADOR_SEED = [
     { especieId: 4, tipoIdentificadorId: 4, formato: 'ovino_caprino_eid' },
     { especieId: 5, tipoIdentificadorId: 3, formato: 'equino_microchip' },
     { especieId: 5, tipoIdentificadorId: 14, formato: null },
+    { especieId: 5, tipoIdentificadorId: 4, casos: [{ id: 'crotal_boton_carne_directo', nombre: 'Crotal electrónico de botón para traslado directo a matadero', formato: 'equino_visual', ayuda: 'Código visual según fecha de nacimiento. El uso de este caso depende de la declaración de destino, origen REGA y traslado directo.', placeholder: 'ES21 + CCAA + 8 dígitos', maxLength: 14, contador: 14 }] },
 ];
 
 // Catálogo de tipos de instalación/edificación ganadera — subconjunto
@@ -308,7 +309,7 @@ class InMemoryMockDB {
                 'pedidos_crotales', 'movimientos_ganado', 'saneamientos', 'adsgs',
                 'config_costes_referencia', 'config_silos', 'especies', 'tipos_identificador',
                 'especie_tipo_identificador', 'razas', 'vacunaciones', 'instalaciones_tipo',
-                'config_botiquin', 'agenda_tareas', 'croquis_parcelas'
+                'config_botiquin', 'agenda_tareas', 'croquis_parcelas', 'contextos_identificacion'
             ],
             contains(name) { return this.names.includes(name); }
         };
@@ -492,6 +493,16 @@ class InMemoryMockDB {
         }
         return tx;
     }
+}
+
+function crearStoreContextosIdentificacion(database) {
+    if (database.objectStoreNames.contains('contextos_identificacion')) return;
+
+    const store = database.createObjectStore('contextos_identificacion', { keyPath: 'id', autoIncrement: true });
+    store.createIndex('animalId', 'animalId');
+    store.createIndex('fincaId', 'fincaId');
+    store.createIndex('tipo', 'tipo');
+    store.createIndex('estado', 'estado');
 }
 
 async function initDB() {
@@ -1060,6 +1071,10 @@ async function initDB() {
             if (oldVersion < 29) {
                 migrarIndiceCaravanaCompartida(db, transaction);
             }
+            // v30: contexto temporal y trazable de elegibilidad de identificación equina.
+            if (oldVersion < 30) {
+                crearStoreContextosIdentificacion(db);
+            }
         },
     });
     } catch (e) {
@@ -1430,7 +1445,30 @@ function migrarIndiceCaravanaCompartida(database, transaction) {
     store.createIndex('caravana', 'numero_identificacion', { unique: false });
 }
 
+async function migrarAsociacionCrotalEquino(database) {
+    const existentes = await database.getAllFromIndex('especie_tipo_identificador', 'especieId', 5);
+    if ((existentes || []).some((item) => Number(item.tipoIdentificadorId) === 4)) return;
+    await database.add('especie_tipo_identificador', {
+        especieId: 5,
+        tipoIdentificadorId: 4,
+        casos: [{
+            id: 'crotal_boton_carne_directo',
+            nombre: 'Crotal electrónico de botón para traslado directo a matadero',
+            formato: 'equino_visual',
+            ayuda: 'Código visual según fecha de nacimiento. Este caso requiere destino de carne, origen admisible y traslado directo.',
+            placeholder: 'ES21 + CCAA + 8 dígitos',
+            maxLength: 14,
+            contador: 14,
+        }],
+    });
+}
+
 async function ejecutarMigracionesIdentificacion(database) {
+    try {
+        await migrarAsociacionCrotalEquino(database);
+    } catch (e) {
+        console.warn('[DB] No se pudo incorporar el caso equino de crotal de botón:', e);
+    }
     try {
         const metaEquinoMicrochip = await database.get('meta', 'migracion_equino_microchip');
         if (!metaEquinoMicrochip) await migrarEquinoMicrochip(database);

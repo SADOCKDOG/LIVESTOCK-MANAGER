@@ -376,6 +376,14 @@ const ErrorHandler = {
     // Compatibilidad con el campo equino legado de 15 cifras. No equivale por
     // sí solo al UELN ni al código ISO 11784 completo del transpondedor; el
     // modelo debe separar esos datos antes de activar reglas normativas nuevas.
+    equino_visual: {
+      regex: /^ES(?:21(?:0[1-9]|1[0-9])\d{8}|(?:0[1-9]|1[0-9])\d{10})$/,
+      descripcion: "Código visual equino: régimen dependiente de fecha de nacimiento",
+      ayuda: "Se valida según el régimen visual equino aplicable a la fecha de nacimiento.",
+      placeholder: "ES21 + CCAA + 8 dígitos",
+      maxLength: 14,
+      contador: 14,
+    },
     equino_microchip: {
       regex: /^\d{15}$/,
       descripcion: "15 cifras en el formato local actual; no equivale al UELN ni al código completo del transpondedor ISO 11784",
@@ -503,6 +511,20 @@ const ErrorHandler = {
     const formato = reglaResuelta.formatoKey
       ? this.CROTAL_FORMATOS[reglaResuelta.formatoKey]
       : null;
+    if (reglaResuelta.formatoKey === "equino_visual") {
+      const resultado = window.EquineIdentificationRules?.validarFormatoCrotalVisualEquino(
+        numero_identificacion,
+        contexto.fecha_nacimiento
+      );
+      if (!resultado?.valido) {
+        throw new this.AppError(
+          resultado?.motivo || "No se pudo resolver el código visual equino aplicable.",
+          this.ERROR_TYPES.VALIDATION,
+          { field: "numero_identificacion", format: resultado?.motivo || "código visual equino según fecha de nacimiento", value: numero_identificacion }
+        );
+      }
+      return String(numero_identificacion).trim().toUpperCase();
+    }
     if (!formato) {
       // Asociación válida pero sin regex estricta definida (ej. DIE equino):
       // solo se exige que no esté vacío, ya comprobado arriba.
