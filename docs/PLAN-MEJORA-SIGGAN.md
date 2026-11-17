@@ -155,7 +155,7 @@ Detalle completo de los 12 estados en [ADSG-WEB-SIGGAN-FLUJOS-ESTRUCTURA.md](ADS
 - **Vigilancia de salmonela** (`TUTORIAL_MUESTRAS_SALMONELLA.pdf`) — es un programa específicamente **avícola** (Reglamento CE 2160/2003), y la app no modela la especie "Aves" hoy. Retomar solo si se amplía el alcance a avícola.
 - **Catálogo `Enfermedades.csv` del FEGA** (603 filas) — es **fitosanitario** (hongos/plagas de plantas), no ganadero pese al nombre engañoso. El catálogo ganadero real de saneamiento ya existe en `js/services/comunidades-service.js:150-158` (`CAMPANAS_SANEAMIENTO`).
 - **PIGGAN como integración separada** — corrección de premisa importante: PIGGAN no es un sistema porcino aparte, es el portal general "Punto de Información y Gestión para el Ganadero Andaluz" (todas las especies), hermano de ADSG WEB y GTA bajo el mismo SIGGANnet. No requiere tratamiento diferenciado en el modelo de datos.
-- **Crotal porcino** — confirmado correcto con doble fuente (manual ADSG + BOE RD 479/2004 texto íntegro), sin cambios necesarios más allá de la posible fila de "tatuaje" como alternativa de marca (menor, ver tabla del punto 1 de `NORMATIVA-CROTAL-ESPECIE.md`).
+- **Identificación porcina (corrección 2026-11-12)** — se rectifica la conclusión histórica de esta auditoría. El formato con siglas provinciales se basaba en el RD 205/1996, derogado por el RD 787/2023. La identificación ordinaria actual usa el código REGA de la explotación de nacimiento (`ES` + 2 provincia + 3 municipio + 7 explotación); la autoridad puede exigir además identificación individual de reproductores por motivos sanitarios. Ver detalle y fuentes en `NORMATIVA-CROTAL-ESPECIE.md`.
 
 ---
 
