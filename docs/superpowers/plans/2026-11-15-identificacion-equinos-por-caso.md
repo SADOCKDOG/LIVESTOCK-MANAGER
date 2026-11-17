@@ -34,6 +34,7 @@ Los datos de destino y traslado se guardan como contexto planificado, fuera de l
 10. [x] Añadir pruebas de persistencia/rollback para alta y edición, fallo parcial, guías coincidentes/no coincidentes, estados declarados y edición de fichas equinas heredadas.
 11. [x] Repetir en tablet el paso de especie del asistente tras corregir el filtrado. Con équidos seleccionado, la pantalla muestra solo `ES210112345679`; al alternar a vacas el équido se desmarca y oculta.
 12. [x] Recorrer y guardar visualmente una guía equina desde el asistente con el équido temporal y los REGA coincidentes. Se verificó el paso 4 en `PLANIFICADO` / `BORRADOR`, la ficha documental `G-62287048` y el enlace persistido `contextos_identificacion.guiaMovimientoId = 9903`. El trámite permanece en borrador y no se presentó.
+13. [x] Cerrar los hallazgos de la revisión final: exigir transpondedor ISO 11784 válido en el guardado del caso de botón, cancelar el contexto planificado si cambia el tipo de identificación y ejecutar la persistencia contextual antes de generar efectos secundarios reversibles.
 
 ## Evidencia visual
 
@@ -52,6 +53,9 @@ La evidencia confirma el comportamiento de interfaz en el APK instalado. No repr
 - Captura del paso administrativo final de la guía equina: `48-wizard-guia-equino-paso-4.png`.
 - Captura de salida sin guardar y retorno al inicio: `42-tablet-sin-guardar.png`.
 - `git diff --check` sin errores.
+- Revisión independiente del diff contra `origin/master`: tres hallazgos corregidos con pruebas de regresión, sin diferidos. Suite completa `node --test tests/*.unit.test.cjs`: 92/92 aprobadas.
+- Build web, `npx cap sync android` y `gradlew assembleDebug` completados. APK debug 4.10.8 / versionCode 530 instalado sobre la instalación existente de Samsung SM-X230.
+- Prueba visual real: el formulario muestra condiciones declaradas completas, bloquea Guardar sin transpondedor ISO 11784 válido y conserva 17 animales antes y después. Captura local en `PRIVATE/evidencias/2026-11-17-equino-transpondedor-obligatorio/bloqueo-sin-transpondedor.png`. El formulario se cerró sin guardar.
 
 ## Límites y siguientes pasos
 

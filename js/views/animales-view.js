@@ -926,15 +926,18 @@ const AnimalesView = {
         data.motivo_baja = "";
       }
 
-      if (Number(data.especieId) === 5 && Number(data.tipoIdentificadorId) === 4) {
+      const usaCasoBotonEquino = Number(data.especieId) === 5 && Number(data.tipoIdentificadorId) === 4;
+      if (usaCasoBotonEquino) {
         const validacionCaso = window.EquineIdentificationRules.evaluarElegibilidadCrotalBoton(this._leerContextoCrotalEquino(data));
         if (!validacionCaso.elegible) return App.toastError(validacionCaso.condicionesPendientes.join(' '));
+        const errorTranspondedor = this._validarTranspondedorCasoEquino(data);
+        if (errorTranspondedor) return App.toastError(errorTranspondedor);
       }
 
-      const guardarContextoEquino = Number(data.especieId) === 5 && Number(data.tipoIdentificadorId) === 4
+      const afterPersist = usaCasoBotonEquino
         ? (animalId, _animalData, registrarCompensacion) => this._guardarContextoCrotalEquino(animalId, data, registrarCompensacion)
-        : null;
-      const nuevoId = await Animales.save(data, guardarContextoEquino ? { afterPersist: guardarContextoEquino } : {});
+        : (id ? (animalId, _animalData, registrarCompensacion) => this._invalidarContextoCrotalEquino(animalId, registrarCompensacion) : null);
+      const nuevoId = await Animales.save(data, afterPersist ? { afterPersist } : {});
       this._animalGuardado = true;
       App.toast("Animal guardado correctamente", "success");
 
@@ -1188,6 +1191,27 @@ const AnimalesView = {
       estado.textContent = resultado?.elegible
         ? 'Condiciones declaradas completas. Confirma los códigos antes de guardar.'
         : (resultado?.condicionesPendientes || ['No se pudo evaluar el caso.']).join(' ');
+    }
+  },
+
+  _validarTranspondedorCasoEquino(data = {}) {
+    if (Number(data.especieId) !== 5 || Number(data.tipoIdentificadorId) !== 4) return null;
+    const rules = window.EquineIdentificationRules;
+    if (rules?.validarTranspondedorEquino?.(data.rfid_codigo)) return null;
+    return 'El caso equino de crotal electrónico de botón requiere un transpondedor ISO 11784 válido de 23 dígitos.';
+  },
+
+  async _invalidarContextoCrotalEquino(animalId, registrarCompensacion) {
+    const existentes = await window.db.getAllFromIndex('contextos_identificacion', 'animalId', Number(animalId));
+    const planes = (existentes || []).filter((item) => item.tipo === 'equino_crotal_boton' && item.estado === 'planificado');
+    for (const previo of planes) {
+      registrarCompensacion(() => window.db.put('contextos_identificacion', previo));
+      await window.db.put('contextos_identificacion', {
+        ...previo,
+        estado: 'cancelado',
+        motivoCancelacion: 'Cambio del tipo de identificación del animal.',
+        actualizadoEn: new Date().toISOString(),
+      });
     }
   },
 

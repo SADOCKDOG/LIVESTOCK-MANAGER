@@ -152,3 +152,45 @@ test('cancelar explícitamente la guía cancela el plan enlazado', async () => {
   await loadMovimientos(db).save(guia({ estado_traslado: 'cancelado' }));
   assert.equal((await db.get('contextos_identificacion', 3)).estado, 'cancelado');
 });
+
+test('al cambiar el caso equino a otra identificación se cancela el contexto planificado', async () => {
+  const animal = { id: 9, numero_identificacion: 'EQ-9', especieId: 5, tipoIdentificadorId: 4, especie: 'Équidos', estado: 'activo' };
+  const initialContext = contexto({ guiaMovimientoId: 77 });
+  const db = createDB({ animales: [animal], contextos_identificacion: [initialContext] });
+  const window = { db };
+  const document = { getElementById() { return null; } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'js', 'views', 'animales-view.js'), 'utf8'), { window, document, console, Date, Number, String, Object });
+  const view = window.AnimalesView;
+  const compensaciones = [];
+
+  await view._invalidarContextoCrotalEquino(9, (_fn) => compensaciones.push(_fn));
+
+  const saved = await db.get('contextos_identificacion', 3);
+  assert.equal(saved.estado, 'cancelado');
+  assert.equal(saved.guiaMovimientoId, 77);
+  assert.match(saved.motivoCancelacion, /identificación/i);
+  await compensaciones[0]();
+  assert.equal((await db.get('contextos_identificacion', 3)).estado, 'planificado');
+});
+
+test('un alta revertida por fallo contextual no deja pesaje ni eventos del censo', async () => {
+  const db = createDB();
+  const eventos = [];
+  const pesajes = [];
+  const window = { db, EventBus: { emit: (...args) => eventos.push(args) } };
+  const ErrorHandler = { async tryAsync(operation) { return operation(); }, async validateCrotal() {} };
+  const Pesajes = { async registrar(entry) { pesajes.push(entry); } };
+  vm.runInNewContext(animalesSource, { window, ErrorHandler, Pesajes, console, Date, Number, String, Set, Array, Object });
+  window.Animales._registrarEventoCenso = async (_edit, animal) => {
+    await db.add('registro_eventos', { entidad_id: animal.id, tipo: 'alta' });
+  };
+
+  await assert.rejects(window.Animales.save({ numero_identificacion: 'EQ-20', peso_inicial: 300 }, {
+    afterPersist: async () => { throw new Error('fallo al guardar contexto'); },
+  }), /fallo al guardar contexto/);
+
+  assert.equal((await db.getAll('animales')).length, 0);
+  assert.equal(pesajes.length, 0);
+  assert.equal((await db.getAll('registro_eventos')).length, 0);
+  assert.equal(eventos.length, 0);
+});

@@ -8,7 +8,7 @@ const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'views', 'animal
 
 function createView(values = {}) {
   const elements = Object.fromEntries(Object.entries(values).map(([id, value]) => [id, { value }]));
-  const window = { __testElements: elements };
+  const window = { __testElements: elements, EquineIdentificationRules: require('../js/equine-identification-rules.js') };
   const document = { getElementById: (id) => elements[id] || null };
   vm.runInNewContext(source, { window, document, console, Date });
   return { view: window.AnimalesView, elements };
@@ -232,4 +232,13 @@ test("editar un dato equino reinicia el estado y la evidencia local", () => {
   assert.equal(elements["a-ueln-verificado-por"].value, "");
   assert.equal(elements["a-ueln-fecha-verificacion"].value, "");
   assert.equal(elements["a-ueln-referencia-verificacion"].value, "");
+});
+
+test('el guardado del caso equino de botón exige un transpondedor ISO válido', () => {
+  const { view } = createView({ association: { especieId: 5, tipoIdentificadorId: 4, formato: 'equino_visual' }, selectedCase: 'crotal_boton_carne_directo' });
+
+  assert.match(view._validarTranspondedorCasoEquino({ especieId: 5, tipoIdentificadorId: 4, rfid_codigo: '' }), /transpondedor ISO 11784 válido de 23 dígitos/i);
+  assert.match(view._validarTranspondedorCasoEquino({ especieId: 5, tipoIdentificadorId: 4, rfid_codigo: '123' }), /transpondedor ISO 11784 válido de 23 dígitos/i);
+  assert.equal(view._validarTranspondedorCasoEquino({ especieId: 5, tipoIdentificadorId: 4, rfid_codigo: '10010000724210112345678' }), null);
+  assert.equal(view._validarTranspondedorCasoEquino({ especieId: 5, tipoIdentificadorId: 3, rfid_codigo: '' }), null);
 });

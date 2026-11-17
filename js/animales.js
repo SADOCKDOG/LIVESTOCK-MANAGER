@@ -295,6 +295,31 @@ const Animales = {
         }
         animalData.id = animalId;
 
+        if (typeof options.afterPersist === 'function') {
+          const compensaciones = [];
+          const registrarCompensacion = (compensar) => {
+            if (typeof compensar !== 'function') throw new TypeError('La compensación debe ser una función');
+            compensaciones.push(compensar);
+          };
+          try {
+            await options.afterPersist(animalId, animalData, registrarCompensacion);
+          } catch (error) {
+            for (const compensar of compensaciones.reverse()) {
+              try {
+                await compensar();
+              } catch (errorCompensacion) {
+                console.error('[Animales] Falló una compensación de persistencia', errorCompensacion);
+              }
+            }
+            if (esEdicion) {
+              await window.db.put('animales', actual);
+            } else {
+              await window.db.delete('animales', animalId);
+            }
+            throw error;
+          }
+        }
+
         // 2. Registrar Peso Inicial si se proporciona
         if (data.peso_inicial && Number(data.peso_inicial) > 0) {
           await Pesajes.registrar({
@@ -328,30 +353,7 @@ const Animales = {
         // 4. Libro de registro SIGGAN: eventos de alta y baja (trazabilidad)
         await this._registrarEventoCenso(esEdicion, animalData, animalAnterior);
 
-        if (typeof options.afterPersist === 'function') {
-          const compensaciones = [];
-          const registrarCompensacion = (compensar) => {
-            if (typeof compensar !== 'function') throw new TypeError('La compensación debe ser una función');
-            compensaciones.push(compensar);
-          };
-          try {
-            await options.afterPersist(animalId, animalData, registrarCompensacion);
-          } catch (error) {
-            for (const compensar of compensaciones.reverse()) {
-              try {
-                await compensar();
-              } catch (errorCompensacion) {
-                console.error('[Animales] Falló una compensación de persistencia', errorCompensacion);
-              }
-            }
-            if (esEdicion) {
-              await window.db.put('animales', actual);
-            } else {
-              await window.db.delete('animales', animalId);
-            }
-            throw error;
-          }
-        }
+
 
         return animalId;
       },
