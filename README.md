@@ -3,10 +3,10 @@
 </p>
 
 <h1 align="center">Livestock Manager Premium</h1>
-<h3 align="center">Sistema Integral de Gestión Ganadera · v4.10.9 (candidato)</h3>
+<h3 align="center">Sistema Integral de Gestión Ganadera · v4.10.10 (candidato)</h3>
 
 <p align="center">
-  <em>4.10.9 (531) es el candidato Android / Google Play; producción continúa en 4.10.8 (530) hasta publicar. La versión nativa de Windows (Tauri) usa su propio esquema de versión 4.11.x.</em>
+  <em>4.10.10 (532) es el candidato Android / Google Play; producción continúa en 4.10.8 (530) hasta publicar. La versión nativa de Windows (Tauri) usa su propio esquema de versión 4.11.x.</em>
 </p>
 
 <p align="center">
@@ -72,7 +72,7 @@ Esta referencia documenta el modelo de separación de identidades Owner (FIDO) �
 |---|---|---|---|
 | Windows (Microsoft Store) | 4.10.526 | Publicada | Gratuita, sin límites de fincas ni animales |
 | Windows nativa (Tauri) | 4.11.24.0 | Distribuida con el paquete «Activación Licencia de Soporte» de Partner Center (canal de vuelo, subido y publicado el 26 oct 2026; trae los fixes de exportaciones del maestro PR #188); incluye el soporte con IA | Gratuita, sin límites; el soporte es opcional |
-| Android (Google Play) | Producción: 4.10.8 (530); candidato: 4.10.9 (531) | Prueba cerrada con testers; el candidato aún no está publicado | Versión Free gratuita, con límites (1 finca, 15 animales); Premium por compra única dentro de la app |
+| Android (Google Play) | Producción: 4.10.8 (530); candidato: 4.10.10 (532) | Prueba cerrada con testers; el candidato aún no está publicado | Versión Free gratuita, con límites (1 finca, 15 animales); Premium por compra única dentro de la app |
 | Soporte técnico con IA | — | Integrado en la app ([`livestock-manager-support-api`](https://github.com/SADOCKDOG/livestock-manager-support-api)) | Complemento opcional con suscripción mensual renovable; límites diarios de incidencias y mensajes por usuario |
 
 > El nombre «Premium» de la ficha de Microsoft Store designa la edición completa, sin límites; no implica coste. Los límites de la sección [Free / Premium](#free--premium) corresponden a la versión de Android.
