@@ -168,6 +168,20 @@ test('bovino valida que la porción regional e individual del chip corresponda a
   );
 });
 
+test('validador ISO bovino admite el código electrónico estructurado', () => {
+  const handler = createErrorHandler(1, 16, 'bovino_fisico');
+  assert.equal(handler.validateBovinoRfid('10020000724220112345678'), '10020000724220112345678');
+});
+
+test('validador ISO bovino rechaza 23 cifras que no respetan los campos del estándar', () => {
+  const handler = createErrorHandler(1, 16, 'bovino_fisico');
+  assert.throws(() => handler.validateBovinoRfid('12345678912345678912345'), (error) => {
+    assert.equal(error.details.field, 'rfid_codigo');
+    assert.match(error.details.format, /ISO 11784/);
+    return true;
+  });
+});
+
 test('ovino/caprino usa el código vigente ES + especie 24 + región + 8 cifras individuales', async () => {
   const handler = createErrorHandler(3, 4, 'ovino_caprino_eid');
   assert.equal(await handler.validateCrotal('ES240112345678', 3, 4), 'ES240112345678');
